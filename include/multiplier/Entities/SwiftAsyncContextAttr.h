@@ -46,6 +46,7 @@ class SwiftAsyncContextAttr : public ParameterABIAttr {
     return AttrKind::SWIFT_ASYNC_CONTEXT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SwiftAsyncContextAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

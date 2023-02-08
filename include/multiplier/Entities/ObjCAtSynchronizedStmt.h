@@ -42,6 +42,7 @@ class ObjCAtSynchronizedStmt : public Stmt {
     return StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCAtSynchronizedStmt> containing(const Decl &decl);
   static gap::generator<ObjCAtSynchronizedStmt> containing(const Stmt &stmt);
 

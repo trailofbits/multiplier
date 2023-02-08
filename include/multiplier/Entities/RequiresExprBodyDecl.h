@@ -40,6 +40,7 @@ class RequiresExprBodyDecl : public Decl {
     return DeclKind::REQUIRES_EXPR_BODY;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<RequiresExprBodyDecl> containing(const Decl &decl);
   static gap::generator<RequiresExprBodyDecl> containing(const Stmt &stmt);
 

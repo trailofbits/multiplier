@@ -43,6 +43,7 @@ class WhileStmt : public Stmt {
     return StmtKind::WHILE_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<WhileStmt> containing(const Decl &decl);
   static gap::generator<WhileStmt> containing(const Stmt &stmt);
 

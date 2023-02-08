@@ -47,6 +47,7 @@ class MaterializeTemporaryExpr : public Expr {
     return StmtKind::MATERIALIZE_TEMPORARY_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<MaterializeTemporaryExpr> containing(const Decl &decl);
   static gap::generator<MaterializeTemporaryExpr> containing(const Stmt &stmt);
 

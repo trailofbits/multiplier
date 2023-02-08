@@ -45,6 +45,7 @@ class ObjCStringLiteral : public Expr {
     return StmtKind::OBJ_C_STRING_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCStringLiteral> containing(const Decl &decl);
   static gap::generator<ObjCStringLiteral> containing(const Stmt &stmt);
 

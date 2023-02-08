@@ -40,6 +40,7 @@ class TypeOfType : public Type {
     return TypeKind::TYPE_OF;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<TypeOfType> from(const Reference &r) {
     return from(r.as_type());
   }

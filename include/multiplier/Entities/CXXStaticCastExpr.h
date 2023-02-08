@@ -50,6 +50,7 @@ class CXXStaticCastExpr : public CXXNamedCastExpr {
     return StmtKind::CXX_STATIC_CAST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXStaticCastExpr> containing(const Decl &decl);
   static gap::generator<CXXStaticCastExpr> containing(const Stmt &stmt);
 

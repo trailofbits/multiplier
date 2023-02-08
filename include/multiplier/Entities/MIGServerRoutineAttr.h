@@ -42,6 +42,7 @@ class MIGServerRoutineAttr : public InheritableAttr {
     return AttrKind::MIG_SERVER_ROUTINE_;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MIGServerRoutineAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

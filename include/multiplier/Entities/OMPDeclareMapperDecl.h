@@ -47,6 +47,7 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
     return DeclKind::OMP_DECLARE_MAPPER;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPDeclareMapperDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclareMapperDecl> containing(const Stmt &stmt);
 

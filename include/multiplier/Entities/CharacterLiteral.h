@@ -45,6 +45,7 @@ class CharacterLiteral : public Expr {
     return StmtKind::CHARACTER_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CharacterLiteral> containing(const Decl &decl);
   static gap::generator<CharacterLiteral> containing(const Stmt &stmt);
 

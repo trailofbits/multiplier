@@ -42,6 +42,7 @@ class OverrideAttr : public InheritableAttr {
     return AttrKind::OVERRIDE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OverrideAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -46,6 +46,7 @@ class AtomicExpr : public Expr {
     return StmtKind::ATOMIC_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<AtomicExpr> containing(const Decl &decl);
   static gap::generator<AtomicExpr> containing(const Stmt &stmt);
 

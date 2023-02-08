@@ -41,6 +41,7 @@ class BuiltinAliasAttr : public Attr {
     return AttrKind::BUILTIN_ALIAS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<BuiltinAliasAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

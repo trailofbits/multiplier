@@ -42,6 +42,7 @@ class AArch64SVEPcsAttr : public InheritableAttr {
     return AttrKind::A_ARCH64_SVE_PCS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AArch64SVEPcsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

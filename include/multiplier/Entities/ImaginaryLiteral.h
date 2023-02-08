@@ -44,6 +44,7 @@ class ImaginaryLiteral : public Expr {
     return StmtKind::IMAGINARY_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ImaginaryLiteral> containing(const Decl &decl);
   static gap::generator<ImaginaryLiteral> containing(const Stmt &stmt);
 

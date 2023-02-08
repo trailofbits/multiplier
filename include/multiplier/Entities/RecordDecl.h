@@ -48,6 +48,7 @@ class RecordDecl : public TagDecl {
     return DeclKind::RECORD;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<RecordDecl> containing(const Decl &decl);
   static gap::generator<RecordDecl> containing(const Stmt &stmt);
 

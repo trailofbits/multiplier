@@ -41,6 +41,7 @@ class SubstTemplateTypeParmPackType : public Type {
     return TypeKind::SUBST_TEMPLATE_TYPE_PARM_PACK;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<SubstTemplateTypeParmPackType> from(const Reference &r) {
     return from(r.as_type());
   }

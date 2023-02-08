@@ -42,6 +42,7 @@ class ArmBuiltinAliasAttr : public InheritableAttr {
     return AttrKind::ARM_BUILTIN_ALIAS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ArmBuiltinAliasAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class PureAttr : public InheritableAttr {
     return AttrKind::PURE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PureAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -44,6 +44,7 @@ class OMPArraySectionExpr : public Expr {
     return StmtKind::OMP_ARRAY_SECTION_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPArraySectionExpr> containing(const Decl &decl);
   static gap::generator<OMPArraySectionExpr> containing(const Stmt &stmt);
 

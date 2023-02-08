@@ -42,6 +42,7 @@ class NoSpeculativeLoadHardeningAttr : public InheritableAttr {
     return AttrKind::NO_SPECULATIVE_LOAD_HARDENING;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoSpeculativeLoadHardeningAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

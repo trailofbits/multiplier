@@ -42,6 +42,7 @@ class AMDGPUNumSGPRAttr : public InheritableAttr {
     return AttrKind::AMDGPU_NUM_SGPR;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AMDGPUNumSGPRAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

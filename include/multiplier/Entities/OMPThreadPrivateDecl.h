@@ -43,6 +43,7 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
     return DeclKind::OMP_THREAD_PRIVATE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPThreadPrivateDecl> containing(const Decl &decl);
   static gap::generator<OMPThreadPrivateDecl> containing(const Stmt &stmt);
 

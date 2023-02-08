@@ -42,6 +42,7 @@ class ConsumableAutoCastAttr : public InheritableAttr {
     return AttrKind::CONSUMABLE_AUTO_CAST;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ConsumableAutoCastAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

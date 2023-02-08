@@ -42,6 +42,7 @@ class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
     return AttrKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -43,6 +43,7 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
     return TypeKind::DEPENDENT_TEMPLATE_SPECIALIZATION;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentTemplateSpecializationType> from(const Reference &r) {
     return from(r.as_type());
   }

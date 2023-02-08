@@ -42,6 +42,7 @@ class WorkGroupSizeHintAttr : public InheritableAttr {
     return AttrKind::WORK_GROUP_SIZE_HINT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<WorkGroupSizeHintAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

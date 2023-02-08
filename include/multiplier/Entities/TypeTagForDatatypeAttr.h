@@ -43,6 +43,7 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
     return AttrKind::TYPE_TAG_FOR_DATATYPE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<TypeTagForDatatypeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

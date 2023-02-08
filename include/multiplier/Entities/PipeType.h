@@ -40,6 +40,7 @@ class PipeType : public Type {
     return TypeKind::PIPE;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<PipeType> from(const Reference &r) {
     return from(r.as_type());
   }

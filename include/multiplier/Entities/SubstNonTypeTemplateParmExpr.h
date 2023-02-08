@@ -46,6 +46,7 @@ class SubstNonTypeTemplateParmExpr : public Expr {
     return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SubstNonTypeTemplateParmExpr> containing(const Decl &decl);
   static gap::generator<SubstNonTypeTemplateParmExpr> containing(const Stmt &stmt);
 

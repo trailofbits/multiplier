@@ -42,6 +42,7 @@ class ArtificialAttr : public InheritableAttr {
     return AttrKind::ARTIFICIAL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ArtificialAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

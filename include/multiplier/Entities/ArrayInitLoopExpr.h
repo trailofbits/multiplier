@@ -45,6 +45,7 @@ class ArrayInitLoopExpr : public Expr {
     return StmtKind::ARRAY_INIT_LOOP_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ArrayInitLoopExpr> containing(const Decl &decl);
   static gap::generator<ArrayInitLoopExpr> containing(const Stmt &stmt);
 

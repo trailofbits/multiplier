@@ -43,6 +43,7 @@ class MSVtorDispAttr : public InheritableAttr {
     return AttrKind::MS_VTOR_DISP;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MSVtorDispAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

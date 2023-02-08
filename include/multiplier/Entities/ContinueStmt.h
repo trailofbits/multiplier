@@ -40,6 +40,7 @@ class ContinueStmt : public Stmt {
     return StmtKind::CONTINUE_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ContinueStmt> containing(const Decl &decl);
   static gap::generator<ContinueStmt> containing(const Stmt &stmt);
 

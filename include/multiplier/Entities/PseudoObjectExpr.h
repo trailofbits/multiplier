@@ -44,6 +44,7 @@ class PseudoObjectExpr : public Expr {
     return StmtKind::PSEUDO_OBJECT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<PseudoObjectExpr> containing(const Decl &decl);
   static gap::generator<PseudoObjectExpr> containing(const Stmt &stmt);
 

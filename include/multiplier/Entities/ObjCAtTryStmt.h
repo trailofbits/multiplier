@@ -42,6 +42,7 @@ class ObjCAtTryStmt : public Stmt {
     return StmtKind::OBJ_C_AT_TRY_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCAtTryStmt> containing(const Decl &decl);
   static gap::generator<ObjCAtTryStmt> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class NoProfileFunctionAttr : public InheritableAttr {
     return AttrKind::NO_PROFILE_FUNCTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoProfileFunctionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

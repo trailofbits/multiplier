@@ -43,6 +43,7 @@ class ArgumentWithTypeTagAttr : public InheritableAttr {
     return AttrKind::ARGUMENT_WITH_TYPE_TAG;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ArgumentWithTypeTagAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

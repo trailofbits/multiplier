@@ -40,6 +40,7 @@ class NoBuiltinAttr : public Attr {
     return AttrKind::NO_BUILTIN;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoBuiltinAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

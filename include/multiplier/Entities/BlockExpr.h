@@ -46,6 +46,7 @@ class BlockExpr : public Expr {
     return StmtKind::BLOCK_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<BlockExpr> containing(const Decl &decl);
   static gap::generator<BlockExpr> containing(const Stmt &stmt);
 

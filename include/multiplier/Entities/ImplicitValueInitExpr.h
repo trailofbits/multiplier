@@ -44,6 +44,7 @@ class ImplicitValueInitExpr : public Expr {
     return StmtKind::IMPLICIT_VALUE_INIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ImplicitValueInitExpr> containing(const Decl &decl);
   static gap::generator<ImplicitValueInitExpr> containing(const Stmt &stmt);
 

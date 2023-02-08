@@ -46,6 +46,7 @@ class CoyieldExpr : public CoroutineSuspendExpr {
     return StmtKind::COYIELD_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CoyieldExpr> containing(const Decl &decl);
   static gap::generator<CoyieldExpr> containing(const Stmt &stmt);
 

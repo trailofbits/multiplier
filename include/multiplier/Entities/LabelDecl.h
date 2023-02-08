@@ -43,6 +43,7 @@ class LabelDecl : public NamedDecl {
     return DeclKind::LABEL;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<LabelDecl> containing(const Decl &decl);
   static gap::generator<LabelDecl> containing(const Stmt &stmt);
 

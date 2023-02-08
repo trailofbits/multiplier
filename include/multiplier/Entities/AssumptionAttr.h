@@ -42,6 +42,7 @@ class AssumptionAttr : public InheritableAttr {
     return AttrKind::ASSUMPTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AssumptionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

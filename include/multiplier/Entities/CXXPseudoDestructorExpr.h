@@ -45,6 +45,7 @@ class CXXPseudoDestructorExpr : public Expr {
     return StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXPseudoDestructorExpr> containing(const Decl &decl);
   static gap::generator<CXXPseudoDestructorExpr> containing(const Stmt &stmt);
 

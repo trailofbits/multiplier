@@ -42,6 +42,7 @@ class ConstructorAttr : public InheritableAttr {
     return AttrKind::CONSTRUCTOR;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ConstructorAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

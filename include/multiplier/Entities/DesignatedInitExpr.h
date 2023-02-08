@@ -45,6 +45,7 @@ class DesignatedInitExpr : public Expr {
     return StmtKind::DESIGNATED_INIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DesignatedInitExpr> containing(const Decl &decl);
   static gap::generator<DesignatedInitExpr> containing(const Stmt &stmt);
 

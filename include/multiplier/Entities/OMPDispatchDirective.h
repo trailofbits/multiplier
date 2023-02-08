@@ -42,6 +42,7 @@ class OMPDispatchDirective : public OMPExecutableDirective {
     return StmtKind::OMP_DISPATCH_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPDispatchDirective> containing(const Decl &decl);
   static gap::generator<OMPDispatchDirective> containing(const Stmt &stmt);
 

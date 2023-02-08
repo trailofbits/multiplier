@@ -43,6 +43,7 @@ class CleanupAttr : public InheritableAttr {
     return AttrKind::CLEANUP;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CleanupAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

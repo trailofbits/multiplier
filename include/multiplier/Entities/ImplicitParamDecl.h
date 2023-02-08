@@ -49,6 +49,7 @@ class ImplicitParamDecl : public VarDecl {
     return DeclKind::IMPLICIT_PARAM;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ImplicitParamDecl> containing(const Decl &decl);
   static gap::generator<ImplicitParamDecl> containing(const Stmt &stmt);
 

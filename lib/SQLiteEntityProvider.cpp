@@ -42,6 +42,7 @@ class SQLiteDecompressionDictionary {
   static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
 
   std::array<ZSTD_DDict *, kNumEntityCategories> dict;
+  std::array<bool, kNumEntityCategories> has_dict;
 
   explicit SQLiteDecompressionDictionary(
       std::filesystem::path path,
@@ -153,6 +154,7 @@ SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
   sqlite::Statement dictionaries = db.Prepare(
       "SELECT entity_category, data FROM entity_dictionary");
 
+  // Pull the dictionaries from the database.
   std::string data;
   while (dictionaries.ExecuteStep()) {
     unsigned category = 0u;
@@ -163,20 +165,24 @@ SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
       continue;
     }
 
-    // ZSTD dictionaries must be at least 8 bytes (for the header).
-    if (8u > data.size()) {
-      assert(false);
+    if (!prev || !prev->has_dict[category]) {
+      dict[category] = ZSTD_createDDict(data.data(), data.size());
+      has_dict[category] = true;
+    }
+  }
+
+  for (auto i = 0u; i < kNumEntityCategories; ++i) {
+    if (dict[i]) {
       continue;
     }
-
-    // Steal the old dictionary.
-    if (prev && prev->dict[category]) {
-      dict[category] = prev->dict[category];
-      prev->dict[category] = nullptr;
-      continue;
+    if (prev) {
+      dict[i] = prev->dict[i];
+      has_dict[i] = prev->has_dict[i];
+      prev->dict[i] = nullptr;
+    } else {
+      dict[i] = ZSTD_createDDict("", 0);
+      has_dict[i] = false;
     }
-
-    dict[category] = ZSTD_createDDict(data.data(), data.size());
   }
 
   dictionaries.Reset();

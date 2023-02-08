@@ -44,6 +44,7 @@ class FloatingLiteral : public Expr {
     return StmtKind::FLOATING_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<FloatingLiteral> containing(const Decl &decl);
   static gap::generator<FloatingLiteral> containing(const Stmt &stmt);
 

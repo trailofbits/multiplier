@@ -59,6 +59,10 @@ class Decl {
   /* implicit */ inline Decl(std::shared_ptr<const DeclImpl> impl_)
       : impl(std::move(impl_)) {}
 
+  constexpr inline static EntityCategory static_category(void) {
+    return EntityCategory::DECLARATION;
+  }
+
   PackedDeclId id(void) const;
   gap::generator<Reference> references(void) const;
 
@@ -76,6 +80,7 @@ class Decl {
   static gap::generator<Decl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<Decl> containing(const Decl &decl);
   static gap::generator<Decl> containing(const Stmt &stmt);
 

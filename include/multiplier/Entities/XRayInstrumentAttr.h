@@ -43,6 +43,7 @@ class XRayInstrumentAttr : public InheritableAttr {
     return AttrKind::X_RAY_INSTRUMENT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<XRayInstrumentAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

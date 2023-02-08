@@ -42,6 +42,7 @@ class LTOVisibilityPublicAttr : public InheritableAttr {
     return AttrKind::LTO_VISIBILITY_PUBLIC;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<LTOVisibilityPublicAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

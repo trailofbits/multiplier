@@ -44,6 +44,7 @@ class OpaqueValueExpr : public Expr {
     return StmtKind::OPAQUE_VALUE_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OpaqueValueExpr> containing(const Decl &decl);
   static gap::generator<OpaqueValueExpr> containing(const Stmt &stmt);
 

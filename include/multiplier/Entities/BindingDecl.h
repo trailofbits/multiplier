@@ -46,6 +46,7 @@ class BindingDecl : public ValueDecl {
     return DeclKind::BINDING;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<BindingDecl> containing(const Decl &decl);
   static gap::generator<BindingDecl> containing(const Stmt &stmt);
 

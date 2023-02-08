@@ -43,6 +43,7 @@ class ReturnTypestateAttr : public InheritableAttr {
     return AttrKind::RETURN_TYPESTATE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ReturnTypestateAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

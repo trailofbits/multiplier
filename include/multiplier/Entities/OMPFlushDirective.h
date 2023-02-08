@@ -42,6 +42,7 @@ class OMPFlushDirective : public OMPExecutableDirective {
     return StmtKind::OMP_FLUSH_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPFlushDirective> containing(const Decl &decl);
   static gap::generator<OMPFlushDirective> containing(const Stmt &stmt);
 

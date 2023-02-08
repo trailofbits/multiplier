@@ -42,6 +42,7 @@ class ImportMacroDirective : public IncludeLikeMacroDirective {
     return MacroKind::IMPORT_DIRECTIVE;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<ImportMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

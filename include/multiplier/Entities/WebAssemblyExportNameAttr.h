@@ -42,6 +42,7 @@ class WebAssemblyExportNameAttr : public InheritableAttr {
     return AttrKind::WEB_ASSEMBLY_EXPORT_NAME;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<WebAssemblyExportNameAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

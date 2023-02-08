@@ -44,6 +44,7 @@ class LifetimeExtendedTemporaryDecl : public Decl {
     return DeclKind::LIFETIME_EXTENDED_TEMPORARY;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Decl &decl);
   static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Stmt &stmt);
 

@@ -41,6 +41,7 @@ class MSDependentExistsStmt : public Stmt {
     return StmtKind::MS_DEPENDENT_EXISTS_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<MSDependentExistsStmt> containing(const Decl &decl);
   static gap::generator<MSDependentExistsStmt> containing(const Stmt &stmt);
 

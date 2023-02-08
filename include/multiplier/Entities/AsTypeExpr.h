@@ -44,6 +44,7 @@ class AsTypeExpr : public Expr {
     return StmtKind::AS_TYPE_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<AsTypeExpr> containing(const Decl &decl);
   static gap::generator<AsTypeExpr> containing(const Stmt &stmt);
 

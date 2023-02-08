@@ -47,6 +47,7 @@ class FunctionProtoType : public FunctionType {
     return TypeKind::FUNCTION_PROTO;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<FunctionProtoType> from(const Reference &r) {
     return from(r.as_type());
   }

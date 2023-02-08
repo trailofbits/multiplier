@@ -45,6 +45,7 @@ class UnaryOperator : public Expr {
     return StmtKind::UNARY_OPERATOR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<UnaryOperator> containing(const Decl &decl);
   static gap::generator<UnaryOperator> containing(const Stmt &stmt);
 

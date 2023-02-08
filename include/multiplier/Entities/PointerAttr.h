@@ -43,6 +43,7 @@ class PointerAttr : public InheritableAttr {
     return AttrKind::POINTER;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PointerAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

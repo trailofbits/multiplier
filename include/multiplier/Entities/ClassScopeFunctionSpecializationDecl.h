@@ -41,6 +41,7 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Decl &decl);
   static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Stmt &stmt);
 

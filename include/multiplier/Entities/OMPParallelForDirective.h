@@ -47,6 +47,7 @@ class OMPParallelForDirective : public OMPLoopDirective {
     return StmtKind::OMP_PARALLEL_FOR_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPParallelForDirective> containing(const Decl &decl);
   static gap::generator<OMPParallelForDirective> containing(const Stmt &stmt);
 

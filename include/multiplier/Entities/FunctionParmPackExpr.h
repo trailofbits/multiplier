@@ -45,6 +45,7 @@ class FunctionParmPackExpr : public Expr {
     return StmtKind::FUNCTION_PARM_PACK_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<FunctionParmPackExpr> containing(const Decl &decl);
   static gap::generator<FunctionParmPackExpr> containing(const Stmt &stmt);
 

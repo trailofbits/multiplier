@@ -40,6 +40,7 @@ class NullStmt : public Stmt {
     return StmtKind::NULL_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<NullStmt> containing(const Decl &decl);
   static gap::generator<NullStmt> containing(const Stmt &stmt);
 

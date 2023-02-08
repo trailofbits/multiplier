@@ -42,6 +42,7 @@ class IndirectGotoStmt : public Stmt {
     return StmtKind::INDIRECT_GOTO_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<IndirectGotoStmt> containing(const Decl &decl);
   static gap::generator<IndirectGotoStmt> containing(const Stmt &stmt);
 

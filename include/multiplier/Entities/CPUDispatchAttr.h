@@ -42,6 +42,7 @@ class CPUDispatchAttr : public InheritableAttr {
     return AttrKind::CPU_DISPATCH;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CPUDispatchAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

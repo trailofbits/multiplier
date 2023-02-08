@@ -42,6 +42,7 @@ class OMPCanonicalLoop : public Stmt {
     return StmtKind::OMP_CANONICAL_LOOP;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPCanonicalLoop> containing(const Decl &decl);
   static gap::generator<OMPCanonicalLoop> containing(const Stmt &stmt);
 

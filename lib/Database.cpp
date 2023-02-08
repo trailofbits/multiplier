@@ -407,7 +407,7 @@ void DictionaryCompressor::Add(Queue &queue, DictionaryContext &context,
 
   // We don't yet have a dictionary. In this case, we collect the data into
   // a format that allows us to reconstruct the (compressed) records later,
-  // while also being able to traint a ZSTD dictionary.
+  // while also being able to train a ZSTD dictionary.
   training_data.append(record.data);
   data_sizes.push_back(record.data.size());
   entity_ids.push_back(record.id);
@@ -441,24 +441,53 @@ void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context,
 
   // Train a ZSTD dictionary on our training set of entity records.
   dictionary.data.resize(kMaxDictionarySize);
-  size_t dictionary_size = ZDICT_trainFromBuffer(
-      dictionary.data.data(), kMaxDictionarySize,
-      record_data, data_sizes.data(), num_records);
 
-  assert(!ZSTD_isError(dictionary_size));
-  dictionary.data.resize(dictionary_size);
+  size_t dictionary_size = 0;
 
-  // Publish the newly trained dictionary so that other threads can immediately
-  // benefit from it. This will unlock the mutex and let any blocked threads
-  // proceed with the new dictionary. Their racy check will pick up the now-
-  // published dictionary.
-  auto d = ZSTD_createCDict(dictionary.data.data(), dictionary_size,
-                            ZSTD_maxCLevel());
-  dict.store(d, std::memory_order_release);
-  locker.unlock();
+  if (training_data.size() <= kMaxDictionarySize) {
+    dictionary_size = ZDICT_trainFromBuffer(
+        dictionary.data.data(), training_data.size(),
+        record_data, data_sizes.data(), num_records);
+
+  } else {
+    dictionary_size = ZDICT_trainFromBuffer(
+        dictionary.data.data(), kMaxDictionarySize,
+        record_data, data_sizes.data(), num_records);
+  }
+
+  ZSTD_CDict *compression_dict = nullptr;
+
+  // Likely the training set is too small; this is unfortunate because it means
+  // we commit to an empty dictionary forevermore.
+  if (ZSTD_isError(dictionary_size)) {
+    compression_dict = ZSTD_createCDict("", 0, ZSTD_maxCLevel());
+    dictionary.data.clear();
+
+  } else {
+    assert(dictionary_size <= dictionary.data.size());
+
+    // TODO(pag): Try `ZDICT_finalizeDictionary`?
+    // ZDICT_params_t params;
+    // params.compressionLevel = ZSTD_maxCLevel();
+    // params.notificationLevel = 0;
+    // params.dictID = static_cast<unsigned>(dictionary.category);
+
+    dictionary.data.resize(dictionary_size);
+
+    // Publish the newly trained dictionary so that other threads can immediately
+    // benefit from it. This will unlock the mutex and let any blocked threads
+    // proceed with the new dictionary. Their racy check will pick up the now-
+    // published dictionary.
+    compression_dict = ZSTD_createCDict(
+        dictionary.data.data(), dictionary_size,
+        ZSTD_maxCLevel());
+  }
 
   // Persist the dictionary.
   queue.enqueue(std::move(dictionary));
+
+  dict.store(compression_dict, std::memory_order_release);
+  locker.unlock();
 
   // Now use it locally.
   auto context_and_index = context.AcquireContext();
@@ -467,8 +496,8 @@ void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context,
   for (auto i = 0u; i < num_records; ++i) {
     auto record_id = entity_ids[i];
     auto record_data_size = data_sizes[i];
-    CompressAndAdd(queue, record_id, record_data, record_data_size, d,
-                   context_and_index.first);
+    CompressAndAdd(queue, record_id, record_data, record_data_size,
+                   compression_dict, context_and_index.first);
     record_data = &(record_data[record_data_size]);
   }
 
@@ -570,12 +599,6 @@ void DatabaseWriterImpl::InitDictionaries(void) {
     std::string data;
     dictionaries.Row().Columns(category, data);
     if (!category || category >= kNumEntityCategories) {
-      assert(false);
-      continue;
-    }
-
-    // ZSTD dictionaries must be at least 8 bytes (for the header).
-    if (8u > data.size()) {
       assert(false);
       continue;
     }

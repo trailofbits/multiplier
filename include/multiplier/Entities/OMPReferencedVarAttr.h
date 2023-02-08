@@ -41,6 +41,7 @@ class OMPReferencedVarAttr : public Attr {
     return AttrKind::OMP_REFERENCED_VAR;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OMPReferencedVarAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -44,6 +44,7 @@ class IntegerLiteral : public Expr {
     return StmtKind::INTEGER_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<IntegerLiteral> containing(const Decl &decl);
   static gap::generator<IntegerLiteral> containing(const Stmt &stmt);
 

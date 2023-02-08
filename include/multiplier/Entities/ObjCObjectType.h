@@ -41,6 +41,7 @@ class ObjCObjectType : public Type {
     return TypeKind::OBJ_C_OBJECT;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ObjCObjectType> from(const Reference &r) {
     return from(r.as_type());
   }

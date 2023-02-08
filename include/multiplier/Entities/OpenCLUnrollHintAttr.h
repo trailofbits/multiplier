@@ -42,6 +42,7 @@ class OpenCLUnrollHintAttr : public StmtAttr {
     return AttrKind::OPEN_CL_UNROLL_HINT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLUnrollHintAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class FlagEnumAttr : public InheritableAttr {
     return AttrKind::FLAG_ENUM;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<FlagEnumAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

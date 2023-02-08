@@ -42,6 +42,7 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
     return StmtKind::OMP_TARGET_UPDATE_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPTargetUpdateDirective> containing(const Decl &decl);
   static gap::generator<OMPTargetUpdateDirective> containing(const Stmt &stmt);
 

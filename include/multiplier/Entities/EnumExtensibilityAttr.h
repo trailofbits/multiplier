@@ -43,6 +43,7 @@ class EnumExtensibilityAttr : public InheritableAttr {
     return AttrKind::ENUM_EXTENSIBILITY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<EnumExtensibilityAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

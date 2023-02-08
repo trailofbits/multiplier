@@ -40,6 +40,7 @@ class BlockPointerType : public Type {
     return TypeKind::BLOCK_POINTER;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<BlockPointerType> from(const Reference &r) {
     return from(r.as_type());
   }

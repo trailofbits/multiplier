@@ -49,6 +49,7 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
     return DeclKind::OBJ_C_CATEGORY;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCCategoryDecl> containing(const Decl &decl);
   static gap::generator<ObjCCategoryDecl> containing(const Stmt &stmt);
 

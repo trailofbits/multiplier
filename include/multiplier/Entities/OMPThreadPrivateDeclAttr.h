@@ -42,6 +42,7 @@ class OMPThreadPrivateDeclAttr : public InheritableAttr {
     return AttrKind::OMP_THREAD_PRIVATE_DECL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OMPThreadPrivateDeclAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

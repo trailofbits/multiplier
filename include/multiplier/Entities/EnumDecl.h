@@ -49,6 +49,7 @@ class EnumDecl : public TagDecl {
     return DeclKind::ENUM;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<EnumDecl> containing(const Decl &decl);
   static gap::generator<EnumDecl> containing(const Stmt &stmt);
 

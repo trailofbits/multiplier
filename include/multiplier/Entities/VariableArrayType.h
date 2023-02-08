@@ -43,6 +43,7 @@ class VariableArrayType : public ArrayType {
     return TypeKind::VARIABLE_ARRAY;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<VariableArrayType> from(const Reference &r) {
     return from(r.as_type());
   }

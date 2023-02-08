@@ -42,6 +42,7 @@ class ObjCImplDecl : public ObjCContainerDecl {
   static gap::generator<ObjCImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCImplDecl> containing(const Decl &decl);
   static gap::generator<ObjCImplDecl> containing(const Stmt &stmt);
 

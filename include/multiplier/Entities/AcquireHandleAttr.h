@@ -42,6 +42,7 @@ class AcquireHandleAttr : public InheritableAttr {
     return AttrKind::ACQUIRE_HANDLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AcquireHandleAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

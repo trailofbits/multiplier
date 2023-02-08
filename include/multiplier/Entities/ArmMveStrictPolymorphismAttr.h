@@ -42,6 +42,7 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
     return AttrKind::ARM_MVE_STRICT_POLYMORPHISM;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ArmMveStrictPolymorphismAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

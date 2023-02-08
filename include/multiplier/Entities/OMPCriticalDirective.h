@@ -42,6 +42,7 @@ class OMPCriticalDirective : public OMPExecutableDirective {
     return StmtKind::OMP_CRITICAL_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPCriticalDirective> containing(const Decl &decl);
   static gap::generator<OMPCriticalDirective> containing(const Stmt &stmt);
 

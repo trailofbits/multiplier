@@ -42,6 +42,7 @@ class NSReturnsAutoreleasedAttr : public InheritableAttr {
     return AttrKind::NS_RETURNS_AUTORELEASED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NSReturnsAutoreleasedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

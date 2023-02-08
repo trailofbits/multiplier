@@ -48,6 +48,7 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
     return DeclKind::NON_TYPE_TEMPLATE_PARM;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<NonTypeTemplateParmDecl> containing(const Decl &decl);
   static gap::generator<NonTypeTemplateParmDecl> containing(const Stmt &stmt);
 

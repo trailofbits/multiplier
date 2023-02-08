@@ -42,6 +42,7 @@ class MayAliasAttr : public InheritableAttr {
     return AttrKind::MAY_ALIAS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MayAliasAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

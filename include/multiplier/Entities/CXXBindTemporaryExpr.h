@@ -44,6 +44,7 @@ class CXXBindTemporaryExpr : public Expr {
     return StmtKind::CXX_BIND_TEMPORARY_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXBindTemporaryExpr> containing(const Decl &decl);
   static gap::generator<CXXBindTemporaryExpr> containing(const Stmt &stmt);
 

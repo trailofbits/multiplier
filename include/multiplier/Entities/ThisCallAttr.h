@@ -42,6 +42,7 @@ class ThisCallAttr : public InheritableAttr {
     return AttrKind::THIS_CALL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ThisCallAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -40,6 +40,7 @@ class BitIntType : public Type {
     return TypeKind::BIT_INT;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<BitIntType> from(const Reference &r) {
     return from(r.as_type());
   }

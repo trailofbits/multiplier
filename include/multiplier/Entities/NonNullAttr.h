@@ -44,6 +44,7 @@ class NonNullAttr : public InheritableParamAttr {
     return AttrKind::NON_NULL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NonNullAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

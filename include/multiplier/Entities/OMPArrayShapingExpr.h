@@ -44,6 +44,7 @@ class OMPArrayShapingExpr : public Expr {
     return StmtKind::OMP_ARRAY_SHAPING_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPArrayShapingExpr> containing(const Decl &decl);
   static gap::generator<OMPArrayShapingExpr> containing(const Stmt &stmt);
 

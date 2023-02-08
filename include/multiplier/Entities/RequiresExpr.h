@@ -46,6 +46,7 @@ class RequiresExpr : public Expr {
     return StmtKind::REQUIRES_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<RequiresExpr> containing(const Decl &decl);
   static gap::generator<RequiresExpr> containing(const Stmt &stmt);
 

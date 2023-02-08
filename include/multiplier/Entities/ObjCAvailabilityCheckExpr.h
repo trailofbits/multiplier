@@ -44,6 +44,7 @@ class ObjCAvailabilityCheckExpr : public Expr {
     return StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCAvailabilityCheckExpr> containing(const Decl &decl);
   static gap::generator<ObjCAvailabilityCheckExpr> containing(const Stmt &stmt);
 

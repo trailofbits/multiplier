@@ -46,6 +46,7 @@ class OMPDeclareReductionDecl : public ValueDecl {
     return DeclKind::OMP_DECLARE_REDUCTION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPDeclareReductionDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclareReductionDecl> containing(const Stmt &stmt);
 

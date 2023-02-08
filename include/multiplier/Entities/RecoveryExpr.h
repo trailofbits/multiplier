@@ -44,6 +44,7 @@ class RecoveryExpr : public Expr {
     return StmtKind::RECOVERY_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<RecoveryExpr> containing(const Decl &decl);
   static gap::generator<RecoveryExpr> containing(const Stmt &stmt);
 

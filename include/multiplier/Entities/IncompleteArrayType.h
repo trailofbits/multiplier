@@ -42,6 +42,7 @@ class IncompleteArrayType : public ArrayType {
     return TypeKind::INCOMPLETE_ARRAY;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<IncompleteArrayType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -41,6 +41,7 @@ class TypedefType : public Type {
     return TypeKind::TYPEDEF;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<TypedefType> from(const Reference &r) {
     return from(r.as_type());
   }

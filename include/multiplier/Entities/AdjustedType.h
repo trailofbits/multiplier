@@ -40,6 +40,7 @@ class AdjustedType : public Type {
     return TypeKind::ADJUSTED;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<AdjustedType> from(const Reference &r) {
     return from(r.as_type());
   }

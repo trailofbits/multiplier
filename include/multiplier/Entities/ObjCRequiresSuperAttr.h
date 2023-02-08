@@ -42,6 +42,7 @@ class ObjCRequiresSuperAttr : public InheritableAttr {
     return AttrKind::OBJ_C_REQUIRES_SUPER;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCRequiresSuperAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

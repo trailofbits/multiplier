@@ -44,6 +44,7 @@ class SwitchStmt : public Stmt {
     return StmtKind::SWITCH_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SwitchStmt> containing(const Decl &decl);
   static gap::generator<SwitchStmt> containing(const Stmt &stmt);
 

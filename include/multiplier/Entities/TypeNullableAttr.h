@@ -42,6 +42,7 @@ class TypeNullableAttr : public TypeAttr {
     return AttrKind::TYPE_NULLABLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<TypeNullableAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

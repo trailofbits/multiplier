@@ -42,6 +42,7 @@ class ElseIfMacroDirective : public ConditionalMacroDirective {
     return MacroKind::ELSE_IF_DIRECTIVE;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<ElseIfMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

@@ -42,6 +42,7 @@ class BTFDeclTagAttr : public InheritableAttr {
     return AttrKind::BTF_DECL_TAG;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<BTFDeclTagAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

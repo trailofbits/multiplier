@@ -42,6 +42,7 @@ class LocksExcludedAttr : public InheritableAttr {
     return AttrKind::LOCKS_EXCLUDED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<LocksExcludedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

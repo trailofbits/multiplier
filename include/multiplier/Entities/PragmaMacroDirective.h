@@ -40,6 +40,7 @@ class PragmaMacroDirective : public MacroDirective {
     return MacroKind::PRAGMA_DIRECTIVE;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<PragmaMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

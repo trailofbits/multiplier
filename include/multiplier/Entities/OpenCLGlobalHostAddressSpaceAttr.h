@@ -42,6 +42,7 @@ class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
     return AttrKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

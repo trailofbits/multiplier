@@ -46,6 +46,7 @@ class UnresolvedLookupExpr : public OverloadExpr {
     return StmtKind::UNRESOLVED_LOOKUP_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<UnresolvedLookupExpr> containing(const Decl &decl);
   static gap::generator<UnresolvedLookupExpr> containing(const Stmt &stmt);
 

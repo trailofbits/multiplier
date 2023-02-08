@@ -110,7 +110,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   pasta::InitPasta init_pasta;
 
   std::stringstream ss;
-  ss << "Usage: " << argv[0]
+  ss << "Usage: " << argv[0] << '\n'
      << " [--num_indexer_workers N]\n"
      << " [--num_command_workers N]\n"
      << " [--env PATH_TO_COPIED_ENV_VARS]\n"

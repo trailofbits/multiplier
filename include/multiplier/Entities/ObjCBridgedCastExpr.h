@@ -49,6 +49,7 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
     return StmtKind::OBJ_C_BRIDGED_CAST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCBridgedCastExpr> containing(const Decl &decl);
   static gap::generator<ObjCBridgedCastExpr> containing(const Stmt &stmt);
 

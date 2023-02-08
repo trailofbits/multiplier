@@ -507,20 +507,18 @@ using PackedFileTokenId = SpecificEntityId<FileTokenId>;
 template <typename T>
 struct EntityTypeImpl;
 
-#define MX_MAP_ENTITY_TYPE(type, lower, enum_, val) \
-    using Packed ## type ## Id = SpecificEntityId<type ## Id>; \
+#define MX_MAP_ENTITY_TYPE(type_name, lower_name, enum_name, val) \
+    using Packed ## type_name ## Id = SpecificEntityId<type_name ## Id>; \
     \
     template <> \
-    struct EntityTypeImpl<type ## Id> { \
-      using Entity = type; \
+    struct EntityTypeImpl<type_name ## Id> { \
+      using Entity = type_name; \
     };
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_MAP_ENTITY_TYPE,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE)
-#undef MX_MAP_ENTITY_TYPE
-
 #undef MX_MAP_ENTITY_TYPE
 
 // Given an entity ID type, get us the entity type.

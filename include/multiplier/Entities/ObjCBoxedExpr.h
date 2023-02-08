@@ -45,6 +45,7 @@ class ObjCBoxedExpr : public Expr {
     return StmtKind::OBJ_C_BOXED_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCBoxedExpr> containing(const Decl &decl);
   static gap::generator<ObjCBoxedExpr> containing(const Stmt &stmt);
 

@@ -37,6 +37,7 @@ class AsmStmt : public Stmt {
   static gap::generator<AsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<AsmStmt> containing(const Decl &decl);
   static gap::generator<AsmStmt> containing(const Stmt &stmt);
 

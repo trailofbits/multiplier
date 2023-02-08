@@ -44,6 +44,7 @@ class MSInheritanceAttr : public InheritableAttr {
     return AttrKind::MS_INHERITANCE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MSInheritanceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

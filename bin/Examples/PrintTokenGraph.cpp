@@ -115,7 +115,7 @@ static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>";
 
   auto empty = true;
-  for (mx::MacroOrToken node : macro.replacement_children()) {
+  for (mx::MacroOrToken node : macro.children()) {
     if (std::holds_alternative<mx::Token>(node)) {
       empty = false;
       const mx::Token &mt = std::get<mx::Token>(node);

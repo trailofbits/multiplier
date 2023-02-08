@@ -44,6 +44,7 @@ class ParenExpr : public Expr {
     return StmtKind::PAREN_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ParenExpr> containing(const Decl &decl);
   static gap::generator<ParenExpr> containing(const Stmt &stmt);
 

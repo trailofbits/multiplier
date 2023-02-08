@@ -44,6 +44,7 @@ class CXXNoexceptExpr : public Expr {
     return StmtKind::CXX_NOEXCEPT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXNoexceptExpr> containing(const Decl &decl);
   static gap::generator<CXXNoexceptExpr> containing(const Stmt &stmt);
 

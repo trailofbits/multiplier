@@ -42,6 +42,7 @@ class RValueReferenceType : public ReferenceType {
     return TypeKind::R_VALUE_REFERENCE;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<RValueReferenceType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -43,6 +43,7 @@ class ConstantArrayType : public ArrayType {
     return TypeKind::CONSTANT_ARRAY;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ConstantArrayType> from(const Reference &r) {
     return from(r.as_type());
   }

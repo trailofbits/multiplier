@@ -53,6 +53,10 @@ class TemplateParameterList {
   /* implicit */ inline TemplateParameterList(std::shared_ptr<const TemplateParameterListImpl> impl_)
       : impl(std::move(impl_)) {}
 
+  constexpr inline static EntityCategory static_category(void) {
+    return EntityCategory::TEMPLATE_PARAMETER_LIST;
+  }
+
   PackedTemplateParameterListId id(void) const;
   gap::generator<Reference> references(void) const;
 

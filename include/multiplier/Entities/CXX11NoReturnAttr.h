@@ -43,6 +43,7 @@ class CXX11NoReturnAttr : public InheritableAttr {
     return AttrKind::CXX11_NO_RETURN;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CXX11NoReturnAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

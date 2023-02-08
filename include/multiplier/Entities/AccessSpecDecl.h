@@ -40,6 +40,7 @@ class AccessSpecDecl : public Decl {
     return DeclKind::ACCESS_SPEC;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<AccessSpecDecl> containing(const Decl &decl);
   static gap::generator<AccessSpecDecl> containing(const Stmt &stmt);
 

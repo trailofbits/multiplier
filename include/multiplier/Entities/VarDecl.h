@@ -56,6 +56,7 @@ class VarDecl : public DeclaratorDecl {
     return DeclKind::VAR;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<VarDecl> containing(const Decl &decl);
   static gap::generator<VarDecl> containing(const Stmt &stmt);
 

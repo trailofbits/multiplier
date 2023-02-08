@@ -51,6 +51,7 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     return DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Decl &decl);
   static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Stmt &stmt);
 

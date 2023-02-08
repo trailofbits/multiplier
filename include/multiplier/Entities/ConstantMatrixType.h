@@ -42,6 +42,7 @@ class ConstantMatrixType : public MatrixType {
     return TypeKind::CONSTANT_MATRIX;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ConstantMatrixType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -40,6 +40,7 @@ class PragmaDetectMismatchDecl : public Decl {
     return DeclKind::PRAGMA_DETECT_MISMATCH;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<PragmaDetectMismatchDecl> containing(const Decl &decl);
   static gap::generator<PragmaDetectMismatchDecl> containing(const Stmt &stmt);
 

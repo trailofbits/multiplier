@@ -42,6 +42,7 @@ class AsmLabelAttr : public InheritableAttr {
     return AttrKind::ASM_LABEL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AsmLabelAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -41,6 +41,7 @@ class MemberPointerType : public Type {
     return TypeKind::MEMBER_POINTER;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<MemberPointerType> from(const Reference &r) {
     return from(r.as_type());
   }

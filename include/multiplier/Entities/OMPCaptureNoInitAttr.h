@@ -42,6 +42,7 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
     return AttrKind::OMP_CAPTURE_NO_INIT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OMPCaptureNoInitAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

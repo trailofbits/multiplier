@@ -41,6 +41,7 @@ class OpenCLAccessAttr : public Attr {
     return AttrKind::OPEN_CL_ACCESS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLAccessAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

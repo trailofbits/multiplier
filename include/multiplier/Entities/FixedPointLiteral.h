@@ -44,6 +44,7 @@ class FixedPointLiteral : public Expr {
     return StmtKind::FIXED_POINT_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<FixedPointLiteral> containing(const Decl &decl);
   static gap::generator<FixedPointLiteral> containing(const Stmt &stmt);
 

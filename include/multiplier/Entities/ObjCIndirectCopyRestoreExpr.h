@@ -44,6 +44,7 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
     return StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCIndirectCopyRestoreExpr> containing(const Decl &decl);
   static gap::generator<ObjCIndirectCopyRestoreExpr> containing(const Stmt &stmt);
 

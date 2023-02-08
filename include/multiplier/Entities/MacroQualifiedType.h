@@ -40,6 +40,7 @@ class MacroQualifiedType : public Type {
     return TypeKind::MACRO_QUALIFIED;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<MacroQualifiedType> from(const Reference &r) {
     return from(r.as_type());
   }

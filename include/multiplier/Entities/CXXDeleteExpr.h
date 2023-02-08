@@ -46,6 +46,7 @@ class CXXDeleteExpr : public Expr {
     return StmtKind::CXX_DELETE_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXDeleteExpr> containing(const Decl &decl);
   static gap::generator<CXXDeleteExpr> containing(const Stmt &stmt);
 

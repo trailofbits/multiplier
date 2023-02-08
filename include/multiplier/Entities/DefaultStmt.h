@@ -42,6 +42,7 @@ class DefaultStmt : public SwitchCase {
     return StmtKind::DEFAULT_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DefaultStmt> containing(const Decl &decl);
   static gap::generator<DefaultStmt> containing(const Stmt &stmt);
 

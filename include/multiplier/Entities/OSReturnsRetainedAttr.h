@@ -42,6 +42,7 @@ class OSReturnsRetainedAttr : public InheritableAttr {
     return AttrKind::OS_RETURNS_RETAINED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OSReturnsRetainedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class InjectedClassNameType : public Type {
     return TypeKind::INJECTED_CLASS_NAME;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<InjectedClassNameType> from(const Reference &r) {
     return from(r.as_type());
   }

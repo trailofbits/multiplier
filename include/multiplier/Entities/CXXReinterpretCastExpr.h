@@ -50,6 +50,7 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
     return StmtKind::CXX_REINTERPRET_CAST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXReinterpretCastExpr> containing(const Decl &decl);
   static gap::generator<CXXReinterpretCastExpr> containing(const Stmt &stmt);
 

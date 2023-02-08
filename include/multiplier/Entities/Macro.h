@@ -51,6 +51,10 @@ class Macro {
   /* implicit */ inline Macro(std::shared_ptr<const MacroImpl> impl_)
       : impl(std::move(impl_)) {}
 
+  constexpr inline static EntityCategory static_category(void) {
+    return EntityCategory::MACRO;
+  }
+
   PackedMacroId id(void) const;
   gap::generator<Reference> references(void) const;
 
@@ -61,6 +65,7 @@ class Macro {
  public:
   static gap::generator<Macro> in(const Fragment &frag);
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<Macro> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

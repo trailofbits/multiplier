@@ -44,6 +44,7 @@ class UseHandleAttr : public InheritableParamAttr {
     return AttrKind::USE_HANDLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<UseHandleAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

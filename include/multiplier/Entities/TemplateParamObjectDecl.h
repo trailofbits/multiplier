@@ -44,6 +44,7 @@ class TemplateParamObjectDecl : public ValueDecl {
     return DeclKind::TEMPLATE_PARAM_OBJECT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TemplateParamObjectDecl> containing(const Decl &decl);
   static gap::generator<TemplateParamObjectDecl> containing(const Stmt &stmt);
 

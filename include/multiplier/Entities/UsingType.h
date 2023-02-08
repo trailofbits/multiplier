@@ -41,6 +41,7 @@ class UsingType : public Type {
     return TypeKind::USING;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<UsingType> from(const Reference &r) {
     return from(r.as_type());
   }

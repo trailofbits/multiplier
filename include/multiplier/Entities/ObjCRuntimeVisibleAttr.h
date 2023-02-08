@@ -40,6 +40,7 @@ class ObjCRuntimeVisibleAttr : public Attr {
     return AttrKind::OBJ_C_RUNTIME_VISIBLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCRuntimeVisibleAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

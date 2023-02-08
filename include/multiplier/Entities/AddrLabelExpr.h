@@ -45,6 +45,7 @@ class AddrLabelExpr : public Expr {
     return StmtKind::ADDR_LABEL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<AddrLabelExpr> containing(const Decl &decl);
   static gap::generator<AddrLabelExpr> containing(const Stmt &stmt);
 

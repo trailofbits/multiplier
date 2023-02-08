@@ -44,6 +44,7 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
     return DeclKind::UNRESOLVED_USING_TYPENAME;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UnresolvedUsingTypenameDecl> containing(const Decl &decl);
   static gap::generator<UnresolvedUsingTypenameDecl> containing(const Stmt &stmt);
 

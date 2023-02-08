@@ -43,6 +43,7 @@ class BlockDecl : public Decl {
     return DeclKind::BLOCK;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<BlockDecl> containing(const Decl &decl);
   static gap::generator<BlockDecl> containing(const Stmt &stmt);
 

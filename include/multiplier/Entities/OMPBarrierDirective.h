@@ -42,6 +42,7 @@ class OMPBarrierDirective : public OMPExecutableDirective {
     return StmtKind::OMP_BARRIER_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPBarrierDirective> containing(const Decl &decl);
   static gap::generator<OMPBarrierDirective> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class FormatAttr : public InheritableAttr {
     return AttrKind::FORMAT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<FormatAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

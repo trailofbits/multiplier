@@ -44,6 +44,7 @@ class SwiftNewTypeAttr : public InheritableAttr {
     return AttrKind::SWIFT_NEW_TYPE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SwiftNewTypeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

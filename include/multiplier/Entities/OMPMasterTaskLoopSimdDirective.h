@@ -46,6 +46,7 @@ class OMPMasterTaskLoopSimdDirective : public OMPLoopDirective {
     return StmtKind::OMP_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPMasterTaskLoopSimdDirective> containing(const Decl &decl);
   static gap::generator<OMPMasterTaskLoopSimdDirective> containing(const Stmt &stmt);
 

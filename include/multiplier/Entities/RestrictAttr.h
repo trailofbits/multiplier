@@ -43,6 +43,7 @@ class RestrictAttr : public InheritableAttr {
     return AttrKind::RESTRICT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<RestrictAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

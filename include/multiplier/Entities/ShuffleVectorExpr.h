@@ -44,6 +44,7 @@ class ShuffleVectorExpr : public Expr {
     return StmtKind::SHUFFLE_VECTOR_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ShuffleVectorExpr> containing(const Decl &decl);
   static gap::generator<ShuffleVectorExpr> containing(const Stmt &stmt);
 

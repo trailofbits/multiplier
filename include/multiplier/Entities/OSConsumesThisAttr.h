@@ -42,6 +42,7 @@ class OSConsumesThisAttr : public InheritableAttr {
     return AttrKind::OS_CONSUMES_THIS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OSConsumesThisAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

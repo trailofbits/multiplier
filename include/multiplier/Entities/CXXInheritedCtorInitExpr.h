@@ -46,6 +46,7 @@ class CXXInheritedCtorInitExpr : public Expr {
     return StmtKind::CXX_INHERITED_CTOR_INIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXInheritedCtorInitExpr> containing(const Decl &decl);
   static gap::generator<CXXInheritedCtorInitExpr> containing(const Stmt &stmt);
 

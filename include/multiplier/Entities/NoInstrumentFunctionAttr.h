@@ -42,6 +42,7 @@ class NoInstrumentFunctionAttr : public InheritableAttr {
     return AttrKind::NO_INSTRUMENT_FUNCTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoInstrumentFunctionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

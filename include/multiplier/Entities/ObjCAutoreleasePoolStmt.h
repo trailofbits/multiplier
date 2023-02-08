@@ -40,6 +40,7 @@ class ObjCAutoreleasePoolStmt : public Stmt {
     return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCAutoreleasePoolStmt> containing(const Decl &decl);
   static gap::generator<ObjCAutoreleasePoolStmt> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class DecayedType : public AdjustedType {
     return TypeKind::DECAYED;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DecayedType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -42,6 +42,7 @@ class NamespaceDecl : public NamedDecl {
     return DeclKind::NAMESPACE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<NamespaceDecl> containing(const Decl &decl);
   static gap::generator<NamespaceDecl> containing(const Stmt &stmt);
 

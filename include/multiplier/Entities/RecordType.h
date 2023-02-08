@@ -42,6 +42,7 @@ class RecordType : public TagType {
     return TypeKind::RECORD;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<RecordType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -43,6 +43,7 @@ class DependentSizedMatrixType : public MatrixType {
     return TypeKind::DEPENDENT_SIZED_MATRIX;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentSizedMatrixType> from(const Reference &r) {
     return from(r.as_type());
   }

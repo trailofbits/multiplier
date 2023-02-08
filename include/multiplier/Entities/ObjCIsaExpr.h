@@ -44,6 +44,7 @@ class ObjCIsaExpr : public Expr {
     return StmtKind::OBJ_C_ISA_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCIsaExpr> containing(const Decl &decl);
   static gap::generator<ObjCIsaExpr> containing(const Stmt &stmt);
 

@@ -48,6 +48,7 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
     return StmtKind::BUILTIN_BIT_CAST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<BuiltinBitCastExpr> containing(const Decl &decl);
   static gap::generator<BuiltinBitCastExpr> containing(const Stmt &stmt);
 

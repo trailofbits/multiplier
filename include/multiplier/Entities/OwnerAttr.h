@@ -43,6 +43,7 @@ class OwnerAttr : public InheritableAttr {
     return AttrKind::OWNER;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OwnerAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

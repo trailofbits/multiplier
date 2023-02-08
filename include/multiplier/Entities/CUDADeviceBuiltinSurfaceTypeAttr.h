@@ -42,6 +42,7 @@ class CUDADeviceBuiltinSurfaceTypeAttr : public InheritableAttr {
     return AttrKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

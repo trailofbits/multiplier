@@ -42,6 +42,7 @@ class FunctionNoProtoType : public FunctionType {
     return TypeKind::FUNCTION_NO_PROTO;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<FunctionNoProtoType> from(const Reference &r) {
     return from(r.as_type());
   }

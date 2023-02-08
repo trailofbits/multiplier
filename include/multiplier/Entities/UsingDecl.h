@@ -44,6 +44,7 @@ class UsingDecl : public BaseUsingDecl {
     return DeclKind::USING;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UsingDecl> containing(const Decl &decl);
   static gap::generator<UsingDecl> containing(const Stmt &stmt);
 

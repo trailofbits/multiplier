@@ -45,6 +45,7 @@ class DependentCoawaitExpr : public Expr {
     return StmtKind::DEPENDENT_COAWAIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DependentCoawaitExpr> containing(const Decl &decl);
   static gap::generator<DependentCoawaitExpr> containing(const Stmt &stmt);
 

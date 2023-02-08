@@ -37,6 +37,7 @@ class ArrayType : public Type {
   static gap::generator<ArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ArrayType> from(const Reference &r) {
     return from(r.as_type());
   }

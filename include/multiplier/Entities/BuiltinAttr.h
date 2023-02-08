@@ -42,6 +42,7 @@ class BuiltinAttr : public InheritableAttr {
     return AttrKind::BUILTIN;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<BuiltinAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

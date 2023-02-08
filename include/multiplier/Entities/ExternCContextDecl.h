@@ -40,6 +40,7 @@ class ExternCContextDecl : public Decl {
     return DeclKind::EXTERN_C_CONTEXT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ExternCContextDecl> containing(const Decl &decl);
   static gap::generator<ExternCContextDecl> containing(const Stmt &stmt);
 

@@ -43,6 +43,7 @@ class GuardedByAttr : public InheritableAttr {
     return AttrKind::GUARDED_BY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<GuardedByAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

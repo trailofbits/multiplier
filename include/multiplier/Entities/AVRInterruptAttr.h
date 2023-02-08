@@ -42,6 +42,7 @@ class AVRInterruptAttr : public InheritableAttr {
     return AttrKind::AVR_INTERRUPT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AVRInterruptAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

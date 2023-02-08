@@ -62,6 +62,7 @@ class CXXRecordDecl : public RecordDecl {
     return DeclKind::CXX_RECORD;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<CXXRecordDecl> containing(const Decl &decl);
   static gap::generator<CXXRecordDecl> containing(const Stmt &stmt);
 

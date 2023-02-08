@@ -54,6 +54,7 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
     return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ClassTemplateSpecializationDecl> containing(const Decl &decl);
   static gap::generator<ClassTemplateSpecializationDecl> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class CFICanonicalJumpTableAttr : public InheritableAttr {
     return AttrKind::CFI_CANONICAL_JUMP_TABLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CFICanonicalJumpTableAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

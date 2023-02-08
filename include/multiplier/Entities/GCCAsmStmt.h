@@ -44,6 +44,7 @@ class GCCAsmStmt : public AsmStmt {
     return StmtKind::GCC_ASM_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<GCCAsmStmt> containing(const Decl &decl);
   static gap::generator<GCCAsmStmt> containing(const Stmt &stmt);
 

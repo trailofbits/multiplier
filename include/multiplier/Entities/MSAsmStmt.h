@@ -43,6 +43,7 @@ class MSAsmStmt : public AsmStmt {
     return StmtKind::MS_ASM_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<MSAsmStmt> containing(const Decl &decl);
   static gap::generator<MSAsmStmt> containing(const Stmt &stmt);
 

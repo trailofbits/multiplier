@@ -42,6 +42,7 @@ class RandomizeLayoutAttr : public InheritableAttr {
     return AttrKind::RANDOMIZE_LAYOUT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<RandomizeLayoutAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

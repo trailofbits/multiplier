@@ -43,6 +43,7 @@ class AcquireCapabilityAttr : public InheritableAttr {
     return AttrKind::ACQUIRE_CAPABILITY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AcquireCapabilityAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class DLLImportStaticLocalAttr : public InheritableAttr {
     return AttrKind::DLL_IMPORT_STATIC_LOCAL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<DLLImportStaticLocalAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

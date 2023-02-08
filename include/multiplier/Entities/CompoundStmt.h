@@ -40,6 +40,7 @@ class CompoundStmt : public Stmt {
     return StmtKind::COMPOUND_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CompoundStmt> containing(const Decl &decl);
   static gap::generator<CompoundStmt> containing(const Stmt &stmt);
 

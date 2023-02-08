@@ -43,6 +43,7 @@ class WarnUnusedResultAttr : public InheritableAttr {
     return AttrKind::WARN_UNUSED_RESULT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<WarnUnusedResultAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

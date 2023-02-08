@@ -42,6 +42,7 @@ class InternalLinkageAttr : public InheritableAttr {
     return AttrKind::INTERNAL_LINKAGE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<InternalLinkageAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

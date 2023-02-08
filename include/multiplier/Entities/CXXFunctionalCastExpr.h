@@ -48,6 +48,7 @@ class CXXFunctionalCastExpr : public ExplicitCastExpr {
     return StmtKind::CXX_FUNCTIONAL_CAST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXFunctionalCastExpr> containing(const Decl &decl);
   static gap::generator<CXXFunctionalCastExpr> containing(const Stmt &stmt);
 

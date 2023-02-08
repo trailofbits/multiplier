@@ -40,6 +40,7 @@ class RedeclarableTemplateDecl : public TemplateDecl {
   static gap::generator<RedeclarableTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<RedeclarableTemplateDecl> containing(const Decl &decl);
   static gap::generator<RedeclarableTemplateDecl> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class MSABIAttr : public InheritableAttr {
     return AttrKind::MSABI;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MSABIAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

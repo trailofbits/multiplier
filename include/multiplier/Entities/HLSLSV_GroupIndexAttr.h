@@ -42,6 +42,7 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
     return AttrKind::HLSLSV__GROUP_INDEX;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<HLSLSV_GroupIndexAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
     return AttrKind::WEB_ASSEMBLY_IMPORT_MODULE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<WebAssemblyImportModuleAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

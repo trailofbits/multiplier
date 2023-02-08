@@ -36,6 +36,7 @@ class OMPDeclarativeDirectiveDecl : public Decl {
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Stmt &stmt);
 

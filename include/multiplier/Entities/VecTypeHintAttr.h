@@ -43,6 +43,7 @@ class VecTypeHintAttr : public InheritableAttr {
     return AttrKind::VEC_TYPE_HINT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<VecTypeHintAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

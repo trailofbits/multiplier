@@ -43,6 +43,7 @@ class DependentSizedArrayType : public ArrayType {
     return TypeKind::DEPENDENT_SIZED_ARRAY;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentSizedArrayType> from(const Reference &r) {
     return from(r.as_type());
   }

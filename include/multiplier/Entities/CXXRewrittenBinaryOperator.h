@@ -45,6 +45,7 @@ class CXXRewrittenBinaryOperator : public Expr {
     return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXRewrittenBinaryOperator> containing(const Decl &decl);
   static gap::generator<CXXRewrittenBinaryOperator> containing(const Stmt &stmt);
 

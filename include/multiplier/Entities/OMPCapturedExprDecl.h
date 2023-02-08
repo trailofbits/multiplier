@@ -48,6 +48,7 @@ class OMPCapturedExprDecl : public VarDecl {
     return DeclKind::OMP_CAPTURED_EXPR;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPCapturedExprDecl> containing(const Decl &decl);
   static gap::generator<OMPCapturedExprDecl> containing(const Stmt &stmt);
 

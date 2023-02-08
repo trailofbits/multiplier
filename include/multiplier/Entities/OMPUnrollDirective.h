@@ -46,6 +46,7 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
     return StmtKind::OMP_UNROLL_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPUnrollDirective> containing(const Decl &decl);
   static gap::generator<OMPUnrollDirective> containing(const Stmt &stmt);
 

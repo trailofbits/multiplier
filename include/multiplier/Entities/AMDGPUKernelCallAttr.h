@@ -42,6 +42,7 @@ class AMDGPUKernelCallAttr : public InheritableAttr {
     return AttrKind::AMDGPU_KERNEL_CALL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AMDGPUKernelCallAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

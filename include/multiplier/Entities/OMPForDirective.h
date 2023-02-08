@@ -47,6 +47,7 @@ class OMPForDirective : public OMPLoopDirective {
     return StmtKind::OMP_FOR_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPForDirective> containing(const Decl &decl);
   static gap::generator<OMPForDirective> containing(const Stmt &stmt);
 

@@ -40,6 +40,7 @@ class ParenType : public Type {
     return TypeKind::PAREN;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ParenType> from(const Reference &r) {
     return from(r.as_type());
   }

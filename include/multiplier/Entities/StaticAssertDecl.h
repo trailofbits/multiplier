@@ -42,6 +42,7 @@ class StaticAssertDecl : public Decl {
     return DeclKind::STATIC_ASSERT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<StaticAssertDecl> containing(const Decl &decl);
   static gap::generator<StaticAssertDecl> containing(const Stmt &stmt);
 

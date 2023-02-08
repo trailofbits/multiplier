@@ -46,6 +46,7 @@ class SwiftErrorResultAttr : public ParameterABIAttr {
     return AttrKind::SWIFT_ERROR_RESULT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SwiftErrorResultAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -41,6 +41,7 @@ class SEHFinallyStmt : public Stmt {
     return StmtKind::SEH_FINALLY_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SEHFinallyStmt> containing(const Decl &decl);
   static gap::generator<SEHFinallyStmt> containing(const Stmt &stmt);
 

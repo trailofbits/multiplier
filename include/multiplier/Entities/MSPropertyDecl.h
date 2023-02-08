@@ -46,6 +46,7 @@ class MSPropertyDecl : public DeclaratorDecl {
     return DeclKind::MS_PROPERTY;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<MSPropertyDecl> containing(const Decl &decl);
   static gap::generator<MSPropertyDecl> containing(const Stmt &stmt);
 

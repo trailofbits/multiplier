@@ -43,6 +43,7 @@ class UsingShadowDecl : public NamedDecl {
     return DeclKind::USING_SHADOW;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UsingShadowDecl> containing(const Decl &decl);
   static gap::generator<UsingShadowDecl> containing(const Stmt &stmt);
 

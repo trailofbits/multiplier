@@ -45,6 +45,7 @@ class ObjCProtocolExpr : public Expr {
     return StmtKind::OBJ_C_PROTOCOL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCProtocolExpr> containing(const Decl &decl);
   static gap::generator<ObjCProtocolExpr> containing(const Stmt &stmt);
 

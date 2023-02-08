@@ -88,6 +88,10 @@ class Fragment {
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const Macro &);
 
+  inline static constexpr EntityCategory entity_category(void) {
+    return EntityCategory::FRAGMENT;
+  }
+
   // Return the entity ID of this fragment.
   SpecificEntityId<FragmentId> id(void) const noexcept;
 

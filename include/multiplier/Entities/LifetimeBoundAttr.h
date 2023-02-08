@@ -42,6 +42,7 @@ class LifetimeBoundAttr : public InheritableAttr {
     return AttrKind::LIFETIME_BOUND;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<LifetimeBoundAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

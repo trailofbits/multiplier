@@ -52,6 +52,7 @@ class VarTemplateSpecializationDecl : public VarDecl {
     return DeclKind::VAR_TEMPLATE_SPECIALIZATION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<VarTemplateSpecializationDecl> containing(const Decl &decl);
   static gap::generator<VarTemplateSpecializationDecl> containing(const Stmt &stmt);
 

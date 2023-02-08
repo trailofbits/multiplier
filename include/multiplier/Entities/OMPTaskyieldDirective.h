@@ -42,6 +42,7 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
     return StmtKind::OMP_TASKYIELD_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPTaskyieldDirective> containing(const Decl &decl);
   static gap::generator<OMPTaskyieldDirective> containing(const Stmt &stmt);
 

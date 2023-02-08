@@ -35,6 +35,7 @@ class MacroDirective : public Macro {
  public:
   static gap::generator<MacroDirective> in(const Fragment &frag);
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

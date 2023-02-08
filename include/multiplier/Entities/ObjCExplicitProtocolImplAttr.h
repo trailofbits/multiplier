@@ -42,6 +42,7 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
     return AttrKind::OBJ_C_EXPLICIT_PROTOCOL_IMPL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCExplicitProtocolImplAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

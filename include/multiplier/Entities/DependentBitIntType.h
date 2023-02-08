@@ -41,6 +41,7 @@ class DependentBitIntType : public Type {
     return TypeKind::DEPENDENT_BIT_INT;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentBitIntType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -43,6 +43,7 @@ class OMPParallelSectionsDirective : public OMPExecutableDirective {
     return StmtKind::OMP_PARALLEL_SECTIONS_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPParallelSectionsDirective> containing(const Decl &decl);
   static gap::generator<OMPParallelSectionsDirective> containing(const Stmt &stmt);
 

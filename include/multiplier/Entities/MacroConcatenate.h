@@ -40,6 +40,7 @@ class MacroConcatenate : public MacroSubstitution {
     return MacroKind::CONCATENATE;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroConcatenate> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

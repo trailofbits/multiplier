@@ -43,6 +43,7 @@ class AssertCapabilityAttr : public InheritableAttr {
     return AttrKind::ASSERT_CAPABILITY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AssertCapabilityAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

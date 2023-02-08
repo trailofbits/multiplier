@@ -42,6 +42,7 @@ class CFReturnsNotRetainedAttr : public InheritableAttr {
     return AttrKind::CF_RETURNS_NOT_RETAINED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CFReturnsNotRetainedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

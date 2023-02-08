@@ -45,6 +45,7 @@ class ObjCEncodeExpr : public Expr {
     return StmtKind::OBJ_C_ENCODE_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCEncodeExpr> containing(const Decl &decl);
   static gap::generator<ObjCEncodeExpr> containing(const Stmt &stmt);
 

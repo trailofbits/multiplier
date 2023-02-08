@@ -42,6 +42,7 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
     return DeclKind::OMP_REQUIRES;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPRequiresDecl> containing(const Decl &decl);
   static gap::generator<OMPRequiresDecl> containing(const Stmt &stmt);
 

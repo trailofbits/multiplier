@@ -45,6 +45,7 @@ class ObjCArrayLiteral : public Expr {
     return StmtKind::OBJ_C_ARRAY_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCArrayLiteral> containing(const Decl &decl);
   static gap::generator<ObjCArrayLiteral> containing(const Stmt &stmt);
 

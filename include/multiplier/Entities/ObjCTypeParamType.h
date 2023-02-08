@@ -41,6 +41,7 @@ class ObjCTypeParamType : public Type {
     return TypeKind::OBJ_C_TYPE_PARAM;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ObjCTypeParamType> from(const Reference &r) {
     return from(r.as_type());
   }

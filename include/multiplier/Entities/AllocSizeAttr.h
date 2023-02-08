@@ -42,6 +42,7 @@ class AllocSizeAttr : public InheritableAttr {
     return AttrKind::ALLOC_SIZE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AllocSizeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

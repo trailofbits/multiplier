@@ -38,6 +38,7 @@ class MacroSubstitution : public Macro {
     return MacroKind::SUBSTITUTION;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroSubstitution> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

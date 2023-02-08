@@ -46,6 +46,7 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
     return StmtKind::CXX_TEMPORARY_OBJECT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXTemporaryObjectExpr> containing(const Decl &decl);
   static gap::generator<CXXTemporaryObjectExpr> containing(const Stmt &stmt);
 

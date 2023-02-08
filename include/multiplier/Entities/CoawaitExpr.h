@@ -46,6 +46,7 @@ class CoawaitExpr : public CoroutineSuspendExpr {
     return StmtKind::COAWAIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CoawaitExpr> containing(const Decl &decl);
   static gap::generator<CoawaitExpr> containing(const Stmt &stmt);
 

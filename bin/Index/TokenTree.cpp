@@ -2496,20 +2496,13 @@ TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
     impl->FindSubstitutionBoundsRec(sub, nullptr, nullptr);
 
 
-//      std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-//      std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-//      sub->Print(std::cerr);
-//      std::cerr << "\n\n\n";
-//      sub->PrintDOT(std::cerr);
-//      std::cerr << "\n\n";
+//    std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+//    std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//    sub->Print(std::cerr);
+//    std::cerr << "\n\n\n";
+//    sub->PrintDOT(std::cerr);
+//    std::cerr << "\n\n";
 
-
-//      std::shared_ptr<const Substitution> ret(std::move(impl), sub);
-//      return TokenTree(std::move(ret));
-
-//    if (!impl->MergeArgPreExpansions(err)) {
-//      return std::nullopt;
-//    }
 
 //        std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
 //        std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";

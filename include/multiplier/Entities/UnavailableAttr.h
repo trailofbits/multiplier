@@ -43,6 +43,7 @@ class UnavailableAttr : public InheritableAttr {
     return AttrKind::UNAVAILABLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<UnavailableAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -40,6 +40,7 @@ class LinkageSpecDecl : public Decl {
     return DeclKind::LINKAGE_SPEC;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<LinkageSpecDecl> containing(const Decl &decl);
   static gap::generator<LinkageSpecDecl> containing(const Stmt &stmt);
 

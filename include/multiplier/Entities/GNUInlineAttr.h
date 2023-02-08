@@ -42,6 +42,7 @@ class GNUInlineAttr : public InheritableAttr {
     return AttrKind::GNU_INLINE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<GNUInlineAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

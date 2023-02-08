@@ -43,6 +43,7 @@ class VisibilityAttr : public InheritableAttr {
     return AttrKind::VISIBILITY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<VisibilityAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

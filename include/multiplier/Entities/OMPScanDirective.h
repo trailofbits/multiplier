@@ -42,6 +42,7 @@ class OMPScanDirective : public OMPExecutableDirective {
     return StmtKind::OMP_SCAN_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPScanDirective> containing(const Decl &decl);
   static gap::generator<OMPScanDirective> containing(const Stmt &stmt);
 

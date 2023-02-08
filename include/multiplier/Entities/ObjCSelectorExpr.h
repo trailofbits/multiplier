@@ -44,6 +44,7 @@ class ObjCSelectorExpr : public Expr {
     return StmtKind::OBJ_C_SELECTOR_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCSelectorExpr> containing(const Decl &decl);
   static gap::generator<ObjCSelectorExpr> containing(const Stmt &stmt);
 

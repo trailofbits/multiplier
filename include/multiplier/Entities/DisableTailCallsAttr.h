@@ -42,6 +42,7 @@ class DisableTailCallsAttr : public InheritableAttr {
     return AttrKind::DISABLE_TAIL_CALLS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<DisableTailCallsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

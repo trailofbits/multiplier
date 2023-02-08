@@ -40,6 +40,7 @@ class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
   static gap::generator<OMPLoopTransformationDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPLoopTransformationDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopTransformationDirective> containing(const Stmt &stmt);
 

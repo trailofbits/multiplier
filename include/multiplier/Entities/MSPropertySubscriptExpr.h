@@ -44,6 +44,7 @@ class MSPropertySubscriptExpr : public Expr {
     return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<MSPropertySubscriptExpr> containing(const Decl &decl);
   static gap::generator<MSPropertySubscriptExpr> containing(const Stmt &stmt);
 

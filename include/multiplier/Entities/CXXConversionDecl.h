@@ -51,6 +51,7 @@ class CXXConversionDecl : public CXXMethodDecl {
     return DeclKind::CXX_CONVERSION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<CXXConversionDecl> containing(const Decl &decl);
   static gap::generator<CXXConversionDecl> containing(const Stmt &stmt);
 

@@ -40,6 +40,7 @@ class RenderScriptKernelAttr : public Attr {
     return AttrKind::RENDER_SCRIPT_KERNEL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<RenderScriptKernelAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -44,6 +44,7 @@ class TypoExpr : public Expr {
     return StmtKind::TYPO_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<TypoExpr> containing(const Decl &decl);
   static gap::generator<TypoExpr> containing(const Stmt &stmt);
 

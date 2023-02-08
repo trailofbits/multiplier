@@ -45,6 +45,7 @@ class EnumConstantDecl : public ValueDecl {
     return DeclKind::ENUM_CONSTANT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<EnumConstantDecl> containing(const Decl &decl);
   static gap::generator<EnumConstantDecl> containing(const Stmt &stmt);
 

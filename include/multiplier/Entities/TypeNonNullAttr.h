@@ -42,6 +42,7 @@ class TypeNonNullAttr : public TypeAttr {
     return AttrKind::TYPE_NON_NULL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<TypeNonNullAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -44,6 +44,7 @@ class ExtVectorElementExpr : public Expr {
     return StmtKind::EXT_VECTOR_ELEMENT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ExtVectorElementExpr> containing(const Decl &decl);
   static gap::generator<ExtVectorElementExpr> containing(const Stmt &stmt);
 

@@ -41,6 +41,7 @@ class DoStmt : public Stmt {
     return StmtKind::DO_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DoStmt> containing(const Decl &decl);
   static gap::generator<DoStmt> containing(const Stmt &stmt);
 

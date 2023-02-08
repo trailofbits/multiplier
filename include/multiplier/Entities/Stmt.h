@@ -50,6 +50,10 @@ class Stmt {
   /* implicit */ inline Stmt(std::shared_ptr<const StmtImpl> impl_)
       : impl(std::move(impl_)) {}
 
+  constexpr inline static EntityCategory static_category(void) {
+    return EntityCategory::STATEMENT;
+  }
+
   PackedStmtId id(void) const;
   gap::generator<Reference> references(void) const;
 
@@ -65,6 +69,7 @@ class Stmt {
   static gap::generator<Stmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<Stmt> containing(const Decl &decl);
   static gap::generator<Stmt> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class ConstAttr : public InheritableAttr {
     return AttrKind::CONST;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ConstAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

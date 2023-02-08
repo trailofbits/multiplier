@@ -41,6 +41,7 @@ class ImportDecl : public Decl {
     return DeclKind::IMPORT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ImportDecl> containing(const Decl &decl);
   static gap::generator<ImportDecl> containing(const Stmt &stmt);
 

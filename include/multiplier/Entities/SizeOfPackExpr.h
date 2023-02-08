@@ -46,6 +46,7 @@ class SizeOfPackExpr : public Expr {
     return StmtKind::SIZE_OF_PACK_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SizeOfPackExpr> containing(const Decl &decl);
   static gap::generator<SizeOfPackExpr> containing(const Stmt &stmt);
 

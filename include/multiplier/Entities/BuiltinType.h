@@ -41,6 +41,7 @@ class BuiltinType : public Type {
     return TypeKind::BUILTIN;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<BuiltinType> from(const Reference &r) {
     return from(r.as_type());
   }

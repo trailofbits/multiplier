@@ -40,6 +40,7 @@ class PackExpansionType : public Type {
     return TypeKind::PACK_EXPANSION;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<PackExpansionType> from(const Reference &r) {
     return from(r.as_type());
   }

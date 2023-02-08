@@ -133,6 +133,32 @@ class Reference {
                               MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER)
 #undef MX_DECLARE_REF_GETTER
+
+  // TODO(pag): Find a way to make this work. Maybe have a `T::category()` that
+  //            we can use for static switch dispatch?
+//  template <typename T>
+//  inline std::optional<T> as(void) const noexcept {
+//    constexpr EntityCategory c = T::static_category();
+//    if constexpr (EntityCategory::NOT_AN_ENTITY == c) {
+//      return std::nullopt;
+//
+//#define MX_REFERENCE_AS(type_name, lower_name, enum_name, category) \
+//    } else if constexpr (EntityCategory::enum_name == c) { \
+//      if (category_ == c) { \
+//        return T::from(as_ ## lower_name()); \
+//      } else { \
+//        return std::nullopt; \
+//      }
+//
+//  MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
+//                              MX_REFERENCE_AS,
+//                              MX_REFERENCE_AS,
+//                              MX_REFERENCE_AS)
+//#undef MX_REFERENCE_AS
+//    } else {
+//      return std::nullopt;  // Unreachable.
+//    }
+//  }
 };
 
 }  // namespace mx

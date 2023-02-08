@@ -42,6 +42,7 @@ class ObjCIndependentClassAttr : public InheritableAttr {
     return AttrKind::OBJ_C_INDEPENDENT_CLASS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCIndependentClassAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

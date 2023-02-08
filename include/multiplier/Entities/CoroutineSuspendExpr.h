@@ -41,6 +41,7 @@ class CoroutineSuspendExpr : public Expr {
   static gap::generator<CoroutineSuspendExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CoroutineSuspendExpr> containing(const Decl &decl);
   static gap::generator<CoroutineSuspendExpr> containing(const Stmt &stmt);
 

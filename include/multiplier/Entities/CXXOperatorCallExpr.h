@@ -47,6 +47,7 @@ class CXXOperatorCallExpr : public CallExpr {
     return StmtKind::CXX_OPERATOR_CALL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXOperatorCallExpr> containing(const Decl &decl);
   static gap::generator<CXXOperatorCallExpr> containing(const Stmt &stmt);
 

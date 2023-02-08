@@ -46,6 +46,7 @@ class CXXDependentScopeMemberExpr : public Expr {
     return StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXDependentScopeMemberExpr> containing(const Decl &decl);
   static gap::generator<CXXDependentScopeMemberExpr> containing(const Stmt &stmt);
 

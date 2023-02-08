@@ -41,6 +41,7 @@ class FileScopeAsmDecl : public Decl {
     return DeclKind::FILE_SCOPE_ASM;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<FileScopeAsmDecl> containing(const Decl &decl);
   static gap::generator<FileScopeAsmDecl> containing(const Stmt &stmt);
 

@@ -51,6 +51,7 @@ class CXXDestructorDecl : public CXXMethodDecl {
     return DeclKind::CXX_DESTRUCTOR;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<CXXDestructorDecl> containing(const Decl &decl);
   static gap::generator<CXXDestructorDecl> containing(const Stmt &stmt);
 

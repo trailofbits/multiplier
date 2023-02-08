@@ -43,6 +43,7 @@ class CaseStmt : public SwitchCase {
     return StmtKind::CASE_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CaseStmt> containing(const Decl &decl);
   static gap::generator<CaseStmt> containing(const Stmt &stmt);
 

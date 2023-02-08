@@ -42,6 +42,7 @@ class OMPMetaDirective : public OMPExecutableDirective {
     return StmtKind::OMP_META_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPMetaDirective> containing(const Decl &decl);
   static gap::generator<OMPMetaDirective> containing(const Stmt &stmt);
 

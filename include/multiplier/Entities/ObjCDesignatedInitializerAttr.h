@@ -40,6 +40,7 @@ class ObjCDesignatedInitializerAttr : public Attr {
     return AttrKind::OBJ_C_DESIGNATED_INITIALIZER;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCDesignatedInitializerAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

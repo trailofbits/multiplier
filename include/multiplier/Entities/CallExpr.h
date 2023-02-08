@@ -49,6 +49,7 @@ class CallExpr : public Expr {
     return StmtKind::CALL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CallExpr> containing(const Decl &decl);
   static gap::generator<CallExpr> containing(const Stmt &stmt);
 

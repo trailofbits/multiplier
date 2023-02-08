@@ -45,6 +45,7 @@ class DiagnoseIfAttr : public InheritableAttr {
     return AttrKind::DIAGNOSE_IF;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<DiagnoseIfAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

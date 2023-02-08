@@ -47,6 +47,7 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
     return DeclKind::OBJ_C_TYPE_PARAM;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCTypeParamDecl> containing(const Decl &decl);
   static gap::generator<ObjCTypeParamDecl> containing(const Stmt &stmt);
 

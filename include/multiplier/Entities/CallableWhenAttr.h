@@ -42,6 +42,7 @@ class CallableWhenAttr : public InheritableAttr {
     return AttrKind::CALLABLE_WHEN;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CallableWhenAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

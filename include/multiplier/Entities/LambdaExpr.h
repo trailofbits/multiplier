@@ -51,6 +51,7 @@ class LambdaExpr : public Expr {
     return StmtKind::LAMBDA_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<LambdaExpr> containing(const Decl &decl);
   static gap::generator<LambdaExpr> containing(const Stmt &stmt);
 

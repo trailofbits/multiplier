@@ -42,6 +42,7 @@ class OpenCLIntelReqdSubGroupSizeAttr : public InheritableAttr {
     return AttrKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

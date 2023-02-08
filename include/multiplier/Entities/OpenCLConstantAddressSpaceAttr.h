@@ -43,6 +43,7 @@ class OpenCLConstantAddressSpaceAttr : public TypeAttr {
     return AttrKind::OPEN_CL_CONSTANT_ADDRESS_SPACE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLConstantAddressSpaceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class AlignMac68kAttr : public InheritableAttr {
     return AttrKind::ALIGN_MAC68K;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AlignMac68kAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

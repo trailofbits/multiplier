@@ -42,6 +42,7 @@ class PtGuardedVarAttr : public InheritableAttr {
     return AttrKind::PT_GUARDED_VAR;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PtGuardedVarAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

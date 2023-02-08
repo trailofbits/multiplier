@@ -36,6 +36,7 @@ class StmtAttr : public Attr {
   static gap::generator<StmtAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<StmtAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

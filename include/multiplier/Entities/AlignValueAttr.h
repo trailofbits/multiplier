@@ -41,6 +41,7 @@ class AlignValueAttr : public Attr {
     return AttrKind::ALIGN_VALUE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AlignValueAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

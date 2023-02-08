@@ -45,6 +45,7 @@ class BinaryOperator : public Expr {
     return StmtKind::BINARY_OPERATOR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<BinaryOperator> containing(const Decl &decl);
   static gap::generator<BinaryOperator> containing(const Stmt &stmt);
 

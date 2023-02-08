@@ -44,6 +44,7 @@ class ReleaseHandleAttr : public InheritableParamAttr {
     return AttrKind::RELEASE_HANDLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ReleaseHandleAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

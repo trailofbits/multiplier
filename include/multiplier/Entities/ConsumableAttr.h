@@ -43,6 +43,7 @@ class ConsumableAttr : public InheritableAttr {
     return AttrKind::CONSUMABLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ConsumableAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

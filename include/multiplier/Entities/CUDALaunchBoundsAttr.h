@@ -43,6 +43,7 @@ class CUDALaunchBoundsAttr : public InheritableAttr {
     return AttrKind::CUDA_LAUNCH_BOUNDS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CUDALaunchBoundsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

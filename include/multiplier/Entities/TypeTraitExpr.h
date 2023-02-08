@@ -46,6 +46,7 @@ class TypeTraitExpr : public Expr {
     return StmtKind::TYPE_TRAIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<TypeTraitExpr> containing(const Decl &decl);
   static gap::generator<TypeTraitExpr> containing(const Stmt &stmt);
 

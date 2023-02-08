@@ -43,6 +43,7 @@ class CastExpr : public Expr {
   static gap::generator<CastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CastExpr> containing(const Decl &decl);
   static gap::generator<CastExpr> containing(const Stmt &stmt);
 

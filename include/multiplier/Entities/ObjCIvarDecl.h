@@ -50,6 +50,7 @@ class ObjCIvarDecl : public FieldDecl {
     return DeclKind::OBJ_C_IVAR;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCIvarDecl> containing(const Decl &decl);
   static gap::generator<ObjCIvarDecl> containing(const Stmt &stmt);
 

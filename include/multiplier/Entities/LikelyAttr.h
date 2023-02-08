@@ -42,6 +42,7 @@ class LikelyAttr : public StmtAttr {
     return AttrKind::LIKELY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<LikelyAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

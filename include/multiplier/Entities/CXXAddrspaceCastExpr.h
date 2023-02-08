@@ -50,6 +50,7 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
     return StmtKind::CXX_ADDRSPACE_CAST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXAddrspaceCastExpr> containing(const Decl &decl);
   static gap::generator<CXXAddrspaceCastExpr> containing(const Stmt &stmt);
 

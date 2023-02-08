@@ -42,6 +42,7 @@ class UsingPackDecl : public NamedDecl {
     return DeclKind::USING_PACK;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UsingPackDecl> containing(const Decl &decl);
   static gap::generator<UsingPackDecl> containing(const Stmt &stmt);
 

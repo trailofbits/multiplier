@@ -51,6 +51,7 @@ class ObjCMethodDecl : public NamedDecl {
     return DeclKind::OBJ_C_METHOD;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCMethodDecl> containing(const Decl &decl);
   static gap::generator<ObjCMethodDecl> containing(const Stmt &stmt);
 

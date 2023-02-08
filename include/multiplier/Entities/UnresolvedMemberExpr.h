@@ -47,6 +47,7 @@ class UnresolvedMemberExpr : public OverloadExpr {
     return StmtKind::UNRESOLVED_MEMBER_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<UnresolvedMemberExpr> containing(const Decl &decl);
   static gap::generator<UnresolvedMemberExpr> containing(const Stmt &stmt);
 

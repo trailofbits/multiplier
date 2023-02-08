@@ -42,6 +42,7 @@ class NoThreadSafetyAnalysisAttr : public InheritableAttr {
     return AttrKind::NO_THREAD_SAFETY_ANALYSIS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoThreadSafetyAnalysisAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

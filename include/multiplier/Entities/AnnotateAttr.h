@@ -44,6 +44,7 @@ class AnnotateAttr : public InheritableParamAttr {
     return AttrKind::ANNOTATE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AnnotateAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

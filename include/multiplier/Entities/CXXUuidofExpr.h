@@ -46,6 +46,7 @@ class CXXUuidofExpr : public Expr {
     return StmtKind::CXX_UUIDOF_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXUuidofExpr> containing(const Decl &decl);
   static gap::generator<CXXUuidofExpr> containing(const Stmt &stmt);
 

@@ -39,6 +39,7 @@ class MacroParameter : public Macro {
     return MacroKind::PARAMETER;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroParameter> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

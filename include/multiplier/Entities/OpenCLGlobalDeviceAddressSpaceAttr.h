@@ -42,6 +42,7 @@ class OpenCLGlobalDeviceAddressSpaceAttr : public TypeAttr {
     return AttrKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

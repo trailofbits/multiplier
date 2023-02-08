@@ -40,6 +40,7 @@ class ObjCNonRuntimeProtocolAttr : public Attr {
     return AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCNonRuntimeProtocolAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

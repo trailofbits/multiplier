@@ -36,6 +36,7 @@ class MatrixType : public Type {
   static gap::generator<MatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<MatrixType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -42,6 +42,7 @@ class NSReturnsNotRetainedAttr : public InheritableAttr {
     return AttrKind::NS_RETURNS_NOT_RETAINED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NSReturnsNotRetainedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

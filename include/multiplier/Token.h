@@ -81,6 +81,10 @@ class Token {
  public:
   Token(void);
 
+  inline static constexpr EntityCategory entity_category(void) {
+    return EntityCategory::TOKEN;
+  }
+
   // Return `true` if this is a valid token.
   operator bool(void) const;
 

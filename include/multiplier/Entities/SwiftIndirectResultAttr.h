@@ -46,6 +46,7 @@ class SwiftIndirectResultAttr : public ParameterABIAttr {
     return AttrKind::SWIFT_INDIRECT_RESULT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SwiftIndirectResultAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

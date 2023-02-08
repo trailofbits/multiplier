@@ -43,6 +43,7 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
     return DeclKind::OBJ_C_COMPATIBLE_ALIAS;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCCompatibleAliasDecl> containing(const Decl &decl);
   static gap::generator<ObjCCompatibleAliasDecl> containing(const Stmt &stmt);
 

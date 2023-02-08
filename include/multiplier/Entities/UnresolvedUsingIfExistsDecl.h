@@ -42,6 +42,7 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
     return DeclKind::UNRESOLVED_USING_IF_EXISTS;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UnresolvedUsingIfExistsDecl> containing(const Decl &decl);
   static gap::generator<UnresolvedUsingIfExistsDecl> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class EnforceTCBLeafAttr : public InheritableAttr {
     return AttrKind::ENFORCE_TCB_LEAF;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<EnforceTCBLeafAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

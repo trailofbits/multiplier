@@ -46,6 +46,7 @@ class PredefinedExpr : public Expr {
     return StmtKind::PREDEFINED_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<PredefinedExpr> containing(const Decl &decl);
   static gap::generator<PredefinedExpr> containing(const Stmt &stmt);
 

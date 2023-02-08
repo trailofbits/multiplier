@@ -40,6 +40,7 @@ class SEHLeaveStmt : public Stmt {
     return StmtKind::SEH_LEAVE_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SEHLeaveStmt> containing(const Decl &decl);
   static gap::generator<SEHLeaveStmt> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class PascalAttr : public InheritableAttr {
     return AttrKind::PASCAL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PascalAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

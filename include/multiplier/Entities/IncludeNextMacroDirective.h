@@ -42,6 +42,7 @@ class IncludeNextMacroDirective : public IncludeLikeMacroDirective {
     return MacroKind::INCLUDE_NEXT_DIRECTIVE;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<IncludeNextMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

@@ -47,6 +47,7 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<BinaryConditionalOperator> containing(const Decl &decl);
   static gap::generator<BinaryConditionalOperator> containing(const Stmt &stmt);
 

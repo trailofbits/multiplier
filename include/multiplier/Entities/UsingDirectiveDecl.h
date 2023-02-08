@@ -42,6 +42,7 @@ class UsingDirectiveDecl : public NamedDecl {
     return DeclKind::USING_DIRECTIVE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UsingDirectiveDecl> containing(const Decl &decl);
   static gap::generator<UsingDirectiveDecl> containing(const Stmt &stmt);
 

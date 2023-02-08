@@ -40,6 +40,7 @@ class AbstractConditionalOperator : public Expr {
   static gap::generator<AbstractConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<AbstractConditionalOperator> containing(const Decl &decl);
   static gap::generator<AbstractConditionalOperator> containing(const Stmt &stmt);
 

@@ -46,6 +46,7 @@ class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPTeamsDistributeSimdDirective> containing(const Decl &decl);
   static gap::generator<OMPTeamsDistributeSimdDirective> containing(const Stmt &stmt);
 

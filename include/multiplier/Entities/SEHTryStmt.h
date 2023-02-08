@@ -43,6 +43,7 @@ class SEHTryStmt : public Stmt {
     return StmtKind::SEH_TRY_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SEHTryStmt> containing(const Decl &decl);
   static gap::generator<SEHTryStmt> containing(const Stmt &stmt);
 

@@ -40,6 +40,7 @@ class ObjCRuntimeNameAttr : public Attr {
     return AttrKind::OBJ_C_RUNTIME_NAME;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCRuntimeNameAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

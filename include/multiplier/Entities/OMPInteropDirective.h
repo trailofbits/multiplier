@@ -42,6 +42,7 @@ class OMPInteropDirective : public OMPExecutableDirective {
     return StmtKind::OMP_INTEROP_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPInteropDirective> containing(const Decl &decl);
   static gap::generator<OMPInteropDirective> containing(const Stmt &stmt);
 

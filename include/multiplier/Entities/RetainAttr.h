@@ -42,6 +42,7 @@ class RetainAttr : public InheritableAttr {
     return AttrKind::RETAIN;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<RetainAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

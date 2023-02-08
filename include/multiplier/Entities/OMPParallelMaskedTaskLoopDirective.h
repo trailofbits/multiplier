@@ -46,6 +46,7 @@ class OMPParallelMaskedTaskLoopDirective : public OMPLoopDirective {
     return StmtKind::OMP_PARALLEL_MASKED_TASK_LOOP_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPParallelMaskedTaskLoopDirective> containing(const Decl &decl);
   static gap::generator<OMPParallelMaskedTaskLoopDirective> containing(const Stmt &stmt);
 

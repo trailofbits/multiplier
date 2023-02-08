@@ -38,6 +38,7 @@ class MacroVAOptArgument : public Macro {
     return MacroKind::VA_OPT_ARGUMENT;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroVAOptArgument> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

@@ -43,6 +43,7 @@ class SectionAttr : public InheritableAttr {
     return AttrKind::SECTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SectionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

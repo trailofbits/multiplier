@@ -42,6 +42,7 @@ class Ptr32Attr : public TypeAttr {
     return AttrKind::PTR32;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<Ptr32Attr> from(const Reference &r) {
     return from(r.as_attribute());
   }

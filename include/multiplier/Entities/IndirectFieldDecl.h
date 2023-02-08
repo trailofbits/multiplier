@@ -46,6 +46,7 @@ class IndirectFieldDecl : public ValueDecl {
     return DeclKind::INDIRECT_FIELD;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<IndirectFieldDecl> containing(const Decl &decl);
   static gap::generator<IndirectFieldDecl> containing(const Stmt &stmt);
 

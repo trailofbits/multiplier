@@ -42,6 +42,7 @@ class ObjCBridgeRelatedAttr : public InheritableAttr {
     return AttrKind::OBJ_C_BRIDGE_RELATED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCBridgeRelatedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -43,6 +43,7 @@ class AttributedStmt : public ValueStmt {
     return StmtKind::ATTRIBUTED_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<AttributedStmt> containing(const Decl &decl);
   static gap::generator<AttributedStmt> containing(const Stmt &stmt);
 

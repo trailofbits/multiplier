@@ -42,6 +42,7 @@ class ObjCSubclassingRestrictedAttr : public InheritableAttr {
     return AttrKind::OBJ_C_SUBCLASSING_RESTRICTED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCSubclassingRestrictedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

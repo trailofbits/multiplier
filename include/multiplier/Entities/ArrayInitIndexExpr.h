@@ -44,6 +44,7 @@ class ArrayInitIndexExpr : public Expr {
     return StmtKind::ARRAY_INIT_INDEX_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ArrayInitIndexExpr> containing(const Decl &decl);
   static gap::generator<ArrayInitIndexExpr> containing(const Stmt &stmt);
 

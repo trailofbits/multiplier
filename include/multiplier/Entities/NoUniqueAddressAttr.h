@@ -42,6 +42,7 @@ class NoUniqueAddressAttr : public InheritableAttr {
     return AttrKind::NO_UNIQUE_ADDRESS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoUniqueAddressAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

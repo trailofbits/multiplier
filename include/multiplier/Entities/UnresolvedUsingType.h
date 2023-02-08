@@ -41,6 +41,7 @@ class UnresolvedUsingType : public Type {
     return TypeKind::UNRESOLVED_USING;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<UnresolvedUsingType> from(const Reference &r) {
     return from(r.as_type());
   }

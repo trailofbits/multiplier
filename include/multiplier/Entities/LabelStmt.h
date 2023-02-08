@@ -43,6 +43,7 @@ class LabelStmt : public ValueStmt {
     return StmtKind::LABEL_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<LabelStmt> containing(const Decl &decl);
   static gap::generator<LabelStmt> containing(const Stmt &stmt);
 

@@ -45,6 +45,7 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
     return DeclKind::CONSTRUCTOR_USING_SHADOW;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ConstructorUsingShadowDecl> containing(const Decl &decl);
   static gap::generator<ConstructorUsingShadowDecl> containing(const Stmt &stmt);
 

@@ -44,6 +44,7 @@ class ObjCBoolLiteralExpr : public Expr {
     return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCBoolLiteralExpr> containing(const Decl &decl);
   static gap::generator<ObjCBoolLiteralExpr> containing(const Stmt &stmt);
 

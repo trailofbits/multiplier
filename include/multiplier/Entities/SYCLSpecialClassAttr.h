@@ -42,6 +42,7 @@ class SYCLSpecialClassAttr : public InheritableAttr {
     return AttrKind::SYCL_SPECIAL_CLASS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SYCLSpecialClassAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

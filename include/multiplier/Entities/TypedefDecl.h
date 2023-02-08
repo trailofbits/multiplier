@@ -46,6 +46,7 @@ class TypedefDecl : public TypedefNameDecl {
     return DeclKind::TYPEDEF;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TypedefDecl> containing(const Decl &decl);
   static gap::generator<TypedefDecl> containing(const Stmt &stmt);
 

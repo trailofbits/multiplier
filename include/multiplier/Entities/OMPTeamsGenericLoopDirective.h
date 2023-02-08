@@ -46,6 +46,7 @@ class OMPTeamsGenericLoopDirective : public OMPLoopDirective {
     return StmtKind::OMP_TEAMS_GENERIC_LOOP_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPTeamsGenericLoopDirective> containing(const Decl &decl);
   static gap::generator<OMPTeamsGenericLoopDirective> containing(const Stmt &stmt);
 

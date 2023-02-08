@@ -42,6 +42,7 @@ class XRayLogArgsAttr : public InheritableAttr {
     return AttrKind::X_RAY_LOG_ARGS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<XRayLogArgsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class VectorCallAttr : public InheritableAttr {
     return AttrKind::VECTOR_CALL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<VectorCallAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

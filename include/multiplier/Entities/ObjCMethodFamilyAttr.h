@@ -43,6 +43,7 @@ class ObjCMethodFamilyAttr : public InheritableAttr {
     return AttrKind::OBJ_C_METHOD_FAMILY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCMethodFamilyAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

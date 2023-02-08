@@ -40,6 +40,7 @@ class AtomicType : public Type {
     return TypeKind::ATOMIC;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<AtomicType> from(const Reference &r) {
     return from(r.as_type());
   }

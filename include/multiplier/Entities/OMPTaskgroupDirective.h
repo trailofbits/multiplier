@@ -43,6 +43,7 @@ class OMPTaskgroupDirective : public OMPExecutableDirective {
     return StmtKind::OMP_TASKGROUP_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPTaskgroupDirective> containing(const Decl &decl);
   static gap::generator<OMPTaskgroupDirective> containing(const Stmt &stmt);
 

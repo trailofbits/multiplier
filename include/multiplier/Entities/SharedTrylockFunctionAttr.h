@@ -43,6 +43,7 @@ class SharedTrylockFunctionAttr : public InheritableAttr {
     return AttrKind::SHARED_TRYLOCK_FUNCTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SharedTrylockFunctionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

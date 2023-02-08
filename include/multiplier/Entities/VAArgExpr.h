@@ -45,6 +45,7 @@ class VAArgExpr : public Expr {
     return StmtKind::VA_ARG_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<VAArgExpr> containing(const Decl &decl);
   static gap::generator<VAArgExpr> containing(const Stmt &stmt);
 

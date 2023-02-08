@@ -42,6 +42,7 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
     return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -45,6 +45,7 @@ class AutoType : public DeducedType {
     return TypeKind::AUTO;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<AutoType> from(const Reference &r) {
     return from(r.as_type());
   }

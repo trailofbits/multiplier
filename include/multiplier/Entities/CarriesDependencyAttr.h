@@ -44,6 +44,7 @@ class CarriesDependencyAttr : public InheritableParamAttr {
     return AttrKind::CARRIES_DEPENDENCY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CarriesDependencyAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

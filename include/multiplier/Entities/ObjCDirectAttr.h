@@ -40,6 +40,7 @@ class ObjCDirectAttr : public Attr {
     return AttrKind::OBJ_C_DIRECT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCDirectAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

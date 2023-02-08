@@ -44,6 +44,7 @@ class BuiltinTemplateDecl : public TemplateDecl {
     return DeclKind::BUILTIN_TEMPLATE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<BuiltinTemplateDecl> containing(const Decl &decl);
   static gap::generator<BuiltinTemplateDecl> containing(const Stmt &stmt);
 

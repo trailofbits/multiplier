@@ -42,6 +42,7 @@ class EnumType : public TagType {
     return TypeKind::ENUM;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<EnumType> from(const Reference &r) {
     return from(r.as_type());
   }

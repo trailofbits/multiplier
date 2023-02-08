@@ -42,6 +42,7 @@ class ScopedLockableAttr : public InheritableAttr {
     return AttrKind::SCOPED_LOCKABLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ScopedLockableAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

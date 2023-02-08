@@ -40,6 +40,7 @@ class ModeAttr : public Attr {
     return AttrKind::MODE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ModeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

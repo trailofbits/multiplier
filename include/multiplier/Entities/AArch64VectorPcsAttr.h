@@ -42,6 +42,7 @@ class AArch64VectorPcsAttr : public InheritableAttr {
     return AttrKind::A_ARCH64_VECTOR_PCS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AArch64VectorPcsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -43,6 +43,7 @@ class FunctionReturnThunksAttr : public InheritableAttr {
     return AttrKind::FUNCTION_RETURN_THUNKS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<FunctionReturnThunksAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -36,6 +36,7 @@ class SwitchCase : public Stmt {
   static gap::generator<SwitchCase> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SwitchCase> containing(const Decl &decl);
   static gap::generator<SwitchCase> containing(const Stmt &stmt);
 

@@ -44,6 +44,7 @@ class OffsetOfExpr : public Expr {
     return StmtKind::OFFSET_OF_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OffsetOfExpr> containing(const Decl &decl);
   static gap::generator<OffsetOfExpr> containing(const Stmt &stmt);
 

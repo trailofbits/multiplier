@@ -42,6 +42,7 @@ class ReqdWorkGroupSizeAttr : public InheritableAttr {
     return AttrKind::REQD_WORK_GROUP_SIZE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ReqdWorkGroupSizeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

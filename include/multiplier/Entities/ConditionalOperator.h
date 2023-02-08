@@ -46,6 +46,7 @@ class ConditionalOperator : public AbstractConditionalOperator {
     return StmtKind::CONDITIONAL_OPERATOR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ConditionalOperator> containing(const Decl &decl);
   static gap::generator<ConditionalOperator> containing(const Stmt &stmt);
 

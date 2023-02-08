@@ -42,6 +42,7 @@ class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
     return AttrKind::OS_RETURNS_RETAINED_ON_ZERO;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class SwiftBridgedTypedefAttr : public InheritableAttr {
     return AttrKind::SWIFT_BRIDGED_TYPEDEF;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SwiftBridgedTypedefAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class StandaloneDebugAttr : public InheritableAttr {
     return AttrKind::STANDALONE_DEBUG;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<StandaloneDebugAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

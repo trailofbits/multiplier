@@ -50,6 +50,7 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
     return DeclKind::OBJ_C_INTERFACE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCInterfaceDecl> containing(const Decl &decl);
   static gap::generator<ObjCInterfaceDecl> containing(const Stmt &stmt);
 

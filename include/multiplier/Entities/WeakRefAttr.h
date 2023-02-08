@@ -42,6 +42,7 @@ class WeakRefAttr : public InheritableAttr {
     return AttrKind::WEAK_REF;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<WeakRefAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

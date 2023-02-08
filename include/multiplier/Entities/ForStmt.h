@@ -43,6 +43,7 @@ class ForStmt : public Stmt {
     return StmtKind::FOR_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ForStmt> containing(const Decl &decl);
   static gap::generator<ForStmt> containing(const Stmt &stmt);
 

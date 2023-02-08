@@ -37,6 +37,7 @@ class ValueStmt : public Stmt {
   static gap::generator<ValueStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ValueStmt> containing(const Decl &decl);
   static gap::generator<ValueStmt> containing(const Stmt &stmt);
 

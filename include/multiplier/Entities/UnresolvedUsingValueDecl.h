@@ -44,6 +44,7 @@ class UnresolvedUsingValueDecl : public ValueDecl {
     return DeclKind::UNRESOLVED_USING_VALUE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UnresolvedUsingValueDecl> containing(const Decl &decl);
   static gap::generator<UnresolvedUsingValueDecl> containing(const Stmt &stmt);
 

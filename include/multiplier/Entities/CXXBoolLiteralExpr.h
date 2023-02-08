@@ -44,6 +44,7 @@ class CXXBoolLiteralExpr : public Expr {
     return StmtKind::CXX_BOOL_LITERAL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXBoolLiteralExpr> containing(const Decl &decl);
   static gap::generator<CXXBoolLiteralExpr> containing(const Stmt &stmt);
 

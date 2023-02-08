@@ -40,6 +40,7 @@ class MacroVAOpt : public MacroSubstitution {
     return MacroKind::VA_OPT;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroVAOpt> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

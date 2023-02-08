@@ -46,6 +46,7 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
     return DeclKind::TYPE_ALIAS_TEMPLATE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TypeAliasTemplateDecl> containing(const Decl &decl);
   static gap::generator<TypeAliasTemplateDecl> containing(const Stmt &stmt);
 

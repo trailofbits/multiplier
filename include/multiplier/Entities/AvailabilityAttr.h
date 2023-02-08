@@ -42,6 +42,7 @@ class AvailabilityAttr : public InheritableAttr {
     return AttrKind::AVAILABILITY;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AvailabilityAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

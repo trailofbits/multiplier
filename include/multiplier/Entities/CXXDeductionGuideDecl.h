@@ -50,6 +50,7 @@ class CXXDeductionGuideDecl : public FunctionDecl {
     return DeclKind::CXX_DEDUCTION_GUIDE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<CXXDeductionGuideDecl> containing(const Decl &decl);
   static gap::generator<CXXDeductionGuideDecl> containing(const Stmt &stmt);
 

@@ -39,6 +39,7 @@ class TemplateDecl : public NamedDecl {
   static gap::generator<TemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TemplateDecl> containing(const Decl &decl);
   static gap::generator<TemplateDecl> containing(const Stmt &stmt);
 

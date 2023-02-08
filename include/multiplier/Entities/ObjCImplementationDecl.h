@@ -48,6 +48,7 @@ class ObjCImplementationDecl : public ObjCImplDecl {
     return DeclKind::OBJ_C_IMPLEMENTATION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCImplementationDecl> containing(const Decl &decl);
   static gap::generator<ObjCImplementationDecl> containing(const Stmt &stmt);
 

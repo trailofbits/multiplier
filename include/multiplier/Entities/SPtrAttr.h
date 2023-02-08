@@ -42,6 +42,7 @@ class SPtrAttr : public TypeAttr {
     return AttrKind::S_PTR;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SPtrAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

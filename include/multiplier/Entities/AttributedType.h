@@ -42,6 +42,7 @@ class AttributedType : public Type {
     return TypeKind::ATTRIBUTED;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<AttributedType> from(const Reference &r) {
     return from(r.as_type());
   }

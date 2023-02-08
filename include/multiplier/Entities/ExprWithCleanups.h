@@ -46,6 +46,7 @@ class ExprWithCleanups : public FullExpr {
     return StmtKind::EXPR_WITH_CLEANUPS;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ExprWithCleanups> containing(const Decl &decl);
   static gap::generator<ExprWithCleanups> containing(const Stmt &stmt);
 

@@ -44,6 +44,7 @@ class IfStmt : public Stmt {
     return StmtKind::IF_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<IfStmt> containing(const Decl &decl);
   static gap::generator<IfStmt> containing(const Stmt &stmt);
 

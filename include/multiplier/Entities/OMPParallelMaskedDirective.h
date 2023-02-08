@@ -43,6 +43,7 @@ class OMPParallelMaskedDirective : public OMPExecutableDirective {
     return StmtKind::OMP_PARALLEL_MASKED_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPParallelMaskedDirective> containing(const Decl &decl);
   static gap::generator<OMPParallelMaskedDirective> containing(const Stmt &stmt);
 

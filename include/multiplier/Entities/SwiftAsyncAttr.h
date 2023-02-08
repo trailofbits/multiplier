@@ -42,6 +42,7 @@ class SwiftAsyncAttr : public InheritableAttr {
     return AttrKind::SWIFT_ASYNC;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SwiftAsyncAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class CUDAHostAttr : public InheritableAttr {
     return AttrKind::CUDA_HOST;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CUDAHostAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

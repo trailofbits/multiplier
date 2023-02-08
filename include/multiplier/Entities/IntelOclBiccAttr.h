@@ -42,6 +42,7 @@ class IntelOclBiccAttr : public InheritableAttr {
     return AttrKind::INTEL_OCL_BICC;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<IntelOclBiccAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

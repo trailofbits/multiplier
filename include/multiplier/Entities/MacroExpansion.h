@@ -42,6 +42,7 @@ class MacroExpansion : public MacroSubstitution {
     return MacroKind::EXPANSION;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroExpansion> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

@@ -48,6 +48,7 @@ class ObjCPropertyDecl : public NamedDecl {
     return DeclKind::OBJ_C_PROPERTY;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCPropertyDecl> containing(const Decl &decl);
   static gap::generator<ObjCPropertyDecl> containing(const Stmt &stmt);
 

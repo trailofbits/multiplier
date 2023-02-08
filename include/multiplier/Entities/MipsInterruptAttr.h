@@ -43,6 +43,7 @@ class MipsInterruptAttr : public InheritableAttr {
     return AttrKind::MIPS_INTERRUPT;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MipsInterruptAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

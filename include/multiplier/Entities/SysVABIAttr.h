@@ -42,6 +42,7 @@ class SysVABIAttr : public InheritableAttr {
     return AttrKind::SYS_VABI;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SysVABIAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

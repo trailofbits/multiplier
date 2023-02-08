@@ -44,6 +44,7 @@ class PackExpansionExpr : public Expr {
     return StmtKind::PACK_EXPANSION_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<PackExpansionExpr> containing(const Decl &decl);
   static gap::generator<PackExpansionExpr> containing(const Stmt &stmt);
 

@@ -41,6 +41,7 @@ class TypeOfExprType : public Type {
     return TypeKind::TYPE_OF_EXPR;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<TypeOfExprType> from(const Reference &r) {
     return from(r.as_type());
   }

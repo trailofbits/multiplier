@@ -37,6 +37,7 @@ class FunctionType : public Type {
   static gap::generator<FunctionType> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<FunctionType> from(const Reference &r) {
     return from(r.as_type());
   }

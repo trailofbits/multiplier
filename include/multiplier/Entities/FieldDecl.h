@@ -49,6 +49,7 @@ class FieldDecl : public DeclaratorDecl {
     return DeclKind::FIELD;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<FieldDecl> containing(const Decl &decl);
   static gap::generator<FieldDecl> containing(const Stmt &stmt);
 

@@ -44,6 +44,7 @@ class SYCLUniqueStableNameExpr : public Expr {
     return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SYCLUniqueStableNameExpr> containing(const Decl &decl);
   static gap::generator<SYCLUniqueStableNameExpr> containing(const Stmt &stmt);
 

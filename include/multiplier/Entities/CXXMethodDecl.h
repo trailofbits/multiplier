@@ -50,6 +50,7 @@ class CXXMethodDecl : public FunctionDecl {
     return DeclKind::CXX_METHOD;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<CXXMethodDecl> containing(const Decl &decl);
   static gap::generator<CXXMethodDecl> containing(const Stmt &stmt);
 

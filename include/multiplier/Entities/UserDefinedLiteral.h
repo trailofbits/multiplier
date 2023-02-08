@@ -47,6 +47,7 @@ class UserDefinedLiteral : public CallExpr {
     return StmtKind::USER_DEFINED_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<UserDefinedLiteral> containing(const Decl &decl);
   static gap::generator<UserDefinedLiteral> containing(const Stmt &stmt);
 

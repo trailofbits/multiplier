@@ -47,6 +47,7 @@ class TypeAliasDecl : public TypedefNameDecl {
     return DeclKind::TYPE_ALIAS;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TypeAliasDecl> containing(const Decl &decl);
   static gap::generator<TypeAliasDecl> containing(const Stmt &stmt);
 

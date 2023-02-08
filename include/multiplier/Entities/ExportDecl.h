@@ -40,6 +40,7 @@ class ExportDecl : public Decl {
     return DeclKind::EXPORT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ExportDecl> containing(const Decl &decl);
   static gap::generator<ExportDecl> containing(const Stmt &stmt);
 

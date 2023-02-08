@@ -42,6 +42,7 @@ class NamespaceAliasDecl : public NamedDecl {
     return DeclKind::NAMESPACE_ALIAS;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<NamespaceAliasDecl> containing(const Decl &decl);
   static gap::generator<NamespaceAliasDecl> containing(const Stmt &stmt);
 

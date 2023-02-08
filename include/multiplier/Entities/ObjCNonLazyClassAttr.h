@@ -40,6 +40,7 @@ class ObjCNonLazyClassAttr : public Attr {
     return AttrKind::OBJ_C_NON_LAZY_CLASS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCNonLazyClassAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

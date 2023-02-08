@@ -44,6 +44,7 @@ class NoInitExpr : public Expr {
     return StmtKind::NO_INIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<NoInitExpr> containing(const Decl &decl);
   static gap::generator<NoInitExpr> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class ConsumableSetOnReadAttr : public InheritableAttr {
     return AttrKind::CONSUMABLE_SET_ON_READ;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ConsumableSetOnReadAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

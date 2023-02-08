@@ -42,6 +42,7 @@ class MinSizeAttr : public InheritableAttr {
     return AttrKind::MIN_SIZE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MinSizeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

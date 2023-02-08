@@ -43,6 +43,7 @@ class ZeroCallUsedRegsAttr : public InheritableAttr {
     return AttrKind::ZERO_CALL_USED_REGS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ZeroCallUsedRegsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

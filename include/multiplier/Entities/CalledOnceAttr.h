@@ -40,6 +40,7 @@ class CalledOnceAttr : public Attr {
     return AttrKind::CALLED_ONCE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CalledOnceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

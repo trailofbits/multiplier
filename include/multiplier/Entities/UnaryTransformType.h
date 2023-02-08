@@ -41,6 +41,7 @@ class UnaryTransformType : public Type {
     return TypeKind::UNARY_TRANSFORM;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<UnaryTransformType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -42,6 +42,7 @@ class DeducedTemplateSpecializationType : public DeducedType {
     return TypeKind::DEDUCED_TEMPLATE_SPECIALIZATION;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DeducedTemplateSpecializationType> from(const Reference &r) {
     return from(r.as_type());
   }

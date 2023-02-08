@@ -41,6 +41,7 @@ class DecltypeType : public Type {
     return TypeKind::DECLTYPE;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DecltypeType> from(const Reference &r) {
     return from(r.as_type());
   }

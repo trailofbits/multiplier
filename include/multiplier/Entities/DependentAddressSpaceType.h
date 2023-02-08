@@ -41,6 +41,7 @@ class DependentAddressSpaceType : public Type {
     return TypeKind::DEPENDENT_ADDRESS_SPACE;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentAddressSpaceType> from(const Reference &r) {
     return from(r.as_type());
   }

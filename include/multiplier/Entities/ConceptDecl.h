@@ -45,6 +45,7 @@ class ConceptDecl : public TemplateDecl {
     return DeclKind::CONCEPT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ConceptDecl> containing(const Decl &decl);
   static gap::generator<ConceptDecl> containing(const Stmt &stmt);
 

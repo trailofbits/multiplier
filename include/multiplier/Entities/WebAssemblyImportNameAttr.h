@@ -42,6 +42,7 @@ class WebAssemblyImportNameAttr : public InheritableAttr {
     return AttrKind::WEB_ASSEMBLY_IMPORT_NAME;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<WebAssemblyImportNameAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

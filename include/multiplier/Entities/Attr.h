@@ -50,6 +50,10 @@ class Attr {
   /* implicit */ inline Attr(std::shared_ptr<const AttrImpl> impl_)
       : impl(std::move(impl_)) {}
 
+  constexpr inline static EntityCategory static_category(void) {
+    return EntityCategory::ATTRIBUTE;
+  }
+
   PackedAttrId id(void) const;
   gap::generator<Reference> references(void) const;
 
@@ -61,6 +65,7 @@ class Attr {
   static gap::generator<Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<Attr> from(const Attr &self) {
     return self;
   }

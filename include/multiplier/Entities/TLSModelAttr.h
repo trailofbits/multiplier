@@ -42,6 +42,7 @@ class TLSModelAttr : public InheritableAttr {
     return AttrKind::TLS_MODEL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<TLSModelAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

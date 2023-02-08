@@ -42,6 +42,7 @@ class AnalyzerNoReturnAttr : public InheritableAttr {
     return AttrKind::ANALYZER_NO_RETURN;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AnalyzerNoReturnAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

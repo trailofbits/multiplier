@@ -42,6 +42,7 @@ class CXXCatchStmt : public Stmt {
     return StmtKind::CXX_CATCH_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXCatchStmt> containing(const Decl &decl);
   static gap::generator<CXXCatchStmt> containing(const Stmt &stmt);
 

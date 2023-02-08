@@ -45,6 +45,7 @@ class MSPropertyRefExpr : public Expr {
     return StmtKind::MS_PROPERTY_REF_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<MSPropertyRefExpr> containing(const Decl &decl);
   static gap::generator<MSPropertyRefExpr> containing(const Stmt &stmt);
 

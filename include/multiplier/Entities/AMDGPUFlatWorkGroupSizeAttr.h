@@ -43,6 +43,7 @@ class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
     return AttrKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class NotTailCalledAttr : public InheritableAttr {
     return AttrKind::NOT_TAIL_CALLED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NotTailCalledAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

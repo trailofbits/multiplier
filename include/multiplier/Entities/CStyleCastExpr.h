@@ -48,6 +48,7 @@ class CStyleCastExpr : public ExplicitCastExpr {
     return StmtKind::C_STYLE_CAST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CStyleCastExpr> containing(const Decl &decl);
   static gap::generator<CStyleCastExpr> containing(const Stmt &stmt);
 

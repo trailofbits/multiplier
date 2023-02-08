@@ -43,6 +43,7 @@ class IBOutletCollectionAttr : public InheritableAttr {
     return AttrKind::IB_OUTLET_COLLECTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<IBOutletCollectionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

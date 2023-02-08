@@ -42,6 +42,7 @@ class DependentVectorType : public Type {
     return TypeKind::DEPENDENT_VECTOR;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentVectorType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -45,6 +45,7 @@ class UsingEnumDecl : public BaseUsingDecl {
     return DeclKind::USING_ENUM;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UsingEnumDecl> containing(const Decl &decl);
   static gap::generator<UsingEnumDecl> containing(const Stmt &stmt);
 

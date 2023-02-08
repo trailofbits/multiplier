@@ -42,6 +42,7 @@ class OMPDeclareSimdDeclAttr : public Attr {
     return AttrKind::OMP_DECLARE_SIMD_DECL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OMPDeclareSimdDeclAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

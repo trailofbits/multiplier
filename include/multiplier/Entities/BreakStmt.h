@@ -40,6 +40,7 @@ class BreakStmt : public Stmt {
     return StmtKind::BREAK_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<BreakStmt> containing(const Decl &decl);
   static gap::generator<BreakStmt> containing(const Stmt &stmt);
 

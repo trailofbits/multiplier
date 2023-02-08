@@ -44,6 +44,7 @@ class GNUNullExpr : public Expr {
     return StmtKind::GNU_NULL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<GNUNullExpr> containing(const Decl &decl);
   static gap::generator<GNUNullExpr> containing(const Stmt &stmt);
 

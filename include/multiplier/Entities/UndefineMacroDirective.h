@@ -40,6 +40,7 @@ class UndefineMacroDirective : public MacroDirective {
     return MacroKind::UNDEFINE_DIRECTIVE;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<UndefineMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

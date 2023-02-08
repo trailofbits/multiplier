@@ -42,6 +42,7 @@ class MSAllocatorAttr : public InheritableAttr {
     return AttrKind::MS_ALLOCATOR;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MSAllocatorAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -47,6 +47,7 @@ class CompoundAssignOperator : public BinaryOperator {
     return StmtKind::COMPOUND_ASSIGN_OPERATOR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CompoundAssignOperator> containing(const Decl &decl);
   static gap::generator<CompoundAssignOperator> containing(const Stmt &stmt);
 

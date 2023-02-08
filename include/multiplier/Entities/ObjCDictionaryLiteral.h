@@ -45,6 +45,7 @@ class ObjCDictionaryLiteral : public Expr {
     return StmtKind::OBJ_C_DICTIONARY_LITERAL;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCDictionaryLiteral> containing(const Decl &decl);
   static gap::generator<ObjCDictionaryLiteral> containing(const Stmt &stmt);
 

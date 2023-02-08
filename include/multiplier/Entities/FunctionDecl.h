@@ -58,6 +58,7 @@ class FunctionDecl : public DeclaratorDecl {
     return DeclKind::FUNCTION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<FunctionDecl> containing(const Decl &decl);
   static gap::generator<FunctionDecl> containing(const Stmt &stmt);
 

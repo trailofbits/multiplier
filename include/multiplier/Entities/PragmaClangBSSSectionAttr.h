@@ -42,6 +42,7 @@ class PragmaClangBSSSectionAttr : public InheritableAttr {
     return AttrKind::PRAGMA_CLANG_BSS_SECTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PragmaClangBSSSectionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -48,6 +48,7 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
     return DeclKind::OBJ_C_AT_DEFS_FIELD;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCAtDefsFieldDecl> containing(const Decl &decl);
   static gap::generator<ObjCAtDefsFieldDecl> containing(const Stmt &stmt);
 

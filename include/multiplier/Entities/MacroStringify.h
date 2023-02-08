@@ -40,6 +40,7 @@ class MacroStringify : public MacroSubstitution {
     return MacroKind::STRINGIFY;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroStringify> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

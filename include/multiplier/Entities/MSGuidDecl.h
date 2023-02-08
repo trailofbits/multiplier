@@ -44,6 +44,7 @@ class MSGuidDecl : public ValueDecl {
     return DeclKind::MS_GUID;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<MSGuidDecl> containing(const Decl &decl);
   static gap::generator<MSGuidDecl> containing(const Stmt &stmt);
 

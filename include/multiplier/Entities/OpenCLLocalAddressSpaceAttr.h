@@ -43,6 +43,7 @@ class OpenCLLocalAddressSpaceAttr : public TypeAttr {
     return AttrKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

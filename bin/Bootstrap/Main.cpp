@@ -1804,11 +1804,13 @@ MethodListPtr CodeGenerator::RunOnClass(
       << "\n#endif\n\n";
 
   std::string base_name;
+  std::string category = "NOT_AN_ENTITY";
   if (false) {
 
 #define SET_BASE_NAME(name, lower_name) \
     } else if (is_ ## lower_name) { \
-      base_name = #lower_name;
+      base_name = #name; \
+      category = SnakeCaseToEnumCase(#lower_name);
 
   FOR_EACH_ENTITY_CATEGORY(SET_BASE_NAME)
 #undef SET_STORAGE
@@ -2120,6 +2122,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     forward_decls.insert(class_name + "Impl");
 
     class_os
+        << "  constexpr inline static EntityCategory static_category(void) {\n"
+        << "    return EntityCategory::" << category << ";\n"
+        << "  }\n\n"
         << "  Packed" << class_name << "Id id(void) const;\n"
         << "  gap::generator<Reference> references(void) const;\n\n";
 
@@ -2314,6 +2319,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
+        << "  static gap::generator<DeclKind> derived_kinds(void);\n"
         << "  static gap::generator<" << class_name
         << "> containing(const Decl &decl);\n"
         << "  static gap::generator<" << class_name
@@ -2363,6 +2369,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
+        << "  static gap::generator<StmtKind> derived_kinds(void);\n"
         << "  static gap::generator<" << class_name
         << "> containing(const Decl &decl);\n"
         << "  static gap::generator<" << class_name
@@ -2411,6 +2418,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << SnakeCaseToEnumCase(snake_name) << ";\n"
           << "  }\n\n";
     }
+
+    class_os
+        << "  static gap::generator<TypeKind> derived_kinds(void);\n";
   
   } else if (is_attribute) {
     if (is_concrete) {
@@ -2423,6 +2433,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << SnakeCaseToEnumCase(snake_name) << ";\n"
           << "  }\n\n";
     }
+
+    class_os
+        << "  static gap::generator<AttrKind> derived_kinds(void);\n";
 
   } else if (is_macro) {
     if (is_concrete) {
@@ -2447,6 +2460,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
+        << "  static gap::generator<MacroKind> derived_kinds(void);\n"
         << "  static gap::generator<" << class_name
         << "> containing(const Macro &macro);\n"
         << "  bool contains(const Macro &macro);\n\n"
@@ -2544,6 +2558,35 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   FOR_EACH_ENTITY_CATEGORY(DECLARE_DEFINE_FROM)
 #undef DECLARE_DEFINE_FROM
+  }
+
+  // Make a generator for all of the derived kinds of this particular entity.
+  if (is_declaration || is_statement || is_attribute || is_type || is_macro) {
+    lib_cpp_os
+        << "static const " << base_name << "Kind k"
+        << class_name << "DerivedKinds[] = {\n";
+    std::vector<const ClassHierarchy *> wl;
+    wl.push_back(cls);
+
+    for (auto i = 0u; i < wl.size(); ++i) {
+      const ClassHierarchy *c = wl[i];
+      std::string c_name = c->record.Name();
+      if (gConcreteClassNames.count(c_name)) {
+        lib_cpp_os << "    " << c_name << "::static_kind(),\n";
+      }
+      for (const ClassHierarchy *d : c->derived) {
+        wl.push_back(d);
+      }
+    }
+
+    lib_cpp_os
+        << "};\n\n"
+        << "gap::generator<" << base_name << "Kind> " << class_name
+        << "::derived_kinds(void) {\n"
+        << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
+        << "    co_yield k;\n"
+        << "  }\n"
+        << "}\n\n";
   }
 
   // Derived classes have optional conversion operators with all of their

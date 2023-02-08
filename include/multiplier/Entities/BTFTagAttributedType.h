@@ -41,6 +41,7 @@ class BTFTagAttributedType : public Type {
     return TypeKind::BTF_TAG_ATTRIBUTED;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<BTFTagAttributedType> from(const Reference &r) {
     return from(r.as_type());
   }

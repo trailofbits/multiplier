@@ -45,6 +45,7 @@ class AlignedAttr : public InheritableAttr {
     return AttrKind::ALIGNED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AlignedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

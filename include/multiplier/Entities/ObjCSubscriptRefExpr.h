@@ -45,6 +45,7 @@ class ObjCSubscriptRefExpr : public Expr {
     return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCSubscriptRefExpr> containing(const Decl &decl);
   static gap::generator<ObjCSubscriptRefExpr> containing(const Stmt &stmt);
 

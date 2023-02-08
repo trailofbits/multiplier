@@ -41,6 +41,7 @@ class ObjCAtCatchStmt : public Stmt {
     return StmtKind::OBJ_C_AT_CATCH_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCAtCatchStmt> containing(const Decl &decl);
   static gap::generator<ObjCAtCatchStmt> containing(const Stmt &stmt);
 

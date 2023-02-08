@@ -52,6 +52,10 @@ class Designator {
   /* implicit */ inline Designator(std::shared_ptr<const DesignatorImpl> impl_)
       : impl(std::move(impl_)) {}
 
+  constexpr inline static EntityCategory static_category(void) {
+    return EntityCategory::DESIGNATOR;
+  }
+
   PackedDesignatorId id(void) const;
   gap::generator<Reference> references(void) const;
 

@@ -42,6 +42,7 @@ class HIPManagedAttr : public InheritableAttr {
     return AttrKind::HIP_MANAGED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<HIPManagedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

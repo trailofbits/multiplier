@@ -45,6 +45,7 @@ class SourceLocExpr : public Expr {
     return StmtKind::SOURCE_LOC_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SourceLocExpr> containing(const Decl &decl);
   static gap::generator<SourceLocExpr> containing(const Stmt &stmt);
 

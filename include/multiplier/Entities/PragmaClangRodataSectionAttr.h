@@ -42,6 +42,7 @@ class PragmaClangRodataSectionAttr : public InheritableAttr {
     return AttrKind::PRAGMA_CLANG_RODATA_SECTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PragmaClangRodataSectionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

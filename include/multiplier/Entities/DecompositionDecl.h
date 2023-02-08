@@ -49,6 +49,7 @@ class DecompositionDecl : public VarDecl {
     return DeclKind::DECOMPOSITION;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<DecompositionDecl> containing(const Decl &decl);
   static gap::generator<DecompositionDecl> containing(const Stmt &stmt);
 

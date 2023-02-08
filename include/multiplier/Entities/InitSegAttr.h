@@ -40,6 +40,7 @@ class InitSegAttr : public Attr {
     return AttrKind::INIT_SEG;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<InitSegAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

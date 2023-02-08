@@ -40,6 +40,7 @@ class EmptyDecl : public Decl {
     return DeclKind::EMPTY;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<EmptyDecl> containing(const Decl &decl);
   static gap::generator<EmptyDecl> containing(const Stmt &stmt);
 

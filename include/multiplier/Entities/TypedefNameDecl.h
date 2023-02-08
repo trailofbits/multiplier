@@ -42,6 +42,7 @@ class TypedefNameDecl : public TypeDecl {
   static gap::generator<TypedefNameDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TypedefNameDecl> containing(const Decl &decl);
   static gap::generator<TypedefNameDecl> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class CoroutineBodyStmt : public Stmt {
     return StmtKind::COROUTINE_BODY_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CoroutineBodyStmt> containing(const Decl &decl);
   static gap::generator<CoroutineBodyStmt> containing(const Stmt &stmt);
 

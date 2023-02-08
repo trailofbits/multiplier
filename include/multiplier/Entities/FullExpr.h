@@ -40,6 +40,7 @@ class FullExpr : public Expr {
   static gap::generator<FullExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<FullExpr> containing(const Decl &decl);
   static gap::generator<FullExpr> containing(const Stmt &stmt);
 

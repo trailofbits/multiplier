@@ -42,6 +42,7 @@ class TypeNullUnspecifiedAttr : public TypeAttr {
     return AttrKind::TYPE_NULL_UNSPECIFIED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<TypeNullUnspecifiedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

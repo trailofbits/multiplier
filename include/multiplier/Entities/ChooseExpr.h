@@ -44,6 +44,7 @@ class ChooseExpr : public Expr {
     return StmtKind::CHOOSE_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ChooseExpr> containing(const Decl &decl);
   static gap::generator<ChooseExpr> containing(const Stmt &stmt);
 

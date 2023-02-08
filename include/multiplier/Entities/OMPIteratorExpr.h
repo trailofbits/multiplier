@@ -44,6 +44,7 @@ class OMPIteratorExpr : public Expr {
     return StmtKind::OMP_ITERATOR_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPIteratorExpr> containing(const Decl &decl);
   static gap::generator<OMPIteratorExpr> containing(const Stmt &stmt);
 

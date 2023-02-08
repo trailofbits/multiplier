@@ -68,6 +68,10 @@ class Type {
   /* implicit */ inline Type(std::shared_ptr<const TypeImpl> impl_)
       : impl(std::move(impl_)) {}
 
+  constexpr inline static EntityCategory static_category(void) {
+    return EntityCategory::TYPE;
+  }
+
   PackedTypeId id(void) const;
   gap::generator<Reference> references(void) const;
 
@@ -79,6 +83,7 @@ class Type {
   static gap::generator<Type> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<Type> from(const Type &self) {
     return self;
   }

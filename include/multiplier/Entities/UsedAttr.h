@@ -42,6 +42,7 @@ class UsedAttr : public InheritableAttr {
     return AttrKind::USED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<UsedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

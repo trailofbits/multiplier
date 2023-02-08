@@ -45,6 +45,7 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
     return DeclKind::OBJ_C_PROTOCOL;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCProtocolDecl> containing(const Decl &decl);
   static gap::generator<ObjCProtocolDecl> containing(const Stmt &stmt);
 

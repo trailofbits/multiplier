@@ -40,6 +40,7 @@ class ObjCAtFinallyStmt : public Stmt {
     return StmtKind::OBJ_C_AT_FINALLY_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCAtFinallyStmt> containing(const Decl &decl);
   static gap::generator<ObjCAtFinallyStmt> containing(const Stmt &stmt);
 

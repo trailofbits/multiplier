@@ -46,6 +46,7 @@ class UnaryExprOrTypeTraitExpr : public Expr {
     return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<UnaryExprOrTypeTraitExpr> containing(const Decl &decl);
   static gap::generator<UnaryExprOrTypeTraitExpr> containing(const Stmt &stmt);
 

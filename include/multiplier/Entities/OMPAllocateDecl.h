@@ -43,6 +43,7 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
     return DeclKind::OMP_ALLOCATE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPAllocateDecl> containing(const Decl &decl);
   static gap::generator<OMPAllocateDecl> containing(const Stmt &stmt);
 

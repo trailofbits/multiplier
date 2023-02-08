@@ -43,6 +43,7 @@ class PcsAttr : public InheritableAttr {
     return AttrKind::PCS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PcsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -38,6 +38,7 @@ class MacroArgument : public Macro {
     return MacroKind::ARGUMENT;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroArgument> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

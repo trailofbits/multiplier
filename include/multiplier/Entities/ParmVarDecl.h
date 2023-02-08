@@ -51,6 +51,7 @@ class ParmVarDecl : public VarDecl {
     return DeclKind::PARM_VAR;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ParmVarDecl> containing(const Decl &decl);
   static gap::generator<ParmVarDecl> containing(const Stmt &stmt);
 

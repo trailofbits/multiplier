@@ -41,6 +41,7 @@ class DefineMacroDirective : public MacroDirective {
     return MacroKind::DEFINE_DIRECTIVE;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<DefineMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

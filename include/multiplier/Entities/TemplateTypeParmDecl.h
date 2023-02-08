@@ -45,6 +45,7 @@ class TemplateTypeParmDecl : public TypeDecl {
     return DeclKind::TEMPLATE_TYPE_PARM;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TemplateTypeParmDecl> containing(const Decl &decl);
   static gap::generator<TemplateTypeParmDecl> containing(const Stmt &stmt);
 

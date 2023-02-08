@@ -46,6 +46,7 @@ class ArrayTypeTraitExpr : public Expr {
     return StmtKind::ARRAY_TYPE_TRAIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ArrayTypeTraitExpr> containing(const Decl &decl);
   static gap::generator<ArrayTypeTraitExpr> containing(const Stmt &stmt);
 

@@ -43,6 +43,7 @@ class CapturedStmt : public Stmt {
     return StmtKind::CAPTURED_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CapturedStmt> containing(const Decl &decl);
   static gap::generator<CapturedStmt> containing(const Stmt &stmt);
 

@@ -44,6 +44,7 @@ class ConvertVectorExpr : public Expr {
     return StmtKind::CONVERT_VECTOR_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ConvertVectorExpr> containing(const Decl &decl);
   static gap::generator<ConvertVectorExpr> containing(const Stmt &stmt);
 

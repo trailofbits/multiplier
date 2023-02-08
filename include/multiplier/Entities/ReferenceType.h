@@ -36,6 +36,7 @@ class ReferenceType : public Type {
   static gap::generator<ReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ReferenceType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -42,6 +42,7 @@ class ObjCGCAttr : public TypeAttr {
     return AttrKind::OBJ_CGC;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCGCAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -47,6 +47,7 @@ class ConstantExpr : public FullExpr {
     return StmtKind::CONSTANT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ConstantExpr> containing(const Decl &decl);
   static gap::generator<ConstantExpr> containing(const Stmt &stmt);
 

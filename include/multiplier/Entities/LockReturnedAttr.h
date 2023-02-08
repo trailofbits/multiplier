@@ -43,6 +43,7 @@ class LockReturnedAttr : public InheritableAttr {
     return AttrKind::LOCK_RETURNED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<LockReturnedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

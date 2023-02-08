@@ -44,6 +44,7 @@ class CXXNullPtrLiteralExpr : public Expr {
     return StmtKind::CXX_NULL_PTR_LITERAL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXNullPtrLiteralExpr> containing(const Decl &decl);
   static gap::generator<CXXNullPtrLiteralExpr> containing(const Stmt &stmt);
 

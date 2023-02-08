@@ -42,6 +42,7 @@ class DependentNameType : public TypeWithKeyword {
     return TypeKind::DEPENDENT_NAME;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentNameType> from(const Reference &r) {
     return from(r.as_type());
   }

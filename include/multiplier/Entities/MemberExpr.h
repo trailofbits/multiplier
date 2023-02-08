@@ -46,6 +46,7 @@ class MemberExpr : public Expr {
     return StmtKind::MEMBER_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<MemberExpr> containing(const Decl &decl);
   static gap::generator<MemberExpr> containing(const Stmt &stmt);
 

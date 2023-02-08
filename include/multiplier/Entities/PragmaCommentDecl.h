@@ -41,6 +41,7 @@ class PragmaCommentDecl : public Decl {
     return DeclKind::PRAGMA_COMMENT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<PragmaCommentDecl> containing(const Decl &decl);
   static gap::generator<PragmaCommentDecl> containing(const Stmt &stmt);
 

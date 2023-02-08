@@ -42,6 +42,7 @@ class CPUSpecificAttr : public InheritableAttr {
     return AttrKind::CPU_SPECIFIC;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CPUSpecificAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

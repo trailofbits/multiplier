@@ -45,6 +45,7 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
     return AttrKind::ALWAYS_INLINE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AlwaysInlineAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

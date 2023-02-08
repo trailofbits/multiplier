@@ -42,6 +42,7 @@ class TransparentUnionAttr : public InheritableAttr {
     return AttrKind::TRANSPARENT_UNION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<TransparentUnionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

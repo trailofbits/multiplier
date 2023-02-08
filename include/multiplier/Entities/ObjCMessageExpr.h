@@ -50,6 +50,7 @@ class ObjCMessageExpr : public Expr {
     return StmtKind::OBJ_C_MESSAGE_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCMessageExpr> containing(const Decl &decl);
   static gap::generator<ObjCMessageExpr> containing(const Stmt &stmt);
 

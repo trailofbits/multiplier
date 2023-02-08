@@ -40,6 +40,7 @@ class ComplexType : public Type {
     return TypeKind::COMPLEX;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ComplexType> from(const Reference &r) {
     return from(r.as_type());
   }

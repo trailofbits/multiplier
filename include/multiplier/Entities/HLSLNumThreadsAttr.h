@@ -42,6 +42,7 @@ class HLSLNumThreadsAttr : public InheritableAttr {
     return AttrKind::HLSL_NUM_THREADS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<HLSLNumThreadsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

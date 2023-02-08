@@ -43,6 +43,7 @@ class FriendDecl : public Decl {
     return DeclKind::FRIEND;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<FriendDecl> containing(const Decl &decl);
   static gap::generator<FriendDecl> containing(const Stmt &stmt);
 

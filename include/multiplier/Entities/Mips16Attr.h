@@ -42,6 +42,7 @@ class Mips16Attr : public InheritableAttr {
     return AttrKind::MIPS16;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<Mips16Attr> from(const Reference &r) {
     return from(r.as_attribute());
   }

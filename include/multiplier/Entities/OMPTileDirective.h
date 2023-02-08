@@ -46,6 +46,7 @@ class OMPTileDirective : public OMPLoopTransformationDirective {
     return StmtKind::OMP_TILE_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPTileDirective> containing(const Decl &decl);
   static gap::generator<OMPTileDirective> containing(const Stmt &stmt);
 

@@ -42,6 +42,7 @@ class CDeclAttr : public InheritableAttr {
     return AttrKind::C_DECL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CDeclAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

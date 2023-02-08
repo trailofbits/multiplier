@@ -43,6 +43,7 @@ class TagDecl : public TypeDecl {
   static gap::generator<TagDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TagDecl> containing(const Decl &decl);
   static gap::generator<TagDecl> containing(const Stmt &stmt);
 

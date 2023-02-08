@@ -45,6 +45,7 @@ class DesignatedInitUpdateExpr : public Expr {
     return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DesignatedInitUpdateExpr> containing(const Decl &decl);
   static gap::generator<DesignatedInitUpdateExpr> containing(const Stmt &stmt);
 

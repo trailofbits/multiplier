@@ -37,6 +37,7 @@ class OMPExecutableDirective : public Stmt {
   static gap::generator<OMPExecutableDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPExecutableDirective> containing(const Decl &decl);
   static gap::generator<OMPExecutableDirective> containing(const Stmt &stmt);
 

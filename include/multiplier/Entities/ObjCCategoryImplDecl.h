@@ -47,6 +47,7 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
     return DeclKind::OBJ_C_CATEGORY_IMPL;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<ObjCCategoryImplDecl> containing(const Decl &decl);
   static gap::generator<ObjCCategoryImplDecl> containing(const Stmt &stmt);
 

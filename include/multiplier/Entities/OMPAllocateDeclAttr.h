@@ -44,6 +44,7 @@ class OMPAllocateDeclAttr : public InheritableAttr {
     return AttrKind::OMP_ALLOCATE_DECL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OMPAllocateDeclAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

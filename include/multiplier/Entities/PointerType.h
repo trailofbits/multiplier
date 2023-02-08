@@ -40,6 +40,7 @@ class PointerType : public Type {
     return TypeKind::POINTER;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<PointerType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -40,6 +40,7 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const Stmt &stmt);
 

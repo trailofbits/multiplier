@@ -45,6 +45,7 @@ class CXXTypeidExpr : public Expr {
     return StmtKind::CXX_TYPEID_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXTypeidExpr> containing(const Decl &decl);
   static gap::generator<CXXTypeidExpr> containing(const Stmt &stmt);
 

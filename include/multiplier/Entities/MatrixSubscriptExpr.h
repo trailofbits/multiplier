@@ -44,6 +44,7 @@ class MatrixSubscriptExpr : public Expr {
     return StmtKind::MATRIX_SUBSCRIPT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<MatrixSubscriptExpr> containing(const Decl &decl);
   static gap::generator<MatrixSubscriptExpr> containing(const Stmt &stmt);
 

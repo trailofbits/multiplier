@@ -41,6 +41,7 @@ class DeclStmt : public Stmt {
     return StmtKind::DECL_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DeclStmt> containing(const Decl &decl);
   static gap::generator<DeclStmt> containing(const Stmt &stmt);
 

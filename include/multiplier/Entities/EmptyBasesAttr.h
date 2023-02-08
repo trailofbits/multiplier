@@ -42,6 +42,7 @@ class EmptyBasesAttr : public InheritableAttr {
     return AttrKind::EMPTY_BASES;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<EmptyBasesAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

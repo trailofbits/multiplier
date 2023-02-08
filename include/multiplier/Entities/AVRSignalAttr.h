@@ -42,6 +42,7 @@ class AVRSignalAttr : public InheritableAttr {
     return AttrKind::AVR_SIGNAL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AVRSignalAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

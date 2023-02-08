@@ -44,6 +44,7 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
   static gap::generator<CXXNamedCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXNamedCastExpr> containing(const Decl &decl);
   static gap::generator<CXXNamedCastExpr> containing(const Stmt &stmt);
 

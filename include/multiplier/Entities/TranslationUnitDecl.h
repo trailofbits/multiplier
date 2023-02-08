@@ -40,6 +40,7 @@ class TranslationUnitDecl : public Decl {
     return DeclKind::TRANSLATION_UNIT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<TranslationUnitDecl> containing(const Decl &decl);
   static gap::generator<TranslationUnitDecl> containing(const Stmt &stmt);
 

@@ -43,6 +43,7 @@ class ObjCInterfaceType : public ObjCObjectType {
     return TypeKind::OBJ_C_INTERFACE;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ObjCInterfaceType> from(const Reference &r) {
     return from(r.as_type());
   }

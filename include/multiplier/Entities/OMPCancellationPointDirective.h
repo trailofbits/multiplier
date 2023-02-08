@@ -42,6 +42,7 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
     return StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPCancellationPointDirective> containing(const Decl &decl);
   static gap::generator<OMPCancellationPointDirective> containing(const Stmt &stmt);
 

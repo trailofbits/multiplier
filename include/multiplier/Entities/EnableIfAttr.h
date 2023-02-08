@@ -43,6 +43,7 @@ class EnableIfAttr : public InheritableAttr {
     return AttrKind::ENABLE_IF;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<EnableIfAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

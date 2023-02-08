@@ -42,6 +42,7 @@ class ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
     return AttrKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

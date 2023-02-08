@@ -40,6 +40,7 @@ class OtherMacroDirective : public MacroDirective {
     return MacroKind::OTHER_DIRECTIVE;
   }
 
+  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<OtherMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

@@ -43,6 +43,7 @@ class BlocksAttr : public InheritableAttr {
     return AttrKind::BLOCKS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<BlocksAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

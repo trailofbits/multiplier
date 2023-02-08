@@ -42,6 +42,7 @@ class ReturnsTwiceAttr : public InheritableAttr {
     return AttrKind::RETURNS_TWICE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ReturnsTwiceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

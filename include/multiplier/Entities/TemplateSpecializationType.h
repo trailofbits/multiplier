@@ -41,6 +41,7 @@ class TemplateSpecializationType : public Type {
     return TypeKind::TEMPLATE_SPECIALIZATION;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<TemplateSpecializationType> from(const Reference &r) {
     return from(r.as_type());
   }

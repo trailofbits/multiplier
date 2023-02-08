@@ -42,6 +42,7 @@ class CUDADeviceAttr : public InheritableAttr {
     return AttrKind::CUDA_DEVICE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CUDADeviceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class MinVectorWidthAttr : public InheritableAttr {
     return AttrKind::MIN_VECTOR_WIDTH;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MinVectorWidthAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

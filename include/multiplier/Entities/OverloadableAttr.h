@@ -40,6 +40,7 @@ class OverloadableAttr : public Attr {
     return AttrKind::OVERLOADABLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OverloadableAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

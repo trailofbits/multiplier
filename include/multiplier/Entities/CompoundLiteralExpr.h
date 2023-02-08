@@ -44,6 +44,7 @@ class CompoundLiteralExpr : public Expr {
     return StmtKind::COMPOUND_LITERAL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CompoundLiteralExpr> containing(const Decl &decl);
   static gap::generator<CompoundLiteralExpr> containing(const Stmt &stmt);
 

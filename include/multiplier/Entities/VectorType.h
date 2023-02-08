@@ -41,6 +41,7 @@ class VectorType : public Type {
     return TypeKind::VECTOR;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<VectorType> from(const Reference &r) {
     return from(r.as_type());
   }

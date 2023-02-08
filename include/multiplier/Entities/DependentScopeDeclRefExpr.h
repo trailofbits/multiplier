@@ -44,6 +44,7 @@ class DependentScopeDeclRefExpr : public Expr {
     return StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DependentScopeDeclRefExpr> containing(const Decl &decl);
   static gap::generator<DependentScopeDeclRefExpr> containing(const Stmt &stmt);
 

@@ -41,6 +41,7 @@ class DependentSizedExtVectorType : public Type {
     return TypeKind::DEPENDENT_SIZED_EXT_VECTOR;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentSizedExtVectorType> from(const Reference &r) {
     return from(r.as_type());
   }

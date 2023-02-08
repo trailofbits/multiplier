@@ -42,6 +42,7 @@ class DeprecatedAttr : public InheritableAttr {
     return AttrKind::DEPRECATED;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<DeprecatedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

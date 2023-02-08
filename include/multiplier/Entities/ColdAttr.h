@@ -42,6 +42,7 @@ class ColdAttr : public InheritableAttr {
     return AttrKind::COLD;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ColdAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

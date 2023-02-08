@@ -44,6 +44,7 @@ class ArraySubscriptExpr : public Expr {
     return StmtKind::ARRAY_SUBSCRIPT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ArraySubscriptExpr> containing(const Decl &decl);
   static gap::generator<ArraySubscriptExpr> containing(const Stmt &stmt);
 

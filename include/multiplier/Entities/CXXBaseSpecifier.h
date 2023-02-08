@@ -55,6 +55,10 @@ class CXXBaseSpecifier {
   /* implicit */ inline CXXBaseSpecifier(std::shared_ptr<const CXXBaseSpecifierImpl> impl_)
       : impl(std::move(impl_)) {}
 
+  constexpr inline static EntityCategory static_category(void) {
+    return EntityCategory::CXX_BASE_SPECIFIER;
+  }
+
   PackedCXXBaseSpecifierId id(void) const;
   gap::generator<Reference> references(void) const;
 

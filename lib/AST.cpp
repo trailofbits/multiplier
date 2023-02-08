@@ -7932,6 +7932,15 @@ gap::generator<Macro> Macro::containing(const Token &token) {
   }
 }
 
+static const MacroKind kMacroDerivedKinds[] = {
+    MacroParameter::static_kind(),    MacroArgument::static_kind(),    MacroSubstitution::static_kind(),    MacroVAOptArgument::static_kind(),    OtherMacroDirective::static_kind(),    UndefineMacroDirective::static_kind(),    PragmaMacroDirective::static_kind(),    DefineMacroDirective::static_kind(),    MacroExpansion::static_kind(),    MacroStringify::static_kind(),    MacroConcatenate::static_kind(),    MacroVAOpt::static_kind(),    IncludeMacroDirective::static_kind(),    IncludeNextMacroDirective::static_kind(),    IncludeMacrosMacroDirective::static_kind(),    ImportMacroDirective::static_kind(),    IfMacroDirective::static_kind(),    IfDefinedMacroDirective::static_kind(),    IfNotDefinedMacroDirective::static_kind(),    ElseIfMacroDirective::static_kind(),    ElseIfDefinedMacroDirective::static_kind(),    ElseIfNotDefinedMacroDirective::static_kind(),    ElseMacroDirective::static_kind(),    EndIfMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> Macro::derived_kinds(void) {
+  for (MacroKind k : kMacroDerivedKinds) {
+    co_yield k;
+  }
+}
+
 MacroKind Macro::kind(void) const {
   return static_cast<MacroKind>(impl->reader.getVal0());
 }
@@ -8004,6 +8013,15 @@ gap::generator<MacroVAOptArgument> MacroVAOptArgument::containing(const Token &t
   }
 }
 
+static const MacroKind kMacroVAOptArgumentDerivedKinds[] = {
+    MacroVAOptArgument::static_kind(),};
+
+gap::generator<MacroKind> MacroVAOptArgument::derived_kinds(void) {
+  for (MacroKind k : kMacroVAOptArgumentDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MacroVAOptArgument> MacroVAOptArgument::from(const Macro &parent) {
   switch (parent.kind()) {
     case mx::MacroKind::VA_OPT_ARGUMENT:
@@ -8049,6 +8067,15 @@ gap::generator<MacroSubstitution> MacroSubstitution::containing(const Token &tok
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kMacroSubstitutionDerivedKinds[] = {
+    MacroSubstitution::static_kind(),    MacroExpansion::static_kind(),    MacroStringify::static_kind(),    MacroConcatenate::static_kind(),    MacroVAOpt::static_kind(),};
+
+gap::generator<MacroKind> MacroSubstitution::derived_kinds(void) {
+  for (MacroKind k : kMacroSubstitutionDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -8119,6 +8146,15 @@ gap::generator<MacroVAOpt> MacroVAOpt::containing(const Token &token) {
   }
 }
 
+static const MacroKind kMacroVAOptDerivedKinds[] = {
+    MacroVAOpt::static_kind(),};
+
+gap::generator<MacroKind> MacroVAOpt::derived_kinds(void) {
+  for (MacroKind k : kMacroVAOptDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MacroVAOpt> MacroVAOpt::from(const MacroSubstitution &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -8168,6 +8204,15 @@ gap::generator<MacroConcatenate> MacroConcatenate::containing(const Token &token
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kMacroConcatenateDerivedKinds[] = {
+    MacroConcatenate::static_kind(),};
+
+gap::generator<MacroKind> MacroConcatenate::derived_kinds(void) {
+  for (MacroKind k : kMacroConcatenateDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -8223,6 +8268,15 @@ gap::generator<MacroStringify> MacroStringify::containing(const Token &token) {
   }
 }
 
+static const MacroKind kMacroStringifyDerivedKinds[] = {
+    MacroStringify::static_kind(),};
+
+gap::generator<MacroKind> MacroStringify::derived_kinds(void) {
+  for (MacroKind k : kMacroStringifyDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MacroStringify> MacroStringify::from(const MacroSubstitution &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -8272,6 +8326,15 @@ gap::generator<MacroExpansion> MacroExpansion::containing(const Token &token) {
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kMacroExpansionDerivedKinds[] = {
+    MacroExpansion::static_kind(),};
+
+gap::generator<MacroKind> MacroExpansion::derived_kinds(void) {
+  for (MacroKind k : kMacroExpansionDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -8363,6 +8426,15 @@ gap::generator<MacroArgument> MacroArgument::containing(const Token &token) {
   }
 }
 
+static const MacroKind kMacroArgumentDerivedKinds[] = {
+    MacroArgument::static_kind(),};
+
+gap::generator<MacroKind> MacroArgument::derived_kinds(void) {
+  for (MacroKind k : kMacroArgumentDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MacroArgument> MacroArgument::from(const Macro &parent) {
   switch (parent.kind()) {
     case mx::MacroKind::ARGUMENT:
@@ -8416,6 +8488,15 @@ gap::generator<MacroParameter> MacroParameter::containing(const Token &token) {
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kMacroParameterDerivedKinds[] = {
+    MacroParameter::static_kind(),};
+
+gap::generator<MacroKind> MacroParameter::derived_kinds(void) {
+  for (MacroKind k : kMacroParameterDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -8490,6 +8571,15 @@ gap::generator<MacroDirective> MacroDirective::containing(const Token &token) {
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kMacroDirectiveDerivedKinds[] = {
+    OtherMacroDirective::static_kind(),    UndefineMacroDirective::static_kind(),    PragmaMacroDirective::static_kind(),    DefineMacroDirective::static_kind(),    IncludeMacroDirective::static_kind(),    IncludeNextMacroDirective::static_kind(),    IncludeMacrosMacroDirective::static_kind(),    ImportMacroDirective::static_kind(),    IfMacroDirective::static_kind(),    IfDefinedMacroDirective::static_kind(),    IfNotDefinedMacroDirective::static_kind(),    ElseIfMacroDirective::static_kind(),    ElseIfDefinedMacroDirective::static_kind(),    ElseIfNotDefinedMacroDirective::static_kind(),    ElseMacroDirective::static_kind(),    EndIfMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> MacroDirective::derived_kinds(void) {
+  for (MacroKind k : kMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -8568,6 +8658,15 @@ gap::generator<DefineMacroDirective> DefineMacroDirective::containing(const Toke
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kDefineMacroDirectiveDerivedKinds[] = {
+    DefineMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> DefineMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kDefineMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -8676,6 +8775,15 @@ gap::generator<PragmaMacroDirective> PragmaMacroDirective::containing(const Toke
   }
 }
 
+static const MacroKind kPragmaMacroDirectiveDerivedKinds[] = {
+    PragmaMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> PragmaMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kPragmaMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PragmaMacroDirective> PragmaMacroDirective::from(const MacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -8725,6 +8833,15 @@ gap::generator<UndefineMacroDirective> UndefineMacroDirective::containing(const 
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kUndefineMacroDirectiveDerivedKinds[] = {
+    UndefineMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> UndefineMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kUndefineMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -8780,6 +8897,15 @@ gap::generator<OtherMacroDirective> OtherMacroDirective::containing(const Token 
   }
 }
 
+static const MacroKind kOtherMacroDirectiveDerivedKinds[] = {
+    OtherMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> OtherMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kOtherMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OtherMacroDirective> OtherMacroDirective::from(const MacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -8829,6 +8955,15 @@ gap::generator<ConditionalMacroDirective> ConditionalMacroDirective::containing(
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kConditionalMacroDirectiveDerivedKinds[] = {
+    IfMacroDirective::static_kind(),    IfDefinedMacroDirective::static_kind(),    IfNotDefinedMacroDirective::static_kind(),    ElseIfMacroDirective::static_kind(),    ElseIfDefinedMacroDirective::static_kind(),    ElseIfNotDefinedMacroDirective::static_kind(),    ElseMacroDirective::static_kind(),    EndIfMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> ConditionalMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kConditionalMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -8891,6 +9026,15 @@ gap::generator<EndIfMacroDirective> EndIfMacroDirective::containing(const Token 
   }
 }
 
+static const MacroKind kEndIfMacroDirectiveDerivedKinds[] = {
+    EndIfMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> EndIfMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kEndIfMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -8944,6 +9088,15 @@ gap::generator<ElseMacroDirective> ElseMacroDirective::containing(const Token &t
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kElseMacroDirectiveDerivedKinds[] = {
+    ElseMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> ElseMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kElseMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -9003,6 +9156,15 @@ gap::generator<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::c
   }
 }
 
+static const MacroKind kElseIfNotDefinedMacroDirectiveDerivedKinds[] = {
+    ElseIfNotDefinedMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> ElseIfNotDefinedMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kElseIfNotDefinedMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -9056,6 +9218,15 @@ gap::generator<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::contain
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kElseIfDefinedMacroDirectiveDerivedKinds[] = {
+    ElseIfDefinedMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> ElseIfDefinedMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kElseIfDefinedMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -9115,6 +9286,15 @@ gap::generator<ElseIfMacroDirective> ElseIfMacroDirective::containing(const Toke
   }
 }
 
+static const MacroKind kElseIfMacroDirectiveDerivedKinds[] = {
+    ElseIfMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> ElseIfMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kElseIfMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -9168,6 +9348,15 @@ gap::generator<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::containin
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kIfNotDefinedMacroDirectiveDerivedKinds[] = {
+    IfNotDefinedMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> IfNotDefinedMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kIfNotDefinedMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -9227,6 +9416,15 @@ gap::generator<IfDefinedMacroDirective> IfDefinedMacroDirective::containing(cons
   }
 }
 
+static const MacroKind kIfDefinedMacroDirectiveDerivedKinds[] = {
+    IfDefinedMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> IfDefinedMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kIfDefinedMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IfDefinedMacroDirective> IfDefinedMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -9283,6 +9481,15 @@ gap::generator<IfMacroDirective> IfMacroDirective::containing(const Token &token
   }
 }
 
+static const MacroKind kIfMacroDirectiveDerivedKinds[] = {
+    IfMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> IfMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kIfMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IfMacroDirective> IfMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -9336,6 +9543,15 @@ gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::containing(
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kIncludeLikeMacroDirectiveDerivedKinds[] = {
+    IncludeMacroDirective::static_kind(),    IncludeNextMacroDirective::static_kind(),    IncludeMacrosMacroDirective::static_kind(),    ImportMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> IncludeLikeMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kIncludeLikeMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -9407,6 +9623,15 @@ gap::generator<ImportMacroDirective> ImportMacroDirective::containing(const Toke
   }
 }
 
+static const MacroKind kImportMacroDirectiveDerivedKinds[] = {
+    ImportMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> ImportMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kImportMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ImportMacroDirective> ImportMacroDirective::from(const IncludeLikeMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -9460,6 +9685,15 @@ gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::contain
     if (auto d = from(m)) {
       co_yield *d;
     }
+  }
+}
+
+static const MacroKind kIncludeMacrosMacroDirectiveDerivedKinds[] = {
+    IncludeMacrosMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> IncludeMacrosMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kIncludeMacrosMacroDirectiveDerivedKinds) {
+    co_yield k;
   }
 }
 
@@ -9519,6 +9753,15 @@ gap::generator<IncludeNextMacroDirective> IncludeNextMacroDirective::containing(
   }
 }
 
+static const MacroKind kIncludeNextMacroDirectiveDerivedKinds[] = {
+    IncludeNextMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> IncludeNextMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kIncludeNextMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IncludeNextMacroDirective> IncludeNextMacroDirective::from(const IncludeLikeMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -9575,6 +9818,15 @@ gap::generator<IncludeMacroDirective> IncludeMacroDirective::containing(const To
   }
 }
 
+static const MacroKind kIncludeMacroDirectiveDerivedKinds[] = {
+    IncludeMacroDirective::static_kind(),};
+
+gap::generator<MacroKind> IncludeMacroDirective::derived_kinds(void) {
+  for (MacroKind k : kIncludeMacroDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IncludeMacroDirective> IncludeMacroDirective::from(const IncludeLikeMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
@@ -9613,6 +9865,15 @@ bool Attr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAttrDerivedKinds[] = {
+    BuiltinAliasAttr::static_kind(),    CalledOnceAttr::static_kind(),    IFuncAttr::static_kind(),    InitSegAttr::static_kind(),    LoaderUninitializedAttr::static_kind(),    LoopHintAttr::static_kind(),    ModeAttr::static_kind(),    NoBuiltinAttr::static_kind(),    NoEscapeAttr::static_kind(),    OMPCaptureKindAttr::static_kind(),    OMPDeclareSimdDeclAttr::static_kind(),    OMPReferencedVarAttr::static_kind(),    ObjCBoxableAttr::static_kind(),    ObjCClassStubAttr::static_kind(),    ObjCDesignatedInitializerAttr::static_kind(),    ObjCDirectAttr::static_kind(),    ObjCDirectMembersAttr::static_kind(),    ObjCNonLazyClassAttr::static_kind(),    ObjCNonRuntimeProtocolAttr::static_kind(),    ObjCRuntimeNameAttr::static_kind(),    ObjCRuntimeVisibleAttr::static_kind(),    OpenCLAccessAttr::static_kind(),    OverloadableAttr::static_kind(),    RenderScriptKernelAttr::static_kind(),    SwiftObjCMembersAttr::static_kind(),    ThreadAttr::static_kind(),    AbiTagAttr::static_kind(),    AliasAttr::static_kind(),    AlignValueAttr::static_kind(),    InitPriorityAttr::static_kind(),    IntelOclBiccAttr::static_kind(),    InternalLinkageAttr::static_kind(),    LTOVisibilityPublicAttr::static_kind(),    LayoutVersionAttr::static_kind(),    LeafAttr::static_kind(),    LifetimeBoundAttr::static_kind(),    LockReturnedAttr::static_kind(),    LocksExcludedAttr::static_kind(),    M68kInterruptAttr::static_kind(),    MIGServerRoutineAttr::static_kind(),    MSABIAttr::static_kind(),    MSAllocatorAttr::static_kind(),    MSInheritanceAttr::static_kind(),    MSNoVTableAttr::static_kind(),    MSP430InterruptAttr::static_kind(),    MSStructAttr::static_kind(),    MSVtorDispAttr::static_kind(),    MaxFieldAlignmentAttr::static_kind(),    MayAliasAttr::static_kind(),    MicroMipsAttr::static_kind(),    MinSizeAttr::static_kind(),    MinVectorWidthAttr::static_kind(),    Mips16Attr::static_kind(),    MipsInterruptAttr::static_kind(),    MipsLongCallAttr::static_kind(),    MipsShortCallAttr::static_kind(),    NSConsumesSelfAttr::static_kind(),    NSErrorDomainAttr::static_kind(),    NSReturnsAutoreleasedAttr::static_kind(),    NSReturnsNotRetainedAttr::static_kind(),    NSReturnsRetainedAttr::static_kind(),    NakedAttr::static_kind(),    NoAliasAttr::static_kind(),    NoCommonAttr::static_kind(),    NoDebugAttr::static_kind(),    NoDestroyAttr::static_kind(),    NoDuplicateAttr::static_kind(),    NoInstrumentFunctionAttr::static_kind(),    NoMicroMipsAttr::static_kind(),    NoMips16Attr::static_kind(),    NoProfileFunctionAttr::static_kind(),    NoRandomizeLayoutAttr::static_kind(),    NoReturnAttr::static_kind(),    NoSanitizeAttr::static_kind(),    NoSpeculativeLoadHardeningAttr::static_kind(),    NoSplitStackAttr::static_kind(),    NoStackProtectorAttr::static_kind(),    NoThreadSafetyAnalysisAttr::static_kind(),    NoThrowAttr::static_kind(),    NoUniqueAddressAttr::static_kind(),    NotTailCalledAttr::static_kind(),    OMPAllocateDeclAttr::static_kind(),    OMPCaptureNoInitAttr::static_kind(),    OMPDeclareTargetDeclAttr::static_kind(),    OMPDeclareVariantAttr::static_kind(),    OMPThreadPrivateDeclAttr::static_kind(),    OSConsumesThisAttr::static_kind(),    OSReturnsNotRetainedAttr::static_kind(),    OSReturnsRetainedAttr::static_kind(),    OSReturnsRetainedOnNonZeroAttr::static_kind(),    OSReturnsRetainedOnZeroAttr::static_kind(),    ObjCBridgeAttr::static_kind(),    ObjCBridgeMutableAttr::static_kind(),    ObjCBridgeRelatedAttr::static_kind(),    ObjCExceptionAttr::static_kind(),    ObjCExplicitProtocolImplAttr::static_kind(),    ObjCExternallyRetainedAttr::static_kind(),    ObjCIndependentClassAttr::static_kind(),    ObjCMethodFamilyAttr::static_kind(),    ObjCNSObjectAttr::static_kind(),    ObjCOwnershipAttr::static_kind(),    ObjCPreciseLifetimeAttr::static_kind(),    ObjCRequiresPropertyDefsAttr::static_kind(),    ObjCRequiresSuperAttr::static_kind(),    ObjCReturnsInnerPointerAttr::static_kind(),    ObjCRootClassAttr::static_kind(),    ObjCSubclassingRestrictedAttr::static_kind(),    OpenCLIntelReqdSubGroupSizeAttr::static_kind(),    OpenCLKernelAttr::static_kind(),    OptimizeNoneAttr::static_kind(),    OverrideAttr::static_kind(),    OwnerAttr::static_kind(),    OwnershipAttr::static_kind(),    PackedAttr::static_kind(),    ParamTypestateAttr::static_kind(),    PascalAttr::static_kind(),    PatchableFunctionEntryAttr::static_kind(),    PcsAttr::static_kind(),    PointerAttr::static_kind(),    PragmaClangBSSSectionAttr::static_kind(),    PragmaClangDataSectionAttr::static_kind(),    PragmaClangRelroSectionAttr::static_kind(),    PragmaClangRodataSectionAttr::static_kind(),    PragmaClangTextSectionAttr::static_kind(),    PreferredNameAttr::static_kind(),    PreserveAllAttr::static_kind(),    PreserveMostAttr::static_kind(),    PtGuardedByAttr::static_kind(),    PtGuardedVarAttr::static_kind(),    PureAttr::static_kind(),    RISCVInterruptAttr::static_kind(),    RandomizeLayoutAttr::static_kind(),    RegCallAttr::static_kind(),    ReinitializesAttr::static_kind(),    ReleaseCapabilityAttr::static_kind(),    ReqdWorkGroupSizeAttr::static_kind(),    RequiresCapabilityAttr::static_kind(),    RestrictAttr::static_kind(),    RetainAttr::static_kind(),    ReturnTypestateAttr::static_kind(),    ReturnsNonNullAttr::static_kind(),    ReturnsTwiceAttr::static_kind(),    SYCLKernelAttr::static_kind(),    SYCLSpecialClassAttr::static_kind(),    ScopedLockableAttr::static_kind(),    SectionAttr::static_kind(),    SelectAnyAttr::static_kind(),    SentinelAttr::static_kind(),    SetTypestateAttr::static_kind(),    SharedTrylockFunctionAttr::static_kind(),    SpeculativeLoadHardeningAttr::static_kind(),    StandaloneDebugAttr::static_kind(),    StdCallAttr::static_kind(),    StrictFPAttr::static_kind(),    SwiftAsyncAttr::static_kind(),    SwiftAsyncCallAttr::static_kind(),    SwiftAsyncErrorAttr::static_kind(),    SwiftAsyncNameAttr::static_kind(),    SwiftAttrAttr::static_kind(),    SwiftBridgeAttr::static_kind(),    SwiftBridgedTypedefAttr::static_kind(),    SwiftCallAttr::static_kind(),    SwiftErrorAttr::static_kind(),    SwiftNameAttr::static_kind(),    SwiftNewTypeAttr::static_kind(),    SwiftPrivateAttr::static_kind(),    SysVABIAttr::static_kind(),    TLSModelAttr::static_kind(),    TargetAttr::static_kind(),    TargetClonesAttr::static_kind(),    TestTypestateAttr::static_kind(),    ThisCallAttr::static_kind(),    TransparentUnionAttr::static_kind(),    TrivialABIAttr::static_kind(),    TryAcquireCapabilityAttr::static_kind(),    TypeTagForDatatypeAttr::static_kind(),    TypeVisibilityAttr::static_kind(),    UnavailableAttr::static_kind(),    UninitializedAttr::static_kind(),    UnusedAttr::static_kind(),    UsedAttr::static_kind(),    UsingIfExistsAttr::static_kind(),    UuidAttr::static_kind(),    VecReturnAttr::static_kind(),    VecTypeHintAttr::static_kind(),    VectorCallAttr::static_kind(),    VisibilityAttr::static_kind(),    WarnUnusedAttr::static_kind(),    WarnUnusedResultAttr::static_kind(),    WeakAttr::static_kind(),    WeakImportAttr::static_kind(),    WeakRefAttr::static_kind(),    WebAssemblyExportNameAttr::static_kind(),    WebAssemblyImportModuleAttr::static_kind(),    WebAssemblyImportNameAttr::static_kind(),    WorkGroupSizeHintAttr::static_kind(),    X86ForceAlignArgPointerAttr::static_kind(),    XRayInstrumentAttr::static_kind(),    XRayLogArgsAttr::static_kind(),    ZeroCallUsedRegsAttr::static_kind(),    AArch64SVEPcsAttr::static_kind(),    AArch64VectorPcsAttr::static_kind(),    AMDGPUFlatWorkGroupSizeAttr::static_kind(),    AMDGPUKernelCallAttr::static_kind(),    AMDGPUNumSGPRAttr::static_kind(),    AMDGPUNumVGPRAttr::static_kind(),    AMDGPUWavesPerEUAttr::static_kind(),    ARMInterruptAttr::static_kind(),    AVRInterruptAttr::static_kind(),    AVRSignalAttr::static_kind(),    AcquireCapabilityAttr::static_kind(),    AcquireHandleAttr::static_kind(),    AcquiredAfterAttr::static_kind(),    AcquiredBeforeAttr::static_kind(),    AlignMac68kAttr::static_kind(),    AlignNaturalAttr::static_kind(),    AlignedAttr::static_kind(),    AllocAlignAttr::static_kind(),    AllocSizeAttr::static_kind(),    AlwaysDestroyAttr::static_kind(),    AnalyzerNoReturnAttr::static_kind(),    AnyX86InterruptAttr::static_kind(),    AnyX86NoCallerSavedRegistersAttr::static_kind(),    AnyX86NoCfCheckAttr::static_kind(),    ArcWeakrefUnavailableAttr::static_kind(),    ArgumentWithTypeTagAttr::static_kind(),    ArmBuiltinAliasAttr::static_kind(),    ArtificialAttr::static_kind(),    AsmLabelAttr::static_kind(),    AssertCapabilityAttr::static_kind(),    AssertExclusiveLockAttr::static_kind(),    AssertSharedLockAttr::static_kind(),    AssumeAlignedAttr::static_kind(),    AssumptionAttr::static_kind(),    AvailabilityAttr::static_kind(),    BPFPreserveAccessIndexAttr::static_kind(),    BTFDeclTagAttr::static_kind(),    BlocksAttr::static_kind(),    BuiltinAttr::static_kind(),    C11NoReturnAttr::static_kind(),    CDeclAttr::static_kind(),    CFAuditedTransferAttr::static_kind(),    CFGuardAttr::static_kind(),    CFICanonicalJumpTableAttr::static_kind(),    CFReturnsNotRetainedAttr::static_kind(),    CFReturnsRetainedAttr::static_kind(),    CFUnknownTransferAttr::static_kind(),    CPUDispatchAttr::static_kind(),    CPUSpecificAttr::static_kind(),    CUDAConstantAttr::static_kind(),    CUDADeviceAttr::static_kind(),    CUDADeviceBuiltinSurfaceTypeAttr::static_kind(),    CUDADeviceBuiltinTextureTypeAttr::static_kind(),    CUDAGlobalAttr::static_kind(),    CUDAHostAttr::static_kind(),    CUDAInvalidTargetAttr::static_kind(),    CUDALaunchBoundsAttr::static_kind(),    CUDASharedAttr::static_kind(),    CXX11NoReturnAttr::static_kind(),    CallableWhenAttr::static_kind(),    CallbackAttr::static_kind(),    CapabilityAttr::static_kind(),    CapturedRecordAttr::static_kind(),    CleanupAttr::static_kind(),    CmseNSEntryAttr::static_kind(),    CodeSegAttr::static_kind(),    ColdAttr::static_kind(),    CommonAttr::static_kind(),    ConstAttr::static_kind(),    ConstInitAttr::static_kind(),    ConstructorAttr::static_kind(),    ConsumableAttr::static_kind(),    ConsumableAutoCastAttr::static_kind(),    ConsumableSetOnReadAttr::static_kind(),    ConvergentAttr::static_kind(),    DLLExportAttr::static_kind(),    DLLExportStaticLocalAttr::static_kind(),    DLLImportAttr::static_kind(),    DLLImportStaticLocalAttr::static_kind(),    DeprecatedAttr::static_kind(),    DestructorAttr::static_kind(),    DiagnoseAsBuiltinAttr::static_kind(),    DiagnoseIfAttr::static_kind(),    DisableSanitizerInstrumentationAttr::static_kind(),    DisableTailCallsAttr::static_kind(),    EmptyBasesAttr::static_kind(),    EnableIfAttr::static_kind(),    EnforceTCBAttr::static_kind(),    EnforceTCBLeafAttr::static_kind(),    EnumExtensibilityAttr::static_kind(),    ErrorAttr::static_kind(),    ExcludeFromExplicitInstantiationAttr::static_kind(),    ExclusiveTrylockFunctionAttr::static_kind(),    ExternalSourceSymbolAttr::static_kind(),    FastCallAttr::static_kind(),    FinalAttr::static_kind(),    FlagEnumAttr::static_kind(),    FlattenAttr::static_kind(),    FormatArgAttr::static_kind(),    FormatAttr::static_kind(),    FunctionReturnThunksAttr::static_kind(),    GNUInlineAttr::static_kind(),    GuardedByAttr::static_kind(),    GuardedVarAttr::static_kind(),    HIPManagedAttr::static_kind(),    HLSLNumThreadsAttr::static_kind(),    HLSLSV_GroupIndexAttr::static_kind(),    HLSLShaderAttr::static_kind(),    HotAttr::static_kind(),    IBActionAttr::static_kind(),    IBOutletAttr::static_kind(),    IBOutletCollectionAttr::static_kind(),    SuppressAttr::static_kind(),    UnlikelyAttr::static_kind(),    FallThroughAttr::static_kind(),    LikelyAttr::static_kind(),    MustTailAttr::static_kind(),    OpenCLUnrollHintAttr::static_kind(),    TypeNonNullAttr::static_kind(),    TypeNullUnspecifiedAttr::static_kind(),    TypeNullableAttr::static_kind(),    TypeNullableResultAttr::static_kind(),    UPtrAttr::static_kind(),    AddressSpaceAttr::static_kind(),    AnnotateTypeAttr::static_kind(),    ArmMveStrictPolymorphismAttr::static_kind(),    BTFTypeTagAttr::static_kind(),    CmseNSCallAttr::static_kind(),    NoDerefAttr::static_kind(),    ObjCGCAttr::static_kind(),    ObjCInertUnsafeUnretainedAttr::static_kind(),    ObjCKindOfAttr::static_kind(),    OpenCLConstantAddressSpaceAttr::static_kind(),    OpenCLGenericAddressSpaceAttr::static_kind(),    OpenCLGlobalAddressSpaceAttr::static_kind(),    OpenCLGlobalDeviceAddressSpaceAttr::static_kind(),    OpenCLGlobalHostAddressSpaceAttr::static_kind(),    OpenCLLocalAddressSpaceAttr::static_kind(),    OpenCLPrivateAddressSpaceAttr::static_kind(),    Ptr32Attr::static_kind(),    Ptr64Attr::static_kind(),    SPtrAttr::static_kind(),    NSConsumedAttr::static_kind(),    NonNullAttr::static_kind(),    OSConsumedAttr::static_kind(),    PassObjectSizeAttr::static_kind(),    ReleaseHandleAttr::static_kind(),    UseHandleAttr::static_kind(),    AnnotateAttr::static_kind(),    CFConsumedAttr::static_kind(),    CarriesDependencyAttr::static_kind(),    NoInlineAttr::static_kind(),    NoMergeAttr::static_kind(),    AlwaysInlineAttr::static_kind(),    SwiftAsyncContextAttr::static_kind(),    SwiftContextAttr::static_kind(),    SwiftErrorResultAttr::static_kind(),    SwiftIndirectResultAttr::static_kind(),};
+
+gap::generator<AttrKind> Attr::derived_kinds(void) {
+  for (AttrKind k : kAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 Token Attr::token(void) const {
@@ -9668,6 +9929,15 @@ bool AlignValueAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAlignValueAttrDerivedKinds[] = {
+    AlignValueAttr::static_kind(),};
+
+gap::generator<AttrKind> AlignValueAttr::derived_kinds(void) {
+  for (AttrKind k : kAlignValueAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AlignValueAttr> AlignValueAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::ALIGN_VALUE:
@@ -9703,6 +9973,15 @@ bool AliasAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAliasAttrDerivedKinds[] = {
+    AliasAttr::static_kind(),};
+
+gap::generator<AttrKind> AliasAttr::derived_kinds(void) {
+  for (AttrKind k : kAliasAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AliasAttr> AliasAttr::from(const Attr &parent) {
@@ -9742,6 +10021,15 @@ bool AbiTagAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAbiTagAttrDerivedKinds[] = {
+    AbiTagAttr::static_kind(),};
+
+gap::generator<AttrKind> AbiTagAttr::derived_kinds(void) {
+  for (AttrKind k : kAbiTagAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AbiTagAttr> AbiTagAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::ABI_TAG:
@@ -9772,6 +10060,15 @@ bool TypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kTypeAttrDerivedKinds[] = {
+    TypeNonNullAttr::static_kind(),    TypeNullUnspecifiedAttr::static_kind(),    TypeNullableAttr::static_kind(),    TypeNullableResultAttr::static_kind(),    UPtrAttr::static_kind(),    AddressSpaceAttr::static_kind(),    AnnotateTypeAttr::static_kind(),    ArmMveStrictPolymorphismAttr::static_kind(),    BTFTypeTagAttr::static_kind(),    CmseNSCallAttr::static_kind(),    NoDerefAttr::static_kind(),    ObjCGCAttr::static_kind(),    ObjCInertUnsafeUnretainedAttr::static_kind(),    ObjCKindOfAttr::static_kind(),    OpenCLConstantAddressSpaceAttr::static_kind(),    OpenCLGenericAddressSpaceAttr::static_kind(),    OpenCLGlobalAddressSpaceAttr::static_kind(),    OpenCLGlobalDeviceAddressSpaceAttr::static_kind(),    OpenCLGlobalHostAddressSpaceAttr::static_kind(),    OpenCLLocalAddressSpaceAttr::static_kind(),    OpenCLPrivateAddressSpaceAttr::static_kind(),    Ptr32Attr::static_kind(),    Ptr64Attr::static_kind(),    SPtrAttr::static_kind(),};
+
+gap::generator<AttrKind> TypeAttr::derived_kinds(void) {
+  for (AttrKind k : kTypeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeAttr> TypeAttr::from(const Attr &parent) {
@@ -9829,6 +10126,15 @@ bool SPtrAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSPtrAttrDerivedKinds[] = {
+    SPtrAttr::static_kind(),};
+
+gap::generator<AttrKind> SPtrAttr::derived_kinds(void) {
+  for (AttrKind k : kSPtrAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SPtrAttr> SPtrAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -9863,6 +10169,15 @@ bool Ptr64Attr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kPtr64AttrDerivedKinds[] = {
+    Ptr64Attr::static_kind(),};
+
+gap::generator<AttrKind> Ptr64Attr::derived_kinds(void) {
+  for (AttrKind k : kPtr64AttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<Ptr64Attr> Ptr64Attr::from(const TypeAttr &parent) {
@@ -9901,6 +10216,15 @@ bool Ptr32Attr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPtr32AttrDerivedKinds[] = {
+    Ptr32Attr::static_kind(),};
+
+gap::generator<AttrKind> Ptr32Attr::derived_kinds(void) {
+  for (AttrKind k : kPtr32AttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<Ptr32Attr> Ptr32Attr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -9935,6 +10259,15 @@ bool OpenCLPrivateAddressSpaceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOpenCLPrivateAddressSpaceAttrDerivedKinds[] = {
+    OpenCLPrivateAddressSpaceAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLPrivateAddressSpaceAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLPrivateAddressSpaceAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OpenCLPrivateAddressSpaceAttr> OpenCLPrivateAddressSpaceAttr::from(const TypeAttr &parent) {
@@ -9977,6 +10310,15 @@ bool OpenCLLocalAddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOpenCLLocalAddressSpaceAttrDerivedKinds[] = {
+    OpenCLLocalAddressSpaceAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLLocalAddressSpaceAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLLocalAddressSpaceAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OpenCLLocalAddressSpaceAttr> OpenCLLocalAddressSpaceAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10017,6 +10359,15 @@ bool OpenCLGlobalHostAddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOpenCLGlobalHostAddressSpaceAttrDerivedKinds[] = {
+    OpenCLGlobalHostAddressSpaceAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLGlobalHostAddressSpaceAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLGlobalHostAddressSpaceAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10053,6 +10404,15 @@ bool OpenCLGlobalDeviceAddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOpenCLGlobalDeviceAddressSpaceAttrDerivedKinds[] = {
+    OpenCLGlobalDeviceAddressSpaceAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLGlobalDeviceAddressSpaceAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLGlobalDeviceAddressSpaceAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OpenCLGlobalDeviceAddressSpaceAttr> OpenCLGlobalDeviceAddressSpaceAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10087,6 +10447,15 @@ bool OpenCLGlobalAddressSpaceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOpenCLGlobalAddressSpaceAttrDerivedKinds[] = {
+    OpenCLGlobalAddressSpaceAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLGlobalAddressSpaceAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLGlobalAddressSpaceAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OpenCLGlobalAddressSpaceAttr> OpenCLGlobalAddressSpaceAttr::from(const TypeAttr &parent) {
@@ -10129,6 +10498,15 @@ bool OpenCLGenericAddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOpenCLGenericAddressSpaceAttrDerivedKinds[] = {
+    OpenCLGenericAddressSpaceAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLGenericAddressSpaceAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLGenericAddressSpaceAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10167,6 +10545,15 @@ bool OpenCLConstantAddressSpaceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOpenCLConstantAddressSpaceAttrDerivedKinds[] = {
+    OpenCLConstantAddressSpaceAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLConstantAddressSpaceAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLConstantAddressSpaceAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::from(const TypeAttr &parent) {
@@ -10209,6 +10596,15 @@ bool ObjCKindOfAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCKindOfAttrDerivedKinds[] = {
+    ObjCKindOfAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCKindOfAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCKindOfAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCKindOfAttr> ObjCKindOfAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10243,6 +10639,15 @@ bool ObjCInertUnsafeUnretainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCInertUnsafeUnretainedAttrDerivedKinds[] = {
+    ObjCInertUnsafeUnretainedAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCInertUnsafeUnretainedAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCInertUnsafeUnretainedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::from(const TypeAttr &parent) {
@@ -10281,6 +10686,15 @@ bool ObjCGCAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCGCAttrDerivedKinds[] = {
+    ObjCGCAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCGCAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCGCAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCGCAttr> ObjCGCAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10315,6 +10729,15 @@ bool NoDerefAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoDerefAttrDerivedKinds[] = {
+    NoDerefAttr::static_kind(),};
+
+gap::generator<AttrKind> NoDerefAttr::derived_kinds(void) {
+  for (AttrKind k : kNoDerefAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoDerefAttr> NoDerefAttr::from(const TypeAttr &parent) {
@@ -10353,6 +10776,15 @@ bool CmseNSCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCmseNSCallAttrDerivedKinds[] = {
+    CmseNSCallAttr::static_kind(),};
+
+gap::generator<AttrKind> CmseNSCallAttr::derived_kinds(void) {
+  for (AttrKind k : kCmseNSCallAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CmseNSCallAttr> CmseNSCallAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10387,6 +10819,15 @@ bool BTFTypeTagAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kBTFTypeTagAttrDerivedKinds[] = {
+    BTFTypeTagAttr::static_kind(),};
+
+gap::generator<AttrKind> BTFTypeTagAttr::derived_kinds(void) {
+  for (AttrKind k : kBTFTypeTagAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BTFTypeTagAttr> BTFTypeTagAttr::from(const TypeAttr &parent) {
@@ -10430,6 +10871,15 @@ bool ArmMveStrictPolymorphismAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kArmMveStrictPolymorphismAttrDerivedKinds[] = {
+    ArmMveStrictPolymorphismAttr::static_kind(),};
+
+gap::generator<AttrKind> ArmMveStrictPolymorphismAttr::derived_kinds(void) {
+  for (AttrKind k : kArmMveStrictPolymorphismAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ArmMveStrictPolymorphismAttr> ArmMveStrictPolymorphismAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10464,6 +10914,15 @@ bool AnnotateTypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAnnotateTypeAttrDerivedKinds[] = {
+    AnnotateTypeAttr::static_kind(),};
+
+gap::generator<AttrKind> AnnotateTypeAttr::derived_kinds(void) {
+  for (AttrKind k : kAnnotateTypeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AnnotateTypeAttr> AnnotateTypeAttr::from(const TypeAttr &parent) {
@@ -10507,6 +10966,15 @@ bool AddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAddressSpaceAttrDerivedKinds[] = {
+    AddressSpaceAttr::static_kind(),};
+
+gap::generator<AttrKind> AddressSpaceAttr::derived_kinds(void) {
+  for (AttrKind k : kAddressSpaceAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AddressSpaceAttr> AddressSpaceAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10541,6 +11009,15 @@ bool UPtrAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kUPtrAttrDerivedKinds[] = {
+    UPtrAttr::static_kind(),};
+
+gap::generator<AttrKind> UPtrAttr::derived_kinds(void) {
+  for (AttrKind k : kUPtrAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UPtrAttr> UPtrAttr::from(const TypeAttr &parent) {
@@ -10579,6 +11056,15 @@ bool TypeNullableResultAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kTypeNullableResultAttrDerivedKinds[] = {
+    TypeNullableResultAttr::static_kind(),};
+
+gap::generator<AttrKind> TypeNullableResultAttr::derived_kinds(void) {
+  for (AttrKind k : kTypeNullableResultAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TypeNullableResultAttr> TypeNullableResultAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10613,6 +11099,15 @@ bool TypeNullableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kTypeNullableAttrDerivedKinds[] = {
+    TypeNullableAttr::static_kind(),};
+
+gap::generator<AttrKind> TypeNullableAttr::derived_kinds(void) {
+  for (AttrKind k : kTypeNullableAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeNullableAttr> TypeNullableAttr::from(const TypeAttr &parent) {
@@ -10651,6 +11146,15 @@ bool TypeNullUnspecifiedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kTypeNullUnspecifiedAttrDerivedKinds[] = {
+    TypeNullUnspecifiedAttr::static_kind(),};
+
+gap::generator<AttrKind> TypeNullUnspecifiedAttr::derived_kinds(void) {
+  for (AttrKind k : kTypeNullUnspecifiedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TypeNullUnspecifiedAttr> TypeNullUnspecifiedAttr::from(const TypeAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10685,6 +11189,15 @@ bool TypeNonNullAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kTypeNonNullAttrDerivedKinds[] = {
+    TypeNonNullAttr::static_kind(),};
+
+gap::generator<AttrKind> TypeNonNullAttr::derived_kinds(void) {
+  for (AttrKind k : kTypeNonNullAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeNonNullAttr> TypeNonNullAttr::from(const TypeAttr &parent) {
@@ -10723,6 +11236,15 @@ bool ThreadAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kThreadAttrDerivedKinds[] = {
+    ThreadAttr::static_kind(),};
+
+gap::generator<AttrKind> ThreadAttr::derived_kinds(void) {
+  for (AttrKind k : kThreadAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ThreadAttr> ThreadAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::THREAD:
@@ -10755,6 +11277,15 @@ bool SwiftObjCMembersAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftObjCMembersAttrDerivedKinds[] = {
+    SwiftObjCMembersAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftObjCMembersAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftObjCMembersAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftObjCMembersAttr> SwiftObjCMembersAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::SWIFT_OBJ_C_MEMBERS:
@@ -10785,6 +11316,15 @@ bool StmtAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kStmtAttrDerivedKinds[] = {
+    SuppressAttr::static_kind(),    UnlikelyAttr::static_kind(),    FallThroughAttr::static_kind(),    LikelyAttr::static_kind(),    MustTailAttr::static_kind(),    OpenCLUnrollHintAttr::static_kind(),};
+
+gap::generator<AttrKind> StmtAttr::derived_kinds(void) {
+  for (AttrKind k : kStmtAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<StmtAttr> StmtAttr::from(const Attr &parent) {
@@ -10824,6 +11364,15 @@ bool OpenCLUnrollHintAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOpenCLUnrollHintAttrDerivedKinds[] = {
+    OpenCLUnrollHintAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLUnrollHintAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLUnrollHintAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OpenCLUnrollHintAttr> OpenCLUnrollHintAttr::from(const StmtAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10858,6 +11407,15 @@ bool MustTailAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMustTailAttrDerivedKinds[] = {
+    MustTailAttr::static_kind(),};
+
+gap::generator<AttrKind> MustTailAttr::derived_kinds(void) {
+  for (AttrKind k : kMustTailAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MustTailAttr> MustTailAttr::from(const StmtAttr &parent) {
@@ -10896,6 +11454,15 @@ bool LikelyAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kLikelyAttrDerivedKinds[] = {
+    LikelyAttr::static_kind(),};
+
+gap::generator<AttrKind> LikelyAttr::derived_kinds(void) {
+  for (AttrKind k : kLikelyAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<LikelyAttr> LikelyAttr::from(const StmtAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -10930,6 +11497,15 @@ bool FallThroughAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kFallThroughAttrDerivedKinds[] = {
+    FallThroughAttr::static_kind(),};
+
+gap::generator<AttrKind> FallThroughAttr::derived_kinds(void) {
+  for (AttrKind k : kFallThroughAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FallThroughAttr> FallThroughAttr::from(const StmtAttr &parent) {
@@ -10968,6 +11544,15 @@ bool UnlikelyAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kUnlikelyAttrDerivedKinds[] = {
+    UnlikelyAttr::static_kind(),};
+
+gap::generator<AttrKind> UnlikelyAttr::derived_kinds(void) {
+  for (AttrKind k : kUnlikelyAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UnlikelyAttr> UnlikelyAttr::from(const StmtAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -11002,6 +11587,15 @@ bool SuppressAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSuppressAttrDerivedKinds[] = {
+    SuppressAttr::static_kind(),};
+
+gap::generator<AttrKind> SuppressAttr::derived_kinds(void) {
+  for (AttrKind k : kSuppressAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SuppressAttr> SuppressAttr::from(const StmtAttr &parent) {
@@ -11040,6 +11634,15 @@ bool RenderScriptKernelAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kRenderScriptKernelAttrDerivedKinds[] = {
+    RenderScriptKernelAttr::static_kind(),};
+
+gap::generator<AttrKind> RenderScriptKernelAttr::derived_kinds(void) {
+  for (AttrKind k : kRenderScriptKernelAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<RenderScriptKernelAttr> RenderScriptKernelAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::RENDER_SCRIPT_KERNEL:
@@ -11072,6 +11675,15 @@ bool OverloadableAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOverloadableAttrDerivedKinds[] = {
+    OverloadableAttr::static_kind(),};
+
+gap::generator<AttrKind> OverloadableAttr::derived_kinds(void) {
+  for (AttrKind k : kOverloadableAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OverloadableAttr> OverloadableAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::OVERLOADABLE:
@@ -11102,6 +11714,15 @@ bool OpenCLAccessAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOpenCLAccessAttrDerivedKinds[] = {
+    OpenCLAccessAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLAccessAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLAccessAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OpenCLAccessAttr> OpenCLAccessAttr::from(const Attr &parent) {
@@ -11152,6 +11773,15 @@ bool ObjCRuntimeVisibleAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCRuntimeVisibleAttrDerivedKinds[] = {
+    ObjCRuntimeVisibleAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCRuntimeVisibleAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCRuntimeVisibleAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCRuntimeVisibleAttr> ObjCRuntimeVisibleAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::OBJ_C_RUNTIME_VISIBLE:
@@ -11182,6 +11812,15 @@ bool ObjCRuntimeNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCRuntimeNameAttrDerivedKinds[] = {
+    ObjCRuntimeNameAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCRuntimeNameAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCRuntimeNameAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCRuntimeNameAttr> ObjCRuntimeNameAttr::from(const Attr &parent) {
@@ -11221,6 +11860,15 @@ bool ObjCNonRuntimeProtocolAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCNonRuntimeProtocolAttrDerivedKinds[] = {
+    ObjCNonRuntimeProtocolAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCNonRuntimeProtocolAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCNonRuntimeProtocolAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL:
@@ -11251,6 +11899,15 @@ bool ObjCNonLazyClassAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCNonLazyClassAttrDerivedKinds[] = {
+    ObjCNonLazyClassAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCNonLazyClassAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCNonLazyClassAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCNonLazyClassAttr> ObjCNonLazyClassAttr::from(const Attr &parent) {
@@ -11285,6 +11942,15 @@ bool ObjCDirectMembersAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCDirectMembersAttrDerivedKinds[] = {
+    ObjCDirectMembersAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCDirectMembersAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCDirectMembersAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCDirectMembersAttr> ObjCDirectMembersAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::OBJ_C_DIRECT_MEMBERS:
@@ -11315,6 +11981,15 @@ bool ObjCDirectAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCDirectAttrDerivedKinds[] = {
+    ObjCDirectAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCDirectAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCDirectAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCDirectAttr> ObjCDirectAttr::from(const Attr &parent) {
@@ -11349,6 +12024,15 @@ bool ObjCDesignatedInitializerAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCDesignatedInitializerAttrDerivedKinds[] = {
+    ObjCDesignatedInitializerAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCDesignatedInitializerAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCDesignatedInitializerAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCDesignatedInitializerAttr> ObjCDesignatedInitializerAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::OBJ_C_DESIGNATED_INITIALIZER:
@@ -11379,6 +12063,15 @@ bool ObjCClassStubAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCClassStubAttrDerivedKinds[] = {
+    ObjCClassStubAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCClassStubAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCClassStubAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCClassStubAttr> ObjCClassStubAttr::from(const Attr &parent) {
@@ -11413,6 +12106,15 @@ bool ObjCBoxableAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCBoxableAttrDerivedKinds[] = {
+    ObjCBoxableAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCBoxableAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCBoxableAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCBoxableAttr> ObjCBoxableAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::OBJ_C_BOXABLE:
@@ -11443,6 +12145,15 @@ bool OMPReferencedVarAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOMPReferencedVarAttrDerivedKinds[] = {
+    OMPReferencedVarAttr::static_kind(),};
+
+gap::generator<AttrKind> OMPReferencedVarAttr::derived_kinds(void) {
+  for (AttrKind k : kOMPReferencedVarAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPReferencedVarAttr> OMPReferencedVarAttr::from(const Attr &parent) {
@@ -11480,6 +12191,15 @@ bool OMPDeclareSimdDeclAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOMPDeclareSimdDeclAttrDerivedKinds[] = {
+    OMPDeclareSimdDeclAttr::static_kind(),};
+
+gap::generator<AttrKind> OMPDeclareSimdDeclAttr::derived_kinds(void) {
+  for (AttrKind k : kOMPDeclareSimdDeclAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const Attr &parent) {
@@ -11523,6 +12243,15 @@ bool OMPCaptureKindAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOMPCaptureKindAttrDerivedKinds[] = {
+    OMPCaptureKindAttr::static_kind(),};
+
+gap::generator<AttrKind> OMPCaptureKindAttr::derived_kinds(void) {
+  for (AttrKind k : kOMPCaptureKindAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::OMP_CAPTURE_KIND:
@@ -11553,6 +12282,15 @@ bool NoEscapeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoEscapeAttrDerivedKinds[] = {
+    NoEscapeAttr::static_kind(),};
+
+gap::generator<AttrKind> NoEscapeAttr::derived_kinds(void) {
+  for (AttrKind k : kNoEscapeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoEscapeAttr> NoEscapeAttr::from(const Attr &parent) {
@@ -11587,6 +12325,15 @@ bool NoBuiltinAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoBuiltinAttrDerivedKinds[] = {
+    NoBuiltinAttr::static_kind(),};
+
+gap::generator<AttrKind> NoBuiltinAttr::derived_kinds(void) {
+  for (AttrKind k : kNoBuiltinAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoBuiltinAttr> NoBuiltinAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::NO_BUILTIN:
@@ -11619,6 +12366,15 @@ bool ModeAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kModeAttrDerivedKinds[] = {
+    ModeAttr::static_kind(),};
+
+gap::generator<AttrKind> ModeAttr::derived_kinds(void) {
+  for (AttrKind k : kModeAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ModeAttr> ModeAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::MODE:
@@ -11649,6 +12405,15 @@ bool LoopHintAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kLoopHintAttrDerivedKinds[] = {
+    LoopHintAttr::static_kind(),};
+
+gap::generator<AttrKind> LoopHintAttr::derived_kinds(void) {
+  for (AttrKind k : kLoopHintAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<LoopHintAttr> LoopHintAttr::from(const Attr &parent) {
@@ -11700,6 +12465,15 @@ bool LoaderUninitializedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kLoaderUninitializedAttrDerivedKinds[] = {
+    LoaderUninitializedAttr::static_kind(),};
+
+gap::generator<AttrKind> LoaderUninitializedAttr::derived_kinds(void) {
+  for (AttrKind k : kLoaderUninitializedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<LoaderUninitializedAttr> LoaderUninitializedAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::LOADER_UNINITIALIZED:
@@ -11730,6 +12504,15 @@ bool InitSegAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kInitSegAttrDerivedKinds[] = {
+    InitSegAttr::static_kind(),};
+
+gap::generator<AttrKind> InitSegAttr::derived_kinds(void) {
+  for (AttrKind k : kInitSegAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<InitSegAttr> InitSegAttr::from(const Attr &parent) {
@@ -11767,6 +12550,15 @@ bool InheritableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kInheritableAttrDerivedKinds[] = {
+    InitPriorityAttr::static_kind(),    IntelOclBiccAttr::static_kind(),    InternalLinkageAttr::static_kind(),    LTOVisibilityPublicAttr::static_kind(),    LayoutVersionAttr::static_kind(),    LeafAttr::static_kind(),    LifetimeBoundAttr::static_kind(),    LockReturnedAttr::static_kind(),    LocksExcludedAttr::static_kind(),    M68kInterruptAttr::static_kind(),    MIGServerRoutineAttr::static_kind(),    MSABIAttr::static_kind(),    MSAllocatorAttr::static_kind(),    MSInheritanceAttr::static_kind(),    MSNoVTableAttr::static_kind(),    MSP430InterruptAttr::static_kind(),    MSStructAttr::static_kind(),    MSVtorDispAttr::static_kind(),    MaxFieldAlignmentAttr::static_kind(),    MayAliasAttr::static_kind(),    MicroMipsAttr::static_kind(),    MinSizeAttr::static_kind(),    MinVectorWidthAttr::static_kind(),    Mips16Attr::static_kind(),    MipsInterruptAttr::static_kind(),    MipsLongCallAttr::static_kind(),    MipsShortCallAttr::static_kind(),    NSConsumesSelfAttr::static_kind(),    NSErrorDomainAttr::static_kind(),    NSReturnsAutoreleasedAttr::static_kind(),    NSReturnsNotRetainedAttr::static_kind(),    NSReturnsRetainedAttr::static_kind(),    NakedAttr::static_kind(),    NoAliasAttr::static_kind(),    NoCommonAttr::static_kind(),    NoDebugAttr::static_kind(),    NoDestroyAttr::static_kind(),    NoDuplicateAttr::static_kind(),    NoInstrumentFunctionAttr::static_kind(),    NoMicroMipsAttr::static_kind(),    NoMips16Attr::static_kind(),    NoProfileFunctionAttr::static_kind(),    NoRandomizeLayoutAttr::static_kind(),    NoReturnAttr::static_kind(),    NoSanitizeAttr::static_kind(),    NoSpeculativeLoadHardeningAttr::static_kind(),    NoSplitStackAttr::static_kind(),    NoStackProtectorAttr::static_kind(),    NoThreadSafetyAnalysisAttr::static_kind(),    NoThrowAttr::static_kind(),    NoUniqueAddressAttr::static_kind(),    NotTailCalledAttr::static_kind(),    OMPAllocateDeclAttr::static_kind(),    OMPCaptureNoInitAttr::static_kind(),    OMPDeclareTargetDeclAttr::static_kind(),    OMPDeclareVariantAttr::static_kind(),    OMPThreadPrivateDeclAttr::static_kind(),    OSConsumesThisAttr::static_kind(),    OSReturnsNotRetainedAttr::static_kind(),    OSReturnsRetainedAttr::static_kind(),    OSReturnsRetainedOnNonZeroAttr::static_kind(),    OSReturnsRetainedOnZeroAttr::static_kind(),    ObjCBridgeAttr::static_kind(),    ObjCBridgeMutableAttr::static_kind(),    ObjCBridgeRelatedAttr::static_kind(),    ObjCExceptionAttr::static_kind(),    ObjCExplicitProtocolImplAttr::static_kind(),    ObjCExternallyRetainedAttr::static_kind(),    ObjCIndependentClassAttr::static_kind(),    ObjCMethodFamilyAttr::static_kind(),    ObjCNSObjectAttr::static_kind(),    ObjCOwnershipAttr::static_kind(),    ObjCPreciseLifetimeAttr::static_kind(),    ObjCRequiresPropertyDefsAttr::static_kind(),    ObjCRequiresSuperAttr::static_kind(),    ObjCReturnsInnerPointerAttr::static_kind(),    ObjCRootClassAttr::static_kind(),    ObjCSubclassingRestrictedAttr::static_kind(),    OpenCLIntelReqdSubGroupSizeAttr::static_kind(),    OpenCLKernelAttr::static_kind(),    OptimizeNoneAttr::static_kind(),    OverrideAttr::static_kind(),    OwnerAttr::static_kind(),    OwnershipAttr::static_kind(),    PackedAttr::static_kind(),    ParamTypestateAttr::static_kind(),    PascalAttr::static_kind(),    PatchableFunctionEntryAttr::static_kind(),    PcsAttr::static_kind(),    PointerAttr::static_kind(),    PragmaClangBSSSectionAttr::static_kind(),    PragmaClangDataSectionAttr::static_kind(),    PragmaClangRelroSectionAttr::static_kind(),    PragmaClangRodataSectionAttr::static_kind(),    PragmaClangTextSectionAttr::static_kind(),    PreferredNameAttr::static_kind(),    PreserveAllAttr::static_kind(),    PreserveMostAttr::static_kind(),    PtGuardedByAttr::static_kind(),    PtGuardedVarAttr::static_kind(),    PureAttr::static_kind(),    RISCVInterruptAttr::static_kind(),    RandomizeLayoutAttr::static_kind(),    RegCallAttr::static_kind(),    ReinitializesAttr::static_kind(),    ReleaseCapabilityAttr::static_kind(),    ReqdWorkGroupSizeAttr::static_kind(),    RequiresCapabilityAttr::static_kind(),    RestrictAttr::static_kind(),    RetainAttr::static_kind(),    ReturnTypestateAttr::static_kind(),    ReturnsNonNullAttr::static_kind(),    ReturnsTwiceAttr::static_kind(),    SYCLKernelAttr::static_kind(),    SYCLSpecialClassAttr::static_kind(),    ScopedLockableAttr::static_kind(),    SectionAttr::static_kind(),    SelectAnyAttr::static_kind(),    SentinelAttr::static_kind(),    SetTypestateAttr::static_kind(),    SharedTrylockFunctionAttr::static_kind(),    SpeculativeLoadHardeningAttr::static_kind(),    StandaloneDebugAttr::static_kind(),    StdCallAttr::static_kind(),    StrictFPAttr::static_kind(),    SwiftAsyncAttr::static_kind(),    SwiftAsyncCallAttr::static_kind(),    SwiftAsyncErrorAttr::static_kind(),    SwiftAsyncNameAttr::static_kind(),    SwiftAttrAttr::static_kind(),    SwiftBridgeAttr::static_kind(),    SwiftBridgedTypedefAttr::static_kind(),    SwiftCallAttr::static_kind(),    SwiftErrorAttr::static_kind(),    SwiftNameAttr::static_kind(),    SwiftNewTypeAttr::static_kind(),    SwiftPrivateAttr::static_kind(),    SysVABIAttr::static_kind(),    TLSModelAttr::static_kind(),    TargetAttr::static_kind(),    TargetClonesAttr::static_kind(),    TestTypestateAttr::static_kind(),    ThisCallAttr::static_kind(),    TransparentUnionAttr::static_kind(),    TrivialABIAttr::static_kind(),    TryAcquireCapabilityAttr::static_kind(),    TypeTagForDatatypeAttr::static_kind(),    TypeVisibilityAttr::static_kind(),    UnavailableAttr::static_kind(),    UninitializedAttr::static_kind(),    UnusedAttr::static_kind(),    UsedAttr::static_kind(),    UsingIfExistsAttr::static_kind(),    UuidAttr::static_kind(),    VecReturnAttr::static_kind(),    VecTypeHintAttr::static_kind(),    VectorCallAttr::static_kind(),    VisibilityAttr::static_kind(),    WarnUnusedAttr::static_kind(),    WarnUnusedResultAttr::static_kind(),    WeakAttr::static_kind(),    WeakImportAttr::static_kind(),    WeakRefAttr::static_kind(),    WebAssemblyExportNameAttr::static_kind(),    WebAssemblyImportModuleAttr::static_kind(),    WebAssemblyImportNameAttr::static_kind(),    WorkGroupSizeHintAttr::static_kind(),    X86ForceAlignArgPointerAttr::static_kind(),    XRayInstrumentAttr::static_kind(),    XRayLogArgsAttr::static_kind(),    ZeroCallUsedRegsAttr::static_kind(),    AArch64SVEPcsAttr::static_kind(),    AArch64VectorPcsAttr::static_kind(),    AMDGPUFlatWorkGroupSizeAttr::static_kind(),    AMDGPUKernelCallAttr::static_kind(),    AMDGPUNumSGPRAttr::static_kind(),    AMDGPUNumVGPRAttr::static_kind(),    AMDGPUWavesPerEUAttr::static_kind(),    ARMInterruptAttr::static_kind(),    AVRInterruptAttr::static_kind(),    AVRSignalAttr::static_kind(),    AcquireCapabilityAttr::static_kind(),    AcquireHandleAttr::static_kind(),    AcquiredAfterAttr::static_kind(),    AcquiredBeforeAttr::static_kind(),    AlignMac68kAttr::static_kind(),    AlignNaturalAttr::static_kind(),    AlignedAttr::static_kind(),    AllocAlignAttr::static_kind(),    AllocSizeAttr::static_kind(),    AlwaysDestroyAttr::static_kind(),    AnalyzerNoReturnAttr::static_kind(),    AnyX86InterruptAttr::static_kind(),    AnyX86NoCallerSavedRegistersAttr::static_kind(),    AnyX86NoCfCheckAttr::static_kind(),    ArcWeakrefUnavailableAttr::static_kind(),    ArgumentWithTypeTagAttr::static_kind(),    ArmBuiltinAliasAttr::static_kind(),    ArtificialAttr::static_kind(),    AsmLabelAttr::static_kind(),    AssertCapabilityAttr::static_kind(),    AssertExclusiveLockAttr::static_kind(),    AssertSharedLockAttr::static_kind(),    AssumeAlignedAttr::static_kind(),    AssumptionAttr::static_kind(),    AvailabilityAttr::static_kind(),    BPFPreserveAccessIndexAttr::static_kind(),    BTFDeclTagAttr::static_kind(),    BlocksAttr::static_kind(),    BuiltinAttr::static_kind(),    C11NoReturnAttr::static_kind(),    CDeclAttr::static_kind(),    CFAuditedTransferAttr::static_kind(),    CFGuardAttr::static_kind(),    CFICanonicalJumpTableAttr::static_kind(),    CFReturnsNotRetainedAttr::static_kind(),    CFReturnsRetainedAttr::static_kind(),    CFUnknownTransferAttr::static_kind(),    CPUDispatchAttr::static_kind(),    CPUSpecificAttr::static_kind(),    CUDAConstantAttr::static_kind(),    CUDADeviceAttr::static_kind(),    CUDADeviceBuiltinSurfaceTypeAttr::static_kind(),    CUDADeviceBuiltinTextureTypeAttr::static_kind(),    CUDAGlobalAttr::static_kind(),    CUDAHostAttr::static_kind(),    CUDAInvalidTargetAttr::static_kind(),    CUDALaunchBoundsAttr::static_kind(),    CUDASharedAttr::static_kind(),    CXX11NoReturnAttr::static_kind(),    CallableWhenAttr::static_kind(),    CallbackAttr::static_kind(),    CapabilityAttr::static_kind(),    CapturedRecordAttr::static_kind(),    CleanupAttr::static_kind(),    CmseNSEntryAttr::static_kind(),    CodeSegAttr::static_kind(),    ColdAttr::static_kind(),    CommonAttr::static_kind(),    ConstAttr::static_kind(),    ConstInitAttr::static_kind(),    ConstructorAttr::static_kind(),    ConsumableAttr::static_kind(),    ConsumableAutoCastAttr::static_kind(),    ConsumableSetOnReadAttr::static_kind(),    ConvergentAttr::static_kind(),    DLLExportAttr::static_kind(),    DLLExportStaticLocalAttr::static_kind(),    DLLImportAttr::static_kind(),    DLLImportStaticLocalAttr::static_kind(),    DeprecatedAttr::static_kind(),    DestructorAttr::static_kind(),    DiagnoseAsBuiltinAttr::static_kind(),    DiagnoseIfAttr::static_kind(),    DisableSanitizerInstrumentationAttr::static_kind(),    DisableTailCallsAttr::static_kind(),    EmptyBasesAttr::static_kind(),    EnableIfAttr::static_kind(),    EnforceTCBAttr::static_kind(),    EnforceTCBLeafAttr::static_kind(),    EnumExtensibilityAttr::static_kind(),    ErrorAttr::static_kind(),    ExcludeFromExplicitInstantiationAttr::static_kind(),    ExclusiveTrylockFunctionAttr::static_kind(),    ExternalSourceSymbolAttr::static_kind(),    FastCallAttr::static_kind(),    FinalAttr::static_kind(),    FlagEnumAttr::static_kind(),    FlattenAttr::static_kind(),    FormatArgAttr::static_kind(),    FormatAttr::static_kind(),    FunctionReturnThunksAttr::static_kind(),    GNUInlineAttr::static_kind(),    GuardedByAttr::static_kind(),    GuardedVarAttr::static_kind(),    HIPManagedAttr::static_kind(),    HLSLNumThreadsAttr::static_kind(),    HLSLSV_GroupIndexAttr::static_kind(),    HLSLShaderAttr::static_kind(),    HotAttr::static_kind(),    IBActionAttr::static_kind(),    IBOutletAttr::static_kind(),    IBOutletCollectionAttr::static_kind(),    NSConsumedAttr::static_kind(),    NonNullAttr::static_kind(),    OSConsumedAttr::static_kind(),    PassObjectSizeAttr::static_kind(),    ReleaseHandleAttr::static_kind(),    UseHandleAttr::static_kind(),    AnnotateAttr::static_kind(),    CFConsumedAttr::static_kind(),    CarriesDependencyAttr::static_kind(),    NoInlineAttr::static_kind(),    NoMergeAttr::static_kind(),    AlwaysInlineAttr::static_kind(),    SwiftAsyncContextAttr::static_kind(),    SwiftContextAttr::static_kind(),    SwiftErrorResultAttr::static_kind(),    SwiftIndirectResultAttr::static_kind(),};
+
+gap::generator<AttrKind> InheritableAttr::derived_kinds(void) {
+  for (AttrKind k : kInheritableAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
@@ -12103,6 +12895,15 @@ bool IBOutletCollectionAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kIBOutletCollectionAttrDerivedKinds[] = {
+    IBOutletCollectionAttr::static_kind(),};
+
+gap::generator<AttrKind> IBOutletCollectionAttr::derived_kinds(void) {
+  for (AttrKind k : kIBOutletCollectionAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IBOutletCollectionAttr> IBOutletCollectionAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12149,6 +12950,15 @@ bool IBOutletAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kIBOutletAttrDerivedKinds[] = {
+    IBOutletAttr::static_kind(),};
+
+gap::generator<AttrKind> IBOutletAttr::derived_kinds(void) {
+  for (AttrKind k : kIBOutletAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IBOutletAttr> IBOutletAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12183,6 +12993,15 @@ bool IBActionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kIBActionAttrDerivedKinds[] = {
+    IBActionAttr::static_kind(),};
+
+gap::generator<AttrKind> IBActionAttr::derived_kinds(void) {
+  for (AttrKind k : kIBActionAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<IBActionAttr> IBActionAttr::from(const InheritableAttr &parent) {
@@ -12221,6 +13040,15 @@ bool HotAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kHotAttrDerivedKinds[] = {
+    HotAttr::static_kind(),};
+
+gap::generator<AttrKind> HotAttr::derived_kinds(void) {
+  for (AttrKind k : kHotAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<HotAttr> HotAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12255,6 +13083,15 @@ bool HLSLShaderAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kHLSLShaderAttrDerivedKinds[] = {
+    HLSLShaderAttr::static_kind(),};
+
+gap::generator<AttrKind> HLSLShaderAttr::derived_kinds(void) {
+  for (AttrKind k : kHLSLShaderAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<HLSLShaderAttr> HLSLShaderAttr::from(const InheritableAttr &parent) {
@@ -12297,6 +13134,15 @@ bool HLSLSV_GroupIndexAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kHLSLSV_GroupIndexAttrDerivedKinds[] = {
+    HLSLSV_GroupIndexAttr::static_kind(),};
+
+gap::generator<AttrKind> HLSLSV_GroupIndexAttr::derived_kinds(void) {
+  for (AttrKind k : kHLSLSV_GroupIndexAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12331,6 +13177,15 @@ bool HLSLNumThreadsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kHLSLNumThreadsAttrDerivedKinds[] = {
+    HLSLNumThreadsAttr::static_kind(),};
+
+gap::generator<AttrKind> HLSLNumThreadsAttr::derived_kinds(void) {
+  for (AttrKind k : kHLSLNumThreadsAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<HLSLNumThreadsAttr> HLSLNumThreadsAttr::from(const InheritableAttr &parent) {
@@ -12369,6 +13224,15 @@ bool HIPManagedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kHIPManagedAttrDerivedKinds[] = {
+    HIPManagedAttr::static_kind(),};
+
+gap::generator<AttrKind> HIPManagedAttr::derived_kinds(void) {
+  for (AttrKind k : kHIPManagedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<HIPManagedAttr> HIPManagedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12405,6 +13269,15 @@ bool GuardedVarAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kGuardedVarAttrDerivedKinds[] = {
+    GuardedVarAttr::static_kind(),};
+
+gap::generator<AttrKind> GuardedVarAttr::derived_kinds(void) {
+  for (AttrKind k : kGuardedVarAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<GuardedVarAttr> GuardedVarAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12439,6 +13312,15 @@ bool GuardedByAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kGuardedByAttrDerivedKinds[] = {
+    GuardedByAttr::static_kind(),};
+
+gap::generator<AttrKind> GuardedByAttr::derived_kinds(void) {
+  for (AttrKind k : kGuardedByAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<GuardedByAttr> GuardedByAttr::from(const InheritableAttr &parent) {
@@ -12482,6 +13364,15 @@ bool GNUInlineAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kGNUInlineAttrDerivedKinds[] = {
+    GNUInlineAttr::static_kind(),};
+
+gap::generator<AttrKind> GNUInlineAttr::derived_kinds(void) {
+  for (AttrKind k : kGNUInlineAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<GNUInlineAttr> GNUInlineAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12516,6 +13407,15 @@ bool FunctionReturnThunksAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kFunctionReturnThunksAttrDerivedKinds[] = {
+    FunctionReturnThunksAttr::static_kind(),};
+
+gap::generator<AttrKind> FunctionReturnThunksAttr::derived_kinds(void) {
+  for (AttrKind k : kFunctionReturnThunksAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from(const InheritableAttr &parent) {
@@ -12558,6 +13458,15 @@ bool FormatAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kFormatAttrDerivedKinds[] = {
+    FormatAttr::static_kind(),};
+
+gap::generator<AttrKind> FormatAttr::derived_kinds(void) {
+  for (AttrKind k : kFormatAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FormatAttr> FormatAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12592,6 +13501,15 @@ bool FormatArgAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kFormatArgAttrDerivedKinds[] = {
+    FormatArgAttr::static_kind(),};
+
+gap::generator<AttrKind> FormatArgAttr::derived_kinds(void) {
+  for (AttrKind k : kFormatArgAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FormatArgAttr> FormatArgAttr::from(const InheritableAttr &parent) {
@@ -12630,6 +13548,15 @@ bool FlattenAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kFlattenAttrDerivedKinds[] = {
+    FlattenAttr::static_kind(),};
+
+gap::generator<AttrKind> FlattenAttr::derived_kinds(void) {
+  for (AttrKind k : kFlattenAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FlattenAttr> FlattenAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12666,6 +13593,15 @@ bool FlagEnumAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kFlagEnumAttrDerivedKinds[] = {
+    FlagEnumAttr::static_kind(),};
+
+gap::generator<AttrKind> FlagEnumAttr::derived_kinds(void) {
+  for (AttrKind k : kFlagEnumAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FlagEnumAttr> FlagEnumAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12700,6 +13636,15 @@ bool FinalAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kFinalAttrDerivedKinds[] = {
+    FinalAttr::static_kind(),};
+
+gap::generator<AttrKind> FinalAttr::derived_kinds(void) {
+  for (AttrKind k : kFinalAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FinalAttr> FinalAttr::from(const InheritableAttr &parent) {
@@ -12746,6 +13691,15 @@ bool FastCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kFastCallAttrDerivedKinds[] = {
+    FastCallAttr::static_kind(),};
+
+gap::generator<AttrKind> FastCallAttr::derived_kinds(void) {
+  for (AttrKind k : kFastCallAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FastCallAttr> FastCallAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12780,6 +13734,15 @@ bool ExternalSourceSymbolAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kExternalSourceSymbolAttrDerivedKinds[] = {
+    ExternalSourceSymbolAttr::static_kind(),};
+
+gap::generator<AttrKind> ExternalSourceSymbolAttr::derived_kinds(void) {
+  for (AttrKind k : kExternalSourceSymbolAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const InheritableAttr &parent) {
@@ -12832,6 +13795,15 @@ bool ExclusiveTrylockFunctionAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kExclusiveTrylockFunctionAttrDerivedKinds[] = {
+    ExclusiveTrylockFunctionAttr::static_kind(),};
+
+gap::generator<AttrKind> ExclusiveTrylockFunctionAttr::derived_kinds(void) {
+  for (AttrKind k : kExclusiveTrylockFunctionAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12873,6 +13845,15 @@ bool ExcludeFromExplicitInstantiationAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kExcludeFromExplicitInstantiationAttrDerivedKinds[] = {
+    ExcludeFromExplicitInstantiationAttr::static_kind(),};
+
+gap::generator<AttrKind> ExcludeFromExplicitInstantiationAttr::derived_kinds(void) {
+  for (AttrKind k : kExcludeFromExplicitInstantiationAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ExcludeFromExplicitInstantiationAttr> ExcludeFromExplicitInstantiationAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -12907,6 +13888,15 @@ bool ErrorAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kErrorAttrDerivedKinds[] = {
+    ErrorAttr::static_kind(),};
+
+gap::generator<AttrKind> ErrorAttr::derived_kinds(void) {
+  for (AttrKind k : kErrorAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ErrorAttr> ErrorAttr::from(const InheritableAttr &parent) {
@@ -12962,6 +13952,15 @@ bool EnumExtensibilityAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kEnumExtensibilityAttrDerivedKinds[] = {
+    EnumExtensibilityAttr::static_kind(),};
+
+gap::generator<AttrKind> EnumExtensibilityAttr::derived_kinds(void) {
+  for (AttrKind k : kEnumExtensibilityAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13000,6 +13999,15 @@ bool EnforceTCBLeafAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kEnforceTCBLeafAttrDerivedKinds[] = {
+    EnforceTCBLeafAttr::static_kind(),};
+
+gap::generator<AttrKind> EnforceTCBLeafAttr::derived_kinds(void) {
+  for (AttrKind k : kEnforceTCBLeafAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const InheritableAttr &parent) {
@@ -13043,6 +14051,15 @@ bool EnforceTCBAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kEnforceTCBAttrDerivedKinds[] = {
+    EnforceTCBAttr::static_kind(),};
+
+gap::generator<AttrKind> EnforceTCBAttr::derived_kinds(void) {
+  for (AttrKind k : kEnforceTCBAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<EnforceTCBAttr> EnforceTCBAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13082,6 +14099,15 @@ bool EnableIfAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kEnableIfAttrDerivedKinds[] = {
+    EnableIfAttr::static_kind(),};
+
+gap::generator<AttrKind> EnableIfAttr::derived_kinds(void) {
+  for (AttrKind k : kEnableIfAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<EnableIfAttr> EnableIfAttr::from(const InheritableAttr &parent) {
@@ -13130,6 +14156,15 @@ bool EmptyBasesAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kEmptyBasesAttrDerivedKinds[] = {
+    EmptyBasesAttr::static_kind(),};
+
+gap::generator<AttrKind> EmptyBasesAttr::derived_kinds(void) {
+  for (AttrKind k : kEmptyBasesAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<EmptyBasesAttr> EmptyBasesAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13164,6 +14199,15 @@ bool DisableTailCallsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kDisableTailCallsAttrDerivedKinds[] = {
+    DisableTailCallsAttr::static_kind(),};
+
+gap::generator<AttrKind> DisableTailCallsAttr::derived_kinds(void) {
+  for (AttrKind k : kDisableTailCallsAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DisableTailCallsAttr> DisableTailCallsAttr::from(const InheritableAttr &parent) {
@@ -13202,6 +14246,15 @@ bool DisableSanitizerInstrumentationAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kDisableSanitizerInstrumentationAttrDerivedKinds[] = {
+    DisableSanitizerInstrumentationAttr::static_kind(),};
+
+gap::generator<AttrKind> DisableSanitizerInstrumentationAttr::derived_kinds(void) {
+  for (AttrKind k : kDisableSanitizerInstrumentationAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DisableSanitizerInstrumentationAttr> DisableSanitizerInstrumentationAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13236,6 +14289,15 @@ bool DiagnoseIfAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kDiagnoseIfAttrDerivedKinds[] = {
+    DiagnoseIfAttr::static_kind(),};
+
+gap::generator<AttrKind> DiagnoseIfAttr::derived_kinds(void) {
+  for (AttrKind k : kDiagnoseIfAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from(const InheritableAttr &parent) {
@@ -13305,6 +14367,15 @@ bool DiagnoseAsBuiltinAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kDiagnoseAsBuiltinAttrDerivedKinds[] = {
+    DiagnoseAsBuiltinAttr::static_kind(),};
+
+gap::generator<AttrKind> DiagnoseAsBuiltinAttr::derived_kinds(void) {
+  for (AttrKind k : kDiagnoseAsBuiltinAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13346,6 +14417,15 @@ bool DestructorAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kDestructorAttrDerivedKinds[] = {
+    DestructorAttr::static_kind(),};
+
+gap::generator<AttrKind> DestructorAttr::derived_kinds(void) {
+  for (AttrKind k : kDestructorAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DestructorAttr> DestructorAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13380,6 +14460,15 @@ bool DeprecatedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kDeprecatedAttrDerivedKinds[] = {
+    DeprecatedAttr::static_kind(),};
+
+gap::generator<AttrKind> DeprecatedAttr::derived_kinds(void) {
+  for (AttrKind k : kDeprecatedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DeprecatedAttr> DeprecatedAttr::from(const InheritableAttr &parent) {
@@ -13428,6 +14517,15 @@ bool DeclOrStmtAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kDeclOrStmtAttrDerivedKinds[] = {
+    NoInlineAttr::static_kind(),    NoMergeAttr::static_kind(),    AlwaysInlineAttr::static_kind(),};
+
+gap::generator<AttrKind> DeclOrStmtAttr::derived_kinds(void) {
+  for (AttrKind k : kDeclOrStmtAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DeclOrStmtAttr> DeclOrStmtAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13464,6 +14562,15 @@ bool AlwaysInlineAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAlwaysInlineAttrDerivedKinds[] = {
+    AlwaysInlineAttr::static_kind(),};
+
+gap::generator<AttrKind> AlwaysInlineAttr::derived_kinds(void) {
+  for (AttrKind k : kAlwaysInlineAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AlwaysInlineAttr> AlwaysInlineAttr::from(const DeclOrStmtAttr &parent) {
@@ -13514,6 +14621,15 @@ bool NoMergeAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoMergeAttrDerivedKinds[] = {
+    NoMergeAttr::static_kind(),};
+
+gap::generator<AttrKind> NoMergeAttr::derived_kinds(void) {
+  for (AttrKind k : kNoMergeAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoMergeAttr> NoMergeAttr::from(const DeclOrStmtAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13552,6 +14668,15 @@ bool NoInlineAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoInlineAttrDerivedKinds[] = {
+    NoInlineAttr::static_kind(),};
+
+gap::generator<AttrKind> NoInlineAttr::derived_kinds(void) {
+  for (AttrKind k : kNoInlineAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoInlineAttr> NoInlineAttr::from(const DeclOrStmtAttr &parent) {
@@ -13598,6 +14723,15 @@ bool DLLImportStaticLocalAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kDLLImportStaticLocalAttrDerivedKinds[] = {
+    DLLImportStaticLocalAttr::static_kind(),};
+
+gap::generator<AttrKind> DLLImportStaticLocalAttr::derived_kinds(void) {
+  for (AttrKind k : kDLLImportStaticLocalAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13632,6 +14766,15 @@ bool DLLImportAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kDLLImportAttrDerivedKinds[] = {
+    DLLImportAttr::static_kind(),};
+
+gap::generator<AttrKind> DLLImportAttr::derived_kinds(void) {
+  for (AttrKind k : kDLLImportAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DLLImportAttr> DLLImportAttr::from(const InheritableAttr &parent) {
@@ -13670,6 +14813,15 @@ bool DLLExportStaticLocalAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kDLLExportStaticLocalAttrDerivedKinds[] = {
+    DLLExportStaticLocalAttr::static_kind(),};
+
+gap::generator<AttrKind> DLLExportStaticLocalAttr::derived_kinds(void) {
+  for (AttrKind k : kDLLExportStaticLocalAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DLLExportStaticLocalAttr> DLLExportStaticLocalAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13704,6 +14856,15 @@ bool DLLExportAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kDLLExportAttrDerivedKinds[] = {
+    DLLExportAttr::static_kind(),};
+
+gap::generator<AttrKind> DLLExportAttr::derived_kinds(void) {
+  for (AttrKind k : kDLLExportAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DLLExportAttr> DLLExportAttr::from(const InheritableAttr &parent) {
@@ -13742,6 +14903,15 @@ bool ConvergentAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kConvergentAttrDerivedKinds[] = {
+    ConvergentAttr::static_kind(),};
+
+gap::generator<AttrKind> ConvergentAttr::derived_kinds(void) {
+  for (AttrKind k : kConvergentAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ConvergentAttr> ConvergentAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13776,6 +14946,15 @@ bool ConsumableSetOnReadAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kConsumableSetOnReadAttrDerivedKinds[] = {
+    ConsumableSetOnReadAttr::static_kind(),};
+
+gap::generator<AttrKind> ConsumableSetOnReadAttr::derived_kinds(void) {
+  for (AttrKind k : kConsumableSetOnReadAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ConsumableSetOnReadAttr> ConsumableSetOnReadAttr::from(const InheritableAttr &parent) {
@@ -13814,6 +14993,15 @@ bool ConsumableAutoCastAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kConsumableAutoCastAttrDerivedKinds[] = {
+    ConsumableAutoCastAttr::static_kind(),};
+
+gap::generator<AttrKind> ConsumableAutoCastAttr::derived_kinds(void) {
+  for (AttrKind k : kConsumableAutoCastAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ConsumableAutoCastAttr> ConsumableAutoCastAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13848,6 +15036,15 @@ bool ConsumableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kConsumableAttrDerivedKinds[] = {
+    ConsumableAttr::static_kind(),};
+
+gap::generator<AttrKind> ConsumableAttr::derived_kinds(void) {
+  for (AttrKind k : kConsumableAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ConsumableAttr> ConsumableAttr::from(const InheritableAttr &parent) {
@@ -13890,6 +15087,15 @@ bool ConstructorAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kConstructorAttrDerivedKinds[] = {
+    ConstructorAttr::static_kind(),};
+
+gap::generator<AttrKind> ConstructorAttr::derived_kinds(void) {
+  for (AttrKind k : kConstructorAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ConstructorAttr> ConstructorAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -13924,6 +15130,15 @@ bool ConstInitAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kConstInitAttrDerivedKinds[] = {
+    ConstInitAttr::static_kind(),};
+
+gap::generator<AttrKind> ConstInitAttr::derived_kinds(void) {
+  for (AttrKind k : kConstInitAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ConstInitAttr> ConstInitAttr::from(const InheritableAttr &parent) {
@@ -13970,6 +15185,15 @@ bool ConstAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kConstAttrDerivedKinds[] = {
+    ConstAttr::static_kind(),};
+
+gap::generator<AttrKind> ConstAttr::derived_kinds(void) {
+  for (AttrKind k : kConstAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ConstAttr> ConstAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14004,6 +15228,15 @@ bool CommonAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCommonAttrDerivedKinds[] = {
+    CommonAttr::static_kind(),};
+
+gap::generator<AttrKind> CommonAttr::derived_kinds(void) {
+  for (AttrKind k : kCommonAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CommonAttr> CommonAttr::from(const InheritableAttr &parent) {
@@ -14042,6 +15275,15 @@ bool ColdAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kColdAttrDerivedKinds[] = {
+    ColdAttr::static_kind(),};
+
+gap::generator<AttrKind> ColdAttr::derived_kinds(void) {
+  for (AttrKind k : kColdAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ColdAttr> ColdAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14076,6 +15318,15 @@ bool CodeSegAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCodeSegAttrDerivedKinds[] = {
+    CodeSegAttr::static_kind(),};
+
+gap::generator<AttrKind> CodeSegAttr::derived_kinds(void) {
+  for (AttrKind k : kCodeSegAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CodeSegAttr> CodeSegAttr::from(const InheritableAttr &parent) {
@@ -14119,6 +15370,15 @@ bool CmseNSEntryAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCmseNSEntryAttrDerivedKinds[] = {
+    CmseNSEntryAttr::static_kind(),};
+
+gap::generator<AttrKind> CmseNSEntryAttr::derived_kinds(void) {
+  for (AttrKind k : kCmseNSEntryAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CmseNSEntryAttr> CmseNSEntryAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14153,6 +15413,15 @@ bool CleanupAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCleanupAttrDerivedKinds[] = {
+    CleanupAttr::static_kind(),};
+
+gap::generator<AttrKind> CleanupAttr::derived_kinds(void) {
+  for (AttrKind k : kCleanupAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CleanupAttr> CleanupAttr::from(const InheritableAttr &parent) {
@@ -14196,6 +15465,15 @@ bool CapturedRecordAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCapturedRecordAttrDerivedKinds[] = {
+    CapturedRecordAttr::static_kind(),};
+
+gap::generator<AttrKind> CapturedRecordAttr::derived_kinds(void) {
+  for (AttrKind k : kCapturedRecordAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CapturedRecordAttr> CapturedRecordAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14230,6 +15508,15 @@ bool CapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCapabilityAttrDerivedKinds[] = {
+    CapabilityAttr::static_kind(),};
+
+gap::generator<AttrKind> CapabilityAttr::derived_kinds(void) {
+  for (AttrKind k : kCapabilityAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CapabilityAttr> CapabilityAttr::from(const InheritableAttr &parent) {
@@ -14281,6 +15568,15 @@ bool CallbackAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCallbackAttrDerivedKinds[] = {
+    CallbackAttr::static_kind(),};
+
+gap::generator<AttrKind> CallbackAttr::derived_kinds(void) {
+  for (AttrKind k : kCallbackAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CallbackAttr> CallbackAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14317,6 +15613,15 @@ bool CallableWhenAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCallableWhenAttrDerivedKinds[] = {
+    CallableWhenAttr::static_kind(),};
+
+gap::generator<AttrKind> CallableWhenAttr::derived_kinds(void) {
+  for (AttrKind k : kCallableWhenAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CallableWhenAttr> CallableWhenAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14351,6 +15656,15 @@ bool CXX11NoReturnAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCXX11NoReturnAttrDerivedKinds[] = {
+    CXX11NoReturnAttr::static_kind(),};
+
+gap::generator<AttrKind> CXX11NoReturnAttr::derived_kinds(void) {
+  for (AttrKind k : kCXX11NoReturnAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const InheritableAttr &parent) {
@@ -14393,6 +15707,15 @@ bool CUDASharedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCUDASharedAttrDerivedKinds[] = {
+    CUDASharedAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDASharedAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDASharedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CUDASharedAttr> CUDASharedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14427,6 +15750,15 @@ bool CUDALaunchBoundsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCUDALaunchBoundsAttrDerivedKinds[] = {
+    CUDALaunchBoundsAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDALaunchBoundsAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDALaunchBoundsAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const InheritableAttr &parent) {
@@ -14475,6 +15807,15 @@ bool CUDAInvalidTargetAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCUDAInvalidTargetAttrDerivedKinds[] = {
+    CUDAInvalidTargetAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDAInvalidTargetAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDAInvalidTargetAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14509,6 +15850,15 @@ bool CUDAHostAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCUDAHostAttrDerivedKinds[] = {
+    CUDAHostAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDAHostAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDAHostAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CUDAHostAttr> CUDAHostAttr::from(const InheritableAttr &parent) {
@@ -14547,6 +15897,15 @@ bool CUDAGlobalAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCUDAGlobalAttrDerivedKinds[] = {
+    CUDAGlobalAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDAGlobalAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDAGlobalAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CUDAGlobalAttr> CUDAGlobalAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14581,6 +15940,15 @@ bool CUDADeviceBuiltinTextureTypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCUDADeviceBuiltinTextureTypeAttrDerivedKinds[] = {
+    CUDADeviceBuiltinTextureTypeAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDADeviceBuiltinTextureTypeAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDADeviceBuiltinTextureTypeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr::from(const InheritableAttr &parent) {
@@ -14619,6 +15987,15 @@ bool CUDADeviceBuiltinSurfaceTypeAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCUDADeviceBuiltinSurfaceTypeAttrDerivedKinds[] = {
+    CUDADeviceBuiltinSurfaceTypeAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDADeviceBuiltinSurfaceTypeAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDADeviceBuiltinSurfaceTypeAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CUDADeviceBuiltinSurfaceTypeAttr> CUDADeviceBuiltinSurfaceTypeAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14653,6 +16030,15 @@ bool CUDADeviceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCUDADeviceAttrDerivedKinds[] = {
+    CUDADeviceAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDADeviceAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDADeviceAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CUDADeviceAttr> CUDADeviceAttr::from(const InheritableAttr &parent) {
@@ -14691,6 +16077,15 @@ bool CUDAConstantAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCUDAConstantAttrDerivedKinds[] = {
+    CUDAConstantAttr::static_kind(),};
+
+gap::generator<AttrKind> CUDAConstantAttr::derived_kinds(void) {
+  for (AttrKind k : kCUDAConstantAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CUDAConstantAttr> CUDAConstantAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14725,6 +16120,15 @@ bool CPUSpecificAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCPUSpecificAttrDerivedKinds[] = {
+    CPUSpecificAttr::static_kind(),};
+
+gap::generator<AttrKind> CPUSpecificAttr::derived_kinds(void) {
+  for (AttrKind k : kCPUSpecificAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CPUSpecificAttr> CPUSpecificAttr::from(const InheritableAttr &parent) {
@@ -14763,6 +16167,15 @@ bool CPUDispatchAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCPUDispatchAttrDerivedKinds[] = {
+    CPUDispatchAttr::static_kind(),};
+
+gap::generator<AttrKind> CPUDispatchAttr::derived_kinds(void) {
+  for (AttrKind k : kCPUDispatchAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CPUDispatchAttr> CPUDispatchAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14797,6 +16210,15 @@ bool CFUnknownTransferAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCFUnknownTransferAttrDerivedKinds[] = {
+    CFUnknownTransferAttr::static_kind(),};
+
+gap::generator<AttrKind> CFUnknownTransferAttr::derived_kinds(void) {
+  for (AttrKind k : kCFUnknownTransferAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const InheritableAttr &parent) {
@@ -14835,6 +16257,15 @@ bool CFReturnsRetainedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCFReturnsRetainedAttrDerivedKinds[] = {
+    CFReturnsRetainedAttr::static_kind(),};
+
+gap::generator<AttrKind> CFReturnsRetainedAttr::derived_kinds(void) {
+  for (AttrKind k : kCFReturnsRetainedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CFReturnsRetainedAttr> CFReturnsRetainedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14869,6 +16300,15 @@ bool CFReturnsNotRetainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCFReturnsNotRetainedAttrDerivedKinds[] = {
+    CFReturnsNotRetainedAttr::static_kind(),};
+
+gap::generator<AttrKind> CFReturnsNotRetainedAttr::derived_kinds(void) {
+  for (AttrKind k : kCFReturnsNotRetainedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::from(const InheritableAttr &parent) {
@@ -14907,6 +16347,15 @@ bool CFICanonicalJumpTableAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCFICanonicalJumpTableAttrDerivedKinds[] = {
+    CFICanonicalJumpTableAttr::static_kind(),};
+
+gap::generator<AttrKind> CFICanonicalJumpTableAttr::derived_kinds(void) {
+  for (AttrKind k : kCFICanonicalJumpTableAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -14941,6 +16390,15 @@ bool CFGuardAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCFGuardAttrDerivedKinds[] = {
+    CFGuardAttr::static_kind(),};
+
+gap::generator<AttrKind> CFGuardAttr::derived_kinds(void) {
+  for (AttrKind k : kCFGuardAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CFGuardAttr> CFGuardAttr::from(const InheritableAttr &parent) {
@@ -14983,6 +16441,15 @@ bool CFAuditedTransferAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCFAuditedTransferAttrDerivedKinds[] = {
+    CFAuditedTransferAttr::static_kind(),};
+
+gap::generator<AttrKind> CFAuditedTransferAttr::derived_kinds(void) {
+  for (AttrKind k : kCFAuditedTransferAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CFAuditedTransferAttr> CFAuditedTransferAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15017,6 +16484,15 @@ bool CDeclAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kCDeclAttrDerivedKinds[] = {
+    CDeclAttr::static_kind(),};
+
+gap::generator<AttrKind> CDeclAttr::derived_kinds(void) {
+  for (AttrKind k : kCDeclAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CDeclAttr> CDeclAttr::from(const InheritableAttr &parent) {
@@ -15055,6 +16531,15 @@ bool C11NoReturnAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kC11NoReturnAttrDerivedKinds[] = {
+    C11NoReturnAttr::static_kind(),};
+
+gap::generator<AttrKind> C11NoReturnAttr::derived_kinds(void) {
+  for (AttrKind k : kC11NoReturnAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15091,6 +16576,15 @@ bool BuiltinAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kBuiltinAttrDerivedKinds[] = {
+    BuiltinAttr::static_kind(),};
+
+gap::generator<AttrKind> BuiltinAttr::derived_kinds(void) {
+  for (AttrKind k : kBuiltinAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<BuiltinAttr> BuiltinAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15125,6 +16619,15 @@ bool BlocksAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kBlocksAttrDerivedKinds[] = {
+    BlocksAttr::static_kind(),};
+
+gap::generator<AttrKind> BlocksAttr::derived_kinds(void) {
+  for (AttrKind k : kBlocksAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BlocksAttr> BlocksAttr::from(const InheritableAttr &parent) {
@@ -15165,6 +16668,15 @@ bool BTFDeclTagAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kBTFDeclTagAttrDerivedKinds[] = {
+    BTFDeclTagAttr::static_kind(),};
+
+gap::generator<AttrKind> BTFDeclTagAttr::derived_kinds(void) {
+  for (AttrKind k : kBTFDeclTagAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BTFDeclTagAttr> BTFDeclTagAttr::from(const InheritableAttr &parent) {
@@ -15208,6 +16720,15 @@ bool BPFPreserveAccessIndexAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kBPFPreserveAccessIndexAttrDerivedKinds[] = {
+    BPFPreserveAccessIndexAttr::static_kind(),};
+
+gap::generator<AttrKind> BPFPreserveAccessIndexAttr::derived_kinds(void) {
+  for (AttrKind k : kBPFPreserveAccessIndexAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15242,6 +16763,15 @@ bool AvailabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAvailabilityAttrDerivedKinds[] = {
+    AvailabilityAttr::static_kind(),};
+
+gap::generator<AttrKind> AvailabilityAttr::derived_kinds(void) {
+  for (AttrKind k : kAvailabilityAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AvailabilityAttr> AvailabilityAttr::from(const InheritableAttr &parent) {
@@ -15298,6 +16828,15 @@ bool AssumptionAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAssumptionAttrDerivedKinds[] = {
+    AssumptionAttr::static_kind(),};
+
+gap::generator<AttrKind> AssumptionAttr::derived_kinds(void) {
+  for (AttrKind k : kAssumptionAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AssumptionAttr> AssumptionAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15337,6 +16876,15 @@ bool AssumeAlignedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAssumeAlignedAttrDerivedKinds[] = {
+    AssumeAlignedAttr::static_kind(),};
+
+gap::generator<AttrKind> AssumeAlignedAttr::derived_kinds(void) {
+  for (AttrKind k : kAssumeAlignedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AssumeAlignedAttr> AssumeAlignedAttr::from(const InheritableAttr &parent) {
@@ -15393,6 +16941,15 @@ bool AssertSharedLockAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAssertSharedLockAttrDerivedKinds[] = {
+    AssertSharedLockAttr::static_kind(),};
+
+gap::generator<AttrKind> AssertSharedLockAttr::derived_kinds(void) {
+  for (AttrKind k : kAssertSharedLockAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AssertSharedLockAttr> AssertSharedLockAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15429,6 +16986,15 @@ bool AssertExclusiveLockAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAssertExclusiveLockAttrDerivedKinds[] = {
+    AssertExclusiveLockAttr::static_kind(),};
+
+gap::generator<AttrKind> AssertExclusiveLockAttr::derived_kinds(void) {
+  for (AttrKind k : kAssertExclusiveLockAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15463,6 +17029,15 @@ bool AssertCapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAssertCapabilityAttrDerivedKinds[] = {
+    AssertCapabilityAttr::static_kind(),};
+
+gap::generator<AttrKind> AssertCapabilityAttr::derived_kinds(void) {
+  for (AttrKind k : kAssertCapabilityAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AssertCapabilityAttr> AssertCapabilityAttr::from(const InheritableAttr &parent) {
@@ -15507,6 +17082,15 @@ bool AsmLabelAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAsmLabelAttrDerivedKinds[] = {
+    AsmLabelAttr::static_kind(),};
+
+gap::generator<AttrKind> AsmLabelAttr::derived_kinds(void) {
+  for (AttrKind k : kAsmLabelAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AsmLabelAttr> AsmLabelAttr::from(const InheritableAttr &parent) {
@@ -15554,6 +17138,15 @@ bool ArtificialAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kArtificialAttrDerivedKinds[] = {
+    ArtificialAttr::static_kind(),};
+
+gap::generator<AttrKind> ArtificialAttr::derived_kinds(void) {
+  for (AttrKind k : kArtificialAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ArtificialAttr> ArtificialAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15590,6 +17183,15 @@ bool ArmBuiltinAliasAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kArmBuiltinAliasAttrDerivedKinds[] = {
+    ArmBuiltinAliasAttr::static_kind(),};
+
+gap::generator<AttrKind> ArmBuiltinAliasAttr::derived_kinds(void) {
+  for (AttrKind k : kArmBuiltinAliasAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ArmBuiltinAliasAttr> ArmBuiltinAliasAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15624,6 +17226,15 @@ bool ArgumentWithTypeTagAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kArgumentWithTypeTagAttrDerivedKinds[] = {
+    ArgumentWithTypeTagAttr::static_kind(),};
+
+gap::generator<AttrKind> ArgumentWithTypeTagAttr::derived_kinds(void) {
+  for (AttrKind k : kArgumentWithTypeTagAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from(const InheritableAttr &parent) {
@@ -15670,6 +17281,15 @@ bool ArcWeakrefUnavailableAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kArcWeakrefUnavailableAttrDerivedKinds[] = {
+    ArcWeakrefUnavailableAttr::static_kind(),};
+
+gap::generator<AttrKind> ArcWeakrefUnavailableAttr::derived_kinds(void) {
+  for (AttrKind k : kArcWeakrefUnavailableAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15704,6 +17324,15 @@ bool AnyX86NoCfCheckAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAnyX86NoCfCheckAttrDerivedKinds[] = {
+    AnyX86NoCfCheckAttr::static_kind(),};
+
+gap::generator<AttrKind> AnyX86NoCfCheckAttr::derived_kinds(void) {
+  for (AttrKind k : kAnyX86NoCfCheckAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::from(const InheritableAttr &parent) {
@@ -15742,6 +17371,15 @@ bool AnyX86NoCallerSavedRegistersAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAnyX86NoCallerSavedRegistersAttrDerivedKinds[] = {
+    AnyX86NoCallerSavedRegistersAttr::static_kind(),};
+
+gap::generator<AttrKind> AnyX86NoCallerSavedRegistersAttr::derived_kinds(void) {
+  for (AttrKind k : kAnyX86NoCallerSavedRegistersAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AnyX86NoCallerSavedRegistersAttr> AnyX86NoCallerSavedRegistersAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15776,6 +17414,15 @@ bool AnyX86InterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAnyX86InterruptAttrDerivedKinds[] = {
+    AnyX86InterruptAttr::static_kind(),};
+
+gap::generator<AttrKind> AnyX86InterruptAttr::derived_kinds(void) {
+  for (AttrKind k : kAnyX86InterruptAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AnyX86InterruptAttr> AnyX86InterruptAttr::from(const InheritableAttr &parent) {
@@ -15814,6 +17461,15 @@ bool AnalyzerNoReturnAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAnalyzerNoReturnAttrDerivedKinds[] = {
+    AnalyzerNoReturnAttr::static_kind(),};
+
+gap::generator<AttrKind> AnalyzerNoReturnAttr::derived_kinds(void) {
+  for (AttrKind k : kAnalyzerNoReturnAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AnalyzerNoReturnAttr> AnalyzerNoReturnAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15848,6 +17504,15 @@ bool AlwaysDestroyAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAlwaysDestroyAttrDerivedKinds[] = {
+    AlwaysDestroyAttr::static_kind(),};
+
+gap::generator<AttrKind> AlwaysDestroyAttr::derived_kinds(void) {
+  for (AttrKind k : kAlwaysDestroyAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AlwaysDestroyAttr> AlwaysDestroyAttr::from(const InheritableAttr &parent) {
@@ -15886,6 +17551,15 @@ bool AllocSizeAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAllocSizeAttrDerivedKinds[] = {
+    AllocSizeAttr::static_kind(),};
+
+gap::generator<AttrKind> AllocSizeAttr::derived_kinds(void) {
+  for (AttrKind k : kAllocSizeAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AllocSizeAttr> AllocSizeAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15922,6 +17596,15 @@ bool AllocAlignAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAllocAlignAttrDerivedKinds[] = {
+    AllocAlignAttr::static_kind(),};
+
+gap::generator<AttrKind> AllocAlignAttr::derived_kinds(void) {
+  for (AttrKind k : kAllocAlignAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AllocAlignAttr> AllocAlignAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -15956,6 +17639,15 @@ bool AlignedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAlignedAttrDerivedKinds[] = {
+    AlignedAttr::static_kind(),};
+
+gap::generator<AttrKind> AlignedAttr::derived_kinds(void) {
+  for (AttrKind k : kAlignedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AlignedAttr> AlignedAttr::from(const InheritableAttr &parent) {
@@ -16052,6 +17744,15 @@ bool AlignNaturalAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAlignNaturalAttrDerivedKinds[] = {
+    AlignNaturalAttr::static_kind(),};
+
+gap::generator<AttrKind> AlignNaturalAttr::derived_kinds(void) {
+  for (AttrKind k : kAlignNaturalAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AlignNaturalAttr> AlignNaturalAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16086,6 +17787,15 @@ bool AlignMac68kAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAlignMac68kAttrDerivedKinds[] = {
+    AlignMac68kAttr::static_kind(),};
+
+gap::generator<AttrKind> AlignMac68kAttr::derived_kinds(void) {
+  for (AttrKind k : kAlignMac68kAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const InheritableAttr &parent) {
@@ -16124,6 +17834,15 @@ bool AcquiredBeforeAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAcquiredBeforeAttrDerivedKinds[] = {
+    AcquiredBeforeAttr::static_kind(),};
+
+gap::generator<AttrKind> AcquiredBeforeAttr::derived_kinds(void) {
+  for (AttrKind k : kAcquiredBeforeAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AcquiredBeforeAttr> AcquiredBeforeAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16160,6 +17879,15 @@ bool AcquiredAfterAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAcquiredAfterAttrDerivedKinds[] = {
+    AcquiredAfterAttr::static_kind(),};
+
+gap::generator<AttrKind> AcquiredAfterAttr::derived_kinds(void) {
+  for (AttrKind k : kAcquiredAfterAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AcquiredAfterAttr> AcquiredAfterAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16194,6 +17922,15 @@ bool AcquireHandleAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAcquireHandleAttrDerivedKinds[] = {
+    AcquireHandleAttr::static_kind(),};
+
+gap::generator<AttrKind> AcquireHandleAttr::derived_kinds(void) {
+  for (AttrKind k : kAcquireHandleAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AcquireHandleAttr> AcquireHandleAttr::from(const InheritableAttr &parent) {
@@ -16235,6 +17972,15 @@ bool AcquireCapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAcquireCapabilityAttrDerivedKinds[] = {
+    AcquireCapabilityAttr::static_kind(),};
+
+gap::generator<AttrKind> AcquireCapabilityAttr::derived_kinds(void) {
+  for (AttrKind k : kAcquireCapabilityAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AcquireCapabilityAttr> AcquireCapabilityAttr::from(const InheritableAttr &parent) {
@@ -16281,6 +18027,15 @@ bool AVRSignalAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAVRSignalAttrDerivedKinds[] = {
+    AVRSignalAttr::static_kind(),};
+
+gap::generator<AttrKind> AVRSignalAttr::derived_kinds(void) {
+  for (AttrKind k : kAVRSignalAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AVRSignalAttr> AVRSignalAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16317,6 +18072,15 @@ bool AVRInterruptAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAVRInterruptAttrDerivedKinds[] = {
+    AVRInterruptAttr::static_kind(),};
+
+gap::generator<AttrKind> AVRInterruptAttr::derived_kinds(void) {
+  for (AttrKind k : kAVRInterruptAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AVRInterruptAttr> AVRInterruptAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16351,6 +18115,15 @@ bool ARMInterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kARMInterruptAttrDerivedKinds[] = {
+    ARMInterruptAttr::static_kind(),};
+
+gap::generator<AttrKind> ARMInterruptAttr::derived_kinds(void) {
+  for (AttrKind k : kARMInterruptAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ARMInterruptAttr> ARMInterruptAttr::from(const InheritableAttr &parent) {
@@ -16391,6 +18164,15 @@ bool AMDGPUWavesPerEUAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAMDGPUWavesPerEUAttrDerivedKinds[] = {
+    AMDGPUWavesPerEUAttr::static_kind(),};
+
+gap::generator<AttrKind> AMDGPUWavesPerEUAttr::derived_kinds(void) {
+  for (AttrKind k : kAMDGPUWavesPerEUAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from(const InheritableAttr &parent) {
@@ -16439,6 +18221,15 @@ bool AMDGPUNumVGPRAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAMDGPUNumVGPRAttrDerivedKinds[] = {
+    AMDGPUNumVGPRAttr::static_kind(),};
+
+gap::generator<AttrKind> AMDGPUNumVGPRAttr::derived_kinds(void) {
+  for (AttrKind k : kAMDGPUNumVGPRAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16473,6 +18264,15 @@ bool AMDGPUNumSGPRAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAMDGPUNumSGPRAttrDerivedKinds[] = {
+    AMDGPUNumSGPRAttr::static_kind(),};
+
+gap::generator<AttrKind> AMDGPUNumSGPRAttr::derived_kinds(void) {
+  for (AttrKind k : kAMDGPUNumSGPRAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AMDGPUNumSGPRAttr> AMDGPUNumSGPRAttr::from(const InheritableAttr &parent) {
@@ -16511,6 +18311,15 @@ bool AMDGPUKernelCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAMDGPUKernelCallAttrDerivedKinds[] = {
+    AMDGPUKernelCallAttr::static_kind(),};
+
+gap::generator<AttrKind> AMDGPUKernelCallAttr::derived_kinds(void) {
+  for (AttrKind k : kAMDGPUKernelCallAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AMDGPUKernelCallAttr> AMDGPUKernelCallAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16545,6 +18354,15 @@ bool AMDGPUFlatWorkGroupSizeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAMDGPUFlatWorkGroupSizeAttrDerivedKinds[] = {
+    AMDGPUFlatWorkGroupSizeAttr::static_kind(),};
+
+gap::generator<AttrKind> AMDGPUFlatWorkGroupSizeAttr::derived_kinds(void) {
+  for (AttrKind k : kAMDGPUFlatWorkGroupSizeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::from(const InheritableAttr &parent) {
@@ -16593,6 +18411,15 @@ bool AArch64VectorPcsAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAArch64VectorPcsAttrDerivedKinds[] = {
+    AArch64VectorPcsAttr::static_kind(),};
+
+gap::generator<AttrKind> AArch64VectorPcsAttr::derived_kinds(void) {
+  for (AttrKind k : kAArch64VectorPcsAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16629,6 +18456,15 @@ bool AArch64SVEPcsAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kAArch64SVEPcsAttrDerivedKinds[] = {
+    AArch64SVEPcsAttr::static_kind(),};
+
+gap::generator<AttrKind> AArch64SVEPcsAttr::derived_kinds(void) {
+  for (AttrKind k : kAArch64SVEPcsAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AArch64SVEPcsAttr> AArch64SVEPcsAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16663,6 +18499,15 @@ bool ZeroCallUsedRegsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kZeroCallUsedRegsAttrDerivedKinds[] = {
+    ZeroCallUsedRegsAttr::static_kind(),};
+
+gap::generator<AttrKind> ZeroCallUsedRegsAttr::derived_kinds(void) {
+  for (AttrKind k : kZeroCallUsedRegsAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from(const InheritableAttr &parent) {
@@ -16705,6 +18550,15 @@ bool XRayLogArgsAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kXRayLogArgsAttrDerivedKinds[] = {
+    XRayLogArgsAttr::static_kind(),};
+
+gap::generator<AttrKind> XRayLogArgsAttr::derived_kinds(void) {
+  for (AttrKind k : kXRayLogArgsAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<XRayLogArgsAttr> XRayLogArgsAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16739,6 +18593,15 @@ bool XRayInstrumentAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kXRayInstrumentAttrDerivedKinds[] = {
+    XRayInstrumentAttr::static_kind(),};
+
+gap::generator<AttrKind> XRayInstrumentAttr::derived_kinds(void) {
+  for (AttrKind k : kXRayInstrumentAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const InheritableAttr &parent) {
@@ -16789,6 +18652,15 @@ bool X86ForceAlignArgPointerAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kX86ForceAlignArgPointerAttrDerivedKinds[] = {
+    X86ForceAlignArgPointerAttr::static_kind(),};
+
+gap::generator<AttrKind> X86ForceAlignArgPointerAttr::derived_kinds(void) {
+  for (AttrKind k : kX86ForceAlignArgPointerAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16825,6 +18697,15 @@ bool WorkGroupSizeHintAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kWorkGroupSizeHintAttrDerivedKinds[] = {
+    WorkGroupSizeHintAttr::static_kind(),};
+
+gap::generator<AttrKind> WorkGroupSizeHintAttr::derived_kinds(void) {
+  for (AttrKind k : kWorkGroupSizeHintAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<WorkGroupSizeHintAttr> WorkGroupSizeHintAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16859,6 +18740,15 @@ bool WebAssemblyImportNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kWebAssemblyImportNameAttrDerivedKinds[] = {
+    WebAssemblyImportNameAttr::static_kind(),};
+
+gap::generator<AttrKind> WebAssemblyImportNameAttr::derived_kinds(void) {
+  for (AttrKind k : kWebAssemblyImportNameAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const InheritableAttr &parent) {
@@ -16902,6 +18792,15 @@ bool WebAssemblyImportModuleAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kWebAssemblyImportModuleAttrDerivedKinds[] = {
+    WebAssemblyImportModuleAttr::static_kind(),};
+
+gap::generator<AttrKind> WebAssemblyImportModuleAttr::derived_kinds(void) {
+  for (AttrKind k : kWebAssemblyImportModuleAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<WebAssemblyImportModuleAttr> WebAssemblyImportModuleAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -16941,6 +18840,15 @@ bool WebAssemblyExportNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kWebAssemblyExportNameAttrDerivedKinds[] = {
+    WebAssemblyExportNameAttr::static_kind(),};
+
+gap::generator<AttrKind> WebAssemblyExportNameAttr::derived_kinds(void) {
+  for (AttrKind k : kWebAssemblyExportNameAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<WebAssemblyExportNameAttr> WebAssemblyExportNameAttr::from(const InheritableAttr &parent) {
@@ -16984,6 +18892,15 @@ bool WeakRefAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kWeakRefAttrDerivedKinds[] = {
+    WeakRefAttr::static_kind(),};
+
+gap::generator<AttrKind> WeakRefAttr::derived_kinds(void) {
+  for (AttrKind k : kWeakRefAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<WeakRefAttr> WeakRefAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17025,6 +18942,15 @@ bool WeakImportAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kWeakImportAttrDerivedKinds[] = {
+    WeakImportAttr::static_kind(),};
+
+gap::generator<AttrKind> WeakImportAttr::derived_kinds(void) {
+  for (AttrKind k : kWeakImportAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<WeakImportAttr> WeakImportAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17061,6 +18987,15 @@ bool WeakAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kWeakAttrDerivedKinds[] = {
+    WeakAttr::static_kind(),};
+
+gap::generator<AttrKind> WeakAttr::derived_kinds(void) {
+  for (AttrKind k : kWeakAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<WeakAttr> WeakAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17095,6 +19030,15 @@ bool WarnUnusedResultAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kWarnUnusedResultAttrDerivedKinds[] = {
+    WarnUnusedResultAttr::static_kind(),};
+
+gap::generator<AttrKind> WarnUnusedResultAttr::derived_kinds(void) {
+  for (AttrKind k : kWarnUnusedResultAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const InheritableAttr &parent) {
@@ -17146,6 +19090,15 @@ bool WarnUnusedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kWarnUnusedAttrDerivedKinds[] = {
+    WarnUnusedAttr::static_kind(),};
+
+gap::generator<AttrKind> WarnUnusedAttr::derived_kinds(void) {
+  for (AttrKind k : kWarnUnusedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<WarnUnusedAttr> WarnUnusedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17180,6 +19133,15 @@ bool VisibilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kVisibilityAttrDerivedKinds[] = {
+    VisibilityAttr::static_kind(),};
+
+gap::generator<AttrKind> VisibilityAttr::derived_kinds(void) {
+  for (AttrKind k : kVisibilityAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<VisibilityAttr> VisibilityAttr::from(const InheritableAttr &parent) {
@@ -17222,6 +19184,15 @@ bool VectorCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kVectorCallAttrDerivedKinds[] = {
+    VectorCallAttr::static_kind(),};
+
+gap::generator<AttrKind> VectorCallAttr::derived_kinds(void) {
+  for (AttrKind k : kVectorCallAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<VectorCallAttr> VectorCallAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17256,6 +19227,15 @@ bool VecTypeHintAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kVecTypeHintAttrDerivedKinds[] = {
+    VecTypeHintAttr::static_kind(),};
+
+gap::generator<AttrKind> VecTypeHintAttr::derived_kinds(void) {
+  for (AttrKind k : kVecTypeHintAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<VecTypeHintAttr> VecTypeHintAttr::from(const InheritableAttr &parent) {
@@ -17304,6 +19284,15 @@ bool VecReturnAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kVecReturnAttrDerivedKinds[] = {
+    VecReturnAttr::static_kind(),};
+
+gap::generator<AttrKind> VecReturnAttr::derived_kinds(void) {
+  for (AttrKind k : kVecReturnAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<VecReturnAttr> VecReturnAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17338,6 +19327,15 @@ bool UuidAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kUuidAttrDerivedKinds[] = {
+    UuidAttr::static_kind(),};
+
+gap::generator<AttrKind> UuidAttr::derived_kinds(void) {
+  for (AttrKind k : kUuidAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UuidAttr> UuidAttr::from(const InheritableAttr &parent) {
@@ -17386,6 +19384,15 @@ bool UsingIfExistsAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kUsingIfExistsAttrDerivedKinds[] = {
+    UsingIfExistsAttr::static_kind(),};
+
+gap::generator<AttrKind> UsingIfExistsAttr::derived_kinds(void) {
+  for (AttrKind k : kUsingIfExistsAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17422,6 +19429,15 @@ bool UsedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kUsedAttrDerivedKinds[] = {
+    UsedAttr::static_kind(),};
+
+gap::generator<AttrKind> UsedAttr::derived_kinds(void) {
+  for (AttrKind k : kUsedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UsedAttr> UsedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17456,6 +19472,15 @@ bool UnusedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kUnusedAttrDerivedKinds[] = {
+    UnusedAttr::static_kind(),};
+
+gap::generator<AttrKind> UnusedAttr::derived_kinds(void) {
+  for (AttrKind k : kUnusedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UnusedAttr> UnusedAttr::from(const InheritableAttr &parent) {
@@ -17498,6 +19523,15 @@ bool UninitializedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kUninitializedAttrDerivedKinds[] = {
+    UninitializedAttr::static_kind(),};
+
+gap::generator<AttrKind> UninitializedAttr::derived_kinds(void) {
+  for (AttrKind k : kUninitializedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UninitializedAttr> UninitializedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17532,6 +19566,15 @@ bool UnavailableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kUnavailableAttrDerivedKinds[] = {
+    UnavailableAttr::static_kind(),};
+
+gap::generator<AttrKind> UnavailableAttr::derived_kinds(void) {
+  for (AttrKind k : kUnavailableAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UnavailableAttr> UnavailableAttr::from(const InheritableAttr &parent) {
@@ -17579,6 +19622,15 @@ bool TypeVisibilityAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kTypeVisibilityAttrDerivedKinds[] = {
+    TypeVisibilityAttr::static_kind(),};
+
+gap::generator<AttrKind> TypeVisibilityAttr::derived_kinds(void) {
+  for (AttrKind k : kTypeVisibilityAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TypeVisibilityAttr> TypeVisibilityAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17617,6 +19669,15 @@ bool TypeTagForDatatypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kTypeTagForDatatypeAttrDerivedKinds[] = {
+    TypeTagForDatatypeAttr::static_kind(),};
+
+gap::generator<AttrKind> TypeTagForDatatypeAttr::derived_kinds(void) {
+  for (AttrKind k : kTypeTagForDatatypeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::from(const InheritableAttr &parent) {
@@ -17673,6 +19734,15 @@ bool TryAcquireCapabilityAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kTryAcquireCapabilityAttrDerivedKinds[] = {
+    TryAcquireCapabilityAttr::static_kind(),};
+
+gap::generator<AttrKind> TryAcquireCapabilityAttr::derived_kinds(void) {
+  for (AttrKind k : kTryAcquireCapabilityAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17722,6 +19792,15 @@ bool TrivialABIAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kTrivialABIAttrDerivedKinds[] = {
+    TrivialABIAttr::static_kind(),};
+
+gap::generator<AttrKind> TrivialABIAttr::derived_kinds(void) {
+  for (AttrKind k : kTrivialABIAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TrivialABIAttr> TrivialABIAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17756,6 +19835,15 @@ bool TransparentUnionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kTransparentUnionAttrDerivedKinds[] = {
+    TransparentUnionAttr::static_kind(),};
+
+gap::generator<AttrKind> TransparentUnionAttr::derived_kinds(void) {
+  for (AttrKind k : kTransparentUnionAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TransparentUnionAttr> TransparentUnionAttr::from(const InheritableAttr &parent) {
@@ -17794,6 +19882,15 @@ bool ThisCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kThisCallAttrDerivedKinds[] = {
+    ThisCallAttr::static_kind(),};
+
+gap::generator<AttrKind> ThisCallAttr::derived_kinds(void) {
+  for (AttrKind k : kThisCallAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ThisCallAttr> ThisCallAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17828,6 +19925,15 @@ bool TestTypestateAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kTestTypestateAttrDerivedKinds[] = {
+    TestTypestateAttr::static_kind(),};
+
+gap::generator<AttrKind> TestTypestateAttr::derived_kinds(void) {
+  for (AttrKind k : kTestTypestateAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TestTypestateAttr> TestTypestateAttr::from(const InheritableAttr &parent) {
@@ -17870,6 +19976,15 @@ bool TargetClonesAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kTargetClonesAttrDerivedKinds[] = {
+    TargetClonesAttr::static_kind(),};
+
+gap::generator<AttrKind> TargetClonesAttr::derived_kinds(void) {
+  for (AttrKind k : kTargetClonesAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TargetClonesAttr> TargetClonesAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17904,6 +20019,15 @@ bool TargetAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kTargetAttrDerivedKinds[] = {
+    TargetAttr::static_kind(),};
+
+gap::generator<AttrKind> TargetAttr::derived_kinds(void) {
+  for (AttrKind k : kTargetAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TargetAttr> TargetAttr::from(const InheritableAttr &parent) {
@@ -17956,6 +20080,15 @@ bool TLSModelAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kTLSModelAttrDerivedKinds[] = {
+    TLSModelAttr::static_kind(),};
+
+gap::generator<AttrKind> TLSModelAttr::derived_kinds(void) {
+  for (AttrKind k : kTLSModelAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TLSModelAttr> TLSModelAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -17997,6 +20130,15 @@ bool SysVABIAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSysVABIAttrDerivedKinds[] = {
+    SysVABIAttr::static_kind(),};
+
+gap::generator<AttrKind> SysVABIAttr::derived_kinds(void) {
+  for (AttrKind k : kSysVABIAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SysVABIAttr> SysVABIAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18033,6 +20175,15 @@ bool SwiftPrivateAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftPrivateAttrDerivedKinds[] = {
+    SwiftPrivateAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftPrivateAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftPrivateAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftPrivateAttr> SwiftPrivateAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18067,6 +20218,15 @@ bool SwiftNewTypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSwiftNewTypeAttrDerivedKinds[] = {
+    SwiftNewTypeAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftNewTypeAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftNewTypeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SwiftNewTypeAttr> SwiftNewTypeAttr::from(const InheritableAttr &parent) {
@@ -18113,6 +20273,15 @@ bool SwiftNameAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftNameAttrDerivedKinds[] = {
+    SwiftNameAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftNameAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftNameAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftNameAttr> SwiftNameAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18152,6 +20321,15 @@ bool SwiftErrorAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSwiftErrorAttrDerivedKinds[] = {
+    SwiftErrorAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftErrorAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftErrorAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SwiftErrorAttr> SwiftErrorAttr::from(const InheritableAttr &parent) {
@@ -18194,6 +20372,15 @@ bool SwiftCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftCallAttrDerivedKinds[] = {
+    SwiftCallAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftCallAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftCallAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftCallAttr> SwiftCallAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18230,6 +20417,15 @@ bool SwiftBridgedTypedefAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftBridgedTypedefAttrDerivedKinds[] = {
+    SwiftBridgedTypedefAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftBridgedTypedefAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftBridgedTypedefAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18264,6 +20460,15 @@ bool SwiftBridgeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSwiftBridgeAttrDerivedKinds[] = {
+    SwiftBridgeAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftBridgeAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftBridgeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SwiftBridgeAttr> SwiftBridgeAttr::from(const InheritableAttr &parent) {
@@ -18307,6 +20512,15 @@ bool SwiftAttrAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftAttrAttrDerivedKinds[] = {
+    SwiftAttrAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftAttrAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftAttrAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftAttrAttr> SwiftAttrAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18346,6 +20560,15 @@ bool SwiftAsyncNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSwiftAsyncNameAttrDerivedKinds[] = {
+    SwiftAsyncNameAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftAsyncNameAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftAsyncNameAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SwiftAsyncNameAttr> SwiftAsyncNameAttr::from(const InheritableAttr &parent) {
@@ -18389,6 +20612,15 @@ bool SwiftAsyncErrorAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftAsyncErrorAttrDerivedKinds[] = {
+    SwiftAsyncErrorAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftAsyncErrorAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftAsyncErrorAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftAsyncErrorAttr> SwiftAsyncErrorAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18429,6 +20661,15 @@ bool SwiftAsyncCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftAsyncCallAttrDerivedKinds[] = {
+    SwiftAsyncCallAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftAsyncCallAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftAsyncCallAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftAsyncCallAttr> SwiftAsyncCallAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18463,6 +20704,15 @@ bool SwiftAsyncAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSwiftAsyncAttrDerivedKinds[] = {
+    SwiftAsyncAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftAsyncAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftAsyncAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SwiftAsyncAttr> SwiftAsyncAttr::from(const InheritableAttr &parent) {
@@ -18501,6 +20751,15 @@ bool StrictFPAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kStrictFPAttrDerivedKinds[] = {
+    StrictFPAttr::static_kind(),};
+
+gap::generator<AttrKind> StrictFPAttr::derived_kinds(void) {
+  for (AttrKind k : kStrictFPAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<StrictFPAttr> StrictFPAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18535,6 +20794,15 @@ bool StdCallAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kStdCallAttrDerivedKinds[] = {
+    StdCallAttr::static_kind(),};
+
+gap::generator<AttrKind> StdCallAttr::derived_kinds(void) {
+  for (AttrKind k : kStdCallAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<StdCallAttr> StdCallAttr::from(const InheritableAttr &parent) {
@@ -18573,6 +20841,15 @@ bool StandaloneDebugAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kStandaloneDebugAttrDerivedKinds[] = {
+    StandaloneDebugAttr::static_kind(),};
+
+gap::generator<AttrKind> StandaloneDebugAttr::derived_kinds(void) {
+  for (AttrKind k : kStandaloneDebugAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<StandaloneDebugAttr> StandaloneDebugAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18609,6 +20886,15 @@ bool SpeculativeLoadHardeningAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSpeculativeLoadHardeningAttrDerivedKinds[] = {
+    SpeculativeLoadHardeningAttr::static_kind(),};
+
+gap::generator<AttrKind> SpeculativeLoadHardeningAttr::derived_kinds(void) {
+  for (AttrKind k : kSpeculativeLoadHardeningAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SpeculativeLoadHardeningAttr> SpeculativeLoadHardeningAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18643,6 +20929,15 @@ bool SharedTrylockFunctionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSharedTrylockFunctionAttrDerivedKinds[] = {
+    SharedTrylockFunctionAttr::static_kind(),};
+
+gap::generator<AttrKind> SharedTrylockFunctionAttr::derived_kinds(void) {
+  for (AttrKind k : kSharedTrylockFunctionAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::from(const InheritableAttr &parent) {
@@ -18686,6 +20981,15 @@ bool SetTypestateAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSetTypestateAttrDerivedKinds[] = {
+    SetTypestateAttr::static_kind(),};
+
+gap::generator<AttrKind> SetTypestateAttr::derived_kinds(void) {
+  for (AttrKind k : kSetTypestateAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SetTypestateAttr> SetTypestateAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18726,6 +21030,15 @@ bool SentinelAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSentinelAttrDerivedKinds[] = {
+    SentinelAttr::static_kind(),};
+
+gap::generator<AttrKind> SentinelAttr::derived_kinds(void) {
+  for (AttrKind k : kSentinelAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SentinelAttr> SentinelAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18762,6 +21075,15 @@ bool SelectAnyAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSelectAnyAttrDerivedKinds[] = {
+    SelectAnyAttr::static_kind(),};
+
+gap::generator<AttrKind> SelectAnyAttr::derived_kinds(void) {
+  for (AttrKind k : kSelectAnyAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SelectAnyAttr> SelectAnyAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18796,6 +21118,15 @@ bool SectionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSectionAttrDerivedKinds[] = {
+    SectionAttr::static_kind(),};
+
+gap::generator<AttrKind> SectionAttr::derived_kinds(void) {
+  for (AttrKind k : kSectionAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SectionAttr> SectionAttr::from(const InheritableAttr &parent) {
@@ -18843,6 +21174,15 @@ bool ScopedLockableAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kScopedLockableAttrDerivedKinds[] = {
+    ScopedLockableAttr::static_kind(),};
+
+gap::generator<AttrKind> ScopedLockableAttr::derived_kinds(void) {
+  for (AttrKind k : kScopedLockableAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ScopedLockableAttr> ScopedLockableAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18877,6 +21217,15 @@ bool SYCLSpecialClassAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSYCLSpecialClassAttrDerivedKinds[] = {
+    SYCLSpecialClassAttr::static_kind(),};
+
+gap::generator<AttrKind> SYCLSpecialClassAttr::derived_kinds(void) {
+  for (AttrKind k : kSYCLSpecialClassAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SYCLSpecialClassAttr> SYCLSpecialClassAttr::from(const InheritableAttr &parent) {
@@ -18915,6 +21264,15 @@ bool SYCLKernelAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSYCLKernelAttrDerivedKinds[] = {
+    SYCLKernelAttr::static_kind(),};
+
+gap::generator<AttrKind> SYCLKernelAttr::derived_kinds(void) {
+  for (AttrKind k : kSYCLKernelAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SYCLKernelAttr> SYCLKernelAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -18949,6 +21307,15 @@ bool ReturnsTwiceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kReturnsTwiceAttrDerivedKinds[] = {
+    ReturnsTwiceAttr::static_kind(),};
+
+gap::generator<AttrKind> ReturnsTwiceAttr::derived_kinds(void) {
+  for (AttrKind k : kReturnsTwiceAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ReturnsTwiceAttr> ReturnsTwiceAttr::from(const InheritableAttr &parent) {
@@ -18987,6 +21354,15 @@ bool ReturnsNonNullAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kReturnsNonNullAttrDerivedKinds[] = {
+    ReturnsNonNullAttr::static_kind(),};
+
+gap::generator<AttrKind> ReturnsNonNullAttr::derived_kinds(void) {
+  for (AttrKind k : kReturnsNonNullAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ReturnsNonNullAttr> ReturnsNonNullAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19021,6 +21397,15 @@ bool ReturnTypestateAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kReturnTypestateAttrDerivedKinds[] = {
+    ReturnTypestateAttr::static_kind(),};
+
+gap::generator<AttrKind> ReturnTypestateAttr::derived_kinds(void) {
+  for (AttrKind k : kReturnTypestateAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ReturnTypestateAttr> ReturnTypestateAttr::from(const InheritableAttr &parent) {
@@ -19063,6 +21448,15 @@ bool RetainAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kRetainAttrDerivedKinds[] = {
+    RetainAttr::static_kind(),};
+
+gap::generator<AttrKind> RetainAttr::derived_kinds(void) {
+  for (AttrKind k : kRetainAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<RetainAttr> RetainAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19097,6 +21491,15 @@ bool RestrictAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kRestrictAttrDerivedKinds[] = {
+    RestrictAttr::static_kind(),};
+
+gap::generator<AttrKind> RestrictAttr::derived_kinds(void) {
+  for (AttrKind k : kRestrictAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<RestrictAttr> RestrictAttr::from(const InheritableAttr &parent) {
@@ -19137,6 +21540,15 @@ bool RequiresCapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kRequiresCapabilityAttrDerivedKinds[] = {
+    RequiresCapabilityAttr::static_kind(),};
+
+gap::generator<AttrKind> RequiresCapabilityAttr::derived_kinds(void) {
+  for (AttrKind k : kRequiresCapabilityAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<RequiresCapabilityAttr> RequiresCapabilityAttr::from(const InheritableAttr &parent) {
@@ -19183,6 +21595,15 @@ bool ReqdWorkGroupSizeAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kReqdWorkGroupSizeAttrDerivedKinds[] = {
+    ReqdWorkGroupSizeAttr::static_kind(),};
+
+gap::generator<AttrKind> ReqdWorkGroupSizeAttr::derived_kinds(void) {
+  for (AttrKind k : kReqdWorkGroupSizeAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ReqdWorkGroupSizeAttr> ReqdWorkGroupSizeAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19217,6 +21638,15 @@ bool ReleaseCapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kReleaseCapabilityAttrDerivedKinds[] = {
+    ReleaseCapabilityAttr::static_kind(),};
+
+gap::generator<AttrKind> ReleaseCapabilityAttr::derived_kinds(void) {
+  for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const InheritableAttr &parent) {
@@ -19267,6 +21697,15 @@ bool ReinitializesAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kReinitializesAttrDerivedKinds[] = {
+    ReinitializesAttr::static_kind(),};
+
+gap::generator<AttrKind> ReinitializesAttr::derived_kinds(void) {
+  for (AttrKind k : kReinitializesAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ReinitializesAttr> ReinitializesAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19301,6 +21740,15 @@ bool RegCallAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kRegCallAttrDerivedKinds[] = {
+    RegCallAttr::static_kind(),};
+
+gap::generator<AttrKind> RegCallAttr::derived_kinds(void) {
+  for (AttrKind k : kRegCallAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<RegCallAttr> RegCallAttr::from(const InheritableAttr &parent) {
@@ -19339,6 +21787,15 @@ bool RandomizeLayoutAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kRandomizeLayoutAttrDerivedKinds[] = {
+    RandomizeLayoutAttr::static_kind(),};
+
+gap::generator<AttrKind> RandomizeLayoutAttr::derived_kinds(void) {
+  for (AttrKind k : kRandomizeLayoutAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<RandomizeLayoutAttr> RandomizeLayoutAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19373,6 +21830,15 @@ bool RISCVInterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kRISCVInterruptAttrDerivedKinds[] = {
+    RISCVInterruptAttr::static_kind(),};
+
+gap::generator<AttrKind> RISCVInterruptAttr::derived_kinds(void) {
+  for (AttrKind k : kRISCVInterruptAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<RISCVInterruptAttr> RISCVInterruptAttr::from(const InheritableAttr &parent) {
@@ -19415,6 +21881,15 @@ bool PureAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPureAttrDerivedKinds[] = {
+    PureAttr::static_kind(),};
+
+gap::generator<AttrKind> PureAttr::derived_kinds(void) {
+  for (AttrKind k : kPureAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PureAttr> PureAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19451,6 +21926,15 @@ bool PtGuardedVarAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPtGuardedVarAttrDerivedKinds[] = {
+    PtGuardedVarAttr::static_kind(),};
+
+gap::generator<AttrKind> PtGuardedVarAttr::derived_kinds(void) {
+  for (AttrKind k : kPtGuardedVarAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PtGuardedVarAttr> PtGuardedVarAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19485,6 +21969,15 @@ bool PtGuardedByAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kPtGuardedByAttrDerivedKinds[] = {
+    PtGuardedByAttr::static_kind(),};
+
+gap::generator<AttrKind> PtGuardedByAttr::derived_kinds(void) {
+  for (AttrKind k : kPtGuardedByAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PtGuardedByAttr> PtGuardedByAttr::from(const InheritableAttr &parent) {
@@ -19528,6 +22021,15 @@ bool PreserveMostAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPreserveMostAttrDerivedKinds[] = {
+    PreserveMostAttr::static_kind(),};
+
+gap::generator<AttrKind> PreserveMostAttr::derived_kinds(void) {
+  for (AttrKind k : kPreserveMostAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PreserveMostAttr> PreserveMostAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19564,6 +22066,15 @@ bool PreserveAllAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPreserveAllAttrDerivedKinds[] = {
+    PreserveAllAttr::static_kind(),};
+
+gap::generator<AttrKind> PreserveAllAttr::derived_kinds(void) {
+  for (AttrKind k : kPreserveAllAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PreserveAllAttr> PreserveAllAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19598,6 +22109,15 @@ bool PreferredNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kPreferredNameAttrDerivedKinds[] = {
+    PreferredNameAttr::static_kind(),};
+
+gap::generator<AttrKind> PreferredNameAttr::derived_kinds(void) {
+  for (AttrKind k : kPreferredNameAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PreferredNameAttr> PreferredNameAttr::from(const InheritableAttr &parent) {
@@ -19646,6 +22166,15 @@ bool PragmaClangTextSectionAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPragmaClangTextSectionAttrDerivedKinds[] = {
+    PragmaClangTextSectionAttr::static_kind(),};
+
+gap::generator<AttrKind> PragmaClangTextSectionAttr::derived_kinds(void) {
+  for (AttrKind k : kPragmaClangTextSectionAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19685,6 +22214,15 @@ bool PragmaClangRodataSectionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kPragmaClangRodataSectionAttrDerivedKinds[] = {
+    PragmaClangRodataSectionAttr::static_kind(),};
+
+gap::generator<AttrKind> PragmaClangRodataSectionAttr::derived_kinds(void) {
+  for (AttrKind k : kPragmaClangRodataSectionAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::from(const InheritableAttr &parent) {
@@ -19728,6 +22266,15 @@ bool PragmaClangRelroSectionAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPragmaClangRelroSectionAttrDerivedKinds[] = {
+    PragmaClangRelroSectionAttr::static_kind(),};
+
+gap::generator<AttrKind> PragmaClangRelroSectionAttr::derived_kinds(void) {
+  for (AttrKind k : kPragmaClangRelroSectionAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19767,6 +22314,15 @@ bool PragmaClangDataSectionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kPragmaClangDataSectionAttrDerivedKinds[] = {
+    PragmaClangDataSectionAttr::static_kind(),};
+
+gap::generator<AttrKind> PragmaClangDataSectionAttr::derived_kinds(void) {
+  for (AttrKind k : kPragmaClangDataSectionAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PragmaClangDataSectionAttr> PragmaClangDataSectionAttr::from(const InheritableAttr &parent) {
@@ -19810,6 +22366,15 @@ bool PragmaClangBSSSectionAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPragmaClangBSSSectionAttrDerivedKinds[] = {
+    PragmaClangBSSSectionAttr::static_kind(),};
+
+gap::generator<AttrKind> PragmaClangBSSSectionAttr::derived_kinds(void) {
+  for (AttrKind k : kPragmaClangBSSSectionAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19849,6 +22414,15 @@ bool PointerAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kPointerAttrDerivedKinds[] = {
+    PointerAttr::static_kind(),};
+
+gap::generator<AttrKind> PointerAttr::derived_kinds(void) {
+  for (AttrKind k : kPointerAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PointerAttr> PointerAttr::from(const InheritableAttr &parent) {
@@ -19897,6 +22471,15 @@ bool PcsAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPcsAttrDerivedKinds[] = {
+    PcsAttr::static_kind(),};
+
+gap::generator<AttrKind> PcsAttr::derived_kinds(void) {
+  for (AttrKind k : kPcsAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PcsAttr> PcsAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19937,6 +22520,15 @@ bool PatchableFunctionEntryAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPatchableFunctionEntryAttrDerivedKinds[] = {
+    PatchableFunctionEntryAttr::static_kind(),};
+
+gap::generator<AttrKind> PatchableFunctionEntryAttr::derived_kinds(void) {
+  for (AttrKind k : kPatchableFunctionEntryAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -19973,6 +22565,15 @@ bool PascalAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPascalAttrDerivedKinds[] = {
+    PascalAttr::static_kind(),};
+
+gap::generator<AttrKind> PascalAttr::derived_kinds(void) {
+  for (AttrKind k : kPascalAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PascalAttr> PascalAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20007,6 +22608,15 @@ bool ParamTypestateAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kParamTypestateAttrDerivedKinds[] = {
+    ParamTypestateAttr::static_kind(),};
+
+gap::generator<AttrKind> ParamTypestateAttr::derived_kinds(void) {
+  for (AttrKind k : kParamTypestateAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ParamTypestateAttr> ParamTypestateAttr::from(const InheritableAttr &parent) {
@@ -20049,6 +22659,15 @@ bool PackedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kPackedAttrDerivedKinds[] = {
+    PackedAttr::static_kind(),};
+
+gap::generator<AttrKind> PackedAttr::derived_kinds(void) {
+  for (AttrKind k : kPackedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PackedAttr> PackedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20083,6 +22702,15 @@ bool OwnershipAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOwnershipAttrDerivedKinds[] = {
+    OwnershipAttr::static_kind(),};
+
+gap::generator<AttrKind> OwnershipAttr::derived_kinds(void) {
+  for (AttrKind k : kOwnershipAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OwnershipAttr> OwnershipAttr::from(const InheritableAttr &parent) {
@@ -20141,6 +22769,15 @@ bool OwnerAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOwnerAttrDerivedKinds[] = {
+    OwnerAttr::static_kind(),};
+
+gap::generator<AttrKind> OwnerAttr::derived_kinds(void) {
+  for (AttrKind k : kOwnerAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OwnerAttr> OwnerAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20187,6 +22824,15 @@ bool OverrideAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOverrideAttrDerivedKinds[] = {
+    OverrideAttr::static_kind(),};
+
+gap::generator<AttrKind> OverrideAttr::derived_kinds(void) {
+  for (AttrKind k : kOverrideAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OverrideAttr> OverrideAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20221,6 +22867,15 @@ bool OptimizeNoneAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOptimizeNoneAttrDerivedKinds[] = {
+    OptimizeNoneAttr::static_kind(),};
+
+gap::generator<AttrKind> OptimizeNoneAttr::derived_kinds(void) {
+  for (AttrKind k : kOptimizeNoneAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OptimizeNoneAttr> OptimizeNoneAttr::from(const InheritableAttr &parent) {
@@ -20259,6 +22914,15 @@ bool OpenCLKernelAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOpenCLKernelAttrDerivedKinds[] = {
+    OpenCLKernelAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLKernelAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLKernelAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OpenCLKernelAttr> OpenCLKernelAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20293,6 +22957,15 @@ bool OpenCLIntelReqdSubGroupSizeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOpenCLIntelReqdSubGroupSizeAttrDerivedKinds[] = {
+    OpenCLIntelReqdSubGroupSizeAttr::static_kind(),};
+
+gap::generator<AttrKind> OpenCLIntelReqdSubGroupSizeAttr::derived_kinds(void) {
+  for (AttrKind k : kOpenCLIntelReqdSubGroupSizeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OpenCLIntelReqdSubGroupSizeAttr> OpenCLIntelReqdSubGroupSizeAttr::from(const InheritableAttr &parent) {
@@ -20331,6 +23004,15 @@ bool ObjCSubclassingRestrictedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCSubclassingRestrictedAttrDerivedKinds[] = {
+    ObjCSubclassingRestrictedAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCSubclassingRestrictedAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCSubclassingRestrictedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCSubclassingRestrictedAttr> ObjCSubclassingRestrictedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20365,6 +23047,15 @@ bool ObjCRootClassAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCRootClassAttrDerivedKinds[] = {
+    ObjCRootClassAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCRootClassAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCRootClassAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCRootClassAttr> ObjCRootClassAttr::from(const InheritableAttr &parent) {
@@ -20403,6 +23094,15 @@ bool ObjCReturnsInnerPointerAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCReturnsInnerPointerAttrDerivedKinds[] = {
+    ObjCReturnsInnerPointerAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCReturnsInnerPointerAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCReturnsInnerPointerAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20437,6 +23137,15 @@ bool ObjCRequiresSuperAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCRequiresSuperAttrDerivedKinds[] = {
+    ObjCRequiresSuperAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCRequiresSuperAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCRequiresSuperAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCRequiresSuperAttr> ObjCRequiresSuperAttr::from(const InheritableAttr &parent) {
@@ -20475,6 +23184,15 @@ bool ObjCRequiresPropertyDefsAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCRequiresPropertyDefsAttrDerivedKinds[] = {
+    ObjCRequiresPropertyDefsAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCRequiresPropertyDefsAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCRequiresPropertyDefsAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCRequiresPropertyDefsAttr> ObjCRequiresPropertyDefsAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20509,6 +23227,15 @@ bool ObjCPreciseLifetimeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCPreciseLifetimeAttrDerivedKinds[] = {
+    ObjCPreciseLifetimeAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCPreciseLifetimeAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCPreciseLifetimeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCPreciseLifetimeAttr> ObjCPreciseLifetimeAttr::from(const InheritableAttr &parent) {
@@ -20547,6 +23274,15 @@ bool ObjCOwnershipAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCOwnershipAttrDerivedKinds[] = {
+    ObjCOwnershipAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCOwnershipAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCOwnershipAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCOwnershipAttr> ObjCOwnershipAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20583,6 +23319,15 @@ bool ObjCNSObjectAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCNSObjectAttrDerivedKinds[] = {
+    ObjCNSObjectAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCNSObjectAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCNSObjectAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCNSObjectAttr> ObjCNSObjectAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20617,6 +23362,15 @@ bool ObjCMethodFamilyAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCMethodFamilyAttrDerivedKinds[] = {
+    ObjCMethodFamilyAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCMethodFamilyAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCMethodFamilyAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from(const InheritableAttr &parent) {
@@ -20659,6 +23413,15 @@ bool ObjCIndependentClassAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCIndependentClassAttrDerivedKinds[] = {
+    ObjCIndependentClassAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCIndependentClassAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCIndependentClassAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20693,6 +23456,15 @@ bool ObjCExternallyRetainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCExternallyRetainedAttrDerivedKinds[] = {
+    ObjCExternallyRetainedAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCExternallyRetainedAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCExternallyRetainedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::from(const InheritableAttr &parent) {
@@ -20731,6 +23503,15 @@ bool ObjCExplicitProtocolImplAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCExplicitProtocolImplAttrDerivedKinds[] = {
+    ObjCExplicitProtocolImplAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCExplicitProtocolImplAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCExplicitProtocolImplAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCExplicitProtocolImplAttr> ObjCExplicitProtocolImplAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20765,6 +23546,15 @@ bool ObjCExceptionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCExceptionAttrDerivedKinds[] = {
+    ObjCExceptionAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCExceptionAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCExceptionAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCExceptionAttr> ObjCExceptionAttr::from(const InheritableAttr &parent) {
@@ -20803,6 +23593,15 @@ bool ObjCBridgeRelatedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCBridgeRelatedAttrDerivedKinds[] = {
+    ObjCBridgeRelatedAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCBridgeRelatedAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCBridgeRelatedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCBridgeRelatedAttr> ObjCBridgeRelatedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20837,6 +23636,15 @@ bool ObjCBridgeMutableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kObjCBridgeMutableAttrDerivedKinds[] = {
+    ObjCBridgeMutableAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCBridgeMutableAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCBridgeMutableAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const InheritableAttr &parent) {
@@ -20875,6 +23683,15 @@ bool ObjCBridgeAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kObjCBridgeAttrDerivedKinds[] = {
+    ObjCBridgeAttr::static_kind(),};
+
+gap::generator<AttrKind> ObjCBridgeAttr::derived_kinds(void) {
+  for (AttrKind k : kObjCBridgeAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCBridgeAttr> ObjCBridgeAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20909,6 +23726,15 @@ bool OSReturnsRetainedOnZeroAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOSReturnsRetainedOnZeroAttrDerivedKinds[] = {
+    OSReturnsRetainedOnZeroAttr::static_kind(),};
+
+gap::generator<AttrKind> OSReturnsRetainedOnZeroAttr::derived_kinds(void) {
+  for (AttrKind k : kOSReturnsRetainedOnZeroAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OSReturnsRetainedOnZeroAttr> OSReturnsRetainedOnZeroAttr::from(const InheritableAttr &parent) {
@@ -20947,6 +23773,15 @@ bool OSReturnsRetainedOnNonZeroAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOSReturnsRetainedOnNonZeroAttrDerivedKinds[] = {
+    OSReturnsRetainedOnNonZeroAttr::static_kind(),};
+
+gap::generator<AttrKind> OSReturnsRetainedOnNonZeroAttr::derived_kinds(void) {
+  for (AttrKind k : kOSReturnsRetainedOnNonZeroAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OSReturnsRetainedOnNonZeroAttr> OSReturnsRetainedOnNonZeroAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -20981,6 +23816,15 @@ bool OSReturnsRetainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOSReturnsRetainedAttrDerivedKinds[] = {
+    OSReturnsRetainedAttr::static_kind(),};
+
+gap::generator<AttrKind> OSReturnsRetainedAttr::derived_kinds(void) {
+  for (AttrKind k : kOSReturnsRetainedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OSReturnsRetainedAttr> OSReturnsRetainedAttr::from(const InheritableAttr &parent) {
@@ -21019,6 +23863,15 @@ bool OSReturnsNotRetainedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOSReturnsNotRetainedAttrDerivedKinds[] = {
+    OSReturnsNotRetainedAttr::static_kind(),};
+
+gap::generator<AttrKind> OSReturnsNotRetainedAttr::derived_kinds(void) {
+  for (AttrKind k : kOSReturnsNotRetainedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OSReturnsNotRetainedAttr> OSReturnsNotRetainedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21053,6 +23906,15 @@ bool OSConsumesThisAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOSConsumesThisAttrDerivedKinds[] = {
+    OSConsumesThisAttr::static_kind(),};
+
+gap::generator<AttrKind> OSConsumesThisAttr::derived_kinds(void) {
+  for (AttrKind k : kOSConsumesThisAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const InheritableAttr &parent) {
@@ -21091,6 +23953,15 @@ bool OMPThreadPrivateDeclAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOMPThreadPrivateDeclAttrDerivedKinds[] = {
+    OMPThreadPrivateDeclAttr::static_kind(),};
+
+gap::generator<AttrKind> OMPThreadPrivateDeclAttr::derived_kinds(void) {
+  for (AttrKind k : kOMPThreadPrivateDeclAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPThreadPrivateDeclAttr> OMPThreadPrivateDeclAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21125,6 +23996,15 @@ bool OMPDeclareVariantAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOMPDeclareVariantAttrDerivedKinds[] = {
+    OMPDeclareVariantAttr::static_kind(),};
+
+gap::generator<AttrKind> OMPDeclareVariantAttr::derived_kinds(void) {
+  for (AttrKind k : kOMPDeclareVariantAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPDeclareVariantAttr> OMPDeclareVariantAttr::from(const InheritableAttr &parent) {
@@ -21166,6 +24046,15 @@ bool OMPDeclareTargetDeclAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOMPDeclareTargetDeclAttrDerivedKinds[] = {
+    OMPDeclareTargetDeclAttr::static_kind(),};
+
+gap::generator<AttrKind> OMPDeclareTargetDeclAttr::derived_kinds(void) {
+  for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const InheritableAttr &parent) {
@@ -21221,6 +24110,15 @@ bool OMPCaptureNoInitAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOMPCaptureNoInitAttrDerivedKinds[] = {
+    OMPCaptureNoInitAttr::static_kind(),};
+
+gap::generator<AttrKind> OMPCaptureNoInitAttr::derived_kinds(void) {
+  for (AttrKind k : kOMPCaptureNoInitAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPCaptureNoInitAttr> OMPCaptureNoInitAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21255,6 +24153,15 @@ bool OMPAllocateDeclAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kOMPAllocateDeclAttrDerivedKinds[] = {
+    OMPAllocateDeclAttr::static_kind(),};
+
+gap::generator<AttrKind> OMPAllocateDeclAttr::derived_kinds(void) {
+  for (AttrKind k : kOMPAllocateDeclAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::from(const InheritableAttr &parent) {
@@ -21307,6 +24214,15 @@ bool NotTailCalledAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNotTailCalledAttrDerivedKinds[] = {
+    NotTailCalledAttr::static_kind(),};
+
+gap::generator<AttrKind> NotTailCalledAttr::derived_kinds(void) {
+  for (AttrKind k : kNotTailCalledAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NotTailCalledAttr> NotTailCalledAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21341,6 +24257,15 @@ bool NoUniqueAddressAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoUniqueAddressAttrDerivedKinds[] = {
+    NoUniqueAddressAttr::static_kind(),};
+
+gap::generator<AttrKind> NoUniqueAddressAttr::derived_kinds(void) {
+  for (AttrKind k : kNoUniqueAddressAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoUniqueAddressAttr> NoUniqueAddressAttr::from(const InheritableAttr &parent) {
@@ -21379,6 +24304,15 @@ bool NoThrowAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoThrowAttrDerivedKinds[] = {
+    NoThrowAttr::static_kind(),};
+
+gap::generator<AttrKind> NoThrowAttr::derived_kinds(void) {
+  for (AttrKind k : kNoThrowAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoThrowAttr> NoThrowAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21413,6 +24347,15 @@ bool NoThreadSafetyAnalysisAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoThreadSafetyAnalysisAttrDerivedKinds[] = {
+    NoThreadSafetyAnalysisAttr::static_kind(),};
+
+gap::generator<AttrKind> NoThreadSafetyAnalysisAttr::derived_kinds(void) {
+  for (AttrKind k : kNoThreadSafetyAnalysisAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoThreadSafetyAnalysisAttr> NoThreadSafetyAnalysisAttr::from(const InheritableAttr &parent) {
@@ -21451,6 +24394,15 @@ bool NoStackProtectorAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoStackProtectorAttrDerivedKinds[] = {
+    NoStackProtectorAttr::static_kind(),};
+
+gap::generator<AttrKind> NoStackProtectorAttr::derived_kinds(void) {
+  for (AttrKind k : kNoStackProtectorAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoStackProtectorAttr> NoStackProtectorAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21485,6 +24437,15 @@ bool NoSplitStackAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoSplitStackAttrDerivedKinds[] = {
+    NoSplitStackAttr::static_kind(),};
+
+gap::generator<AttrKind> NoSplitStackAttr::derived_kinds(void) {
+  for (AttrKind k : kNoSplitStackAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoSplitStackAttr> NoSplitStackAttr::from(const InheritableAttr &parent) {
@@ -21523,6 +24484,15 @@ bool NoSpeculativeLoadHardeningAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoSpeculativeLoadHardeningAttrDerivedKinds[] = {
+    NoSpeculativeLoadHardeningAttr::static_kind(),};
+
+gap::generator<AttrKind> NoSpeculativeLoadHardeningAttr::derived_kinds(void) {
+  for (AttrKind k : kNoSpeculativeLoadHardeningAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21557,6 +24527,15 @@ bool NoSanitizeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoSanitizeAttrDerivedKinds[] = {
+    NoSanitizeAttr::static_kind(),};
+
+gap::generator<AttrKind> NoSanitizeAttr::derived_kinds(void) {
+  for (AttrKind k : kNoSanitizeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoSanitizeAttr> NoSanitizeAttr::from(const InheritableAttr &parent) {
@@ -21599,6 +24578,15 @@ bool NoReturnAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoReturnAttrDerivedKinds[] = {
+    NoReturnAttr::static_kind(),};
+
+gap::generator<AttrKind> NoReturnAttr::derived_kinds(void) {
+  for (AttrKind k : kNoReturnAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoReturnAttr> NoReturnAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21633,6 +24621,15 @@ bool NoRandomizeLayoutAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoRandomizeLayoutAttrDerivedKinds[] = {
+    NoRandomizeLayoutAttr::static_kind(),};
+
+gap::generator<AttrKind> NoRandomizeLayoutAttr::derived_kinds(void) {
+  for (AttrKind k : kNoRandomizeLayoutAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoRandomizeLayoutAttr> NoRandomizeLayoutAttr::from(const InheritableAttr &parent) {
@@ -21671,6 +24668,15 @@ bool NoProfileFunctionAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoProfileFunctionAttrDerivedKinds[] = {
+    NoProfileFunctionAttr::static_kind(),};
+
+gap::generator<AttrKind> NoProfileFunctionAttr::derived_kinds(void) {
+  for (AttrKind k : kNoProfileFunctionAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoProfileFunctionAttr> NoProfileFunctionAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21705,6 +24711,15 @@ bool NoMips16Attr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoMips16AttrDerivedKinds[] = {
+    NoMips16Attr::static_kind(),};
+
+gap::generator<AttrKind> NoMips16Attr::derived_kinds(void) {
+  for (AttrKind k : kNoMips16AttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoMips16Attr> NoMips16Attr::from(const InheritableAttr &parent) {
@@ -21743,6 +24758,15 @@ bool NoMicroMipsAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoMicroMipsAttrDerivedKinds[] = {
+    NoMicroMipsAttr::static_kind(),};
+
+gap::generator<AttrKind> NoMicroMipsAttr::derived_kinds(void) {
+  for (AttrKind k : kNoMicroMipsAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoMicroMipsAttr> NoMicroMipsAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21777,6 +24801,15 @@ bool NoInstrumentFunctionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoInstrumentFunctionAttrDerivedKinds[] = {
+    NoInstrumentFunctionAttr::static_kind(),};
+
+gap::generator<AttrKind> NoInstrumentFunctionAttr::derived_kinds(void) {
+  for (AttrKind k : kNoInstrumentFunctionAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::from(const InheritableAttr &parent) {
@@ -21815,6 +24848,15 @@ bool NoDuplicateAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoDuplicateAttrDerivedKinds[] = {
+    NoDuplicateAttr::static_kind(),};
+
+gap::generator<AttrKind> NoDuplicateAttr::derived_kinds(void) {
+  for (AttrKind k : kNoDuplicateAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoDuplicateAttr> NoDuplicateAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21849,6 +24891,15 @@ bool NoDestroyAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoDestroyAttrDerivedKinds[] = {
+    NoDestroyAttr::static_kind(),};
+
+gap::generator<AttrKind> NoDestroyAttr::derived_kinds(void) {
+  for (AttrKind k : kNoDestroyAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoDestroyAttr> NoDestroyAttr::from(const InheritableAttr &parent) {
@@ -21887,6 +24938,15 @@ bool NoDebugAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoDebugAttrDerivedKinds[] = {
+    NoDebugAttr::static_kind(),};
+
+gap::generator<AttrKind> NoDebugAttr::derived_kinds(void) {
+  for (AttrKind k : kNoDebugAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoDebugAttr> NoDebugAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21921,6 +24981,15 @@ bool NoCommonAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNoCommonAttrDerivedKinds[] = {
+    NoCommonAttr::static_kind(),};
+
+gap::generator<AttrKind> NoCommonAttr::derived_kinds(void) {
+  for (AttrKind k : kNoCommonAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NoCommonAttr> NoCommonAttr::from(const InheritableAttr &parent) {
@@ -21959,6 +25028,15 @@ bool NoAliasAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNoAliasAttrDerivedKinds[] = {
+    NoAliasAttr::static_kind(),};
+
+gap::generator<AttrKind> NoAliasAttr::derived_kinds(void) {
+  for (AttrKind k : kNoAliasAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoAliasAttr> NoAliasAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -21993,6 +25071,15 @@ bool NakedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNakedAttrDerivedKinds[] = {
+    NakedAttr::static_kind(),};
+
+gap::generator<AttrKind> NakedAttr::derived_kinds(void) {
+  for (AttrKind k : kNakedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NakedAttr> NakedAttr::from(const InheritableAttr &parent) {
@@ -22031,6 +25118,15 @@ bool NSReturnsRetainedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNSReturnsRetainedAttrDerivedKinds[] = {
+    NSReturnsRetainedAttr::static_kind(),};
+
+gap::generator<AttrKind> NSReturnsRetainedAttr::derived_kinds(void) {
+  for (AttrKind k : kNSReturnsRetainedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NSReturnsRetainedAttr> NSReturnsRetainedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22065,6 +25161,15 @@ bool NSReturnsNotRetainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNSReturnsNotRetainedAttrDerivedKinds[] = {
+    NSReturnsNotRetainedAttr::static_kind(),};
+
+gap::generator<AttrKind> NSReturnsNotRetainedAttr::derived_kinds(void) {
+  for (AttrKind k : kNSReturnsNotRetainedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const InheritableAttr &parent) {
@@ -22103,6 +25208,15 @@ bool NSReturnsAutoreleasedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNSReturnsAutoreleasedAttrDerivedKinds[] = {
+    NSReturnsAutoreleasedAttr::static_kind(),};
+
+gap::generator<AttrKind> NSReturnsAutoreleasedAttr::derived_kinds(void) {
+  for (AttrKind k : kNSReturnsAutoreleasedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NSReturnsAutoreleasedAttr> NSReturnsAutoreleasedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22137,6 +25251,15 @@ bool NSErrorDomainAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNSErrorDomainAttrDerivedKinds[] = {
+    NSErrorDomainAttr::static_kind(),};
+
+gap::generator<AttrKind> NSErrorDomainAttr::derived_kinds(void) {
+  for (AttrKind k : kNSErrorDomainAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const InheritableAttr &parent) {
@@ -22180,6 +25303,15 @@ bool NSConsumesSelfAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNSConsumesSelfAttrDerivedKinds[] = {
+    NSConsumesSelfAttr::static_kind(),};
+
+gap::generator<AttrKind> NSConsumesSelfAttr::derived_kinds(void) {
+  for (AttrKind k : kNSConsumesSelfAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NSConsumesSelfAttr> NSConsumesSelfAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22214,6 +25346,15 @@ bool MipsShortCallAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMipsShortCallAttrDerivedKinds[] = {
+    MipsShortCallAttr::static_kind(),};
+
+gap::generator<AttrKind> MipsShortCallAttr::derived_kinds(void) {
+  for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const InheritableAttr &parent) {
@@ -22256,6 +25397,15 @@ bool MipsLongCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMipsLongCallAttrDerivedKinds[] = {
+    MipsLongCallAttr::static_kind(),};
+
+gap::generator<AttrKind> MipsLongCallAttr::derived_kinds(void) {
+  for (AttrKind k : kMipsLongCallAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MipsLongCallAttr> MipsLongCallAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22294,6 +25444,15 @@ bool MipsInterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMipsInterruptAttrDerivedKinds[] = {
+    MipsInterruptAttr::static_kind(),};
+
+gap::generator<AttrKind> MipsInterruptAttr::derived_kinds(void) {
+  for (AttrKind k : kMipsInterruptAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MipsInterruptAttr> MipsInterruptAttr::from(const InheritableAttr &parent) {
@@ -22336,6 +25495,15 @@ bool Mips16Attr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMips16AttrDerivedKinds[] = {
+    Mips16Attr::static_kind(),};
+
+gap::generator<AttrKind> Mips16Attr::derived_kinds(void) {
+  for (AttrKind k : kMips16AttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<Mips16Attr> Mips16Attr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22370,6 +25538,15 @@ bool MinVectorWidthAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMinVectorWidthAttrDerivedKinds[] = {
+    MinVectorWidthAttr::static_kind(),};
+
+gap::generator<AttrKind> MinVectorWidthAttr::derived_kinds(void) {
+  for (AttrKind k : kMinVectorWidthAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MinVectorWidthAttr> MinVectorWidthAttr::from(const InheritableAttr &parent) {
@@ -22408,6 +25585,15 @@ bool MinSizeAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMinSizeAttrDerivedKinds[] = {
+    MinSizeAttr::static_kind(),};
+
+gap::generator<AttrKind> MinSizeAttr::derived_kinds(void) {
+  for (AttrKind k : kMinSizeAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MinSizeAttr> MinSizeAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22442,6 +25628,15 @@ bool MicroMipsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMicroMipsAttrDerivedKinds[] = {
+    MicroMipsAttr::static_kind(),};
+
+gap::generator<AttrKind> MicroMipsAttr::derived_kinds(void) {
+  for (AttrKind k : kMicroMipsAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MicroMipsAttr> MicroMipsAttr::from(const InheritableAttr &parent) {
@@ -22480,6 +25675,15 @@ bool MayAliasAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMayAliasAttrDerivedKinds[] = {
+    MayAliasAttr::static_kind(),};
+
+gap::generator<AttrKind> MayAliasAttr::derived_kinds(void) {
+  for (AttrKind k : kMayAliasAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MayAliasAttr> MayAliasAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22516,6 +25720,15 @@ bool MaxFieldAlignmentAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMaxFieldAlignmentAttrDerivedKinds[] = {
+    MaxFieldAlignmentAttr::static_kind(),};
+
+gap::generator<AttrKind> MaxFieldAlignmentAttr::derived_kinds(void) {
+  for (AttrKind k : kMaxFieldAlignmentAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22550,6 +25763,15 @@ bool MSVtorDispAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMSVtorDispAttrDerivedKinds[] = {
+    MSVtorDispAttr::static_kind(),};
+
+gap::generator<AttrKind> MSVtorDispAttr::derived_kinds(void) {
+  for (AttrKind k : kMSVtorDispAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const InheritableAttr &parent) {
@@ -22592,6 +25814,15 @@ bool MSStructAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMSStructAttrDerivedKinds[] = {
+    MSStructAttr::static_kind(),};
+
+gap::generator<AttrKind> MSStructAttr::derived_kinds(void) {
+  for (AttrKind k : kMSStructAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MSStructAttr> MSStructAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22626,6 +25857,15 @@ bool MSP430InterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMSP430InterruptAttrDerivedKinds[] = {
+    MSP430InterruptAttr::static_kind(),};
+
+gap::generator<AttrKind> MSP430InterruptAttr::derived_kinds(void) {
+  for (AttrKind k : kMSP430InterruptAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MSP430InterruptAttr> MSP430InterruptAttr::from(const InheritableAttr &parent) {
@@ -22664,6 +25904,15 @@ bool MSNoVTableAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMSNoVTableAttrDerivedKinds[] = {
+    MSNoVTableAttr::static_kind(),};
+
+gap::generator<AttrKind> MSNoVTableAttr::derived_kinds(void) {
+  for (AttrKind k : kMSNoVTableAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MSNoVTableAttr> MSNoVTableAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22698,6 +25947,15 @@ bool MSInheritanceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMSInheritanceAttrDerivedKinds[] = {
+    MSInheritanceAttr::static_kind(),};
+
+gap::generator<AttrKind> MSInheritanceAttr::derived_kinds(void) {
+  for (AttrKind k : kMSInheritanceAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MSInheritanceAttr> MSInheritanceAttr::from(const InheritableAttr &parent) {
@@ -22748,6 +26006,15 @@ bool MSAllocatorAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMSAllocatorAttrDerivedKinds[] = {
+    MSAllocatorAttr::static_kind(),};
+
+gap::generator<AttrKind> MSAllocatorAttr::derived_kinds(void) {
+  for (AttrKind k : kMSAllocatorAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MSAllocatorAttr> MSAllocatorAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22782,6 +26049,15 @@ bool MSABIAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kMSABIAttrDerivedKinds[] = {
+    MSABIAttr::static_kind(),};
+
+gap::generator<AttrKind> MSABIAttr::derived_kinds(void) {
+  for (AttrKind k : kMSABIAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MSABIAttr> MSABIAttr::from(const InheritableAttr &parent) {
@@ -22820,6 +26096,15 @@ bool MIGServerRoutineAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kMIGServerRoutineAttrDerivedKinds[] = {
+    MIGServerRoutineAttr::static_kind(),};
+
+gap::generator<AttrKind> MIGServerRoutineAttr::derived_kinds(void) {
+  for (AttrKind k : kMIGServerRoutineAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MIGServerRoutineAttr> MIGServerRoutineAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22854,6 +26139,15 @@ bool M68kInterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kM68kInterruptAttrDerivedKinds[] = {
+    M68kInterruptAttr::static_kind(),};
+
+gap::generator<AttrKind> M68kInterruptAttr::derived_kinds(void) {
+  for (AttrKind k : kM68kInterruptAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<M68kInterruptAttr> M68kInterruptAttr::from(const InheritableAttr &parent) {
@@ -22892,6 +26186,15 @@ bool LocksExcludedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kLocksExcludedAttrDerivedKinds[] = {
+    LocksExcludedAttr::static_kind(),};
+
+gap::generator<AttrKind> LocksExcludedAttr::derived_kinds(void) {
+  for (AttrKind k : kLocksExcludedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<LocksExcludedAttr> LocksExcludedAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -22926,6 +26229,15 @@ bool LockReturnedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kLockReturnedAttrDerivedKinds[] = {
+    LockReturnedAttr::static_kind(),};
+
+gap::generator<AttrKind> LockReturnedAttr::derived_kinds(void) {
+  for (AttrKind k : kLockReturnedAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<LockReturnedAttr> LockReturnedAttr::from(const InheritableAttr &parent) {
@@ -22969,6 +26281,15 @@ bool LifetimeBoundAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kLifetimeBoundAttrDerivedKinds[] = {
+    LifetimeBoundAttr::static_kind(),};
+
+gap::generator<AttrKind> LifetimeBoundAttr::derived_kinds(void) {
+  for (AttrKind k : kLifetimeBoundAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<LifetimeBoundAttr> LifetimeBoundAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23003,6 +26324,15 @@ bool LeafAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kLeafAttrDerivedKinds[] = {
+    LeafAttr::static_kind(),};
+
+gap::generator<AttrKind> LeafAttr::derived_kinds(void) {
+  for (AttrKind k : kLeafAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<LeafAttr> LeafAttr::from(const InheritableAttr &parent) {
@@ -23041,6 +26371,15 @@ bool LayoutVersionAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kLayoutVersionAttrDerivedKinds[] = {
+    LayoutVersionAttr::static_kind(),};
+
+gap::generator<AttrKind> LayoutVersionAttr::derived_kinds(void) {
+  for (AttrKind k : kLayoutVersionAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<LayoutVersionAttr> LayoutVersionAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23075,6 +26414,15 @@ bool LTOVisibilityPublicAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kLTOVisibilityPublicAttrDerivedKinds[] = {
+    LTOVisibilityPublicAttr::static_kind(),};
+
+gap::generator<AttrKind> LTOVisibilityPublicAttr::derived_kinds(void) {
+  for (AttrKind k : kLTOVisibilityPublicAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<LTOVisibilityPublicAttr> LTOVisibilityPublicAttr::from(const InheritableAttr &parent) {
@@ -23113,6 +26461,15 @@ bool InternalLinkageAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kInternalLinkageAttrDerivedKinds[] = {
+    InternalLinkageAttr::static_kind(),};
+
+gap::generator<AttrKind> InternalLinkageAttr::derived_kinds(void) {
+  for (AttrKind k : kInternalLinkageAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<InternalLinkageAttr> InternalLinkageAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23147,6 +26504,15 @@ bool IntelOclBiccAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kIntelOclBiccAttrDerivedKinds[] = {
+    IntelOclBiccAttr::static_kind(),};
+
+gap::generator<AttrKind> IntelOclBiccAttr::derived_kinds(void) {
+  for (AttrKind k : kIntelOclBiccAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<IntelOclBiccAttr> IntelOclBiccAttr::from(const InheritableAttr &parent) {
@@ -23185,6 +26551,15 @@ bool InitPriorityAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kInitPriorityAttrDerivedKinds[] = {
+    InitPriorityAttr::static_kind(),};
+
+gap::generator<AttrKind> InitPriorityAttr::derived_kinds(void) {
+  for (AttrKind k : kInitPriorityAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<InitPriorityAttr> InitPriorityAttr::from(const InheritableAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23219,6 +26594,15 @@ bool InheritableParamAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kInheritableParamAttrDerivedKinds[] = {
+    NSConsumedAttr::static_kind(),    NonNullAttr::static_kind(),    OSConsumedAttr::static_kind(),    PassObjectSizeAttr::static_kind(),    ReleaseHandleAttr::static_kind(),    UseHandleAttr::static_kind(),    AnnotateAttr::static_kind(),    CFConsumedAttr::static_kind(),    CarriesDependencyAttr::static_kind(),    SwiftAsyncContextAttr::static_kind(),    SwiftContextAttr::static_kind(),    SwiftErrorResultAttr::static_kind(),    SwiftIndirectResultAttr::static_kind(),};
+
+gap::generator<AttrKind> InheritableParamAttr::derived_kinds(void) {
+  for (AttrKind k : kInheritableParamAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<InheritableParamAttr> InheritableParamAttr::from(const InheritableAttr &parent) {
@@ -23269,6 +26653,15 @@ bool CarriesDependencyAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCarriesDependencyAttrDerivedKinds[] = {
+    CarriesDependencyAttr::static_kind(),};
+
+gap::generator<AttrKind> CarriesDependencyAttr::derived_kinds(void) {
+  for (AttrKind k : kCarriesDependencyAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CarriesDependencyAttr> CarriesDependencyAttr::from(const InheritableParamAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23309,6 +26702,15 @@ bool CFConsumedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCFConsumedAttrDerivedKinds[] = {
+    CFConsumedAttr::static_kind(),};
+
+gap::generator<AttrKind> CFConsumedAttr::derived_kinds(void) {
+  for (AttrKind k : kCFConsumedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CFConsumedAttr> CFConsumedAttr::from(const InheritableParamAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23347,6 +26749,15 @@ bool AnnotateAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kAnnotateAttrDerivedKinds[] = {
+    AnnotateAttr::static_kind(),};
+
+gap::generator<AttrKind> AnnotateAttr::derived_kinds(void) {
+  for (AttrKind k : kAnnotateAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AnnotateAttr> AnnotateAttr::from(const InheritableParamAttr &parent) {
@@ -23394,6 +26805,15 @@ bool UseHandleAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kUseHandleAttrDerivedKinds[] = {
+    UseHandleAttr::static_kind(),};
+
+gap::generator<AttrKind> UseHandleAttr::derived_kinds(void) {
+  for (AttrKind k : kUseHandleAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UseHandleAttr> UseHandleAttr::from(const InheritableParamAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23439,6 +26859,15 @@ bool ReleaseHandleAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kReleaseHandleAttrDerivedKinds[] = {
+    ReleaseHandleAttr::static_kind(),};
+
+gap::generator<AttrKind> ReleaseHandleAttr::derived_kinds(void) {
+  for (AttrKind k : kReleaseHandleAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ReleaseHandleAttr> ReleaseHandleAttr::from(const InheritableParamAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23482,6 +26911,15 @@ bool PassObjectSizeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kPassObjectSizeAttrDerivedKinds[] = {
+    PassObjectSizeAttr::static_kind(),};
+
+gap::generator<AttrKind> PassObjectSizeAttr::derived_kinds(void) {
+  for (AttrKind k : kPassObjectSizeAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const InheritableParamAttr &parent) {
@@ -23532,6 +26970,15 @@ bool ParameterABIAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kParameterABIAttrDerivedKinds[] = {
+    SwiftAsyncContextAttr::static_kind(),    SwiftContextAttr::static_kind(),    SwiftErrorResultAttr::static_kind(),    SwiftIndirectResultAttr::static_kind(),};
+
+gap::generator<AttrKind> ParameterABIAttr::derived_kinds(void) {
+  for (AttrKind k : kParameterABIAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ParameterABIAttr> ParameterABIAttr::from(const InheritableParamAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23579,6 +27026,15 @@ bool SwiftIndirectResultAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftIndirectResultAttrDerivedKinds[] = {
+    SwiftIndirectResultAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftIndirectResultAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftIndirectResultAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const ParameterABIAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23621,6 +27077,15 @@ bool SwiftErrorResultAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSwiftErrorResultAttrDerivedKinds[] = {
+    SwiftErrorResultAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftErrorResultAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftErrorResultAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SwiftErrorResultAttr> SwiftErrorResultAttr::from(const ParameterABIAttr &parent) {
@@ -23667,6 +27132,15 @@ bool SwiftContextAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kSwiftContextAttrDerivedKinds[] = {
+    SwiftContextAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftContextAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftContextAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwiftContextAttr> SwiftContextAttr::from(const ParameterABIAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23709,6 +27183,15 @@ bool SwiftAsyncContextAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kSwiftAsyncContextAttrDerivedKinds[] = {
+    SwiftAsyncContextAttr::static_kind(),};
+
+gap::generator<AttrKind> SwiftAsyncContextAttr::derived_kinds(void) {
+  for (AttrKind k : kSwiftAsyncContextAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SwiftAsyncContextAttr> SwiftAsyncContextAttr::from(const ParameterABIAttr &parent) {
@@ -23755,6 +27238,15 @@ bool OSConsumedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kOSConsumedAttrDerivedKinds[] = {
+    OSConsumedAttr::static_kind(),};
+
+gap::generator<AttrKind> OSConsumedAttr::derived_kinds(void) {
+  for (AttrKind k : kOSConsumedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OSConsumedAttr> OSConsumedAttr::from(const InheritableParamAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23793,6 +27285,15 @@ bool NonNullAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kNonNullAttrDerivedKinds[] = {
+    NonNullAttr::static_kind(),};
+
+gap::generator<AttrKind> NonNullAttr::derived_kinds(void) {
+  for (AttrKind k : kNonNullAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NonNullAttr> NonNullAttr::from(const InheritableParamAttr &parent) {
@@ -23835,6 +27336,15 @@ bool NSConsumedAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kNSConsumedAttrDerivedKinds[] = {
+    NSConsumedAttr::static_kind(),};
+
+gap::generator<AttrKind> NSConsumedAttr::derived_kinds(void) {
+  for (AttrKind k : kNSConsumedAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NSConsumedAttr> NSConsumedAttr::from(const InheritableParamAttr &parent) {
   return from(reinterpret_cast<const Attr &>(parent));
 }
@@ -23875,6 +27385,15 @@ bool IFuncAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kIFuncAttrDerivedKinds[] = {
+    IFuncAttr::static_kind(),};
+
+gap::generator<AttrKind> IFuncAttr::derived_kinds(void) {
+  for (AttrKind k : kIFuncAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IFuncAttr> IFuncAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::I_FUNC:
@@ -23912,6 +27431,15 @@ bool CalledOnceAttr::contains(const Token &tok) const {
   return false;
 }
 
+static const AttrKind kCalledOnceAttrDerivedKinds[] = {
+    CalledOnceAttr::static_kind(),};
+
+gap::generator<AttrKind> CalledOnceAttr::derived_kinds(void) {
+  for (AttrKind k : kCalledOnceAttrDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CalledOnceAttr> CalledOnceAttr::from(const Attr &parent) {
   switch (parent.kind()) {
     case mx::AttrKind::CALLED_ONCE:
@@ -23942,6 +27470,15 @@ bool BuiltinAliasAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const AttrKind kBuiltinAliasAttrDerivedKinds[] = {
+    BuiltinAliasAttr::static_kind(),};
+
+gap::generator<AttrKind> BuiltinAliasAttr::derived_kinds(void) {
+  for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const Attr &parent) {
@@ -23978,6 +27515,15 @@ bool Type::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kTypeDerivedKinds[] = {
+    TypeOfExprType::static_kind(),    TypeOfType::static_kind(),    TypedefType::static_kind(),    UnaryTransformType::static_kind(),    UnresolvedUsingType::static_kind(),    UsingType::static_kind(),    VectorType::static_kind(),    AdjustedType::static_kind(),    AtomicType::static_kind(),    AttributedType::static_kind(),    BTFTagAttributedType::static_kind(),    BitIntType::static_kind(),    BlockPointerType::static_kind(),    BuiltinType::static_kind(),    ComplexType::static_kind(),    DecltypeType::static_kind(),    DependentAddressSpaceType::static_kind(),    DependentBitIntType::static_kind(),    DependentSizedExtVectorType::static_kind(),    DependentVectorType::static_kind(),    InjectedClassNameType::static_kind(),    MacroQualifiedType::static_kind(),    MemberPointerType::static_kind(),    ObjCObjectPointerType::static_kind(),    ObjCObjectType::static_kind(),    ObjCTypeParamType::static_kind(),    PackExpansionType::static_kind(),    ParenType::static_kind(),    PipeType::static_kind(),    PointerType::static_kind(),    SubstTemplateTypeParmPackType::static_kind(),    SubstTemplateTypeParmType::static_kind(),    TemplateSpecializationType::static_kind(),    TemplateTypeParmType::static_kind(),    ExtVectorType::static_kind(),    DependentNameType::static_kind(),    DependentTemplateSpecializationType::static_kind(),    ElaboratedType::static_kind(),    DecayedType::static_kind(),    ConstantArrayType::static_kind(),    DependentSizedArrayType::static_kind(),    IncompleteArrayType::static_kind(),    VariableArrayType::static_kind(),    AutoType::static_kind(),    DeducedTemplateSpecializationType::static_kind(),    FunctionNoProtoType::static_kind(),    FunctionProtoType::static_kind(),    ConstantMatrixType::static_kind(),    DependentSizedMatrixType::static_kind(),    ObjCInterfaceType::static_kind(),    LValueReferenceType::static_kind(),    RValueReferenceType::static_kind(),    EnumType::static_kind(),    RecordType::static_kind(),};
+
+gap::generator<TypeKind> Type::derived_kinds(void) {
+  for (TypeKind k : kTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 bool Type::is_qualified(void) const {
@@ -25364,6 +28910,15 @@ bool TemplateTypeParmType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kTemplateTypeParmTypeDerivedKinds[] = {
+    TemplateTypeParmType::static_kind(),};
+
+gap::generator<TypeKind> TemplateTypeParmType::derived_kinds(void) {
+  for (TypeKind k : kTemplateTypeParmTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::TEMPLATE_TYPE_PARM:
@@ -25420,6 +28975,15 @@ bool TemplateSpecializationType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kTemplateSpecializationTypeDerivedKinds[] = {
+    TemplateSpecializationType::static_kind(),};
+
+gap::generator<TypeKind> TemplateSpecializationType::derived_kinds(void) {
+  for (TypeKind k : kTemplateSpecializationTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const Type &parent) {
@@ -25505,6 +29069,15 @@ bool TagType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kTagTypeDerivedKinds[] = {
+    EnumType::static_kind(),    RecordType::static_kind(),};
+
+gap::generator<TypeKind> TagType::derived_kinds(void) {
+  for (TypeKind k : kTagTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TagType> TagType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::RECORD:
@@ -25545,6 +29118,15 @@ bool RecordType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kRecordTypeDerivedKinds[] = {
+    RecordType::static_kind(),};
+
+gap::generator<TypeKind> RecordType::derived_kinds(void) {
+  for (TypeKind k : kRecordTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<RecordType> RecordType::from(const TagType &parent) {
@@ -25596,6 +29178,15 @@ bool EnumType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kEnumTypeDerivedKinds[] = {
+    EnumType::static_kind(),};
+
+gap::generator<TypeKind> EnumType::derived_kinds(void) {
+  for (TypeKind k : kEnumTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<EnumType> EnumType::from(const TagType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -25639,6 +29230,15 @@ bool SubstTemplateTypeParmType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kSubstTemplateTypeParmTypeDerivedKinds[] = {
+    SubstTemplateTypeParmType::static_kind(),};
+
+gap::generator<TypeKind> SubstTemplateTypeParmType::derived_kinds(void) {
+  for (TypeKind k : kSubstTemplateTypeParmTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const Type &parent) {
@@ -25692,6 +29292,15 @@ bool SubstTemplateTypeParmPackType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kSubstTemplateTypeParmPackTypeDerivedKinds[] = {
+    SubstTemplateTypeParmPackType::static_kind(),};
+
+gap::generator<TypeKind> SubstTemplateTypeParmPackType::derived_kinds(void) {
+  for (TypeKind k : kSubstTemplateTypeParmPackTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::SUBST_TEMPLATE_TYPE_PARM_PACK:
@@ -25736,6 +29345,15 @@ bool ReferenceType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kReferenceTypeDerivedKinds[] = {
+    LValueReferenceType::static_kind(),    RValueReferenceType::static_kind(),};
+
+gap::generator<TypeKind> ReferenceType::derived_kinds(void) {
+  for (TypeKind k : kReferenceTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ReferenceType> ReferenceType::from(const Type &parent) {
@@ -25784,6 +29402,15 @@ bool RValueReferenceType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kRValueReferenceTypeDerivedKinds[] = {
+    RValueReferenceType::static_kind(),};
+
+gap::generator<TypeKind> RValueReferenceType::derived_kinds(void) {
+  for (TypeKind k : kRValueReferenceTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<RValueReferenceType> RValueReferenceType::from(const ReferenceType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -25827,6 +29454,15 @@ bool LValueReferenceType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kLValueReferenceTypeDerivedKinds[] = {
+    LValueReferenceType::static_kind(),};
+
+gap::generator<TypeKind> LValueReferenceType::derived_kinds(void) {
+  for (TypeKind k : kLValueReferenceTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<LValueReferenceType> LValueReferenceType::from(const ReferenceType &parent) {
@@ -25874,6 +29510,15 @@ bool PointerType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kPointerTypeDerivedKinds[] = {
+    PointerType::static_kind(),};
+
+gap::generator<TypeKind> PointerType::derived_kinds(void) {
+  for (TypeKind k : kPointerTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PointerType> PointerType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::POINTER:
@@ -25913,6 +29558,15 @@ bool PipeType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kPipeTypeDerivedKinds[] = {
+    PipeType::static_kind(),};
+
+gap::generator<TypeKind> PipeType::derived_kinds(void) {
+  for (TypeKind k : kPipeTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PipeType> PipeType::from(const Type &parent) {
@@ -25965,6 +29619,15 @@ bool ParenType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kParenTypeDerivedKinds[] = {
+    ParenType::static_kind(),};
+
+gap::generator<TypeKind> ParenType::derived_kinds(void) {
+  for (TypeKind k : kParenTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ParenType> ParenType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::PAREN:
@@ -26009,6 +29672,15 @@ bool PackExpansionType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kPackExpansionTypeDerivedKinds[] = {
+    PackExpansionType::static_kind(),};
+
+gap::generator<TypeKind> PackExpansionType::derived_kinds(void) {
+  for (TypeKind k : kPackExpansionTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PackExpansionType> PackExpansionType::from(const Type &parent) {
@@ -26066,6 +29738,15 @@ bool ObjCTypeParamType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kObjCTypeParamTypeDerivedKinds[] = {
+    ObjCTypeParamType::static_kind(),};
+
+gap::generator<TypeKind> ObjCTypeParamType::derived_kinds(void) {
+  for (TypeKind k : kObjCTypeParamTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::OBJ_C_TYPE_PARAM:
@@ -26110,6 +29791,15 @@ bool ObjCObjectType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kObjCObjectTypeDerivedKinds[] = {
+    ObjCObjectType::static_kind(),    ObjCInterfaceType::static_kind(),};
+
+gap::generator<TypeKind> ObjCObjectType::derived_kinds(void) {
+  for (TypeKind k : kObjCObjectTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCObjectType> ObjCObjectType::from(const Type &parent) {
@@ -26266,6 +29956,15 @@ bool ObjCInterfaceType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kObjCInterfaceTypeDerivedKinds[] = {
+    ObjCInterfaceType::static_kind(),};
+
+gap::generator<TypeKind> ObjCInterfaceType::derived_kinds(void) {
+  for (TypeKind k : kObjCInterfaceTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const ObjCObjectType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -26305,6 +30004,15 @@ bool ObjCObjectPointerType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kObjCObjectPointerTypeDerivedKinds[] = {
+    ObjCObjectPointerType::static_kind(),};
+
+gap::generator<TypeKind> ObjCObjectPointerType::derived_kinds(void) {
+  for (TypeKind k : kObjCObjectPointerTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const Type &parent) {
@@ -26475,6 +30183,15 @@ bool MemberPointerType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kMemberPointerTypeDerivedKinds[] = {
+    MemberPointerType::static_kind(),};
+
+gap::generator<TypeKind> MemberPointerType::derived_kinds(void) {
+  for (TypeKind k : kMemberPointerTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MemberPointerType> MemberPointerType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::MEMBER_POINTER:
@@ -26534,6 +30251,15 @@ bool MatrixType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kMatrixTypeDerivedKinds[] = {
+    ConstantMatrixType::static_kind(),    DependentSizedMatrixType::static_kind(),};
+
+gap::generator<TypeKind> MatrixType::derived_kinds(void) {
+  for (TypeKind k : kMatrixTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MatrixType> MatrixType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::DEPENDENT_SIZED_MATRIX:
@@ -26579,6 +30305,15 @@ bool DependentSizedMatrixType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kDependentSizedMatrixTypeDerivedKinds[] = {
+    DependentSizedMatrixType::static_kind(),};
+
+gap::generator<TypeKind> DependentSizedMatrixType::derived_kinds(void) {
+  for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const MatrixType &parent) {
@@ -26631,6 +30366,15 @@ bool ConstantMatrixType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kConstantMatrixTypeDerivedKinds[] = {
+    ConstantMatrixType::static_kind(),};
+
+gap::generator<TypeKind> ConstantMatrixType::derived_kinds(void) {
+  for (TypeKind k : kConstantMatrixTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ConstantMatrixType> ConstantMatrixType::from(const MatrixType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -26665,6 +30409,15 @@ bool MacroQualifiedType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kMacroQualifiedTypeDerivedKinds[] = {
+    MacroQualifiedType::static_kind(),};
+
+gap::generator<TypeKind> MacroQualifiedType::derived_kinds(void) {
+  for (TypeKind k : kMacroQualifiedTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MacroQualifiedType> MacroQualifiedType::from(const Type &parent) {
@@ -26716,6 +30469,15 @@ bool InjectedClassNameType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kInjectedClassNameTypeDerivedKinds[] = {
+    InjectedClassNameType::static_kind(),};
+
+gap::generator<TypeKind> InjectedClassNameType::derived_kinds(void) {
+  for (TypeKind k : kInjectedClassNameTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<InjectedClassNameType> InjectedClassNameType::from(const Type &parent) {
@@ -26772,6 +30534,15 @@ bool FunctionType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kFunctionTypeDerivedKinds[] = {
+    FunctionNoProtoType::static_kind(),    FunctionProtoType::static_kind(),};
+
+gap::generator<TypeKind> FunctionType::derived_kinds(void) {
+  for (TypeKind k : kFunctionTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FunctionType> FunctionType::from(const Type &parent) {
@@ -26843,6 +30614,15 @@ bool FunctionProtoType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kFunctionProtoTypeDerivedKinds[] = {
+    FunctionProtoType::static_kind(),};
+
+gap::generator<TypeKind> FunctionProtoType::derived_kinds(void) {
+  for (TypeKind k : kFunctionProtoTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FunctionProtoType> FunctionProtoType::from(const FunctionType &parent) {
@@ -27037,6 +30817,15 @@ bool FunctionNoProtoType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kFunctionNoProtoTypeDerivedKinds[] = {
+    FunctionNoProtoType::static_kind(),};
+
+gap::generator<TypeKind> FunctionNoProtoType::derived_kinds(void) {
+  for (TypeKind k : kFunctionNoProtoTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const FunctionType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -27080,6 +30869,15 @@ bool DependentVectorType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kDependentVectorTypeDerivedKinds[] = {
+    DependentVectorType::static_kind(),};
+
+gap::generator<TypeKind> DependentVectorType::derived_kinds(void) {
+  for (TypeKind k : kDependentVectorTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DependentVectorType> DependentVectorType::from(const Type &parent) {
@@ -27141,6 +30939,15 @@ bool DependentSizedExtVectorType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kDependentSizedExtVectorTypeDerivedKinds[] = {
+    DependentSizedExtVectorType::static_kind(),};
+
+gap::generator<TypeKind> DependentSizedExtVectorType::derived_kinds(void) {
+  for (TypeKind k : kDependentSizedExtVectorTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::DEPENDENT_SIZED_EXT_VECTOR:
@@ -27194,6 +31001,15 @@ bool DependentBitIntType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kDependentBitIntTypeDerivedKinds[] = {
+    DependentBitIntType::static_kind(),};
+
+gap::generator<TypeKind> DependentBitIntType::derived_kinds(void) {
+  for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DependentBitIntType> DependentBitIntType::from(const Type &parent) {
@@ -27250,6 +31066,15 @@ bool DependentAddressSpaceType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kDependentAddressSpaceTypeDerivedKinds[] = {
+    DependentAddressSpaceType::static_kind(),};
+
+gap::generator<TypeKind> DependentAddressSpaceType::derived_kinds(void) {
+  for (TypeKind k : kDependentAddressSpaceTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::DEPENDENT_ADDRESS_SPACE:
@@ -27298,6 +31123,15 @@ bool DeducedType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kDeducedTypeDerivedKinds[] = {
+    AutoType::static_kind(),    DeducedTemplateSpecializationType::static_kind(),};
+
+gap::generator<TypeKind> DeducedType::derived_kinds(void) {
+  for (TypeKind k : kDeducedTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DeducedType> DeducedType::from(const Type &parent) {
@@ -27359,6 +31193,15 @@ bool DeducedTemplateSpecializationType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kDeducedTemplateSpecializationTypeDerivedKinds[] = {
+    DeducedTemplateSpecializationType::static_kind(),};
+
+gap::generator<TypeKind> DeducedTemplateSpecializationType::derived_kinds(void) {
+  for (TypeKind k : kDeducedTemplateSpecializationTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const DeducedType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -27393,6 +31236,15 @@ bool AutoType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kAutoTypeDerivedKinds[] = {
+    AutoType::static_kind(),};
+
+gap::generator<TypeKind> AutoType::derived_kinds(void) {
+  for (TypeKind k : kAutoTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AutoType> AutoType::from(const DeducedType &parent) {
@@ -27481,6 +31333,15 @@ bool DecltypeType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kDecltypeTypeDerivedKinds[] = {
+    DecltypeType::static_kind(),};
+
+gap::generator<TypeKind> DecltypeType::derived_kinds(void) {
+  for (TypeKind k : kDecltypeTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DecltypeType> DecltypeType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::DECLTYPE:
@@ -27532,6 +31393,15 @@ bool ComplexType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kComplexTypeDerivedKinds[] = {
+    ComplexType::static_kind(),};
+
+gap::generator<TypeKind> ComplexType::derived_kinds(void) {
+  for (TypeKind k : kComplexTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ComplexType> ComplexType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::COMPLEX:
@@ -27576,6 +31446,15 @@ bool BuiltinType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kBuiltinTypeDerivedKinds[] = {
+    BuiltinType::static_kind(),};
+
+gap::generator<TypeKind> BuiltinType::derived_kinds(void) {
+  for (TypeKind k : kBuiltinTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BuiltinType> BuiltinType::from(const Type &parent) {
@@ -27643,6 +31522,15 @@ bool BlockPointerType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kBlockPointerTypeDerivedKinds[] = {
+    BlockPointerType::static_kind(),};
+
+gap::generator<TypeKind> BlockPointerType::derived_kinds(void) {
+  for (TypeKind k : kBlockPointerTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<BlockPointerType> BlockPointerType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::BLOCK_POINTER:
@@ -27682,6 +31570,15 @@ bool BitIntType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kBitIntTypeDerivedKinds[] = {
+    BitIntType::static_kind(),};
+
+gap::generator<TypeKind> BitIntType::derived_kinds(void) {
+  for (TypeKind k : kBitIntTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BitIntType> BitIntType::from(const Type &parent) {
@@ -27733,6 +31630,15 @@ bool BTFTagAttributedType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kBTFTagAttributedTypeDerivedKinds[] = {
+    BTFTagAttributedType::static_kind(),};
+
+gap::generator<TypeKind> BTFTagAttributedType::derived_kinds(void) {
+  for (TypeKind k : kBTFTagAttributedTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::BTF_TAG_ATTRIBUTED:
@@ -27782,6 +31688,15 @@ bool AttributedType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kAttributedTypeDerivedKinds[] = {
+    AttributedType::static_kind(),};
+
+gap::generator<TypeKind> AttributedType::derived_kinds(void) {
+  for (TypeKind k : kAttributedTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AttributedType> AttributedType::from(const Type &parent) {
@@ -27860,6 +31775,15 @@ bool AtomicType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kAtomicTypeDerivedKinds[] = {
+    AtomicType::static_kind(),};
+
+gap::generator<TypeKind> AtomicType::derived_kinds(void) {
+  for (TypeKind k : kAtomicTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AtomicType> AtomicType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::ATOMIC:
@@ -27906,6 +31830,15 @@ bool ArrayType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kArrayTypeDerivedKinds[] = {
+    ConstantArrayType::static_kind(),    DependentSizedArrayType::static_kind(),    IncompleteArrayType::static_kind(),    VariableArrayType::static_kind(),};
+
+gap::generator<TypeKind> ArrayType::derived_kinds(void) {
+  for (TypeKind k : kArrayTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ArrayType> ArrayType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::VARIABLE_ARRAY:
@@ -27948,6 +31881,15 @@ bool VariableArrayType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kVariableArrayTypeDerivedKinds[] = {
+    VariableArrayType::static_kind(),};
+
+gap::generator<TypeKind> VariableArrayType::derived_kinds(void) {
+  for (TypeKind k : kVariableArrayTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<VariableArrayType> VariableArrayType::from(const ArrayType &parent) {
@@ -28013,6 +31955,15 @@ bool IncompleteArrayType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kIncompleteArrayTypeDerivedKinds[] = {
+    IncompleteArrayType::static_kind(),};
+
+gap::generator<TypeKind> IncompleteArrayType::derived_kinds(void) {
+  for (TypeKind k : kIncompleteArrayTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IncompleteArrayType> IncompleteArrayType::from(const ArrayType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -28056,6 +32007,15 @@ bool DependentSizedArrayType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kDependentSizedArrayTypeDerivedKinds[] = {
+    DependentSizedArrayType::static_kind(),};
+
+gap::generator<TypeKind> DependentSizedArrayType::derived_kinds(void) {
+  for (TypeKind k : kDependentSizedArrayTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const ArrayType &parent) {
@@ -28121,6 +32081,15 @@ bool ConstantArrayType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kConstantArrayTypeDerivedKinds[] = {
+    ConstantArrayType::static_kind(),};
+
+gap::generator<TypeKind> ConstantArrayType::derived_kinds(void) {
+  for (TypeKind k : kConstantArrayTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ConstantArrayType> ConstantArrayType::from(const ArrayType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -28179,6 +32148,15 @@ bool AdjustedType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kAdjustedTypeDerivedKinds[] = {
+    AdjustedType::static_kind(),    DecayedType::static_kind(),};
+
+gap::generator<TypeKind> AdjustedType::derived_kinds(void) {
+  for (TypeKind k : kAdjustedTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AdjustedType> AdjustedType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::ADJUSTED:
@@ -28231,6 +32209,15 @@ bool DecayedType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kDecayedTypeDerivedKinds[] = {
+    DecayedType::static_kind(),};
+
+gap::generator<TypeKind> DecayedType::derived_kinds(void) {
+  for (TypeKind k : kDecayedTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DecayedType> DecayedType::from(const AdjustedType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -28265,6 +32252,15 @@ bool TypeWithKeyword::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kTypeWithKeywordDerivedKinds[] = {
+    DependentNameType::static_kind(),    DependentTemplateSpecializationType::static_kind(),    ElaboratedType::static_kind(),};
+
+gap::generator<TypeKind> TypeWithKeyword::derived_kinds(void) {
+  for (TypeKind k : kTypeWithKeywordDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeWithKeyword> TypeWithKeyword::from(const Type &parent) {
@@ -28303,6 +32299,15 @@ bool ElaboratedType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kElaboratedTypeDerivedKinds[] = {
+    ElaboratedType::static_kind(),};
+
+gap::generator<TypeKind> ElaboratedType::derived_kinds(void) {
+  for (TypeKind k : kElaboratedTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ElaboratedType> ElaboratedType::from(const TypeWithKeyword &parent) {
@@ -28366,6 +32371,15 @@ bool DependentTemplateSpecializationType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kDependentTemplateSpecializationTypeDerivedKinds[] = {
+    DependentTemplateSpecializationType::static_kind(),};
+
+gap::generator<TypeKind> DependentTemplateSpecializationType::derived_kinds(void) {
+  for (TypeKind k : kDependentTemplateSpecializationTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializationType::from(const TypeWithKeyword &parent) {
@@ -28434,6 +32448,15 @@ bool DependentNameType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kDependentNameTypeDerivedKinds[] = {
+    DependentNameType::static_kind(),};
+
+gap::generator<TypeKind> DependentNameType::derived_kinds(void) {
+  for (TypeKind k : kDependentNameTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DependentNameType> DependentNameType::from(const TypeWithKeyword &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -28477,6 +32500,15 @@ bool VectorType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kVectorTypeDerivedKinds[] = {
+    VectorType::static_kind(),    ExtVectorType::static_kind(),};
+
+gap::generator<TypeKind> VectorType::derived_kinds(void) {
+  for (TypeKind k : kVectorTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<VectorType> VectorType::from(const Type &parent) {
@@ -28530,6 +32562,15 @@ bool ExtVectorType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kExtVectorTypeDerivedKinds[] = {
+    ExtVectorType::static_kind(),};
+
+gap::generator<TypeKind> ExtVectorType::derived_kinds(void) {
+  for (TypeKind k : kExtVectorTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ExtVectorType> ExtVectorType::from(const VectorType &parent) {
   return from(reinterpret_cast<const Type &>(parent));
 }
@@ -28564,6 +32605,15 @@ bool UsingType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kUsingTypeDerivedKinds[] = {
+    UsingType::static_kind(),};
+
+gap::generator<TypeKind> UsingType::derived_kinds(void) {
+  for (TypeKind k : kUsingTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UsingType> UsingType::from(const Type &parent) {
@@ -28617,6 +32667,15 @@ bool UnresolvedUsingType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kUnresolvedUsingTypeDerivedKinds[] = {
+    UnresolvedUsingType::static_kind(),};
+
+gap::generator<TypeKind> UnresolvedUsingType::derived_kinds(void) {
+  for (TypeKind k : kUnresolvedUsingTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::UNRESOLVED_USING:
@@ -28661,6 +32720,15 @@ bool UnaryTransformType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kUnaryTransformTypeDerivedKinds[] = {
+    UnaryTransformType::static_kind(),};
+
+gap::generator<TypeKind> UnaryTransformType::derived_kinds(void) {
+  for (TypeKind k : kUnaryTransformTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UnaryTransformType> UnaryTransformType::from(const Type &parent) {
@@ -28718,6 +32786,15 @@ bool TypedefType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kTypedefTypeDerivedKinds[] = {
+    TypedefType::static_kind(),};
+
+gap::generator<TypeKind> TypedefType::derived_kinds(void) {
+  for (TypeKind k : kTypedefTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TypedefType> TypedefType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::TYPEDEF:
@@ -28764,6 +32841,15 @@ bool TypeOfType::contains(const Token &tok) const {
   return false;
 }
 
+static const TypeKind kTypeOfTypeDerivedKinds[] = {
+    TypeOfType::static_kind(),};
+
+gap::generator<TypeKind> TypeOfType::derived_kinds(void) {
+  for (TypeKind k : kTypeOfTypeDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TypeOfType> TypeOfType::from(const Type &parent) {
   switch (parent.kind()) {
     case mx::TypeKind::TYPE_OF:
@@ -28808,6 +32894,15 @@ bool TypeOfExprType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+static const TypeKind kTypeOfExprTypeDerivedKinds[] = {
+    TypeOfExprType::static_kind(),};
+
+gap::generator<TypeKind> TypeOfExprType::derived_kinds(void) {
+  for (TypeKind k : kTypeOfExprTypeDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeOfExprType> TypeOfExprType::from(const Type &parent) {
@@ -28929,6 +33024,15 @@ bool Stmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kStmtDerivedKinds[] = {
+    SwitchStmt::static_kind(),    WhileStmt::static_kind(),    BreakStmt::static_kind(),    CXXCatchStmt::static_kind(),    CXXForRangeStmt::static_kind(),    CXXTryStmt::static_kind(),    CapturedStmt::static_kind(),    CompoundStmt::static_kind(),    ContinueStmt::static_kind(),    CoreturnStmt::static_kind(),    CoroutineBodyStmt::static_kind(),    DeclStmt::static_kind(),    DoStmt::static_kind(),    ForStmt::static_kind(),    GotoStmt::static_kind(),    IfStmt::static_kind(),    IndirectGotoStmt::static_kind(),    MSDependentExistsStmt::static_kind(),    NullStmt::static_kind(),    OMPCanonicalLoop::static_kind(),    ObjCAtCatchStmt::static_kind(),    ObjCAtFinallyStmt::static_kind(),    ObjCAtSynchronizedStmt::static_kind(),    ObjCAtThrowStmt::static_kind(),    ObjCAtTryStmt::static_kind(),    ObjCAutoreleasePoolStmt::static_kind(),    ObjCForCollectionStmt::static_kind(),    ReturnStmt::static_kind(),    SEHExceptStmt::static_kind(),    SEHFinallyStmt::static_kind(),    SEHLeaveStmt::static_kind(),    SEHTryStmt::static_kind(),    CaseStmt::static_kind(),    DefaultStmt::static_kind(),    AttributedStmt::static_kind(),    LabelStmt::static_kind(),    GCCAsmStmt::static_kind(),    MSAsmStmt::static_kind(),    OMPFlushDirective::static_kind(),    OMPInteropDirective::static_kind(),    OMPMaskedDirective::static_kind(),    OMPMasterDirective::static_kind(),    OMPMetaDirective::static_kind(),    OMPOrderedDirective::static_kind(),    OMPParallelDirective::static_kind(),    OMPParallelMaskedDirective::static_kind(),    OMPParallelMasterDirective::static_kind(),    OMPParallelSectionsDirective::static_kind(),    OMPScanDirective::static_kind(),    OMPSectionDirective::static_kind(),    OMPSectionsDirective::static_kind(),    OMPSingleDirective::static_kind(),    OMPTargetDataDirective::static_kind(),    OMPTargetDirective::static_kind(),    OMPTargetEnterDataDirective::static_kind(),    OMPTargetExitDataDirective::static_kind(),    OMPTargetParallelDirective::static_kind(),    OMPTargetTeamsDirective::static_kind(),    OMPTargetUpdateDirective::static_kind(),    OMPTaskDirective::static_kind(),    OMPTaskgroupDirective::static_kind(),    OMPTaskwaitDirective::static_kind(),    OMPTaskyieldDirective::static_kind(),    OMPTeamsDirective::static_kind(),    OMPAtomicDirective::static_kind(),    OMPBarrierDirective::static_kind(),    OMPCancelDirective::static_kind(),    OMPCancellationPointDirective::static_kind(),    OMPCriticalDirective::static_kind(),    OMPDepobjDirective::static_kind(),    OMPDispatchDirective::static_kind(),    ExpressionTraitExpr::static_kind(),    ExtVectorElementExpr::static_kind(),    FixedPointLiteral::static_kind(),    FloatingLiteral::static_kind(),    FunctionParmPackExpr::static_kind(),    GNUNullExpr::static_kind(),    GenericSelectionExpr::static_kind(),    ImaginaryLiteral::static_kind(),    ImplicitValueInitExpr::static_kind(),    InitListExpr::static_kind(),    IntegerLiteral::static_kind(),    LambdaExpr::static_kind(),    MSPropertyRefExpr::static_kind(),    MSPropertySubscriptExpr::static_kind(),    MaterializeTemporaryExpr::static_kind(),    MatrixSubscriptExpr::static_kind(),    MemberExpr::static_kind(),    NoInitExpr::static_kind(),    OMPArraySectionExpr::static_kind(),    OMPArrayShapingExpr::static_kind(),    OMPIteratorExpr::static_kind(),    ObjCArrayLiteral::static_kind(),    ObjCAvailabilityCheckExpr::static_kind(),    ObjCBoolLiteralExpr::static_kind(),    ObjCBoxedExpr::static_kind(),    ObjCDictionaryLiteral::static_kind(),    ObjCEncodeExpr::static_kind(),    ObjCIndirectCopyRestoreExpr::static_kind(),    ObjCIsaExpr::static_kind(),    ObjCIvarRefExpr::static_kind(),    ObjCMessageExpr::static_kind(),    ObjCPropertyRefExpr::static_kind(),    ObjCProtocolExpr::static_kind(),    ObjCSelectorExpr::static_kind(),    ObjCStringLiteral::static_kind(),    ObjCSubscriptRefExpr::static_kind(),    OffsetOfExpr::static_kind(),    OpaqueValueExpr::static_kind(),    PackExpansionExpr::static_kind(),    ParenExpr::static_kind(),    ParenListExpr::static_kind(),    PredefinedExpr::static_kind(),    PseudoObjectExpr::static_kind(),    RecoveryExpr::static_kind(),    RequiresExpr::static_kind(),    SYCLUniqueStableNameExpr::static_kind(),    ShuffleVectorExpr::static_kind(),    SizeOfPackExpr::static_kind(),    SourceLocExpr::static_kind(),    StmtExpr::static_kind(),    StringLiteral::static_kind(),    SubstNonTypeTemplateParmExpr::static_kind(),    SubstNonTypeTemplateParmPackExpr::static_kind(),    TypeTraitExpr::static_kind(),    TypoExpr::static_kind(),    UnaryExprOrTypeTraitExpr::static_kind(),    UnaryOperator::static_kind(),    VAArgExpr::static_kind(),    AddrLabelExpr::static_kind(),    ArrayInitIndexExpr::static_kind(),    ArrayInitLoopExpr::static_kind(),    ArraySubscriptExpr::static_kind(),    ArrayTypeTraitExpr::static_kind(),    AsTypeExpr::static_kind(),    AtomicExpr::static_kind(),    BinaryOperator::static_kind(),    BlockExpr::static_kind(),    CXXBindTemporaryExpr::static_kind(),    CXXBoolLiteralExpr::static_kind(),    CXXConstructExpr::static_kind(),    CXXDefaultArgExpr::static_kind(),    CXXDefaultInitExpr::static_kind(),    CXXDeleteExpr::static_kind(),    CXXDependentScopeMemberExpr::static_kind(),    CXXFoldExpr::static_kind(),    CXXInheritedCtorInitExpr::static_kind(),    CXXNewExpr::static_kind(),    CXXNoexceptExpr::static_kind(),    CXXNullPtrLiteralExpr::static_kind(),    CXXPseudoDestructorExpr::static_kind(),    CXXRewrittenBinaryOperator::static_kind(),    CXXScalarValueInitExpr::static_kind(),    CXXStdInitializerListExpr::static_kind(),    CXXThisExpr::static_kind(),    CXXThrowExpr::static_kind(),    CXXTypeidExpr::static_kind(),    CXXUnresolvedConstructExpr::static_kind(),    CXXUuidofExpr::static_kind(),    CallExpr::static_kind(),    CharacterLiteral::static_kind(),    ChooseExpr::static_kind(),    CompoundLiteralExpr::static_kind(),    ConceptSpecializationExpr::static_kind(),    ConvertVectorExpr::static_kind(),    DeclRefExpr::static_kind(),    DependentCoawaitExpr::static_kind(),    DependentScopeDeclRefExpr::static_kind(),    DesignatedInitExpr::static_kind(),    DesignatedInitUpdateExpr::static_kind(),    ConstantExpr::static_kind(),    ExprWithCleanups::static_kind(),    UnresolvedLookupExpr::static_kind(),    UnresolvedMemberExpr::static_kind(),    BinaryConditionalOperator::static_kind(),    ConditionalOperator::static_kind(),    CompoundAssignOperator::static_kind(),    CXXTemporaryObjectExpr::static_kind(),    UserDefinedLiteral::static_kind(),    CUDAKernelCallExpr::static_kind(),    CXXMemberCallExpr::static_kind(),    CXXOperatorCallExpr::static_kind(),    ImplicitCastExpr::static_kind(),    CoyieldExpr::static_kind(),    CoawaitExpr::static_kind(),    OMPMaskedTaskLoopDirective::static_kind(),    OMPMaskedTaskLoopSimdDirective::static_kind(),    OMPMasterTaskLoopDirective::static_kind(),    OMPMasterTaskLoopSimdDirective::static_kind(),    OMPParallelForDirective::static_kind(),    OMPParallelForSimdDirective::static_kind(),    OMPParallelGenericLoopDirective::static_kind(),    OMPParallelMaskedTaskLoopDirective::static_kind(),    OMPParallelMaskedTaskLoopSimdDirective::static_kind(),    OMPParallelMasterTaskLoopDirective::static_kind(),    OMPParallelMasterTaskLoopSimdDirective::static_kind(),    OMPSimdDirective::static_kind(),    OMPTargetParallelForDirective::static_kind(),    OMPTargetParallelForSimdDirective::static_kind(),    OMPTargetParallelGenericLoopDirective::static_kind(),    OMPTargetSimdDirective::static_kind(),    OMPTargetTeamsDistributeDirective::static_kind(),    OMPTargetTeamsDistributeParallelForDirective::static_kind(),    OMPTargetTeamsDistributeParallelForSimdDirective::static_kind(),    OMPTargetTeamsDistributeSimdDirective::static_kind(),    OMPTargetTeamsGenericLoopDirective::static_kind(),    OMPTaskLoopDirective::static_kind(),    OMPTaskLoopSimdDirective::static_kind(),    OMPTeamsDistributeDirective::static_kind(),    OMPTeamsDistributeParallelForDirective::static_kind(),    OMPTeamsDistributeParallelForSimdDirective::static_kind(),    OMPTeamsDistributeSimdDirective::static_kind(),    OMPTeamsGenericLoopDirective::static_kind(),    OMPDistributeDirective::static_kind(),    OMPDistributeParallelForDirective::static_kind(),    OMPDistributeParallelForSimdDirective::static_kind(),    OMPDistributeSimdDirective::static_kind(),    OMPForDirective::static_kind(),    OMPForSimdDirective::static_kind(),    OMPGenericLoopDirective::static_kind(),    OMPTileDirective::static_kind(),    OMPUnrollDirective::static_kind(),    ObjCBridgedCastExpr::static_kind(),    BuiltinBitCastExpr::static_kind(),    CStyleCastExpr::static_kind(),    CXXFunctionalCastExpr::static_kind(),    CXXReinterpretCastExpr::static_kind(),    CXXStaticCastExpr::static_kind(),    CXXAddrspaceCastExpr::static_kind(),    CXXConstCastExpr::static_kind(),    CXXDynamicCastExpr::static_kind(),};
+
+gap::generator<StmtKind> Stmt::derived_kinds(void) {
+  for (StmtKind k : kStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 Stmt Stmt::ignore_containers(void) const {
   RawEntityId eid = impl->reader.getVal3();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
@@ -29011,6 +33115,15 @@ bool SEHTryStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kSEHTryStmtDerivedKinds[] = {
+    SEHTryStmt::static_kind(),};
+
+gap::generator<StmtKind> SEHTryStmt::derived_kinds(void) {
+  for (StmtKind k : kSEHTryStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SEHTryStmt> SEHTryStmt::from(const Stmt &parent) {
@@ -29103,6 +33216,15 @@ bool SEHLeaveStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kSEHLeaveStmtDerivedKinds[] = {
+    SEHLeaveStmt::static_kind(),};
+
+gap::generator<StmtKind> SEHLeaveStmt::derived_kinds(void) {
+  for (StmtKind k : kSEHLeaveStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::SEH_LEAVE_STMT:
@@ -29167,6 +33289,15 @@ bool SEHFinallyStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kSEHFinallyStmtDerivedKinds[] = {
+    SEHFinallyStmt::static_kind(),};
+
+gap::generator<StmtKind> SEHFinallyStmt::derived_kinds(void) {
+  for (StmtKind k : kSEHFinallyStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const Stmt &parent) {
@@ -29238,6 +33369,15 @@ bool SEHExceptStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kSEHExceptStmtDerivedKinds[] = {
+    SEHExceptStmt::static_kind(),};
+
+gap::generator<StmtKind> SEHExceptStmt::derived_kinds(void) {
+  for (StmtKind k : kSEHExceptStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SEHExceptStmt> SEHExceptStmt::from(const Stmt &parent) {
@@ -29314,6 +33454,15 @@ bool ReturnStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kReturnStmtDerivedKinds[] = {
+    ReturnStmt::static_kind(),};
+
+gap::generator<StmtKind> ReturnStmt::derived_kinds(void) {
+  for (StmtKind k : kReturnStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ReturnStmt> ReturnStmt::from(const Stmt &parent) {
@@ -29408,6 +33557,15 @@ bool ObjCForCollectionStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCForCollectionStmtDerivedKinds[] = {
+    ObjCForCollectionStmt::static_kind(),};
+
+gap::generator<StmtKind> ObjCForCollectionStmt::derived_kinds(void) {
+  for (StmtKind k : kObjCForCollectionStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::OBJ_C_FOR_COLLECTION_STMT:
@@ -29493,6 +33651,15 @@ bool ObjCAutoreleasePoolStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCAutoreleasePoolStmtDerivedKinds[] = {
+    ObjCAutoreleasePoolStmt::static_kind(),};
+
+gap::generator<StmtKind> ObjCAutoreleasePoolStmt::derived_kinds(void) {
+  for (StmtKind k : kObjCAutoreleasePoolStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::OBJ_C_AUTORELEASE_POOL_STMT:
@@ -29562,6 +33729,15 @@ bool ObjCAtTryStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCAtTryStmtDerivedKinds[] = {
+    ObjCAtTryStmt::static_kind(),};
+
+gap::generator<StmtKind> ObjCAtTryStmt::derived_kinds(void) {
+  for (StmtKind k : kObjCAtTryStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const Stmt &parent) {
@@ -29663,6 +33839,15 @@ bool ObjCAtThrowStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCAtThrowStmtDerivedKinds[] = {
+    ObjCAtThrowStmt::static_kind(),};
+
+gap::generator<StmtKind> ObjCAtThrowStmt::derived_kinds(void) {
+  for (StmtKind k : kObjCAtThrowStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::OBJ_C_AT_THROW_STMT:
@@ -29732,6 +33917,15 @@ bool ObjCAtSynchronizedStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCAtSynchronizedStmtDerivedKinds[] = {
+    ObjCAtSynchronizedStmt::static_kind(),};
+
+gap::generator<StmtKind> ObjCAtSynchronizedStmt::derived_kinds(void) {
+  for (StmtKind k : kObjCAtSynchronizedStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const Stmt &parent) {
@@ -29810,6 +34004,15 @@ bool ObjCAtFinallyStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCAtFinallyStmtDerivedKinds[] = {
+    ObjCAtFinallyStmt::static_kind(),};
+
+gap::generator<StmtKind> ObjCAtFinallyStmt::derived_kinds(void) {
+  for (StmtKind k : kObjCAtFinallyStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::OBJ_C_AT_FINALLY_STMT:
@@ -29879,6 +34082,15 @@ bool ObjCAtCatchStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCAtCatchStmtDerivedKinds[] = {
+    ObjCAtCatchStmt::static_kind(),};
+
+gap::generator<StmtKind> ObjCAtCatchStmt::derived_kinds(void) {
+  for (StmtKind k : kObjCAtCatchStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const Stmt &parent) {
@@ -29963,6 +34175,15 @@ bool OMPExecutableDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPExecutableDirectiveDerivedKinds[] = {
+    OMPFlushDirective::static_kind(),    OMPInteropDirective::static_kind(),    OMPMaskedDirective::static_kind(),    OMPMasterDirective::static_kind(),    OMPMetaDirective::static_kind(),    OMPOrderedDirective::static_kind(),    OMPParallelDirective::static_kind(),    OMPParallelMaskedDirective::static_kind(),    OMPParallelMasterDirective::static_kind(),    OMPParallelSectionsDirective::static_kind(),    OMPScanDirective::static_kind(),    OMPSectionDirective::static_kind(),    OMPSectionsDirective::static_kind(),    OMPSingleDirective::static_kind(),    OMPTargetDataDirective::static_kind(),    OMPTargetDirective::static_kind(),    OMPTargetEnterDataDirective::static_kind(),    OMPTargetExitDataDirective::static_kind(),    OMPTargetParallelDirective::static_kind(),    OMPTargetTeamsDirective::static_kind(),    OMPTargetUpdateDirective::static_kind(),    OMPTaskDirective::static_kind(),    OMPTaskgroupDirective::static_kind(),    OMPTaskwaitDirective::static_kind(),    OMPTaskyieldDirective::static_kind(),    OMPTeamsDirective::static_kind(),    OMPAtomicDirective::static_kind(),    OMPBarrierDirective::static_kind(),    OMPCancelDirective::static_kind(),    OMPCancellationPointDirective::static_kind(),    OMPCriticalDirective::static_kind(),    OMPDepobjDirective::static_kind(),    OMPDispatchDirective::static_kind(),    OMPMaskedTaskLoopDirective::static_kind(),    OMPMaskedTaskLoopSimdDirective::static_kind(),    OMPMasterTaskLoopDirective::static_kind(),    OMPMasterTaskLoopSimdDirective::static_kind(),    OMPParallelForDirective::static_kind(),    OMPParallelForSimdDirective::static_kind(),    OMPParallelGenericLoopDirective::static_kind(),    OMPParallelMaskedTaskLoopDirective::static_kind(),    OMPParallelMaskedTaskLoopSimdDirective::static_kind(),    OMPParallelMasterTaskLoopDirective::static_kind(),    OMPParallelMasterTaskLoopSimdDirective::static_kind(),    OMPSimdDirective::static_kind(),    OMPTargetParallelForDirective::static_kind(),    OMPTargetParallelForSimdDirective::static_kind(),    OMPTargetParallelGenericLoopDirective::static_kind(),    OMPTargetSimdDirective::static_kind(),    OMPTargetTeamsDistributeDirective::static_kind(),    OMPTargetTeamsDistributeParallelForDirective::static_kind(),    OMPTargetTeamsDistributeParallelForSimdDirective::static_kind(),    OMPTargetTeamsDistributeSimdDirective::static_kind(),    OMPTargetTeamsGenericLoopDirective::static_kind(),    OMPTaskLoopDirective::static_kind(),    OMPTaskLoopSimdDirective::static_kind(),    OMPTeamsDistributeDirective::static_kind(),    OMPTeamsDistributeParallelForDirective::static_kind(),    OMPTeamsDistributeParallelForSimdDirective::static_kind(),    OMPTeamsDistributeSimdDirective::static_kind(),    OMPTeamsGenericLoopDirective::static_kind(),    OMPDistributeDirective::static_kind(),    OMPDistributeParallelForDirective::static_kind(),    OMPDistributeParallelForSimdDirective::static_kind(),    OMPDistributeSimdDirective::static_kind(),    OMPForDirective::static_kind(),    OMPForSimdDirective::static_kind(),    OMPGenericLoopDirective::static_kind(),    OMPTileDirective::static_kind(),    OMPUnrollDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPExecutableDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &parent) {
@@ -30124,6 +34345,15 @@ bool OMPDispatchDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPDispatchDirectiveDerivedKinds[] = {
+    OMPDispatchDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPDispatchDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPDispatchDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -30194,6 +34424,15 @@ bool OMPDepobjDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPDepobjDirectiveDerivedKinds[] = {
+    OMPDepobjDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPDepobjDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPDepobjDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPDepobjDirective> OMPDepobjDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -30258,6 +34497,15 @@ bool OMPCriticalDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPCriticalDirectiveDerivedKinds[] = {
+    OMPCriticalDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPCriticalDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPCriticalDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPCriticalDirective> OMPCriticalDirective::from(const OMPExecutableDirective &parent) {
@@ -30326,6 +34574,15 @@ bool OMPCancellationPointDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPCancellationPointDirectiveDerivedKinds[] = {
+    OMPCancellationPointDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPCancellationPointDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPCancellationPointDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -30390,6 +34647,15 @@ bool OMPCancelDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPCancelDirectiveDerivedKinds[] = {
+    OMPCancelDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPCancelDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPCancelDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPCancelDirective> OMPCancelDirective::from(const OMPExecutableDirective &parent) {
@@ -30458,6 +34724,15 @@ bool OMPBarrierDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPBarrierDirectiveDerivedKinds[] = {
+    OMPBarrierDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPBarrierDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPBarrierDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPBarrierDirective> OMPBarrierDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -30522,6 +34797,15 @@ bool OMPAtomicDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPAtomicDirectiveDerivedKinds[] = {
+    OMPAtomicDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPAtomicDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const OMPExecutableDirective &parent) {
@@ -30637,6 +34921,15 @@ bool OMPTeamsDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTeamsDirectiveDerivedKinds[] = {
+    OMPTeamsDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTeamsDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTeamsDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -30701,6 +34994,15 @@ bool OMPTaskyieldDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTaskyieldDirectiveDerivedKinds[] = {
+    OMPTaskyieldDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTaskyieldDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTaskyieldDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const OMPExecutableDirective &parent) {
@@ -30769,6 +35071,15 @@ bool OMPTaskwaitDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTaskwaitDirectiveDerivedKinds[] = {
+    OMPTaskwaitDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTaskwaitDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTaskwaitDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -30833,6 +35144,15 @@ bool OMPTaskgroupDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTaskgroupDirectiveDerivedKinds[] = {
+    OMPTaskgroupDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTaskgroupDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTaskgroupDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const OMPExecutableDirective &parent) {
@@ -30906,6 +35226,15 @@ bool OMPTaskDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTaskDirectiveDerivedKinds[] = {
+    OMPTaskDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTaskDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTaskDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTaskDirective> OMPTaskDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -30976,6 +35305,15 @@ bool OMPTargetUpdateDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTargetUpdateDirectiveDerivedKinds[] = {
+    OMPTargetUpdateDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetUpdateDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetUpdateDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetUpdateDirective> OMPTargetUpdateDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31042,6 +35380,15 @@ bool OMPTargetTeamsDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTargetTeamsDirectiveDerivedKinds[] = {
+    OMPTargetTeamsDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetTeamsDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetTeamsDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetTeamsDirective> OMPTargetTeamsDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31106,6 +35453,15 @@ bool OMPTargetParallelDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTargetParallelDirectiveDerivedKinds[] = {
+    OMPTargetParallelDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetParallelDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetParallelDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const OMPExecutableDirective &parent) {
@@ -31183,6 +35539,15 @@ bool OMPTargetExitDataDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTargetExitDataDirectiveDerivedKinds[] = {
+    OMPTargetExitDataDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetExitDataDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetExitDataDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetExitDataDirective> OMPTargetExitDataDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31247,6 +35612,15 @@ bool OMPTargetEnterDataDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTargetEnterDataDirectiveDerivedKinds[] = {
+    OMPTargetEnterDataDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetEnterDataDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetEnterDataDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const OMPExecutableDirective &parent) {
@@ -31315,6 +35689,15 @@ bool OMPTargetDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTargetDirectiveDerivedKinds[] = {
+    OMPTargetDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetDirective> OMPTargetDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31379,6 +35762,15 @@ bool OMPTargetDataDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTargetDataDirectiveDerivedKinds[] = {
+    OMPTargetDataDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetDataDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetDataDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTargetDataDirective> OMPTargetDataDirective::from(const OMPExecutableDirective &parent) {
@@ -31447,6 +35839,15 @@ bool OMPSingleDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPSingleDirectiveDerivedKinds[] = {
+    OMPSingleDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPSingleDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPSingleDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPSingleDirective> OMPSingleDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31511,6 +35912,15 @@ bool OMPSectionsDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPSectionsDirectiveDerivedKinds[] = {
+    OMPSectionsDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPSectionsDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPSectionsDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const OMPExecutableDirective &parent) {
@@ -31588,6 +35998,15 @@ bool OMPSectionDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPSectionDirectiveDerivedKinds[] = {
+    OMPSectionDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPSectionDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPSectionDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPSectionDirective> OMPSectionDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31658,6 +36077,15 @@ bool OMPScanDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPScanDirectiveDerivedKinds[] = {
+    OMPScanDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPScanDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPScanDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPScanDirective> OMPScanDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31722,6 +36150,15 @@ bool OMPParallelSectionsDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPParallelSectionsDirectiveDerivedKinds[] = {
+    OMPParallelSectionsDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelSectionsDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelSectionsDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const OMPExecutableDirective &parent) {
@@ -31799,6 +36236,15 @@ bool OMPParallelMasterDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPParallelMasterDirectiveDerivedKinds[] = {
+    OMPParallelMasterDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelMasterDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelMasterDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31870,6 +36316,15 @@ bool OMPParallelMaskedDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPParallelMaskedDirectiveDerivedKinds[] = {
+    OMPParallelMaskedDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelMaskedDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelMaskedDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPParallelMaskedDirective> OMPParallelMaskedDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -31939,6 +36394,15 @@ bool OMPParallelDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPParallelDirectiveDerivedKinds[] = {
+    OMPParallelDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPParallelDirective> OMPParallelDirective::from(const OMPExecutableDirective &parent) {
@@ -32016,6 +36480,15 @@ bool OMPOrderedDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPOrderedDirectiveDerivedKinds[] = {
+    OMPOrderedDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPOrderedDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPOrderedDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPOrderedDirective> OMPOrderedDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -32080,6 +36553,15 @@ bool OMPMetaDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPMetaDirectiveDerivedKinds[] = {
+    OMPMetaDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPMetaDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPMetaDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPMetaDirective> OMPMetaDirective::from(const OMPExecutableDirective &parent) {
@@ -32153,6 +36635,15 @@ bool OMPMasterDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPMasterDirectiveDerivedKinds[] = {
+    OMPMasterDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPMasterDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPMasterDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPMasterDirective> OMPMasterDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -32219,6 +36710,15 @@ bool OMPMaskedDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPMaskedDirectiveDerivedKinds[] = {
+    OMPMaskedDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPMaskedDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPMaskedDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPMaskedDirective> OMPMaskedDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -32283,6 +36783,15 @@ bool OMPLoopBasedDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPLoopBasedDirectiveDerivedKinds[] = {
+    OMPMaskedTaskLoopDirective::static_kind(),    OMPMaskedTaskLoopSimdDirective::static_kind(),    OMPMasterTaskLoopDirective::static_kind(),    OMPMasterTaskLoopSimdDirective::static_kind(),    OMPParallelForDirective::static_kind(),    OMPParallelForSimdDirective::static_kind(),    OMPParallelGenericLoopDirective::static_kind(),    OMPParallelMaskedTaskLoopDirective::static_kind(),    OMPParallelMaskedTaskLoopSimdDirective::static_kind(),    OMPParallelMasterTaskLoopDirective::static_kind(),    OMPParallelMasterTaskLoopSimdDirective::static_kind(),    OMPSimdDirective::static_kind(),    OMPTargetParallelForDirective::static_kind(),    OMPTargetParallelForSimdDirective::static_kind(),    OMPTargetParallelGenericLoopDirective::static_kind(),    OMPTargetSimdDirective::static_kind(),    OMPTargetTeamsDistributeDirective::static_kind(),    OMPTargetTeamsDistributeParallelForDirective::static_kind(),    OMPTargetTeamsDistributeParallelForSimdDirective::static_kind(),    OMPTargetTeamsDistributeSimdDirective::static_kind(),    OMPTargetTeamsGenericLoopDirective::static_kind(),    OMPTaskLoopDirective::static_kind(),    OMPTaskLoopSimdDirective::static_kind(),    OMPTeamsDistributeDirective::static_kind(),    OMPTeamsDistributeParallelForDirective::static_kind(),    OMPTeamsDistributeParallelForSimdDirective::static_kind(),    OMPTeamsDistributeSimdDirective::static_kind(),    OMPTeamsGenericLoopDirective::static_kind(),    OMPDistributeDirective::static_kind(),    OMPDistributeParallelForDirective::static_kind(),    OMPDistributeParallelForSimdDirective::static_kind(),    OMPDistributeSimdDirective::static_kind(),    OMPForDirective::static_kind(),    OMPForSimdDirective::static_kind(),    OMPGenericLoopDirective::static_kind(),    OMPTileDirective::static_kind(),    OMPUnrollDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPLoopBasedDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPLoopBasedDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const OMPExecutableDirective &parent) {
@@ -32387,6 +36896,15 @@ bool OMPLoopTransformationDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPLoopTransformationDirectiveDerivedKinds[] = {
+    OMPTileDirective::static_kind(),    OMPUnrollDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPLoopTransformationDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPLoopTransformationDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const OMPLoopBasedDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -32468,6 +36986,15 @@ bool OMPUnrollDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPUnrollDirectiveDerivedKinds[] = {
+    OMPUnrollDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPUnrollDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPUnrollDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPUnrollDirective> OMPUnrollDirective::from(const OMPLoopTransformationDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -32542,6 +37069,15 @@ bool OMPTileDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTileDirectiveDerivedKinds[] = {
+    OMPTileDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTileDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTileDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTileDirective> OMPTileDirective::from(const OMPLoopTransformationDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -32614,6 +37150,15 @@ bool OMPLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPLoopDirectiveDerivedKinds[] = {
+    OMPMaskedTaskLoopDirective::static_kind(),    OMPMaskedTaskLoopSimdDirective::static_kind(),    OMPMasterTaskLoopDirective::static_kind(),    OMPMasterTaskLoopSimdDirective::static_kind(),    OMPParallelForDirective::static_kind(),    OMPParallelForSimdDirective::static_kind(),    OMPParallelGenericLoopDirective::static_kind(),    OMPParallelMaskedTaskLoopDirective::static_kind(),    OMPParallelMaskedTaskLoopSimdDirective::static_kind(),    OMPParallelMasterTaskLoopDirective::static_kind(),    OMPParallelMasterTaskLoopSimdDirective::static_kind(),    OMPSimdDirective::static_kind(),    OMPTargetParallelForDirective::static_kind(),    OMPTargetParallelForSimdDirective::static_kind(),    OMPTargetParallelGenericLoopDirective::static_kind(),    OMPTargetSimdDirective::static_kind(),    OMPTargetTeamsDistributeDirective::static_kind(),    OMPTargetTeamsDistributeParallelForDirective::static_kind(),    OMPTargetTeamsDistributeParallelForSimdDirective::static_kind(),    OMPTargetTeamsDistributeSimdDirective::static_kind(),    OMPTargetTeamsGenericLoopDirective::static_kind(),    OMPTaskLoopDirective::static_kind(),    OMPTaskLoopSimdDirective::static_kind(),    OMPTeamsDistributeDirective::static_kind(),    OMPTeamsDistributeParallelForDirective::static_kind(),    OMPTeamsDistributeParallelForSimdDirective::static_kind(),    OMPTeamsDistributeSimdDirective::static_kind(),    OMPTeamsGenericLoopDirective::static_kind(),    OMPDistributeDirective::static_kind(),    OMPDistributeParallelForDirective::static_kind(),    OMPDistributeParallelForSimdDirective::static_kind(),    OMPDistributeSimdDirective::static_kind(),    OMPForDirective::static_kind(),    OMPForSimdDirective::static_kind(),    OMPGenericLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPLoopDirective> OMPLoopDirective::from(const OMPLoopBasedDirective &parent) {
@@ -33054,6 +37599,15 @@ bool OMPGenericLoopDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPGenericLoopDirectiveDerivedKinds[] = {
+    OMPGenericLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPGenericLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPGenericLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPGenericLoopDirective> OMPGenericLoopDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -33128,6 +37682,15 @@ bool OMPForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPForSimdDirectiveDerivedKinds[] = {
+    OMPForSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPForSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPForSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -33200,6 +37763,15 @@ bool OMPForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPForDirectiveDerivedKinds[] = {
+    OMPForDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPForDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPForDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPForDirective> OMPForDirective::from(const OMPLoopDirective &parent) {
@@ -33285,6 +37857,15 @@ bool OMPDistributeSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPDistributeSimdDirectiveDerivedKinds[] = {
+    OMPDistributeSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPDistributeSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPDistributeSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -33359,6 +37940,15 @@ bool OMPDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPDistributeParallelForSimdDirectiveDerivedKinds[] = {
+    OMPDistributeParallelForSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPDistributeParallelForSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPDistributeParallelForSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -33431,6 +38021,15 @@ bool OMPDistributeParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPDistributeParallelForDirectiveDerivedKinds[] = {
+    OMPDistributeParallelForDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPDistributeParallelForDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPDistributeParallelForDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::from(const OMPLoopDirective &parent) {
@@ -33516,6 +38115,15 @@ bool OMPDistributeDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPDistributeDirectiveDerivedKinds[] = {
+    OMPDistributeDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPDistributeDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPDistributeDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -33588,6 +38196,15 @@ bool OMPTeamsGenericLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTeamsGenericLoopDirectiveDerivedKinds[] = {
+    OMPTeamsGenericLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTeamsGenericLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTeamsGenericLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::from(const OMPLoopDirective &parent) {
@@ -33664,6 +38281,15 @@ bool OMPTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTeamsDistributeSimdDirectiveDerivedKinds[] = {
+    OMPTeamsDistributeSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTeamsDistributeSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTeamsDistributeSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -33738,6 +38364,15 @@ bool OMPTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTeamsDistributeParallelForSimdDirectiveDerivedKinds[] = {
+    OMPTeamsDistributeParallelForSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTeamsDistributeParallelForSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTeamsDistributeParallelForSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -33810,6 +38445,15 @@ bool OMPTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTeamsDistributeParallelForDirectiveDerivedKinds[] = {
+    OMPTeamsDistributeParallelForDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTeamsDistributeParallelForDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTeamsDistributeParallelForDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::from(const OMPLoopDirective &parent) {
@@ -33895,6 +38539,15 @@ bool OMPTeamsDistributeDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTeamsDistributeDirectiveDerivedKinds[] = {
+    OMPTeamsDistributeDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTeamsDistributeDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTeamsDistributeDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -33969,6 +38622,15 @@ bool OMPTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTaskLoopSimdDirectiveDerivedKinds[] = {
+    OMPTaskLoopSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTaskLoopSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTaskLoopSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -34041,6 +38703,15 @@ bool OMPTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTaskLoopDirectiveDerivedKinds[] = {
+    OMPTaskLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTaskLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTaskLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const OMPLoopDirective &parent) {
@@ -34121,6 +38792,15 @@ bool OMPTargetTeamsGenericLoopDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTargetTeamsGenericLoopDirectiveDerivedKinds[] = {
+    OMPTargetTeamsGenericLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetTeamsGenericLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetTeamsGenericLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -34193,6 +38873,15 @@ bool OMPTargetTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTargetTeamsDistributeSimdDirectiveDerivedKinds[] = {
+    OMPTargetTeamsDistributeSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetTeamsDistributeSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetTeamsDistributeSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::from(const OMPLoopDirective &parent) {
@@ -34269,6 +38958,15 @@ bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt
   return false;
 }
 
+static const StmtKind kOMPTargetTeamsDistributeParallelForSimdDirectiveDerivedKinds[] = {
+    OMPTargetTeamsDistributeParallelForSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetTeamsDistributeParallelForSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetTeamsDistributeParallelForSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -34341,6 +39039,15 @@ bool OMPTargetTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTargetTeamsDistributeParallelForDirectiveDerivedKinds[] = {
+    OMPTargetTeamsDistributeParallelForDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetTeamsDistributeParallelForDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetTeamsDistributeParallelForDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::from(const OMPLoopDirective &parent) {
@@ -34426,6 +39133,15 @@ bool OMPTargetTeamsDistributeDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTargetTeamsDistributeDirectiveDerivedKinds[] = {
+    OMPTargetTeamsDistributeDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetTeamsDistributeDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetTeamsDistributeDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -34498,6 +39214,15 @@ bool OMPTargetSimdDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTargetSimdDirectiveDerivedKinds[] = {
+    OMPTargetSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTargetSimdDirective> OMPTargetSimdDirective::from(const OMPLoopDirective &parent) {
@@ -34574,6 +39299,15 @@ bool OMPTargetParallelGenericLoopDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTargetParallelGenericLoopDirectiveDerivedKinds[] = {
+    OMPTargetParallelGenericLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetParallelGenericLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetParallelGenericLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLoopDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -34648,6 +39382,15 @@ bool OMPTargetParallelForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPTargetParallelForSimdDirectiveDerivedKinds[] = {
+    OMPTargetParallelForSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetParallelForSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetParallelForSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -34720,6 +39463,15 @@ bool OMPTargetParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPTargetParallelForDirectiveDerivedKinds[] = {
+    OMPTargetParallelForDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPTargetParallelForDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPTargetParallelForDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from(const OMPLoopDirective &parent) {
@@ -34805,6 +39557,15 @@ bool OMPSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPSimdDirectiveDerivedKinds[] = {
+    OMPSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPSimdDirective> OMPSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -34879,6 +39640,15 @@ bool OMPParallelMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPParallelMasterTaskLoopSimdDirectiveDerivedKinds[] = {
+    OMPParallelMasterTaskLoopSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelMasterTaskLoopSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelMasterTaskLoopSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -34951,6 +39721,15 @@ bool OMPParallelMasterTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPParallelMasterTaskLoopDirectiveDerivedKinds[] = {
+    OMPParallelMasterTaskLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelMasterTaskLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelMasterTaskLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::from(const OMPLoopDirective &parent) {
@@ -35031,6 +39810,15 @@ bool OMPParallelMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPParallelMaskedTaskLoopSimdDirectiveDerivedKinds[] = {
+    OMPParallelMaskedTaskLoopSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelMaskedTaskLoopSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelMaskedTaskLoopSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -35103,6 +39891,15 @@ bool OMPParallelMaskedTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPParallelMaskedTaskLoopDirectiveDerivedKinds[] = {
+    OMPParallelMaskedTaskLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelMaskedTaskLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelMaskedTaskLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPParallelMaskedTaskLoopDirective> OMPParallelMaskedTaskLoopDirective::from(const OMPLoopDirective &parent) {
@@ -35183,6 +39980,15 @@ bool OMPParallelGenericLoopDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPParallelGenericLoopDirectiveDerivedKinds[] = {
+    OMPParallelGenericLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelGenericLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelGenericLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -35257,6 +40063,15 @@ bool OMPParallelForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPParallelForSimdDirectiveDerivedKinds[] = {
+    OMPParallelForSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelForSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelForSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPParallelForSimdDirective> OMPParallelForSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -35329,6 +40144,15 @@ bool OMPParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPParallelForDirectiveDerivedKinds[] = {
+    OMPParallelForDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPParallelForDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPParallelForDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const OMPLoopDirective &parent) {
@@ -35414,6 +40238,15 @@ bool OMPMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPMasterTaskLoopSimdDirectiveDerivedKinds[] = {
+    OMPMasterTaskLoopSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPMasterTaskLoopSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPMasterTaskLoopSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -35486,6 +40319,15 @@ bool OMPMasterTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPMasterTaskLoopDirectiveDerivedKinds[] = {
+    OMPMasterTaskLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPMasterTaskLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPMasterTaskLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const OMPLoopDirective &parent) {
@@ -35566,6 +40408,15 @@ bool OMPMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPMaskedTaskLoopSimdDirectiveDerivedKinds[] = {
+    OMPMaskedTaskLoopSimdDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPMaskedTaskLoopSimdDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPMaskedTaskLoopSimdDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPMaskedTaskLoopSimdDirective> OMPMaskedTaskLoopSimdDirective::from(const OMPLoopDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -35638,6 +40489,15 @@ bool OMPMaskedTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPMaskedTaskLoopDirectiveDerivedKinds[] = {
+    OMPMaskedTaskLoopDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPMaskedTaskLoopDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPMaskedTaskLoopDirectiveDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::from(const OMPLoopDirective &parent) {
@@ -35718,6 +40578,15 @@ bool OMPInteropDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPInteropDirectiveDerivedKinds[] = {
+    OMPInteropDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPInteropDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPInteropDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPInteropDirective> OMPInteropDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -35784,6 +40653,15 @@ bool OMPFlushDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPFlushDirectiveDerivedKinds[] = {
+    OMPFlushDirective::static_kind(),};
+
+gap::generator<StmtKind> OMPFlushDirective::derived_kinds(void) {
+  for (StmtKind k : kOMPFlushDirectiveDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPFlushDirective> OMPFlushDirective::from(const OMPExecutableDirective &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -35848,6 +40726,15 @@ bool OMPCanonicalLoop::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPCanonicalLoopDerivedKinds[] = {
+    OMPCanonicalLoop::static_kind(),};
+
+gap::generator<StmtKind> OMPCanonicalLoop::derived_kinds(void) {
+  for (StmtKind k : kOMPCanonicalLoopDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const Stmt &parent) {
@@ -35932,6 +40819,15 @@ bool NullStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kNullStmtDerivedKinds[] = {
+    NullStmt::static_kind(),};
+
+gap::generator<StmtKind> NullStmt::derived_kinds(void) {
+  for (StmtKind k : kNullStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NullStmt> NullStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::NULL_STMT:
@@ -36000,6 +40896,15 @@ bool MSDependentExistsStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kMSDependentExistsStmtDerivedKinds[] = {
+    MSDependentExistsStmt::static_kind(),};
+
+gap::generator<StmtKind> MSDependentExistsStmt::derived_kinds(void) {
+  for (StmtKind k : kMSDependentExistsStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const Stmt &parent) {
@@ -36079,6 +40984,15 @@ bool IndirectGotoStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kIndirectGotoStmtDerivedKinds[] = {
+    IndirectGotoStmt::static_kind(),};
+
+gap::generator<StmtKind> IndirectGotoStmt::derived_kinds(void) {
+  for (StmtKind k : kIndirectGotoStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Stmt &parent) {
@@ -36167,6 +41081,15 @@ bool IfStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kIfStmtDerivedKinds[] = {
+    IfStmt::static_kind(),};
+
+gap::generator<StmtKind> IfStmt::derived_kinds(void) {
+  for (StmtKind k : kIfStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<IfStmt> IfStmt::from(const Stmt &parent) {
@@ -36345,6 +41268,15 @@ bool GotoStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kGotoStmtDerivedKinds[] = {
+    GotoStmt::static_kind(),};
+
+gap::generator<StmtKind> GotoStmt::derived_kinds(void) {
+  for (StmtKind k : kGotoStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<GotoStmt> GotoStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::GOTO_STMT:
@@ -36418,6 +41350,15 @@ bool ForStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kForStmtDerivedKinds[] = {
+    ForStmt::static_kind(),};
+
+gap::generator<StmtKind> ForStmt::derived_kinds(void) {
+  for (StmtKind k : kForStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ForStmt> ForStmt::from(const Stmt &parent) {
@@ -36564,6 +41505,15 @@ bool DoStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kDoStmtDerivedKinds[] = {
+    DoStmt::static_kind(),};
+
+gap::generator<StmtKind> DoStmt::derived_kinds(void) {
+  for (StmtKind k : kDoStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DoStmt> DoStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::DO_STMT:
@@ -36646,6 +41596,15 @@ bool DeclStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kDeclStmtDerivedKinds[] = {
+    DeclStmt::static_kind(),};
+
+gap::generator<StmtKind> DeclStmt::derived_kinds(void) {
+  for (StmtKind k : kDeclStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DeclStmt> DeclStmt::from(const Stmt &parent) {
@@ -36746,6 +41705,15 @@ bool CoroutineBodyStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCoroutineBodyStmtDerivedKinds[] = {
+    CoroutineBodyStmt::static_kind(),};
+
+gap::generator<StmtKind> CoroutineBodyStmt::derived_kinds(void) {
+  for (StmtKind k : kCoroutineBodyStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const Stmt &parent) {
@@ -36900,6 +41868,15 @@ bool CoreturnStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCoreturnStmtDerivedKinds[] = {
+    CoreturnStmt::static_kind(),};
+
+gap::generator<StmtKind> CoreturnStmt::derived_kinds(void) {
+  for (StmtKind k : kCoreturnStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CoreturnStmt> CoreturnStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::CORETURN_STMT:
@@ -36980,6 +41957,15 @@ bool ContinueStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kContinueStmtDerivedKinds[] = {
+    ContinueStmt::static_kind(),};
+
+gap::generator<StmtKind> ContinueStmt::derived_kinds(void) {
+  for (StmtKind k : kContinueStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ContinueStmt> ContinueStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::CONTINUE_STMT:
@@ -37044,6 +42030,15 @@ bool CompoundStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCompoundStmtDerivedKinds[] = {
+    CompoundStmt::static_kind(),};
+
+gap::generator<StmtKind> CompoundStmt::derived_kinds(void) {
+  for (StmtKind k : kCompoundStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CompoundStmt> CompoundStmt::from(const Stmt &parent) {
@@ -37133,6 +42128,15 @@ bool CapturedStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCapturedStmtDerivedKinds[] = {
+    CapturedStmt::static_kind(),};
+
+gap::generator<StmtKind> CapturedStmt::derived_kinds(void) {
+  for (StmtKind k : kCapturedStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CapturedStmt> CapturedStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::CAPTURED_STMT:
@@ -37212,6 +42216,15 @@ bool CXXTryStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXTryStmtDerivedKinds[] = {
+    CXXTryStmt::static_kind(),};
+
+gap::generator<StmtKind> CXXTryStmt::derived_kinds(void) {
+  for (StmtKind k : kCXXTryStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXTryStmt> CXXTryStmt::from(const Stmt &parent) {
@@ -37306,6 +42319,15 @@ bool CXXForRangeStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXForRangeStmtDerivedKinds[] = {
+    CXXForRangeStmt::static_kind(),};
+
+gap::generator<StmtKind> CXXForRangeStmt::derived_kinds(void) {
+  for (StmtKind k : kCXXForRangeStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const Stmt &parent) {
@@ -37444,6 +42466,15 @@ bool CXXCatchStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXCatchStmtDerivedKinds[] = {
+    CXXCatchStmt::static_kind(),};
+
+gap::generator<StmtKind> CXXCatchStmt::derived_kinds(void) {
+  for (StmtKind k : kCXXCatchStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXCatchStmt> CXXCatchStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::CXX_CATCH_STMT:
@@ -37533,6 +42564,15 @@ bool BreakStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kBreakStmtDerivedKinds[] = {
+    BreakStmt::static_kind(),};
+
+gap::generator<StmtKind> BreakStmt::derived_kinds(void) {
+  for (StmtKind k : kBreakStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<BreakStmt> BreakStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::BREAK_STMT:
@@ -37597,6 +42637,15 @@ bool AsmStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kAsmStmtDerivedKinds[] = {
+    GCCAsmStmt::static_kind(),    MSAsmStmt::static_kind(),};
+
+gap::generator<StmtKind> AsmStmt::derived_kinds(void) {
+  for (StmtKind k : kAsmStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AsmStmt> AsmStmt::from(const Stmt &parent) {
@@ -37825,6 +42874,15 @@ bool MSAsmStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kMSAsmStmtDerivedKinds[] = {
+    MSAsmStmt::static_kind(),};
+
+gap::generator<StmtKind> MSAsmStmt::derived_kinds(void) {
+  for (StmtKind k : kMSAsmStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MSAsmStmt> MSAsmStmt::from(const AsmStmt &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -37943,6 +43001,15 @@ bool GCCAsmStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kGCCAsmStmtDerivedKinds[] = {
+    GCCAsmStmt::static_kind(),};
+
+gap::generator<StmtKind> GCCAsmStmt::derived_kinds(void) {
+  for (StmtKind k : kGCCAsmStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<GCCAsmStmt> GCCAsmStmt::from(const AsmStmt &parent) {
@@ -38193,6 +43260,15 @@ bool WhileStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kWhileStmtDerivedKinds[] = {
+    WhileStmt::static_kind(),};
+
+gap::generator<StmtKind> WhileStmt::derived_kinds(void) {
+  for (StmtKind k : kWhileStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<WhileStmt> WhileStmt::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::WHILE_STMT:
@@ -38305,6 +43381,15 @@ bool ValueStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kValueStmtDerivedKinds[] = {
+    AttributedStmt::static_kind(),    LabelStmt::static_kind(),    ExpressionTraitExpr::static_kind(),    ExtVectorElementExpr::static_kind(),    FixedPointLiteral::static_kind(),    FloatingLiteral::static_kind(),    FunctionParmPackExpr::static_kind(),    GNUNullExpr::static_kind(),    GenericSelectionExpr::static_kind(),    ImaginaryLiteral::static_kind(),    ImplicitValueInitExpr::static_kind(),    InitListExpr::static_kind(),    IntegerLiteral::static_kind(),    LambdaExpr::static_kind(),    MSPropertyRefExpr::static_kind(),    MSPropertySubscriptExpr::static_kind(),    MaterializeTemporaryExpr::static_kind(),    MatrixSubscriptExpr::static_kind(),    MemberExpr::static_kind(),    NoInitExpr::static_kind(),    OMPArraySectionExpr::static_kind(),    OMPArrayShapingExpr::static_kind(),    OMPIteratorExpr::static_kind(),    ObjCArrayLiteral::static_kind(),    ObjCAvailabilityCheckExpr::static_kind(),    ObjCBoolLiteralExpr::static_kind(),    ObjCBoxedExpr::static_kind(),    ObjCDictionaryLiteral::static_kind(),    ObjCEncodeExpr::static_kind(),    ObjCIndirectCopyRestoreExpr::static_kind(),    ObjCIsaExpr::static_kind(),    ObjCIvarRefExpr::static_kind(),    ObjCMessageExpr::static_kind(),    ObjCPropertyRefExpr::static_kind(),    ObjCProtocolExpr::static_kind(),    ObjCSelectorExpr::static_kind(),    ObjCStringLiteral::static_kind(),    ObjCSubscriptRefExpr::static_kind(),    OffsetOfExpr::static_kind(),    OpaqueValueExpr::static_kind(),    PackExpansionExpr::static_kind(),    ParenExpr::static_kind(),    ParenListExpr::static_kind(),    PredefinedExpr::static_kind(),    PseudoObjectExpr::static_kind(),    RecoveryExpr::static_kind(),    RequiresExpr::static_kind(),    SYCLUniqueStableNameExpr::static_kind(),    ShuffleVectorExpr::static_kind(),    SizeOfPackExpr::static_kind(),    SourceLocExpr::static_kind(),    StmtExpr::static_kind(),    StringLiteral::static_kind(),    SubstNonTypeTemplateParmExpr::static_kind(),    SubstNonTypeTemplateParmPackExpr::static_kind(),    TypeTraitExpr::static_kind(),    TypoExpr::static_kind(),    UnaryExprOrTypeTraitExpr::static_kind(),    UnaryOperator::static_kind(),    VAArgExpr::static_kind(),    AddrLabelExpr::static_kind(),    ArrayInitIndexExpr::static_kind(),    ArrayInitLoopExpr::static_kind(),    ArraySubscriptExpr::static_kind(),    ArrayTypeTraitExpr::static_kind(),    AsTypeExpr::static_kind(),    AtomicExpr::static_kind(),    BinaryOperator::static_kind(),    BlockExpr::static_kind(),    CXXBindTemporaryExpr::static_kind(),    CXXBoolLiteralExpr::static_kind(),    CXXConstructExpr::static_kind(),    CXXDefaultArgExpr::static_kind(),    CXXDefaultInitExpr::static_kind(),    CXXDeleteExpr::static_kind(),    CXXDependentScopeMemberExpr::static_kind(),    CXXFoldExpr::static_kind(),    CXXInheritedCtorInitExpr::static_kind(),    CXXNewExpr::static_kind(),    CXXNoexceptExpr::static_kind(),    CXXNullPtrLiteralExpr::static_kind(),    CXXPseudoDestructorExpr::static_kind(),    CXXRewrittenBinaryOperator::static_kind(),    CXXScalarValueInitExpr::static_kind(),    CXXStdInitializerListExpr::static_kind(),    CXXThisExpr::static_kind(),    CXXThrowExpr::static_kind(),    CXXTypeidExpr::static_kind(),    CXXUnresolvedConstructExpr::static_kind(),    CXXUuidofExpr::static_kind(),    CallExpr::static_kind(),    CharacterLiteral::static_kind(),    ChooseExpr::static_kind(),    CompoundLiteralExpr::static_kind(),    ConceptSpecializationExpr::static_kind(),    ConvertVectorExpr::static_kind(),    DeclRefExpr::static_kind(),    DependentCoawaitExpr::static_kind(),    DependentScopeDeclRefExpr::static_kind(),    DesignatedInitExpr::static_kind(),    DesignatedInitUpdateExpr::static_kind(),    ConstantExpr::static_kind(),    ExprWithCleanups::static_kind(),    UnresolvedLookupExpr::static_kind(),    UnresolvedMemberExpr::static_kind(),    BinaryConditionalOperator::static_kind(),    ConditionalOperator::static_kind(),    CompoundAssignOperator::static_kind(),    CXXTemporaryObjectExpr::static_kind(),    UserDefinedLiteral::static_kind(),    CUDAKernelCallExpr::static_kind(),    CXXMemberCallExpr::static_kind(),    CXXOperatorCallExpr::static_kind(),    ImplicitCastExpr::static_kind(),    CoyieldExpr::static_kind(),    CoawaitExpr::static_kind(),    ObjCBridgedCastExpr::static_kind(),    BuiltinBitCastExpr::static_kind(),    CStyleCastExpr::static_kind(),    CXXFunctionalCastExpr::static_kind(),    CXXReinterpretCastExpr::static_kind(),    CXXStaticCastExpr::static_kind(),    CXXAddrspaceCastExpr::static_kind(),    CXXConstCastExpr::static_kind(),    CXXDynamicCastExpr::static_kind(),};
+
+gap::generator<StmtKind> ValueStmt::derived_kinds(void) {
+  for (StmtKind k : kValueStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ValueStmt> ValueStmt::from(const Stmt &parent) {
@@ -38506,6 +43591,15 @@ bool LabelStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kLabelStmtDerivedKinds[] = {
+    LabelStmt::static_kind(),};
+
+gap::generator<StmtKind> LabelStmt::derived_kinds(void) {
+  for (StmtKind k : kLabelStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<LabelStmt> LabelStmt::from(const ValueStmt &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -38593,6 +43687,15 @@ bool Expr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kExprDerivedKinds[] = {
+    ExpressionTraitExpr::static_kind(),    ExtVectorElementExpr::static_kind(),    FixedPointLiteral::static_kind(),    FloatingLiteral::static_kind(),    FunctionParmPackExpr::static_kind(),    GNUNullExpr::static_kind(),    GenericSelectionExpr::static_kind(),    ImaginaryLiteral::static_kind(),    ImplicitValueInitExpr::static_kind(),    InitListExpr::static_kind(),    IntegerLiteral::static_kind(),    LambdaExpr::static_kind(),    MSPropertyRefExpr::static_kind(),    MSPropertySubscriptExpr::static_kind(),    MaterializeTemporaryExpr::static_kind(),    MatrixSubscriptExpr::static_kind(),    MemberExpr::static_kind(),    NoInitExpr::static_kind(),    OMPArraySectionExpr::static_kind(),    OMPArrayShapingExpr::static_kind(),    OMPIteratorExpr::static_kind(),    ObjCArrayLiteral::static_kind(),    ObjCAvailabilityCheckExpr::static_kind(),    ObjCBoolLiteralExpr::static_kind(),    ObjCBoxedExpr::static_kind(),    ObjCDictionaryLiteral::static_kind(),    ObjCEncodeExpr::static_kind(),    ObjCIndirectCopyRestoreExpr::static_kind(),    ObjCIsaExpr::static_kind(),    ObjCIvarRefExpr::static_kind(),    ObjCMessageExpr::static_kind(),    ObjCPropertyRefExpr::static_kind(),    ObjCProtocolExpr::static_kind(),    ObjCSelectorExpr::static_kind(),    ObjCStringLiteral::static_kind(),    ObjCSubscriptRefExpr::static_kind(),    OffsetOfExpr::static_kind(),    OpaqueValueExpr::static_kind(),    PackExpansionExpr::static_kind(),    ParenExpr::static_kind(),    ParenListExpr::static_kind(),    PredefinedExpr::static_kind(),    PseudoObjectExpr::static_kind(),    RecoveryExpr::static_kind(),    RequiresExpr::static_kind(),    SYCLUniqueStableNameExpr::static_kind(),    ShuffleVectorExpr::static_kind(),    SizeOfPackExpr::static_kind(),    SourceLocExpr::static_kind(),    StmtExpr::static_kind(),    StringLiteral::static_kind(),    SubstNonTypeTemplateParmExpr::static_kind(),    SubstNonTypeTemplateParmPackExpr::static_kind(),    TypeTraitExpr::static_kind(),    TypoExpr::static_kind(),    UnaryExprOrTypeTraitExpr::static_kind(),    UnaryOperator::static_kind(),    VAArgExpr::static_kind(),    AddrLabelExpr::static_kind(),    ArrayInitIndexExpr::static_kind(),    ArrayInitLoopExpr::static_kind(),    ArraySubscriptExpr::static_kind(),    ArrayTypeTraitExpr::static_kind(),    AsTypeExpr::static_kind(),    AtomicExpr::static_kind(),    BinaryOperator::static_kind(),    BlockExpr::static_kind(),    CXXBindTemporaryExpr::static_kind(),    CXXBoolLiteralExpr::static_kind(),    CXXConstructExpr::static_kind(),    CXXDefaultArgExpr::static_kind(),    CXXDefaultInitExpr::static_kind(),    CXXDeleteExpr::static_kind(),    CXXDependentScopeMemberExpr::static_kind(),    CXXFoldExpr::static_kind(),    CXXInheritedCtorInitExpr::static_kind(),    CXXNewExpr::static_kind(),    CXXNoexceptExpr::static_kind(),    CXXNullPtrLiteralExpr::static_kind(),    CXXPseudoDestructorExpr::static_kind(),    CXXRewrittenBinaryOperator::static_kind(),    CXXScalarValueInitExpr::static_kind(),    CXXStdInitializerListExpr::static_kind(),    CXXThisExpr::static_kind(),    CXXThrowExpr::static_kind(),    CXXTypeidExpr::static_kind(),    CXXUnresolvedConstructExpr::static_kind(),    CXXUuidofExpr::static_kind(),    CallExpr::static_kind(),    CharacterLiteral::static_kind(),    ChooseExpr::static_kind(),    CompoundLiteralExpr::static_kind(),    ConceptSpecializationExpr::static_kind(),    ConvertVectorExpr::static_kind(),    DeclRefExpr::static_kind(),    DependentCoawaitExpr::static_kind(),    DependentScopeDeclRefExpr::static_kind(),    DesignatedInitExpr::static_kind(),    DesignatedInitUpdateExpr::static_kind(),    ConstantExpr::static_kind(),    ExprWithCleanups::static_kind(),    UnresolvedLookupExpr::static_kind(),    UnresolvedMemberExpr::static_kind(),    BinaryConditionalOperator::static_kind(),    ConditionalOperator::static_kind(),    CompoundAssignOperator::static_kind(),    CXXTemporaryObjectExpr::static_kind(),    UserDefinedLiteral::static_kind(),    CUDAKernelCallExpr::static_kind(),    CXXMemberCallExpr::static_kind(),    CXXOperatorCallExpr::static_kind(),    ImplicitCastExpr::static_kind(),    CoyieldExpr::static_kind(),    CoawaitExpr::static_kind(),    ObjCBridgedCastExpr::static_kind(),    BuiltinBitCastExpr::static_kind(),    CStyleCastExpr::static_kind(),    CXXFunctionalCastExpr::static_kind(),    CXXReinterpretCastExpr::static_kind(),    CXXStaticCastExpr::static_kind(),    CXXAddrspaceCastExpr::static_kind(),    CXXConstCastExpr::static_kind(),    CXXDynamicCastExpr::static_kind(),};
+
+gap::generator<StmtKind> Expr::derived_kinds(void) {
+  for (StmtKind k : kExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<Expr> Expr::from(const ValueStmt &parent) {
@@ -39018,6 +44121,15 @@ bool DesignatedInitUpdateExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kDesignatedInitUpdateExprDerivedKinds[] = {
+    DesignatedInitUpdateExpr::static_kind(),};
+
+gap::generator<StmtKind> DesignatedInitUpdateExpr::derived_kinds(void) {
+  for (StmtKind k : kDesignatedInitUpdateExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -39096,6 +44208,15 @@ bool DesignatedInitExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kDesignatedInitExprDerivedKinds[] = {
+    DesignatedInitExpr::static_kind(),};
+
+gap::generator<StmtKind> DesignatedInitExpr::derived_kinds(void) {
+  for (StmtKind k : kDesignatedInitExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Expr &parent) {
@@ -39234,6 +44355,15 @@ bool DependentScopeDeclRefExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kDependentScopeDeclRefExprDerivedKinds[] = {
+    DependentScopeDeclRefExpr::static_kind(),};
+
+gap::generator<StmtKind> DependentScopeDeclRefExpr::derived_kinds(void) {
+  for (StmtKind k : kDependentScopeDeclRefExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -39324,6 +44454,15 @@ bool DependentCoawaitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kDependentCoawaitExprDerivedKinds[] = {
+    DependentCoawaitExpr::static_kind(),};
+
+gap::generator<StmtKind> DependentCoawaitExpr::derived_kinds(void) {
+  for (StmtKind k : kDependentCoawaitExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -39406,6 +44545,15 @@ bool DeclRefExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kDeclRefExprDerivedKinds[] = {
+    DeclRefExpr::static_kind(),};
+
+gap::generator<StmtKind> DeclRefExpr::derived_kinds(void) {
+  for (StmtKind k : kDeclRefExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DeclRefExpr> DeclRefExpr::from(const Expr &parent) {
@@ -39528,6 +44676,15 @@ bool CoroutineSuspendExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCoroutineSuspendExprDerivedKinds[] = {
+    CoyieldExpr::static_kind(),    CoawaitExpr::static_kind(),};
+
+gap::generator<StmtKind> CoroutineSuspendExpr::derived_kinds(void) {
+  for (StmtKind k : kCoroutineSuspendExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -39633,6 +44790,15 @@ bool CoawaitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCoawaitExprDerivedKinds[] = {
+    CoawaitExpr::static_kind(),};
+
+gap::generator<StmtKind> CoawaitExpr::derived_kinds(void) {
+  for (StmtKind k : kCoawaitExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CoawaitExpr> CoawaitExpr::from(const CoroutineSuspendExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -39711,6 +44877,15 @@ bool CoyieldExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCoyieldExprDerivedKinds[] = {
+    CoyieldExpr::static_kind(),};
+
+gap::generator<StmtKind> CoyieldExpr::derived_kinds(void) {
+  for (StmtKind k : kCoyieldExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CoyieldExpr> CoyieldExpr::from(const CoroutineSuspendExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -39783,6 +44958,15 @@ bool ConvertVectorExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kConvertVectorExprDerivedKinds[] = {
+    ConvertVectorExpr::static_kind(),};
+
+gap::generator<StmtKind> ConvertVectorExpr::derived_kinds(void) {
+  for (StmtKind k : kConvertVectorExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const Expr &parent) {
@@ -39866,6 +45050,15 @@ bool ConceptSpecializationExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kConceptSpecializationExprDerivedKinds[] = {
+    ConceptSpecializationExpr::static_kind(),};
+
+gap::generator<StmtKind> ConceptSpecializationExpr::derived_kinds(void) {
+  for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const Expr &parent) {
@@ -39963,6 +45156,15 @@ bool CompoundLiteralExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCompoundLiteralExprDerivedKinds[] = {
+    CompoundLiteralExpr::static_kind(),};
+
+gap::generator<StmtKind> CompoundLiteralExpr::derived_kinds(void) {
+  for (StmtKind k : kCompoundLiteralExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -40044,6 +45246,15 @@ bool ChooseExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kChooseExprDerivedKinds[] = {
+    ChooseExpr::static_kind(),};
+
+gap::generator<StmtKind> ChooseExpr::derived_kinds(void) {
+  for (StmtKind k : kChooseExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ChooseExpr> ChooseExpr::from(const Expr &parent) {
@@ -40152,6 +45363,15 @@ bool CharacterLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCharacterLiteralDerivedKinds[] = {
+    CharacterLiteral::static_kind(),};
+
+gap::generator<StmtKind> CharacterLiteral::derived_kinds(void) {
+  for (StmtKind k : kCharacterLiteralDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CharacterLiteral> CharacterLiteral::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -40228,6 +45448,15 @@ bool CastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCastExprDerivedKinds[] = {
+    ImplicitCastExpr::static_kind(),    ObjCBridgedCastExpr::static_kind(),    BuiltinBitCastExpr::static_kind(),    CStyleCastExpr::static_kind(),    CXXFunctionalCastExpr::static_kind(),    CXXReinterpretCastExpr::static_kind(),    CXXStaticCastExpr::static_kind(),    CXXAddrspaceCastExpr::static_kind(),    CXXConstCastExpr::static_kind(),    CXXDynamicCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CastExpr::derived_kinds(void) {
+  for (StmtKind k : kCastExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CastExpr> CastExpr::from(const Expr &parent) {
@@ -40358,6 +45587,15 @@ bool ImplicitCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kImplicitCastExprDerivedKinds[] = {
+    ImplicitCastExpr::static_kind(),};
+
+gap::generator<StmtKind> ImplicitCastExpr::derived_kinds(void) {
+  for (StmtKind k : kImplicitCastExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const CastExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -40434,6 +45672,15 @@ bool ExplicitCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kExplicitCastExprDerivedKinds[] = {
+    ObjCBridgedCastExpr::static_kind(),    BuiltinBitCastExpr::static_kind(),    CStyleCastExpr::static_kind(),    CXXFunctionalCastExpr::static_kind(),    CXXReinterpretCastExpr::static_kind(),    CXXStaticCastExpr::static_kind(),    CXXAddrspaceCastExpr::static_kind(),    CXXConstCastExpr::static_kind(),    CXXDynamicCastExpr::static_kind(),};
+
+gap::generator<StmtKind> ExplicitCastExpr::derived_kinds(void) {
+  for (StmtKind k : kExplicitCastExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const CastExpr &parent) {
@@ -40521,6 +45768,15 @@ bool CXXNamedCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXNamedCastExprDerivedKinds[] = {
+    CXXReinterpretCastExpr::static_kind(),    CXXStaticCastExpr::static_kind(),    CXXAddrspaceCastExpr::static_kind(),    CXXConstCastExpr::static_kind(),    CXXDynamicCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXNamedCastExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXNamedCastExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const ExplicitCastExpr &parent) {
@@ -40623,6 +45879,15 @@ bool CXXDynamicCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXDynamicCastExprDerivedKinds[] = {
+    CXXDynamicCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXDynamicCastExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXDynamicCastExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const CXXNamedCastExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -40709,6 +45974,15 @@ bool CXXConstCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXConstCastExprDerivedKinds[] = {
+    CXXConstCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXConstCastExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXConstCastExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const CXXNamedCastExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -40789,6 +46063,15 @@ bool CXXAddrspaceCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXAddrspaceCastExprDerivedKinds[] = {
+    CXXAddrspaceCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXAddrspaceCastExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXAddrspaceCastExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const CXXNamedCastExpr &parent) {
@@ -40873,6 +46156,15 @@ bool CXXStaticCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXStaticCastExprDerivedKinds[] = {
+    CXXStaticCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXStaticCastExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXStaticCastExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const CXXNamedCastExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -40955,6 +46247,15 @@ bool CXXReinterpretCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXReinterpretCastExprDerivedKinds[] = {
+    CXXReinterpretCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXReinterpretCastExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXReinterpretCastExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const CXXNamedCastExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -41035,6 +46336,15 @@ bool CXXFunctionalCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXFunctionalCastExprDerivedKinds[] = {
+    CXXFunctionalCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXFunctionalCastExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXFunctionalCastExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const ExplicitCastExpr &parent) {
@@ -41127,6 +46437,15 @@ bool CStyleCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCStyleCastExprDerivedKinds[] = {
+    CStyleCastExpr::static_kind(),};
+
+gap::generator<StmtKind> CStyleCastExpr::derived_kinds(void) {
+  for (StmtKind k : kCStyleCastExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CStyleCastExpr> CStyleCastExpr::from(const ExplicitCastExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -41213,6 +46532,15 @@ bool BuiltinBitCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kBuiltinBitCastExprDerivedKinds[] = {
+    BuiltinBitCastExpr::static_kind(),};
+
+gap::generator<StmtKind> BuiltinBitCastExpr::derived_kinds(void) {
+  for (StmtKind k : kBuiltinBitCastExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const ExplicitCastExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -41289,6 +46617,15 @@ bool ObjCBridgedCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCBridgedCastExprDerivedKinds[] = {
+    ObjCBridgedCastExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCBridgedCastExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCBridgedCastExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const ExplicitCastExpr &parent) {
@@ -41384,6 +46721,15 @@ bool CallExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCallExprDerivedKinds[] = {
+    CallExpr::static_kind(),    UserDefinedLiteral::static_kind(),    CUDAKernelCallExpr::static_kind(),    CXXMemberCallExpr::static_kind(),    CXXOperatorCallExpr::static_kind(),};
+
+gap::generator<StmtKind> CallExpr::derived_kinds(void) {
+  for (StmtKind k : kCallExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CallExpr> CallExpr::from(const Expr &parent) {
@@ -41564,6 +46910,15 @@ bool CXXOperatorCallExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXOperatorCallExprDerivedKinds[] = {
+    CXXOperatorCallExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXOperatorCallExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXOperatorCallExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const CallExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -41656,6 +47011,15 @@ bool CXXMemberCallExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXMemberCallExprDerivedKinds[] = {
+    CXXMemberCallExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXMemberCallExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXMemberCallExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const CallExpr &parent) {
@@ -41760,6 +47124,15 @@ bool CUDAKernelCallExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCUDAKernelCallExprDerivedKinds[] = {
+    CUDAKernelCallExpr::static_kind(),};
+
+gap::generator<StmtKind> CUDAKernelCallExpr::derived_kinds(void) {
+  for (StmtKind k : kCUDAKernelCallExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const CallExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -41837,6 +47210,15 @@ bool UserDefinedLiteral::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kUserDefinedLiteralDerivedKinds[] = {
+    UserDefinedLiteral::static_kind(),};
+
+gap::generator<StmtKind> UserDefinedLiteral::derived_kinds(void) {
+  for (StmtKind k : kUserDefinedLiteralDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const CallExpr &parent) {
@@ -41924,6 +47306,15 @@ bool CXXUuidofExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXUuidofExprDerivedKinds[] = {
+    CXXUuidofExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXUuidofExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXUuidofExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const Expr &parent) {
@@ -42026,6 +47417,15 @@ bool CXXUnresolvedConstructExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXUnresolvedConstructExprDerivedKinds[] = {
+    CXXUnresolvedConstructExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXUnresolvedConstructExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXUnresolvedConstructExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const Expr &parent) {
@@ -42138,6 +47538,15 @@ bool CXXTypeidExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXTypeidExprDerivedKinds[] = {
+    CXXTypeidExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXTypeidExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXTypeidExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -42248,6 +47657,15 @@ bool CXXThrowExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXThrowExprDerivedKinds[] = {
+    CXXThrowExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXThrowExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXThrowExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXThrowExpr> CXXThrowExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -42339,6 +47757,15 @@ bool CXXThisExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXThisExprDerivedKinds[] = {
+    CXXThisExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXThisExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXThisExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXThisExpr> CXXThisExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -42417,6 +47844,15 @@ bool CXXStdInitializerListExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXStdInitializerListExprDerivedKinds[] = {
+    CXXStdInitializerListExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXStdInitializerListExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXStdInitializerListExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -42492,6 +47928,15 @@ bool CXXScalarValueInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXScalarValueInitExprDerivedKinds[] = {
+    CXXScalarValueInitExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXScalarValueInitExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXScalarValueInitExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -42564,6 +48009,15 @@ bool CXXRewrittenBinaryOperator::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXRewrittenBinaryOperatorDerivedKinds[] = {
+    CXXRewrittenBinaryOperator::static_kind(),};
+
+gap::generator<StmtKind> CXXRewrittenBinaryOperator::derived_kinds(void) {
+  for (StmtKind k : kCXXRewrittenBinaryOperatorDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const Expr &parent) {
@@ -42678,6 +48132,15 @@ bool CXXPseudoDestructorExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXPseudoDestructorExprDerivedKinds[] = {
+    CXXPseudoDestructorExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXPseudoDestructorExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXPseudoDestructorExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Expr &parent) {
@@ -42797,6 +48260,15 @@ bool CXXNullPtrLiteralExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXNullPtrLiteralExprDerivedKinds[] = {
+    CXXNullPtrLiteralExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXNullPtrLiteralExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXNullPtrLiteralExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -42869,6 +48341,15 @@ bool CXXNoexceptExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXNoexceptExprDerivedKinds[] = {
+    CXXNoexceptExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXNoexceptExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXNoexceptExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Expr &parent) {
@@ -42948,6 +48429,15 @@ bool CXXNewExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXNewExprDerivedKinds[] = {
+    CXXNewExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXNewExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXNewExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXNewExpr> CXXNewExpr::from(const Expr &parent) {
@@ -43139,6 +48629,15 @@ bool CXXInheritedCtorInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXInheritedCtorInitExprDerivedKinds[] = {
+    CXXInheritedCtorInitExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXInheritedCtorInitExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXInheritedCtorInitExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -43228,6 +48727,15 @@ bool CXXFoldExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXFoldExprDerivedKinds[] = {
+    CXXFoldExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXFoldExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXFoldExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXFoldExpr> CXXFoldExpr::from(const Expr &parent) {
@@ -43356,6 +48864,15 @@ bool CXXDependentScopeMemberExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXDependentScopeMemberExprDerivedKinds[] = {
+    CXXDependentScopeMemberExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXDependentScopeMemberExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXDependentScopeMemberExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const Expr &parent) {
@@ -43495,6 +49012,15 @@ bool CXXDeleteExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXDeleteExprDerivedKinds[] = {
+    CXXDeleteExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXDeleteExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXDeleteExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -43596,6 +49122,15 @@ bool CXXDefaultInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXDefaultInitExprDerivedKinds[] = {
+    CXXDefaultInitExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXDefaultInitExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXDefaultInitExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -43688,6 +49223,15 @@ bool CXXDefaultArgExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXDefaultArgExprDerivedKinds[] = {
+    CXXDefaultArgExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXDefaultArgExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXDefaultArgExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -43770,6 +49314,15 @@ bool CXXConstructExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXConstructExprDerivedKinds[] = {
+    CXXConstructExpr::static_kind(),    CXXTemporaryObjectExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXConstructExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXConstructExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXConstructExpr> CXXConstructExpr::from(const Expr &parent) {
@@ -43904,6 +49457,15 @@ bool CXXTemporaryObjectExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXTemporaryObjectExprDerivedKinds[] = {
+    CXXTemporaryObjectExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXTemporaryObjectExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXTemporaryObjectExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const CXXConstructExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -43976,6 +49538,15 @@ bool CXXBoolLiteralExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCXXBoolLiteralExprDerivedKinds[] = {
+    CXXBoolLiteralExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXBoolLiteralExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXBoolLiteralExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const Expr &parent) {
@@ -44056,6 +49627,15 @@ bool CXXBindTemporaryExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCXXBindTemporaryExprDerivedKinds[] = {
+    CXXBindTemporaryExpr::static_kind(),};
+
+gap::generator<StmtKind> CXXBindTemporaryExpr::derived_kinds(void) {
+  for (StmtKind k : kCXXBindTemporaryExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -44129,6 +49709,15 @@ bool BlockExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kBlockExprDerivedKinds[] = {
+    BlockExpr::static_kind(),};
+
+gap::generator<StmtKind> BlockExpr::derived_kinds(void) {
+  for (StmtKind k : kBlockExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BlockExpr> BlockExpr::from(const Expr &parent) {
@@ -44218,6 +49807,15 @@ bool BinaryOperator::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kBinaryOperatorDerivedKinds[] = {
+    BinaryOperator::static_kind(),    CompoundAssignOperator::static_kind(),};
+
+gap::generator<StmtKind> BinaryOperator::derived_kinds(void) {
+  for (StmtKind k : kBinaryOperatorDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BinaryOperator> BinaryOperator::from(const Expr &parent) {
@@ -44370,6 +49968,15 @@ bool CompoundAssignOperator::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kCompoundAssignOperatorDerivedKinds[] = {
+    CompoundAssignOperator::static_kind(),};
+
+gap::generator<StmtKind> CompoundAssignOperator::derived_kinds(void) {
+  for (StmtKind k : kCompoundAssignOperatorDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const BinaryOperator &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -44452,6 +50059,15 @@ bool AtomicExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kAtomicExprDerivedKinds[] = {
+    AtomicExpr::static_kind(),};
+
+gap::generator<StmtKind> AtomicExpr::derived_kinds(void) {
+  for (StmtKind k : kAtomicExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AtomicExpr> AtomicExpr::from(const Expr &parent) {
@@ -44651,6 +50267,15 @@ bool AsTypeExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kAsTypeExprDerivedKinds[] = {
+    AsTypeExpr::static_kind(),};
+
+gap::generator<StmtKind> AsTypeExpr::derived_kinds(void) {
+  for (StmtKind k : kAsTypeExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AsTypeExpr> AsTypeExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -44732,6 +50357,15 @@ bool ArrayTypeTraitExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kArrayTypeTraitExprDerivedKinds[] = {
+    ArrayTypeTraitExpr::static_kind(),};
+
+gap::generator<StmtKind> ArrayTypeTraitExpr::derived_kinds(void) {
+  for (StmtKind k : kArrayTypeTraitExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Expr &parent) {
@@ -44816,6 +50450,15 @@ bool ArraySubscriptExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kArraySubscriptExprDerivedKinds[] = {
+    ArraySubscriptExpr::static_kind(),};
+
+gap::generator<StmtKind> ArraySubscriptExpr::derived_kinds(void) {
+  for (StmtKind k : kArraySubscriptExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Expr &parent) {
@@ -44912,6 +50555,15 @@ bool ArrayInitLoopExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kArrayInitLoopExprDerivedKinds[] = {
+    ArrayInitLoopExpr::static_kind(),};
+
+gap::generator<StmtKind> ArrayInitLoopExpr::derived_kinds(void) {
+  for (StmtKind k : kArrayInitLoopExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -44992,6 +50644,15 @@ bool ArrayInitIndexExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kArrayInitIndexExprDerivedKinds[] = {
+    ArrayInitIndexExpr::static_kind(),};
+
+gap::generator<StmtKind> ArrayInitIndexExpr::derived_kinds(void) {
+  for (StmtKind k : kArrayInitIndexExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -45060,6 +50721,15 @@ bool AddrLabelExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kAddrLabelExprDerivedKinds[] = {
+    AddrLabelExpr::static_kind(),};
+
+gap::generator<StmtKind> AddrLabelExpr::derived_kinds(void) {
+  for (StmtKind k : kAddrLabelExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AddrLabelExpr> AddrLabelExpr::from(const Expr &parent) {
@@ -45143,6 +50813,15 @@ bool AbstractConditionalOperator::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kAbstractConditionalOperatorDerivedKinds[] = {
+    BinaryConditionalOperator::static_kind(),    ConditionalOperator::static_kind(),};
+
+gap::generator<StmtKind> AbstractConditionalOperator::derived_kinds(void) {
+  for (StmtKind k : kAbstractConditionalOperatorDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const Expr &parent) {
@@ -45239,6 +50918,15 @@ bool ConditionalOperator::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kConditionalOperatorDerivedKinds[] = {
+    ConditionalOperator::static_kind(),};
+
+gap::generator<StmtKind> ConditionalOperator::derived_kinds(void) {
+  for (StmtKind k : kConditionalOperatorDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ConditionalOperator> ConditionalOperator::from(const AbstractConditionalOperator &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -45323,6 +51011,15 @@ bool BinaryConditionalOperator::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kBinaryConditionalOperatorDerivedKinds[] = {
+    BinaryConditionalOperator::static_kind(),};
+
+gap::generator<StmtKind> BinaryConditionalOperator::derived_kinds(void) {
+  for (StmtKind k : kBinaryConditionalOperatorDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const AbstractConditionalOperator &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -45405,6 +51102,15 @@ bool VAArgExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kVAArgExprDerivedKinds[] = {
+    VAArgExpr::static_kind(),};
+
+gap::generator<StmtKind> VAArgExpr::derived_kinds(void) {
+  for (StmtKind k : kVAArgExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<VAArgExpr> VAArgExpr::from(const Expr &parent) {
@@ -45497,6 +51203,15 @@ bool UnaryOperator::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kUnaryOperatorDerivedKinds[] = {
+    UnaryOperator::static_kind(),};
+
+gap::generator<StmtKind> UnaryOperator::derived_kinds(void) {
+  for (StmtKind k : kUnaryOperatorDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UnaryOperator> UnaryOperator::from(const Expr &parent) {
@@ -45612,6 +51327,15 @@ bool UnaryExprOrTypeTraitExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kUnaryExprOrTypeTraitExprDerivedKinds[] = {
+    UnaryExprOrTypeTraitExpr::static_kind(),};
+
+gap::generator<StmtKind> UnaryExprOrTypeTraitExpr::derived_kinds(void) {
+  for (StmtKind k : kUnaryExprOrTypeTraitExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Expr &parent) {
@@ -45731,6 +51455,15 @@ bool TypoExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kTypoExprDerivedKinds[] = {
+    TypoExpr::static_kind(),};
+
+gap::generator<StmtKind> TypoExpr::derived_kinds(void) {
+  for (StmtKind k : kTypoExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TypoExpr> TypoExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -45799,6 +51532,15 @@ bool TypeTraitExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kTypeTraitExprDerivedKinds[] = {
+    TypeTraitExpr::static_kind(),};
+
+gap::generator<StmtKind> TypeTraitExpr::derived_kinds(void) {
+  for (StmtKind k : kTypeTraitExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeTraitExpr> TypeTraitExpr::from(const Expr &parent) {
@@ -45905,6 +51647,15 @@ bool SubstNonTypeTemplateParmPackExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kSubstNonTypeTemplateParmPackExprDerivedKinds[] = {
+    SubstNonTypeTemplateParmPackExpr::static_kind(),};
+
+gap::generator<StmtKind> SubstNonTypeTemplateParmPackExpr::derived_kinds(void) {
+  for (StmtKind k : kSubstNonTypeTemplateParmPackExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -45982,6 +51733,15 @@ bool SubstNonTypeTemplateParmExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kSubstNonTypeTemplateParmExprDerivedKinds[] = {
+    SubstNonTypeTemplateParmExpr::static_kind(),};
+
+gap::generator<StmtKind> SubstNonTypeTemplateParmExpr::derived_kinds(void) {
+  for (StmtKind k : kSubstNonTypeTemplateParmExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const Expr &parent) {
@@ -46075,6 +51835,15 @@ bool StringLiteral::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kStringLiteralDerivedKinds[] = {
+    StringLiteral::static_kind(),};
+
+gap::generator<StmtKind> StringLiteral::derived_kinds(void) {
+  for (StmtKind k : kStringLiteralDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<StringLiteral> StringLiteral::from(const Expr &parent) {
@@ -46208,6 +51977,15 @@ bool StmtExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kStmtExprDerivedKinds[] = {
+    StmtExpr::static_kind(),};
+
+gap::generator<StmtKind> StmtExpr::derived_kinds(void) {
+  for (StmtKind k : kStmtExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<StmtExpr> StmtExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -46289,6 +52067,15 @@ bool SourceLocExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kSourceLocExprDerivedKinds[] = {
+    SourceLocExpr::static_kind(),};
+
+gap::generator<StmtKind> SourceLocExpr::derived_kinds(void) {
+  for (StmtKind k : kSourceLocExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SourceLocExpr> SourceLocExpr::from(const Expr &parent) {
@@ -46376,6 +52163,15 @@ bool SizeOfPackExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kSizeOfPackExprDerivedKinds[] = {
+    SizeOfPackExpr::static_kind(),};
+
+gap::generator<StmtKind> SizeOfPackExpr::derived_kinds(void) {
+  for (StmtKind k : kSizeOfPackExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Expr &parent) {
@@ -46494,6 +52290,15 @@ bool ShuffleVectorExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kShuffleVectorExprDerivedKinds[] = {
+    ShuffleVectorExpr::static_kind(),};
+
+gap::generator<StmtKind> ShuffleVectorExpr::derived_kinds(void) {
+  for (StmtKind k : kShuffleVectorExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -46570,6 +52375,15 @@ bool SYCLUniqueStableNameExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kSYCLUniqueStableNameExprDerivedKinds[] = {
+    SYCLUniqueStableNameExpr::static_kind(),};
+
+gap::generator<StmtKind> SYCLUniqueStableNameExpr::derived_kinds(void) {
+  for (StmtKind k : kSYCLUniqueStableNameExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const Expr &parent) {
@@ -46657,6 +52471,15 @@ bool RequiresExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kRequiresExprDerivedKinds[] = {
+    RequiresExpr::static_kind(),};
+
+gap::generator<StmtKind> RequiresExpr::derived_kinds(void) {
+  for (StmtKind k : kRequiresExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<RequiresExpr> RequiresExpr::from(const Expr &parent) {
@@ -46769,6 +52592,15 @@ bool RecoveryExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kRecoveryExprDerivedKinds[] = {
+    RecoveryExpr::static_kind(),};
+
+gap::generator<StmtKind> RecoveryExpr::derived_kinds(void) {
+  for (StmtKind k : kRecoveryExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<RecoveryExpr> RecoveryExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -46860,6 +52692,15 @@ bool PseudoObjectExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kPseudoObjectExprDerivedKinds[] = {
+    PseudoObjectExpr::static_kind(),};
+
+gap::generator<StmtKind> PseudoObjectExpr::derived_kinds(void) {
+  for (StmtKind k : kPseudoObjectExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const Expr &parent) {
@@ -46988,6 +52829,15 @@ bool PredefinedExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kPredefinedExprDerivedKinds[] = {
+    PredefinedExpr::static_kind(),};
+
+gap::generator<StmtKind> PredefinedExpr::derived_kinds(void) {
+  for (StmtKind k : kPredefinedExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PredefinedExpr> PredefinedExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -47074,6 +52924,15 @@ bool ParenListExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kParenListExprDerivedKinds[] = {
+    ParenListExpr::static_kind(),};
+
+gap::generator<StmtKind> ParenListExpr::derived_kinds(void) {
+  for (StmtKind k : kParenListExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ParenListExpr> ParenListExpr::from(const Expr &parent) {
@@ -47177,6 +53036,15 @@ bool ParenExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kParenExprDerivedKinds[] = {
+    ParenExpr::static_kind(),};
+
+gap::generator<StmtKind> ParenExpr::derived_kinds(void) {
+  for (StmtKind k : kParenExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ParenExpr> ParenExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -47258,6 +53126,15 @@ bool PackExpansionExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kPackExpansionExprDerivedKinds[] = {
+    PackExpansionExpr::static_kind(),};
+
+gap::generator<StmtKind> PackExpansionExpr::derived_kinds(void) {
+  for (StmtKind k : kPackExpansionExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PackExpansionExpr> PackExpansionExpr::from(const Expr &parent) {
@@ -47346,6 +53223,15 @@ bool OverloadExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOverloadExprDerivedKinds[] = {
+    UnresolvedLookupExpr::static_kind(),    UnresolvedMemberExpr::static_kind(),};
+
+gap::generator<StmtKind> OverloadExpr::derived_kinds(void) {
+  for (StmtKind k : kOverloadExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OverloadExpr> OverloadExpr::from(const Expr &parent) {
@@ -47456,6 +53342,15 @@ bool UnresolvedMemberExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kUnresolvedMemberExprDerivedKinds[] = {
+    UnresolvedMemberExpr::static_kind(),};
+
+gap::generator<StmtKind> UnresolvedMemberExpr::derived_kinds(void) {
+  for (StmtKind k : kUnresolvedMemberExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const OverloadExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -47560,6 +53455,15 @@ bool UnresolvedLookupExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kUnresolvedLookupExprDerivedKinds[] = {
+    UnresolvedLookupExpr::static_kind(),};
+
+gap::generator<StmtKind> UnresolvedLookupExpr::derived_kinds(void) {
+  for (StmtKind k : kUnresolvedLookupExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const OverloadExpr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -47640,6 +53544,15 @@ bool OpaqueValueExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOpaqueValueExprDerivedKinds[] = {
+    OpaqueValueExpr::static_kind(),};
+
+gap::generator<StmtKind> OpaqueValueExpr::derived_kinds(void) {
+  for (StmtKind k : kOpaqueValueExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const Expr &parent) {
@@ -47725,6 +53638,15 @@ bool OffsetOfExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOffsetOfExprDerivedKinds[] = {
+    OffsetOfExpr::static_kind(),};
+
+gap::generator<StmtKind> OffsetOfExpr::derived_kinds(void) {
+  for (StmtKind k : kOffsetOfExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OffsetOfExpr> OffsetOfExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -47801,6 +53723,15 @@ bool ObjCSubscriptRefExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCSubscriptRefExprDerivedKinds[] = {
+    ObjCSubscriptRefExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCSubscriptRefExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCSubscriptRefExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Expr &parent) {
@@ -47896,6 +53827,15 @@ bool ObjCStringLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCStringLiteralDerivedKinds[] = {
+    ObjCStringLiteral::static_kind(),};
+
+gap::generator<StmtKind> ObjCStringLiteral::derived_kinds(void) {
+  for (StmtKind k : kObjCStringLiteralDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -47975,6 +53915,15 @@ bool ObjCSelectorExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCSelectorExprDerivedKinds[] = {
+    ObjCSelectorExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCSelectorExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCSelectorExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -48051,6 +54000,15 @@ bool ObjCProtocolExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCProtocolExprDerivedKinds[] = {
+    ObjCProtocolExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCProtocolExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCProtocolExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Expr &parent) {
@@ -48138,6 +54096,15 @@ bool ObjCPropertyRefExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCPropertyRefExprDerivedKinds[] = {
+    ObjCPropertyRefExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCPropertyRefExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCPropertyRefExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Expr &parent) {
@@ -48279,6 +54246,15 @@ bool ObjCMessageExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCMessageExprDerivedKinds[] = {
+    ObjCMessageExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCMessageExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCMessageExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Expr &parent) {
@@ -48486,6 +54462,15 @@ bool ObjCIvarRefExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCIvarRefExprDerivedKinds[] = {
+    ObjCIvarRefExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCIvarRefExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCIvarRefExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -48582,6 +54567,15 @@ bool ObjCIsaExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCIsaExprDerivedKinds[] = {
+    ObjCIsaExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCIsaExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCIsaExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -48673,6 +54667,15 @@ bool ObjCIndirectCopyRestoreExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCIndirectCopyRestoreExprDerivedKinds[] = {
+    ObjCIndirectCopyRestoreExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCIndirectCopyRestoreExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCIndirectCopyRestoreExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -48750,6 +54753,15 @@ bool ObjCEncodeExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCEncodeExprDerivedKinds[] = {
+    ObjCEncodeExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCEncodeExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCEncodeExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const Expr &parent) {
@@ -48835,6 +54847,15 @@ bool ObjCDictionaryLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCDictionaryLiteralDerivedKinds[] = {
+    ObjCDictionaryLiteral::static_kind(),};
+
+gap::generator<StmtKind> ObjCDictionaryLiteral::derived_kinds(void) {
+  for (StmtKind k : kObjCDictionaryLiteralDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -48908,6 +54929,15 @@ bool ObjCBoxedExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCBoxedExprDerivedKinds[] = {
+    ObjCBoxedExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCBoxedExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCBoxedExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const Expr &parent) {
@@ -48998,6 +55028,15 @@ bool ObjCBoolLiteralExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCBoolLiteralExprDerivedKinds[] = {
+    ObjCBoolLiteralExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCBoolLiteralExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCBoolLiteralExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -49076,6 +55115,15 @@ bool ObjCAvailabilityCheckExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kObjCAvailabilityCheckExprDerivedKinds[] = {
+    ObjCAvailabilityCheckExpr::static_kind(),};
+
+gap::generator<StmtKind> ObjCAvailabilityCheckExpr::derived_kinds(void) {
+  for (StmtKind k : kObjCAvailabilityCheckExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -49148,6 +55196,15 @@ bool ObjCArrayLiteral::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kObjCArrayLiteralDerivedKinds[] = {
+    ObjCArrayLiteral::static_kind(),};
+
+gap::generator<StmtKind> ObjCArrayLiteral::derived_kinds(void) {
+  for (StmtKind k : kObjCArrayLiteralDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Expr &parent) {
@@ -49248,6 +55305,15 @@ bool OMPIteratorExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPIteratorExprDerivedKinds[] = {
+    OMPIteratorExpr::static_kind(),};
+
+gap::generator<StmtKind> OMPIteratorExpr::derived_kinds(void) {
+  for (StmtKind k : kOMPIteratorExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -49328,6 +55394,15 @@ bool OMPArrayShapingExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kOMPArrayShapingExprDerivedKinds[] = {
+    OMPArrayShapingExpr::static_kind(),};
+
+gap::generator<StmtKind> OMPArrayShapingExpr::derived_kinds(void) {
+  for (StmtKind k : kOMPArrayShapingExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Expr &parent) {
@@ -49436,6 +55511,15 @@ bool OMPArraySectionExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kOMPArraySectionExprDerivedKinds[] = {
+    OMPArraySectionExpr::static_kind(),};
+
+gap::generator<StmtKind> OMPArraySectionExpr::derived_kinds(void) {
+  for (StmtKind k : kOMPArraySectionExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -49538,6 +55622,15 @@ bool NoInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kNoInitExprDerivedKinds[] = {
+    NoInitExpr::static_kind(),};
+
+gap::generator<StmtKind> NoInitExpr::derived_kinds(void) {
+  for (StmtKind k : kNoInitExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<NoInitExpr> NoInitExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -49606,6 +55699,15 @@ bool MemberExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kMemberExprDerivedKinds[] = {
+    MemberExpr::static_kind(),};
+
+gap::generator<StmtKind> MemberExpr::derived_kinds(void) {
+  for (StmtKind k : kMemberExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MemberExpr> MemberExpr::from(const Expr &parent) {
@@ -49736,6 +55838,15 @@ bool MatrixSubscriptExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kMatrixSubscriptExprDerivedKinds[] = {
+    MatrixSubscriptExpr::static_kind(),};
+
+gap::generator<StmtKind> MatrixSubscriptExpr::derived_kinds(void) {
+  for (StmtKind k : kMatrixSubscriptExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -49827,6 +55938,15 @@ bool MaterializeTemporaryExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kMaterializeTemporaryExprDerivedKinds[] = {
+    MaterializeTemporaryExpr::static_kind(),};
+
+gap::generator<StmtKind> MaterializeTemporaryExpr::derived_kinds(void) {
+  for (StmtKind k : kMaterializeTemporaryExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Expr &parent) {
@@ -49942,6 +56062,15 @@ bool MSPropertySubscriptExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kMSPropertySubscriptExprDerivedKinds[] = {
+    MSPropertySubscriptExpr::static_kind(),};
+
+gap::generator<StmtKind> MSPropertySubscriptExpr::derived_kinds(void) {
+  for (StmtKind k : kMSPropertySubscriptExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -50024,6 +56153,15 @@ bool MSPropertyRefExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kMSPropertyRefExprDerivedKinds[] = {
+    MSPropertyRefExpr::static_kind(),};
+
+gap::generator<StmtKind> MSPropertyRefExpr::derived_kinds(void) {
+  for (StmtKind k : kMSPropertyRefExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Expr &parent) {
@@ -50116,6 +56254,15 @@ bool LambdaExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kLambdaExprDerivedKinds[] = {
+    LambdaExpr::static_kind(),};
+
+gap::generator<StmtKind> LambdaExpr::derived_kinds(void) {
+  for (StmtKind k : kLambdaExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<LambdaExpr> LambdaExpr::from(const Expr &parent) {
@@ -50299,6 +56446,15 @@ bool IntegerLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kIntegerLiteralDerivedKinds[] = {
+    IntegerLiteral::static_kind(),};
+
+gap::generator<StmtKind> IntegerLiteral::derived_kinds(void) {
+  for (StmtKind k : kIntegerLiteralDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<IntegerLiteral> IntegerLiteral::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -50371,6 +56527,15 @@ bool InitListExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kInitListExprDerivedKinds[] = {
+    InitListExpr::static_kind(),};
+
+gap::generator<StmtKind> InitListExpr::derived_kinds(void) {
+  for (StmtKind k : kInitListExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<InitListExpr> InitListExpr::from(const Expr &parent) {
@@ -50559,6 +56724,15 @@ bool ImplicitValueInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kImplicitValueInitExprDerivedKinds[] = {
+    ImplicitValueInitExpr::static_kind(),};
+
+gap::generator<StmtKind> ImplicitValueInitExpr::derived_kinds(void) {
+  for (StmtKind k : kImplicitValueInitExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -50627,6 +56801,15 @@ bool ImaginaryLiteral::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kImaginaryLiteralDerivedKinds[] = {
+    ImaginaryLiteral::static_kind(),};
+
+gap::generator<StmtKind> ImaginaryLiteral::derived_kinds(void) {
+  for (StmtKind k : kImaginaryLiteralDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const Expr &parent) {
@@ -50702,6 +56885,15 @@ bool GenericSelectionExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kGenericSelectionExprDerivedKinds[] = {
+    GenericSelectionExpr::static_kind(),};
+
+gap::generator<StmtKind> GenericSelectionExpr::derived_kinds(void) {
+  for (StmtKind k : kGenericSelectionExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Expr &parent) {
@@ -50823,6 +57015,15 @@ bool GNUNullExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kGNUNullExprDerivedKinds[] = {
+    GNUNullExpr::static_kind(),};
+
+gap::generator<StmtKind> GNUNullExpr::derived_kinds(void) {
+  for (StmtKind k : kGNUNullExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<GNUNullExpr> GNUNullExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -50895,6 +57096,15 @@ bool FunctionParmPackExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kFunctionParmPackExprDerivedKinds[] = {
+    FunctionParmPackExpr::static_kind(),};
+
+gap::generator<StmtKind> FunctionParmPackExpr::derived_kinds(void) {
+  for (StmtKind k : kFunctionParmPackExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Expr &parent) {
@@ -50999,6 +57209,15 @@ bool FullExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kFullExprDerivedKinds[] = {
+    ConstantExpr::static_kind(),    ExprWithCleanups::static_kind(),};
+
+gap::generator<StmtKind> FullExpr::derived_kinds(void) {
+  for (StmtKind k : kFullExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FullExpr> FullExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -51073,6 +57292,15 @@ bool ExprWithCleanups::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kExprWithCleanupsDerivedKinds[] = {
+    ExprWithCleanups::static_kind(),};
+
+gap::generator<StmtKind> ExprWithCleanups::derived_kinds(void) {
+  for (StmtKind k : kExprWithCleanupsDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ExprWithCleanups> ExprWithCleanups::from(const FullExpr &parent) {
@@ -51151,6 +57379,15 @@ bool ConstantExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kConstantExprDerivedKinds[] = {
+    ConstantExpr::static_kind(),};
+
+gap::generator<StmtKind> ConstantExpr::derived_kinds(void) {
+  for (StmtKind k : kConstantExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ConstantExpr> ConstantExpr::from(const FullExpr &parent) {
@@ -51239,6 +57476,15 @@ bool FloatingLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kFloatingLiteralDerivedKinds[] = {
+    FloatingLiteral::static_kind(),};
+
+gap::generator<StmtKind> FloatingLiteral::derived_kinds(void) {
+  for (StmtKind k : kFloatingLiteralDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FloatingLiteral> FloatingLiteral::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -51317,6 +57563,15 @@ bool FixedPointLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kFixedPointLiteralDerivedKinds[] = {
+    FixedPointLiteral::static_kind(),};
+
+gap::generator<StmtKind> FixedPointLiteral::derived_kinds(void) {
+  for (StmtKind k : kFixedPointLiteralDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FixedPointLiteral> FixedPointLiteral::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -51389,6 +57644,15 @@ bool ExtVectorElementExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kExtVectorElementExprDerivedKinds[] = {
+    ExtVectorElementExpr::static_kind(),};
+
+gap::generator<StmtKind> ExtVectorElementExpr::derived_kinds(void) {
+  for (StmtKind k : kExtVectorElementExprDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Expr &parent) {
@@ -51478,6 +57742,15 @@ bool ExpressionTraitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kExpressionTraitExprDerivedKinds[] = {
+    ExpressionTraitExpr::static_kind(),};
+
+gap::generator<StmtKind> ExpressionTraitExpr::derived_kinds(void) {
+  for (StmtKind k : kExpressionTraitExprDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const Expr &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -51559,6 +57832,15 @@ bool AttributedStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kAttributedStmtDerivedKinds[] = {
+    AttributedStmt::static_kind(),};
+
+gap::generator<StmtKind> AttributedStmt::derived_kinds(void) {
+  for (StmtKind k : kAttributedStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<AttributedStmt> AttributedStmt::from(const ValueStmt &parent) {
@@ -51655,6 +57937,15 @@ bool SwitchStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kSwitchStmtDerivedKinds[] = {
+    SwitchStmt::static_kind(),};
+
+gap::generator<StmtKind> SwitchStmt::derived_kinds(void) {
+  for (StmtKind k : kSwitchStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
@@ -51805,6 +58096,15 @@ bool SwitchCase::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kSwitchCaseDerivedKinds[] = {
+    CaseStmt::static_kind(),    DefaultStmt::static_kind(),};
+
+gap::generator<StmtKind> SwitchCase::derived_kinds(void) {
+  for (StmtKind k : kSwitchCaseDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<SwitchCase> SwitchCase::from(const Stmt &parent) {
   switch (parent.kind()) {
     case mx::StmtKind::DEFAULT_STMT:
@@ -51894,6 +58194,15 @@ bool DefaultStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+static const StmtKind kDefaultStmtDerivedKinds[] = {
+    DefaultStmt::static_kind(),};
+
+gap::generator<StmtKind> DefaultStmt::derived_kinds(void) {
+  for (StmtKind k : kDefaultStmtDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<DefaultStmt> DefaultStmt::from(const SwitchCase &parent) {
   return from(reinterpret_cast<const Stmt &>(parent));
 }
@@ -51962,6 +58271,15 @@ bool CaseStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const StmtKind kCaseStmtDerivedKinds[] = {
+    CaseStmt::static_kind(),};
+
+gap::generator<StmtKind> CaseStmt::derived_kinds(void) {
+  for (StmtKind k : kCaseStmtDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CaseStmt> CaseStmt::from(const SwitchCase &parent) {
@@ -52082,6 +58400,15 @@ bool Decl::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+static const DeclKind kDeclDerivedKinds[] = {
+    EmptyDecl::static_kind(),    ExportDecl::static_kind(),    ExternCContextDecl::static_kind(),    FileScopeAsmDecl::static_kind(),    FriendDecl::static_kind(),    FriendTemplateDecl::static_kind(),    ImportDecl::static_kind(),    LifetimeExtendedTemporaryDecl::static_kind(),    LinkageSpecDecl::static_kind(),    ObjCPropertyImplDecl::static_kind(),    PragmaCommentDecl::static_kind(),    PragmaDetectMismatchDecl::static_kind(),    RequiresExprBodyDecl::static_kind(),    StaticAssertDecl::static_kind(),    TranslationUnitDecl::static_kind(),    AccessSpecDecl::static_kind(),    BlockDecl::static_kind(),    CapturedDecl::static_kind(),    ClassScopeFunctionSpecializationDecl::static_kind(),    NamespaceAliasDecl::static_kind(),    NamespaceDecl::static_kind(),    ObjCCompatibleAliasDecl::static_kind(),    ObjCMethodDecl::static_kind(),    ObjCPropertyDecl::static_kind(),    UnresolvedUsingIfExistsDecl::static_kind(),    UsingDirectiveDecl::static_kind(),    UsingPackDecl::static_kind(),    UsingShadowDecl::static_kind(),    LabelDecl::static_kind(),    OMPAllocateDecl::static_kind(),    OMPRequiresDecl::static_kind(),    OMPThreadPrivateDecl::static_kind(),    ObjCInterfaceDecl::static_kind(),    ObjCProtocolDecl::static_kind(),    ObjCCategoryDecl::static_kind(),    TemplateTemplateParmDecl::static_kind(),    BuiltinTemplateDecl::static_kind(),    ConceptDecl::static_kind(),    UnresolvedUsingTypenameDecl::static_kind(),    TemplateTypeParmDecl::static_kind(),    ConstructorUsingShadowDecl::static_kind(),    BindingDecl::static_kind(),    EnumConstantDecl::static_kind(),    IndirectFieldDecl::static_kind(),    MSGuidDecl::static_kind(),    OMPDeclareReductionDecl::static_kind(),    TemplateParamObjectDecl::static_kind(),    UnnamedGlobalConstantDecl::static_kind(),    UnresolvedUsingValueDecl::static_kind(),    UsingDecl::static_kind(),    UsingEnumDecl::static_kind(),    ObjCImplementationDecl::static_kind(),    ObjCCategoryImplDecl::static_kind(),    TypeAliasTemplateDecl::static_kind(),    VarTemplateDecl::static_kind(),    ClassTemplateDecl::static_kind(),    FunctionTemplateDecl::static_kind(),    ObjCTypeParamDecl::static_kind(),    TypeAliasDecl::static_kind(),    TypedefDecl::static_kind(),    EnumDecl::static_kind(),    RecordDecl::static_kind(),    OMPDeclareMapperDecl::static_kind(),    FieldDecl::static_kind(),    FunctionDecl::static_kind(),    MSPropertyDecl::static_kind(),    NonTypeTemplateParmDecl::static_kind(),    VarDecl::static_kind(),    CXXRecordDecl::static_kind(),    ObjCAtDefsFieldDecl::static_kind(),    ObjCIvarDecl::static_kind(),    CXXDeductionGuideDecl::static_kind(),    CXXMethodDecl::static_kind(),    VarTemplateSpecializationDecl::static_kind(),    DecompositionDecl::static_kind(),    ImplicitParamDecl::static_kind(),    OMPCapturedExprDecl::static_kind(),    ParmVarDecl::static_kind(),    ClassTemplateSpecializationDecl::static_kind(),    CXXConstructorDecl::static_kind(),    CXXConversionDecl::static_kind(),    CXXDestructorDecl::static_kind(),    VarTemplatePartialSpecializationDecl::static_kind(),    ClassTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> Decl::derived_kinds(void) {
+  for (DeclKind k : kDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<Attr> Decl::nth_attribute(unsigned n) const {
@@ -52377,6 +58704,15 @@ gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializ
   co_return;
 }
 
+static const DeclKind kClassScopeFunctionSpecializationDeclDerivedKinds[] = {
+    ClassScopeFunctionSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> ClassScopeFunctionSpecializationDecl::derived_kinds(void) {
+  for (DeclKind k : kClassScopeFunctionSpecializationDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION:
@@ -52458,6 +58794,15 @@ gap::generator<CapturedDecl> CapturedDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kCapturedDeclDerivedKinds[] = {
+    CapturedDecl::static_kind(),};
+
+gap::generator<DeclKind> CapturedDecl::derived_kinds(void) {
+  for (DeclKind k : kCapturedDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CapturedDecl> CapturedDecl::from(const Decl &parent) {
@@ -52573,6 +58918,15 @@ gap::generator<BlockDecl> BlockDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kBlockDeclDerivedKinds[] = {
+    BlockDecl::static_kind(),};
+
+gap::generator<DeclKind> BlockDecl::derived_kinds(void) {
+  for (DeclKind k : kBlockDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BlockDecl> BlockDecl::from(const Decl &parent) {
@@ -52759,6 +59113,15 @@ gap::generator<AccessSpecDecl> AccessSpecDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kAccessSpecDeclDerivedKinds[] = {
+    AccessSpecDecl::static_kind(),};
+
+gap::generator<DeclKind> AccessSpecDecl::derived_kinds(void) {
+  for (DeclKind k : kAccessSpecDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<AccessSpecDecl> AccessSpecDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::ACCESS_SPEC:
@@ -52841,6 +59204,15 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::redecla
   co_return;
 }
 
+static const DeclKind kOMPDeclarativeDirectiveDeclDerivedKinds[] = {
+    OMPAllocateDecl::static_kind(),    OMPRequiresDecl::static_kind(),    OMPThreadPrivateDecl::static_kind(),};
+
+gap::generator<DeclKind> OMPDeclarativeDirectiveDecl::derived_kinds(void) {
+  for (DeclKind k : kOMPDeclarativeDirectiveDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::OMP_THREAD_PRIVATE:
@@ -52915,6 +59287,15 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kOMPThreadPrivateDeclDerivedKinds[] = {
+    OMPThreadPrivateDecl::static_kind(),};
+
+gap::generator<DeclKind> OMPThreadPrivateDecl::derived_kinds(void) {
+  for (DeclKind k : kOMPThreadPrivateDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const OMPDeclarativeDirectiveDecl &parent) {
@@ -53018,6 +59399,15 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kOMPRequiresDeclDerivedKinds[] = {
+    OMPRequiresDecl::static_kind(),};
+
+gap::generator<DeclKind> OMPRequiresDecl::derived_kinds(void) {
+  for (DeclKind k : kOMPRequiresDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const OMPDeclarativeDirectiveDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -53094,6 +59484,15 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kOMPAllocateDeclDerivedKinds[] = {
+    OMPAllocateDecl::static_kind(),};
+
+gap::generator<DeclKind> OMPAllocateDecl::derived_kinds(void) {
+  for (DeclKind k : kOMPAllocateDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const OMPDeclarativeDirectiveDecl &parent) {
@@ -53197,6 +59596,15 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::redeclarations(void) co
   co_return;
 }
 
+static const DeclKind kTranslationUnitDeclDerivedKinds[] = {
+    TranslationUnitDecl::static_kind(),};
+
+gap::generator<DeclKind> TranslationUnitDecl::derived_kinds(void) {
+  for (DeclKind k : kTranslationUnitDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::TRANSLATION_UNIT:
@@ -53278,6 +59686,15 @@ gap::generator<StaticAssertDecl> StaticAssertDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kStaticAssertDeclDerivedKinds[] = {
+    StaticAssertDecl::static_kind(),};
+
+gap::generator<DeclKind> StaticAssertDecl::derived_kinds(void) {
+  for (DeclKind k : kStaticAssertDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<StaticAssertDecl> StaticAssertDecl::from(const Decl &parent) {
@@ -53372,6 +59789,15 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::redeclarations(void) 
   co_return;
 }
 
+static const DeclKind kRequiresExprBodyDeclDerivedKinds[] = {
+    RequiresExprBodyDecl::static_kind(),};
+
+gap::generator<DeclKind> RequiresExprBodyDecl::derived_kinds(void) {
+  for (DeclKind k : kRequiresExprBodyDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::REQUIRES_EXPR_BODY:
@@ -53453,6 +59879,15 @@ gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::redeclaration
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kPragmaDetectMismatchDeclDerivedKinds[] = {
+    PragmaDetectMismatchDecl::static_kind(),};
+
+gap::generator<DeclKind> PragmaDetectMismatchDecl::derived_kinds(void) {
+  for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Decl &parent) {
@@ -53539,6 +59974,15 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::redeclarations(void) const 
   co_return;
 }
 
+static const DeclKind kPragmaCommentDeclDerivedKinds[] = {
+    PragmaCommentDecl::static_kind(),};
+
+gap::generator<DeclKind> PragmaCommentDecl::derived_kinds(void) {
+  for (DeclKind k : kPragmaCommentDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::PRAGMA_COMMENT:
@@ -53620,6 +60064,15 @@ gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kObjCPropertyImplDeclDerivedKinds[] = {
+    ObjCPropertyImplDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCPropertyImplDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCPropertyImplDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Decl &parent) {
@@ -53736,6 +60189,15 @@ gap::generator<NamedDecl> NamedDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kNamedDeclDerivedKinds[] = {
+    NamespaceAliasDecl::static_kind(),    NamespaceDecl::static_kind(),    ObjCCompatibleAliasDecl::static_kind(),    ObjCMethodDecl::static_kind(),    ObjCPropertyDecl::static_kind(),    UnresolvedUsingIfExistsDecl::static_kind(),    UsingDirectiveDecl::static_kind(),    UsingPackDecl::static_kind(),    UsingShadowDecl::static_kind(),    LabelDecl::static_kind(),    ObjCInterfaceDecl::static_kind(),    ObjCProtocolDecl::static_kind(),    ObjCCategoryDecl::static_kind(),    TemplateTemplateParmDecl::static_kind(),    BuiltinTemplateDecl::static_kind(),    ConceptDecl::static_kind(),    UnresolvedUsingTypenameDecl::static_kind(),    TemplateTypeParmDecl::static_kind(),    ConstructorUsingShadowDecl::static_kind(),    BindingDecl::static_kind(),    EnumConstantDecl::static_kind(),    IndirectFieldDecl::static_kind(),    MSGuidDecl::static_kind(),    OMPDeclareReductionDecl::static_kind(),    TemplateParamObjectDecl::static_kind(),    UnnamedGlobalConstantDecl::static_kind(),    UnresolvedUsingValueDecl::static_kind(),    UsingDecl::static_kind(),    UsingEnumDecl::static_kind(),    ObjCImplementationDecl::static_kind(),    ObjCCategoryImplDecl::static_kind(),    TypeAliasTemplateDecl::static_kind(),    VarTemplateDecl::static_kind(),    ClassTemplateDecl::static_kind(),    FunctionTemplateDecl::static_kind(),    ObjCTypeParamDecl::static_kind(),    TypeAliasDecl::static_kind(),    TypedefDecl::static_kind(),    EnumDecl::static_kind(),    RecordDecl::static_kind(),    OMPDeclareMapperDecl::static_kind(),    FieldDecl::static_kind(),    FunctionDecl::static_kind(),    MSPropertyDecl::static_kind(),    NonTypeTemplateParmDecl::static_kind(),    VarDecl::static_kind(),    CXXRecordDecl::static_kind(),    ObjCAtDefsFieldDecl::static_kind(),    ObjCIvarDecl::static_kind(),    CXXDeductionGuideDecl::static_kind(),    CXXMethodDecl::static_kind(),    VarTemplateSpecializationDecl::static_kind(),    DecompositionDecl::static_kind(),    ImplicitParamDecl::static_kind(),    OMPCapturedExprDecl::static_kind(),    ParmVarDecl::static_kind(),    ClassTemplateSpecializationDecl::static_kind(),    CXXConstructorDecl::static_kind(),    CXXConversionDecl::static_kind(),    CXXDestructorDecl::static_kind(),    VarTemplatePartialSpecializationDecl::static_kind(),    ClassTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> NamedDecl::derived_kinds(void) {
+  for (DeclKind k : kNamedDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
@@ -53937,6 +60399,15 @@ gap::generator<LabelDecl> LabelDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kLabelDeclDerivedKinds[] = {
+    LabelDecl::static_kind(),};
+
+gap::generator<DeclKind> LabelDecl::derived_kinds(void) {
+  for (DeclKind k : kLabelDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<LabelDecl> LabelDecl::from(const NamedDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -54035,6 +60506,15 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kBaseUsingDeclDerivedKinds[] = {
+    UsingDecl::static_kind(),    UsingEnumDecl::static_kind(),};
+
+gap::generator<DeclKind> BaseUsingDecl::derived_kinds(void) {
+  for (DeclKind k : kBaseUsingDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BaseUsingDecl> BaseUsingDecl::from(const NamedDecl &parent) {
@@ -54139,6 +60619,15 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kUsingEnumDeclDerivedKinds[] = {
+    UsingEnumDecl::static_kind(),};
+
+gap::generator<DeclKind> UsingEnumDecl::derived_kinds(void) {
+  for (DeclKind k : kUsingEnumDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UsingEnumDecl> UsingEnumDecl::from(const BaseUsingDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -54234,6 +60723,15 @@ gap::generator<UsingDecl> UsingDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kUsingDeclDerivedKinds[] = {
+    UsingDecl::static_kind(),};
+
+gap::generator<DeclKind> UsingDecl::derived_kinds(void) {
+  for (DeclKind k : kUsingDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UsingDecl> UsingDecl::from(const BaseUsingDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -54326,6 +60824,15 @@ gap::generator<ValueDecl> ValueDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kValueDeclDerivedKinds[] = {
+    BindingDecl::static_kind(),    EnumConstantDecl::static_kind(),    IndirectFieldDecl::static_kind(),    MSGuidDecl::static_kind(),    OMPDeclareReductionDecl::static_kind(),    TemplateParamObjectDecl::static_kind(),    UnnamedGlobalConstantDecl::static_kind(),    UnresolvedUsingValueDecl::static_kind(),    OMPDeclareMapperDecl::static_kind(),    FieldDecl::static_kind(),    FunctionDecl::static_kind(),    MSPropertyDecl::static_kind(),    NonTypeTemplateParmDecl::static_kind(),    VarDecl::static_kind(),    ObjCAtDefsFieldDecl::static_kind(),    ObjCIvarDecl::static_kind(),    CXXDeductionGuideDecl::static_kind(),    CXXMethodDecl::static_kind(),    VarTemplateSpecializationDecl::static_kind(),    DecompositionDecl::static_kind(),    ImplicitParamDecl::static_kind(),    OMPCapturedExprDecl::static_kind(),    ParmVarDecl::static_kind(),    CXXConstructorDecl::static_kind(),    CXXConversionDecl::static_kind(),    CXXDestructorDecl::static_kind(),    VarTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> ValueDecl::derived_kinds(void) {
+  for (DeclKind k : kValueDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ValueDecl> ValueDecl::from(const NamedDecl &parent) {
@@ -54441,6 +60948,15 @@ gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::redeclaration
   co_return;
 }
 
+static const DeclKind kUnresolvedUsingValueDeclDerivedKinds[] = {
+    UnresolvedUsingValueDecl::static_kind(),};
+
+gap::generator<DeclKind> UnresolvedUsingValueDecl::derived_kinds(void) {
+  for (DeclKind k : kUnresolvedUsingValueDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const ValueDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -54539,6 +61055,15 @@ gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::redeclarati
   co_return;
 }
 
+static const DeclKind kUnnamedGlobalConstantDeclDerivedKinds[] = {
+    UnnamedGlobalConstantDecl::static_kind(),};
+
+gap::generator<DeclKind> UnnamedGlobalConstantDecl::derived_kinds(void) {
+  for (DeclKind k : kUnnamedGlobalConstantDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::from(const ValueDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -54621,6 +61146,15 @@ gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::redeclarations(
   co_return;
 }
 
+static const DeclKind kTemplateParamObjectDeclDerivedKinds[] = {
+    TemplateParamObjectDecl::static_kind(),};
+
+gap::generator<DeclKind> TemplateParamObjectDecl::derived_kinds(void) {
+  for (DeclKind k : kTemplateParamObjectDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const ValueDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -54701,6 +61235,15 @@ gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::redeclarations(
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kOMPDeclareReductionDeclDerivedKinds[] = {
+    OMPDeclareReductionDecl::static_kind(),};
+
+gap::generator<DeclKind> OMPDeclareReductionDecl::derived_kinds(void) {
+  for (DeclKind k : kOMPDeclareReductionDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const ValueDecl &parent) {
@@ -54828,6 +61371,15 @@ gap::generator<MSGuidDecl> MSGuidDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kMSGuidDeclDerivedKinds[] = {
+    MSGuidDecl::static_kind(),};
+
+gap::generator<DeclKind> MSGuidDecl::derived_kinds(void) {
+  for (DeclKind k : kMSGuidDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MSGuidDecl> MSGuidDecl::from(const ValueDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -54908,6 +61460,15 @@ gap::generator<IndirectFieldDecl> IndirectFieldDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kIndirectFieldDeclDerivedKinds[] = {
+    IndirectFieldDecl::static_kind(),};
+
+gap::generator<DeclKind> IndirectFieldDecl::derived_kinds(void) {
+  for (DeclKind k : kIndirectFieldDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const ValueDecl &parent) {
@@ -55031,6 +61592,15 @@ gap::generator<EnumConstantDecl> EnumConstantDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kEnumConstantDeclDerivedKinds[] = {
+    EnumConstantDecl::static_kind(),};
+
+gap::generator<DeclKind> EnumConstantDecl::derived_kinds(void) {
+  for (DeclKind k : kEnumConstantDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<EnumConstantDecl> EnumConstantDecl::from(const ValueDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -55124,6 +61694,15 @@ gap::generator<DeclaratorDecl> DeclaratorDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kDeclaratorDeclDerivedKinds[] = {
+    FieldDecl::static_kind(),    FunctionDecl::static_kind(),    MSPropertyDecl::static_kind(),    NonTypeTemplateParmDecl::static_kind(),    VarDecl::static_kind(),    ObjCAtDefsFieldDecl::static_kind(),    ObjCIvarDecl::static_kind(),    CXXDeductionGuideDecl::static_kind(),    CXXMethodDecl::static_kind(),    VarTemplateSpecializationDecl::static_kind(),    DecompositionDecl::static_kind(),    ImplicitParamDecl::static_kind(),    OMPCapturedExprDecl::static_kind(),    ParmVarDecl::static_kind(),    CXXConstructorDecl::static_kind(),    CXXConversionDecl::static_kind(),    CXXDestructorDecl::static_kind(),    VarTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> DeclaratorDecl::derived_kinds(void) {
+  for (DeclKind k : kDeclaratorDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DeclaratorDecl> DeclaratorDecl::from(const ValueDecl &parent) {
@@ -55273,6 +61852,15 @@ gap::generator<VarDecl> VarDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kVarDeclDerivedKinds[] = {
+    VarDecl::static_kind(),    VarTemplateSpecializationDecl::static_kind(),    DecompositionDecl::static_kind(),    ImplicitParamDecl::static_kind(),    OMPCapturedExprDecl::static_kind(),    ParmVarDecl::static_kind(),    VarTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> VarDecl::derived_kinds(void) {
+  for (DeclKind k : kVarDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<VarDecl> VarDecl::from(const DeclaratorDecl &parent) {
@@ -55635,6 +62223,15 @@ gap::generator<ParmVarDecl> ParmVarDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kParmVarDeclDerivedKinds[] = {
+    ParmVarDecl::static_kind(),};
+
+gap::generator<DeclKind> ParmVarDecl::derived_kinds(void) {
+  for (DeclKind k : kParmVarDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ParmVarDecl> ParmVarDecl::from(const VarDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -55793,6 +62390,15 @@ gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::redeclarations(void) co
   co_return;
 }
 
+static const DeclKind kOMPCapturedExprDeclDerivedKinds[] = {
+    OMPCapturedExprDecl::static_kind(),};
+
+gap::generator<DeclKind> OMPCapturedExprDecl::derived_kinds(void) {
+  for (DeclKind k : kOMPCapturedExprDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const VarDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -55881,6 +62487,15 @@ gap::generator<ImplicitParamDecl> ImplicitParamDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kImplicitParamDeclDerivedKinds[] = {
+    ImplicitParamDecl::static_kind(),};
+
+gap::generator<DeclKind> ImplicitParamDecl::derived_kinds(void) {
+  for (DeclKind k : kImplicitParamDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const VarDecl &parent) {
@@ -55975,6 +62590,15 @@ gap::generator<DecompositionDecl> DecompositionDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kDecompositionDeclDerivedKinds[] = {
+    DecompositionDecl::static_kind(),};
+
+gap::generator<DeclKind> DecompositionDecl::derived_kinds(void) {
+  for (DeclKind k : kDecompositionDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<DecompositionDecl> DecompositionDecl::from(const VarDecl &parent) {
@@ -56088,6 +62712,15 @@ gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::red
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kVarTemplateSpecializationDeclDerivedKinds[] = {
+    VarTemplateSpecializationDecl::static_kind(),    VarTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> VarTemplateSpecializationDecl::derived_kinds(void) {
+  for (DeclKind k : kVarTemplateSpecializationDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from(const VarDecl &parent) {
@@ -56257,6 +62890,15 @@ gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializ
   co_return;
 }
 
+static const DeclKind kVarTemplatePartialSpecializationDeclDerivedKinds[] = {
+    VarTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> VarTemplatePartialSpecializationDecl::derived_kinds(void) {
+  for (DeclKind k : kVarTemplatePartialSpecializationDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const VarTemplateSpecializationDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -56363,6 +63005,15 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::redeclarations(
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kNonTypeTemplateParmDeclDerivedKinds[] = {
+    NonTypeTemplateParmDecl::static_kind(),};
+
+gap::generator<DeclKind> NonTypeTemplateParmDecl::derived_kinds(void) {
+  for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const DeclaratorDecl &parent) {
@@ -56531,6 +63182,15 @@ gap::generator<MSPropertyDecl> MSPropertyDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kMSPropertyDeclDerivedKinds[] = {
+    MSPropertyDecl::static_kind(),};
+
+gap::generator<DeclKind> MSPropertyDecl::derived_kinds(void) {
+  for (DeclKind k : kMSPropertyDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<MSPropertyDecl> MSPropertyDecl::from(const DeclaratorDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -56623,6 +63283,15 @@ gap::generator<FunctionDecl> FunctionDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kFunctionDeclDerivedKinds[] = {
+    FunctionDecl::static_kind(),    CXXDeductionGuideDecl::static_kind(),    CXXMethodDecl::static_kind(),    CXXConstructorDecl::static_kind(),    CXXConversionDecl::static_kind(),    CXXDestructorDecl::static_kind(),};
+
+gap::generator<DeclKind> FunctionDecl::derived_kinds(void) {
+  for (DeclKind k : kFunctionDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FunctionDecl> FunctionDecl::from(const DeclaratorDecl &parent) {
@@ -57149,6 +63818,15 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kCXXMethodDeclDerivedKinds[] = {
+    CXXMethodDecl::static_kind(),    CXXConstructorDecl::static_kind(),    CXXConversionDecl::static_kind(),    CXXDestructorDecl::static_kind(),};
+
+gap::generator<DeclKind> CXXMethodDecl::derived_kinds(void) {
+  for (DeclKind k : kCXXMethodDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXMethodDecl> CXXMethodDecl::from(const FunctionDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -57327,6 +64005,15 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::redeclarations(void) const 
   co_return;
 }
 
+static const DeclKind kCXXDestructorDeclDerivedKinds[] = {
+    CXXDestructorDecl::static_kind(),};
+
+gap::generator<DeclKind> CXXDestructorDecl::derived_kinds(void) {
+  for (DeclKind k : kCXXDestructorDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const CXXMethodDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -57447,6 +64134,15 @@ gap::generator<CXXConversionDecl> CXXConversionDecl::redeclarations(void) const 
   co_return;
 }
 
+static const DeclKind kCXXConversionDeclDerivedKinds[] = {
+    CXXConversionDecl::static_kind(),};
+
+gap::generator<DeclKind> CXXConversionDecl::derived_kinds(void) {
+  for (DeclKind k : kCXXConversionDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXConversionDecl> CXXConversionDecl::from(const CXXMethodDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -57552,6 +64248,15 @@ gap::generator<CXXConstructorDecl> CXXConstructorDecl::redeclarations(void) cons
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kCXXConstructorDeclDerivedKinds[] = {
+    CXXConstructorDecl::static_kind(),};
+
+gap::generator<DeclKind> CXXConstructorDecl::derived_kinds(void) {
+  for (DeclKind k : kCXXConstructorDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const CXXMethodDecl &parent) {
@@ -57681,6 +64386,15 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::redeclarations(void
   co_return;
 }
 
+static const DeclKind kCXXDeductionGuideDeclDerivedKinds[] = {
+    CXXDeductionGuideDecl::static_kind(),};
+
+gap::generator<DeclKind> CXXDeductionGuideDecl::derived_kinds(void) {
+  for (DeclKind k : kCXXDeductionGuideDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const FunctionDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -57787,6 +64501,15 @@ gap::generator<FieldDecl> FieldDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kFieldDeclDerivedKinds[] = {
+    FieldDecl::static_kind(),    ObjCAtDefsFieldDecl::static_kind(),    ObjCIvarDecl::static_kind(),};
+
+gap::generator<DeclKind> FieldDecl::derived_kinds(void) {
+  for (DeclKind k : kFieldDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FieldDecl> FieldDecl::from(const DeclaratorDecl &parent) {
@@ -57952,6 +64675,15 @@ gap::generator<ObjCIvarDecl> ObjCIvarDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kObjCIvarDeclDerivedKinds[] = {
+    ObjCIvarDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCIvarDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCIvarDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const FieldDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -58064,6 +64796,15 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::redeclarations(void) co
   co_return;
 }
 
+static const DeclKind kObjCAtDefsFieldDeclDerivedKinds[] = {
+    ObjCAtDefsFieldDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCAtDefsFieldDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCAtDefsFieldDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const FieldDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -58152,6 +64893,15 @@ gap::generator<BindingDecl> BindingDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kBindingDeclDerivedKinds[] = {
+    BindingDecl::static_kind(),};
+
+gap::generator<DeclKind> BindingDecl::derived_kinds(void) {
+  for (DeclKind k : kBindingDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<BindingDecl> BindingDecl::from(const ValueDecl &parent) {
@@ -58251,6 +65001,15 @@ gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDec
   co_return;
 }
 
+static const DeclKind kOMPDeclarativeDirectiveValueDeclDerivedKinds[] = {
+    OMPDeclareMapperDecl::static_kind(),};
+
+gap::generator<DeclKind> OMPDeclarativeDirectiveValueDecl::derived_kinds(void) {
+  for (DeclKind k : kOMPDeclarativeDirectiveValueDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::from(const ValueDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -58331,6 +65090,15 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kOMPDeclareMapperDeclDerivedKinds[] = {
+    OMPDeclareMapperDecl::static_kind(),};
+
+gap::generator<DeclKind> OMPDeclareMapperDecl::derived_kinds(void) {
+  for (DeclKind k : kOMPDeclareMapperDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const OMPDeclarativeDirectiveValueDecl &parent) {
@@ -58433,6 +65201,15 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kUsingShadowDeclDerivedKinds[] = {
+    UsingShadowDecl::static_kind(),    ConstructorUsingShadowDecl::static_kind(),};
+
+gap::generator<DeclKind> UsingShadowDecl::derived_kinds(void) {
+  for (DeclKind k : kUsingShadowDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UsingShadowDecl> UsingShadowDecl::from(const NamedDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -58533,6 +65310,15 @@ gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::redeclara
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kConstructorUsingShadowDeclDerivedKinds[] = {
+    ConstructorUsingShadowDecl::static_kind(),};
+
+gap::generator<DeclKind> ConstructorUsingShadowDecl::derived_kinds(void) {
+  for (DeclKind k : kConstructorUsingShadowDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const UsingShadowDecl &parent) {
@@ -58657,6 +65443,15 @@ gap::generator<UsingPackDecl> UsingPackDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kUsingPackDeclDerivedKinds[] = {
+    UsingPackDecl::static_kind(),};
+
+gap::generator<DeclKind> UsingPackDecl::derived_kinds(void) {
+  for (DeclKind k : kUsingPackDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UsingPackDecl> UsingPackDecl::from(const NamedDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -58763,6 +65558,15 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::redeclarations(void) cons
   co_return;
 }
 
+static const DeclKind kUsingDirectiveDeclDerivedKinds[] = {
+    UsingDirectiveDecl::static_kind(),};
+
+gap::generator<DeclKind> UsingDirectiveDecl::derived_kinds(void) {
+  for (DeclKind k : kUsingDirectiveDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const NamedDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -58858,6 +65662,15 @@ gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::redecla
   co_return;
 }
 
+static const DeclKind kUnresolvedUsingIfExistsDeclDerivedKinds[] = {
+    UnresolvedUsingIfExistsDecl::static_kind(),};
+
+gap::generator<DeclKind> UnresolvedUsingIfExistsDecl::derived_kinds(void) {
+  for (DeclKind k : kUnresolvedUsingIfExistsDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const NamedDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -58934,6 +65747,15 @@ gap::generator<TypeDecl> TypeDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kTypeDeclDerivedKinds[] = {
+    UnresolvedUsingTypenameDecl::static_kind(),    TemplateTypeParmDecl::static_kind(),    ObjCTypeParamDecl::static_kind(),    TypeAliasDecl::static_kind(),    TypedefDecl::static_kind(),    EnumDecl::static_kind(),    RecordDecl::static_kind(),    CXXRecordDecl::static_kind(),    ClassTemplateSpecializationDecl::static_kind(),    ClassTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> TypeDecl::derived_kinds(void) {
+  for (DeclKind k : kTypeDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeDecl> TypeDecl::from(const NamedDecl &parent) {
@@ -59034,6 +65856,15 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kTemplateTypeParmDeclDerivedKinds[] = {
+    TemplateTypeParmDecl::static_kind(),};
+
+gap::generator<DeclKind> TemplateTypeParmDecl::derived_kinds(void) {
+  for (DeclKind k : kTemplateTypeParmDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const TypeDecl &parent) {
@@ -59170,6 +66001,15 @@ gap::generator<TagDecl> TagDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kTagDeclDerivedKinds[] = {
+    EnumDecl::static_kind(),    RecordDecl::static_kind(),    CXXRecordDecl::static_kind(),    ClassTemplateSpecializationDecl::static_kind(),    ClassTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> TagDecl::derived_kinds(void) {
+  for (DeclKind k : kTagDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TagDecl> TagDecl::from(const TypeDecl &parent) {
@@ -59378,6 +66218,15 @@ gap::generator<RecordDecl> RecordDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kRecordDeclDerivedKinds[] = {
+    RecordDecl::static_kind(),    CXXRecordDecl::static_kind(),    ClassTemplateSpecializationDecl::static_kind(),    ClassTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> RecordDecl::derived_kinds(void) {
+  for (DeclKind k : kRecordDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<RecordDecl> RecordDecl::from(const TagDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -59572,6 +66421,15 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kCXXRecordDeclDerivedKinds[] = {
+    CXXRecordDecl::static_kind(),    ClassTemplateSpecializationDecl::static_kind(),    ClassTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> CXXRecordDecl::derived_kinds(void) {
+  for (DeclKind k : kCXXRecordDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::from(const RecordDecl &parent) {
@@ -60798,6 +67656,15 @@ gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl:
   co_return;
 }
 
+static const DeclKind kClassTemplateSpecializationDeclDerivedKinds[] = {
+    ClassTemplateSpecializationDecl::static_kind(),    ClassTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> ClassTemplateSpecializationDecl::derived_kinds(void) {
+  for (DeclKind k : kClassTemplateSpecializationDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const CXXRecordDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -60981,6 +67848,15 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
   co_return;
 }
 
+static const DeclKind kClassTemplatePartialSpecializationDeclDerivedKinds[] = {
+    ClassTemplatePartialSpecializationDecl::static_kind(),};
+
+gap::generator<DeclKind> ClassTemplatePartialSpecializationDecl::derived_kinds(void) {
+  for (DeclKind k : kClassTemplatePartialSpecializationDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const ClassTemplateSpecializationDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -61101,6 +67977,15 @@ gap::generator<EnumDecl> EnumDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kEnumDeclDerivedKinds[] = {
+    EnumDecl::static_kind(),};
+
+gap::generator<DeclKind> EnumDecl::derived_kinds(void) {
+  for (DeclKind k : kEnumDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<EnumDecl> EnumDecl::from(const TagDecl &parent) {
@@ -61310,6 +68195,15 @@ gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::redecla
   co_return;
 }
 
+static const DeclKind kUnresolvedUsingTypenameDeclDerivedKinds[] = {
+    UnresolvedUsingTypenameDecl::static_kind(),};
+
+gap::generator<DeclKind> UnresolvedUsingTypenameDecl::derived_kinds(void) {
+  for (DeclKind k : kUnresolvedUsingTypenameDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(const TypeDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -61406,6 +68300,15 @@ gap::generator<TypedefNameDecl> TypedefNameDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kTypedefNameDeclDerivedKinds[] = {
+    ObjCTypeParamDecl::static_kind(),    TypeAliasDecl::static_kind(),    TypedefDecl::static_kind(),};
+
+gap::generator<DeclKind> TypedefNameDecl::derived_kinds(void) {
+  for (DeclKind k : kTypedefNameDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypedefNameDecl> TypedefNameDecl::from(const TypeDecl &parent) {
@@ -61518,6 +68421,15 @@ gap::generator<TypedefDecl> TypedefDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kTypedefDeclDerivedKinds[] = {
+    TypedefDecl::static_kind(),};
+
+gap::generator<DeclKind> TypedefDecl::derived_kinds(void) {
+  for (DeclKind k : kTypedefDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TypedefDecl> TypedefDecl::from(const TypedefNameDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -61602,6 +68514,15 @@ gap::generator<TypeAliasDecl> TypeAliasDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kTypeAliasDeclDerivedKinds[] = {
+    TypeAliasDecl::static_kind(),};
+
+gap::generator<DeclKind> TypeAliasDecl::derived_kinds(void) {
+  for (DeclKind k : kTypeAliasDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TypeAliasDecl> TypeAliasDecl::from(const TypedefNameDecl &parent) {
@@ -61701,6 +68622,15 @@ gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kObjCTypeParamDeclDerivedKinds[] = {
+    ObjCTypeParamDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCTypeParamDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCTypeParamDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const TypedefNameDecl &parent) {
@@ -61805,6 +68735,15 @@ gap::generator<TemplateDecl> TemplateDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kTemplateDeclDerivedKinds[] = {
+    TemplateTemplateParmDecl::static_kind(),    BuiltinTemplateDecl::static_kind(),    ConceptDecl::static_kind(),    TypeAliasTemplateDecl::static_kind(),    VarTemplateDecl::static_kind(),    ClassTemplateDecl::static_kind(),    FunctionTemplateDecl::static_kind(),};
+
+gap::generator<DeclKind> TemplateDecl::derived_kinds(void) {
+  for (DeclKind k : kTemplateDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TemplateDecl> TemplateDecl::from(const NamedDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -61903,6 +68842,15 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::redeclaration
   co_return;
 }
 
+static const DeclKind kRedeclarableTemplateDeclDerivedKinds[] = {
+    TypeAliasTemplateDecl::static_kind(),    VarTemplateDecl::static_kind(),    ClassTemplateDecl::static_kind(),    FunctionTemplateDecl::static_kind(),};
+
+gap::generator<DeclKind> RedeclarableTemplateDecl::derived_kinds(void) {
+  for (DeclKind k : kRedeclarableTemplateDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const TemplateDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -61995,6 +68943,15 @@ gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kFunctionTemplateDeclDerivedKinds[] = {
+    FunctionTemplateDecl::static_kind(),};
+
+gap::generator<DeclKind> FunctionTemplateDecl::derived_kinds(void) {
+  for (DeclKind k : kFunctionTemplateDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const RedeclarableTemplateDecl &parent) {
@@ -62091,6 +69048,15 @@ gap::generator<ClassTemplateDecl> ClassTemplateDecl::redeclarations(void) const 
   co_return;
 }
 
+static const DeclKind kClassTemplateDeclDerivedKinds[] = {
+    ClassTemplateDecl::static_kind(),};
+
+gap::generator<DeclKind> ClassTemplateDecl::derived_kinds(void) {
+  for (DeclKind k : kClassTemplateDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const RedeclarableTemplateDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -62179,6 +69145,15 @@ gap::generator<VarTemplateDecl> VarTemplateDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kVarTemplateDeclDerivedKinds[] = {
+    VarTemplateDecl::static_kind(),};
+
+gap::generator<DeclKind> VarTemplateDecl::derived_kinds(void) {
+  for (DeclKind k : kVarTemplateDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<VarTemplateDecl> VarTemplateDecl::from(const RedeclarableTemplateDecl &parent) {
@@ -62271,6 +69246,15 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::redeclarations(void
   co_return;
 }
 
+static const DeclKind kTypeAliasTemplateDeclDerivedKinds[] = {
+    TypeAliasTemplateDecl::static_kind(),};
+
+gap::generator<DeclKind> TypeAliasTemplateDecl::derived_kinds(void) {
+  for (DeclKind k : kTypeAliasTemplateDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const RedeclarableTemplateDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -62355,6 +69339,15 @@ gap::generator<ConceptDecl> ConceptDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kConceptDeclDerivedKinds[] = {
+    ConceptDecl::static_kind(),};
+
+gap::generator<DeclKind> ConceptDecl::derived_kinds(void) {
+  for (DeclKind k : kConceptDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ConceptDecl> ConceptDecl::from(const TemplateDecl &parent) {
@@ -62448,6 +69441,15 @@ gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::redeclarations(void) co
   co_return;
 }
 
+static const DeclKind kBuiltinTemplateDeclDerivedKinds[] = {
+    BuiltinTemplateDecl::static_kind(),};
+
+gap::generator<DeclKind> BuiltinTemplateDecl::derived_kinds(void) {
+  for (DeclKind k : kBuiltinTemplateDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const TemplateDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -62528,6 +69530,15 @@ gap::generator<TemplateTemplateParmDecl> TemplateTemplateParmDecl::redeclaration
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kTemplateTemplateParmDeclDerivedKinds[] = {
+    TemplateTemplateParmDecl::static_kind(),};
+
+gap::generator<DeclKind> TemplateTemplateParmDecl::derived_kinds(void) {
+  for (DeclKind k : kTemplateTemplateParmDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const TemplateDecl &parent) {
@@ -62630,6 +69641,15 @@ gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kObjCPropertyDeclDerivedKinds[] = {
+    ObjCPropertyDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCPropertyDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCPropertyDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const NamedDecl &parent) {
@@ -62784,6 +69804,15 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kObjCMethodDeclDerivedKinds[] = {
+    ObjCMethodDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCMethodDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCMethodDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const NamedDecl &parent) {
@@ -63045,6 +70074,15 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::redeclarations(void) const 
   co_return;
 }
 
+static const DeclKind kObjCContainerDeclDerivedKinds[] = {
+    ObjCInterfaceDecl::static_kind(),    ObjCProtocolDecl::static_kind(),    ObjCCategoryDecl::static_kind(),    ObjCImplementationDecl::static_kind(),    ObjCCategoryImplDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCContainerDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCContainerDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const NamedDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -63283,6 +70321,15 @@ gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kObjCCategoryDeclDerivedKinds[] = {
+    ObjCCategoryDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCCategoryDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCCategoryDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const ObjCContainerDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -63469,6 +70516,15 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kObjCProtocolDeclDerivedKinds[] = {
+    ObjCProtocolDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCProtocolDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCProtocolDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const ObjCContainerDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -63616,6 +70672,15 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kObjCInterfaceDeclDerivedKinds[] = {
+    ObjCInterfaceDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCInterfaceDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCInterfaceDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const ObjCContainerDecl &parent) {
@@ -63966,6 +71031,15 @@ gap::generator<ObjCImplDecl> ObjCImplDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kObjCImplDeclDerivedKinds[] = {
+    ObjCImplementationDecl::static_kind(),    ObjCCategoryImplDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCImplDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCImplDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCImplDecl> ObjCImplDecl::from(const ObjCContainerDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -64077,6 +71151,15 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::redeclarations(void) 
   co_return;
 }
 
+static const DeclKind kObjCCategoryImplDeclDerivedKinds[] = {
+    ObjCCategoryImplDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCCategoryImplDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCCategoryImplDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const ObjCImplDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -64170,6 +71253,15 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::redeclarations(vo
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kObjCImplementationDeclDerivedKinds[] = {
+    ObjCImplementationDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCImplementationDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCImplementationDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const ObjCImplDecl &parent) {
@@ -64311,6 +71403,15 @@ gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::redeclarations(
   co_return;
 }
 
+static const DeclKind kObjCCompatibleAliasDeclDerivedKinds[] = {
+    ObjCCompatibleAliasDecl::static_kind(),};
+
+gap::generator<DeclKind> ObjCCompatibleAliasDecl::derived_kinds(void) {
+  for (DeclKind k : kObjCCompatibleAliasDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const NamedDecl &parent) {
   return from(reinterpret_cast<const Decl &>(parent));
 }
@@ -64392,6 +71493,15 @@ gap::generator<NamespaceDecl> NamespaceDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kNamespaceDeclDerivedKinds[] = {
+    NamespaceDecl::static_kind(),};
+
+gap::generator<DeclKind> NamespaceDecl::derived_kinds(void) {
+  for (DeclKind k : kNamespaceDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NamespaceDecl> NamespaceDecl::from(const NamedDecl &parent) {
@@ -64479,6 +71589,15 @@ gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::redeclarations(void) cons
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kNamespaceAliasDeclDerivedKinds[] = {
+    NamespaceAliasDecl::static_kind(),};
+
+gap::generator<DeclKind> NamespaceAliasDecl::derived_kinds(void) {
+  for (DeclKind k : kNamespaceAliasDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const NamedDecl &parent) {
@@ -64576,6 +71695,15 @@ gap::generator<LinkageSpecDecl> LinkageSpecDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kLinkageSpecDeclDerivedKinds[] = {
+    LinkageSpecDecl::static_kind(),};
+
+gap::generator<DeclKind> LinkageSpecDecl::derived_kinds(void) {
+  for (DeclKind k : kLinkageSpecDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::LINKAGE_SPEC:
@@ -64657,6 +71785,15 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::red
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kLifetimeExtendedTemporaryDeclDerivedKinds[] = {
+    LifetimeExtendedTemporaryDecl::static_kind(),};
+
+gap::generator<DeclKind> LifetimeExtendedTemporaryDecl::derived_kinds(void) {
+  for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const Decl &parent) {
@@ -64758,6 +71895,15 @@ gap::generator<ImportDecl> ImportDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kImportDeclDerivedKinds[] = {
+    ImportDecl::static_kind(),};
+
+gap::generator<DeclKind> ImportDecl::derived_kinds(void) {
+  for (DeclKind k : kImportDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ImportDecl> ImportDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::IMPORT:
@@ -64857,6 +72003,15 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::redeclarations(void) cons
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kFriendTemplateDeclDerivedKinds[] = {
+    FriendTemplateDecl::static_kind(),};
+
+gap::generator<DeclKind> FriendTemplateDecl::derived_kinds(void) {
+  for (DeclKind k : kFriendTemplateDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Decl &parent) {
@@ -64966,6 +72121,15 @@ gap::generator<FriendDecl> FriendDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kFriendDeclDerivedKinds[] = {
+    FriendDecl::static_kind(),};
+
+gap::generator<DeclKind> FriendDecl::derived_kinds(void) {
+  for (DeclKind k : kFriendDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<FriendDecl> FriendDecl::from(const Decl &parent) {
@@ -65097,6 +72261,15 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::redeclarations(void) const {
   co_return;
 }
 
+static const DeclKind kFileScopeAsmDeclDerivedKinds[] = {
+    FileScopeAsmDecl::static_kind(),};
+
+gap::generator<DeclKind> FileScopeAsmDecl::derived_kinds(void) {
+  for (DeclKind k : kFileScopeAsmDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::FILE_SCOPE_ASM:
@@ -65184,6 +72357,15 @@ gap::generator<ExternCContextDecl> ExternCContextDecl::redeclarations(void) cons
   co_return;
 }
 
+static const DeclKind kExternCContextDeclDerivedKinds[] = {
+    ExternCContextDecl::static_kind(),};
+
+gap::generator<DeclKind> ExternCContextDecl::derived_kinds(void) {
+  for (DeclKind k : kExternCContextDeclDerivedKinds) {
+    co_yield k;
+  }
+}
+
 std::optional<ExternCContextDecl> ExternCContextDecl::from(const Decl &parent) {
   switch (parent.kind()) {
     case mx::DeclKind::EXTERN_C_CONTEXT:
@@ -65265,6 +72447,15 @@ gap::generator<ExportDecl> ExportDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kExportDeclDerivedKinds[] = {
+    ExportDecl::static_kind(),};
+
+gap::generator<DeclKind> ExportDecl::derived_kinds(void) {
+  for (DeclKind k : kExportDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<ExportDecl> ExportDecl::from(const Decl &parent) {
@@ -65360,6 +72551,15 @@ gap::generator<EmptyDecl> EmptyDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+static const DeclKind kEmptyDeclDerivedKinds[] = {
+    EmptyDecl::static_kind(),};
+
+gap::generator<DeclKind> EmptyDecl::derived_kinds(void) {
+  for (DeclKind k : kEmptyDeclDerivedKinds) {
+    co_yield k;
+  }
 }
 
 std::optional<EmptyDecl> EmptyDecl::from(const Decl &parent) {

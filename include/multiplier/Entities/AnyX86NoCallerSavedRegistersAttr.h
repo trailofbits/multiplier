@@ -42,6 +42,7 @@ class AnyX86NoCallerSavedRegistersAttr : public InheritableAttr {
     return AttrKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -42,6 +42,7 @@ class RegCallAttr : public InheritableAttr {
     return AttrKind::REG_CALL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<RegCallAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

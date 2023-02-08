@@ -40,6 +40,7 @@ class AliasAttr : public Attr {
     return AttrKind::ALIAS;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AliasAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

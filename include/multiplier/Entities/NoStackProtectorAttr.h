@@ -42,6 +42,7 @@ class NoStackProtectorAttr : public InheritableAttr {
     return AttrKind::NO_STACK_PROTECTOR;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoStackProtectorAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

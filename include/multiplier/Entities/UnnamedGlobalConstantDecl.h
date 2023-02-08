@@ -44,6 +44,7 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
     return DeclKind::UNNAMED_GLOBAL_CONSTANT;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UnnamedGlobalConstantDecl> containing(const Decl &decl);
   static gap::generator<UnnamedGlobalConstantDecl> containing(const Stmt &stmt);
 

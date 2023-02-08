@@ -42,6 +42,7 @@ class CodeSegAttr : public InheritableAttr {
     return AttrKind::CODE_SEG;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CodeSegAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

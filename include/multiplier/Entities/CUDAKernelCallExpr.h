@@ -46,6 +46,7 @@ class CUDAKernelCallExpr : public CallExpr {
     return StmtKind::CUDA_KERNEL_CALL_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CUDAKernelCallExpr> containing(const Decl &decl);
   static gap::generator<CUDAKernelCallExpr> containing(const Stmt &stmt);
 

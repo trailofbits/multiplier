@@ -42,6 +42,7 @@ class ExtVectorType : public VectorType {
     return TypeKind::EXT_VECTOR;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ExtVectorType> from(const Reference &r) {
     return from(r.as_type());
   }

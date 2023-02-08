@@ -46,6 +46,7 @@ class OMPTargetSimdDirective : public OMPLoopDirective {
     return StmtKind::OMP_TARGET_SIMD_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPTargetSimdDirective> containing(const Decl &decl);
   static gap::generator<OMPTargetSimdDirective> containing(const Stmt &stmt);
 

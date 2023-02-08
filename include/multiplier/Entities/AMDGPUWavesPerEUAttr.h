@@ -43,6 +43,7 @@ class AMDGPUWavesPerEUAttr : public InheritableAttr {
     return AttrKind::AMDGPU_WAVES_PER_EU;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AMDGPUWavesPerEUAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

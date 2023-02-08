@@ -41,6 +41,7 @@ class CapturedDecl : public Decl {
     return DeclKind::CAPTURED;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<CapturedDecl> containing(const Decl &decl);
   static gap::generator<CapturedDecl> containing(const Stmt &stmt);
 

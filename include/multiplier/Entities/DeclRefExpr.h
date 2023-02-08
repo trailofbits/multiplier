@@ -47,6 +47,7 @@ class DeclRefExpr : public Expr {
     return StmtKind::DECL_REF_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DeclRefExpr> containing(const Decl &decl);
   static gap::generator<DeclRefExpr> containing(const Stmt &stmt);
 

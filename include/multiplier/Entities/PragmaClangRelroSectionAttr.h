@@ -42,6 +42,7 @@ class PragmaClangRelroSectionAttr : public InheritableAttr {
     return AttrKind::PRAGMA_CLANG_RELRO_SECTION;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PragmaClangRelroSectionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

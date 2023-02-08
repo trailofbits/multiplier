@@ -114,6 +114,10 @@ class File {
   //            use `File::containing` on the result of `Token::file_token`.
   static std::optional<File> containing(const Token &token);
 
+  inline static constexpr EntityCategory entity_category(void) {
+    return EntityCategory::FILE;
+  }
+
   // Return the entity ID of this file.
   SpecificEntityId<FileId> id(void) const noexcept;
 

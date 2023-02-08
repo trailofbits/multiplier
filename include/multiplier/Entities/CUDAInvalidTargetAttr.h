@@ -42,6 +42,7 @@ class CUDAInvalidTargetAttr : public InheritableAttr {
     return AttrKind::CUDA_INVALID_TARGET;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CUDAInvalidTargetAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

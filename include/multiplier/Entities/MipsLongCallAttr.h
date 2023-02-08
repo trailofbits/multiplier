@@ -43,6 +43,7 @@ class MipsLongCallAttr : public InheritableAttr {
     return AttrKind::MIPS_LONG_CALL;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MipsLongCallAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

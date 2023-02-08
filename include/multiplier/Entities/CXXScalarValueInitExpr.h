@@ -44,6 +44,7 @@ class CXXScalarValueInitExpr : public Expr {
     return StmtKind::CXX_SCALAR_VALUE_INIT_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXScalarValueInitExpr> containing(const Decl &decl);
   static gap::generator<CXXScalarValueInitExpr> containing(const Stmt &stmt);
 

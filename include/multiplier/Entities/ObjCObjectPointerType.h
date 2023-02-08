@@ -44,6 +44,7 @@ class ObjCObjectPointerType : public Type {
     return TypeKind::OBJ_C_OBJECT_POINTER;
   }
 
+  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ObjCObjectPointerType> from(const Reference &r) {
     return from(r.as_type());
   }

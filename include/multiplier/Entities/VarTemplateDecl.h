@@ -46,6 +46,7 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
     return DeclKind::VAR_TEMPLATE;
   }
 
+  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<VarTemplateDecl> containing(const Decl &decl);
   static gap::generator<VarTemplateDecl> containing(const Stmt &stmt);
 

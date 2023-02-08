@@ -45,6 +45,7 @@ class ObjCIvarRefExpr : public Expr {
     return StmtKind::OBJ_C_IVAR_REF_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCIvarRefExpr> containing(const Decl &decl);
   static gap::generator<ObjCIvarRefExpr> containing(const Stmt &stmt);
 

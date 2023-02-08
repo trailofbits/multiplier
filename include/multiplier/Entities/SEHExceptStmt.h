@@ -42,6 +42,7 @@ class SEHExceptStmt : public Stmt {
     return StmtKind::SEH_EXCEPT_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SEHExceptStmt> containing(const Decl &decl);
   static gap::generator<SEHExceptStmt> containing(const Stmt &stmt);
 

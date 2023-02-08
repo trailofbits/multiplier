@@ -44,6 +44,7 @@ class CXXStdInitializerListExpr : public Expr {
     return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXStdInitializerListExpr> containing(const Decl &decl);
   static gap::generator<CXXStdInitializerListExpr> containing(const Stmt &stmt);
 

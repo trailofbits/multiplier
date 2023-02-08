@@ -42,6 +42,7 @@ class ObjCKindOfAttr : public TypeAttr {
     return AttrKind::OBJ_C_KIND_OF;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCKindOfAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

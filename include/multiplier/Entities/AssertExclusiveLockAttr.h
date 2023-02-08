@@ -42,6 +42,7 @@ class AssertExclusiveLockAttr : public InheritableAttr {
     return AttrKind::ASSERT_EXCLUSIVE_LOCK;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AssertExclusiveLockAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

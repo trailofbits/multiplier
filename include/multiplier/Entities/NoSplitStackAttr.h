@@ -42,6 +42,7 @@ class NoSplitStackAttr : public InheritableAttr {
     return AttrKind::NO_SPLIT_STACK;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoSplitStackAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

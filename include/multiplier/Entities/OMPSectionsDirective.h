@@ -43,6 +43,7 @@ class OMPSectionsDirective : public OMPExecutableDirective {
     return StmtKind::OMP_SECTIONS_DIRECTIVE;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPSectionsDirective> containing(const Decl &decl);
   static gap::generator<OMPSectionsDirective> containing(const Stmt &stmt);
 

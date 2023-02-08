@@ -46,6 +46,7 @@ class ImplicitCastExpr : public CastExpr {
     return StmtKind::IMPLICIT_CAST_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ImplicitCastExpr> containing(const Decl &decl);
   static gap::generator<ImplicitCastExpr> containing(const Stmt &stmt);
 

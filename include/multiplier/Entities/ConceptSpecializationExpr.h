@@ -45,6 +45,7 @@ class ConceptSpecializationExpr : public Expr {
     return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ConceptSpecializationExpr> containing(const Decl &decl);
   static gap::generator<ConceptSpecializationExpr> containing(const Stmt &stmt);
 

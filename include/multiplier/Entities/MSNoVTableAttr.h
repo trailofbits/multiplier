@@ -42,6 +42,7 @@ class MSNoVTableAttr : public InheritableAttr {
     return AttrKind::MS_NO_V_TABLE;
   }
 
+  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MSNoVTableAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

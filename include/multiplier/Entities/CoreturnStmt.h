@@ -41,6 +41,7 @@ class CoreturnStmt : public Stmt {
     return StmtKind::CORETURN_STMT;
   }
 
+  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CoreturnStmt> containing(const Decl &decl);
   static gap::generator<CoreturnStmt> containing(const Stmt &stmt);
 
