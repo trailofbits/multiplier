@@ -30,11 +30,16 @@ static std::optional<mx::FunctionDecl> StrchrEntityExists(const mx::Index &index
   return std::nullopt;
 }
 
-void TaintTrack(const mx::FunctionDecl &func, TaintMap &map) {
+void TaintTrack(mx::FunctionDecl &func, TaintMap &map) {
   for (mx::Reference ref : func.references()) {
     auto taint_source = ref.as_statement();
     for (mx::CallExpr call : mx::CallExpr::containing(*taint_source)) {
       if (auto orig_decl = call.direct_callee()) {
+
+        const mx::FunctionDecl& orig_func_decl = *orig_decl;
+        if (orig_func_decl.id() != func.id()) {
+          continue;
+        }
         
         std::optional<mx::Expr> first_arg = call.nth_argument(0);
         if (!first_arg) {
