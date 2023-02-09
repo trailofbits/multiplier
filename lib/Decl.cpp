@@ -24,7 +24,9 @@ DeclImpl::DeclImpl(std::shared_ptr<EntityProvider> ep_,
                    RawEntityId id_)
     : EntityImpl<ast::Decl>(std::move(ep_), kj::mv(data_)),
       fragment_id(FragmentIdFromEntityId(id_).value()),
-      offset(FragmentOffsetFromEntityId(id_).value()) {}
+      offset(FragmentOffsetFromEntityId(id_).value()),
+      definition_id(kInvalidEntityId),
+      canonical_id(kInvalidEntityId) {}
 
 SpecificEntityId<DeclId> Decl::id(void) const {
   DeclId eid;
@@ -36,10 +38,26 @@ SpecificEntityId<DeclId> Decl::id(void) const {
 }
 
 std::optional<Decl> Decl::definition(void) const {
-  for (RawEntityId raw_id : impl->ep->Redeclarations(impl->ep, id().Pack())) {
-    if (DeclImplPtr redecl = impl->ep->DeclFor(impl->ep, raw_id)) {
+  const EntityProvider::Ptr &ep = impl->ep;
+
+  RawEntityId cached_id = impl->definition_id.load(std::memory_order_acquire);
+  if (cached_id != kInvalidEntityId) {
+    if (DeclImplPtr redecl = ep->DeclFor(ep, cached_id)) {
+      return Decl(std::move(redecl));
+    }
+  }
+
+  for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
+    if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
+
+      if (impl->canonical_id.load(std::memory_order_relaxed) ==
+              kInvalidEntityId) {
+        impl->canonical_id.store(raw_id, std::memory_order_release);
+      }
+
       Decl decl(std::move(redecl));
       if (decl.is_definition()) {
+        impl->definition_id.store(raw_id, std::memory_order_release);
         return decl;
       }
     }
@@ -49,9 +67,23 @@ std::optional<Decl> Decl::definition(void) const {
 
 Decl Decl::canonical_declaration(void) const {
   const EntityProvider::Ptr &ep = impl->ep;
+
+  RawEntityId cached_id = impl->canonical_id.load(std::memory_order_acquire);
+  if (cached_id != kInvalidEntityId) {
+    if (DeclImplPtr redecl = ep->DeclFor(ep, cached_id)) {
+      return Decl(std::move(redecl));
+    }
+  }
+
   for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
     if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
-      return Decl(std::move(redecl));
+      impl->canonical_id.store(raw_id, std::memory_order_release);
+      Decl decl(std::move(redecl));
+      if (decl.is_definition()) {
+        impl->definition_id.store(raw_id, std::memory_order_release);
+      }
+
+      return decl;
     }
   }
   assert(false);

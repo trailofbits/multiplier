@@ -217,7 +217,7 @@ struct NamedEntityRecord {
       R"(CREATE VIRTUAL TABLE IF NOT EXISTS named_entity_index
          USING fts5(name, content='named_entity', content_rowid='entity_id'))",
 
-      R"(CREATE TRIGGER named_entity_ai AFTER INSERT ON named_entity BEGIN
+      R"(CREATE TRIGGER IF NOT EXISTS named_entity_ai AFTER INSERT ON named_entity BEGIN
            INSERT INTO named_entity_index (rowid, name) 
            VALUES (new.entity_id, new.name);
          END)"
