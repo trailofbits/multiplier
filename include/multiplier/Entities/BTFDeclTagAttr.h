@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class BTFDeclTagAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<BTFDeclTagAttr> in(const Fragment &frag);
+  static gap::generator<BTFDeclTagAttr> in(const Index &index);
   static gap::generator<BTFDeclTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<BTFDeclTagAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BTF_DECL_TAG;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<BTFDeclTagAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

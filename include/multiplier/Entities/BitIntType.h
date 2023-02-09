@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class BitIntType : public Type {
   friend class Type;
  public:
   static gap::generator<BitIntType> in(const Fragment &frag);
+  static gap::generator<BitIntType> in(const Index &index);
   static gap::generator<BitIntType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<BitIntType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BIT_INT;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<BitIntType> from(const Reference &r) {
     return from(r.as_type());
   }

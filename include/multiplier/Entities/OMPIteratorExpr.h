@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,16 +38,20 @@ class OMPIteratorExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OMPIteratorExpr> in(const Fragment &frag);
+  static gap::generator<OMPIteratorExpr> in(const Index &index);
   static gap::generator<OMPIteratorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<OMPIteratorExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ITERATOR_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPIteratorExpr> containing(const Decl &decl);
+  static gap::generator<OMPIteratorExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OMPIteratorExpr> containing(const Stmt &stmt);
+  static gap::generator<OMPIteratorExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

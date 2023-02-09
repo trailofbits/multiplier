@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,16 +37,20 @@ class FriendTemplateDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<FriendTemplateDecl> in(const Fragment &frag);
+  static gap::generator<FriendTemplateDecl> in(const Index &index);
   static gap::generator<FriendTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<FriendTemplateDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FRIEND_TEMPLATE;
   }
 
-  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<FriendTemplateDecl> containing(const Decl &decl);
+  static gap::generator<FriendTemplateDecl> containing(const std::optional<Decl> &decl);
+
   static gap::generator<FriendTemplateDecl> containing(const Stmt &stmt);
+  static gap::generator<FriendTemplateDecl> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

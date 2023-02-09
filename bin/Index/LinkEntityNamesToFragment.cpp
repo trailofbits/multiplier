@@ -129,7 +129,7 @@ void LinkEntityNamesToFragment(
   for (const pasta::Decl &decl : pf.decls_to_serialize) {
     if (auto nd = pasta::NamedDecl::From(decl);
         nd && ShouldGetSymbolName(decl)) {
-      database.AddAsync(mx::SymbolNameRecord{
+      database.AddAsync(mx::NamedEntityRecord{
           em.EntityId(decl), ContextualSymbolName(nd.value())});
     }
   }
@@ -145,7 +145,7 @@ void LinkEntityNamesToFragment(
     if (auto nm = pasta::DefineMacroDirective::From(macro)) {
       if (auto macro_name = nm->Name()) {
         std::string_view name = macro_name->Data();
-        database.AddAsync(mx::SymbolNameRecord{
+        database.AddAsync(mx::NamedEntityRecord{
             em.EntityId(macro), std::string(name.data(), name.size())});
       }
     }

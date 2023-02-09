@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,11 +39,13 @@ class MacroExpansion : public MacroSubstitution {
  public:
   static gap::generator<MacroExpansion> in(const Fragment &frag);
 
+  static gap::generator<MacroExpansion> in(const Index &index);
+  static std::optional<MacroExpansion> by_id(const Index &, EntityId);
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::EXPANSION;
   }
 
-  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroExpansion> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

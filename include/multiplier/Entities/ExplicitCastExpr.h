@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -40,12 +41,16 @@ class ExplicitCastExpr : public CastExpr {
   friend class Stmt;
  public:
   static gap::generator<ExplicitCastExpr> in(const Fragment &frag);
+  static gap::generator<ExplicitCastExpr> in(const Index &index);
   static gap::generator<ExplicitCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ExplicitCastExpr> by_id(const Index &, EntityId);
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ExplicitCastExpr> containing(const Decl &decl);
+  static gap::generator<ExplicitCastExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<ExplicitCastExpr> containing(const Stmt &stmt);
+  static gap::generator<ExplicitCastExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

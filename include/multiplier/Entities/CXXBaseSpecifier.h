@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -46,6 +47,8 @@ class CXXBaseSpecifier {
   friend class Type;
   friend class CXXBaseSpecifierImpl;
   std::shared_ptr<const CXXBaseSpecifierImpl> impl;
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier(const CXXBaseSpecifier &) = default;

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<HLSLSV_GroupIndexAttr> in(const Fragment &frag);
+  static gap::generator<HLSLSV_GroupIndexAttr> in(const Index &index);
   static gap::generator<HLSLSV_GroupIndexAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<HLSLSV_GroupIndexAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSLSV__GROUP_INDEX;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<HLSLSV_GroupIndexAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

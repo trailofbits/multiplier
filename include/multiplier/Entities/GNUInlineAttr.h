@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class GNUInlineAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<GNUInlineAttr> in(const Fragment &frag);
+  static gap::generator<GNUInlineAttr> in(const Index &index);
   static gap::generator<GNUInlineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<GNUInlineAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::GNU_INLINE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<GNUInlineAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

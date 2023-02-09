@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,16 +36,20 @@ class NamespaceAliasDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<NamespaceAliasDecl> in(const Fragment &frag);
+  static gap::generator<NamespaceAliasDecl> in(const Index &index);
   static gap::generator<NamespaceAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<NamespaceAliasDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMESPACE_ALIAS;
   }
 
-  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<NamespaceAliasDecl> containing(const Decl &decl);
+  static gap::generator<NamespaceAliasDecl> containing(const std::optional<Decl> &decl);
+
   static gap::generator<NamespaceAliasDecl> containing(const Stmt &stmt);
+  static gap::generator<NamespaceAliasDecl> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

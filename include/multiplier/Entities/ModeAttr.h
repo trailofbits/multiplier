@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class ModeAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ModeAttr> in(const Fragment &frag);
+  static gap::generator<ModeAttr> in(const Index &index);
   static gap::generator<ModeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ModeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MODE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ModeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

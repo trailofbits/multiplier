@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class SourceLocExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<SourceLocExpr> in(const Fragment &frag);
+  static gap::generator<SourceLocExpr> in(const Index &index);
   static gap::generator<SourceLocExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<SourceLocExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SOURCE_LOC_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SourceLocExpr> containing(const Decl &decl);
+  static gap::generator<SourceLocExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<SourceLocExpr> containing(const Stmt &stmt);
+  static gap::generator<SourceLocExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

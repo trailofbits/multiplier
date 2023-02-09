@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,12 +39,16 @@ class OverloadExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OverloadExpr> in(const Fragment &frag);
+  static gap::generator<OverloadExpr> in(const Index &index);
   static gap::generator<OverloadExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<OverloadExpr> by_id(const Index &, EntityId);
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OverloadExpr> containing(const Decl &decl);
+  static gap::generator<OverloadExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OverloadExpr> containing(const Stmt &stmt);
+  static gap::generator<OverloadExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

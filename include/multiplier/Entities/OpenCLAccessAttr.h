@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -34,14 +35,15 @@ class OpenCLAccessAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<OpenCLAccessAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLAccessAttr> in(const Index &index);
   static gap::generator<OpenCLAccessAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<OpenCLAccessAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_ACCESS;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLAccessAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Fragment &frag);
+  static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Index &index);
   static gap::generator<ObjCRequiresPropertyDefsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ObjCRequiresPropertyDefsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFS;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

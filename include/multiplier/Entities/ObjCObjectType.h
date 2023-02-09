@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -34,14 +35,15 @@ class ObjCObjectType : public Type {
   friend class Type;
  public:
   static gap::generator<ObjCObjectType> in(const Fragment &frag);
+  static gap::generator<ObjCObjectType> in(const Index &index);
   static gap::generator<ObjCObjectType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ObjCObjectType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_OBJECT;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ObjCObjectType> from(const Reference &r) {
     return from(r.as_type());
   }

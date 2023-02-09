@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class CUDAConstantAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CUDAConstantAttr> in(const Fragment &frag);
+  static gap::generator<CUDAConstantAttr> in(const Index &index);
   static gap::generator<CUDAConstantAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<CUDAConstantAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_CONSTANT;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CUDAConstantAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

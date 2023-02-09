@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,16 +36,20 @@ class OMPInteropDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPInteropDirective> in(const Fragment &frag);
+  static gap::generator<OMPInteropDirective> in(const Index &index);
   static gap::generator<OMPInteropDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<OMPInteropDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_INTEROP_DIRECTIVE;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPInteropDirective> containing(const Decl &decl);
+  static gap::generator<OMPInteropDirective> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OMPInteropDirective> containing(const Stmt &stmt);
+  static gap::generator<OMPInteropDirective> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

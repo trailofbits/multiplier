@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -40,16 +41,20 @@ class UnresolvedMemberExpr : public OverloadExpr {
   friend class Stmt;
  public:
   static gap::generator<UnresolvedMemberExpr> in(const Fragment &frag);
+  static gap::generator<UnresolvedMemberExpr> in(const Index &index);
   static gap::generator<UnresolvedMemberExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<UnresolvedMemberExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_MEMBER_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<UnresolvedMemberExpr> containing(const Decl &decl);
+  static gap::generator<UnresolvedMemberExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<UnresolvedMemberExpr> containing(const Stmt &stmt);
+  static gap::generator<UnresolvedMemberExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -16,9 +16,10 @@ DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
 DEFINE_bool(list_variables, false, "Should we list the variables inside of functions?");
 DEFINE_bool(show_locations, false, "Show the file locations of the functions?");
 
-static void PrintFunctionNames(mx::Fragment fragment) {
-  for (mx::FunctionDecl func : mx::FunctionDecl::in(fragment)) {
-    auto file = mx::File::containing(fragment);
+static void PrintFunctionNames(mx::Index index) {
+  for (mx::FunctionDecl func : mx::FunctionDecl::in(index)) {
+    auto file = mx::File::containing(func);
+    auto fragment = mx::Fragment::containing(func);
 
     std::cout
         << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
@@ -66,40 +67,15 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--db DATABASE] [--fragment_id ID | --file_id ID]"
-    << " [--list_variables LIST_VARIABLES] [--show_locations SHOW_LOCATIONS]\n";
+    << " [--db DATABASE]\n"
+    << " [--list_variables]\n"
+    << " [--show_locations]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  mx::Index index = InitExample(FLAGS_show_locations);
-
-  if (FLAGS_fragment_id) {
-    auto fragment = index.fragment(FLAGS_fragment_id);
-    if (!fragment) {
-      std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
-      return EXIT_FAILURE;
-    }
-    PrintFunctionNames(std::move(*fragment));
-
-  } else if (FLAGS_file_id) {
-    auto file = index.file(FLAGS_file_id);
-    if (!file) {
-      std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
-      return EXIT_FAILURE;
-    }
-    for (mx::Fragment fragment : file->fragments()) {
-      PrintFunctionNames(std::move(fragment));
-    }
-
-  } else {
-    for (mx::File file : index.files()) {
-      for (mx::Fragment fragment : file.fragments()) {
-        PrintFunctionNames(std::move(fragment));
-      }
-    }
-  }
+  PrintFunctionNames(InitExample(FLAGS_show_locations));
 
   return EXIT_SUCCESS;
 }

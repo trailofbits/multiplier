@@ -882,7 +882,7 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    SymbolNameRecord record, sqlite::Statement &insert) {
+    NamedEntityRecord record, sqlite::Statement &insert) {
   if (!record.name.empty()) {
     insert.BindValues(record.entity_id, record.name);
     return true;

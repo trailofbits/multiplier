@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class FlagEnumAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<FlagEnumAttr> in(const Fragment &frag);
+  static gap::generator<FlagEnumAttr> in(const Index &index);
   static gap::generator<FlagEnumAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<FlagEnumAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FLAG_ENUM;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<FlagEnumAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

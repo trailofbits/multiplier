@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -39,16 +40,20 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPParallelForSimdDirective> in(const Fragment &frag);
+  static gap::generator<OMPParallelForSimdDirective> in(const Index &index);
   static gap::generator<OMPParallelForSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<OMPParallelForSimdDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_FOR_SIMD_DIRECTIVE;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPParallelForSimdDirective> containing(const Decl &decl);
+  static gap::generator<OMPParallelForSimdDirective> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OMPParallelForSimdDirective> containing(const Stmt &stmt);
+  static gap::generator<OMPParallelForSimdDirective> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

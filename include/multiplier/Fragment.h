@@ -48,22 +48,25 @@ using MacroOrToken = std::variant<Macro, Token>;
 // trees, and tokens.
 class Fragment {
  private:
-  friend class Attr;
-  friend class Decl;
   friend class EntityProvider;
-  friend class File;
   friend class FragmentImpl;
   friend class Index;
-  friend class Macro;
   friend class Reference;
   friend class RemoteEntityProvider;
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
-  friend class Stmt;
-  friend class Token;
-  friend class Type;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
+
+#define MX_FRIEND(type_name, ln, e, c) \
+    friend class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND)
+#undef MX_FRIEND
 
   std::shared_ptr<const FragmentImpl> impl;
 

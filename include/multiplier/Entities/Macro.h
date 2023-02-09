@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -42,6 +43,8 @@ class Macro {
   friend class Type;
   friend class MacroImpl;
   std::shared_ptr<const MacroImpl> impl;
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
  public:
   Macro(Macro &&) noexcept = default;
   Macro(const Macro &) = default;
@@ -59,13 +62,16 @@ class Macro {
   gap::generator<Reference> references(void) const;
 
  protected:
-  static gap::generator<Macro> in_internal(const Fragment &fragment);
   static gap::generator<Macro> containing_internal(const Token &token);
 
  public:
+  static gap::generator<Macro> in(const Fragment &frag, std::span<MacroKind> kinds);
+  static gap::generator<Macro> in(const Index &index, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const Fragment &frag);
 
-  static gap::generator<MacroKind> derived_kinds(void);
+  static gap::generator<Macro> in(const Index &index);
+  static std::optional<Macro> by_id(const Index &, EntityId);
+
   static gap::generator<Macro> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

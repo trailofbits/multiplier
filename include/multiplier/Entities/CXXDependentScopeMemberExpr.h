@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -39,16 +40,20 @@ class CXXDependentScopeMemberExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXDependentScopeMemberExpr> in(const Fragment &frag);
+  static gap::generator<CXXDependentScopeMemberExpr> in(const Index &index);
   static gap::generator<CXXDependentScopeMemberExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<CXXDependentScopeMemberExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXDependentScopeMemberExpr> containing(const Decl &decl);
+  static gap::generator<CXXDependentScopeMemberExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<CXXDependentScopeMemberExpr> containing(const Stmt &stmt);
+  static gap::generator<CXXDependentScopeMemberExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

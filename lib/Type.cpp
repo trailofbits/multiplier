@@ -39,12 +39,4 @@ gap::generator<Reference> Type::references(void) const {
   }
 }
 
-gap::generator<Type> Type::in_internal(const Fragment &fragment) {
-  FragmentId fid(fragment.impl->fragment_id);
-  const EntityProvider::Ptr &ep = fragment.impl->ep;
-  for (TypeImplPtr reader : ep->TypesFor(ep, fid)) {
-    co_yield Type(std::move(reader));
-  }
-}
-
 }  // namespace mx

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class ObjCNonRuntimeProtocolAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Fragment &frag);
+  static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Index &index);
   static gap::generator<ObjCNonRuntimeProtocolAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ObjCNonRuntimeProtocolAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCNonRuntimeProtocolAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -41,6 +42,8 @@ class Stmt {
   friend class Type;
   friend class StmtImpl;
   std::shared_ptr<const StmtImpl> impl;
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
  public:
   Stmt(Stmt &&) noexcept = default;
   Stmt(const Stmt &) = default;
@@ -61,17 +64,20 @@ class Stmt {
   std::optional<Stmt> parent_statement(void) const;
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
- protected:
-  static gap::generator<Stmt> in_internal(const Fragment &fragment);
-
  public:
+  static gap::generator<Stmt> in(const Fragment &frag, std::span<StmtKind> kinds);
+  static gap::generator<Stmt> in(const Index &index, std::span<StmtKind> kinds);
   static gap::generator<Stmt> in(const Fragment &frag);
+  static gap::generator<Stmt> in(const Index &index);
   static gap::generator<Stmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<Stmt> by_id(const Index &, EntityId);
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<Stmt> containing(const Decl &decl);
+  static gap::generator<Stmt> containing(const std::optional<Decl> &decl);
+
   static gap::generator<Stmt> containing(const Stmt &stmt);
+  static gap::generator<Stmt> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

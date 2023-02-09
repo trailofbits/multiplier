@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -41,16 +42,20 @@ class CStyleCastExpr : public ExplicitCastExpr {
   friend class Stmt;
  public:
   static gap::generator<CStyleCastExpr> in(const Fragment &frag);
+  static gap::generator<CStyleCastExpr> in(const Index &index);
   static gap::generator<CStyleCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<CStyleCastExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::C_STYLE_CAST_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CStyleCastExpr> containing(const Decl &decl);
+  static gap::generator<CStyleCastExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<CStyleCastExpr> containing(const Stmt &stmt);
+  static gap::generator<CStyleCastExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

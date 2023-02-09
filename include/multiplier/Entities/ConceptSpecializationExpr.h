@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class ConceptSpecializationExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ConceptSpecializationExpr> in(const Fragment &frag);
+  static gap::generator<ConceptSpecializationExpr> in(const Index &index);
   static gap::generator<ConceptSpecializationExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ConceptSpecializationExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ConceptSpecializationExpr> containing(const Decl &decl);
+  static gap::generator<ConceptSpecializationExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<ConceptSpecializationExpr> containing(const Stmt &stmt);
+  static gap::generator<ConceptSpecializationExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

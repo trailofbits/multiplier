@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class LValueReferenceType : public ReferenceType {
   friend class Type;
  public:
   static gap::generator<LValueReferenceType> in(const Fragment &frag);
+  static gap::generator<LValueReferenceType> in(const Index &index);
   static gap::generator<LValueReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<LValueReferenceType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::L_VALUE_REFERENCE;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<LValueReferenceType> from(const Reference &r) {
     return from(r.as_type());
   }

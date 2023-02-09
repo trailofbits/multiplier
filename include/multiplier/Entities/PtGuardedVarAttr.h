@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class PtGuardedVarAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PtGuardedVarAttr> in(const Fragment &frag);
+  static gap::generator<PtGuardedVarAttr> in(const Index &index);
   static gap::generator<PtGuardedVarAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<PtGuardedVarAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PT_GUARDED_VAR;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<PtGuardedVarAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

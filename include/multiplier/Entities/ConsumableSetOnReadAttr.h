@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ConsumableSetOnReadAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ConsumableSetOnReadAttr> in(const Fragment &frag);
+  static gap::generator<ConsumableSetOnReadAttr> in(const Index &index);
   static gap::generator<ConsumableSetOnReadAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ConsumableSetOnReadAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE_SET_ON_READ;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ConsumableSetOnReadAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

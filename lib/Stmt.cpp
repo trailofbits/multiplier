@@ -39,12 +39,4 @@ gap::generator<Reference> Stmt::references(void) const {
   }
 }
 
-gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
-  FragmentId fid(fragment.impl->fragment_id);
-  const EntityProvider::Ptr &ep = fragment.impl->ep;
-  for (StmtImplPtr reader : ep->StmtsFor(ep, fid)) {
-    co_yield Stmt(std::move(reader));
-  }
-}
-
 }  // namespace mx

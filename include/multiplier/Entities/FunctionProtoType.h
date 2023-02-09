@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -40,14 +41,15 @@ class FunctionProtoType : public FunctionType {
   friend class Type;
  public:
   static gap::generator<FunctionProtoType> in(const Fragment &frag);
+  static gap::generator<FunctionProtoType> in(const Index &index);
   static gap::generator<FunctionProtoType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<FunctionProtoType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::FUNCTION_PROTO;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<FunctionProtoType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -7,10 +7,11 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iomanip>
+#include <multiplier/AST.h>
 #include <sstream>
+#include <unordered_set>
 
 #include "Index.h"
-#include <multiplier/AST.h>
 
 DECLARE_bool(help);
 DEFINE_string(db, "", "Database file");
@@ -45,71 +46,78 @@ void PrintToken(std::ostream &os, mx::Token token) {
   os << token.data(); 
 }
 
-bool ContainsHighlightedTokens(gap::generator<mx::MacroOrToken> nodes,
-                               const mx::TokenRange &entity_tokens) {
-  for (mx::MacroOrToken node : nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      if (entity_tokens.index_of(std::get<mx::Token>(node))) {
-        return true;
-      }
-    } else if (auto sub = mx::MacroSubstitution::from(
-                   std::get<mx::Macro>(node))) {
-      if (ContainsHighlightedTokens(sub->replacement_children(),
-                                    entity_tokens)) {
-        return true;
-      }
+// Collect the file tokens associated with `entity_tokens`.
+std::unordered_set<mx::RawEntityId> FileTokenIdsFor(
+    const mx::TokenRange &entity_tokens) {
+  std::unordered_set<mx::RawEntityId> token_ids;
+  std::vector<mx::Macro> macros;
+  for (mx::Token tok : entity_tokens) {
+
+    // Ascend the macros, finding the top used macro.
+    std::optional<mx::Macro> last_macro;
+    for (mx::Macro macro : mx::Macro::containing(tok)) {
+      last_macro.reset();
+      last_macro.emplace(std::move(macro));
     }
-  }
-  return false;
-}
 
-// TODO(pag): This whole thing is broken, because you can't ask top-down if a
-//            parsed token is inside of a substitution; you can only ask if a
-//            token derived from a parsed token is in the right range.
-void PrintUnparsedTokens(
-    std::ostream &os, gap::generator<mx::MacroOrToken> nodes,
-    const mx::TokenRange &entity_tokens, bool force_highlight) {
-
-  for (mx::MacroOrToken &node : nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      mx::Token &token = std::get<mx::Token>(node);
-      if (force_highlight || entity_tokens.index_of(token)) {
-        HighlightToken(os, std::move(token));
-      } else {
-        PrintToken(os, std::move(token));
+    // If we aren't in a macro, then find the relevant file token.
+    if (!last_macro) {
+      if (auto file_tok = tok.file_token()) {
+        token_ids.insert(file_tok.id().Pack());
       }
-    } else {
-      mx::Macro &macro = std::get<mx::Macro>(node);
-      auto sub_force_highlight = force_highlight;
-      if (!sub_force_highlight) {
-        if (auto sub = mx::MacroSubstitution::from(macro)) {
-          sub_force_highlight = ContainsHighlightedTokens(
-              sub->replacement_children(), entity_tokens);
+      continue;
+    }
+
+    macros.push_back(std::move(*last_macro));
+
+    // Drill down, finding the file tokens used in the top macro use, its
+    // arguments, etc.
+    while (!macros.empty()) {
+      mx::Macro macro = macros.back();
+      macros.pop_back();
+      for (mx::MacroOrToken use : macro.children()) {
+        if (std::holds_alternative<mx::Token>(use)) {
+          if (auto use_file_tok = std::get<mx::Token>(use).file_token()) {
+            token_ids.insert(use_file_tok.id().Pack());
+          }
+        } else if (std::holds_alternative<mx::Macro>(use)) {
+          macros.push_back(std::move(std::get<mx::Macro>(use)));
         }
       }
-      PrintUnparsedTokens(os, macro.children(), entity_tokens,
-                          sub_force_highlight);
     }
   }
+  return token_ids;
 }
 
 void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
-                    const mx::TokenRange &entity_tokens,
+                    std::unordered_set<mx::RawEntityId> highlight_token_ids,
                     std::string indent, bool print_line_numbers) {
+
   auto location = fragment.file_tokens().begin()->location(location_cache);
+  unsigned line_number = 0;
   if (!location) {
-    return;
+    print_line_numbers = false;
+  } else {
+    line_number = location->first;
   }
 
-  auto line_number = location->first;
   std::stringstream ss;
   std::string sep = indent;
-  PrintUnparsedTokens(ss, fragment.preprocessed_code(), entity_tokens);
+
+  for (mx::Token file_tok : fragment.file_tokens()) {
+    if (highlight_token_ids.count(file_tok.id().Pack())) {
+      HighlightToken(ss, file_tok);
+    } else {
+      PrintToken(ss, file_tok);
+    }
+  }
 
   auto render_line_number = print_line_numbers;
 
   if (print_line_numbers) {
+    auto file = mx::File::containing(fragment);
     os
+        << '\n' << sep << "         " << file_paths[file->id()].generic_string()
         << '\n' << sep << "         +---------------------------------------------\n";
   }
 
@@ -127,4 +135,11 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
       sep.clear();
     }
   }
+}
+
+void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
+                    const mx::TokenRange &entity_tokens,
+                    std::string indent, bool print_line_numbers) {
+  RenderFragment(os, fragment, FileTokenIdsFor(entity_tokens), indent,
+                 print_line_numbers);
 }

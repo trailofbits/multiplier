@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ObjCGCAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCGCAttr> in(const Fragment &frag);
+  static gap::generator<ObjCGCAttr> in(const Index &index);
   static gap::generator<ObjCGCAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ObjCGCAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_CGC;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCGCAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

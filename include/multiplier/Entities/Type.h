@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -59,6 +60,8 @@ class Type {
   friend class TokenContext;
   friend class TypeImpl;
   std::shared_ptr<const TypeImpl> impl;
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
  public:
   Type(Type &&) noexcept = default;
   Type(const Type &) = default;
@@ -75,15 +78,15 @@ class Type {
   PackedTypeId id(void) const;
   gap::generator<Reference> references(void) const;
 
- protected:
-  static gap::generator<Type> in_internal(const Fragment &fragment);
-
  public:
+  static gap::generator<Type> in(const Fragment &frag, std::span<TypeKind> kinds);
+  static gap::generator<Type> in(const Index &index, std::span<TypeKind> kinds);
   static gap::generator<Type> in(const Fragment &frag);
+  static gap::generator<Type> in(const Index &index);
   static gap::generator<Type> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<Type> by_id(const Index &, EntityId);
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<Type> from(const Type &self) {
     return self;
   }

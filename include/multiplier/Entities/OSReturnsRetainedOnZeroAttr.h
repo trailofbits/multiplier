@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OSReturnsRetainedOnZeroAttr> in(const Fragment &frag);
+  static gap::generator<OSReturnsRetainedOnZeroAttr> in(const Index &index);
   static gap::generator<OSReturnsRetainedOnZeroAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<OSReturnsRetainedOnZeroAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_RETURNS_RETAINED_ON_ZERO;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

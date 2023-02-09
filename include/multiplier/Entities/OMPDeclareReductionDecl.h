@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -39,16 +40,20 @@ class OMPDeclareReductionDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<OMPDeclareReductionDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclareReductionDecl> in(const Index &index);
   static gap::generator<OMPDeclareReductionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<OMPDeclareReductionDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_REDUCTION;
   }
 
-  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPDeclareReductionDecl> containing(const Decl &decl);
+  static gap::generator<OMPDeclareReductionDecl> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OMPDeclareReductionDecl> containing(const Stmt &stmt);
+  static gap::generator<OMPDeclareReductionDecl> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

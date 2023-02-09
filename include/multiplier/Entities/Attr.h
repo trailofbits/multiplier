@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -41,6 +42,8 @@ class Attr {
   friend class Type;
   friend class AttrImpl;
   std::shared_ptr<const AttrImpl> impl;
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
  public:
   Attr(Attr &&) noexcept = default;
   Attr(const Attr &) = default;
@@ -57,15 +60,15 @@ class Attr {
   PackedAttrId id(void) const;
   gap::generator<Reference> references(void) const;
 
- protected:
-  static gap::generator<Attr> in_internal(const Fragment &fragment);
-
  public:
+  static gap::generator<Attr> in(const Fragment &frag, std::span<AttrKind> kinds);
+  static gap::generator<Attr> in(const Index &index, std::span<AttrKind> kinds);
   static gap::generator<Attr> in(const Fragment &frag);
+  static gap::generator<Attr> in(const Index &index);
   static gap::generator<Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<Attr> by_id(const Index &, EntityId);
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<Attr> from(const Attr &self) {
     return self;
   }

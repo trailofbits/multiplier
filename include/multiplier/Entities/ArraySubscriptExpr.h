@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,16 +38,20 @@ class ArraySubscriptExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ArraySubscriptExpr> in(const Fragment &frag);
+  static gap::generator<ArraySubscriptExpr> in(const Index &index);
   static gap::generator<ArraySubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<ArraySubscriptExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_SUBSCRIPT_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ArraySubscriptExpr> containing(const Decl &decl);
+  static gap::generator<ArraySubscriptExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<ArraySubscriptExpr> containing(const Stmt &stmt);
+  static gap::generator<ArraySubscriptExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

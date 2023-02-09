@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,11 +38,13 @@ class DefineMacroDirective : public MacroDirective {
  public:
   static gap::generator<DefineMacroDirective> in(const Fragment &frag);
 
+  static gap::generator<DefineMacroDirective> in(const Index &index);
+  static std::optional<DefineMacroDirective> by_id(const Index &, EntityId);
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::DEFINE_DIRECTIVE;
   }
 
-  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<DefineMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

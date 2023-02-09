@@ -34,7 +34,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   // Print our the tokens of this fragment as they appear in the file.
   if (FLAGS_unparsed) {
-    PrintUnparsedTokens(std::cout, fragment->preprocessed_code());
+    RenderFragment(std::cout, *fragment, mx::TokenRange(), "", true);
 
   // Print out the tokens of this fragment that were actually parsed. These
   // are post-macro expansion tokens, and generally don't include whitespace

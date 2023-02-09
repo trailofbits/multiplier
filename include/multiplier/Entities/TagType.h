@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -34,10 +35,11 @@ class TagType : public Type {
   friend class Type;
  public:
   static gap::generator<TagType> in(const Fragment &frag);
+  static gap::generator<TagType> in(const Index &index);
   static gap::generator<TagType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<TagType> by_id(const Index &, EntityId);
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<TagType> from(const Reference &r) {
     return from(r.as_type());
   }

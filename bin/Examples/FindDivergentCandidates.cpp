@@ -11,8 +11,6 @@
 #include "Index.h"
 #include <multiplier/AST.h>
 
-DEFINE_uint64(file_id, 0, "ID of the file from which to check for potential candidates of divergent representations");
-DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to check for potential candidates of divergent representations");
 DEFINE_bool(show_locations, false, "Show the locations of users?");
 
 /* Find candidate divergent representations within a fragment.
@@ -25,19 +23,17 @@ DEFINE_bool(show_locations, false, "Show the locations of users?");
  * Variables that meet these conditions may be optimized by the compiler into 
  * divergent representations.
  */
-static void FindDivergentCandidates(const mx::Fragment fragment) {
-  for (mx::Stmt stmt : mx::Stmt::in(fragment)) {
-    /* Determine whether a statement is a loop. */
-    mx::StmtKind kind = stmt.kind();
-    if (kind != mx::StmtKind::FOR_STMT &&
-        kind != mx::StmtKind::WHILE_STMT &&
-        kind != mx::StmtKind::DO_STMT) {
-      continue;
-    }
+static void FindDivergentCandidates(mx::Index index) {
+  mx::StmtKind loops[] = {mx::StmtKind::FOR_STMT, mx::StmtKind::WHILE_STMT,
+                          mx::StmtKind::DO_STMT};
+  for (mx::Stmt stmt : mx::Stmt::in(index, loops)) {
 
     /* Determine whether a variable is incremented in the loop. */
     for (mx::Stmt child : stmt.children()) {
-      if (child.kind() != mx::StmtKind::UNARY_OPERATOR) { continue; }
+      if (child.kind() != mx::StmtKind::UNARY_OPERATOR) {
+        continue;
+      }
+
       if (auto unary_op = mx::UnaryOperator::from(child)) {
         mx::UnaryOperatorKind operator_kind = unary_op->opcode();
         switch (operator_kind) {
@@ -98,6 +94,8 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
             }
           }
           if (mem_access && used_out_of_loop) {
+            auto toks = FileTokenIdsFor(decl.tokens());
+
             // Found a candidate - let's print stuff about it.
             std::cout << "-------------------" << std::endl;
             std::cout << "candidate decl: " << decl.tokens().data() << std::endl;
@@ -114,11 +112,20 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
                   << outside_uses.front().tokens().data()
                   << std::endl;
 
+            for (mx::ArraySubscriptExpr access : mem_accesses) {
+              auto access_toks = FileTokenIdsFor(access.tokens());
+              toks.insert(access_toks.begin(), access_toks.end());
+            }
+
+            for (mx::Stmt outside : outside_uses) {
+              auto outside_toks = FileTokenIdsFor(outside.tokens());
+              toks.insert(outside_toks.begin(), outside_toks.end());
+            }
+
             if (FLAGS_show_locations) {
               std::cout << std::endl;
-              if (auto toks = decl.tokens()) {
-                RenderFragment(std::cout, fragment, toks, "\t", true);
-              }
+              RenderFragment(std::cout, mx::Fragment::containing(decl),
+                             toks, "\t", true);
               std::cout << std::endl;
             }
           }
@@ -142,31 +149,7 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  mx::Index index = InitExample(FLAGS_show_locations);
-
-  if (FLAGS_fragment_id) {
-    auto fragment = index.fragment(FLAGS_fragment_id);
-    if (!fragment) {
-      std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
-      return EXIT_FAILURE;
-    }
-    FindDivergentCandidates(std::move(*fragment));
-  } else if (FLAGS_file_id) {
-    auto file = index.file(FLAGS_file_id);
-    if (!file) {
-      std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
-      return EXIT_FAILURE;
-    }
-    for (mx::Fragment fragment : file->fragments()) {
-      FindDivergentCandidates(std::move(fragment));
-    }
-  } else {
-    for (mx::File file : index.files()) {
-      for (mx::Fragment fragment : file.fragments()) {
-        FindDivergentCandidates(std::move(fragment));
-      }
-    }
-  }
+  FindDivergentCandidates(InitExample(FLAGS_show_locations));
 
   return EXIT_SUCCESS;
 }

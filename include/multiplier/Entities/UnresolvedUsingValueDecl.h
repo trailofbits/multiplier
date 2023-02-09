@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,16 +38,20 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<UnresolvedUsingValueDecl> in(const Fragment &frag);
+  static gap::generator<UnresolvedUsingValueDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<UnresolvedUsingValueDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_VALUE;
   }
 
-  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UnresolvedUsingValueDecl> containing(const Decl &decl);
+  static gap::generator<UnresolvedUsingValueDecl> containing(const std::optional<Decl> &decl);
+
   static gap::generator<UnresolvedUsingValueDecl> containing(const Stmt &stmt);
+  static gap::generator<UnresolvedUsingValueDecl> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

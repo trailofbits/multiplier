@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -43,6 +44,8 @@ class Designator {
   friend class Type;
   friend class DesignatorImpl;
   std::shared_ptr<const DesignatorImpl> impl;
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
  public:
   Designator(Designator &&) noexcept = default;
   Designator(const Designator &) = default;

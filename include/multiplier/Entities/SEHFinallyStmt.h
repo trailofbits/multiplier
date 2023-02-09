@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -34,16 +35,20 @@ class SEHFinallyStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<SEHFinallyStmt> in(const Fragment &frag);
+  static gap::generator<SEHFinallyStmt> in(const Index &index);
   static gap::generator<SEHFinallyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  static std::optional<SEHFinallyStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_FINALLY_STMT;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<SEHFinallyStmt> containing(const Decl &decl);
+  static gap::generator<SEHFinallyStmt> containing(const std::optional<Decl> &decl);
+
   static gap::generator<SEHFinallyStmt> containing(const Stmt &stmt);
+  static gap::generator<SEHFinallyStmt> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
