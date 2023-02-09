@@ -91,4 +91,19 @@ gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
   }
 }
 
+// Grab all call expressions of this FunctionDecl
+gap::generator<CallExpr> FunctionDecl::callers() const {
+  for (Reference ref : references()) {
+    auto reference = ref.as_statement();
+    for (CallExpr call : CallExpr::containing(reference)) {
+      if (auto decl = call.direct_callee()) {
+        const FunctionDecl& orig_func_decl = *decl;
+        if (orig_func_decl == this) {
+          co_yield CallExpr(std::move(call));
+        }
+      }
+    }
+  }
+}
+
 }  // namespace mx

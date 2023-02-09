@@ -2090,6 +2090,12 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    assert(false);\n"
           << "  }\n"
           << "  return std::nullopt;\n"
+          << "}\n";
+
+      // Equality on Decls need to be tested in its canonicalized form
+      lib_cpp_os
+          << "bool Decl::operator==(const " << class_name << " &rhs) {\n"
+          << "  return canonical_declaration().id() == rhs.canonical_declaration().id();\n"
           << "}\n\n";
     }
 
@@ -2114,6 +2120,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  " << class_name << "(const " << class_name << " &) = default;\n"
         << "  " << class_name << " &operator=(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << " &operator=(const " << class_name << " &) = default;\n\n"
+        << "  inline std::strong_ordering operator<=>(const " << class_name << " &rhs) { id() <=> rhs.id(); }\n\n"
         << "  /* implicit */ inline " << class_name
         << "(std::shared_ptr<const " << class_name << "Impl> impl_)\n"
         << "      : impl(std::move(impl_)) {}\n\n";
@@ -2141,7 +2148,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  gap::generator<Decl> redeclarations(void) const;\n"
           << " protected:\n"
           << "  static gap::generator<Decl> in_internal(const Fragment &fragment);\n\n"
-          << " public:\n";
+          << " public:\n"
+          << "  bool operator==(const " << class_name << " &rhs);\n\n";
 
       seen_methods->emplace("uses");  // Manual.
       seen_methods->emplace("definition");  // Manual.
@@ -2161,6 +2169,15 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("begin_token");  // Disable this.
       seen_methods->emplace("end_token");  // Disable this.
       seen_methods->emplace("previous_declaration");  // Disable this.
+
+    // `FunctionDecl::callers`.
+    } else if (class_name == "FunctionDecl") {
+      forward_decls.insert("CallExpr");
+      class_os
+        << " public:\n"
+        << "  gap::generator<CallExpr> callers(void) const;\n";
+
+      seen_methods->emplace("callers");  // Manual.
 
     } else if (class_name == "Stmt") {
       class_os
@@ -2346,13 +2363,13 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent == this) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent == this) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2396,13 +2413,13 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent == this) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent == this) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -3312,7 +3329,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#include <multiplier/AST.h>\n"
-      << "#include <cassert>\n\n"
+      << "#include <cassert>\n"
+      << "#include <compare>\n\n"
       << "#include \"Attr.h\"\n"
       << "#include \"Decl.h\"\n"
       << "#include \"File.h\"\n"
