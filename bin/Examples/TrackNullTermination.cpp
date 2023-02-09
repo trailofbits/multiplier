@@ -13,52 +13,44 @@
 
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print function names");
 DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
-DEFINE_bool(show_locations, false, "Show the file locations of the functions?");
-
-struct LibraryModel {
-  std::string_view func_name;
-  unsigned arg_index;
-};
-
-// Which calls and arguments to taint track
-static const LibraryModel kTaintSources[] = {
-  {"read", 1u},
-};
 
 // Where to do a stop and determine if null-termination exists
-static const LibraryModel kTaintSinks[] = {
+static const std::unordered_map<std::string_view, unsigned int> kTaintSinks = {
   {"strlen", 0u},  
 };
 
-//
-static void TaintFunctionArgument() {
-
-}
-
-static void NullTerminationCheck() {
-
-}
-
-static void TaintRiskyFunctions(const mx::Index &index) {
-
-  std::vector<mx::FunctionDecl> found_decls;
-  for (libraryModel source : kTaintSources) {
-    for (mx::NamedEntity ne : index.query_entities(source.func_name)) {
-      if (!std::holds_alternative<mx::NamedDecl>(ne)) {
-        continue;
-      }
-
-      auto func = mx::FunctionDecl::from(std::get<mx::NamedDecl>(ne));
-      if (func && func->name() == source.func_name) {
-        found_decls.push_back(func);
-      }
-    }
+static void TrackPotentialSink(const mx::CallExpr call_expr) {
+  std::optional<mx::FunctionDecl> func_decl = call_expr.direct_callee();
+  if (!func_decl) {
+    return;
   }
+
+  std::string_view risky_call = func_decl->name();
+  if (!kTaintSinks.contains(risky_call)) {
+    return;
+  }
+
+  std::optional<mx::Expr> haystack_arg = call_expr.nth_argument(kTaintSinks.at(risky_call));
+  if (!haystack_arg) {
+    return;
+  }
+
+
+  std::optional<mx::DeclRefExpr> decl =
+      mx::DeclRefExpr::from(haystack_arg->ignore_casts());
+  if (!decl) {
+    return;
+  }
+
+  // TODO: at this point generate a backward slice of the parameter
+  std::cout << risky_call << " " << decl->tokens().data() << std::endl;
 }
 
 
 static void TrackNullTermination(mx::Fragment fragment) {
-  
+  for (mx::CallExpr call_expr : mx::CallExpr::in(fragment)) {
+    TrackPotentialSink(call_expr);
+  }
 }
 
 extern "C" int main(int argc, char *argv[]) {
@@ -72,10 +64,7 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  mx::Index index = InitExample(FLAGS_show_locations);
-
-  // Start by
-  TaintRiskyFunctions(index);
+  mx::Index index = InitExample(true);
 
   if (FLAGS_fragment_id) {
     auto fragment = index.fragment(FLAGS_fragment_id);
