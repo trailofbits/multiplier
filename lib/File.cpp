@@ -203,6 +203,16 @@ std::optional<File> File::containing(const Token &token) {
   }
 }
 
+// Go through the tokens of the iterator and return the first file found.
+std::optional<File> File::containing(const TokenRange &tokens) {
+  for (Token tok : tokens) {
+    if (auto file = File::containing(tok)) {
+      return file;
+    }
+  }
+  return std::nullopt;
+}
+
 // Return the file containing a regex match.
 std::optional<File> File::containing(const RegexQueryMatch &match) {
   if (auto file = match.impl->OwningFile()) {

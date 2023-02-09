@@ -50,22 +50,38 @@ void PrintToken(std::ostream &os, mx::Token token) {
 std::unordered_set<mx::RawEntityId> FileTokenIdsFor(
     const mx::TokenRange &entity_tokens) {
   std::unordered_set<mx::RawEntityId> token_ids;
+  std::vector<mx::Macro> macros;
   for (mx::Token tok : entity_tokens) {
-    if (auto file_tok = tok.file_token()) {
-      token_ids.insert(file_tok.id().Pack());
-    } else {
-      std::optional<mx::Macro> last_macro;
-      for (mx::Macro macro : mx::Macro::containing(tok)) {
-        last_macro.reset();
-        last_macro.emplace(std::move(macro));
+
+    // Ascend the macros, finding the top used macro.
+    std::optional<mx::Macro> last_macro;
+    for (mx::Macro macro : mx::Macro::containing(tok)) {
+      last_macro.reset();
+      last_macro.emplace(std::move(macro));
+    }
+
+    // If we aren't in a macro, then find the relevant file token.
+    if (!last_macro) {
+      if (auto file_tok = tok.file_token()) {
+        token_ids.insert(file_tok.id().Pack());
       }
-      if (last_macro) {
-        for (mx::MacroOrToken use : last_macro->children()) {
-          if (std::holds_alternative<mx::Token>(use)) {
-            if (auto use_file_tok = std::get<mx::Token>(use).file_token()) {
-              token_ids.insert(use_file_tok.id().Pack());
-            }
+      continue;
+    }
+
+    macros.push_back(std::move(*last_macro));
+
+    // Drill down, finding the file tokens used in the top macro use, its
+    // arguments, etc.
+    while (!macros.empty()) {
+      mx::Macro macro = macros.back();
+      macros.pop_back();
+      for (mx::MacroOrToken use : macro.children()) {
+        if (std::holds_alternative<mx::Token>(use)) {
+          if (auto use_file_tok = std::get<mx::Token>(use).file_token()) {
+            token_ids.insert(use_file_tok.id().Pack());
           }
+        } else if (std::holds_alternative<mx::Macro>(use)) {
+          macros.push_back(std::move(std::get<mx::Macro>(use)));
         }
       }
     }
@@ -78,10 +94,13 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
                     std::string indent, bool print_line_numbers) {
 
   auto location = fragment.file_tokens().begin()->location(location_cache);
+  unsigned line_number = 0;
   if (!location) {
-    return;
+    print_line_numbers = false;
+  } else {
+    line_number = location->first;
   }
-  auto line_number = location->first;
+
   std::stringstream ss;
   std::string sep = indent;
 
@@ -96,7 +115,9 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
   auto render_line_number = print_line_numbers;
 
   if (print_line_numbers) {
+    auto file = mx::File::containing(fragment);
     os
+        << '\n' << sep << "         " << file_paths[file->id()].generic_string()
         << '\n' << sep << "         +---------------------------------------------\n";
   }
 

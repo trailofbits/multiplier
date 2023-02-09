@@ -91,10 +91,10 @@ class File {
   /* implicit */ inline File(std::shared_ptr<const FileImpl> impl_)
       : impl(std::move(impl_)) {}
 
-  // Return the file containing a regex match.
+  // Return the file containing a regex query match.
   static std::optional<File> containing(const RegexQueryMatch &match);
 
-  // Return the file containing a specific fragment.
+  // Return the file containing a specific weggli query match.
   static std::optional<File> containing(const WeggliQueryMatch &match);
 
 #define MX_DECLARE_CONTAINING(type_name, lower_name, enum_name, category) \
@@ -114,6 +114,9 @@ class File {
   //            than the file from which the token came. For that, once should
   //            use `File::containing` on the result of `Token::file_token`.
   static std::optional<File> containing(const Token &token);
+
+  // Go through the tokens of the iterator and return the first file found.
+  static std::optional<File> containing(const TokenRange &tokens);
 
   inline static constexpr EntityCategory entity_category(void) {
     return EntityCategory::FILE;
