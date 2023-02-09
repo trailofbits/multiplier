@@ -40,7 +40,7 @@ class ArgumentWithTypeTagAttr : public InheritableAttr {
   static gap::generator<ArgumentWithTypeTagAttr> in(const Index &index);
   static gap::generator<ArgumentWithTypeTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ArgumentWithTypeTagAttr> by(const Index &, EntityId);
+  static std::optional<ArgumentWithTypeTagAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARGUMENT_WITH_TYPE_TAG;

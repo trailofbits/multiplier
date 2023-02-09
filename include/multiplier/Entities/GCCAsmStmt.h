@@ -41,7 +41,7 @@ class GCCAsmStmt : public AsmStmt {
   static gap::generator<GCCAsmStmt> in(const Index &index);
   static gap::generator<GCCAsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<GCCAsmStmt> by(const Index &, EntityId);
+  static std::optional<GCCAsmStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GCC_ASM_STMT;

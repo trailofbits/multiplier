@@ -40,7 +40,7 @@ class ReleaseCapabilityAttr : public InheritableAttr {
   static gap::generator<ReleaseCapabilityAttr> in(const Index &index);
   static gap::generator<ReleaseCapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ReleaseCapabilityAttr> by(const Index &, EntityId);
+  static std::optional<ReleaseCapabilityAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RELEASE_CAPABILITY;

@@ -38,7 +38,7 @@ class TypeWithKeyword : public Type {
   static gap::generator<TypeWithKeyword> in(const Index &index);
   static gap::generator<TypeWithKeyword> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeWithKeyword> by(const Index &, EntityId);
+  static std::optional<TypeWithKeyword> by_id(const Index &, EntityId);
 
   inline static std::optional<TypeWithKeyword> from(const Reference &r) {
     return from(r.as_type());

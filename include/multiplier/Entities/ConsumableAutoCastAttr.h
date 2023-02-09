@@ -39,7 +39,7 @@ class ConsumableAutoCastAttr : public InheritableAttr {
   static gap::generator<ConsumableAutoCastAttr> in(const Index &index);
   static gap::generator<ConsumableAutoCastAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConsumableAutoCastAttr> by(const Index &, EntityId);
+  static std::optional<ConsumableAutoCastAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE_AUTO_CAST;

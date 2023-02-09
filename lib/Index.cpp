@@ -238,17 +238,8 @@ VariantEntity Index::entity(EntityId eid) const {
 //
 // NOTE(pag): This might return redeclarations.
 gap::generator<NamedEntity> Index::query_entities(std::string name) const {
-  std::vector<RawEntityId> entity_ids;
-  impl->FindSymbol(impl, std::move(name), entity_ids);
-  
-  if (entity_ids.empty()) {
-    co_return;
-  }
 
-  NamedEntityList entities;
-  entities.reserve(entity_ids.size());
-
-  for (RawEntityId eid : entity_ids) {
+  for (RawEntityId eid : impl->FindSymbol(impl, std::move(name))) {
     VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<DeclId>(vid)) {
       DeclImplPtr decl_ptr = impl->DeclFor(impl, eid);
@@ -257,7 +248,7 @@ gap::generator<NamedEntity> Index::query_entities(std::string name) const {
         continue;
       }
 
-      auto nd = NamedDecl::from(Decl(std::move(decl_ptr)));
+      std::optional<NamedDecl> nd = NamedDecl::from(Decl(std::move(decl_ptr)));
       if (!nd) {
         assert(false);
         continue;
@@ -272,13 +263,23 @@ gap::generator<NamedEntity> Index::query_entities(std::string name) const {
         continue;
       }
 
-      auto def = DefineMacroDirective::from(Macro(std::move(macro_ptr)));
+      std::optional<DefineMacroDirective> def =
+          DefineMacroDirective::from(Macro(std::move(macro_ptr)));
       if (!def) {
         assert(false);
         continue;
       }
 
       co_yield std::move(def.value());
+
+    } else if (std::holds_alternative<FileId>(vid)) {
+      FileImplPtr file_ptr = impl->FileFor(impl, eid);
+      if (!file_ptr) {
+        assert(false);
+        continue;
+      }
+
+      co_yield File(std::move(file_ptr));
 
     } else {
       assert(false);

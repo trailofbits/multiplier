@@ -42,7 +42,7 @@ class CXXDefaultInitExpr : public Expr {
   static gap::generator<CXXDefaultInitExpr> in(const Index &index);
   static gap::generator<CXXDefaultInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXDefaultInitExpr> by(const Index &, EntityId);
+  static std::optional<CXXDefaultInitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DEFAULT_INIT_EXPR;

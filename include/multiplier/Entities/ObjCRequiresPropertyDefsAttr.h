@@ -39,7 +39,7 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
   static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Index &index);
   static gap::generator<ObjCRequiresPropertyDefsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCRequiresPropertyDefsAttr> by(const Index &, EntityId);
+  static std::optional<ObjCRequiresPropertyDefsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFS;

@@ -41,7 +41,7 @@ class NonNullAttr : public InheritableParamAttr {
   static gap::generator<NonNullAttr> in(const Index &index);
   static gap::generator<NonNullAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NonNullAttr> by(const Index &, EntityId);
+  static std::optional<NonNullAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NON_NULL;

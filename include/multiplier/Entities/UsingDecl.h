@@ -41,7 +41,7 @@ class UsingDecl : public BaseUsingDecl {
   static gap::generator<UsingDecl> in(const Index &index);
   static gap::generator<UsingDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UsingDecl> by(const Index &, EntityId);
+  static std::optional<UsingDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING;

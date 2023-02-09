@@ -48,7 +48,7 @@ class ObjCMethodDecl : public NamedDecl {
   static gap::generator<ObjCMethodDecl> in(const Index &index);
   static gap::generator<ObjCMethodDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCMethodDecl> by(const Index &, EntityId);
+  static std::optional<ObjCMethodDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_METHOD;

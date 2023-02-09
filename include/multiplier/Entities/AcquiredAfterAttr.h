@@ -39,7 +39,7 @@ class AcquiredAfterAttr : public InheritableAttr {
   static gap::generator<AcquiredAfterAttr> in(const Index &index);
   static gap::generator<AcquiredAfterAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AcquiredAfterAttr> by(const Index &, EntityId);
+  static std::optional<AcquiredAfterAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ACQUIRED_AFTER;

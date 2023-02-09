@@ -38,7 +38,7 @@ class BTFTagAttributedType : public Type {
   static gap::generator<BTFTagAttributedType> in(const Index &index);
   static gap::generator<BTFTagAttributedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BTFTagAttributedType> by(const Index &, EntityId);
+  static std::optional<BTFTagAttributedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BTF_TAG_ATTRIBUTED;

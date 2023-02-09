@@ -43,7 +43,7 @@ class CoawaitExpr : public CoroutineSuspendExpr {
   static gap::generator<CoawaitExpr> in(const Index &index);
   static gap::generator<CoawaitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CoawaitExpr> by(const Index &, EntityId);
+  static std::optional<CoawaitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COAWAIT_EXPR;

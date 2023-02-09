@@ -42,7 +42,7 @@ class ObjCEncodeExpr : public Expr {
   static gap::generator<ObjCEncodeExpr> in(const Index &index);
   static gap::generator<ObjCEncodeExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCEncodeExpr> by(const Index &, EntityId);
+  static std::optional<ObjCEncodeExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ENCODE_EXPR;

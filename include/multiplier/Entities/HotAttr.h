@@ -39,7 +39,7 @@ class HotAttr : public InheritableAttr {
   static gap::generator<HotAttr> in(const Index &index);
   static gap::generator<HotAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<HotAttr> by(const Index &, EntityId);
+  static std::optional<HotAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HOT;

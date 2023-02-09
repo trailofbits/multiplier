@@ -44,7 +44,7 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   static gap::generator<OMPDeclareMapperDecl> in(const Index &index);
   static gap::generator<OMPDeclareMapperDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPDeclareMapperDecl> by(const Index &, EntityId);
+  static std::optional<OMPDeclareMapperDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_MAPPER;

@@ -40,7 +40,7 @@ class HLSLShaderAttr : public InheritableAttr {
   static gap::generator<HLSLShaderAttr> in(const Index &index);
   static gap::generator<HLSLShaderAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<HLSLShaderAttr> by(const Index &, EntityId);
+  static std::optional<HLSLShaderAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSL_SHADER;

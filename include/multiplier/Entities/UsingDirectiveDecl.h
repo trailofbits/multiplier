@@ -39,7 +39,7 @@ class UsingDirectiveDecl : public NamedDecl {
   static gap::generator<UsingDirectiveDecl> in(const Index &index);
   static gap::generator<UsingDirectiveDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UsingDirectiveDecl> by(const Index &, EntityId);
+  static std::optional<UsingDirectiveDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_DIRECTIVE;

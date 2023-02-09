@@ -41,7 +41,7 @@ class ObjCBoolLiteralExpr : public Expr {
   static gap::generator<ObjCBoolLiteralExpr> in(const Index &index);
   static gap::generator<ObjCBoolLiteralExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCBoolLiteralExpr> by(const Index &, EntityId);
+  static std::optional<ObjCBoolLiteralExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;

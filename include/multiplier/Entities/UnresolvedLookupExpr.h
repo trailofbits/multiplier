@@ -43,7 +43,7 @@ class UnresolvedLookupExpr : public OverloadExpr {
   static gap::generator<UnresolvedLookupExpr> in(const Index &index);
   static gap::generator<UnresolvedLookupExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UnresolvedLookupExpr> by(const Index &, EntityId);
+  static std::optional<UnresolvedLookupExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_LOOKUP_EXPR;

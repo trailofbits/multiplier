@@ -39,7 +39,7 @@ class IntelOclBiccAttr : public InheritableAttr {
   static gap::generator<IntelOclBiccAttr> in(const Index &index);
   static gap::generator<IntelOclBiccAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<IntelOclBiccAttr> by(const Index &, EntityId);
+  static std::optional<IntelOclBiccAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INTEL_OCL_BICC;

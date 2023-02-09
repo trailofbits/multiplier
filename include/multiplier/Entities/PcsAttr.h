@@ -40,7 +40,7 @@ class PcsAttr : public InheritableAttr {
   static gap::generator<PcsAttr> in(const Index &index);
   static gap::generator<PcsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PcsAttr> by(const Index &, EntityId);
+  static std::optional<PcsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PCS;

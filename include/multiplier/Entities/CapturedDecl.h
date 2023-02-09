@@ -38,7 +38,7 @@ class CapturedDecl : public Decl {
   static gap::generator<CapturedDecl> in(const Index &index);
   static gap::generator<CapturedDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CapturedDecl> by(const Index &, EntityId);
+  static std::optional<CapturedDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CAPTURED;

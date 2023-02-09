@@ -37,7 +37,7 @@ class AbiTagAttr : public Attr {
   static gap::generator<AbiTagAttr> in(const Index &index);
   static gap::generator<AbiTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AbiTagAttr> by(const Index &, EntityId);
+  static std::optional<AbiTagAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ABI_TAG;

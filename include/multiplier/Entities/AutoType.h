@@ -42,7 +42,7 @@ class AutoType : public DeducedType {
   static gap::generator<AutoType> in(const Index &index);
   static gap::generator<AutoType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AutoType> by(const Index &, EntityId);
+  static std::optional<AutoType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::AUTO;

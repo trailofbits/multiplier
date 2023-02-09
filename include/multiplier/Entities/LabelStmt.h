@@ -40,7 +40,7 @@ class LabelStmt : public ValueStmt {
   static gap::generator<LabelStmt> in(const Index &index);
   static gap::generator<LabelStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LabelStmt> by(const Index &, EntityId);
+  static std::optional<LabelStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LABEL_STMT;

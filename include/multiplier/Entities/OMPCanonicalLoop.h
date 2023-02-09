@@ -39,7 +39,7 @@ class OMPCanonicalLoop : public Stmt {
   static gap::generator<OMPCanonicalLoop> in(const Index &index);
   static gap::generator<OMPCanonicalLoop> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPCanonicalLoop> by(const Index &, EntityId);
+  static std::optional<OMPCanonicalLoop> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANONICAL_LOOP;

@@ -40,7 +40,7 @@ class MSAsmStmt : public AsmStmt {
   static gap::generator<MSAsmStmt> in(const Index &index);
   static gap::generator<MSAsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSAsmStmt> by(const Index &, EntityId);
+  static std::optional<MSAsmStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_ASM_STMT;

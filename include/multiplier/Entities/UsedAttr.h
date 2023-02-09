@@ -39,7 +39,7 @@ class UsedAttr : public InheritableAttr {
   static gap::generator<UsedAttr> in(const Index &index);
   static gap::generator<UsedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UsedAttr> by(const Index &, EntityId);
+  static std::optional<UsedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::USED;

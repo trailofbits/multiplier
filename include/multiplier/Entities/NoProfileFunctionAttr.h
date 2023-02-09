@@ -39,7 +39,7 @@ class NoProfileFunctionAttr : public InheritableAttr {
   static gap::generator<NoProfileFunctionAttr> in(const Index &index);
   static gap::generator<NoProfileFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoProfileFunctionAttr> by(const Index &, EntityId);
+  static std::optional<NoProfileFunctionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_PROFILE_FUNCTION;

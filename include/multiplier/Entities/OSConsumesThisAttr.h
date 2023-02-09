@@ -39,7 +39,7 @@ class OSConsumesThisAttr : public InheritableAttr {
   static gap::generator<OSConsumesThisAttr> in(const Index &index);
   static gap::generator<OSConsumesThisAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OSConsumesThisAttr> by(const Index &, EntityId);
+  static std::optional<OSConsumesThisAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_CONSUMES_THIS;

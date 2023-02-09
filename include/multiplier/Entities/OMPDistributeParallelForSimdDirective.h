@@ -43,7 +43,7 @@ class OMPDistributeParallelForSimdDirective : public OMPLoopDirective {
   static gap::generator<OMPDistributeParallelForSimdDirective> in(const Index &index);
   static gap::generator<OMPDistributeParallelForSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPDistributeParallelForSimdDirective> by(const Index &, EntityId);
+  static std::optional<OMPDistributeParallelForSimdDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;

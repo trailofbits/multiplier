@@ -45,7 +45,7 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
   static gap::generator<CXXNamedCastExpr> in(const Index &index);
   static gap::generator<CXXNamedCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXNamedCastExpr> by(const Index &, EntityId);
+  static std::optional<CXXNamedCastExpr> by_id(const Index &, EntityId);
 
   static gap::generator<CXXNamedCastExpr> containing(const Decl &decl);
   static gap::generator<CXXNamedCastExpr> containing(const std::optional<Decl> &decl);

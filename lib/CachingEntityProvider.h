@@ -96,8 +96,7 @@ class CachingEntityProvider final : public EntityProvider {
   gap::generator<std::pair<RawEntityId, RawEntityId>>
   References(const Ptr &, RawEntityId eid) final;
 
-  void FindSymbol(const Ptr &, std::string name,
-                  std::vector<RawEntityId> &ids_out) final;
+  gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) final;
 
 #define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
     friend class type_name ## Impl; \

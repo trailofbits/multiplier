@@ -42,7 +42,7 @@ class OverloadExpr : public Expr {
   static gap::generator<OverloadExpr> in(const Index &index);
   static gap::generator<OverloadExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OverloadExpr> by(const Index &, EntityId);
+  static std::optional<OverloadExpr> by_id(const Index &, EntityId);
 
   static gap::generator<OverloadExpr> containing(const Decl &decl);
   static gap::generator<OverloadExpr> containing(const std::optional<Decl> &decl);

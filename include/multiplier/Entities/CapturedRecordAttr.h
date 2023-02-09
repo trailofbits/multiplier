@@ -39,7 +39,7 @@ class CapturedRecordAttr : public InheritableAttr {
   static gap::generator<CapturedRecordAttr> in(const Index &index);
   static gap::generator<CapturedRecordAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CapturedRecordAttr> by(const Index &, EntityId);
+  static std::optional<CapturedRecordAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CAPTURED_RECORD;

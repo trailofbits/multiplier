@@ -41,7 +41,7 @@ class AbstractConditionalOperator : public Expr {
   static gap::generator<AbstractConditionalOperator> in(const Index &index);
   static gap::generator<AbstractConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AbstractConditionalOperator> by(const Index &, EntityId);
+  static std::optional<AbstractConditionalOperator> by_id(const Index &, EntityId);
 
   static gap::generator<AbstractConditionalOperator> containing(const Decl &decl);
   static gap::generator<AbstractConditionalOperator> containing(const std::optional<Decl> &decl);

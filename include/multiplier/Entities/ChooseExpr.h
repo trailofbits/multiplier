@@ -41,7 +41,7 @@ class ChooseExpr : public Expr {
   static gap::generator<ChooseExpr> in(const Index &index);
   static gap::generator<ChooseExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ChooseExpr> by(const Index &, EntityId);
+  static std::optional<ChooseExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CHOOSE_EXPR;

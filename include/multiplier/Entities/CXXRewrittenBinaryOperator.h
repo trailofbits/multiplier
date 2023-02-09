@@ -42,7 +42,7 @@ class CXXRewrittenBinaryOperator : public Expr {
   static gap::generator<CXXRewrittenBinaryOperator> in(const Index &index);
   static gap::generator<CXXRewrittenBinaryOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXRewrittenBinaryOperator> by(const Index &, EntityId);
+  static std::optional<CXXRewrittenBinaryOperator> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;

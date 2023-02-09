@@ -39,7 +39,7 @@ class AcquireHandleAttr : public InheritableAttr {
   static gap::generator<AcquireHandleAttr> in(const Index &index);
   static gap::generator<AcquireHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AcquireHandleAttr> by(const Index &, EntityId);
+  static std::optional<AcquireHandleAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ACQUIRE_HANDLE;

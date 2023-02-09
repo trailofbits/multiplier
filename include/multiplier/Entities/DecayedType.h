@@ -39,7 +39,7 @@ class DecayedType : public AdjustedType {
   static gap::generator<DecayedType> in(const Index &index);
   static gap::generator<DecayedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DecayedType> by(const Index &, EntityId);
+  static std::optional<DecayedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DECAYED;

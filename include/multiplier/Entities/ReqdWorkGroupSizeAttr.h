@@ -39,7 +39,7 @@ class ReqdWorkGroupSizeAttr : public InheritableAttr {
   static gap::generator<ReqdWorkGroupSizeAttr> in(const Index &index);
   static gap::generator<ReqdWorkGroupSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ReqdWorkGroupSizeAttr> by(const Index &, EntityId);
+  static std::optional<ReqdWorkGroupSizeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REQD_WORK_GROUP_SIZE;

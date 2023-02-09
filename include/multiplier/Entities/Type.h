@@ -85,7 +85,7 @@ class Type {
   static gap::generator<Type> in(const Index &index);
   static gap::generator<Type> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<Type> by(const Index &, EntityId);
+  static std::optional<Type> by_id(const Index &, EntityId);
 
   inline static std::optional<Type> from(const Type &self) {
     return self;

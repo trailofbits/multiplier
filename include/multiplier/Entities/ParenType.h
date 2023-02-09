@@ -37,7 +37,7 @@ class ParenType : public Type {
   static gap::generator<ParenType> in(const Index &index);
   static gap::generator<ParenType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ParenType> by(const Index &, EntityId);
+  static std::optional<ParenType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::PAREN;

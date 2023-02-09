@@ -29,6 +29,7 @@
 
 #define MX_REFERENCE_PAGE_SIZE 128
 #define MX_ID_LIST_PAGE_SIZE 128
+
 #define MX_TO_STR_(a) #a
 #define MX_TO_STR(a) MX_TO_STR_(a)
 
@@ -227,12 +228,20 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
 
 #if MX_DATABASE_HAS_FTS5
       get_entities_by_name(db.Prepare(
-          "SELECT DISTINCT(rowid) FROM symbol WHERE name MATCH ?1 || '*' "
-          "ORDER BY rowid ASC")),
+          "SELECT DISTINCT(rowid) "
+          "FROM named_entity_index "
+          "WHERE name MATCH ?1 || '*' "
+          "  AND rowid > ?2 "
+          "ORDER BY rowid ASC "
+          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))),
 #else
       get_entities_by_name(db.Prepare(
-          "SELECT DISTINCT(rowid) FROM symbol WHERE name LIKE '%' || ?1 || '%' "
-          "ORDER BY rowid ASC")),
+          "SELECT DISTINCT(rowid) "
+          "FROM named_entity "
+          "WHERE name LIKE '%' || ?1 || '%' "
+          "  AND entity_id > ?2 "
+          "ORDER BY entity_id ASC "
+          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))),
 #endif
 
       get_references(db.Prepare(
@@ -617,7 +626,8 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
     auto num_paged_results = 0u;
 
     // Go collect a "page" of reference entries. We go one page at a time so
-    // that we can avoid the
+    // that we can avoid having do to any kind of clever query caching to make
+    // generators / coroutines work.
     do {
       sqlite::AbortingTransaction temporary_changes_only(context->db);
 
@@ -644,7 +654,7 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
 
         vid = EntityId(from_id).Unpack();
         if (std::holds_alternative<InvalidId>(vid)) {
-          assert(false);
+          assert(from_id == kInvalidEntityId);
           continue;
         }
 
@@ -667,25 +677,71 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
   }
 }
 
-void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
-                                      std::vector<RawEntityId> &entity_ids) {
-  entity_ids.clear();
+gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
+    const Ptr &self, std::string symbol) {
 
   ImplPtr context = impl.Lock();
-  sqlite::Statement &symbol_query = context->get_entities_by_name;
-  for (symbol_query.BindValues(symbol); symbol_query.ExecuteStep(); ) {
-    RawEntityId entity_id = kInvalidEntityId;
-    symbol_query.Row().Columns(entity_id);
-    VariantId vid = EntityId(entity_id).Unpack();
-    if (std::holds_alternative<MacroId>(vid) ||
-        std::holds_alternative<DeclId>(vid)) {
-      entity_ids.push_back(entity_id);
+  sqlite::Statement &list_ids = context->get_entities_by_name;
 
-    } else {
-      assert(false);
+  // NOTE(pag): SQLite doesn't understand unsigned integers. When it sees our
+  //            entity IDs, if the high bit is `1`, then it treats those as
+  //            negative numbers. To get pagination-like effects, we iterate
+  //            from one lower bound to the next lower bound. So, we can't
+  //            start with `kInvalidEntityId` (zero) as our initial lower bound,
+  //            which would be natural given the unsigned representation of
+  //            raw entity IDs, so instead we use the minimum signed 64-bit
+  //            integer.
+  auto lower_bound = std::numeric_limits<int64_t>::min();
+
+  std::array<RawEntityId, MX_ID_LIST_PAGE_SIZE> paged_results;
+
+  auto version = self->VersionNumber();
+  for (auto found = true; found; ) {
+    found = false;
+    auto num_paged_results = 0u;
+
+    // Go collect a "page" of matched name entries. We go one page at a time so
+    // that we can avoid having do to any kind of clever query caching to make
+    // generators / coroutines work.
+    do {
+
+      // (Re)do the join to get the next page of entity references.
+      list_ids.BindValues(symbol, lower_bound);
+      while (list_ids.ExecuteStep()) {
+        found = true;
+        RawEntityId found_id = kInvalidEntityId;
+        list_ids.Row().Columns(found_id);
+
+        // For next page.
+        lower_bound = std::max(lower_bound, static_cast<int64_t>(found_id));
+
+        VariantId vid = EntityId(found_id).Unpack();
+        if (std::holds_alternative<InvalidId>(vid)) {
+          assert(found_id == kInvalidEntityId);
+          continue;
+        } else if (std::holds_alternative<MacroId>(vid) ||
+                   std::holds_alternative<DeclId>(vid) ||
+                   std::holds_alternative<FileId>(vid)) {
+          paged_results[num_paged_results] = found_id;
+          ++num_paged_results;
+        } else {
+          assert(false);
+          continue;
+        }
+      }
+
+      list_ids.Reset();
+    } while (false);
+
+    for (auto i = 0u; i < num_paged_results; ++i) {
+      co_yield paged_results[i];
+    }
+
+    // Index changed on us; exit early.
+    if (found && version != self->VersionNumber()) {
+      co_return;
     }
   }
-  symbol_query.Reset();
 }
 
 #define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \

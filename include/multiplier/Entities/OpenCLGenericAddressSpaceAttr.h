@@ -40,7 +40,7 @@ class OpenCLGenericAddressSpaceAttr : public TypeAttr {
   static gap::generator<OpenCLGenericAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGenericAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OpenCLGenericAddressSpaceAttr> by(const Index &, EntityId);
+  static std::optional<OpenCLGenericAddressSpaceAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GENERIC_ADDRESS_SPACE;

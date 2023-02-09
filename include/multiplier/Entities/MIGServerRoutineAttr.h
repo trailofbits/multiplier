@@ -39,7 +39,7 @@ class MIGServerRoutineAttr : public InheritableAttr {
   static gap::generator<MIGServerRoutineAttr> in(const Index &index);
   static gap::generator<MIGServerRoutineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MIGServerRoutineAttr> by(const Index &, EntityId);
+  static std::optional<MIGServerRoutineAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIG_SERVER_ROUTINE_;

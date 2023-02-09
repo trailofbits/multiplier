@@ -38,7 +38,7 @@ class TypedefType : public Type {
   static gap::generator<TypedefType> in(const Index &index);
   static gap::generator<TypedefType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypedefType> by(const Index &, EntityId);
+  static std::optional<TypedefType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPEDEF;

@@ -44,7 +44,7 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   static gap::generator<ObjCCategoryImplDecl> in(const Index &index);
   static gap::generator<ObjCCategoryImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCCategoryImplDecl> by(const Index &, EntityId);
+  static std::optional<ObjCCategoryImplDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_CATEGORY_IMPL;

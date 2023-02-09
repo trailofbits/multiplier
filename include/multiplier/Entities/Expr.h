@@ -45,7 +45,7 @@ class Expr : public ValueStmt {
   static gap::generator<Expr> in(const Index &index);
   static gap::generator<Expr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<Expr> by(const Index &, EntityId);
+  static std::optional<Expr> by_id(const Index &, EntityId);
 
   static gap::generator<Expr> containing(const Decl &decl);
   static gap::generator<Expr> containing(const std::optional<Decl> &decl);

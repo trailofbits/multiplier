@@ -39,7 +39,7 @@ class PureAttr : public InheritableAttr {
   static gap::generator<PureAttr> in(const Index &index);
   static gap::generator<PureAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PureAttr> by(const Index &, EntityId);
+  static std::optional<PureAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PURE;

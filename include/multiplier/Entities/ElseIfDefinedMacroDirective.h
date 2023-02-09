@@ -40,7 +40,7 @@ class ElseIfDefinedMacroDirective : public ConditionalMacroDirective {
   static gap::generator<ElseIfDefinedMacroDirective> in(const Fragment &frag);
 
   static gap::generator<ElseIfDefinedMacroDirective> in(const Index &index);
-  std::optional<ElseIfDefinedMacroDirective> by(const Index &, EntityId);
+  static std::optional<ElseIfDefinedMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::ELSE_IF_DEFINED_DIRECTIVE;

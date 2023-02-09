@@ -39,7 +39,7 @@ class AVRSignalAttr : public InheritableAttr {
   static gap::generator<AVRSignalAttr> in(const Index &index);
   static gap::generator<AVRSignalAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AVRSignalAttr> by(const Index &, EntityId);
+  static std::optional<AVRSignalAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AVR_SIGNAL;

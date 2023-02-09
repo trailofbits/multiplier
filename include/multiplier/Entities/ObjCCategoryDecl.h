@@ -46,7 +46,7 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   static gap::generator<ObjCCategoryDecl> in(const Index &index);
   static gap::generator<ObjCCategoryDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCCategoryDecl> by(const Index &, EntityId);
+  static std::optional<ObjCCategoryDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_CATEGORY;

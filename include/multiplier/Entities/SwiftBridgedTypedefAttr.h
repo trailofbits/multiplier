@@ -39,7 +39,7 @@ class SwiftBridgedTypedefAttr : public InheritableAttr {
   static gap::generator<SwiftBridgedTypedefAttr> in(const Index &index);
   static gap::generator<SwiftBridgedTypedefAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftBridgedTypedefAttr> by(const Index &, EntityId);
+  static std::optional<SwiftBridgedTypedefAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_BRIDGED_TYPEDEF;

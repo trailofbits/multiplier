@@ -45,7 +45,7 @@ class ObjCPropertyRefExpr : public Expr {
   static gap::generator<ObjCPropertyRefExpr> in(const Index &index);
   static gap::generator<ObjCPropertyRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCPropertyRefExpr> by(const Index &, EntityId);
+  static std::optional<ObjCPropertyRefExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_PROPERTY_REF_EXPR;

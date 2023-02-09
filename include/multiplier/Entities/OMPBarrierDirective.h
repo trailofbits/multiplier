@@ -39,7 +39,7 @@ class OMPBarrierDirective : public OMPExecutableDirective {
   static gap::generator<OMPBarrierDirective> in(const Index &index);
   static gap::generator<OMPBarrierDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPBarrierDirective> by(const Index &, EntityId);
+  static std::optional<OMPBarrierDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_BARRIER_DIRECTIVE;

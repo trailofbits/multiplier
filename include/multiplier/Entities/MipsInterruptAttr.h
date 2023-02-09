@@ -40,7 +40,7 @@ class MipsInterruptAttr : public InheritableAttr {
   static gap::generator<MipsInterruptAttr> in(const Index &index);
   static gap::generator<MipsInterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MipsInterruptAttr> by(const Index &, EntityId);
+  static std::optional<MipsInterruptAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIPS_INTERRUPT;

@@ -39,7 +39,7 @@ class RetainAttr : public InheritableAttr {
   static gap::generator<RetainAttr> in(const Index &index);
   static gap::generator<RetainAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RetainAttr> by(const Index &, EntityId);
+  static std::optional<RetainAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RETAIN;

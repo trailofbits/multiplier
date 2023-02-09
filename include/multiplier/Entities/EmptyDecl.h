@@ -37,7 +37,7 @@ class EmptyDecl : public Decl {
   static gap::generator<EmptyDecl> in(const Index &index);
   static gap::generator<EmptyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EmptyDecl> by(const Index &, EntityId);
+  static std::optional<EmptyDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EMPTY;

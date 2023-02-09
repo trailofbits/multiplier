@@ -39,7 +39,7 @@ class NoUniqueAddressAttr : public InheritableAttr {
   static gap::generator<NoUniqueAddressAttr> in(const Index &index);
   static gap::generator<NoUniqueAddressAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoUniqueAddressAttr> by(const Index &, EntityId);
+  static std::optional<NoUniqueAddressAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_UNIQUE_ADDRESS;

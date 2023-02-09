@@ -39,7 +39,7 @@ class Mips16Attr : public InheritableAttr {
   static gap::generator<Mips16Attr> in(const Index &index);
   static gap::generator<Mips16Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<Mips16Attr> by(const Index &, EntityId);
+  static std::optional<Mips16Attr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIPS16;

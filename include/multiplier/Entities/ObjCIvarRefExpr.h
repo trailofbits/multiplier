@@ -42,7 +42,7 @@ class ObjCIvarRefExpr : public Expr {
   static gap::generator<ObjCIvarRefExpr> in(const Index &index);
   static gap::generator<ObjCIvarRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCIvarRefExpr> by(const Index &, EntityId);
+  static std::optional<ObjCIvarRefExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_IVAR_REF_EXPR;

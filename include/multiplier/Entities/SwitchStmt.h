@@ -41,7 +41,7 @@ class SwitchStmt : public Stmt {
   static gap::generator<SwitchStmt> in(const Index &index);
   static gap::generator<SwitchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwitchStmt> by(const Index &, EntityId);
+  static std::optional<SwitchStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SWITCH_STMT;

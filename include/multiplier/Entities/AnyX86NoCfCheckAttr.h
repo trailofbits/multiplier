@@ -39,7 +39,7 @@ class AnyX86NoCfCheckAttr : public InheritableAttr {
   static gap::generator<AnyX86NoCfCheckAttr> in(const Index &index);
   static gap::generator<AnyX86NoCfCheckAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AnyX86NoCfCheckAttr> by(const Index &, EntityId);
+  static std::optional<AnyX86NoCfCheckAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_NO_CF_CHECK;

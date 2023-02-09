@@ -43,7 +43,7 @@ class IndirectFieldDecl : public ValueDecl {
   static gap::generator<IndirectFieldDecl> in(const Index &index);
   static gap::generator<IndirectFieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<IndirectFieldDecl> by(const Index &, EntityId);
+  static std::optional<IndirectFieldDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::INDIRECT_FIELD;

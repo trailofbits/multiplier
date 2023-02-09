@@ -39,7 +39,7 @@ class OMPMetaDirective : public OMPExecutableDirective {
   static gap::generator<OMPMetaDirective> in(const Index &index);
   static gap::generator<OMPMetaDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPMetaDirective> by(const Index &, EntityId);
+  static std::optional<OMPMetaDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_META_DIRECTIVE;

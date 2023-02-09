@@ -39,7 +39,7 @@ class WeakImportAttr : public InheritableAttr {
   static gap::generator<WeakImportAttr> in(const Index &index);
   static gap::generator<WeakImportAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<WeakImportAttr> by(const Index &, EntityId);
+  static std::optional<WeakImportAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEAK_IMPORT;

@@ -42,7 +42,7 @@ class AddrLabelExpr : public Expr {
   static gap::generator<AddrLabelExpr> in(const Index &index);
   static gap::generator<AddrLabelExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AddrLabelExpr> by(const Index &, EntityId);
+  static std::optional<AddrLabelExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ADDR_LABEL_EXPR;

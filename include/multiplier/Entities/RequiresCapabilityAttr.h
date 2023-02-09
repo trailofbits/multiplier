@@ -40,7 +40,7 @@ class RequiresCapabilityAttr : public InheritableAttr {
   static gap::generator<RequiresCapabilityAttr> in(const Index &index);
   static gap::generator<RequiresCapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RequiresCapabilityAttr> by(const Index &, EntityId);
+  static std::optional<RequiresCapabilityAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REQUIRES_CAPABILITY;

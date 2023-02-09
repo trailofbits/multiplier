@@ -39,7 +39,7 @@ class UsingPackDecl : public NamedDecl {
   static gap::generator<UsingPackDecl> in(const Index &index);
   static gap::generator<UsingPackDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UsingPackDecl> by(const Index &, EntityId);
+  static std::optional<UsingPackDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_PACK;

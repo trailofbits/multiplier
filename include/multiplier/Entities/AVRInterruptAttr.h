@@ -39,7 +39,7 @@ class AVRInterruptAttr : public InheritableAttr {
   static gap::generator<AVRInterruptAttr> in(const Index &index);
   static gap::generator<AVRInterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AVRInterruptAttr> by(const Index &, EntityId);
+  static std::optional<AVRInterruptAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AVR_INTERRUPT;

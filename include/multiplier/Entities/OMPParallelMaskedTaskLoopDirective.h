@@ -43,7 +43,7 @@ class OMPParallelMaskedTaskLoopDirective : public OMPLoopDirective {
   static gap::generator<OMPParallelMaskedTaskLoopDirective> in(const Index &index);
   static gap::generator<OMPParallelMaskedTaskLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPParallelMaskedTaskLoopDirective> by(const Index &, EntityId);
+  static std::optional<OMPParallelMaskedTaskLoopDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASKED_TASK_LOOP_DIRECTIVE;

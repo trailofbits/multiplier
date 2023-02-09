@@ -40,7 +40,7 @@ class SwiftAsyncErrorAttr : public InheritableAttr {
   static gap::generator<SwiftAsyncErrorAttr> in(const Index &index);
   static gap::generator<SwiftAsyncErrorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftAsyncErrorAttr> by(const Index &, EntityId);
+  static std::optional<SwiftAsyncErrorAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ASYNC_ERROR;

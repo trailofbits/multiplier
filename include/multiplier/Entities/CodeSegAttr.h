@@ -39,7 +39,7 @@ class CodeSegAttr : public InheritableAttr {
   static gap::generator<CodeSegAttr> in(const Index &index);
   static gap::generator<CodeSegAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CodeSegAttr> by(const Index &, EntityId);
+  static std::optional<CodeSegAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CODE_SEG;

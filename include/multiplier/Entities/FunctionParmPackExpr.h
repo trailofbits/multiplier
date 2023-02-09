@@ -42,7 +42,7 @@ class FunctionParmPackExpr : public Expr {
   static gap::generator<FunctionParmPackExpr> in(const Index &index);
   static gap::generator<FunctionParmPackExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FunctionParmPackExpr> by(const Index &, EntityId);
+  static std::optional<FunctionParmPackExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FUNCTION_PARM_PACK_EXPR;

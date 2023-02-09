@@ -38,7 +38,7 @@ class ObjCObjectType : public Type {
   static gap::generator<ObjCObjectType> in(const Index &index);
   static gap::generator<ObjCObjectType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCObjectType> by(const Index &, EntityId);
+  static std::optional<ObjCObjectType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_OBJECT;

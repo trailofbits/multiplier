@@ -39,7 +39,7 @@ class ObjCBridgeAttr : public InheritableAttr {
   static gap::generator<ObjCBridgeAttr> in(const Index &index);
   static gap::generator<ObjCBridgeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCBridgeAttr> by(const Index &, EntityId);
+  static std::optional<ObjCBridgeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_BRIDGE;

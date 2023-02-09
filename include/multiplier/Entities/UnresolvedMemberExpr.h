@@ -44,7 +44,7 @@ class UnresolvedMemberExpr : public OverloadExpr {
   static gap::generator<UnresolvedMemberExpr> in(const Index &index);
   static gap::generator<UnresolvedMemberExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UnresolvedMemberExpr> by(const Index &, EntityId);
+  static std::optional<UnresolvedMemberExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_MEMBER_EXPR;

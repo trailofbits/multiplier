@@ -39,7 +39,7 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
   static gap::generator<WebAssemblyImportModuleAttr> in(const Index &index);
   static gap::generator<WebAssemblyImportModuleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<WebAssemblyImportModuleAttr> by(const Index &, EntityId);
+  static std::optional<WebAssemblyImportModuleAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEB_ASSEMBLY_IMPORT_MODULE;

@@ -45,7 +45,7 @@ class RecordDecl : public TagDecl {
   static gap::generator<RecordDecl> in(const Index &index);
   static gap::generator<RecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RecordDecl> by(const Index &, EntityId);
+  static std::optional<RecordDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::RECORD;

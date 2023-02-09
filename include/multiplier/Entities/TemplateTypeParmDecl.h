@@ -42,7 +42,7 @@ class TemplateTypeParmDecl : public TypeDecl {
   static gap::generator<TemplateTypeParmDecl> in(const Index &index);
   static gap::generator<TemplateTypeParmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TemplateTypeParmDecl> by(const Index &, EntityId);
+  static std::optional<TemplateTypeParmDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_TYPE_PARM;

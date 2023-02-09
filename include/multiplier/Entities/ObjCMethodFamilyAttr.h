@@ -40,7 +40,7 @@ class ObjCMethodFamilyAttr : public InheritableAttr {
   static gap::generator<ObjCMethodFamilyAttr> in(const Index &index);
   static gap::generator<ObjCMethodFamilyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCMethodFamilyAttr> by(const Index &, EntityId);
+  static std::optional<ObjCMethodFamilyAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_METHOD_FAMILY;

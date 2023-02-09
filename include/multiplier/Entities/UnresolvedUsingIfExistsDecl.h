@@ -39,7 +39,7 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
   static gap::generator<UnresolvedUsingIfExistsDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingIfExistsDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UnresolvedUsingIfExistsDecl> by(const Index &, EntityId);
+  static std::optional<UnresolvedUsingIfExistsDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_IF_EXISTS;

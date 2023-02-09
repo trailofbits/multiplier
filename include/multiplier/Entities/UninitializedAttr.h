@@ -39,7 +39,7 @@ class UninitializedAttr : public InheritableAttr {
   static gap::generator<UninitializedAttr> in(const Index &index);
   static gap::generator<UninitializedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UninitializedAttr> by(const Index &, EntityId);
+  static std::optional<UninitializedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UNINITIALIZED;

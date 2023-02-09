@@ -38,7 +38,7 @@ class UndefineMacroDirective : public MacroDirective {
   static gap::generator<UndefineMacroDirective> in(const Fragment &frag);
 
   static gap::generator<UndefineMacroDirective> in(const Index &index);
-  std::optional<UndefineMacroDirective> by(const Index &, EntityId);
+  static std::optional<UndefineMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::UNDEFINE_DIRECTIVE;

@@ -38,7 +38,7 @@ class FunctionType : public Type {
   static gap::generator<FunctionType> in(const Index &index);
   static gap::generator<FunctionType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FunctionType> by(const Index &, EntityId);
+  static std::optional<FunctionType> by_id(const Index &, EntityId);
 
   inline static std::optional<FunctionType> from(const Reference &r) {
     return from(r.as_type());

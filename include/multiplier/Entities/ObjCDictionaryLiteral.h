@@ -42,7 +42,7 @@ class ObjCDictionaryLiteral : public Expr {
   static gap::generator<ObjCDictionaryLiteral> in(const Index &index);
   static gap::generator<ObjCDictionaryLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCDictionaryLiteral> by(const Index &, EntityId);
+  static std::optional<ObjCDictionaryLiteral> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_DICTIONARY_LITERAL;

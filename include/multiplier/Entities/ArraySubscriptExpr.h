@@ -41,7 +41,7 @@ class ArraySubscriptExpr : public Expr {
   static gap::generator<ArraySubscriptExpr> in(const Index &index);
   static gap::generator<ArraySubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ArraySubscriptExpr> by(const Index &, EntityId);
+  static std::optional<ArraySubscriptExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_SUBSCRIPT_EXPR;

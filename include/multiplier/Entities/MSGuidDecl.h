@@ -41,7 +41,7 @@ class MSGuidDecl : public ValueDecl {
   static gap::generator<MSGuidDecl> in(const Index &index);
   static gap::generator<MSGuidDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSGuidDecl> by(const Index &, EntityId);
+  static std::optional<MSGuidDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_GUID;

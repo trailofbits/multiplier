@@ -41,7 +41,7 @@ class CXXScalarValueInitExpr : public Expr {
   static gap::generator<CXXScalarValueInitExpr> in(const Index &index);
   static gap::generator<CXXScalarValueInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXScalarValueInitExpr> by(const Index &, EntityId);
+  static std::optional<CXXScalarValueInitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_SCALAR_VALUE_INIT_EXPR;

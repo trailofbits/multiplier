@@ -41,7 +41,7 @@ class CXXStdInitializerListExpr : public Expr {
   static gap::generator<CXXStdInitializerListExpr> in(const Index &index);
   static gap::generator<CXXStdInitializerListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXStdInitializerListExpr> by(const Index &, EntityId);
+  static std::optional<CXXStdInitializerListExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;

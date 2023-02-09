@@ -40,7 +40,7 @@ class FriendDecl : public Decl {
   static gap::generator<FriendDecl> in(const Index &index);
   static gap::generator<FriendDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FriendDecl> by(const Index &, EntityId);
+  static std::optional<FriendDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FRIEND;

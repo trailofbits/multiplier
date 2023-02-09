@@ -42,7 +42,7 @@ class ArrayInitLoopExpr : public Expr {
   static gap::generator<ArrayInitLoopExpr> in(const Index &index);
   static gap::generator<ArrayInitLoopExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ArrayInitLoopExpr> by(const Index &, EntityId);
+  static std::optional<ArrayInitLoopExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_INIT_LOOP_EXPR;

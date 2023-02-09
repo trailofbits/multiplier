@@ -41,7 +41,7 @@ class RedeclarableTemplateDecl : public TemplateDecl {
   static gap::generator<RedeclarableTemplateDecl> in(const Index &index);
   static gap::generator<RedeclarableTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RedeclarableTemplateDecl> by(const Index &, EntityId);
+  static std::optional<RedeclarableTemplateDecl> by_id(const Index &, EntityId);
 
   static gap::generator<RedeclarableTemplateDecl> containing(const Decl &decl);
   static gap::generator<RedeclarableTemplateDecl> containing(const std::optional<Decl> &decl);

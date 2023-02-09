@@ -62,9 +62,9 @@ InvalidEntityProvider::References(const Ptr &, RawEntityId) {
   co_return;
 }
 
-void InvalidEntityProvider::FindSymbol(
-    const Ptr &, std::string, std::vector<RawEntityId> &ids_out) {
-  ids_out.clear();
+gap::generator<RawEntityId> InvalidEntityProvider::FindSymbol(
+    const Ptr &, std::string) {
+  co_return;
 }
 
 #define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \

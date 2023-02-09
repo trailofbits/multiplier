@@ -39,7 +39,7 @@ class Ptr32Attr : public TypeAttr {
   static gap::generator<Ptr32Attr> in(const Index &index);
   static gap::generator<Ptr32Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<Ptr32Attr> by(const Index &, EntityId);
+  static std::optional<Ptr32Attr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PTR32;

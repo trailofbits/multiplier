@@ -39,7 +39,7 @@ class NoThreadSafetyAnalysisAttr : public InheritableAttr {
   static gap::generator<NoThreadSafetyAnalysisAttr> in(const Index &index);
   static gap::generator<NoThreadSafetyAnalysisAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoThreadSafetyAnalysisAttr> by(const Index &, EntityId);
+  static std::optional<NoThreadSafetyAnalysisAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_THREAD_SAFETY_ANALYSIS;

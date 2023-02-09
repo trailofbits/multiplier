@@ -39,7 +39,7 @@ class SwiftAsyncAttr : public InheritableAttr {
   static gap::generator<SwiftAsyncAttr> in(const Index &index);
   static gap::generator<SwiftAsyncAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftAsyncAttr> by(const Index &, EntityId);
+  static std::optional<SwiftAsyncAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ASYNC;

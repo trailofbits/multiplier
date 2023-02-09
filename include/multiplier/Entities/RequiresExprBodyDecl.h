@@ -37,7 +37,7 @@ class RequiresExprBodyDecl : public Decl {
   static gap::generator<RequiresExprBodyDecl> in(const Index &index);
   static gap::generator<RequiresExprBodyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RequiresExprBodyDecl> by(const Index &, EntityId);
+  static std::optional<RequiresExprBodyDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::REQUIRES_EXPR_BODY;

@@ -40,7 +40,7 @@ class TypeVisibilityAttr : public InheritableAttr {
   static gap::generator<TypeVisibilityAttr> in(const Index &index);
   static gap::generator<TypeVisibilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeVisibilityAttr> by(const Index &, EntityId);
+  static std::optional<TypeVisibilityAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_VISIBILITY;

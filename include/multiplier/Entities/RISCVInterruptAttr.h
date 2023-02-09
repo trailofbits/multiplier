@@ -40,7 +40,7 @@ class RISCVInterruptAttr : public InheritableAttr {
   static gap::generator<RISCVInterruptAttr> in(const Index &index);
   static gap::generator<RISCVInterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RISCVInterruptAttr> by(const Index &, EntityId);
+  static std::optional<RISCVInterruptAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RISCV_INTERRUPT;

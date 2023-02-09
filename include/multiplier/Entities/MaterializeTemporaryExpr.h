@@ -44,7 +44,7 @@ class MaterializeTemporaryExpr : public Expr {
   static gap::generator<MaterializeTemporaryExpr> in(const Index &index);
   static gap::generator<MaterializeTemporaryExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MaterializeTemporaryExpr> by(const Index &, EntityId);
+  static std::optional<MaterializeTemporaryExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MATERIALIZE_TEMPORARY_EXPR;

@@ -37,7 +37,7 @@ class MacroQualifiedType : public Type {
   static gap::generator<MacroQualifiedType> in(const Index &index);
   static gap::generator<MacroQualifiedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MacroQualifiedType> by(const Index &, EntityId);
+  static std::optional<MacroQualifiedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::MACRO_QUALIFIED;

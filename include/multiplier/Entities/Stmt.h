@@ -71,7 +71,7 @@ class Stmt {
   static gap::generator<Stmt> in(const Index &index);
   static gap::generator<Stmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<Stmt> by(const Index &, EntityId);
+  static std::optional<Stmt> by_id(const Index &, EntityId);
 
   static gap::generator<Stmt> containing(const Decl &decl);
   static gap::generator<Stmt> containing(const std::optional<Decl> &decl);

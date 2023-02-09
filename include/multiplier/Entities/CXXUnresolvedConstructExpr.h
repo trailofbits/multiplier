@@ -42,7 +42,7 @@ class CXXUnresolvedConstructExpr : public Expr {
   static gap::generator<CXXUnresolvedConstructExpr> in(const Index &index);
   static gap::generator<CXXUnresolvedConstructExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXUnresolvedConstructExpr> by(const Index &, EntityId);
+  static std::optional<CXXUnresolvedConstructExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;

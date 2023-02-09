@@ -42,7 +42,7 @@ class InitListExpr : public Expr {
   static gap::generator<InitListExpr> in(const Index &index);
   static gap::generator<InitListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<InitListExpr> by(const Index &, EntityId);
+  static std::optional<InitListExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INIT_LIST_EXPR;

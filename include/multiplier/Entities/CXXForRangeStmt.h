@@ -40,7 +40,7 @@ class CXXForRangeStmt : public Stmt {
   static gap::generator<CXXForRangeStmt> in(const Index &index);
   static gap::generator<CXXForRangeStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXForRangeStmt> by(const Index &, EntityId);
+  static std::optional<CXXForRangeStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FOR_RANGE_STMT;

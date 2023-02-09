@@ -42,7 +42,7 @@ class CoroutineSuspendExpr : public Expr {
   static gap::generator<CoroutineSuspendExpr> in(const Index &index);
   static gap::generator<CoroutineSuspendExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CoroutineSuspendExpr> by(const Index &, EntityId);
+  static std::optional<CoroutineSuspendExpr> by_id(const Index &, EntityId);
 
   static gap::generator<CoroutineSuspendExpr> containing(const Decl &decl);
   static gap::generator<CoroutineSuspendExpr> containing(const std::optional<Decl> &decl);

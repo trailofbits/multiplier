@@ -40,7 +40,7 @@ class ForStmt : public Stmt {
   static gap::generator<ForStmt> in(const Index &index);
   static gap::generator<ForStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ForStmt> by(const Index &, EntityId);
+  static std::optional<ForStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FOR_STMT;

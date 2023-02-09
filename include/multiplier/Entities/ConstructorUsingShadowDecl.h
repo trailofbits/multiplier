@@ -42,7 +42,7 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   static gap::generator<ConstructorUsingShadowDecl> in(const Index &index);
   static gap::generator<ConstructorUsingShadowDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConstructorUsingShadowDecl> by(const Index &, EntityId);
+  static std::optional<ConstructorUsingShadowDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CONSTRUCTOR_USING_SHADOW;

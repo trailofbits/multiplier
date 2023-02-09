@@ -39,7 +39,7 @@ class EnforceTCBLeafAttr : public InheritableAttr {
   static gap::generator<EnforceTCBLeafAttr> in(const Index &index);
   static gap::generator<EnforceTCBLeafAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EnforceTCBLeafAttr> by(const Index &, EntityId);
+  static std::optional<EnforceTCBLeafAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENFORCE_TCB_LEAF;

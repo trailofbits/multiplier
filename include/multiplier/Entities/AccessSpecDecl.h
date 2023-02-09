@@ -37,7 +37,7 @@ class AccessSpecDecl : public Decl {
   static gap::generator<AccessSpecDecl> in(const Index &index);
   static gap::generator<AccessSpecDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AccessSpecDecl> by(const Index &, EntityId);
+  static std::optional<AccessSpecDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ACCESS_SPEC;

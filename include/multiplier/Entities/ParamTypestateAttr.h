@@ -40,7 +40,7 @@ class ParamTypestateAttr : public InheritableAttr {
   static gap::generator<ParamTypestateAttr> in(const Index &index);
   static gap::generator<ParamTypestateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ParamTypestateAttr> by(const Index &, EntityId);
+  static std::optional<ParamTypestateAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PARAM_TYPESTATE;

@@ -43,7 +43,7 @@ class OMPTeamsDistributeSimdDirective : public OMPLoopDirective {
   static gap::generator<OMPTeamsDistributeSimdDirective> in(const Index &index);
   static gap::generator<OMPTeamsDistributeSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPTeamsDistributeSimdDirective> by(const Index &, EntityId);
+  static std::optional<OMPTeamsDistributeSimdDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;

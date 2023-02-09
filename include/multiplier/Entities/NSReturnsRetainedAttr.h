@@ -39,7 +39,7 @@ class NSReturnsRetainedAttr : public InheritableAttr {
   static gap::generator<NSReturnsRetainedAttr> in(const Index &index);
   static gap::generator<NSReturnsRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NSReturnsRetainedAttr> by(const Index &, EntityId);
+  static std::optional<NSReturnsRetainedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_RETURNS_RETAINED;

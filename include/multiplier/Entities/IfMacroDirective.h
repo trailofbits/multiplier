@@ -40,7 +40,7 @@ class IfMacroDirective : public ConditionalMacroDirective {
   static gap::generator<IfMacroDirective> in(const Fragment &frag);
 
   static gap::generator<IfMacroDirective> in(const Index &index);
-  std::optional<IfMacroDirective> by(const Index &, EntityId);
+  static std::optional<IfMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::IF_DIRECTIVE;

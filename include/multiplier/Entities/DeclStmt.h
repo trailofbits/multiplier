@@ -38,7 +38,7 @@ class DeclStmt : public Stmt {
   static gap::generator<DeclStmt> in(const Index &index);
   static gap::generator<DeclStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DeclStmt> by(const Index &, EntityId);
+  static std::optional<DeclStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DECL_STMT;

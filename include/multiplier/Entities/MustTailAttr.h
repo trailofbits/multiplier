@@ -39,7 +39,7 @@ class MustTailAttr : public StmtAttr {
   static gap::generator<MustTailAttr> in(const Index &index);
   static gap::generator<MustTailAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MustTailAttr> by(const Index &, EntityId);
+  static std::optional<MustTailAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MUST_TAIL;

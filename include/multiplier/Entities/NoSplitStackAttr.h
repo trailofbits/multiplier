@@ -39,7 +39,7 @@ class NoSplitStackAttr : public InheritableAttr {
   static gap::generator<NoSplitStackAttr> in(const Index &index);
   static gap::generator<NoSplitStackAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoSplitStackAttr> by(const Index &, EntityId);
+  static std::optional<NoSplitStackAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_SPLIT_STACK;

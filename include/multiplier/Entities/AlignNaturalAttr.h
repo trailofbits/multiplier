@@ -39,7 +39,7 @@ class AlignNaturalAttr : public InheritableAttr {
   static gap::generator<AlignNaturalAttr> in(const Index &index);
   static gap::generator<AlignNaturalAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AlignNaturalAttr> by(const Index &, EntityId);
+  static std::optional<AlignNaturalAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGN_NATURAL;

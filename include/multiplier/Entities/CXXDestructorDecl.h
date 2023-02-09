@@ -48,7 +48,7 @@ class CXXDestructorDecl : public CXXMethodDecl {
   static gap::generator<CXXDestructorDecl> in(const Index &index);
   static gap::generator<CXXDestructorDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXDestructorDecl> by(const Index &, EntityId);
+  static std::optional<CXXDestructorDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DESTRUCTOR;

@@ -39,7 +39,7 @@ class CPUDispatchAttr : public InheritableAttr {
   static gap::generator<CPUDispatchAttr> in(const Index &index);
   static gap::generator<CPUDispatchAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CPUDispatchAttr> by(const Index &, EntityId);
+  static std::optional<CPUDispatchAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CPU_DISPATCH;

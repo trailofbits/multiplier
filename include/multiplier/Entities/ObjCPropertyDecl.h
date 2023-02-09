@@ -45,7 +45,7 @@ class ObjCPropertyDecl : public NamedDecl {
   static gap::generator<ObjCPropertyDecl> in(const Index &index);
   static gap::generator<ObjCPropertyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCPropertyDecl> by(const Index &, EntityId);
+  static std::optional<ObjCPropertyDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROPERTY;

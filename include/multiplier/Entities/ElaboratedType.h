@@ -40,7 +40,7 @@ class ElaboratedType : public TypeWithKeyword {
   static gap::generator<ElaboratedType> in(const Index &index);
   static gap::generator<ElaboratedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ElaboratedType> by(const Index &, EntityId);
+  static std::optional<ElaboratedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ELABORATED;

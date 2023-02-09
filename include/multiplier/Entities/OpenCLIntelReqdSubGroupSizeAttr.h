@@ -39,7 +39,7 @@ class OpenCLIntelReqdSubGroupSizeAttr : public InheritableAttr {
   static gap::generator<OpenCLIntelReqdSubGroupSizeAttr> in(const Index &index);
   static gap::generator<OpenCLIntelReqdSubGroupSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OpenCLIntelReqdSubGroupSizeAttr> by(const Index &, EntityId);
+  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;

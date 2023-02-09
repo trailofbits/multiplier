@@ -41,7 +41,7 @@ class NSConsumedAttr : public InheritableParamAttr {
   static gap::generator<NSConsumedAttr> in(const Index &index);
   static gap::generator<NSConsumedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NSConsumedAttr> by(const Index &, EntityId);
+  static std::optional<NSConsumedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_CONSUMED;

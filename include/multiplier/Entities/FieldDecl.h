@@ -46,7 +46,7 @@ class FieldDecl : public DeclaratorDecl {
   static gap::generator<FieldDecl> in(const Index &index);
   static gap::generator<FieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FieldDecl> by(const Index &, EntityId);
+  static std::optional<FieldDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FIELD;

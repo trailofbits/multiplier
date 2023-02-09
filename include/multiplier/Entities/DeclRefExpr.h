@@ -44,7 +44,7 @@ class DeclRefExpr : public Expr {
   static gap::generator<DeclRefExpr> in(const Index &index);
   static gap::generator<DeclRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DeclRefExpr> by(const Index &, EntityId);
+  static std::optional<DeclRefExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DECL_REF_EXPR;

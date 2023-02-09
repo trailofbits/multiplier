@@ -40,7 +40,7 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   static gap::generator<ObjCCompatibleAliasDecl> in(const Index &index);
   static gap::generator<ObjCCompatibleAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCCompatibleAliasDecl> by(const Index &, EntityId);
+  static std::optional<ObjCCompatibleAliasDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_COMPATIBLE_ALIAS;

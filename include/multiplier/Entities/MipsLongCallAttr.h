@@ -40,7 +40,7 @@ class MipsLongCallAttr : public InheritableAttr {
   static gap::generator<MipsLongCallAttr> in(const Index &index);
   static gap::generator<MipsLongCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MipsLongCallAttr> by(const Index &, EntityId);
+  static std::optional<MipsLongCallAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIPS_LONG_CALL;

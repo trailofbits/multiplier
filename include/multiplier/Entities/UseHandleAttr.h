@@ -41,7 +41,7 @@ class UseHandleAttr : public InheritableParamAttr {
   static gap::generator<UseHandleAttr> in(const Index &index);
   static gap::generator<UseHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UseHandleAttr> by(const Index &, EntityId);
+  static std::optional<UseHandleAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::USE_HANDLE;

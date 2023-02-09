@@ -47,7 +47,7 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   static gap::generator<ObjCInterfaceDecl> in(const Index &index);
   static gap::generator<ObjCInterfaceDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCInterfaceDecl> by(const Index &, EntityId);
+  static std::optional<ObjCInterfaceDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_INTERFACE;

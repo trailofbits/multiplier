@@ -41,7 +41,7 @@ class ArrayInitIndexExpr : public Expr {
   static gap::generator<ArrayInitIndexExpr> in(const Index &index);
   static gap::generator<ArrayInitIndexExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ArrayInitIndexExpr> by(const Index &, EntityId);
+  static std::optional<ArrayInitIndexExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_INIT_INDEX_EXPR;

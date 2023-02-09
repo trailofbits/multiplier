@@ -39,7 +39,7 @@ class IBActionAttr : public InheritableAttr {
   static gap::generator<IBActionAttr> in(const Index &index);
   static gap::generator<IBActionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<IBActionAttr> by(const Index &, EntityId);
+  static std::optional<IBActionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_ACTION;

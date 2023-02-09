@@ -37,7 +37,7 @@ class ObjCDesignatedInitializerAttr : public Attr {
   static gap::generator<ObjCDesignatedInitializerAttr> in(const Index &index);
   static gap::generator<ObjCDesignatedInitializerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCDesignatedInitializerAttr> by(const Index &, EntityId);
+  static std::optional<ObjCDesignatedInitializerAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DESIGNATED_INITIALIZER;

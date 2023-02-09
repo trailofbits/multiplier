@@ -41,7 +41,7 @@ class LifetimeExtendedTemporaryDecl : public Decl {
   static gap::generator<LifetimeExtendedTemporaryDecl> in(const Index &index);
   static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LifetimeExtendedTemporaryDecl> by(const Index &, EntityId);
+  static std::optional<LifetimeExtendedTemporaryDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LIFETIME_EXTENDED_TEMPORARY;

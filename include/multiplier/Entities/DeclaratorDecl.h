@@ -43,7 +43,7 @@ class DeclaratorDecl : public ValueDecl {
   static gap::generator<DeclaratorDecl> in(const Index &index);
   static gap::generator<DeclaratorDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DeclaratorDecl> by(const Index &, EntityId);
+  static std::optional<DeclaratorDecl> by_id(const Index &, EntityId);
 
   static gap::generator<DeclaratorDecl> containing(const Decl &decl);
   static gap::generator<DeclaratorDecl> containing(const std::optional<Decl> &decl);

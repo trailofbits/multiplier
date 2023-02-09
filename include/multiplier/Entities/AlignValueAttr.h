@@ -38,7 +38,7 @@ class AlignValueAttr : public Attr {
   static gap::generator<AlignValueAttr> in(const Index &index);
   static gap::generator<AlignValueAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AlignValueAttr> by(const Index &, EntityId);
+  static std::optional<AlignValueAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGN_VALUE;

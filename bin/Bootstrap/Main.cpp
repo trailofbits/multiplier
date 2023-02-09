@@ -2310,7 +2310,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "> in(const Fragment &frag);\n\n"
         << "  static gap::generator<"
         << class_name << "> in(const Index &index);\n"
-        << "  std::optional<" << class_name << "> by(const Index &, EntityId);\n\n";
+        << "  static std::optional<" << class_name << "> by_id(const Index &, EntityId);\n\n";
   }
 
   if (is_declaration) {
@@ -2601,6 +2601,28 @@ MethodListPtr CodeGenerator::RunOnClass(
   // Make a generator for all of the derived kinds of this particular entity.
   if (is_declaration || is_statement || is_attribute || is_type || is_macro) {
 
+    lib_cpp_os
+        << "std::optional<" << class_name << "> " << class_name
+        << "::by_id(const Index &index, EntityId eid) {\n"
+        << "  VariantId vid = eid.Unpack();\n"
+        << "  if (std::holds_alternative<" << base_name << "Id>(vid)) {\n";
+
+    if (base_name == class_name) {
+      lib_cpp_os
+          << "    index." << lower_name << "(eid.Pack());\n";
+    } else {
+      lib_cpp_os
+          << "    return " << class_name << "::from(index."
+          << lower_name << "(eid.Pack()));\n";
+    }
+
+    lib_cpp_os
+        << "  } else if (std::holds_alternative<InvalidId>(vid)) {\n"
+        << "    assert(eid.Pack() == kInvalidEntityId);\n"
+        << "  }\n"
+        << "  return std::nullopt;\n"
+        << "}\n\n";
+
     if (class_name == base_name) {
       lib_cpp_os
           << "gap::generator<" << class_name << "> " << class_name
@@ -2646,25 +2668,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "      co_yield " << base_name << "(std::move(eptr));\n"
           << "    }\n"
           << "  }\n"
-          << "}\n\n"
-          << "std::optional<" << class_name << "> " << class_name << "::by_id(const Index &index, EntityId eid) {\n"
-          << "  VariantId vid = eid.Unpack();\n"
-          << "  if (std::holds_alternative<" << base_name << "Id>(vid)) {\n";
-
-      if (base_name == class_name) {
-        lib_cpp_os
-            << "    index." << lower_name << "(eid.Pack());\n";
-      } else {
-        lib_cpp_os
-            << "    return " << class_name << "::from(index."
-            << lower_name << "(eid.Pack()));\n";
-      }
-
-      lib_cpp_os
-          << "  } else if (std::holds_alternative<InvalidId>(vid)) {\n"
-          << "    assert(eid.Pack() == kInvalidEntityId);\n"
-          << "  }\n"
-          << "  return std::nullopt;\n"
           << "}\n\n";
     } else {
       lib_cpp_os

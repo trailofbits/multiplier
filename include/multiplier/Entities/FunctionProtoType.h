@@ -44,7 +44,7 @@ class FunctionProtoType : public FunctionType {
   static gap::generator<FunctionProtoType> in(const Index &index);
   static gap::generator<FunctionProtoType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FunctionProtoType> by(const Index &, EntityId);
+  static std::optional<FunctionProtoType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::FUNCTION_PROTO;

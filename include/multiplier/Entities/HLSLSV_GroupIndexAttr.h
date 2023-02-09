@@ -39,7 +39,7 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
   static gap::generator<HLSLSV_GroupIndexAttr> in(const Index &index);
   static gap::generator<HLSLSV_GroupIndexAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<HLSLSV_GroupIndexAttr> by(const Index &, EntityId);
+  static std::optional<HLSLSV_GroupIndexAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSLSV__GROUP_INDEX;

@@ -42,7 +42,7 @@ class ConceptDecl : public TemplateDecl {
   static gap::generator<ConceptDecl> in(const Index &index);
   static gap::generator<ConceptDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConceptDecl> by(const Index &, EntityId);
+  static std::optional<ConceptDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CONCEPT;

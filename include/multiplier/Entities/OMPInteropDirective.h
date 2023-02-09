@@ -39,7 +39,7 @@ class OMPInteropDirective : public OMPExecutableDirective {
   static gap::generator<OMPInteropDirective> in(const Index &index);
   static gap::generator<OMPInteropDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPInteropDirective> by(const Index &, EntityId);
+  static std::optional<OMPInteropDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_INTEROP_DIRECTIVE;

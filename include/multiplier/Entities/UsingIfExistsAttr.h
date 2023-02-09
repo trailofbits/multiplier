@@ -39,7 +39,7 @@ class UsingIfExistsAttr : public InheritableAttr {
   static gap::generator<UsingIfExistsAttr> in(const Index &index);
   static gap::generator<UsingIfExistsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UsingIfExistsAttr> by(const Index &, EntityId);
+  static std::optional<UsingIfExistsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::USING_IF_EXISTS;

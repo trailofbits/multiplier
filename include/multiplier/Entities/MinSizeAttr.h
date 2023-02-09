@@ -39,7 +39,7 @@ class MinSizeAttr : public InheritableAttr {
   static gap::generator<MinSizeAttr> in(const Index &index);
   static gap::generator<MinSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MinSizeAttr> by(const Index &, EntityId);
+  static std::optional<MinSizeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIN_SIZE;

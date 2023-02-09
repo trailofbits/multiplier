@@ -38,7 +38,7 @@ class PragmaCommentDecl : public Decl {
   static gap::generator<PragmaCommentDecl> in(const Index &index);
   static gap::generator<PragmaCommentDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PragmaCommentDecl> by(const Index &, EntityId);
+  static std::optional<PragmaCommentDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PRAGMA_COMMENT;

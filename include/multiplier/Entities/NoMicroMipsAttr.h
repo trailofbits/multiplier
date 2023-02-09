@@ -39,7 +39,7 @@ class NoMicroMipsAttr : public InheritableAttr {
   static gap::generator<NoMicroMipsAttr> in(const Index &index);
   static gap::generator<NoMicroMipsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoMicroMipsAttr> by(const Index &, EntityId);
+  static std::optional<NoMicroMipsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_MICRO_MIPS;

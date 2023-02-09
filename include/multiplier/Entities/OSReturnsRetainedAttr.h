@@ -39,7 +39,7 @@ class OSReturnsRetainedAttr : public InheritableAttr {
   static gap::generator<OSReturnsRetainedAttr> in(const Index &index);
   static gap::generator<OSReturnsRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OSReturnsRetainedAttr> by(const Index &, EntityId);
+  static std::optional<OSReturnsRetainedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_RETURNS_RETAINED;

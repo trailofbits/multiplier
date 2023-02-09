@@ -39,7 +39,7 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
   static gap::generator<ArcWeakrefUnavailableAttr> in(const Index &index);
   static gap::generator<ArcWeakrefUnavailableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ArcWeakrefUnavailableAttr> by(const Index &, EntityId);
+  static std::optional<ArcWeakrefUnavailableAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARC_WEAKREF_UNAVAILABLE;

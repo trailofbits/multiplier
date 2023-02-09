@@ -41,7 +41,7 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   static gap::generator<UnresolvedUsingValueDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UnresolvedUsingValueDecl> by(const Index &, EntityId);
+  static std::optional<UnresolvedUsingValueDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_VALUE;

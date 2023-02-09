@@ -41,7 +41,7 @@ class NoInitExpr : public Expr {
   static gap::generator<NoInitExpr> in(const Index &index);
   static gap::generator<NoInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoInitExpr> by(const Index &, EntityId);
+  static std::optional<NoInitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::NO_INIT_EXPR;

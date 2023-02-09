@@ -39,7 +39,7 @@ class StandaloneDebugAttr : public InheritableAttr {
   static gap::generator<StandaloneDebugAttr> in(const Index &index);
   static gap::generator<StandaloneDebugAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<StandaloneDebugAttr> by(const Index &, EntityId);
+  static std::optional<StandaloneDebugAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::STANDALONE_DEBUG;

@@ -41,7 +41,7 @@ class OMPArraySectionExpr : public Expr {
   static gap::generator<OMPArraySectionExpr> in(const Index &index);
   static gap::generator<OMPArraySectionExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPArraySectionExpr> by(const Index &, EntityId);
+  static std::optional<OMPArraySectionExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ARRAY_SECTION_EXPR;

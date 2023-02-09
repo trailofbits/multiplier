@@ -37,7 +37,7 @@ class CompoundStmt : public Stmt {
   static gap::generator<CompoundStmt> in(const Index &index);
   static gap::generator<CompoundStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CompoundStmt> by(const Index &, EntityId);
+  static std::optional<CompoundStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_STMT;

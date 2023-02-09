@@ -39,7 +39,7 @@ class CPUSpecificAttr : public InheritableAttr {
   static gap::generator<CPUSpecificAttr> in(const Index &index);
   static gap::generator<CPUSpecificAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CPUSpecificAttr> by(const Index &, EntityId);
+  static std::optional<CPUSpecificAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CPU_SPECIFIC;

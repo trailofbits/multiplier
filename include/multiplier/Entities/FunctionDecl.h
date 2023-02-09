@@ -55,7 +55,7 @@ class FunctionDecl : public DeclaratorDecl {
   static gap::generator<FunctionDecl> in(const Index &index);
   static gap::generator<FunctionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FunctionDecl> by(const Index &, EntityId);
+  static std::optional<FunctionDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION;

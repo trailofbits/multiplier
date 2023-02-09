@@ -37,7 +37,7 @@ class InheritableAttr : public Attr {
   static gap::generator<InheritableAttr> in(const Index &index);
   static gap::generator<InheritableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<InheritableAttr> by(const Index &, EntityId);
+  static std::optional<InheritableAttr> by_id(const Index &, EntityId);
 
   inline static std::optional<InheritableAttr> from(const Reference &r) {
     return from(r.as_attribute());

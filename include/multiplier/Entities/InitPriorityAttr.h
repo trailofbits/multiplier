@@ -39,7 +39,7 @@ class InitPriorityAttr : public InheritableAttr {
   static gap::generator<InitPriorityAttr> in(const Index &index);
   static gap::generator<InitPriorityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<InitPriorityAttr> by(const Index &, EntityId);
+  static std::optional<InitPriorityAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_PRIORITY;

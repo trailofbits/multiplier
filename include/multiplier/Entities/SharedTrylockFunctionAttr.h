@@ -40,7 +40,7 @@ class SharedTrylockFunctionAttr : public InheritableAttr {
   static gap::generator<SharedTrylockFunctionAttr> in(const Index &index);
   static gap::generator<SharedTrylockFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SharedTrylockFunctionAttr> by(const Index &, EntityId);
+  static std::optional<SharedTrylockFunctionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SHARED_TRYLOCK_FUNCTION;

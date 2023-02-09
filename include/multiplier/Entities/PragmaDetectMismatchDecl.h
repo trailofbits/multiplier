@@ -37,7 +37,7 @@ class PragmaDetectMismatchDecl : public Decl {
   static gap::generator<PragmaDetectMismatchDecl> in(const Index &index);
   static gap::generator<PragmaDetectMismatchDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PragmaDetectMismatchDecl> by(const Index &, EntityId);
+  static std::optional<PragmaDetectMismatchDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PRAGMA_DETECT_MISMATCH;

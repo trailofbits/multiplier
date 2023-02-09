@@ -37,7 +37,7 @@ class NoBuiltinAttr : public Attr {
   static gap::generator<NoBuiltinAttr> in(const Index &index);
   static gap::generator<NoBuiltinAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoBuiltinAttr> by(const Index &, EntityId);
+  static std::optional<NoBuiltinAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_BUILTIN;

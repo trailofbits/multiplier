@@ -38,7 +38,7 @@ class OpenCLAccessAttr : public Attr {
   static gap::generator<OpenCLAccessAttr> in(const Index &index);
   static gap::generator<OpenCLAccessAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OpenCLAccessAttr> by(const Index &, EntityId);
+  static std::optional<OpenCLAccessAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_ACCESS;

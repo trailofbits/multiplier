@@ -41,7 +41,7 @@ class ExtVectorElementExpr : public Expr {
   static gap::generator<ExtVectorElementExpr> in(const Index &index);
   static gap::generator<ExtVectorElementExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ExtVectorElementExpr> by(const Index &, EntityId);
+  static std::optional<ExtVectorElementExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXT_VECTOR_ELEMENT_EXPR;

@@ -39,7 +39,7 @@ class TypeNonNullAttr : public TypeAttr {
   static gap::generator<TypeNonNullAttr> in(const Index &index);
   static gap::generator<TypeNonNullAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeNonNullAttr> by(const Index &, EntityId);
+  static std::optional<TypeNonNullAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_NON_NULL;

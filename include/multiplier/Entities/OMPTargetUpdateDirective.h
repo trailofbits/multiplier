@@ -39,7 +39,7 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
   static gap::generator<OMPTargetUpdateDirective> in(const Index &index);
   static gap::generator<OMPTargetUpdateDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPTargetUpdateDirective> by(const Index &, EntityId);
+  static std::optional<OMPTargetUpdateDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_UPDATE_DIRECTIVE;

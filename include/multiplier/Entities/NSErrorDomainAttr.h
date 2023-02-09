@@ -40,7 +40,7 @@ class NSErrorDomainAttr : public InheritableAttr {
   static gap::generator<NSErrorDomainAttr> in(const Index &index);
   static gap::generator<NSErrorDomainAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NSErrorDomainAttr> by(const Index &, EntityId);
+  static std::optional<NSErrorDomainAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_ERROR_DOMAIN;

@@ -39,7 +39,7 @@ class ObjCGCAttr : public TypeAttr {
   static gap::generator<ObjCGCAttr> in(const Index &index);
   static gap::generator<ObjCGCAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCGCAttr> by(const Index &, EntityId);
+  static std::optional<ObjCGCAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_CGC;

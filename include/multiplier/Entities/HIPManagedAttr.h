@@ -39,7 +39,7 @@ class HIPManagedAttr : public InheritableAttr {
   static gap::generator<HIPManagedAttr> in(const Index &index);
   static gap::generator<HIPManagedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<HIPManagedAttr> by(const Index &, EntityId);
+  static std::optional<HIPManagedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HIP_MANAGED;

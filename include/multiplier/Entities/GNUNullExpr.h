@@ -41,7 +41,7 @@ class GNUNullExpr : public Expr {
   static gap::generator<GNUNullExpr> in(const Index &index);
   static gap::generator<GNUNullExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<GNUNullExpr> by(const Index &, EntityId);
+  static std::optional<GNUNullExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GNU_NULL_EXPR;

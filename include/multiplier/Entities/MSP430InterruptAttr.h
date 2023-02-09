@@ -39,7 +39,7 @@ class MSP430InterruptAttr : public InheritableAttr {
   static gap::generator<MSP430InterruptAttr> in(const Index &index);
   static gap::generator<MSP430InterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSP430InterruptAttr> by(const Index &, EntityId);
+  static std::optional<MSP430InterruptAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MSP430_INTERRUPT;

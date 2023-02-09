@@ -39,7 +39,7 @@ class CommonAttr : public InheritableAttr {
   static gap::generator<CommonAttr> in(const Index &index);
   static gap::generator<CommonAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CommonAttr> by(const Index &, EntityId);
+  static std::optional<CommonAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::COMMON;

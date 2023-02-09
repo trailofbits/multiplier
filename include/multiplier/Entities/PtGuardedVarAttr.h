@@ -39,7 +39,7 @@ class PtGuardedVarAttr : public InheritableAttr {
   static gap::generator<PtGuardedVarAttr> in(const Index &index);
   static gap::generator<PtGuardedVarAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PtGuardedVarAttr> by(const Index &, EntityId);
+  static std::optional<PtGuardedVarAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PT_GUARDED_VAR;

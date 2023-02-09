@@ -39,7 +39,7 @@ class SelectAnyAttr : public InheritableAttr {
   static gap::generator<SelectAnyAttr> in(const Index &index);
   static gap::generator<SelectAnyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SelectAnyAttr> by(const Index &, EntityId);
+  static std::optional<SelectAnyAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SELECT_ANY;

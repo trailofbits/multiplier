@@ -51,7 +51,7 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
   static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Index &index);
   static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ClassTemplatePartialSpecializationDecl> by(const Index &, EntityId);
+  static std::optional<ClassTemplatePartialSpecializationDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;

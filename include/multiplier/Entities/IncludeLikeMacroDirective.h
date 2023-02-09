@@ -39,7 +39,7 @@ class IncludeLikeMacroDirective : public MacroDirective {
   static gap::generator<IncludeLikeMacroDirective> in(const Fragment &frag);
 
   static gap::generator<IncludeLikeMacroDirective> in(const Index &index);
-  std::optional<IncludeLikeMacroDirective> by(const Index &, EntityId);
+  static std::optional<IncludeLikeMacroDirective> by_id(const Index &, EntityId);
 
   static gap::generator<IncludeLikeMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);

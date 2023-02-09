@@ -27,7 +27,7 @@ class DatabaseWriterImpl;
     m(RedeclarationRecord) \
     m(MangledNameRecord) \
     m(ReferenceRecord) \
-    m(SymbolNameRecord) \
+    m(NamedEntityRecord) \
     m(DictionaryRecord)
 
 
@@ -204,28 +204,36 @@ struct MangledNameRecord {
 };
 
 // Represents the name of some symbol.
-struct SymbolNameRecord {
-  static constexpr const char *kTableName = "symbol";
+struct NamedEntityRecord {
+  static constexpr const char *kTableName = "named_entity";
+
+  static constexpr const char *kInitStatements[] = {
+      R"(CREATE TABLE IF NOT EXISTS named_entity (
+           entity_id INTEGER NOT NULL PRIMARY KEY,
+           name TEXT NOT NULL
+         ) WITHOUT ROWID)",
 
 #if MX_DATABASE_HAS_FTS5
-  static constexpr const char *kInitStatements[] = {
-      R"(CREATE VIRTUAL TABLE IF NOT EXISTS symbol
-         USING fts5(name, content=''))"};
+      R"(CREATE VIRTUAL TABLE IF NOT EXISTS named_entity_index
+         USING fts5(name, content='named_entity', content_rowid='entity_id'))",
+
+      R"(CREATE TRIGGER named_entity_ai AFTER INSERT ON named_entity BEGIN
+           INSERT INTO named_entity_index (rowid, name) 
+           VALUES (new.entity_id, new.name);
+         END)"
+#endif
+      };
 
   static constexpr const char *kExitStatements[] = {
-      R"(INSERT INTO symbol(symbol) VALUES('optimize'))"};
-
+#if MX_DATABASE_HAS_FTS5
+      R"(INSERT INTO named_entity_index(named_entity_index) VALUES('optimize'))"
 #else
-  static constexpr const char *kInitStatements[] = {
-      R"(CREATE TABLE IF NOT EXISTS symbol (
-           name TEXT NOT NULL
-         ))"};
-
-  static constexpr const char *kExitStatements[] = {nullptr};
+      nullptr
 #endif
+      };
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO symbol (rowid, name)
+      R"(INSERT OR IGNORE INTO named_entity (entity_id, name)
          VALUES (?1, ?2))";
 
   // A `DeclId` or a `MacroId`.

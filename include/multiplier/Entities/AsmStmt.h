@@ -38,7 +38,7 @@ class AsmStmt : public Stmt {
   static gap::generator<AsmStmt> in(const Index &index);
   static gap::generator<AsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AsmStmt> by(const Index &, EntityId);
+  static std::optional<AsmStmt> by_id(const Index &, EntityId);
 
   static gap::generator<AsmStmt> containing(const Decl &decl);
   static gap::generator<AsmStmt> containing(const std::optional<Decl> &decl);

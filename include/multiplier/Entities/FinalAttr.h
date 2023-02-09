@@ -40,7 +40,7 @@ class FinalAttr : public InheritableAttr {
   static gap::generator<FinalAttr> in(const Index &index);
   static gap::generator<FinalAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FinalAttr> by(const Index &, EntityId);
+  static std::optional<FinalAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FINAL;

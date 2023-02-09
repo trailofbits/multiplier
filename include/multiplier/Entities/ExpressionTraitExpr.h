@@ -42,7 +42,7 @@ class ExpressionTraitExpr : public Expr {
   static gap::generator<ExpressionTraitExpr> in(const Index &index);
   static gap::generator<ExpressionTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ExpressionTraitExpr> by(const Index &, EntityId);
+  static std::optional<ExpressionTraitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXPRESSION_TRAIT_EXPR;

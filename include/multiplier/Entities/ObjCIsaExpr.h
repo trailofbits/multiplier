@@ -41,7 +41,7 @@ class ObjCIsaExpr : public Expr {
   static gap::generator<ObjCIsaExpr> in(const Index &index);
   static gap::generator<ObjCIsaExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCIsaExpr> by(const Index &, EntityId);
+  static std::optional<ObjCIsaExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ISA_EXPR;

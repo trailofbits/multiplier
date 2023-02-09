@@ -40,7 +40,7 @@ class ObjCInterfaceType : public ObjCObjectType {
   static gap::generator<ObjCInterfaceType> in(const Index &index);
   static gap::generator<ObjCInterfaceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCInterfaceType> by(const Index &, EntityId);
+  static std::optional<ObjCInterfaceType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_INTERFACE;

@@ -43,7 +43,7 @@ class ImplicitCastExpr : public CastExpr {
   static gap::generator<ImplicitCastExpr> in(const Index &index);
   static gap::generator<ImplicitCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ImplicitCastExpr> by(const Index &, EntityId);
+  static std::optional<ImplicitCastExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IMPLICIT_CAST_EXPR;

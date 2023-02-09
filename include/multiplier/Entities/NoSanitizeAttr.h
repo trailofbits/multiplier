@@ -39,7 +39,7 @@ class NoSanitizeAttr : public InheritableAttr {
   static gap::generator<NoSanitizeAttr> in(const Index &index);
   static gap::generator<NoSanitizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoSanitizeAttr> by(const Index &, EntityId);
+  static std::optional<NoSanitizeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_SANITIZE;

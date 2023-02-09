@@ -43,7 +43,7 @@ class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
   static gap::generator<OMPParallelMasterTaskLoopSimdDirective> in(const Index &index);
   static gap::generator<OMPParallelMasterTaskLoopSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPParallelMasterTaskLoopSimdDirective> by(const Index &, EntityId);
+  static std::optional<OMPParallelMasterTaskLoopSimdDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE;

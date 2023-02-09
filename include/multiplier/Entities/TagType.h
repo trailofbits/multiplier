@@ -38,7 +38,7 @@ class TagType : public Type {
   static gap::generator<TagType> in(const Index &index);
   static gap::generator<TagType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TagType> by(const Index &, EntityId);
+  static std::optional<TagType> by_id(const Index &, EntityId);
 
   inline static std::optional<TagType> from(const Reference &r) {
     return from(r.as_type());

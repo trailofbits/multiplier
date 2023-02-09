@@ -39,7 +39,7 @@ class CmseNSEntryAttr : public InheritableAttr {
   static gap::generator<CmseNSEntryAttr> in(const Index &index);
   static gap::generator<CmseNSEntryAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CmseNSEntryAttr> by(const Index &, EntityId);
+  static std::optional<CmseNSEntryAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CMSE_NS_ENTRY;

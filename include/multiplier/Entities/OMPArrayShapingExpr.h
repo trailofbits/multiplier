@@ -41,7 +41,7 @@ class OMPArrayShapingExpr : public Expr {
   static gap::generator<OMPArrayShapingExpr> in(const Index &index);
   static gap::generator<OMPArrayShapingExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPArrayShapingExpr> by(const Index &, EntityId);
+  static std::optional<OMPArrayShapingExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ARRAY_SHAPING_EXPR;

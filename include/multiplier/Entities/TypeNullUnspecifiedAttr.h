@@ -39,7 +39,7 @@ class TypeNullUnspecifiedAttr : public TypeAttr {
   static gap::generator<TypeNullUnspecifiedAttr> in(const Index &index);
   static gap::generator<TypeNullUnspecifiedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeNullUnspecifiedAttr> by(const Index &, EntityId);
+  static std::optional<TypeNullUnspecifiedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_NULL_UNSPECIFIED;

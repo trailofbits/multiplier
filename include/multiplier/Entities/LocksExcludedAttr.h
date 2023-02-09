@@ -39,7 +39,7 @@ class LocksExcludedAttr : public InheritableAttr {
   static gap::generator<LocksExcludedAttr> in(const Index &index);
   static gap::generator<LocksExcludedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LocksExcludedAttr> by(const Index &, EntityId);
+  static std::optional<LocksExcludedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOCKS_EXCLUDED;

@@ -43,7 +43,7 @@ class ArrayTypeTraitExpr : public Expr {
   static gap::generator<ArrayTypeTraitExpr> in(const Index &index);
   static gap::generator<ArrayTypeTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ArrayTypeTraitExpr> by(const Index &, EntityId);
+  static std::optional<ArrayTypeTraitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_TYPE_TRAIT_EXPR;

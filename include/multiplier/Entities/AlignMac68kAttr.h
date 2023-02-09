@@ -39,7 +39,7 @@ class AlignMac68kAttr : public InheritableAttr {
   static gap::generator<AlignMac68kAttr> in(const Index &index);
   static gap::generator<AlignMac68kAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AlignMac68kAttr> by(const Index &, EntityId);
+  static std::optional<AlignMac68kAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGN_MAC68K;

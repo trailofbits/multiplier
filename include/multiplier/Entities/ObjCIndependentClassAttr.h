@@ -39,7 +39,7 @@ class ObjCIndependentClassAttr : public InheritableAttr {
   static gap::generator<ObjCIndependentClassAttr> in(const Index &index);
   static gap::generator<ObjCIndependentClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCIndependentClassAttr> by(const Index &, EntityId);
+  static std::optional<ObjCIndependentClassAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_INDEPENDENT_CLASS;

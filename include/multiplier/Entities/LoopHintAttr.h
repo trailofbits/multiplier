@@ -41,7 +41,7 @@ class LoopHintAttr : public Attr {
   static gap::generator<LoopHintAttr> in(const Index &index);
   static gap::generator<LoopHintAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LoopHintAttr> by(const Index &, EntityId);
+  static std::optional<LoopHintAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOOP_HINT;

@@ -39,7 +39,7 @@ class CUDAHostAttr : public InheritableAttr {
   static gap::generator<CUDAHostAttr> in(const Index &index);
   static gap::generator<CUDAHostAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CUDAHostAttr> by(const Index &, EntityId);
+  static std::optional<CUDAHostAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_HOST;

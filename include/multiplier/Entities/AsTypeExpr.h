@@ -41,7 +41,7 @@ class AsTypeExpr : public Expr {
   static gap::generator<AsTypeExpr> in(const Index &index);
   static gap::generator<AsTypeExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AsTypeExpr> by(const Index &, EntityId);
+  static std::optional<AsTypeExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::AS_TYPE_EXPR;

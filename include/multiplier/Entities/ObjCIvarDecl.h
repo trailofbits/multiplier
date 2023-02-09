@@ -47,7 +47,7 @@ class ObjCIvarDecl : public FieldDecl {
   static gap::generator<ObjCIvarDecl> in(const Index &index);
   static gap::generator<ObjCIvarDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCIvarDecl> by(const Index &, EntityId);
+  static std::optional<ObjCIvarDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_IVAR;

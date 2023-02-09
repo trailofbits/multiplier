@@ -42,7 +42,7 @@ class ConceptSpecializationExpr : public Expr {
   static gap::generator<ConceptSpecializationExpr> in(const Index &index);
   static gap::generator<ConceptSpecializationExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConceptSpecializationExpr> by(const Index &, EntityId);
+  static std::optional<ConceptSpecializationExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONCEPT_SPECIALIZATION_EXPR;

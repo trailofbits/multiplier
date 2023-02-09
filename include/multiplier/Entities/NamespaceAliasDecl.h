@@ -39,7 +39,7 @@ class NamespaceAliasDecl : public NamedDecl {
   static gap::generator<NamespaceAliasDecl> in(const Index &index);
   static gap::generator<NamespaceAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NamespaceAliasDecl> by(const Index &, EntityId);
+  static std::optional<NamespaceAliasDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMESPACE_ALIAS;

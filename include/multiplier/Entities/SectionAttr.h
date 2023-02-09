@@ -40,7 +40,7 @@ class SectionAttr : public InheritableAttr {
   static gap::generator<SectionAttr> in(const Index &index);
   static gap::generator<SectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SectionAttr> by(const Index &, EntityId);
+  static std::optional<SectionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SECTION;

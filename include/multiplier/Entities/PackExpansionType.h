@@ -37,7 +37,7 @@ class PackExpansionType : public Type {
   static gap::generator<PackExpansionType> in(const Index &index);
   static gap::generator<PackExpansionType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PackExpansionType> by(const Index &, EntityId);
+  static std::optional<PackExpansionType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::PACK_EXPANSION;

@@ -39,7 +39,7 @@ class StrictFPAttr : public InheritableAttr {
   static gap::generator<StrictFPAttr> in(const Index &index);
   static gap::generator<StrictFPAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<StrictFPAttr> by(const Index &, EntityId);
+  static std::optional<StrictFPAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::STRICT_FP;

@@ -42,7 +42,7 @@ class OMPDeclareTargetDeclAttr : public InheritableAttr {
   static gap::generator<OMPDeclareTargetDeclAttr> in(const Index &index);
   static gap::generator<OMPDeclareTargetDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPDeclareTargetDeclAttr> by(const Index &, EntityId);
+  static std::optional<OMPDeclareTargetDeclAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_TARGET_DECL;

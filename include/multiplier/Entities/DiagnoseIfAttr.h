@@ -42,7 +42,7 @@ class DiagnoseIfAttr : public InheritableAttr {
   static gap::generator<DiagnoseIfAttr> in(const Index &index);
   static gap::generator<DiagnoseIfAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DiagnoseIfAttr> by(const Index &, EntityId);
+  static std::optional<DiagnoseIfAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DIAGNOSE_IF;

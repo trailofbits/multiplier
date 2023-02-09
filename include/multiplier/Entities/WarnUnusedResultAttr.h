@@ -40,7 +40,7 @@ class WarnUnusedResultAttr : public InheritableAttr {
   static gap::generator<WarnUnusedResultAttr> in(const Index &index);
   static gap::generator<WarnUnusedResultAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<WarnUnusedResultAttr> by(const Index &, EntityId);
+  static std::optional<WarnUnusedResultAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WARN_UNUSED_RESULT;

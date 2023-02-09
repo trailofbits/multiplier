@@ -47,7 +47,7 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   static gap::generator<CXXDeductionGuideDecl> in(const Index &index);
   static gap::generator<CXXDeductionGuideDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXDeductionGuideDecl> by(const Index &, EntityId);
+  static std::optional<CXXDeductionGuideDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DEDUCTION_GUIDE;

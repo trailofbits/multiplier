@@ -45,7 +45,7 @@ class OMPCapturedExprDecl : public VarDecl {
   static gap::generator<OMPCapturedExprDecl> in(const Index &index);
   static gap::generator<OMPCapturedExprDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPCapturedExprDecl> by(const Index &, EntityId);
+  static std::optional<OMPCapturedExprDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_CAPTURED_EXPR;

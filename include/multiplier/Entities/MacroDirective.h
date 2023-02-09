@@ -37,7 +37,7 @@ class MacroDirective : public Macro {
   static gap::generator<MacroDirective> in(const Fragment &frag);
 
   static gap::generator<MacroDirective> in(const Index &index);
-  std::optional<MacroDirective> by(const Index &, EntityId);
+  static std::optional<MacroDirective> by_id(const Index &, EntityId);
 
   static gap::generator<MacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);

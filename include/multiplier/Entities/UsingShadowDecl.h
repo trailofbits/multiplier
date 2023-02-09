@@ -40,7 +40,7 @@ class UsingShadowDecl : public NamedDecl {
   static gap::generator<UsingShadowDecl> in(const Index &index);
   static gap::generator<UsingShadowDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UsingShadowDecl> by(const Index &, EntityId);
+  static std::optional<UsingShadowDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_SHADOW;

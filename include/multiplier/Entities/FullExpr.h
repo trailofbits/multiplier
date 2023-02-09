@@ -41,7 +41,7 @@ class FullExpr : public Expr {
   static gap::generator<FullExpr> in(const Index &index);
   static gap::generator<FullExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FullExpr> by(const Index &, EntityId);
+  static std::optional<FullExpr> by_id(const Index &, EntityId);
 
   static gap::generator<FullExpr> containing(const Decl &decl);
   static gap::generator<FullExpr> containing(const std::optional<Decl> &decl);

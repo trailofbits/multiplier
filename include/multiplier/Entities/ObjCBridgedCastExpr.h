@@ -46,7 +46,7 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
   static gap::generator<ObjCBridgedCastExpr> in(const Index &index);
   static gap::generator<ObjCBridgedCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCBridgedCastExpr> by(const Index &, EntityId);
+  static std::optional<ObjCBridgedCastExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BRIDGED_CAST_EXPR;

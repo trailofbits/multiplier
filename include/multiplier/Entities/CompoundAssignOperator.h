@@ -44,7 +44,7 @@ class CompoundAssignOperator : public BinaryOperator {
   static gap::generator<CompoundAssignOperator> in(const Index &index);
   static gap::generator<CompoundAssignOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CompoundAssignOperator> by(const Index &, EntityId);
+  static std::optional<CompoundAssignOperator> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_ASSIGN_OPERATOR;

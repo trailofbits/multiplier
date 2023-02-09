@@ -39,7 +39,7 @@ class ReturnsNonNullAttr : public InheritableAttr {
   static gap::generator<ReturnsNonNullAttr> in(const Index &index);
   static gap::generator<ReturnsNonNullAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ReturnsNonNullAttr> by(const Index &, EntityId);
+  static std::optional<ReturnsNonNullAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RETURNS_NON_NULL;

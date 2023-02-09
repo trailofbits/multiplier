@@ -38,7 +38,7 @@ class ObjCAtThrowStmt : public Stmt {
   static gap::generator<ObjCAtThrowStmt> in(const Index &index);
   static gap::generator<ObjCAtThrowStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCAtThrowStmt> by(const Index &, EntityId);
+  static std::optional<ObjCAtThrowStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_THROW_STMT;

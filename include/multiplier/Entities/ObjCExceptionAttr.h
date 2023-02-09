@@ -39,7 +39,7 @@ class ObjCExceptionAttr : public InheritableAttr {
   static gap::generator<ObjCExceptionAttr> in(const Index &index);
   static gap::generator<ObjCExceptionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCExceptionAttr> by(const Index &, EntityId);
+  static std::optional<ObjCExceptionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_EXCEPTION;

@@ -7964,6 +7964,16 @@ gap::generator<Macro> Macro::containing(const Token &token) {
   }
 }
 
+std::optional<Macro> Macro::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    index.macro(eid.Pack());
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 gap::generator<Macro> Macro::in(const Index &index) {
   const EntityProvider::Ptr &ep = entity_provider_of(index);
   for (MacroImplPtr eptr : ep->MacrosFor(ep)) {
@@ -8000,16 +8010,6 @@ gap::generator<Macro> Macro::in(const Fragment &frag, std::span<MacroKind> kinds
       co_yield Macro(std::move(eptr));
     }
   }
-}
-
-std::optional<Macro> Macro::by(const Index &index, EntityId eid) {
-  VariantId vid = eid.Unpack();
-  if (std::holds_alternative<MacroId>(vid)) {
-    index.macro(eid.Pack());
-  } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(eid.Pack() == kInvalidEntityId);
-  }
-  return std::nullopt;
 }
 
 MacroKind Macro::kind(void) const {
@@ -8074,6 +8074,16 @@ gap::generator<MacroVAOptArgument> MacroVAOptArgument::containing(const Token &t
       co_yield *d;
     }
   }
+}
+
+std::optional<MacroVAOptArgument> MacroVAOptArgument::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroVAOptArgument::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kMacroVAOptArgumentDerivedKinds[] = {
@@ -8141,6 +8151,16 @@ gap::generator<MacroSubstitution> MacroSubstitution::containing(const Token &tok
       co_yield *d;
     }
   }
+}
+
+std::optional<MacroSubstitution> MacroSubstitution::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroSubstitution::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kMacroSubstitutionDerivedKinds[] = {
@@ -8233,6 +8253,16 @@ gap::generator<MacroVAOpt> MacroVAOpt::containing(const Token &token) {
   }
 }
 
+std::optional<MacroVAOpt> MacroVAOpt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroVAOpt::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kMacroVAOptDerivedKinds[] = {
     MacroVAOpt::static_kind(),
 };
@@ -8302,6 +8332,16 @@ gap::generator<MacroConcatenate> MacroConcatenate::containing(const Token &token
       co_yield *d;
     }
   }
+}
+
+std::optional<MacroConcatenate> MacroConcatenate::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroConcatenate::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kMacroConcatenateDerivedKinds[] = {
@@ -8375,6 +8415,16 @@ gap::generator<MacroStringify> MacroStringify::containing(const Token &token) {
   }
 }
 
+std::optional<MacroStringify> MacroStringify::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroStringify::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kMacroStringifyDerivedKinds[] = {
     MacroStringify::static_kind(),
 };
@@ -8444,6 +8494,16 @@ gap::generator<MacroExpansion> MacroExpansion::containing(const Token &token) {
       co_yield *d;
     }
   }
+}
+
+std::optional<MacroExpansion> MacroExpansion::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroExpansion::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kMacroExpansionDerivedKinds[] = {
@@ -8553,6 +8613,16 @@ gap::generator<MacroArgument> MacroArgument::containing(const Token &token) {
   }
 }
 
+std::optional<MacroArgument> MacroArgument::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroArgument::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kMacroArgumentDerivedKinds[] = {
     MacroArgument::static_kind(),
 };
@@ -8626,6 +8696,16 @@ gap::generator<MacroParameter> MacroParameter::containing(const Token &token) {
       co_yield *d;
     }
   }
+}
+
+std::optional<MacroParameter> MacroParameter::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroParameter::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kMacroParameterDerivedKinds[] = {
@@ -8719,6 +8799,16 @@ gap::generator<MacroDirective> MacroDirective::containing(const Token &token) {
       co_yield *d;
     }
   }
+}
+
+std::optional<MacroDirective> MacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return MacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kMacroDirectiveDerivedKinds[] = {
@@ -8831,6 +8921,16 @@ gap::generator<DefineMacroDirective> DefineMacroDirective::containing(const Toke
       co_yield *d;
     }
   }
+}
+
+std::optional<DefineMacroDirective> DefineMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return DefineMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kDefineMacroDirectiveDerivedKinds[] = {
@@ -8957,6 +9057,16 @@ gap::generator<PragmaMacroDirective> PragmaMacroDirective::containing(const Toke
   }
 }
 
+std::optional<PragmaMacroDirective> PragmaMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return PragmaMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kPragmaMacroDirectiveDerivedKinds[] = {
     PragmaMacroDirective::static_kind(),
 };
@@ -9026,6 +9136,16 @@ gap::generator<UndefineMacroDirective> UndefineMacroDirective::containing(const 
       co_yield *d;
     }
   }
+}
+
+std::optional<UndefineMacroDirective> UndefineMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return UndefineMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kUndefineMacroDirectiveDerivedKinds[] = {
@@ -9099,6 +9219,16 @@ gap::generator<OtherMacroDirective> OtherMacroDirective::containing(const Token 
   }
 }
 
+std::optional<OtherMacroDirective> OtherMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return OtherMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kOtherMacroDirectiveDerivedKinds[] = {
     OtherMacroDirective::static_kind(),
 };
@@ -9168,6 +9298,16 @@ gap::generator<ConditionalMacroDirective> ConditionalMacroDirective::containing(
       co_yield *d;
     }
   }
+}
+
+std::optional<ConditionalMacroDirective> ConditionalMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return ConditionalMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kConditionalMacroDirectiveDerivedKinds[] = {
@@ -9255,6 +9395,16 @@ gap::generator<EndIfMacroDirective> EndIfMacroDirective::containing(const Token 
   }
 }
 
+std::optional<EndIfMacroDirective> EndIfMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return EndIfMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kEndIfMacroDirectiveDerivedKinds[] = {
     EndIfMacroDirective::static_kind(),
 };
@@ -9328,6 +9478,16 @@ gap::generator<ElseMacroDirective> ElseMacroDirective::containing(const Token &t
       co_yield *d;
     }
   }
+}
+
+std::optional<ElseMacroDirective> ElseMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return ElseMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kElseMacroDirectiveDerivedKinds[] = {
@@ -9405,6 +9565,16 @@ gap::generator<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::c
   }
 }
 
+std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return ElseIfNotDefinedMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kElseIfNotDefinedMacroDirectiveDerivedKinds[] = {
     ElseIfNotDefinedMacroDirective::static_kind(),
 };
@@ -9478,6 +9648,16 @@ gap::generator<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::contain
       co_yield *d;
     }
   }
+}
+
+std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return ElseIfDefinedMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kElseIfDefinedMacroDirectiveDerivedKinds[] = {
@@ -9555,6 +9735,16 @@ gap::generator<ElseIfMacroDirective> ElseIfMacroDirective::containing(const Toke
   }
 }
 
+std::optional<ElseIfMacroDirective> ElseIfMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return ElseIfMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kElseIfMacroDirectiveDerivedKinds[] = {
     ElseIfMacroDirective::static_kind(),
 };
@@ -9628,6 +9818,16 @@ gap::generator<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::containin
       co_yield *d;
     }
   }
+}
+
+std::optional<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return IfNotDefinedMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kIfNotDefinedMacroDirectiveDerivedKinds[] = {
@@ -9705,6 +9905,16 @@ gap::generator<IfDefinedMacroDirective> IfDefinedMacroDirective::containing(cons
   }
 }
 
+std::optional<IfDefinedMacroDirective> IfDefinedMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return IfDefinedMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kIfDefinedMacroDirectiveDerivedKinds[] = {
     IfDefinedMacroDirective::static_kind(),
 };
@@ -9780,6 +9990,16 @@ gap::generator<IfMacroDirective> IfMacroDirective::containing(const Token &token
   }
 }
 
+std::optional<IfMacroDirective> IfMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return IfMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kIfMacroDirectiveDerivedKinds[] = {
     IfMacroDirective::static_kind(),
 };
@@ -9853,6 +10073,16 @@ gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::containing(
       co_yield *d;
     }
   }
+}
+
+std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return IncludeLikeMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kIncludeLikeMacroDirectiveDerivedKinds[] = {
@@ -9945,6 +10175,16 @@ gap::generator<ImportMacroDirective> ImportMacroDirective::containing(const Toke
   }
 }
 
+std::optional<ImportMacroDirective> ImportMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return ImportMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kImportMacroDirectiveDerivedKinds[] = {
     ImportMacroDirective::static_kind(),
 };
@@ -10018,6 +10258,16 @@ gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::contain
       co_yield *d;
     }
   }
+}
+
+std::optional<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return IncludeMacrosMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const MacroKind kIncludeMacrosMacroDirectiveDerivedKinds[] = {
@@ -10095,6 +10345,16 @@ gap::generator<IncludeNextMacroDirective> IncludeNextMacroDirective::containing(
   }
 }
 
+std::optional<IncludeNextMacroDirective> IncludeNextMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return IncludeNextMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kIncludeNextMacroDirectiveDerivedKinds[] = {
     IncludeNextMacroDirective::static_kind(),
 };
@@ -10170,6 +10430,16 @@ gap::generator<IncludeMacroDirective> IncludeMacroDirective::containing(const To
   }
 }
 
+std::optional<IncludeMacroDirective> IncludeMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return IncludeMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const MacroKind kIncludeMacroDirectiveDerivedKinds[] = {
     IncludeMacroDirective::static_kind(),
 };
@@ -10237,6 +10507,16 @@ bool Attr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<Attr> Attr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    index.attribute(eid.Pack());
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 gap::generator<Attr> Attr::in(const Index &index) {
   const EntityProvider::Ptr &ep = entity_provider_of(index);
   for (AttrImplPtr eptr : ep->AttrsFor(ep)) {
@@ -10273,16 +10553,6 @@ gap::generator<Attr> Attr::in(const Fragment &frag, std::span<AttrKind> kinds) {
       co_yield Attr(std::move(eptr));
     }
   }
-}
-
-std::optional<Attr> Attr::by(const Index &index, EntityId eid) {
-  VariantId vid = eid.Unpack();
-  if (std::holds_alternative<AttrId>(vid)) {
-    index.attribute(eid.Pack());
-  } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(eid.Pack() == kInvalidEntityId);
-  }
-  return std::nullopt;
 }
 
 Token Attr::token(void) const {
@@ -10328,6 +10598,16 @@ bool AlignValueAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AlignValueAttr> AlignValueAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AlignValueAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAlignValueAttrDerivedKinds[] = {
@@ -10386,6 +10666,16 @@ bool AliasAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AliasAttr> AliasAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AliasAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAliasAttrDerivedKinds[] = {
     AliasAttr::static_kind(),
 };
@@ -10442,6 +10732,16 @@ bool AbiTagAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AbiTagAttr> AbiTagAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AbiTagAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAbiTagAttrDerivedKinds[] = {
     AbiTagAttr::static_kind(),
 };
@@ -10491,6 +10791,16 @@ bool TypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TypeAttr> TypeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TypeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kTypeAttrDerivedKinds[] = {
@@ -10590,6 +10900,16 @@ bool SPtrAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SPtrAttr> SPtrAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SPtrAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSPtrAttrDerivedKinds[] = {
     SPtrAttr::static_kind(),
 };
@@ -10643,6 +10963,16 @@ bool Ptr64Attr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<Ptr64Attr> Ptr64Attr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return Ptr64Attr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kPtr64AttrDerivedKinds[] = {
@@ -10700,6 +11030,16 @@ bool Ptr32Attr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<Ptr32Attr> Ptr32Attr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return Ptr32Attr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPtr32AttrDerivedKinds[] = {
     Ptr32Attr::static_kind(),
 };
@@ -10753,6 +11093,16 @@ bool OpenCLPrivateAddressSpaceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OpenCLPrivateAddressSpaceAttr> OpenCLPrivateAddressSpaceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLPrivateAddressSpaceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOpenCLPrivateAddressSpaceAttrDerivedKinds[] = {
@@ -10814,6 +11164,16 @@ bool OpenCLLocalAddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OpenCLLocalAddressSpaceAttr> OpenCLLocalAddressSpaceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLLocalAddressSpaceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOpenCLLocalAddressSpaceAttrDerivedKinds[] = {
     OpenCLLocalAddressSpaceAttr::static_kind(),
 };
@@ -10873,6 +11233,16 @@ bool OpenCLGlobalHostAddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLGlobalHostAddressSpaceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOpenCLGlobalHostAddressSpaceAttrDerivedKinds[] = {
     OpenCLGlobalHostAddressSpaceAttr::static_kind(),
 };
@@ -10928,6 +11298,16 @@ bool OpenCLGlobalDeviceAddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OpenCLGlobalDeviceAddressSpaceAttr> OpenCLGlobalDeviceAddressSpaceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLGlobalDeviceAddressSpaceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOpenCLGlobalDeviceAddressSpaceAttrDerivedKinds[] = {
     OpenCLGlobalDeviceAddressSpaceAttr::static_kind(),
 };
@@ -10981,6 +11361,16 @@ bool OpenCLGlobalAddressSpaceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OpenCLGlobalAddressSpaceAttr> OpenCLGlobalAddressSpaceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLGlobalAddressSpaceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOpenCLGlobalAddressSpaceAttrDerivedKinds[] = {
@@ -11042,6 +11432,16 @@ bool OpenCLGenericAddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLGenericAddressSpaceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOpenCLGenericAddressSpaceAttrDerivedKinds[] = {
     OpenCLGenericAddressSpaceAttr::static_kind(),
 };
@@ -11099,6 +11499,16 @@ bool OpenCLConstantAddressSpaceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLConstantAddressSpaceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOpenCLConstantAddressSpaceAttrDerivedKinds[] = {
@@ -11160,6 +11570,16 @@ bool ObjCKindOfAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCKindOfAttr> ObjCKindOfAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCKindOfAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCKindOfAttrDerivedKinds[] = {
     ObjCKindOfAttr::static_kind(),
 };
@@ -11213,6 +11633,16 @@ bool ObjCInertUnsafeUnretainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCInertUnsafeUnretainedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCInertUnsafeUnretainedAttrDerivedKinds[] = {
@@ -11270,6 +11700,16 @@ bool ObjCGCAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCGCAttr> ObjCGCAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCGCAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCGCAttrDerivedKinds[] = {
     ObjCGCAttr::static_kind(),
 };
@@ -11323,6 +11763,16 @@ bool NoDerefAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoDerefAttr> NoDerefAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoDerefAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoDerefAttrDerivedKinds[] = {
@@ -11380,6 +11830,16 @@ bool CmseNSCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CmseNSCallAttr> CmseNSCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CmseNSCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCmseNSCallAttrDerivedKinds[] = {
     CmseNSCallAttr::static_kind(),
 };
@@ -11433,6 +11893,16 @@ bool BTFTypeTagAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<BTFTypeTagAttr> BTFTypeTagAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return BTFTypeTagAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kBTFTypeTagAttrDerivedKinds[] = {
@@ -11495,6 +11965,16 @@ bool ArmMveStrictPolymorphismAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ArmMveStrictPolymorphismAttr> ArmMveStrictPolymorphismAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ArmMveStrictPolymorphismAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kArmMveStrictPolymorphismAttrDerivedKinds[] = {
     ArmMveStrictPolymorphismAttr::static_kind(),
 };
@@ -11548,6 +12028,16 @@ bool AnnotateTypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AnnotateTypeAttr> AnnotateTypeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AnnotateTypeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAnnotateTypeAttrDerivedKinds[] = {
@@ -11610,6 +12100,16 @@ bool AddressSpaceAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AddressSpaceAttr> AddressSpaceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AddressSpaceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAddressSpaceAttrDerivedKinds[] = {
     AddressSpaceAttr::static_kind(),
 };
@@ -11663,6 +12163,16 @@ bool UPtrAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<UPtrAttr> UPtrAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UPtrAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kUPtrAttrDerivedKinds[] = {
@@ -11720,6 +12230,16 @@ bool TypeNullableResultAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TypeNullableResultAttr> TypeNullableResultAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TypeNullableResultAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kTypeNullableResultAttrDerivedKinds[] = {
     TypeNullableResultAttr::static_kind(),
 };
@@ -11773,6 +12293,16 @@ bool TypeNullableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TypeNullableAttr> TypeNullableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TypeNullableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kTypeNullableAttrDerivedKinds[] = {
@@ -11830,6 +12360,16 @@ bool TypeNullUnspecifiedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TypeNullUnspecifiedAttr> TypeNullUnspecifiedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TypeNullUnspecifiedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kTypeNullUnspecifiedAttrDerivedKinds[] = {
     TypeNullUnspecifiedAttr::static_kind(),
 };
@@ -11883,6 +12423,16 @@ bool TypeNonNullAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TypeNonNullAttr> TypeNonNullAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TypeNonNullAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kTypeNonNullAttrDerivedKinds[] = {
@@ -11940,6 +12490,16 @@ bool ThreadAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ThreadAttr> ThreadAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ThreadAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kThreadAttrDerivedKinds[] = {
     ThreadAttr::static_kind(),
 };
@@ -11991,6 +12551,16 @@ bool SwiftObjCMembersAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftObjCMembersAttr> SwiftObjCMembersAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftObjCMembersAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftObjCMembersAttrDerivedKinds[] = {
     SwiftObjCMembersAttr::static_kind(),
 };
@@ -12040,6 +12610,16 @@ bool StmtAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<StmtAttr> StmtAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return StmtAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kStmtAttrDerivedKinds[] = {
@@ -12103,6 +12683,16 @@ bool OpenCLUnrollHintAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OpenCLUnrollHintAttr> OpenCLUnrollHintAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLUnrollHintAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOpenCLUnrollHintAttrDerivedKinds[] = {
     OpenCLUnrollHintAttr::static_kind(),
 };
@@ -12156,6 +12746,16 @@ bool MustTailAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MustTailAttr> MustTailAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MustTailAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMustTailAttrDerivedKinds[] = {
@@ -12213,6 +12813,16 @@ bool LikelyAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<LikelyAttr> LikelyAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LikelyAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kLikelyAttrDerivedKinds[] = {
     LikelyAttr::static_kind(),
 };
@@ -12266,6 +12876,16 @@ bool FallThroughAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<FallThroughAttr> FallThroughAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return FallThroughAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kFallThroughAttrDerivedKinds[] = {
@@ -12323,6 +12943,16 @@ bool UnlikelyAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<UnlikelyAttr> UnlikelyAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UnlikelyAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kUnlikelyAttrDerivedKinds[] = {
     UnlikelyAttr::static_kind(),
 };
@@ -12376,6 +13006,16 @@ bool SuppressAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SuppressAttr> SuppressAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SuppressAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSuppressAttrDerivedKinds[] = {
@@ -12433,6 +13073,16 @@ bool RenderScriptKernelAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<RenderScriptKernelAttr> RenderScriptKernelAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return RenderScriptKernelAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kRenderScriptKernelAttrDerivedKinds[] = {
     RenderScriptKernelAttr::static_kind(),
 };
@@ -12484,6 +13134,16 @@ bool OverloadableAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OverloadableAttr> OverloadableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OverloadableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOverloadableAttrDerivedKinds[] = {
     OverloadableAttr::static_kind(),
 };
@@ -12533,6 +13193,16 @@ bool OpenCLAccessAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OpenCLAccessAttr> OpenCLAccessAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLAccessAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOpenCLAccessAttrDerivedKinds[] = {
@@ -12602,6 +13272,16 @@ bool ObjCRuntimeVisibleAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCRuntimeVisibleAttr> ObjCRuntimeVisibleAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCRuntimeVisibleAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCRuntimeVisibleAttrDerivedKinds[] = {
     ObjCRuntimeVisibleAttr::static_kind(),
 };
@@ -12651,6 +13331,16 @@ bool ObjCRuntimeNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCRuntimeNameAttr> ObjCRuntimeNameAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCRuntimeNameAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCRuntimeNameAttrDerivedKinds[] = {
@@ -12709,6 +13399,16 @@ bool ObjCNonRuntimeProtocolAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCNonRuntimeProtocolAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCNonRuntimeProtocolAttrDerivedKinds[] = {
     ObjCNonRuntimeProtocolAttr::static_kind(),
 };
@@ -12758,6 +13458,16 @@ bool ObjCNonLazyClassAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCNonLazyClassAttr> ObjCNonLazyClassAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCNonLazyClassAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCNonLazyClassAttrDerivedKinds[] = {
@@ -12811,6 +13521,16 @@ bool ObjCDirectMembersAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCDirectMembersAttr> ObjCDirectMembersAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCDirectMembersAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCDirectMembersAttrDerivedKinds[] = {
     ObjCDirectMembersAttr::static_kind(),
 };
@@ -12860,6 +13580,16 @@ bool ObjCDirectAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCDirectAttr> ObjCDirectAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCDirectAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCDirectAttrDerivedKinds[] = {
@@ -12913,6 +13643,16 @@ bool ObjCDesignatedInitializerAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCDesignatedInitializerAttr> ObjCDesignatedInitializerAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCDesignatedInitializerAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCDesignatedInitializerAttrDerivedKinds[] = {
     ObjCDesignatedInitializerAttr::static_kind(),
 };
@@ -12962,6 +13702,16 @@ bool ObjCClassStubAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCClassStubAttr> ObjCClassStubAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCClassStubAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCClassStubAttrDerivedKinds[] = {
@@ -13015,6 +13765,16 @@ bool ObjCBoxableAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCBoxableAttr> ObjCBoxableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCBoxableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCBoxableAttrDerivedKinds[] = {
     ObjCBoxableAttr::static_kind(),
 };
@@ -13064,6 +13824,16 @@ bool OMPReferencedVarAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPReferencedVarAttr> OMPReferencedVarAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OMPReferencedVarAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOMPReferencedVarAttrDerivedKinds[] = {
@@ -13120,6 +13890,16 @@ bool OMPDeclareSimdDeclAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OMPDeclareSimdDeclAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOMPDeclareSimdDeclAttrDerivedKinds[] = {
@@ -13182,6 +13962,16 @@ bool OMPCaptureKindAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OMPCaptureKindAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOMPCaptureKindAttrDerivedKinds[] = {
     OMPCaptureKindAttr::static_kind(),
 };
@@ -13231,6 +14021,16 @@ bool NoEscapeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoEscapeAttr> NoEscapeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoEscapeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoEscapeAttrDerivedKinds[] = {
@@ -13284,6 +14084,16 @@ bool NoBuiltinAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoBuiltinAttr> NoBuiltinAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoBuiltinAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoBuiltinAttrDerivedKinds[] = {
     NoBuiltinAttr::static_kind(),
 };
@@ -13335,6 +14145,16 @@ bool ModeAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ModeAttr> ModeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ModeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kModeAttrDerivedKinds[] = {
     ModeAttr::static_kind(),
 };
@@ -13384,6 +14204,16 @@ bool LoopHintAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<LoopHintAttr> LoopHintAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LoopHintAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kLoopHintAttrDerivedKinds[] = {
@@ -13454,6 +14284,16 @@ bool LoaderUninitializedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<LoaderUninitializedAttr> LoaderUninitializedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LoaderUninitializedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kLoaderUninitializedAttrDerivedKinds[] = {
     LoaderUninitializedAttr::static_kind(),
 };
@@ -13503,6 +14343,16 @@ bool InitSegAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<InitSegAttr> InitSegAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return InitSegAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kInitSegAttrDerivedKinds[] = {
@@ -13559,6 +14409,16 @@ bool InheritableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<InheritableAttr> InheritableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return InheritableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kInheritableAttrDerivedKinds[] = {
@@ -14212,6 +15072,16 @@ bool IBOutletCollectionAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<IBOutletCollectionAttr> IBOutletCollectionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return IBOutletCollectionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kIBOutletCollectionAttrDerivedKinds[] = {
     IBOutletCollectionAttr::static_kind(),
 };
@@ -14277,6 +15147,16 @@ bool IBOutletAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<IBOutletAttr> IBOutletAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return IBOutletAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kIBOutletAttrDerivedKinds[] = {
     IBOutletAttr::static_kind(),
 };
@@ -14330,6 +15210,16 @@ bool IBActionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<IBActionAttr> IBActionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return IBActionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kIBActionAttrDerivedKinds[] = {
@@ -14387,6 +15277,16 @@ bool HotAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<HotAttr> HotAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return HotAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kHotAttrDerivedKinds[] = {
     HotAttr::static_kind(),
 };
@@ -14440,6 +15340,16 @@ bool HLSLShaderAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<HLSLShaderAttr> HLSLShaderAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return HLSLShaderAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kHLSLShaderAttrDerivedKinds[] = {
@@ -14501,6 +15411,16 @@ bool HLSLSV_GroupIndexAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return HLSLSV_GroupIndexAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kHLSLSV_GroupIndexAttrDerivedKinds[] = {
     HLSLSV_GroupIndexAttr::static_kind(),
 };
@@ -14554,6 +15474,16 @@ bool HLSLNumThreadsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<HLSLNumThreadsAttr> HLSLNumThreadsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return HLSLNumThreadsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kHLSLNumThreadsAttrDerivedKinds[] = {
@@ -14611,6 +15541,16 @@ bool HIPManagedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<HIPManagedAttr> HIPManagedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return HIPManagedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kHIPManagedAttrDerivedKinds[] = {
     HIPManagedAttr::static_kind(),
 };
@@ -14666,6 +15606,16 @@ bool GuardedVarAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<GuardedVarAttr> GuardedVarAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return GuardedVarAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kGuardedVarAttrDerivedKinds[] = {
     GuardedVarAttr::static_kind(),
 };
@@ -14719,6 +15669,16 @@ bool GuardedByAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<GuardedByAttr> GuardedByAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return GuardedByAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kGuardedByAttrDerivedKinds[] = {
@@ -14781,6 +15741,16 @@ bool GNUInlineAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<GNUInlineAttr> GNUInlineAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return GNUInlineAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kGNUInlineAttrDerivedKinds[] = {
     GNUInlineAttr::static_kind(),
 };
@@ -14834,6 +15804,16 @@ bool FunctionReturnThunksAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return FunctionReturnThunksAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kFunctionReturnThunksAttrDerivedKinds[] = {
@@ -14895,6 +15875,16 @@ bool FormatAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<FormatAttr> FormatAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return FormatAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kFormatAttrDerivedKinds[] = {
     FormatAttr::static_kind(),
 };
@@ -14948,6 +15938,16 @@ bool FormatArgAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<FormatArgAttr> FormatArgAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return FormatArgAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kFormatArgAttrDerivedKinds[] = {
@@ -15005,6 +16005,16 @@ bool FlattenAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<FlattenAttr> FlattenAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return FlattenAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kFlattenAttrDerivedKinds[] = {
     FlattenAttr::static_kind(),
 };
@@ -15060,6 +16070,16 @@ bool FlagEnumAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<FlagEnumAttr> FlagEnumAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return FlagEnumAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kFlagEnumAttrDerivedKinds[] = {
     FlagEnumAttr::static_kind(),
 };
@@ -15113,6 +16133,16 @@ bool FinalAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<FinalAttr> FinalAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return FinalAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kFinalAttrDerivedKinds[] = {
@@ -15178,6 +16208,16 @@ bool FastCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<FastCallAttr> FastCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return FastCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kFastCallAttrDerivedKinds[] = {
     FastCallAttr::static_kind(),
 };
@@ -15231,6 +16271,16 @@ bool ExternalSourceSymbolAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ExternalSourceSymbolAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kExternalSourceSymbolAttrDerivedKinds[] = {
@@ -15302,6 +16352,16 @@ bool ExclusiveTrylockFunctionAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ExclusiveTrylockFunctionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kExclusiveTrylockFunctionAttrDerivedKinds[] = {
     ExclusiveTrylockFunctionAttr::static_kind(),
 };
@@ -15362,6 +16422,16 @@ bool ExcludeFromExplicitInstantiationAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ExcludeFromExplicitInstantiationAttr> ExcludeFromExplicitInstantiationAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ExcludeFromExplicitInstantiationAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kExcludeFromExplicitInstantiationAttrDerivedKinds[] = {
     ExcludeFromExplicitInstantiationAttr::static_kind(),
 };
@@ -15415,6 +16485,16 @@ bool ErrorAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ErrorAttr> ErrorAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ErrorAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kErrorAttrDerivedKinds[] = {
@@ -15489,6 +16569,16 @@ bool EnumExtensibilityAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return EnumExtensibilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kEnumExtensibilityAttrDerivedKinds[] = {
     EnumExtensibilityAttr::static_kind(),
 };
@@ -15546,6 +16636,16 @@ bool EnforceTCBLeafAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return EnforceTCBLeafAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kEnforceTCBLeafAttrDerivedKinds[] = {
@@ -15608,6 +16708,16 @@ bool EnforceTCBAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<EnforceTCBAttr> EnforceTCBAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return EnforceTCBAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kEnforceTCBAttrDerivedKinds[] = {
     EnforceTCBAttr::static_kind(),
 };
@@ -15666,6 +16776,16 @@ bool EnableIfAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<EnableIfAttr> EnableIfAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return EnableIfAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kEnableIfAttrDerivedKinds[] = {
@@ -15733,6 +16853,16 @@ bool EmptyBasesAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<EmptyBasesAttr> EmptyBasesAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return EmptyBasesAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kEmptyBasesAttrDerivedKinds[] = {
     EmptyBasesAttr::static_kind(),
 };
@@ -15786,6 +16916,16 @@ bool DisableTailCallsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DisableTailCallsAttr> DisableTailCallsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DisableTailCallsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kDisableTailCallsAttrDerivedKinds[] = {
@@ -15843,6 +16983,16 @@ bool DisableSanitizerInstrumentationAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DisableSanitizerInstrumentationAttr> DisableSanitizerInstrumentationAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DisableSanitizerInstrumentationAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kDisableSanitizerInstrumentationAttrDerivedKinds[] = {
     DisableSanitizerInstrumentationAttr::static_kind(),
 };
@@ -15896,6 +17046,16 @@ bool DiagnoseIfAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DiagnoseIfAttr> DiagnoseIfAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DiagnoseIfAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kDiagnoseIfAttrDerivedKinds[] = {
@@ -15984,6 +17144,16 @@ bool DiagnoseAsBuiltinAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DiagnoseAsBuiltinAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kDiagnoseAsBuiltinAttrDerivedKinds[] = {
     DiagnoseAsBuiltinAttr::static_kind(),
 };
@@ -16044,6 +17214,16 @@ bool DestructorAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DestructorAttr> DestructorAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DestructorAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kDestructorAttrDerivedKinds[] = {
     DestructorAttr::static_kind(),
 };
@@ -16097,6 +17277,16 @@ bool DeprecatedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DeprecatedAttr> DeprecatedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DeprecatedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kDeprecatedAttrDerivedKinds[] = {
@@ -16164,6 +17354,16 @@ bool DeclOrStmtAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DeclOrStmtAttr> DeclOrStmtAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DeclOrStmtAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kDeclOrStmtAttrDerivedKinds[] = {
     NoInlineAttr::static_kind(),
     NoMergeAttr::static_kind(),
@@ -16221,6 +17421,16 @@ bool AlwaysInlineAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AlwaysInlineAttr> AlwaysInlineAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AlwaysInlineAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAlwaysInlineAttrDerivedKinds[] = {
@@ -16290,6 +17500,16 @@ bool NoMergeAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoMergeAttr> NoMergeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoMergeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoMergeAttrDerivedKinds[] = {
     NoMergeAttr::static_kind(),
 };
@@ -16347,6 +17567,16 @@ bool NoInlineAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoInlineAttr> NoInlineAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoInlineAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoInlineAttrDerivedKinds[] = {
@@ -16412,6 +17642,16 @@ bool DLLImportStaticLocalAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DLLImportStaticLocalAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kDLLImportStaticLocalAttrDerivedKinds[] = {
     DLLImportStaticLocalAttr::static_kind(),
 };
@@ -16465,6 +17705,16 @@ bool DLLImportAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DLLImportAttr> DLLImportAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DLLImportAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kDLLImportAttrDerivedKinds[] = {
@@ -16522,6 +17772,16 @@ bool DLLExportStaticLocalAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DLLExportStaticLocalAttr> DLLExportStaticLocalAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DLLExportStaticLocalAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kDLLExportStaticLocalAttrDerivedKinds[] = {
     DLLExportStaticLocalAttr::static_kind(),
 };
@@ -16575,6 +17835,16 @@ bool DLLExportAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DLLExportAttr> DLLExportAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return DLLExportAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kDLLExportAttrDerivedKinds[] = {
@@ -16632,6 +17902,16 @@ bool ConvergentAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ConvergentAttr> ConvergentAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ConvergentAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kConvergentAttrDerivedKinds[] = {
     ConvergentAttr::static_kind(),
 };
@@ -16685,6 +17965,16 @@ bool ConsumableSetOnReadAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ConsumableSetOnReadAttr> ConsumableSetOnReadAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ConsumableSetOnReadAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kConsumableSetOnReadAttrDerivedKinds[] = {
@@ -16742,6 +18032,16 @@ bool ConsumableAutoCastAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ConsumableAutoCastAttr> ConsumableAutoCastAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ConsumableAutoCastAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kConsumableAutoCastAttrDerivedKinds[] = {
     ConsumableAutoCastAttr::static_kind(),
 };
@@ -16795,6 +18095,16 @@ bool ConsumableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ConsumableAttr> ConsumableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ConsumableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kConsumableAttrDerivedKinds[] = {
@@ -16856,6 +18166,16 @@ bool ConstructorAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ConstructorAttr> ConstructorAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ConstructorAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kConstructorAttrDerivedKinds[] = {
     ConstructorAttr::static_kind(),
 };
@@ -16909,6 +18229,16 @@ bool ConstInitAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ConstInitAttr> ConstInitAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ConstInitAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kConstInitAttrDerivedKinds[] = {
@@ -16974,6 +18304,16 @@ bool ConstAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ConstAttr> ConstAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ConstAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kConstAttrDerivedKinds[] = {
     ConstAttr::static_kind(),
 };
@@ -17027,6 +18367,16 @@ bool CommonAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CommonAttr> CommonAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CommonAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCommonAttrDerivedKinds[] = {
@@ -17084,6 +18434,16 @@ bool ColdAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ColdAttr> ColdAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ColdAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kColdAttrDerivedKinds[] = {
     ColdAttr::static_kind(),
 };
@@ -17137,6 +18497,16 @@ bool CodeSegAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CodeSegAttr> CodeSegAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CodeSegAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCodeSegAttrDerivedKinds[] = {
@@ -17199,6 +18569,16 @@ bool CmseNSEntryAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CmseNSEntryAttr> CmseNSEntryAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CmseNSEntryAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCmseNSEntryAttrDerivedKinds[] = {
     CmseNSEntryAttr::static_kind(),
 };
@@ -17252,6 +18632,16 @@ bool CleanupAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CleanupAttr> CleanupAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CleanupAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCleanupAttrDerivedKinds[] = {
@@ -17314,6 +18704,16 @@ bool CapturedRecordAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CapturedRecordAttr> CapturedRecordAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CapturedRecordAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCapturedRecordAttrDerivedKinds[] = {
     CapturedRecordAttr::static_kind(),
 };
@@ -17367,6 +18767,16 @@ bool CapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CapabilityAttr> CapabilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CapabilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCapabilityAttrDerivedKinds[] = {
@@ -17437,6 +18847,16 @@ bool CallbackAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CallbackAttr> CallbackAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CallbackAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCallbackAttrDerivedKinds[] = {
     CallbackAttr::static_kind(),
 };
@@ -17492,6 +18912,16 @@ bool CallableWhenAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CallableWhenAttr> CallableWhenAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CallableWhenAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCallableWhenAttrDerivedKinds[] = {
     CallableWhenAttr::static_kind(),
 };
@@ -17545,6 +18975,16 @@ bool CXX11NoReturnAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CXX11NoReturnAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCXX11NoReturnAttrDerivedKinds[] = {
@@ -17606,6 +19046,16 @@ bool CUDASharedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CUDASharedAttr> CUDASharedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDASharedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCUDASharedAttrDerivedKinds[] = {
     CUDASharedAttr::static_kind(),
 };
@@ -17659,6 +19109,16 @@ bool CUDALaunchBoundsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDALaunchBoundsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCUDALaunchBoundsAttrDerivedKinds[] = {
@@ -17726,6 +19186,16 @@ bool CUDAInvalidTargetAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDAInvalidTargetAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCUDAInvalidTargetAttrDerivedKinds[] = {
     CUDAInvalidTargetAttr::static_kind(),
 };
@@ -17779,6 +19249,16 @@ bool CUDAHostAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CUDAHostAttr> CUDAHostAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDAHostAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCUDAHostAttrDerivedKinds[] = {
@@ -17836,6 +19316,16 @@ bool CUDAGlobalAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CUDAGlobalAttr> CUDAGlobalAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDAGlobalAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCUDAGlobalAttrDerivedKinds[] = {
     CUDAGlobalAttr::static_kind(),
 };
@@ -17889,6 +19379,16 @@ bool CUDADeviceBuiltinTextureTypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDADeviceBuiltinTextureTypeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCUDADeviceBuiltinTextureTypeAttrDerivedKinds[] = {
@@ -17946,6 +19446,16 @@ bool CUDADeviceBuiltinSurfaceTypeAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CUDADeviceBuiltinSurfaceTypeAttr> CUDADeviceBuiltinSurfaceTypeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDADeviceBuiltinSurfaceTypeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCUDADeviceBuiltinSurfaceTypeAttrDerivedKinds[] = {
     CUDADeviceBuiltinSurfaceTypeAttr::static_kind(),
 };
@@ -17999,6 +19509,16 @@ bool CUDADeviceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CUDADeviceAttr> CUDADeviceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDADeviceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCUDADeviceAttrDerivedKinds[] = {
@@ -18056,6 +19576,16 @@ bool CUDAConstantAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CUDAConstantAttr> CUDAConstantAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CUDAConstantAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCUDAConstantAttrDerivedKinds[] = {
     CUDAConstantAttr::static_kind(),
 };
@@ -18109,6 +19639,16 @@ bool CPUSpecificAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CPUSpecificAttr> CPUSpecificAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CPUSpecificAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCPUSpecificAttrDerivedKinds[] = {
@@ -18166,6 +19706,16 @@ bool CPUDispatchAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CPUDispatchAttr> CPUDispatchAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CPUDispatchAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCPUDispatchAttrDerivedKinds[] = {
     CPUDispatchAttr::static_kind(),
 };
@@ -18219,6 +19769,16 @@ bool CFUnknownTransferAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CFUnknownTransferAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCFUnknownTransferAttrDerivedKinds[] = {
@@ -18276,6 +19836,16 @@ bool CFReturnsRetainedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CFReturnsRetainedAttr> CFReturnsRetainedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CFReturnsRetainedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCFReturnsRetainedAttrDerivedKinds[] = {
     CFReturnsRetainedAttr::static_kind(),
 };
@@ -18329,6 +19899,16 @@ bool CFReturnsNotRetainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CFReturnsNotRetainedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCFReturnsNotRetainedAttrDerivedKinds[] = {
@@ -18386,6 +19966,16 @@ bool CFICanonicalJumpTableAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CFICanonicalJumpTableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCFICanonicalJumpTableAttrDerivedKinds[] = {
     CFICanonicalJumpTableAttr::static_kind(),
 };
@@ -18439,6 +20029,16 @@ bool CFGuardAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CFGuardAttr> CFGuardAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CFGuardAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCFGuardAttrDerivedKinds[] = {
@@ -18500,6 +20100,16 @@ bool CFAuditedTransferAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CFAuditedTransferAttr> CFAuditedTransferAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CFAuditedTransferAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCFAuditedTransferAttrDerivedKinds[] = {
     CFAuditedTransferAttr::static_kind(),
 };
@@ -18553,6 +20163,16 @@ bool CDeclAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<CDeclAttr> CDeclAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CDeclAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kCDeclAttrDerivedKinds[] = {
@@ -18610,6 +20230,16 @@ bool C11NoReturnAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<C11NoReturnAttr> C11NoReturnAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return C11NoReturnAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kC11NoReturnAttrDerivedKinds[] = {
     C11NoReturnAttr::static_kind(),
 };
@@ -18665,6 +20295,16 @@ bool BuiltinAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<BuiltinAttr> BuiltinAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return BuiltinAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kBuiltinAttrDerivedKinds[] = {
     BuiltinAttr::static_kind(),
 };
@@ -18718,6 +20358,16 @@ bool BlocksAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<BlocksAttr> BlocksAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return BlocksAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kBlocksAttrDerivedKinds[] = {
@@ -18777,6 +20427,16 @@ bool BTFDeclTagAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<BTFDeclTagAttr> BTFDeclTagAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return BTFDeclTagAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kBTFDeclTagAttrDerivedKinds[] = {
@@ -18839,6 +20499,16 @@ bool BPFPreserveAccessIndexAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return BPFPreserveAccessIndexAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kBPFPreserveAccessIndexAttrDerivedKinds[] = {
     BPFPreserveAccessIndexAttr::static_kind(),
 };
@@ -18892,6 +20562,16 @@ bool AvailabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AvailabilityAttr> AvailabilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AvailabilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAvailabilityAttrDerivedKinds[] = {
@@ -18967,6 +20647,16 @@ bool AssumptionAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AssumptionAttr> AssumptionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AssumptionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAssumptionAttrDerivedKinds[] = {
     AssumptionAttr::static_kind(),
 };
@@ -19025,6 +20715,16 @@ bool AssumeAlignedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AssumeAlignedAttr> AssumeAlignedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AssumeAlignedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAssumeAlignedAttrDerivedKinds[] = {
@@ -19100,6 +20800,16 @@ bool AssertSharedLockAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AssertSharedLockAttr> AssertSharedLockAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AssertSharedLockAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAssertSharedLockAttrDerivedKinds[] = {
     AssertSharedLockAttr::static_kind(),
 };
@@ -19155,6 +20865,16 @@ bool AssertExclusiveLockAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AssertExclusiveLockAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAssertExclusiveLockAttrDerivedKinds[] = {
     AssertExclusiveLockAttr::static_kind(),
 };
@@ -19208,6 +20928,16 @@ bool AssertCapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AssertCapabilityAttr> AssertCapabilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AssertCapabilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAssertCapabilityAttrDerivedKinds[] = {
@@ -19271,6 +21001,16 @@ bool AsmLabelAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AsmLabelAttr> AsmLabelAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AsmLabelAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAsmLabelAttrDerivedKinds[] = {
@@ -19337,6 +21077,16 @@ bool ArtificialAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ArtificialAttr> ArtificialAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ArtificialAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kArtificialAttrDerivedKinds[] = {
     ArtificialAttr::static_kind(),
 };
@@ -19392,6 +21142,16 @@ bool ArmBuiltinAliasAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ArmBuiltinAliasAttr> ArmBuiltinAliasAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ArmBuiltinAliasAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kArmBuiltinAliasAttrDerivedKinds[] = {
     ArmBuiltinAliasAttr::static_kind(),
 };
@@ -19445,6 +21205,16 @@ bool ArgumentWithTypeTagAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ArgumentWithTypeTagAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kArgumentWithTypeTagAttrDerivedKinds[] = {
@@ -19510,6 +21280,16 @@ bool ArcWeakrefUnavailableAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ArcWeakrefUnavailableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kArcWeakrefUnavailableAttrDerivedKinds[] = {
     ArcWeakrefUnavailableAttr::static_kind(),
 };
@@ -19563,6 +21343,16 @@ bool AnyX86NoCfCheckAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AnyX86NoCfCheckAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAnyX86NoCfCheckAttrDerivedKinds[] = {
@@ -19620,6 +21410,16 @@ bool AnyX86NoCallerSavedRegistersAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AnyX86NoCallerSavedRegistersAttr> AnyX86NoCallerSavedRegistersAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AnyX86NoCallerSavedRegistersAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAnyX86NoCallerSavedRegistersAttrDerivedKinds[] = {
     AnyX86NoCallerSavedRegistersAttr::static_kind(),
 };
@@ -19673,6 +21473,16 @@ bool AnyX86InterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AnyX86InterruptAttr> AnyX86InterruptAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AnyX86InterruptAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAnyX86InterruptAttrDerivedKinds[] = {
@@ -19730,6 +21540,16 @@ bool AnalyzerNoReturnAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AnalyzerNoReturnAttr> AnalyzerNoReturnAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AnalyzerNoReturnAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAnalyzerNoReturnAttrDerivedKinds[] = {
     AnalyzerNoReturnAttr::static_kind(),
 };
@@ -19783,6 +21603,16 @@ bool AlwaysDestroyAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AlwaysDestroyAttr> AlwaysDestroyAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AlwaysDestroyAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAlwaysDestroyAttrDerivedKinds[] = {
@@ -19840,6 +21670,16 @@ bool AllocSizeAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AllocSizeAttr> AllocSizeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AllocSizeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAllocSizeAttrDerivedKinds[] = {
     AllocSizeAttr::static_kind(),
 };
@@ -19895,6 +21735,16 @@ bool AllocAlignAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AllocAlignAttr> AllocAlignAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AllocAlignAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAllocAlignAttrDerivedKinds[] = {
     AllocAlignAttr::static_kind(),
 };
@@ -19948,6 +21798,16 @@ bool AlignedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AlignedAttr> AlignedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AlignedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAlignedAttrDerivedKinds[] = {
@@ -20063,6 +21923,16 @@ bool AlignNaturalAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AlignNaturalAttr> AlignNaturalAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AlignNaturalAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAlignNaturalAttrDerivedKinds[] = {
     AlignNaturalAttr::static_kind(),
 };
@@ -20116,6 +21986,16 @@ bool AlignMac68kAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AlignMac68kAttr> AlignMac68kAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AlignMac68kAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAlignMac68kAttrDerivedKinds[] = {
@@ -20173,6 +22053,16 @@ bool AcquiredBeforeAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AcquiredBeforeAttr> AcquiredBeforeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AcquiredBeforeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAcquiredBeforeAttrDerivedKinds[] = {
     AcquiredBeforeAttr::static_kind(),
 };
@@ -20228,6 +22118,16 @@ bool AcquiredAfterAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AcquiredAfterAttr> AcquiredAfterAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AcquiredAfterAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAcquiredAfterAttrDerivedKinds[] = {
     AcquiredAfterAttr::static_kind(),
 };
@@ -20281,6 +22181,16 @@ bool AcquireHandleAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AcquireHandleAttr> AcquireHandleAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AcquireHandleAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAcquireHandleAttrDerivedKinds[] = {
@@ -20341,6 +22251,16 @@ bool AcquireCapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AcquireCapabilityAttr> AcquireCapabilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AcquireCapabilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAcquireCapabilityAttrDerivedKinds[] = {
@@ -20406,6 +22326,16 @@ bool AVRSignalAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AVRSignalAttr> AVRSignalAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AVRSignalAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAVRSignalAttrDerivedKinds[] = {
     AVRSignalAttr::static_kind(),
 };
@@ -20461,6 +22391,16 @@ bool AVRInterruptAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AVRInterruptAttr> AVRInterruptAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AVRInterruptAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAVRInterruptAttrDerivedKinds[] = {
     AVRInterruptAttr::static_kind(),
 };
@@ -20514,6 +22454,16 @@ bool ARMInterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ARMInterruptAttr> ARMInterruptAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ARMInterruptAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kARMInterruptAttrDerivedKinds[] = {
@@ -20573,6 +22523,16 @@ bool AMDGPUWavesPerEUAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AMDGPUWavesPerEUAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAMDGPUWavesPerEUAttrDerivedKinds[] = {
@@ -20640,6 +22600,16 @@ bool AMDGPUNumVGPRAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AMDGPUNumVGPRAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAMDGPUNumVGPRAttrDerivedKinds[] = {
     AMDGPUNumVGPRAttr::static_kind(),
 };
@@ -20693,6 +22663,16 @@ bool AMDGPUNumSGPRAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AMDGPUNumSGPRAttr> AMDGPUNumSGPRAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AMDGPUNumSGPRAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAMDGPUNumSGPRAttrDerivedKinds[] = {
@@ -20750,6 +22730,16 @@ bool AMDGPUKernelCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AMDGPUKernelCallAttr> AMDGPUKernelCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AMDGPUKernelCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAMDGPUKernelCallAttrDerivedKinds[] = {
     AMDGPUKernelCallAttr::static_kind(),
 };
@@ -20803,6 +22793,16 @@ bool AMDGPUFlatWorkGroupSizeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AMDGPUFlatWorkGroupSizeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAMDGPUFlatWorkGroupSizeAttrDerivedKinds[] = {
@@ -20870,6 +22870,16 @@ bool AArch64VectorPcsAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AArch64VectorPcsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAArch64VectorPcsAttrDerivedKinds[] = {
     AArch64VectorPcsAttr::static_kind(),
 };
@@ -20925,6 +22935,16 @@ bool AArch64SVEPcsAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AArch64SVEPcsAttr> AArch64SVEPcsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AArch64SVEPcsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kAArch64SVEPcsAttrDerivedKinds[] = {
     AArch64SVEPcsAttr::static_kind(),
 };
@@ -20978,6 +22998,16 @@ bool ZeroCallUsedRegsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ZeroCallUsedRegsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kZeroCallUsedRegsAttrDerivedKinds[] = {
@@ -21039,6 +23069,16 @@ bool XRayLogArgsAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<XRayLogArgsAttr> XRayLogArgsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return XRayLogArgsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kXRayLogArgsAttrDerivedKinds[] = {
     XRayLogArgsAttr::static_kind(),
 };
@@ -21092,6 +23132,16 @@ bool XRayInstrumentAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<XRayInstrumentAttr> XRayInstrumentAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return XRayInstrumentAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kXRayInstrumentAttrDerivedKinds[] = {
@@ -21161,6 +23211,16 @@ bool X86ForceAlignArgPointerAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return X86ForceAlignArgPointerAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kX86ForceAlignArgPointerAttrDerivedKinds[] = {
     X86ForceAlignArgPointerAttr::static_kind(),
 };
@@ -21216,6 +23276,16 @@ bool WorkGroupSizeHintAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<WorkGroupSizeHintAttr> WorkGroupSizeHintAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WorkGroupSizeHintAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kWorkGroupSizeHintAttrDerivedKinds[] = {
     WorkGroupSizeHintAttr::static_kind(),
 };
@@ -21269,6 +23339,16 @@ bool WebAssemblyImportNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WebAssemblyImportNameAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kWebAssemblyImportNameAttrDerivedKinds[] = {
@@ -21331,6 +23411,16 @@ bool WebAssemblyImportModuleAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<WebAssemblyImportModuleAttr> WebAssemblyImportModuleAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WebAssemblyImportModuleAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kWebAssemblyImportModuleAttrDerivedKinds[] = {
     WebAssemblyImportModuleAttr::static_kind(),
 };
@@ -21389,6 +23479,16 @@ bool WebAssemblyExportNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<WebAssemblyExportNameAttr> WebAssemblyExportNameAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WebAssemblyExportNameAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kWebAssemblyExportNameAttrDerivedKinds[] = {
@@ -21451,6 +23551,16 @@ bool WeakRefAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<WeakRefAttr> WeakRefAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WeakRefAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kWeakRefAttrDerivedKinds[] = {
     WeakRefAttr::static_kind(),
 };
@@ -21511,6 +23621,16 @@ bool WeakImportAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<WeakImportAttr> WeakImportAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WeakImportAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kWeakImportAttrDerivedKinds[] = {
     WeakImportAttr::static_kind(),
 };
@@ -21566,6 +23686,16 @@ bool WeakAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<WeakAttr> WeakAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WeakAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kWeakAttrDerivedKinds[] = {
     WeakAttr::static_kind(),
 };
@@ -21619,6 +23749,16 @@ bool WarnUnusedResultAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WarnUnusedResultAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kWarnUnusedResultAttrDerivedKinds[] = {
@@ -21689,6 +23829,16 @@ bool WarnUnusedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<WarnUnusedAttr> WarnUnusedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return WarnUnusedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kWarnUnusedAttrDerivedKinds[] = {
     WarnUnusedAttr::static_kind(),
 };
@@ -21742,6 +23892,16 @@ bool VisibilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<VisibilityAttr> VisibilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return VisibilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kVisibilityAttrDerivedKinds[] = {
@@ -21803,6 +23963,16 @@ bool VectorCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<VectorCallAttr> VectorCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return VectorCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kVectorCallAttrDerivedKinds[] = {
     VectorCallAttr::static_kind(),
 };
@@ -21856,6 +24026,16 @@ bool VecTypeHintAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<VecTypeHintAttr> VecTypeHintAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return VecTypeHintAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kVecTypeHintAttrDerivedKinds[] = {
@@ -21923,6 +24103,16 @@ bool VecReturnAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<VecReturnAttr> VecReturnAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return VecReturnAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kVecReturnAttrDerivedKinds[] = {
     VecReturnAttr::static_kind(),
 };
@@ -21976,6 +24166,16 @@ bool UuidAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<UuidAttr> UuidAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UuidAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kUuidAttrDerivedKinds[] = {
@@ -22043,6 +24243,16 @@ bool UsingIfExistsAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<UsingIfExistsAttr> UsingIfExistsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UsingIfExistsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kUsingIfExistsAttrDerivedKinds[] = {
     UsingIfExistsAttr::static_kind(),
 };
@@ -22098,6 +24308,16 @@ bool UsedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<UsedAttr> UsedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UsedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kUsedAttrDerivedKinds[] = {
     UsedAttr::static_kind(),
 };
@@ -22151,6 +24371,16 @@ bool UnusedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<UnusedAttr> UnusedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UnusedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kUnusedAttrDerivedKinds[] = {
@@ -22212,6 +24442,16 @@ bool UninitializedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<UninitializedAttr> UninitializedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UninitializedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kUninitializedAttrDerivedKinds[] = {
     UninitializedAttr::static_kind(),
 };
@@ -22265,6 +24505,16 @@ bool UnavailableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<UnavailableAttr> UnavailableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UnavailableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kUnavailableAttrDerivedKinds[] = {
@@ -22331,6 +24581,16 @@ bool TypeVisibilityAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TypeVisibilityAttr> TypeVisibilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TypeVisibilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kTypeVisibilityAttrDerivedKinds[] = {
     TypeVisibilityAttr::static_kind(),
 };
@@ -22388,6 +24648,16 @@ bool TypeTagForDatatypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TypeTagForDatatypeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kTypeTagForDatatypeAttrDerivedKinds[] = {
@@ -22463,6 +24733,16 @@ bool TryAcquireCapabilityAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TryAcquireCapabilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kTryAcquireCapabilityAttrDerivedKinds[] = {
     TryAcquireCapabilityAttr::static_kind(),
 };
@@ -22531,6 +24811,16 @@ bool TrivialABIAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TrivialABIAttr> TrivialABIAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TrivialABIAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kTrivialABIAttrDerivedKinds[] = {
     TrivialABIAttr::static_kind(),
 };
@@ -22584,6 +24874,16 @@ bool TransparentUnionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TransparentUnionAttr> TransparentUnionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TransparentUnionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kTransparentUnionAttrDerivedKinds[] = {
@@ -22641,6 +24941,16 @@ bool ThisCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ThisCallAttr> ThisCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ThisCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kThisCallAttrDerivedKinds[] = {
     ThisCallAttr::static_kind(),
 };
@@ -22694,6 +25004,16 @@ bool TestTypestateAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TestTypestateAttr> TestTypestateAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TestTypestateAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kTestTypestateAttrDerivedKinds[] = {
@@ -22755,6 +25075,16 @@ bool TargetClonesAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TargetClonesAttr> TargetClonesAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TargetClonesAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kTargetClonesAttrDerivedKinds[] = {
     TargetClonesAttr::static_kind(),
 };
@@ -22808,6 +25138,16 @@ bool TargetAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TargetAttr> TargetAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TargetAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kTargetAttrDerivedKinds[] = {
@@ -22879,6 +25219,16 @@ bool TLSModelAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TLSModelAttr> TLSModelAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return TLSModelAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kTLSModelAttrDerivedKinds[] = {
     TLSModelAttr::static_kind(),
 };
@@ -22939,6 +25289,16 @@ bool SysVABIAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SysVABIAttr> SysVABIAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SysVABIAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSysVABIAttrDerivedKinds[] = {
     SysVABIAttr::static_kind(),
 };
@@ -22994,6 +25354,16 @@ bool SwiftPrivateAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftPrivateAttr> SwiftPrivateAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftPrivateAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftPrivateAttrDerivedKinds[] = {
     SwiftPrivateAttr::static_kind(),
 };
@@ -23047,6 +25417,16 @@ bool SwiftNewTypeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwiftNewTypeAttr> SwiftNewTypeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftNewTypeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSwiftNewTypeAttrDerivedKinds[] = {
@@ -23112,6 +25492,16 @@ bool SwiftNameAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftNameAttr> SwiftNameAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftNameAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftNameAttrDerivedKinds[] = {
     SwiftNameAttr::static_kind(),
 };
@@ -23170,6 +25560,16 @@ bool SwiftErrorAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwiftErrorAttr> SwiftErrorAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftErrorAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSwiftErrorAttrDerivedKinds[] = {
@@ -23231,6 +25631,16 @@ bool SwiftCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftCallAttr> SwiftCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftCallAttrDerivedKinds[] = {
     SwiftCallAttr::static_kind(),
 };
@@ -23286,6 +25696,16 @@ bool SwiftBridgedTypedefAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftBridgedTypedefAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftBridgedTypedefAttrDerivedKinds[] = {
     SwiftBridgedTypedefAttr::static_kind(),
 };
@@ -23339,6 +25759,16 @@ bool SwiftBridgeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwiftBridgeAttr> SwiftBridgeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftBridgeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSwiftBridgeAttrDerivedKinds[] = {
@@ -23401,6 +25831,16 @@ bool SwiftAttrAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftAttrAttr> SwiftAttrAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftAttrAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftAttrAttrDerivedKinds[] = {
     SwiftAttrAttr::static_kind(),
 };
@@ -23459,6 +25899,16 @@ bool SwiftAsyncNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwiftAsyncNameAttr> SwiftAsyncNameAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftAsyncNameAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSwiftAsyncNameAttrDerivedKinds[] = {
@@ -23521,6 +25971,16 @@ bool SwiftAsyncErrorAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftAsyncErrorAttr> SwiftAsyncErrorAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftAsyncErrorAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftAsyncErrorAttrDerivedKinds[] = {
     SwiftAsyncErrorAttr::static_kind(),
 };
@@ -23580,6 +26040,16 @@ bool SwiftAsyncCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftAsyncCallAttr> SwiftAsyncCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftAsyncCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftAsyncCallAttrDerivedKinds[] = {
     SwiftAsyncCallAttr::static_kind(),
 };
@@ -23633,6 +26103,16 @@ bool SwiftAsyncAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwiftAsyncAttr> SwiftAsyncAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftAsyncAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSwiftAsyncAttrDerivedKinds[] = {
@@ -23690,6 +26170,16 @@ bool StrictFPAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<StrictFPAttr> StrictFPAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return StrictFPAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kStrictFPAttrDerivedKinds[] = {
     StrictFPAttr::static_kind(),
 };
@@ -23743,6 +26233,16 @@ bool StdCallAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<StdCallAttr> StdCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return StdCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kStdCallAttrDerivedKinds[] = {
@@ -23800,6 +26300,16 @@ bool StandaloneDebugAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<StandaloneDebugAttr> StandaloneDebugAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return StandaloneDebugAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kStandaloneDebugAttrDerivedKinds[] = {
     StandaloneDebugAttr::static_kind(),
 };
@@ -23855,6 +26365,16 @@ bool SpeculativeLoadHardeningAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SpeculativeLoadHardeningAttr> SpeculativeLoadHardeningAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SpeculativeLoadHardeningAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSpeculativeLoadHardeningAttrDerivedKinds[] = {
     SpeculativeLoadHardeningAttr::static_kind(),
 };
@@ -23908,6 +26428,16 @@ bool SharedTrylockFunctionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SharedTrylockFunctionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSharedTrylockFunctionAttrDerivedKinds[] = {
@@ -23970,6 +26500,16 @@ bool SetTypestateAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SetTypestateAttr> SetTypestateAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SetTypestateAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSetTypestateAttrDerivedKinds[] = {
     SetTypestateAttr::static_kind(),
 };
@@ -24029,6 +26569,16 @@ bool SentinelAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SentinelAttr> SentinelAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SentinelAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSentinelAttrDerivedKinds[] = {
     SentinelAttr::static_kind(),
 };
@@ -24084,6 +26634,16 @@ bool SelectAnyAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SelectAnyAttr> SelectAnyAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SelectAnyAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSelectAnyAttrDerivedKinds[] = {
     SelectAnyAttr::static_kind(),
 };
@@ -24137,6 +26697,16 @@ bool SectionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SectionAttr> SectionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SectionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSectionAttrDerivedKinds[] = {
@@ -24203,6 +26773,16 @@ bool ScopedLockableAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ScopedLockableAttr> ScopedLockableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ScopedLockableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kScopedLockableAttrDerivedKinds[] = {
     ScopedLockableAttr::static_kind(),
 };
@@ -24256,6 +26836,16 @@ bool SYCLSpecialClassAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SYCLSpecialClassAttr> SYCLSpecialClassAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SYCLSpecialClassAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSYCLSpecialClassAttrDerivedKinds[] = {
@@ -24313,6 +26903,16 @@ bool SYCLKernelAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SYCLKernelAttr> SYCLKernelAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SYCLKernelAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSYCLKernelAttrDerivedKinds[] = {
     SYCLKernelAttr::static_kind(),
 };
@@ -24366,6 +26966,16 @@ bool ReturnsTwiceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ReturnsTwiceAttr> ReturnsTwiceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ReturnsTwiceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kReturnsTwiceAttrDerivedKinds[] = {
@@ -24423,6 +27033,16 @@ bool ReturnsNonNullAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ReturnsNonNullAttr> ReturnsNonNullAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ReturnsNonNullAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kReturnsNonNullAttrDerivedKinds[] = {
     ReturnsNonNullAttr::static_kind(),
 };
@@ -24476,6 +27096,16 @@ bool ReturnTypestateAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ReturnTypestateAttr> ReturnTypestateAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ReturnTypestateAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kReturnTypestateAttrDerivedKinds[] = {
@@ -24537,6 +27167,16 @@ bool RetainAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<RetainAttr> RetainAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return RetainAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kRetainAttrDerivedKinds[] = {
     RetainAttr::static_kind(),
 };
@@ -24590,6 +27230,16 @@ bool RestrictAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<RestrictAttr> RestrictAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return RestrictAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kRestrictAttrDerivedKinds[] = {
@@ -24649,6 +27299,16 @@ bool RequiresCapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<RequiresCapabilityAttr> RequiresCapabilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return RequiresCapabilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kRequiresCapabilityAttrDerivedKinds[] = {
@@ -24714,6 +27374,16 @@ bool ReqdWorkGroupSizeAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ReqdWorkGroupSizeAttr> ReqdWorkGroupSizeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ReqdWorkGroupSizeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kReqdWorkGroupSizeAttrDerivedKinds[] = {
     ReqdWorkGroupSizeAttr::static_kind(),
 };
@@ -24767,6 +27437,16 @@ bool ReleaseCapabilityAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ReleaseCapabilityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kReleaseCapabilityAttrDerivedKinds[] = {
@@ -24836,6 +27516,16 @@ bool ReinitializesAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ReinitializesAttr> ReinitializesAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ReinitializesAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kReinitializesAttrDerivedKinds[] = {
     ReinitializesAttr::static_kind(),
 };
@@ -24889,6 +27579,16 @@ bool RegCallAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<RegCallAttr> RegCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return RegCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kRegCallAttrDerivedKinds[] = {
@@ -24946,6 +27646,16 @@ bool RandomizeLayoutAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<RandomizeLayoutAttr> RandomizeLayoutAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return RandomizeLayoutAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kRandomizeLayoutAttrDerivedKinds[] = {
     RandomizeLayoutAttr::static_kind(),
 };
@@ -24999,6 +27709,16 @@ bool RISCVInterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<RISCVInterruptAttr> RISCVInterruptAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return RISCVInterruptAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kRISCVInterruptAttrDerivedKinds[] = {
@@ -25060,6 +27780,16 @@ bool PureAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PureAttr> PureAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PureAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPureAttrDerivedKinds[] = {
     PureAttr::static_kind(),
 };
@@ -25115,6 +27845,16 @@ bool PtGuardedVarAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PtGuardedVarAttr> PtGuardedVarAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PtGuardedVarAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPtGuardedVarAttrDerivedKinds[] = {
     PtGuardedVarAttr::static_kind(),
 };
@@ -25168,6 +27908,16 @@ bool PtGuardedByAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<PtGuardedByAttr> PtGuardedByAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PtGuardedByAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kPtGuardedByAttrDerivedKinds[] = {
@@ -25230,6 +27980,16 @@ bool PreserveMostAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PreserveMostAttr> PreserveMostAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PreserveMostAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPreserveMostAttrDerivedKinds[] = {
     PreserveMostAttr::static_kind(),
 };
@@ -25285,6 +28045,16 @@ bool PreserveAllAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PreserveAllAttr> PreserveAllAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PreserveAllAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPreserveAllAttrDerivedKinds[] = {
     PreserveAllAttr::static_kind(),
 };
@@ -25338,6 +28108,16 @@ bool PreferredNameAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<PreferredNameAttr> PreferredNameAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PreferredNameAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kPreferredNameAttrDerivedKinds[] = {
@@ -25405,6 +28185,16 @@ bool PragmaClangTextSectionAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PragmaClangTextSectionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPragmaClangTextSectionAttrDerivedKinds[] = {
     PragmaClangTextSectionAttr::static_kind(),
 };
@@ -25463,6 +28253,16 @@ bool PragmaClangRodataSectionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PragmaClangRodataSectionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kPragmaClangRodataSectionAttrDerivedKinds[] = {
@@ -25525,6 +28325,16 @@ bool PragmaClangRelroSectionAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PragmaClangRelroSectionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPragmaClangRelroSectionAttrDerivedKinds[] = {
     PragmaClangRelroSectionAttr::static_kind(),
 };
@@ -25583,6 +28393,16 @@ bool PragmaClangDataSectionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<PragmaClangDataSectionAttr> PragmaClangDataSectionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PragmaClangDataSectionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kPragmaClangDataSectionAttrDerivedKinds[] = {
@@ -25645,6 +28465,16 @@ bool PragmaClangBSSSectionAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PragmaClangBSSSectionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPragmaClangBSSSectionAttrDerivedKinds[] = {
     PragmaClangBSSSectionAttr::static_kind(),
 };
@@ -25703,6 +28533,16 @@ bool PointerAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<PointerAttr> PointerAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PointerAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kPointerAttrDerivedKinds[] = {
@@ -25770,6 +28610,16 @@ bool PcsAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PcsAttr> PcsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PcsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPcsAttrDerivedKinds[] = {
     PcsAttr::static_kind(),
 };
@@ -25829,6 +28679,16 @@ bool PatchableFunctionEntryAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PatchableFunctionEntryAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPatchableFunctionEntryAttrDerivedKinds[] = {
     PatchableFunctionEntryAttr::static_kind(),
 };
@@ -25884,6 +28744,16 @@ bool PascalAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PascalAttr> PascalAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PascalAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPascalAttrDerivedKinds[] = {
     PascalAttr::static_kind(),
 };
@@ -25937,6 +28807,16 @@ bool ParamTypestateAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ParamTypestateAttr> ParamTypestateAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ParamTypestateAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kParamTypestateAttrDerivedKinds[] = {
@@ -25998,6 +28878,16 @@ bool PackedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PackedAttr> PackedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PackedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kPackedAttrDerivedKinds[] = {
     PackedAttr::static_kind(),
 };
@@ -26051,6 +28941,16 @@ bool OwnershipAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OwnershipAttr> OwnershipAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OwnershipAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOwnershipAttrDerivedKinds[] = {
@@ -26128,6 +29028,16 @@ bool OwnerAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OwnerAttr> OwnerAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OwnerAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOwnerAttrDerivedKinds[] = {
     OwnerAttr::static_kind(),
 };
@@ -26193,6 +29103,16 @@ bool OverrideAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OverrideAttr> OverrideAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OverrideAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOverrideAttrDerivedKinds[] = {
     OverrideAttr::static_kind(),
 };
@@ -26246,6 +29166,16 @@ bool OptimizeNoneAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OptimizeNoneAttr> OptimizeNoneAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OptimizeNoneAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOptimizeNoneAttrDerivedKinds[] = {
@@ -26303,6 +29233,16 @@ bool OpenCLKernelAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OpenCLKernelAttr> OpenCLKernelAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLKernelAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOpenCLKernelAttrDerivedKinds[] = {
     OpenCLKernelAttr::static_kind(),
 };
@@ -26356,6 +29296,16 @@ bool OpenCLIntelReqdSubGroupSizeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OpenCLIntelReqdSubGroupSizeAttr> OpenCLIntelReqdSubGroupSizeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OpenCLIntelReqdSubGroupSizeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOpenCLIntelReqdSubGroupSizeAttrDerivedKinds[] = {
@@ -26413,6 +29363,16 @@ bool ObjCSubclassingRestrictedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCSubclassingRestrictedAttr> ObjCSubclassingRestrictedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCSubclassingRestrictedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCSubclassingRestrictedAttrDerivedKinds[] = {
     ObjCSubclassingRestrictedAttr::static_kind(),
 };
@@ -26466,6 +29426,16 @@ bool ObjCRootClassAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCRootClassAttr> ObjCRootClassAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCRootClassAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCRootClassAttrDerivedKinds[] = {
@@ -26523,6 +29493,16 @@ bool ObjCReturnsInnerPointerAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCReturnsInnerPointerAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCReturnsInnerPointerAttrDerivedKinds[] = {
     ObjCReturnsInnerPointerAttr::static_kind(),
 };
@@ -26576,6 +29556,16 @@ bool ObjCRequiresSuperAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCRequiresSuperAttr> ObjCRequiresSuperAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCRequiresSuperAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCRequiresSuperAttrDerivedKinds[] = {
@@ -26633,6 +29623,16 @@ bool ObjCRequiresPropertyDefsAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCRequiresPropertyDefsAttr> ObjCRequiresPropertyDefsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCRequiresPropertyDefsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCRequiresPropertyDefsAttrDerivedKinds[] = {
     ObjCRequiresPropertyDefsAttr::static_kind(),
 };
@@ -26686,6 +29686,16 @@ bool ObjCPreciseLifetimeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCPreciseLifetimeAttr> ObjCPreciseLifetimeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCPreciseLifetimeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCPreciseLifetimeAttrDerivedKinds[] = {
@@ -26743,6 +29753,16 @@ bool ObjCOwnershipAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCOwnershipAttr> ObjCOwnershipAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCOwnershipAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCOwnershipAttrDerivedKinds[] = {
     ObjCOwnershipAttr::static_kind(),
 };
@@ -26798,6 +29818,16 @@ bool ObjCNSObjectAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCNSObjectAttr> ObjCNSObjectAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCNSObjectAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCNSObjectAttrDerivedKinds[] = {
     ObjCNSObjectAttr::static_kind(),
 };
@@ -26851,6 +29881,16 @@ bool ObjCMethodFamilyAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCMethodFamilyAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCMethodFamilyAttrDerivedKinds[] = {
@@ -26912,6 +29952,16 @@ bool ObjCIndependentClassAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCIndependentClassAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCIndependentClassAttrDerivedKinds[] = {
     ObjCIndependentClassAttr::static_kind(),
 };
@@ -26965,6 +30015,16 @@ bool ObjCExternallyRetainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCExternallyRetainedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCExternallyRetainedAttrDerivedKinds[] = {
@@ -27022,6 +30082,16 @@ bool ObjCExplicitProtocolImplAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCExplicitProtocolImplAttr> ObjCExplicitProtocolImplAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCExplicitProtocolImplAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCExplicitProtocolImplAttrDerivedKinds[] = {
     ObjCExplicitProtocolImplAttr::static_kind(),
 };
@@ -27075,6 +30145,16 @@ bool ObjCExceptionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCExceptionAttr> ObjCExceptionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCExceptionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCExceptionAttrDerivedKinds[] = {
@@ -27132,6 +30212,16 @@ bool ObjCBridgeRelatedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCBridgeRelatedAttr> ObjCBridgeRelatedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCBridgeRelatedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCBridgeRelatedAttrDerivedKinds[] = {
     ObjCBridgeRelatedAttr::static_kind(),
 };
@@ -27185,6 +30275,16 @@ bool ObjCBridgeMutableAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCBridgeMutableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kObjCBridgeMutableAttrDerivedKinds[] = {
@@ -27242,6 +30342,16 @@ bool ObjCBridgeAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCBridgeAttr> ObjCBridgeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ObjCBridgeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kObjCBridgeAttrDerivedKinds[] = {
     ObjCBridgeAttr::static_kind(),
 };
@@ -27295,6 +30405,16 @@ bool OSReturnsRetainedOnZeroAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OSReturnsRetainedOnZeroAttr> OSReturnsRetainedOnZeroAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OSReturnsRetainedOnZeroAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOSReturnsRetainedOnZeroAttrDerivedKinds[] = {
@@ -27352,6 +30472,16 @@ bool OSReturnsRetainedOnNonZeroAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OSReturnsRetainedOnNonZeroAttr> OSReturnsRetainedOnNonZeroAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OSReturnsRetainedOnNonZeroAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOSReturnsRetainedOnNonZeroAttrDerivedKinds[] = {
     OSReturnsRetainedOnNonZeroAttr::static_kind(),
 };
@@ -27405,6 +30535,16 @@ bool OSReturnsRetainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OSReturnsRetainedAttr> OSReturnsRetainedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OSReturnsRetainedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOSReturnsRetainedAttrDerivedKinds[] = {
@@ -27462,6 +30602,16 @@ bool OSReturnsNotRetainedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OSReturnsNotRetainedAttr> OSReturnsNotRetainedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OSReturnsNotRetainedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOSReturnsNotRetainedAttrDerivedKinds[] = {
     OSReturnsNotRetainedAttr::static_kind(),
 };
@@ -27515,6 +30665,16 @@ bool OSConsumesThisAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OSConsumesThisAttr> OSConsumesThisAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OSConsumesThisAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOSConsumesThisAttrDerivedKinds[] = {
@@ -27572,6 +30732,16 @@ bool OMPThreadPrivateDeclAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OMPThreadPrivateDeclAttr> OMPThreadPrivateDeclAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OMPThreadPrivateDeclAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOMPThreadPrivateDeclAttrDerivedKinds[] = {
     OMPThreadPrivateDeclAttr::static_kind(),
 };
@@ -27625,6 +30795,16 @@ bool OMPDeclareVariantAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPDeclareVariantAttr> OMPDeclareVariantAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OMPDeclareVariantAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOMPDeclareVariantAttrDerivedKinds[] = {
@@ -27685,6 +30865,16 @@ bool OMPDeclareTargetDeclAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OMPDeclareTargetDeclAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOMPDeclareTargetDeclAttrDerivedKinds[] = {
@@ -27759,6 +30949,16 @@ bool OMPCaptureNoInitAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OMPCaptureNoInitAttr> OMPCaptureNoInitAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OMPCaptureNoInitAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOMPCaptureNoInitAttrDerivedKinds[] = {
     OMPCaptureNoInitAttr::static_kind(),
 };
@@ -27812,6 +31012,16 @@ bool OMPAllocateDeclAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OMPAllocateDeclAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kOMPAllocateDeclAttrDerivedKinds[] = {
@@ -27883,6 +31093,16 @@ bool NotTailCalledAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NotTailCalledAttr> NotTailCalledAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NotTailCalledAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNotTailCalledAttrDerivedKinds[] = {
     NotTailCalledAttr::static_kind(),
 };
@@ -27936,6 +31156,16 @@ bool NoUniqueAddressAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoUniqueAddressAttr> NoUniqueAddressAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoUniqueAddressAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoUniqueAddressAttrDerivedKinds[] = {
@@ -27993,6 +31223,16 @@ bool NoThrowAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoThrowAttr> NoThrowAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoThrowAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoThrowAttrDerivedKinds[] = {
     NoThrowAttr::static_kind(),
 };
@@ -28046,6 +31286,16 @@ bool NoThreadSafetyAnalysisAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoThreadSafetyAnalysisAttr> NoThreadSafetyAnalysisAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoThreadSafetyAnalysisAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoThreadSafetyAnalysisAttrDerivedKinds[] = {
@@ -28103,6 +31353,16 @@ bool NoStackProtectorAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoStackProtectorAttr> NoStackProtectorAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoStackProtectorAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoStackProtectorAttrDerivedKinds[] = {
     NoStackProtectorAttr::static_kind(),
 };
@@ -28156,6 +31416,16 @@ bool NoSplitStackAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoSplitStackAttr> NoSplitStackAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoSplitStackAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoSplitStackAttrDerivedKinds[] = {
@@ -28213,6 +31483,16 @@ bool NoSpeculativeLoadHardeningAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoSpeculativeLoadHardeningAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoSpeculativeLoadHardeningAttrDerivedKinds[] = {
     NoSpeculativeLoadHardeningAttr::static_kind(),
 };
@@ -28266,6 +31546,16 @@ bool NoSanitizeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoSanitizeAttr> NoSanitizeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoSanitizeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoSanitizeAttrDerivedKinds[] = {
@@ -28327,6 +31617,16 @@ bool NoReturnAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoReturnAttr> NoReturnAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoReturnAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoReturnAttrDerivedKinds[] = {
     NoReturnAttr::static_kind(),
 };
@@ -28380,6 +31680,16 @@ bool NoRandomizeLayoutAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoRandomizeLayoutAttr> NoRandomizeLayoutAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoRandomizeLayoutAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoRandomizeLayoutAttrDerivedKinds[] = {
@@ -28437,6 +31747,16 @@ bool NoProfileFunctionAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoProfileFunctionAttr> NoProfileFunctionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoProfileFunctionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoProfileFunctionAttrDerivedKinds[] = {
     NoProfileFunctionAttr::static_kind(),
 };
@@ -28490,6 +31810,16 @@ bool NoMips16Attr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoMips16Attr> NoMips16Attr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoMips16Attr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoMips16AttrDerivedKinds[] = {
@@ -28547,6 +31877,16 @@ bool NoMicroMipsAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoMicroMipsAttr> NoMicroMipsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoMicroMipsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoMicroMipsAttrDerivedKinds[] = {
     NoMicroMipsAttr::static_kind(),
 };
@@ -28600,6 +31940,16 @@ bool NoInstrumentFunctionAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoInstrumentFunctionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoInstrumentFunctionAttrDerivedKinds[] = {
@@ -28657,6 +32007,16 @@ bool NoDuplicateAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoDuplicateAttr> NoDuplicateAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoDuplicateAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoDuplicateAttrDerivedKinds[] = {
     NoDuplicateAttr::static_kind(),
 };
@@ -28710,6 +32070,16 @@ bool NoDestroyAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoDestroyAttr> NoDestroyAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoDestroyAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoDestroyAttrDerivedKinds[] = {
@@ -28767,6 +32137,16 @@ bool NoDebugAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoDebugAttr> NoDebugAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoDebugAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoDebugAttrDerivedKinds[] = {
     NoDebugAttr::static_kind(),
 };
@@ -28820,6 +32200,16 @@ bool NoCommonAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NoCommonAttr> NoCommonAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoCommonAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNoCommonAttrDerivedKinds[] = {
@@ -28877,6 +32267,16 @@ bool NoAliasAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NoAliasAttr> NoAliasAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NoAliasAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNoAliasAttrDerivedKinds[] = {
     NoAliasAttr::static_kind(),
 };
@@ -28930,6 +32330,16 @@ bool NakedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NakedAttr> NakedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NakedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNakedAttrDerivedKinds[] = {
@@ -28987,6 +32397,16 @@ bool NSReturnsRetainedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NSReturnsRetainedAttr> NSReturnsRetainedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NSReturnsRetainedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNSReturnsRetainedAttrDerivedKinds[] = {
     NSReturnsRetainedAttr::static_kind(),
 };
@@ -29040,6 +32460,16 @@ bool NSReturnsNotRetainedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NSReturnsNotRetainedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNSReturnsNotRetainedAttrDerivedKinds[] = {
@@ -29097,6 +32527,16 @@ bool NSReturnsAutoreleasedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NSReturnsAutoreleasedAttr> NSReturnsAutoreleasedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NSReturnsAutoreleasedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNSReturnsAutoreleasedAttrDerivedKinds[] = {
     NSReturnsAutoreleasedAttr::static_kind(),
 };
@@ -29150,6 +32590,16 @@ bool NSErrorDomainAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NSErrorDomainAttr> NSErrorDomainAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NSErrorDomainAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNSErrorDomainAttrDerivedKinds[] = {
@@ -29212,6 +32662,16 @@ bool NSConsumesSelfAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NSConsumesSelfAttr> NSConsumesSelfAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NSConsumesSelfAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNSConsumesSelfAttrDerivedKinds[] = {
     NSConsumesSelfAttr::static_kind(),
 };
@@ -29265,6 +32725,16 @@ bool MipsShortCallAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MipsShortCallAttr> MipsShortCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MipsShortCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMipsShortCallAttrDerivedKinds[] = {
@@ -29326,6 +32796,16 @@ bool MipsLongCallAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MipsLongCallAttr> MipsLongCallAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MipsLongCallAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMipsLongCallAttrDerivedKinds[] = {
     MipsLongCallAttr::static_kind(),
 };
@@ -29383,6 +32863,16 @@ bool MipsInterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MipsInterruptAttr> MipsInterruptAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MipsInterruptAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMipsInterruptAttrDerivedKinds[] = {
@@ -29444,6 +32934,16 @@ bool Mips16Attr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<Mips16Attr> Mips16Attr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return Mips16Attr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMips16AttrDerivedKinds[] = {
     Mips16Attr::static_kind(),
 };
@@ -29497,6 +32997,16 @@ bool MinVectorWidthAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MinVectorWidthAttr> MinVectorWidthAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MinVectorWidthAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMinVectorWidthAttrDerivedKinds[] = {
@@ -29554,6 +33064,16 @@ bool MinSizeAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MinSizeAttr> MinSizeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MinSizeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMinSizeAttrDerivedKinds[] = {
     MinSizeAttr::static_kind(),
 };
@@ -29607,6 +33127,16 @@ bool MicroMipsAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MicroMipsAttr> MicroMipsAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MicroMipsAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMicroMipsAttrDerivedKinds[] = {
@@ -29664,6 +33194,16 @@ bool MayAliasAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MayAliasAttr> MayAliasAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MayAliasAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMayAliasAttrDerivedKinds[] = {
     MayAliasAttr::static_kind(),
 };
@@ -29719,6 +33259,16 @@ bool MaxFieldAlignmentAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MaxFieldAlignmentAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMaxFieldAlignmentAttrDerivedKinds[] = {
     MaxFieldAlignmentAttr::static_kind(),
 };
@@ -29772,6 +33322,16 @@ bool MSVtorDispAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MSVtorDispAttr> MSVtorDispAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MSVtorDispAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMSVtorDispAttrDerivedKinds[] = {
@@ -29833,6 +33393,16 @@ bool MSStructAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MSStructAttr> MSStructAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MSStructAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMSStructAttrDerivedKinds[] = {
     MSStructAttr::static_kind(),
 };
@@ -29886,6 +33456,16 @@ bool MSP430InterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MSP430InterruptAttr> MSP430InterruptAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MSP430InterruptAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMSP430InterruptAttrDerivedKinds[] = {
@@ -29943,6 +33523,16 @@ bool MSNoVTableAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MSNoVTableAttr> MSNoVTableAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MSNoVTableAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMSNoVTableAttrDerivedKinds[] = {
     MSNoVTableAttr::static_kind(),
 };
@@ -29996,6 +33586,16 @@ bool MSInheritanceAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MSInheritanceAttr> MSInheritanceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MSInheritanceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMSInheritanceAttrDerivedKinds[] = {
@@ -30065,6 +33665,16 @@ bool MSAllocatorAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MSAllocatorAttr> MSAllocatorAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MSAllocatorAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMSAllocatorAttrDerivedKinds[] = {
     MSAllocatorAttr::static_kind(),
 };
@@ -30118,6 +33728,16 @@ bool MSABIAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MSABIAttr> MSABIAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MSABIAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kMSABIAttrDerivedKinds[] = {
@@ -30175,6 +33795,16 @@ bool MIGServerRoutineAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MIGServerRoutineAttr> MIGServerRoutineAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return MIGServerRoutineAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kMIGServerRoutineAttrDerivedKinds[] = {
     MIGServerRoutineAttr::static_kind(),
 };
@@ -30228,6 +33858,16 @@ bool M68kInterruptAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<M68kInterruptAttr> M68kInterruptAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return M68kInterruptAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kM68kInterruptAttrDerivedKinds[] = {
@@ -30285,6 +33925,16 @@ bool LocksExcludedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<LocksExcludedAttr> LocksExcludedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LocksExcludedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kLocksExcludedAttrDerivedKinds[] = {
     LocksExcludedAttr::static_kind(),
 };
@@ -30338,6 +33988,16 @@ bool LockReturnedAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<LockReturnedAttr> LockReturnedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LockReturnedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kLockReturnedAttrDerivedKinds[] = {
@@ -30400,6 +34060,16 @@ bool LifetimeBoundAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<LifetimeBoundAttr> LifetimeBoundAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LifetimeBoundAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kLifetimeBoundAttrDerivedKinds[] = {
     LifetimeBoundAttr::static_kind(),
 };
@@ -30453,6 +34123,16 @@ bool LeafAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<LeafAttr> LeafAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LeafAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kLeafAttrDerivedKinds[] = {
@@ -30510,6 +34190,16 @@ bool LayoutVersionAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<LayoutVersionAttr> LayoutVersionAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LayoutVersionAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kLayoutVersionAttrDerivedKinds[] = {
     LayoutVersionAttr::static_kind(),
 };
@@ -30563,6 +34253,16 @@ bool LTOVisibilityPublicAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<LTOVisibilityPublicAttr> LTOVisibilityPublicAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return LTOVisibilityPublicAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kLTOVisibilityPublicAttrDerivedKinds[] = {
@@ -30620,6 +34320,16 @@ bool InternalLinkageAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<InternalLinkageAttr> InternalLinkageAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return InternalLinkageAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kInternalLinkageAttrDerivedKinds[] = {
     InternalLinkageAttr::static_kind(),
 };
@@ -30673,6 +34383,16 @@ bool IntelOclBiccAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<IntelOclBiccAttr> IntelOclBiccAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return IntelOclBiccAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kIntelOclBiccAttrDerivedKinds[] = {
@@ -30730,6 +34450,16 @@ bool InitPriorityAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<InitPriorityAttr> InitPriorityAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return InitPriorityAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kInitPriorityAttrDerivedKinds[] = {
     InitPriorityAttr::static_kind(),
 };
@@ -30783,6 +34513,16 @@ bool InheritableParamAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<InheritableParamAttr> InheritableParamAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return InheritableParamAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kInheritableParamAttrDerivedKinds[] = {
@@ -30864,6 +34604,16 @@ bool CarriesDependencyAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CarriesDependencyAttr> CarriesDependencyAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CarriesDependencyAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCarriesDependencyAttrDerivedKinds[] = {
     CarriesDependencyAttr::static_kind(),
 };
@@ -30923,6 +34673,16 @@ bool CFConsumedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CFConsumedAttr> CFConsumedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CFConsumedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCFConsumedAttrDerivedKinds[] = {
     CFConsumedAttr::static_kind(),
 };
@@ -30980,6 +34740,16 @@ bool AnnotateAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AnnotateAttr> AnnotateAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return AnnotateAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kAnnotateAttrDerivedKinds[] = {
@@ -31046,6 +34816,16 @@ bool UseHandleAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<UseHandleAttr> UseHandleAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return UseHandleAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kUseHandleAttrDerivedKinds[] = {
     UseHandleAttr::static_kind(),
 };
@@ -31110,6 +34890,16 @@ bool ReleaseHandleAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ReleaseHandleAttr> ReleaseHandleAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ReleaseHandleAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kReleaseHandleAttrDerivedKinds[] = {
     ReleaseHandleAttr::static_kind(),
 };
@@ -31172,6 +34962,16 @@ bool PassObjectSizeAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<PassObjectSizeAttr> PassObjectSizeAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return PassObjectSizeAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kPassObjectSizeAttrDerivedKinds[] = {
@@ -31239,6 +35039,16 @@ bool ParameterABIAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ParameterABIAttr> ParameterABIAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return ParameterABIAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kParameterABIAttrDerivedKinds[] = {
@@ -31310,6 +35120,16 @@ bool SwiftIndirectResultAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftIndirectResultAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftIndirectResultAttrDerivedKinds[] = {
     SwiftIndirectResultAttr::static_kind(),
 };
@@ -31371,6 +35191,16 @@ bool SwiftErrorResultAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwiftErrorResultAttr> SwiftErrorResultAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftErrorResultAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSwiftErrorResultAttrDerivedKinds[] = {
@@ -31436,6 +35266,16 @@ bool SwiftContextAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SwiftContextAttr> SwiftContextAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftContextAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kSwiftContextAttrDerivedKinds[] = {
     SwiftContextAttr::static_kind(),
 };
@@ -31497,6 +35337,16 @@ bool SwiftAsyncContextAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SwiftAsyncContextAttr> SwiftAsyncContextAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return SwiftAsyncContextAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kSwiftAsyncContextAttrDerivedKinds[] = {
@@ -31562,6 +35412,16 @@ bool OSConsumedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<OSConsumedAttr> OSConsumedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return OSConsumedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kOSConsumedAttrDerivedKinds[] = {
     OSConsumedAttr::static_kind(),
 };
@@ -31619,6 +35479,16 @@ bool NonNullAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<NonNullAttr> NonNullAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NonNullAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kNonNullAttrDerivedKinds[] = {
@@ -31680,6 +35550,16 @@ bool NSConsumedAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<NSConsumedAttr> NSConsumedAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return NSConsumedAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kNSConsumedAttrDerivedKinds[] = {
     NSConsumedAttr::static_kind(),
 };
@@ -31739,6 +35619,16 @@ bool IFuncAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<IFuncAttr> IFuncAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return IFuncAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kIFuncAttrDerivedKinds[] = {
     IFuncAttr::static_kind(),
 };
@@ -31795,6 +35685,16 @@ bool CalledOnceAttr::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<CalledOnceAttr> CalledOnceAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return CalledOnceAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const AttrKind kCalledOnceAttrDerivedKinds[] = {
     CalledOnceAttr::static_kind(),
 };
@@ -31844,6 +35744,16 @@ bool BuiltinAliasAttr::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<BuiltinAliasAttr> BuiltinAliasAttr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return BuiltinAliasAttr::from(index.attribute(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const AttrKind kBuiltinAliasAttrDerivedKinds[] = {
@@ -31909,6 +35819,16 @@ bool Type::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<Type> Type::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    index.type(eid.Pack());
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 gap::generator<Type> Type::in(const Index &index) {
   const EntityProvider::Ptr &ep = entity_provider_of(index);
   for (TypeImplPtr eptr : ep->TypesFor(ep)) {
@@ -31945,16 +35865,6 @@ gap::generator<Type> Type::in(const Fragment &frag, std::span<TypeKind> kinds) {
       co_yield Type(std::move(eptr));
     }
   }
-}
-
-std::optional<Type> Type::by(const Index &index, EntityId eid) {
-  VariantId vid = eid.Unpack();
-  if (std::holds_alternative<TypeId>(vid)) {
-    index.type(eid.Pack());
-  } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(eid.Pack() == kInvalidEntityId);
-  }
-  return std::nullopt;
 }
 
 bool Type::is_qualified(void) const {
@@ -33333,6 +37243,16 @@ bool TemplateTypeParmType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TemplateTypeParmType> TemplateTypeParmType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return TemplateTypeParmType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kTemplateTypeParmTypeDerivedKinds[] = {
     TemplateTypeParmType::static_kind(),
 };
@@ -33408,6 +37328,16 @@ bool TemplateSpecializationType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TemplateSpecializationType> TemplateSpecializationType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return TemplateSpecializationType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kTemplateSpecializationTypeDerivedKinds[] = {
@@ -33512,6 +37442,16 @@ bool TagType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TagType> TagType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return TagType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kTagTypeDerivedKinds[] = {
     EnumType::static_kind(),
     RecordType::static_kind(),
@@ -33572,6 +37512,16 @@ bool RecordType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<RecordType> RecordType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return RecordType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kRecordTypeDerivedKinds[] = {
@@ -33642,6 +37592,16 @@ bool EnumType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<EnumType> EnumType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return EnumType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kEnumTypeDerivedKinds[] = {
     EnumType::static_kind(),
 };
@@ -33704,6 +37664,16 @@ bool SubstTemplateTypeParmType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return SubstTemplateTypeParmType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kSubstTemplateTypeParmTypeDerivedKinds[] = {
@@ -33776,6 +37746,16 @@ bool SubstTemplateTypeParmPackType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return SubstTemplateTypeParmPackType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kSubstTemplateTypeParmPackTypeDerivedKinds[] = {
     SubstTemplateTypeParmPackType::static_kind(),
 };
@@ -33839,6 +37819,16 @@ bool ReferenceType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ReferenceType> ReferenceType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ReferenceType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kReferenceTypeDerivedKinds[] = {
@@ -33907,6 +37897,16 @@ bool RValueReferenceType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<RValueReferenceType> RValueReferenceType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return RValueReferenceType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kRValueReferenceTypeDerivedKinds[] = {
     RValueReferenceType::static_kind(),
 };
@@ -33969,6 +37969,16 @@ bool LValueReferenceType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<LValueReferenceType> LValueReferenceType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return LValueReferenceType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kLValueReferenceTypeDerivedKinds[] = {
@@ -34035,6 +38045,16 @@ bool PointerType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<PointerType> PointerType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return PointerType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kPointerTypeDerivedKinds[] = {
     PointerType::static_kind(),
 };
@@ -34093,6 +38113,16 @@ bool PipeType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<PipeType> PipeType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return PipeType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kPipeTypeDerivedKinds[] = {
@@ -34164,6 +38194,16 @@ bool ParenType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ParenType> ParenType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ParenType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kParenTypeDerivedKinds[] = {
     ParenType::static_kind(),
 };
@@ -34227,6 +38267,16 @@ bool PackExpansionType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<PackExpansionType> PackExpansionType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return PackExpansionType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kPackExpansionTypeDerivedKinds[] = {
@@ -34303,6 +38353,16 @@ bool ObjCTypeParamType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCTypeParamType> ObjCTypeParamType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ObjCTypeParamType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kObjCTypeParamTypeDerivedKinds[] = {
     ObjCTypeParamType::static_kind(),
 };
@@ -34366,6 +38426,16 @@ bool ObjCObjectType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCObjectType> ObjCObjectType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ObjCObjectType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kObjCObjectTypeDerivedKinds[] = {
@@ -34542,6 +38612,16 @@ bool ObjCInterfaceType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ObjCInterfaceType> ObjCInterfaceType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ObjCInterfaceType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kObjCInterfaceTypeDerivedKinds[] = {
     ObjCInterfaceType::static_kind(),
 };
@@ -34600,6 +38680,16 @@ bool ObjCObjectPointerType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCObjectPointerType> ObjCObjectPointerType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ObjCObjectPointerType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kObjCObjectPointerTypeDerivedKinds[] = {
@@ -34789,6 +38879,16 @@ bool MemberPointerType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MemberPointerType> MemberPointerType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return MemberPointerType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kMemberPointerTypeDerivedKinds[] = {
     MemberPointerType::static_kind(),
 };
@@ -34867,6 +38967,16 @@ bool MatrixType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<MatrixType> MatrixType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return MatrixType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kMatrixTypeDerivedKinds[] = {
     ConstantMatrixType::static_kind(),
     DependentSizedMatrixType::static_kind(),
@@ -34932,6 +39042,16 @@ bool DependentSizedMatrixType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DependentSizedMatrixType> DependentSizedMatrixType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DependentSizedMatrixType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kDependentSizedMatrixTypeDerivedKinds[] = {
@@ -35003,6 +39123,16 @@ bool ConstantMatrixType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ConstantMatrixType> ConstantMatrixType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ConstantMatrixType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kConstantMatrixTypeDerivedKinds[] = {
     ConstantMatrixType::static_kind(),
 };
@@ -35056,6 +39186,16 @@ bool MacroQualifiedType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<MacroQualifiedType> MacroQualifiedType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return MacroQualifiedType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kMacroQualifiedTypeDerivedKinds[] = {
@@ -35126,6 +39266,16 @@ bool InjectedClassNameType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<InjectedClassNameType> InjectedClassNameType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return InjectedClassNameType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kInjectedClassNameTypeDerivedKinds[] = {
@@ -35201,6 +39351,16 @@ bool FunctionType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<FunctionType> FunctionType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return FunctionType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kFunctionTypeDerivedKinds[] = {
@@ -35292,6 +39452,16 @@ bool FunctionProtoType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<FunctionProtoType> FunctionProtoType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return FunctionProtoType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kFunctionProtoTypeDerivedKinds[] = {
@@ -35505,6 +39675,16 @@ bool FunctionNoProtoType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<FunctionNoProtoType> FunctionNoProtoType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return FunctionNoProtoType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kFunctionNoProtoTypeDerivedKinds[] = {
     FunctionNoProtoType::static_kind(),
 };
@@ -35567,6 +39747,16 @@ bool DependentVectorType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DependentVectorType> DependentVectorType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DependentVectorType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kDependentVectorTypeDerivedKinds[] = {
@@ -35647,6 +39837,16 @@ bool DependentSizedExtVectorType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DependentSizedExtVectorType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kDependentSizedExtVectorTypeDerivedKinds[] = {
     DependentSizedExtVectorType::static_kind(),
 };
@@ -35719,6 +39919,16 @@ bool DependentBitIntType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DependentBitIntType> DependentBitIntType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DependentBitIntType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kDependentBitIntTypeDerivedKinds[] = {
@@ -35794,6 +40004,16 @@ bool DependentAddressSpaceType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DependentAddressSpaceType> DependentAddressSpaceType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DependentAddressSpaceType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kDependentAddressSpaceTypeDerivedKinds[] = {
     DependentAddressSpaceType::static_kind(),
 };
@@ -35861,6 +40081,16 @@ bool DeducedType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DeducedType> DeducedType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DeducedType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kDeducedTypeDerivedKinds[] = {
@@ -35942,6 +40172,16 @@ bool DeducedTemplateSpecializationType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DeducedTemplateSpecializationType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kDeducedTemplateSpecializationTypeDerivedKinds[] = {
     DeducedTemplateSpecializationType::static_kind(),
 };
@@ -35995,6 +40235,16 @@ bool AutoType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AutoType> AutoType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return AutoType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kAutoTypeDerivedKinds[] = {
@@ -36102,6 +40352,16 @@ bool DecltypeType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DecltypeType> DecltypeType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DecltypeType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kDecltypeTypeDerivedKinds[] = {
     DecltypeType::static_kind(),
 };
@@ -36172,6 +40432,16 @@ bool ComplexType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ComplexType> ComplexType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ComplexType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kComplexTypeDerivedKinds[] = {
     ComplexType::static_kind(),
 };
@@ -36235,6 +40505,16 @@ bool BuiltinType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<BuiltinType> BuiltinType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return BuiltinType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kBuiltinTypeDerivedKinds[] = {
@@ -36321,6 +40601,16 @@ bool BlockPointerType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<BlockPointerType> BlockPointerType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return BlockPointerType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kBlockPointerTypeDerivedKinds[] = {
     BlockPointerType::static_kind(),
 };
@@ -36379,6 +40669,16 @@ bool BitIntType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<BitIntType> BitIntType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return BitIntType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kBitIntTypeDerivedKinds[] = {
@@ -36449,6 +40749,16 @@ bool BTFTagAttributedType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<BTFTagAttributedType> BTFTagAttributedType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return BTFTagAttributedType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kBTFTagAttributedTypeDerivedKinds[] = {
     BTFTagAttributedType::static_kind(),
 };
@@ -36517,6 +40827,16 @@ bool AttributedType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<AttributedType> AttributedType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return AttributedType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kAttributedTypeDerivedKinds[] = {
@@ -36614,6 +40934,16 @@ bool AtomicType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AtomicType> AtomicType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return AtomicType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kAtomicTypeDerivedKinds[] = {
     AtomicType::static_kind(),
 };
@@ -36677,6 +41007,16 @@ bool ArrayType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ArrayType> ArrayType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ArrayType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kArrayTypeDerivedKinds[] = {
@@ -36743,6 +41083,16 @@ bool VariableArrayType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<VariableArrayType> VariableArrayType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return VariableArrayType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kVariableArrayTypeDerivedKinds[] = {
@@ -36827,6 +41177,16 @@ bool IncompleteArrayType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<IncompleteArrayType> IncompleteArrayType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return IncompleteArrayType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kIncompleteArrayTypeDerivedKinds[] = {
     IncompleteArrayType::static_kind(),
 };
@@ -36889,6 +41249,16 @@ bool DependentSizedArrayType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DependentSizedArrayType> DependentSizedArrayType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DependentSizedArrayType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kDependentSizedArrayTypeDerivedKinds[] = {
@@ -36973,6 +41343,16 @@ bool ConstantArrayType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ConstantArrayType> ConstantArrayType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ConstantArrayType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kConstantArrayTypeDerivedKinds[] = {
     ConstantArrayType::static_kind(),
 };
@@ -37050,6 +41430,16 @@ bool AdjustedType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<AdjustedType> AdjustedType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return AdjustedType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kAdjustedTypeDerivedKinds[] = {
     AdjustedType::static_kind(),
     DecayedType::static_kind(),
@@ -37122,6 +41512,16 @@ bool DecayedType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DecayedType> DecayedType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DecayedType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kDecayedTypeDerivedKinds[] = {
     DecayedType::static_kind(),
 };
@@ -37175,6 +41575,16 @@ bool TypeWithKeyword::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TypeWithKeyword> TypeWithKeyword::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return TypeWithKeyword::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kTypeWithKeywordDerivedKinds[] = {
@@ -37234,6 +41644,16 @@ bool ElaboratedType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<ElaboratedType> ElaboratedType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ElaboratedType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kElaboratedTypeDerivedKinds[] = {
@@ -37316,6 +41736,16 @@ bool DependentTemplateSpecializationType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializationType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DependentTemplateSpecializationType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kDependentTemplateSpecializationTypeDerivedKinds[] = {
@@ -37403,6 +41833,16 @@ bool DependentNameType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<DependentNameType> DependentNameType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return DependentNameType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kDependentNameTypeDerivedKinds[] = {
     DependentNameType::static_kind(),
 };
@@ -37465,6 +41905,16 @@ bool VectorType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<VectorType> VectorType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return VectorType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kVectorTypeDerivedKinds[] = {
@@ -37538,6 +41988,16 @@ bool ExtVectorType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<ExtVectorType> ExtVectorType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ExtVectorType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kExtVectorTypeDerivedKinds[] = {
     ExtVectorType::static_kind(),
 };
@@ -37591,6 +42051,16 @@ bool UsingType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<UsingType> UsingType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return UsingType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kUsingTypeDerivedKinds[] = {
@@ -37663,6 +42133,16 @@ bool UnresolvedUsingType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<UnresolvedUsingType> UnresolvedUsingType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return UnresolvedUsingType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kUnresolvedUsingTypeDerivedKinds[] = {
     UnresolvedUsingType::static_kind(),
 };
@@ -37726,6 +42206,16 @@ bool UnaryTransformType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<UnaryTransformType> UnaryTransformType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return UnaryTransformType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kUnaryTransformTypeDerivedKinds[] = {
@@ -37802,6 +42292,16 @@ bool TypedefType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TypedefType> TypedefType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return TypedefType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kTypedefTypeDerivedKinds[] = {
     TypedefType::static_kind(),
 };
@@ -37867,6 +42367,16 @@ bool TypeOfType::contains(const Token &tok) const {
   return false;
 }
 
+std::optional<TypeOfType> TypeOfType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return TypeOfType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const TypeKind kTypeOfTypeDerivedKinds[] = {
     TypeOfType::static_kind(),
 };
@@ -37930,6 +42440,16 @@ bool TypeOfExprType::contains(const Token &tok) const {
     if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+std::optional<TypeOfExprType> TypeOfExprType::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TypeId>(vid)) {
+    return TypeOfExprType::from(index.type(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const TypeKind kTypeOfExprTypeDerivedKinds[] = {
@@ -38094,6 +42614,16 @@ bool Stmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<Stmt> Stmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    index.statement(eid.Pack());
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 gap::generator<Stmt> Stmt::in(const Index &index) {
   const EntityProvider::Ptr &ep = entity_provider_of(index);
   for (StmtImplPtr eptr : ep->StmtsFor(ep)) {
@@ -38130,16 +42660,6 @@ gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<StmtKind> kinds) {
       co_yield Stmt(std::move(eptr));
     }
   }
-}
-
-std::optional<Stmt> Stmt::by(const Index &index, EntityId eid) {
-  VariantId vid = eid.Unpack();
-  if (std::holds_alternative<StmtId>(vid)) {
-    index.statement(eid.Pack());
-  } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(eid.Pack() == kInvalidEntityId);
-  }
-  return std::nullopt;
 }
 
 Stmt Stmt::ignore_containers(void) const {
@@ -38232,6 +42752,16 @@ bool SEHTryStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<SEHTryStmt> SEHTryStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SEHTryStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kSEHTryStmtDerivedKinds[] = {
@@ -38359,6 +42889,16 @@ bool SEHLeaveStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<SEHLeaveStmt> SEHLeaveStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SEHLeaveStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kSEHLeaveStmtDerivedKinds[] = {
     SEHLeaveStmt::static_kind(),
 };
@@ -38458,6 +42998,16 @@ bool SEHFinallyStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<SEHFinallyStmt> SEHFinallyStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SEHFinallyStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kSEHFinallyStmtDerivedKinds[] = {
@@ -38564,6 +43114,16 @@ bool SEHExceptStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<SEHExceptStmt> SEHExceptStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SEHExceptStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kSEHExceptStmtDerivedKinds[] = {
@@ -38675,6 +43235,16 @@ bool ReturnStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ReturnStmt> ReturnStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ReturnStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kReturnStmtDerivedKinds[] = {
@@ -38804,6 +43374,16 @@ bool ObjCForCollectionStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCForCollectionStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCForCollectionStmtDerivedKinds[] = {
     ObjCForCollectionStmt::static_kind(),
 };
@@ -38924,6 +43504,16 @@ bool ObjCAutoreleasePoolStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCAutoreleasePoolStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCAutoreleasePoolStmtDerivedKinds[] = {
     ObjCAutoreleasePoolStmt::static_kind(),
 };
@@ -39028,6 +43618,16 @@ bool ObjCAtTryStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCAtTryStmt> ObjCAtTryStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCAtTryStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCAtTryStmtDerivedKinds[] = {
@@ -39164,6 +43764,16 @@ bool ObjCAtThrowStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCAtThrowStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCAtThrowStmtDerivedKinds[] = {
     ObjCAtThrowStmt::static_kind(),
 };
@@ -39268,6 +43878,16 @@ bool ObjCAtSynchronizedStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCAtSynchronizedStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCAtSynchronizedStmtDerivedKinds[] = {
@@ -39381,6 +44001,16 @@ bool ObjCAtFinallyStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCAtFinallyStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCAtFinallyStmtDerivedKinds[] = {
     ObjCAtFinallyStmt::static_kind(),
 };
@@ -39485,6 +44115,16 @@ bool ObjCAtCatchStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCAtCatchStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCAtCatchStmtDerivedKinds[] = {
@@ -39604,6 +44244,16 @@ bool OMPExecutableDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPExecutableDirective> OMPExecutableDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPExecutableDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPExecutableDirectiveDerivedKinds[] = {
@@ -39869,6 +44519,16 @@ bool OMPDispatchDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPDispatchDirective> OMPDispatchDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPDispatchDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPDispatchDirectiveDerivedKinds[] = {
     OMPDispatchDirective::static_kind(),
 };
@@ -39974,6 +44634,16 @@ bool OMPDepobjDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPDepobjDirective> OMPDepobjDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPDepobjDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPDepobjDirectiveDerivedKinds[] = {
     OMPDepobjDirective::static_kind(),
 };
@@ -40073,6 +44743,16 @@ bool OMPCriticalDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPCriticalDirective> OMPCriticalDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPCriticalDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPCriticalDirectiveDerivedKinds[] = {
@@ -40176,6 +44856,16 @@ bool OMPCancellationPointDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPCancellationPointDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPCancellationPointDirectiveDerivedKinds[] = {
     OMPCancellationPointDirective::static_kind(),
 };
@@ -40275,6 +44965,16 @@ bool OMPCancelDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPCancelDirective> OMPCancelDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPCancelDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPCancelDirectiveDerivedKinds[] = {
@@ -40378,6 +45078,16 @@ bool OMPBarrierDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPBarrierDirective> OMPBarrierDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPBarrierDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPBarrierDirectiveDerivedKinds[] = {
     OMPBarrierDirective::static_kind(),
 };
@@ -40477,6 +45187,16 @@ bool OMPAtomicDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPAtomicDirective> OMPAtomicDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPAtomicDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPAtomicDirectiveDerivedKinds[] = {
@@ -40627,6 +45347,16 @@ bool OMPTeamsDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTeamsDirective> OMPTeamsDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTeamsDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTeamsDirectiveDerivedKinds[] = {
     OMPTeamsDirective::static_kind(),
 };
@@ -40726,6 +45456,16 @@ bool OMPTaskyieldDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTaskyieldDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTaskyieldDirectiveDerivedKinds[] = {
@@ -40829,6 +45569,16 @@ bool OMPTaskwaitDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTaskwaitDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTaskwaitDirectiveDerivedKinds[] = {
     OMPTaskwaitDirective::static_kind(),
 };
@@ -40928,6 +45678,16 @@ bool OMPTaskgroupDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTaskgroupDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTaskgroupDirectiveDerivedKinds[] = {
@@ -41036,6 +45796,16 @@ bool OMPTaskDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTaskDirective> OMPTaskDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTaskDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTaskDirectiveDerivedKinds[] = {
     OMPTaskDirective::static_kind(),
 };
@@ -41141,6 +45911,16 @@ bool OMPTargetUpdateDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTargetUpdateDirective> OMPTargetUpdateDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetUpdateDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetUpdateDirectiveDerivedKinds[] = {
     OMPTargetUpdateDirective::static_kind(),
 };
@@ -41242,6 +46022,16 @@ bool OMPTargetTeamsDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTargetTeamsDirective> OMPTargetTeamsDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetTeamsDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetTeamsDirectiveDerivedKinds[] = {
     OMPTargetTeamsDirective::static_kind(),
 };
@@ -41341,6 +46131,16 @@ bool OMPTargetParallelDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetParallelDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTargetParallelDirectiveDerivedKinds[] = {
@@ -41453,6 +46253,16 @@ bool OMPTargetExitDataDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTargetExitDataDirective> OMPTargetExitDataDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetExitDataDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetExitDataDirectiveDerivedKinds[] = {
     OMPTargetExitDataDirective::static_kind(),
 };
@@ -41552,6 +46362,16 @@ bool OMPTargetEnterDataDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetEnterDataDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTargetEnterDataDirectiveDerivedKinds[] = {
@@ -41655,6 +46475,16 @@ bool OMPTargetDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTargetDirective> OMPTargetDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetDirectiveDerivedKinds[] = {
     OMPTargetDirective::static_kind(),
 };
@@ -41754,6 +46584,16 @@ bool OMPTargetDataDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTargetDataDirective> OMPTargetDataDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetDataDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTargetDataDirectiveDerivedKinds[] = {
@@ -41857,6 +46697,16 @@ bool OMPSingleDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPSingleDirective> OMPSingleDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPSingleDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPSingleDirectiveDerivedKinds[] = {
     OMPSingleDirective::static_kind(),
 };
@@ -41956,6 +46806,16 @@ bool OMPSectionsDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPSectionsDirective> OMPSectionsDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPSectionsDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPSectionsDirectiveDerivedKinds[] = {
@@ -42068,6 +46928,16 @@ bool OMPSectionDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPSectionDirective> OMPSectionDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPSectionDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPSectionDirectiveDerivedKinds[] = {
     OMPSectionDirective::static_kind(),
 };
@@ -42173,6 +47043,16 @@ bool OMPScanDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPScanDirective> OMPScanDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPScanDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPScanDirectiveDerivedKinds[] = {
     OMPScanDirective::static_kind(),
 };
@@ -42272,6 +47152,16 @@ bool OMPParallelSectionsDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelSectionsDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPParallelSectionsDirectiveDerivedKinds[] = {
@@ -42384,6 +47274,16 @@ bool OMPParallelMasterDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelMasterDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPParallelMasterDirectiveDerivedKinds[] = {
     OMPParallelMasterDirective::static_kind(),
 };
@@ -42490,6 +47390,16 @@ bool OMPParallelMaskedDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPParallelMaskedDirective> OMPParallelMaskedDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelMaskedDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPParallelMaskedDirectiveDerivedKinds[] = {
     OMPParallelMaskedDirective::static_kind(),
 };
@@ -42594,6 +47504,16 @@ bool OMPParallelDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPParallelDirective> OMPParallelDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPParallelDirectiveDerivedKinds[] = {
@@ -42706,6 +47626,16 @@ bool OMPOrderedDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPOrderedDirective> OMPOrderedDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPOrderedDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPOrderedDirectiveDerivedKinds[] = {
     OMPOrderedDirective::static_kind(),
 };
@@ -42805,6 +47735,16 @@ bool OMPMetaDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPMetaDirective> OMPMetaDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPMetaDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPMetaDirectiveDerivedKinds[] = {
@@ -42913,6 +47853,16 @@ bool OMPMasterDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPMasterDirective> OMPMasterDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPMasterDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPMasterDirectiveDerivedKinds[] = {
     OMPMasterDirective::static_kind(),
 };
@@ -43014,6 +47964,16 @@ bool OMPMaskedDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPMaskedDirective> OMPMaskedDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPMaskedDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPMaskedDirectiveDerivedKinds[] = {
     OMPMaskedDirective::static_kind(),
 };
@@ -43113,6 +48073,16 @@ bool OMPLoopBasedDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPLoopBasedDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPLoopBasedDirectiveDerivedKinds[] = {
@@ -43288,6 +48258,16 @@ bool OMPLoopTransformationDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPLoopTransformationDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPLoopTransformationDirectiveDerivedKinds[] = {
     OMPTileDirective::static_kind(),
     OMPUnrollDirective::static_kind(),
@@ -43405,6 +48385,16 @@ bool OMPUnrollDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPUnrollDirective> OMPUnrollDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPUnrollDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPUnrollDirectiveDerivedKinds[] = {
     OMPUnrollDirective::static_kind(),
 };
@@ -43514,6 +48504,16 @@ bool OMPTileDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTileDirective> OMPTileDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTileDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTileDirectiveDerivedKinds[] = {
     OMPTileDirective::static_kind(),
 };
@@ -43621,6 +48621,16 @@ bool OMPLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPLoopDirective> OMPLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPLoopDirectiveDerivedKinds[] = {
@@ -44130,6 +49140,16 @@ bool OMPGenericLoopDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPGenericLoopDirective> OMPGenericLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPGenericLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPGenericLoopDirectiveDerivedKinds[] = {
     OMPGenericLoopDirective::static_kind(),
 };
@@ -44239,6 +49259,16 @@ bool OMPForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPForSimdDirective> OMPForSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPForSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPForSimdDirectiveDerivedKinds[] = {
     OMPForSimdDirective::static_kind(),
 };
@@ -44346,6 +49376,16 @@ bool OMPForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPForDirective> OMPForDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPForDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPForDirectiveDerivedKinds[] = {
@@ -44466,6 +49506,16 @@ bool OMPDistributeSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPDistributeSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPDistributeSimdDirectiveDerivedKinds[] = {
     OMPDistributeSimdDirective::static_kind(),
 };
@@ -44575,6 +49625,16 @@ bool OMPDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPDistributeParallelForSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPDistributeParallelForSimdDirectiveDerivedKinds[] = {
     OMPDistributeParallelForSimdDirective::static_kind(),
 };
@@ -44682,6 +49742,16 @@ bool OMPDistributeParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPDistributeParallelForDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPDistributeParallelForDirectiveDerivedKinds[] = {
@@ -44802,6 +49872,16 @@ bool OMPDistributeDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPDistributeDirective> OMPDistributeDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPDistributeDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPDistributeDirectiveDerivedKinds[] = {
     OMPDistributeDirective::static_kind(),
 };
@@ -44909,6 +49989,16 @@ bool OMPTeamsGenericLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTeamsGenericLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTeamsGenericLoopDirectiveDerivedKinds[] = {
@@ -45020,6 +50110,16 @@ bool OMPTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTeamsDistributeSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTeamsDistributeSimdDirectiveDerivedKinds[] = {
     OMPTeamsDistributeSimdDirective::static_kind(),
 };
@@ -45129,6 +50229,16 @@ bool OMPTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTeamsDistributeParallelForSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTeamsDistributeParallelForSimdDirectiveDerivedKinds[] = {
     OMPTeamsDistributeParallelForSimdDirective::static_kind(),
 };
@@ -45236,6 +50346,16 @@ bool OMPTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTeamsDistributeParallelForDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTeamsDistributeParallelForDirectiveDerivedKinds[] = {
@@ -45356,6 +50476,16 @@ bool OMPTeamsDistributeDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTeamsDistributeDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTeamsDistributeDirectiveDerivedKinds[] = {
     OMPTeamsDistributeDirective::static_kind(),
 };
@@ -45465,6 +50595,16 @@ bool OMPTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTaskLoopSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTaskLoopSimdDirectiveDerivedKinds[] = {
     OMPTaskLoopSimdDirective::static_kind(),
 };
@@ -45572,6 +50712,16 @@ bool OMPTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTaskLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTaskLoopDirectiveDerivedKinds[] = {
@@ -45687,6 +50837,16 @@ bool OMPTargetTeamsGenericLoopDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetTeamsGenericLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetTeamsGenericLoopDirectiveDerivedKinds[] = {
     OMPTargetTeamsGenericLoopDirective::static_kind(),
 };
@@ -45794,6 +50954,16 @@ bool OMPTargetTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetTeamsDistributeSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTargetTeamsDistributeSimdDirectiveDerivedKinds[] = {
@@ -45905,6 +51075,16 @@ bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt
   return false;
 }
 
+std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetTeamsDistributeParallelForSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetTeamsDistributeParallelForSimdDirectiveDerivedKinds[] = {
     OMPTargetTeamsDistributeParallelForSimdDirective::static_kind(),
 };
@@ -46012,6 +51192,16 @@ bool OMPTargetTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetTeamsDistributeParallelForDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTargetTeamsDistributeParallelForDirectiveDerivedKinds[] = {
@@ -46132,6 +51322,16 @@ bool OMPTargetTeamsDistributeDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetTeamsDistributeDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetTeamsDistributeDirectiveDerivedKinds[] = {
     OMPTargetTeamsDistributeDirective::static_kind(),
 };
@@ -46239,6 +51439,16 @@ bool OMPTargetSimdDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTargetSimdDirective> OMPTargetSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTargetSimdDirectiveDerivedKinds[] = {
@@ -46350,6 +51560,16 @@ bool OMPTargetParallelGenericLoopDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetParallelGenericLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetParallelGenericLoopDirectiveDerivedKinds[] = {
     OMPTargetParallelGenericLoopDirective::static_kind(),
 };
@@ -46459,6 +51679,16 @@ bool OMPTargetParallelForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetParallelForSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPTargetParallelForSimdDirectiveDerivedKinds[] = {
     OMPTargetParallelForSimdDirective::static_kind(),
 };
@@ -46566,6 +51796,16 @@ bool OMPTargetParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPTargetParallelForDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPTargetParallelForDirectiveDerivedKinds[] = {
@@ -46686,6 +51926,16 @@ bool OMPSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPSimdDirective> OMPSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPSimdDirectiveDerivedKinds[] = {
     OMPSimdDirective::static_kind(),
 };
@@ -46795,6 +52045,16 @@ bool OMPParallelMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelMasterTaskLoopSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPParallelMasterTaskLoopSimdDirectiveDerivedKinds[] = {
     OMPParallelMasterTaskLoopSimdDirective::static_kind(),
 };
@@ -46902,6 +52162,16 @@ bool OMPParallelMasterTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelMasterTaskLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPParallelMasterTaskLoopDirectiveDerivedKinds[] = {
@@ -47017,6 +52287,16 @@ bool OMPParallelMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelMaskedTaskLoopSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPParallelMaskedTaskLoopSimdDirectiveDerivedKinds[] = {
     OMPParallelMaskedTaskLoopSimdDirective::static_kind(),
 };
@@ -47124,6 +52404,16 @@ bool OMPParallelMaskedTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPParallelMaskedTaskLoopDirective> OMPParallelMaskedTaskLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelMaskedTaskLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPParallelMaskedTaskLoopDirectiveDerivedKinds[] = {
@@ -47239,6 +52529,16 @@ bool OMPParallelGenericLoopDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelGenericLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPParallelGenericLoopDirectiveDerivedKinds[] = {
     OMPParallelGenericLoopDirective::static_kind(),
 };
@@ -47348,6 +52648,16 @@ bool OMPParallelForSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPParallelForSimdDirective> OMPParallelForSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelForSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPParallelForSimdDirectiveDerivedKinds[] = {
     OMPParallelForSimdDirective::static_kind(),
 };
@@ -47455,6 +52765,16 @@ bool OMPParallelForDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPParallelForDirective> OMPParallelForDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPParallelForDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPParallelForDirectiveDerivedKinds[] = {
@@ -47575,6 +52895,16 @@ bool OMPMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPMasterTaskLoopSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPMasterTaskLoopSimdDirectiveDerivedKinds[] = {
     OMPMasterTaskLoopSimdDirective::static_kind(),
 };
@@ -47682,6 +53012,16 @@ bool OMPMasterTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPMasterTaskLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPMasterTaskLoopDirectiveDerivedKinds[] = {
@@ -47797,6 +53137,16 @@ bool OMPMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPMaskedTaskLoopSimdDirective> OMPMaskedTaskLoopSimdDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPMaskedTaskLoopSimdDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPMaskedTaskLoopSimdDirectiveDerivedKinds[] = {
     OMPMaskedTaskLoopSimdDirective::static_kind(),
 };
@@ -47904,6 +53254,16 @@ bool OMPMaskedTaskLoopDirective::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPMaskedTaskLoopDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPMaskedTaskLoopDirectiveDerivedKinds[] = {
@@ -48019,6 +53379,16 @@ bool OMPInteropDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPInteropDirective> OMPInteropDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPInteropDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPInteropDirectiveDerivedKinds[] = {
     OMPInteropDirective::static_kind(),
 };
@@ -48120,6 +53490,16 @@ bool OMPFlushDirective::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPFlushDirective> OMPFlushDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPFlushDirective::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPFlushDirectiveDerivedKinds[] = {
     OMPFlushDirective::static_kind(),
 };
@@ -48219,6 +53599,16 @@ bool OMPCanonicalLoop::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPCanonicalLoop> OMPCanonicalLoop::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPCanonicalLoop::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPCanonicalLoopDerivedKinds[] = {
@@ -48338,6 +53728,16 @@ bool NullStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<NullStmt> NullStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return NullStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kNullStmtDerivedKinds[] = {
     NullStmt::static_kind(),
 };
@@ -48441,6 +53841,16 @@ bool MSDependentExistsStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<MSDependentExistsStmt> MSDependentExistsStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return MSDependentExistsStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kMSDependentExistsStmtDerivedKinds[] = {
@@ -48555,6 +53965,16 @@ bool IndirectGotoStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<IndirectGotoStmt> IndirectGotoStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return IndirectGotoStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kIndirectGotoStmtDerivedKinds[] = {
@@ -48678,6 +54098,16 @@ bool IfStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<IfStmt> IfStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return IfStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kIfStmtDerivedKinds[] = {
@@ -48891,6 +54321,16 @@ bool GotoStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<GotoStmt> GotoStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return GotoStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kGotoStmtDerivedKinds[] = {
     GotoStmt::static_kind(),
 };
@@ -48999,6 +54439,16 @@ bool ForStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ForStmt> ForStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ForStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kForStmtDerivedKinds[] = {
@@ -49180,6 +54630,16 @@ bool DoStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<DoStmt> DoStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return DoStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kDoStmtDerivedKinds[] = {
     DoStmt::static_kind(),
 };
@@ -49297,6 +54757,16 @@ bool DeclStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<DeclStmt> DeclStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return DeclStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kDeclStmtDerivedKinds[] = {
@@ -49432,6 +54902,16 @@ bool CoroutineBodyStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CoroutineBodyStmt> CoroutineBodyStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CoroutineBodyStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCoroutineBodyStmtDerivedKinds[] = {
@@ -49621,6 +55101,16 @@ bool CoreturnStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CoreturnStmt> CoreturnStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CoreturnStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCoreturnStmtDerivedKinds[] = {
     CoreturnStmt::static_kind(),
 };
@@ -49736,6 +55226,16 @@ bool ContinueStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ContinueStmt> ContinueStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ContinueStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kContinueStmtDerivedKinds[] = {
     ContinueStmt::static_kind(),
 };
@@ -49835,6 +55335,16 @@ bool CompoundStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CompoundStmt> CompoundStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CompoundStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCompoundStmtDerivedKinds[] = {
@@ -49959,6 +55469,16 @@ bool CapturedStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CapturedStmt> CapturedStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CapturedStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCapturedStmtDerivedKinds[] = {
     CapturedStmt::static_kind(),
 };
@@ -50073,6 +55593,16 @@ bool CXXTryStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXTryStmt> CXXTryStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXTryStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXTryStmtDerivedKinds[] = {
@@ -50202,6 +55732,16 @@ bool CXXForRangeStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXForRangeStmt> CXXForRangeStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXForRangeStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXForRangeStmtDerivedKinds[] = {
@@ -50375,6 +55915,16 @@ bool CXXCatchStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXCatchStmt> CXXCatchStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXCatchStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXCatchStmtDerivedKinds[] = {
     CXXCatchStmt::static_kind(),
 };
@@ -50499,6 +56049,16 @@ bool BreakStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<BreakStmt> BreakStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return BreakStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kBreakStmtDerivedKinds[] = {
     BreakStmt::static_kind(),
 };
@@ -50598,6 +56158,16 @@ bool AsmStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<AsmStmt> AsmStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return AsmStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kAsmStmtDerivedKinds[] = {
@@ -50862,6 +56432,16 @@ bool MSAsmStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<MSAsmStmt> MSAsmStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return MSAsmStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kMSAsmStmtDerivedKinds[] = {
     MSAsmStmt::static_kind(),
 };
@@ -51015,6 +56595,16 @@ bool GCCAsmStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<GCCAsmStmt> GCCAsmStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return GCCAsmStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kGCCAsmStmtDerivedKinds[] = {
@@ -51300,6 +56890,16 @@ bool WhileStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<WhileStmt> WhileStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return WhileStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kWhileStmtDerivedKinds[] = {
     WhileStmt::static_kind(),
 };
@@ -51447,6 +57047,16 @@ bool ValueStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ValueStmt> ValueStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ValueStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kValueStmtDerivedKinds[] = {
@@ -51807,6 +57417,16 @@ bool LabelStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<LabelStmt> LabelStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return LabelStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kLabelStmtDerivedKinds[] = {
     LabelStmt::static_kind(),
 };
@@ -51929,6 +57549,16 @@ bool Expr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<Expr> Expr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return Expr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kExprDerivedKinds[] = {
@@ -52511,6 +58141,16 @@ bool DesignatedInitUpdateExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return DesignatedInitUpdateExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kDesignatedInitUpdateExprDerivedKinds[] = {
     DesignatedInitUpdateExpr::static_kind(),
 };
@@ -52624,6 +58264,16 @@ bool DesignatedInitExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<DesignatedInitExpr> DesignatedInitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return DesignatedInitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kDesignatedInitExprDerivedKinds[] = {
@@ -52797,6 +58447,16 @@ bool DependentScopeDeclRefExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return DependentScopeDeclRefExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kDependentScopeDeclRefExprDerivedKinds[] = {
     DependentScopeDeclRefExpr::static_kind(),
 };
@@ -52922,6 +58582,16 @@ bool DependentCoawaitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return DependentCoawaitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kDependentCoawaitExprDerivedKinds[] = {
     DependentCoawaitExpr::static_kind(),
 };
@@ -53039,6 +58709,16 @@ bool DeclRefExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<DeclRefExpr> DeclRefExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return DeclRefExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kDeclRefExprDerivedKinds[] = {
@@ -53196,6 +58876,16 @@ bool CoroutineSuspendExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CoroutineSuspendExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCoroutineSuspendExprDerivedKinds[] = {
     CoyieldExpr::static_kind(),
     CoawaitExpr::static_kind(),
@@ -53337,6 +59027,16 @@ bool CoawaitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CoawaitExpr> CoawaitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CoawaitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCoawaitExprDerivedKinds[] = {
     CoawaitExpr::static_kind(),
 };
@@ -53450,6 +59150,16 @@ bool CoyieldExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CoyieldExpr> CoyieldExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CoyieldExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCoyieldExprDerivedKinds[] = {
     CoyieldExpr::static_kind(),
 };
@@ -53557,6 +59267,16 @@ bool ConvertVectorExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ConvertVectorExpr> ConvertVectorExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ConvertVectorExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kConvertVectorExprDerivedKinds[] = {
@@ -53675,6 +59395,16 @@ bool ConceptSpecializationExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ConceptSpecializationExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kConceptSpecializationExprDerivedKinds[] = {
@@ -53807,6 +59537,16 @@ bool CompoundLiteralExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CompoundLiteralExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCompoundLiteralExprDerivedKinds[] = {
     CompoundLiteralExpr::static_kind(),
 };
@@ -53923,6 +59663,16 @@ bool ChooseExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ChooseExpr> ChooseExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ChooseExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kChooseExprDerivedKinds[] = {
@@ -54066,6 +59816,16 @@ bool CharacterLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CharacterLiteral> CharacterLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CharacterLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCharacterLiteralDerivedKinds[] = {
     CharacterLiteral::static_kind(),
 };
@@ -54177,6 +59937,16 @@ bool CastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CastExpr> CastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCastExprDerivedKinds[] = {
@@ -54351,6 +60121,16 @@ bool ImplicitCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ImplicitCastExpr> ImplicitCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ImplicitCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kImplicitCastExprDerivedKinds[] = {
     ImplicitCastExpr::static_kind(),
 };
@@ -54462,6 +60242,16 @@ bool ExplicitCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ExplicitCastExpr> ExplicitCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ExplicitCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kExplicitCastExprDerivedKinds[] = {
@@ -54592,6 +60382,16 @@ bool CXXNamedCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXNamedCastExpr> CXXNamedCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXNamedCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXNamedCastExprDerivedKinds[] = {
@@ -54733,6 +60533,16 @@ bool CXXDynamicCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXDynamicCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXDynamicCastExprDerivedKinds[] = {
     CXXDynamicCastExpr::static_kind(),
 };
@@ -54854,6 +60664,16 @@ bool CXXConstCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXConstCastExpr> CXXConstCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXConstCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXConstCastExprDerivedKinds[] = {
     CXXConstCastExpr::static_kind(),
 };
@@ -54969,6 +60789,16 @@ bool CXXAddrspaceCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXAddrspaceCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXAddrspaceCastExprDerivedKinds[] = {
@@ -55088,6 +60918,16 @@ bool CXXStaticCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXStaticCastExpr> CXXStaticCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXStaticCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXStaticCastExprDerivedKinds[] = {
     CXXStaticCastExpr::static_kind(),
 };
@@ -55205,6 +61045,16 @@ bool CXXReinterpretCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXReinterpretCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXReinterpretCastExprDerivedKinds[] = {
     CXXReinterpretCastExpr::static_kind(),
 };
@@ -55320,6 +61170,16 @@ bool CXXFunctionalCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXFunctionalCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXFunctionalCastExprDerivedKinds[] = {
@@ -55447,6 +61307,16 @@ bool CStyleCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CStyleCastExpr> CStyleCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CStyleCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCStyleCastExprDerivedKinds[] = {
     CStyleCastExpr::static_kind(),
 };
@@ -55568,6 +61438,16 @@ bool BuiltinBitCastExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return BuiltinBitCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kBuiltinBitCastExprDerivedKinds[] = {
     BuiltinBitCastExpr::static_kind(),
 };
@@ -55679,6 +61559,16 @@ bool ObjCBridgedCastExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCBridgedCastExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCBridgedCastExprDerivedKinds[] = {
@@ -55809,6 +61699,16 @@ bool CallExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CallExpr> CallExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CallExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCallExprDerivedKinds[] = {
@@ -56028,6 +61928,16 @@ bool CXXOperatorCallExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXOperatorCallExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXOperatorCallExprDerivedKinds[] = {
     CXXOperatorCallExpr::static_kind(),
 };
@@ -56155,6 +62065,16 @@ bool CXXMemberCallExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXMemberCallExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXMemberCallExprDerivedKinds[] = {
@@ -56294,6 +62214,16 @@ bool CUDAKernelCallExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CUDAKernelCallExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCUDAKernelCallExprDerivedKinds[] = {
     CUDAKernelCallExpr::static_kind(),
 };
@@ -56406,6 +62336,16 @@ bool UserDefinedLiteral::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<UserDefinedLiteral> UserDefinedLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return UserDefinedLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kUserDefinedLiteralDerivedKinds[] = {
@@ -56528,6 +62468,16 @@ bool CXXUuidofExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXUuidofExpr> CXXUuidofExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXUuidofExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXUuidofExprDerivedKinds[] = {
@@ -56665,6 +62615,16 @@ bool CXXUnresolvedConstructExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXUnresolvedConstructExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXUnresolvedConstructExprDerivedKinds[] = {
@@ -56812,6 +62772,16 @@ bool CXXTypeidExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXTypeidExpr> CXXTypeidExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXTypeidExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXTypeidExprDerivedKinds[] = {
     CXXTypeidExpr::static_kind(),
 };
@@ -56957,6 +62927,16 @@ bool CXXThrowExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXThrowExpr> CXXThrowExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXThrowExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXThrowExprDerivedKinds[] = {
     CXXThrowExpr::static_kind(),
 };
@@ -57083,6 +63063,16 @@ bool CXXThisExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXThisExpr> CXXThisExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXThisExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXThisExprDerivedKinds[] = {
     CXXThisExpr::static_kind(),
 };
@@ -57196,6 +63186,16 @@ bool CXXStdInitializerListExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXStdInitializerListExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXStdInitializerListExprDerivedKinds[] = {
     CXXStdInitializerListExpr::static_kind(),
 };
@@ -57306,6 +63306,16 @@ bool CXXScalarValueInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXScalarValueInitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXScalarValueInitExprDerivedKinds[] = {
     CXXScalarValueInitExpr::static_kind(),
 };
@@ -57413,6 +63423,16 @@ bool CXXRewrittenBinaryOperator::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXRewrittenBinaryOperator::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXRewrittenBinaryOperatorDerivedKinds[] = {
@@ -57562,6 +63582,16 @@ bool CXXPseudoDestructorExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXPseudoDestructorExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXPseudoDestructorExprDerivedKinds[] = {
@@ -57716,6 +63746,16 @@ bool CXXNullPtrLiteralExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXNullPtrLiteralExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXNullPtrLiteralExprDerivedKinds[] = {
     CXXNullPtrLiteralExpr::static_kind(),
 };
@@ -57823,6 +63863,16 @@ bool CXXNoexceptExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXNoexceptExpr> CXXNoexceptExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXNoexceptExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXNoexceptExprDerivedKinds[] = {
@@ -57937,6 +63987,16 @@ bool CXXNewExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXNewExpr> CXXNewExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXNewExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXNewExprDerivedKinds[] = {
@@ -58163,6 +64223,16 @@ bool CXXInheritedCtorInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXInheritedCtorInitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXInheritedCtorInitExprDerivedKinds[] = {
     CXXInheritedCtorInitExpr::static_kind(),
 };
@@ -58287,6 +64357,16 @@ bool CXXFoldExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXFoldExpr> CXXFoldExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXFoldExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXFoldExprDerivedKinds[] = {
@@ -58450,6 +64530,16 @@ bool CXXDependentScopeMemberExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXDependentScopeMemberExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXDependentScopeMemberExprDerivedKinds[] = {
@@ -58624,6 +64714,16 @@ bool CXXDeleteExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXDeleteExpr> CXXDeleteExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXDeleteExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXDeleteExprDerivedKinds[] = {
     CXXDeleteExpr::static_kind(),
 };
@@ -58760,6 +64860,16 @@ bool CXXDefaultInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXDefaultInitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXDefaultInitExprDerivedKinds[] = {
     CXXDefaultInitExpr::static_kind(),
 };
@@ -58887,6 +64997,16 @@ bool CXXDefaultArgExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXDefaultArgExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXDefaultArgExprDerivedKinds[] = {
     CXXDefaultArgExpr::static_kind(),
 };
@@ -59004,6 +65124,16 @@ bool CXXConstructExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXConstructExpr> CXXConstructExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXConstructExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXConstructExprDerivedKinds[] = {
@@ -59174,6 +65304,16 @@ bool CXXTemporaryObjectExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXTemporaryObjectExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXTemporaryObjectExprDerivedKinds[] = {
     CXXTemporaryObjectExpr::static_kind(),
 };
@@ -59281,6 +65421,16 @@ bool CXXBoolLiteralExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXBoolLiteralExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCXXBoolLiteralExprDerivedKinds[] = {
@@ -59396,6 +65546,16 @@ bool CXXBindTemporaryExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CXXBindTemporaryExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCXXBindTemporaryExprDerivedKinds[] = {
     CXXBindTemporaryExpr::static_kind(),
 };
@@ -59504,6 +65664,16 @@ bool BlockExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<BlockExpr> BlockExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return BlockExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kBlockExprDerivedKinds[] = {
@@ -59628,6 +65798,16 @@ bool BinaryOperator::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<BinaryOperator> BinaryOperator::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return BinaryOperator::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kBinaryOperatorDerivedKinds[] = {
@@ -59816,6 +65996,16 @@ bool CompoundAssignOperator::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<CompoundAssignOperator> CompoundAssignOperator::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CompoundAssignOperator::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kCompoundAssignOperatorDerivedKinds[] = {
     CompoundAssignOperator::static_kind(),
 };
@@ -59933,6 +66123,16 @@ bool AtomicExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<AtomicExpr> AtomicExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return AtomicExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kAtomicExprDerivedKinds[] = {
@@ -60167,6 +66367,16 @@ bool AsTypeExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<AsTypeExpr> AsTypeExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return AsTypeExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kAsTypeExprDerivedKinds[] = {
     AsTypeExpr::static_kind(),
 };
@@ -60283,6 +66493,16 @@ bool ArrayTypeTraitExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ArrayTypeTraitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kArrayTypeTraitExprDerivedKinds[] = {
@@ -60402,6 +66622,16 @@ bool ArraySubscriptExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ArraySubscriptExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kArraySubscriptExprDerivedKinds[] = {
@@ -60533,6 +66763,16 @@ bool ArrayInitLoopExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ArrayInitLoopExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kArrayInitLoopExprDerivedKinds[] = {
     ArrayInitLoopExpr::static_kind(),
 };
@@ -60648,6 +66888,16 @@ bool ArrayInitIndexExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ArrayInitIndexExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kArrayInitIndexExprDerivedKinds[] = {
     ArrayInitIndexExpr::static_kind(),
 };
@@ -60751,6 +67001,16 @@ bool AddrLabelExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<AddrLabelExpr> AddrLabelExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return AddrLabelExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kAddrLabelExprDerivedKinds[] = {
@@ -60869,6 +67129,16 @@ bool AbstractConditionalOperator::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return AbstractConditionalOperator::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kAbstractConditionalOperatorDerivedKinds[] = {
@@ -61001,6 +67271,16 @@ bool ConditionalOperator::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ConditionalOperator> ConditionalOperator::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ConditionalOperator::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kConditionalOperatorDerivedKinds[] = {
     ConditionalOperator::static_kind(),
 };
@@ -61120,6 +67400,16 @@ bool BinaryConditionalOperator::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return BinaryConditionalOperator::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kBinaryConditionalOperatorDerivedKinds[] = {
     BinaryConditionalOperator::static_kind(),
 };
@@ -61237,6 +67527,16 @@ bool VAArgExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<VAArgExpr> VAArgExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return VAArgExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kVAArgExprDerivedKinds[] = {
@@ -61364,6 +67664,16 @@ bool UnaryOperator::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<UnaryOperator> UnaryOperator::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return UnaryOperator::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kUnaryOperatorDerivedKinds[] = {
@@ -61514,6 +67824,16 @@ bool UnaryExprOrTypeTraitExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return UnaryExprOrTypeTraitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kUnaryExprOrTypeTraitExprDerivedKinds[] = {
@@ -61668,6 +67988,16 @@ bool TypoExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<TypoExpr> TypoExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return TypoExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kTypoExprDerivedKinds[] = {
     TypoExpr::static_kind(),
 };
@@ -61771,6 +68101,16 @@ bool TypeTraitExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<TypeTraitExpr> TypeTraitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return TypeTraitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kTypeTraitExprDerivedKinds[] = {
@@ -61912,6 +68252,16 @@ bool SubstNonTypeTemplateParmPackExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SubstNonTypeTemplateParmPackExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kSubstNonTypeTemplateParmPackExprDerivedKinds[] = {
     SubstNonTypeTemplateParmPackExpr::static_kind(),
 };
@@ -62024,6 +68374,16 @@ bool SubstNonTypeTemplateParmExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SubstNonTypeTemplateParmExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kSubstNonTypeTemplateParmExprDerivedKinds[] = {
@@ -62152,6 +68512,16 @@ bool StringLiteral::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<StringLiteral> StringLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return StringLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kStringLiteralDerivedKinds[] = {
@@ -62320,6 +68690,16 @@ bool StmtExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<StmtExpr> StmtExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return StmtExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kStmtExprDerivedKinds[] = {
     StmtExpr::static_kind(),
 };
@@ -62436,6 +68816,16 @@ bool SourceLocExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<SourceLocExpr> SourceLocExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SourceLocExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kSourceLocExprDerivedKinds[] = {
@@ -62558,6 +68948,16 @@ bool SizeOfPackExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<SizeOfPackExpr> SizeOfPackExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SizeOfPackExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kSizeOfPackExprDerivedKinds[] = {
@@ -62711,6 +69111,16 @@ bool ShuffleVectorExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ShuffleVectorExpr> ShuffleVectorExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ShuffleVectorExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kShuffleVectorExprDerivedKinds[] = {
     ShuffleVectorExpr::static_kind(),
 };
@@ -62822,6 +69232,16 @@ bool SYCLUniqueStableNameExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SYCLUniqueStableNameExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kSYCLUniqueStableNameExprDerivedKinds[] = {
@@ -62944,6 +69364,16 @@ bool RequiresExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<RequiresExpr> RequiresExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return RequiresExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kRequiresExprDerivedKinds[] = {
@@ -63091,6 +69521,16 @@ bool RecoveryExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<RecoveryExpr> RecoveryExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return RecoveryExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kRecoveryExprDerivedKinds[] = {
     RecoveryExpr::static_kind(),
 };
@@ -63217,6 +69657,16 @@ bool PseudoObjectExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<PseudoObjectExpr> PseudoObjectExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return PseudoObjectExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kPseudoObjectExprDerivedKinds[] = {
@@ -63380,6 +69830,16 @@ bool PredefinedExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<PredefinedExpr> PredefinedExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return PredefinedExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kPredefinedExprDerivedKinds[] = {
     PredefinedExpr::static_kind(),
 };
@@ -63501,6 +69961,16 @@ bool ParenListExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ParenListExpr> ParenListExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ParenListExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kParenListExprDerivedKinds[] = {
@@ -63639,6 +70109,16 @@ bool ParenExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ParenExpr> ParenExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ParenExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kParenExprDerivedKinds[] = {
     ParenExpr::static_kind(),
 };
@@ -63755,6 +70235,16 @@ bool PackExpansionExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<PackExpansionExpr> PackExpansionExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return PackExpansionExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kPackExpansionExprDerivedKinds[] = {
@@ -63878,6 +70368,16 @@ bool OverloadExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OverloadExpr> OverloadExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OverloadExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOverloadExprDerivedKinds[] = {
@@ -64024,6 +70524,16 @@ bool UnresolvedMemberExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return UnresolvedMemberExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kUnresolvedMemberExprDerivedKinds[] = {
     UnresolvedMemberExpr::static_kind(),
 };
@@ -64163,6 +70673,16 @@ bool UnresolvedLookupExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return UnresolvedLookupExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kUnresolvedLookupExprDerivedKinds[] = {
     UnresolvedLookupExpr::static_kind(),
 };
@@ -64278,6 +70798,16 @@ bool OpaqueValueExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OpaqueValueExpr> OpaqueValueExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OpaqueValueExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOpaqueValueExprDerivedKinds[] = {
@@ -64398,6 +70928,16 @@ bool OffsetOfExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OffsetOfExpr> OffsetOfExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OffsetOfExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOffsetOfExprDerivedKinds[] = {
     OffsetOfExpr::static_kind(),
 };
@@ -64509,6 +71049,16 @@ bool ObjCSubscriptRefExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCSubscriptRefExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCSubscriptRefExprDerivedKinds[] = {
@@ -64639,6 +71189,16 @@ bool ObjCStringLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCStringLiteral> ObjCStringLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCStringLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCStringLiteralDerivedKinds[] = {
     ObjCStringLiteral::static_kind(),
 };
@@ -64753,6 +71313,16 @@ bool ObjCSelectorExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCSelectorExpr> ObjCSelectorExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCSelectorExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCSelectorExprDerivedKinds[] = {
     ObjCSelectorExpr::static_kind(),
 };
@@ -64864,6 +71434,16 @@ bool ObjCProtocolExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCProtocolExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCProtocolExprDerivedKinds[] = {
@@ -64986,6 +71566,16 @@ bool ObjCPropertyRefExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCPropertyRefExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCPropertyRefExprDerivedKinds[] = {
@@ -65162,6 +71752,16 @@ bool ObjCMessageExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCMessageExpr> ObjCMessageExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCMessageExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCMessageExprDerivedKinds[] = {
@@ -65404,6 +72004,16 @@ bool ObjCIvarRefExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCIvarRefExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCIvarRefExprDerivedKinds[] = {
     ObjCIvarRefExpr::static_kind(),
 };
@@ -65535,6 +72145,16 @@ bool ObjCIsaExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCIsaExpr> ObjCIsaExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCIsaExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCIsaExprDerivedKinds[] = {
     ObjCIsaExpr::static_kind(),
 };
@@ -65661,6 +72281,16 @@ bool ObjCIndirectCopyRestoreExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCIndirectCopyRestoreExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCIndirectCopyRestoreExprDerivedKinds[] = {
     ObjCIndirectCopyRestoreExpr::static_kind(),
 };
@@ -65773,6 +72403,16 @@ bool ObjCEncodeExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCEncodeExpr> ObjCEncodeExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCEncodeExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCEncodeExprDerivedKinds[] = {
@@ -65893,6 +72533,16 @@ bool ObjCDictionaryLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCDictionaryLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCDictionaryLiteralDerivedKinds[] = {
     ObjCDictionaryLiteral::static_kind(),
 };
@@ -66001,6 +72651,16 @@ bool ObjCBoxedExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCBoxedExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCBoxedExprDerivedKinds[] = {
@@ -66126,6 +72786,16 @@ bool ObjCBoolLiteralExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCBoolLiteralExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCBoolLiteralExprDerivedKinds[] = {
     ObjCBoolLiteralExpr::static_kind(),
 };
@@ -66239,6 +72909,16 @@ bool ObjCAvailabilityCheckExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCAvailabilityCheckExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kObjCAvailabilityCheckExprDerivedKinds[] = {
     ObjCAvailabilityCheckExpr::static_kind(),
 };
@@ -66346,6 +73026,16 @@ bool ObjCArrayLiteral::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ObjCArrayLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kObjCArrayLiteralDerivedKinds[] = {
@@ -66481,6 +73171,16 @@ bool OMPIteratorExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPIteratorExpr> OMPIteratorExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPIteratorExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPIteratorExprDerivedKinds[] = {
     OMPIteratorExpr::static_kind(),
 };
@@ -66596,6 +73296,16 @@ bool OMPArrayShapingExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPArrayShapingExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kOMPArrayShapingExprDerivedKinds[] = {
@@ -66739,6 +73449,16 @@ bool OMPArraySectionExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<OMPArraySectionExpr> OMPArraySectionExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return OMPArraySectionExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kOMPArraySectionExprDerivedKinds[] = {
     OMPArraySectionExpr::static_kind(),
 };
@@ -66876,6 +73596,16 @@ bool NoInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<NoInitExpr> NoInitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return NoInitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kNoInitExprDerivedKinds[] = {
     NoInitExpr::static_kind(),
 };
@@ -66979,6 +73709,16 @@ bool MemberExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<MemberExpr> MemberExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return MemberExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kMemberExprDerivedKinds[] = {
@@ -67144,6 +73884,16 @@ bool MatrixSubscriptExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return MatrixSubscriptExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kMatrixSubscriptExprDerivedKinds[] = {
     MatrixSubscriptExpr::static_kind(),
 };
@@ -67270,6 +74020,16 @@ bool MaterializeTemporaryExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return MaterializeTemporaryExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kMaterializeTemporaryExprDerivedKinds[] = {
@@ -67420,6 +74180,16 @@ bool MSPropertySubscriptExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return MSPropertySubscriptExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kMSPropertySubscriptExprDerivedKinds[] = {
     MSPropertySubscriptExpr::static_kind(),
 };
@@ -67537,6 +74307,16 @@ bool MSPropertyRefExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<MSPropertyRefExpr> MSPropertyRefExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return MSPropertyRefExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kMSPropertyRefExprDerivedKinds[] = {
@@ -67664,6 +74444,16 @@ bool LambdaExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<LambdaExpr> LambdaExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return LambdaExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kLambdaExprDerivedKinds[] = {
@@ -67882,6 +74672,16 @@ bool IntegerLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<IntegerLiteral> IntegerLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return IntegerLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kIntegerLiteralDerivedKinds[] = {
     IntegerLiteral::static_kind(),
 };
@@ -67989,6 +74789,16 @@ bool InitListExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<InitListExpr> InitListExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return InitListExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kInitListExprDerivedKinds[] = {
@@ -68212,6 +75022,16 @@ bool ImplicitValueInitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ImplicitValueInitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kImplicitValueInitExprDerivedKinds[] = {
     ImplicitValueInitExpr::static_kind(),
 };
@@ -68315,6 +75135,16 @@ bool ImaginaryLiteral::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ImaginaryLiteral> ImaginaryLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ImaginaryLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kImaginaryLiteralDerivedKinds[] = {
@@ -68425,6 +75255,16 @@ bool GenericSelectionExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<GenericSelectionExpr> GenericSelectionExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return GenericSelectionExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kGenericSelectionExprDerivedKinds[] = {
@@ -68581,6 +75421,16 @@ bool GNUNullExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<GNUNullExpr> GNUNullExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return GNUNullExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kGNUNullExprDerivedKinds[] = {
     GNUNullExpr::static_kind(),
 };
@@ -68688,6 +75538,16 @@ bool FunctionParmPackExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<FunctionParmPackExpr> FunctionParmPackExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return FunctionParmPackExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kFunctionParmPackExprDerivedKinds[] = {
@@ -68827,6 +75687,16 @@ bool FullExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<FullExpr> FullExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return FullExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kFullExprDerivedKinds[] = {
     ConstantExpr::static_kind(),
     ExprWithCleanups::static_kind(),
@@ -68937,6 +75807,16 @@ bool ExprWithCleanups::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ExprWithCleanups> ExprWithCleanups::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ExprWithCleanups::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kExprWithCleanupsDerivedKinds[] = {
@@ -69050,6 +75930,16 @@ bool ConstantExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ConstantExpr> ConstantExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ConstantExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kConstantExprDerivedKinds[] = {
@@ -69173,6 +76063,16 @@ bool FloatingLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<FloatingLiteral> FloatingLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return FloatingLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kFloatingLiteralDerivedKinds[] = {
     FloatingLiteral::static_kind(),
 };
@@ -69286,6 +76186,16 @@ bool FixedPointLiteral::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<FixedPointLiteral> FixedPointLiteral::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return FixedPointLiteral::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kFixedPointLiteralDerivedKinds[] = {
     FixedPointLiteral::static_kind(),
 };
@@ -69393,6 +76303,16 @@ bool ExtVectorElementExpr::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ExtVectorElementExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kExtVectorElementExprDerivedKinds[] = {
@@ -69517,6 +76437,16 @@ bool ExpressionTraitExpr::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<ExpressionTraitExpr> ExpressionTraitExpr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ExpressionTraitExpr::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kExpressionTraitExprDerivedKinds[] = {
     ExpressionTraitExpr::static_kind(),
 };
@@ -69633,6 +76563,16 @@ bool AttributedStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<AttributedStmt> AttributedStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return AttributedStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kAttributedStmtDerivedKinds[] = {
@@ -69764,6 +76704,16 @@ bool SwitchStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<SwitchStmt> SwitchStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SwitchStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kSwitchStmtDerivedKinds[] = {
@@ -69949,6 +76899,16 @@ bool SwitchCase::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<SwitchCase> SwitchCase::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return SwitchCase::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kSwitchCaseDerivedKinds[] = {
     CaseStmt::static_kind(),
     DefaultStmt::static_kind(),
@@ -70074,6 +77034,16 @@ bool DefaultStmt::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<DefaultStmt> DefaultStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return DefaultStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const StmtKind kDefaultStmtDerivedKinds[] = {
     DefaultStmt::static_kind(),
 };
@@ -70177,6 +77147,16 @@ bool CaseStmt::contains(const Stmt &stmt) {
     if (parent.id() == id()) { return true; }
   }
   return false;
+}
+
+std::optional<CaseStmt> CaseStmt::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<StmtId>(vid)) {
+    return CaseStmt::from(index.statement(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const StmtKind kCaseStmtDerivedKinds[] = {
@@ -70342,6 +77322,16 @@ bool Decl::contains(const Stmt &stmt) {
   return false;
 }
 
+std::optional<Decl> Decl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    index.declaration(eid.Pack());
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 gap::generator<Decl> Decl::in(const Index &index) {
   const EntityProvider::Ptr &ep = entity_provider_of(index);
   for (DeclImplPtr eptr : ep->DeclsFor(ep)) {
@@ -70378,16 +77368,6 @@ gap::generator<Decl> Decl::in(const Fragment &frag, std::span<DeclKind> kinds) {
       co_yield Decl(std::move(eptr));
     }
   }
-}
-
-std::optional<Decl> Decl::by(const Index &index, EntityId eid) {
-  VariantId vid = eid.Unpack();
-  if (std::holds_alternative<DeclId>(vid)) {
-    index.declaration(eid.Pack());
-  } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(eid.Pack() == kInvalidEntityId);
-  }
-  return std::nullopt;
 }
 
 std::optional<Attr> Decl::nth_attribute(unsigned n) const {
@@ -70691,6 +77671,16 @@ gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializ
   co_return;
 }
 
+std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ClassScopeFunctionSpecializationDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kClassScopeFunctionSpecializationDeclDerivedKinds[] = {
     ClassScopeFunctionSpecializationDecl::static_kind(),
 };
@@ -70807,6 +77797,16 @@ gap::generator<CapturedDecl> CapturedDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<CapturedDecl> CapturedDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return CapturedDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kCapturedDeclDerivedKinds[] = {
@@ -70957,6 +77957,16 @@ gap::generator<BlockDecl> BlockDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<BlockDecl> BlockDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return BlockDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kBlockDeclDerivedKinds[] = {
@@ -71178,6 +78188,16 @@ gap::generator<AccessSpecDecl> AccessSpecDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<AccessSpecDecl> AccessSpecDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return AccessSpecDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kAccessSpecDeclDerivedKinds[] = {
     AccessSpecDecl::static_kind(),
 };
@@ -71295,6 +78315,16 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::redecla
   co_return;
 }
 
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return OMPDeclarativeDirectiveDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kOMPDeclarativeDirectiveDeclDerivedKinds[] = {
     OMPAllocateDecl::static_kind(),
     OMPRequiresDecl::static_kind(),
@@ -71406,6 +78436,16 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return OMPThreadPrivateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kOMPThreadPrivateDeclDerivedKinds[] = {
@@ -71544,6 +78584,16 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<OMPRequiresDecl> OMPRequiresDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return OMPRequiresDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kOMPRequiresDeclDerivedKinds[] = {
     OMPRequiresDecl::static_kind(),
 };
@@ -71655,6 +78705,16 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<OMPAllocateDecl> OMPAllocateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return OMPAllocateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kOMPAllocateDeclDerivedKinds[] = {
@@ -71793,6 +78853,16 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::redeclarations(void) co
   co_return;
 }
 
+std::optional<TranslationUnitDecl> TranslationUnitDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TranslationUnitDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kTranslationUnitDeclDerivedKinds[] = {
     TranslationUnitDecl::static_kind(),
 };
@@ -71909,6 +78979,16 @@ gap::generator<StaticAssertDecl> StaticAssertDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<StaticAssertDecl> StaticAssertDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return StaticAssertDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kStaticAssertDeclDerivedKinds[] = {
@@ -72038,6 +79118,16 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::redeclarations(void) 
   co_return;
 }
 
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return RequiresExprBodyDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kRequiresExprBodyDeclDerivedKinds[] = {
     RequiresExprBodyDecl::static_kind(),
 };
@@ -72154,6 +79244,16 @@ gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::redeclaration
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return PragmaDetectMismatchDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kPragmaDetectMismatchDeclDerivedKinds[] = {
@@ -72275,6 +79375,16 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::redeclarations(void) const 
   co_return;
 }
 
+std::optional<PragmaCommentDecl> PragmaCommentDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return PragmaCommentDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kPragmaCommentDeclDerivedKinds[] = {
     PragmaCommentDecl::static_kind(),
 };
@@ -72391,6 +79501,16 @@ gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCPropertyImplDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kObjCPropertyImplDeclDerivedKinds[] = {
@@ -72542,6 +79662,16 @@ gap::generator<NamedDecl> NamedDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<NamedDecl> NamedDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return NamedDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kNamedDeclDerivedKinds[] = {
@@ -72839,6 +79969,16 @@ gap::generator<LabelDecl> LabelDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<LabelDecl> LabelDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return LabelDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kLabelDeclDerivedKinds[] = {
     LabelDecl::static_kind(),
 };
@@ -72972,6 +80112,16 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<BaseUsingDecl> BaseUsingDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return BaseUsingDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kBaseUsingDeclDerivedKinds[] = {
@@ -73112,6 +80262,16 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<UsingEnumDecl> UsingEnumDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UsingEnumDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kUsingEnumDeclDerivedKinds[] = {
     UsingEnumDecl::static_kind(),
 };
@@ -73242,6 +80402,16 @@ gap::generator<UsingDecl> UsingDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<UsingDecl> UsingDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UsingDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kUsingDeclDerivedKinds[] = {
     UsingDecl::static_kind(),
 };
@@ -73369,6 +80539,16 @@ gap::generator<ValueDecl> ValueDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ValueDecl> ValueDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ValueDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kValueDeclDerivedKinds[] = {
@@ -73545,6 +80725,16 @@ gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::redeclaration
   co_return;
 }
 
+std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UnresolvedUsingValueDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kUnresolvedUsingValueDeclDerivedKinds[] = {
     UnresolvedUsingValueDecl::static_kind(),
 };
@@ -73678,6 +80868,16 @@ gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::redeclarati
   co_return;
 }
 
+std::optional<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UnnamedGlobalConstantDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kUnnamedGlobalConstantDeclDerivedKinds[] = {
     UnnamedGlobalConstantDecl::static_kind(),
 };
@@ -73795,6 +80995,16 @@ gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::redeclarations(
   co_return;
 }
 
+std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TemplateParamObjectDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kTemplateParamObjectDeclDerivedKinds[] = {
     TemplateParamObjectDecl::static_kind(),
 };
@@ -73910,6 +81120,16 @@ gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::redeclarations(
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return OMPDeclareReductionDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kOMPDeclareReductionDeclDerivedKinds[] = {
@@ -74072,6 +81292,16 @@ gap::generator<MSGuidDecl> MSGuidDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<MSGuidDecl> MSGuidDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return MSGuidDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kMSGuidDeclDerivedKinds[] = {
     MSGuidDecl::static_kind(),
 };
@@ -74187,6 +81417,16 @@ gap::generator<IndirectFieldDecl> IndirectFieldDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<IndirectFieldDecl> IndirectFieldDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return IndirectFieldDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kIndirectFieldDeclDerivedKinds[] = {
@@ -74345,6 +81585,16 @@ gap::generator<EnumConstantDecl> EnumConstantDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<EnumConstantDecl> EnumConstantDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return EnumConstantDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kEnumConstantDeclDerivedKinds[] = {
     EnumConstantDecl::static_kind(),
 };
@@ -74473,6 +81723,16 @@ gap::generator<DeclaratorDecl> DeclaratorDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<DeclaratorDecl> DeclaratorDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return DeclaratorDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kDeclaratorDeclDerivedKinds[] = {
@@ -74674,6 +81934,16 @@ gap::generator<VarDecl> VarDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<VarDecl> VarDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return VarDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kVarDeclDerivedKinds[] = {
@@ -75077,6 +82347,16 @@ gap::generator<ParmVarDecl> ParmVarDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<ParmVarDecl> ParmVarDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ParmVarDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kParmVarDeclDerivedKinds[] = {
     ParmVarDecl::static_kind(),
 };
@@ -75270,6 +82550,16 @@ gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::redeclarations(void) co
   co_return;
 }
 
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return OMPCapturedExprDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kOMPCapturedExprDeclDerivedKinds[] = {
     OMPCapturedExprDecl::static_kind(),
 };
@@ -75393,6 +82683,16 @@ gap::generator<ImplicitParamDecl> ImplicitParamDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ImplicitParamDecl> ImplicitParamDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ImplicitParamDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kImplicitParamDeclDerivedKinds[] = {
@@ -75522,6 +82822,16 @@ gap::generator<DecompositionDecl> DecompositionDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<DecompositionDecl> DecompositionDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return DecompositionDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kDecompositionDeclDerivedKinds[] = {
@@ -75670,6 +82980,16 @@ gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::red
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return VarTemplateSpecializationDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kVarTemplateSpecializationDeclDerivedKinds[] = {
@@ -75875,6 +83195,16 @@ gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializ
   co_return;
 }
 
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return VarTemplatePartialSpecializationDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kVarTemplatePartialSpecializationDeclDerivedKinds[] = {
     VarTemplatePartialSpecializationDecl::static_kind(),
 };
@@ -76016,6 +83346,16 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::redeclarations(
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return NonTypeTemplateParmDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kNonTypeTemplateParmDeclDerivedKinds[] = {
@@ -76219,6 +83559,16 @@ gap::generator<MSPropertyDecl> MSPropertyDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<MSPropertyDecl> MSPropertyDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return MSPropertyDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kMSPropertyDeclDerivedKinds[] = {
     MSPropertyDecl::static_kind(),
 };
@@ -76346,6 +83696,16 @@ gap::generator<FunctionDecl> FunctionDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<FunctionDecl> FunctionDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return FunctionDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kFunctionDeclDerivedKinds[] = {
@@ -76912,6 +84272,16 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<CXXMethodDecl> CXXMethodDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return CXXMethodDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kCXXMethodDeclDerivedKinds[] = {
     CXXMethodDecl::static_kind(),
     CXXConstructorDecl::static_kind(),
@@ -77128,6 +84498,16 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::redeclarations(void) const 
   co_return;
 }
 
+std::optional<CXXDestructorDecl> CXXDestructorDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return CXXDestructorDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kCXXDestructorDeclDerivedKinds[] = {
     CXXDestructorDecl::static_kind(),
 };
@@ -77283,6 +84663,16 @@ gap::generator<CXXConversionDecl> CXXConversionDecl::redeclarations(void) const 
   co_return;
 }
 
+std::optional<CXXConversionDecl> CXXConversionDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return CXXConversionDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kCXXConversionDeclDerivedKinds[] = {
     CXXConversionDecl::static_kind(),
 };
@@ -77423,6 +84813,16 @@ gap::generator<CXXConstructorDecl> CXXConstructorDecl::redeclarations(void) cons
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return CXXConstructorDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kCXXConstructorDeclDerivedKinds[] = {
@@ -77587,6 +84987,16 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::redeclarations(void
   co_return;
 }
 
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return CXXDeductionGuideDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kCXXDeductionGuideDeclDerivedKinds[] = {
     CXXDeductionGuideDecl::static_kind(),
 };
@@ -77728,6 +85138,16 @@ gap::generator<FieldDecl> FieldDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<FieldDecl> FieldDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return FieldDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kFieldDeclDerivedKinds[] = {
@@ -77930,6 +85350,16 @@ gap::generator<ObjCIvarDecl> ObjCIvarDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<ObjCIvarDecl> ObjCIvarDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCIvarDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kObjCIvarDeclDerivedKinds[] = {
     ObjCIvarDecl::static_kind(),
 };
@@ -78077,6 +85507,16 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::redeclarations(void) co
   co_return;
 }
 
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCAtDefsFieldDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kObjCAtDefsFieldDeclDerivedKinds[] = {
     ObjCAtDefsFieldDecl::static_kind(),
 };
@@ -78200,6 +85640,16 @@ gap::generator<BindingDecl> BindingDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<BindingDecl> BindingDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return BindingDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kBindingDeclDerivedKinds[] = {
@@ -78334,6 +85784,16 @@ gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDec
   co_return;
 }
 
+std::optional<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return OMPDeclarativeDirectiveValueDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kOMPDeclarativeDirectiveValueDeclDerivedKinds[] = {
     OMPDeclareMapperDecl::static_kind(),
 };
@@ -78449,6 +85909,16 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return OMPDeclareMapperDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kOMPDeclareMapperDeclDerivedKinds[] = {
@@ -78584,6 +86054,16 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<UsingShadowDecl> UsingShadowDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UsingShadowDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kUsingShadowDeclDerivedKinds[] = {
@@ -78722,6 +86202,16 @@ gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::redeclara
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ConstructorUsingShadowDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kConstructorUsingShadowDeclDerivedKinds[] = {
@@ -78881,6 +86371,16 @@ gap::generator<UsingPackDecl> UsingPackDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<UsingPackDecl> UsingPackDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UsingPackDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kUsingPackDeclDerivedKinds[] = {
     UsingPackDecl::static_kind(),
 };
@@ -79022,6 +86522,16 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::redeclarations(void) cons
   co_return;
 }
 
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UsingDirectiveDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kUsingDirectiveDeclDerivedKinds[] = {
     UsingDirectiveDecl::static_kind(),
 };
@@ -79152,6 +86662,16 @@ gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::redecla
   co_return;
 }
 
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UnresolvedUsingIfExistsDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kUnresolvedUsingIfExistsDeclDerivedKinds[] = {
     UnresolvedUsingIfExistsDecl::static_kind(),
 };
@@ -79263,6 +86783,16 @@ gap::generator<TypeDecl> TypeDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<TypeDecl> TypeDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TypeDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kTypeDeclDerivedKinds[] = {
@@ -79407,6 +86937,16 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::redeclarations(void) 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TemplateTypeParmDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kTemplateTypeParmDeclDerivedKinds[] = {
@@ -79578,6 +87118,16 @@ gap::generator<TagDecl> TagDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<TagDecl> TagDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TagDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kTagDeclDerivedKinds[] = {
@@ -79825,6 +87375,16 @@ gap::generator<RecordDecl> RecordDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<RecordDecl> RecordDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return RecordDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kRecordDeclDerivedKinds[] = {
     RecordDecl::static_kind(),
     CXXRecordDecl::static_kind(),
@@ -80057,6 +87617,16 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return CXXRecordDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kCXXRecordDeclDerivedKinds[] = {
@@ -81320,6 +88890,16 @@ gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl:
   co_return;
 }
 
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ClassTemplateSpecializationDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kClassTemplateSpecializationDeclDerivedKinds[] = {
     ClassTemplateSpecializationDecl::static_kind(),
     ClassTemplatePartialSpecializationDecl::static_kind(),
@@ -81539,6 +89119,16 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
   co_return;
 }
 
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ClassTemplatePartialSpecializationDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kClassTemplatePartialSpecializationDeclDerivedKinds[] = {
     ClassTemplatePartialSpecializationDecl::static_kind(),
 };
@@ -81694,6 +89284,16 @@ gap::generator<EnumDecl> EnumDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<EnumDecl> EnumDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return EnumDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kEnumDeclDerivedKinds[] = {
@@ -81938,6 +89538,16 @@ gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::redecla
   co_return;
 }
 
+std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return UnresolvedUsingTypenameDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kUnresolvedUsingTypenameDeclDerivedKinds[] = {
     UnresolvedUsingTypenameDecl::static_kind(),
 };
@@ -82069,6 +89679,16 @@ gap::generator<TypedefNameDecl> TypedefNameDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<TypedefNameDecl> TypedefNameDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TypedefNameDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kTypedefNameDeclDerivedKinds[] = {
@@ -82218,6 +89838,16 @@ gap::generator<TypedefDecl> TypedefDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<TypedefDecl> TypedefDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TypedefDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kTypedefDeclDerivedKinds[] = {
     TypedefDecl::static_kind(),
 };
@@ -82337,6 +89967,16 @@ gap::generator<TypeAliasDecl> TypeAliasDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<TypeAliasDecl> TypeAliasDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TypeAliasDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kTypeAliasDeclDerivedKinds[] = {
@@ -82471,6 +90111,16 @@ gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCTypeParamDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kObjCTypeParamDeclDerivedKinds[] = {
@@ -82608,6 +90258,16 @@ gap::generator<TemplateDecl> TemplateDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<TemplateDecl> TemplateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TemplateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kTemplateDeclDerivedKinds[] = {
@@ -82749,6 +90409,16 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::redeclaration
   co_return;
 }
 
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return RedeclarableTemplateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kRedeclarableTemplateDeclDerivedKinds[] = {
     TypeAliasTemplateDecl::static_kind(),
     VarTemplateDecl::static_kind(),
@@ -82881,6 +90551,16 @@ gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::redeclarations(void) 
   co_return;
 }
 
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return FunctionTemplateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kFunctionTemplateDeclDerivedKinds[] = {
     FunctionTemplateDecl::static_kind(),
 };
@@ -83010,6 +90690,16 @@ gap::generator<ClassTemplateDecl> ClassTemplateDecl::redeclarations(void) const 
   co_return;
 }
 
+std::optional<ClassTemplateDecl> ClassTemplateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ClassTemplateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kClassTemplateDeclDerivedKinds[] = {
     ClassTemplateDecl::static_kind(),
 };
@@ -83133,6 +90823,16 @@ gap::generator<VarTemplateDecl> VarTemplateDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<VarTemplateDecl> VarTemplateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return VarTemplateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kVarTemplateDeclDerivedKinds[] = {
@@ -83260,6 +90960,16 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::redeclarations(void
   co_return;
 }
 
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TypeAliasTemplateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kTypeAliasTemplateDeclDerivedKinds[] = {
     TypeAliasTemplateDecl::static_kind(),
 };
@@ -83379,6 +91089,16 @@ gap::generator<ConceptDecl> ConceptDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ConceptDecl> ConceptDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ConceptDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kConceptDeclDerivedKinds[] = {
@@ -83507,6 +91227,16 @@ gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::redeclarations(void) co
   co_return;
 }
 
+std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return BuiltinTemplateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kBuiltinTemplateDeclDerivedKinds[] = {
     BuiltinTemplateDecl::static_kind(),
 };
@@ -83622,6 +91352,16 @@ gap::generator<TemplateTemplateParmDecl> TemplateTemplateParmDecl::redeclaration
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return TemplateTemplateParmDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kTemplateTemplateParmDeclDerivedKinds[] = {
@@ -83759,6 +91499,16 @@ gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ObjCPropertyDecl> ObjCPropertyDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCPropertyDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kObjCPropertyDeclDerivedKinds[] = {
@@ -83948,6 +91698,16 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ObjCMethodDecl> ObjCMethodDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCMethodDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kObjCMethodDeclDerivedKinds[] = {
@@ -84244,6 +92004,16 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::redeclarations(void) const 
   co_return;
 }
 
+std::optional<ObjCContainerDecl> ObjCContainerDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCContainerDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kObjCContainerDeclDerivedKinds[] = {
     ObjCInterfaceDecl::static_kind(),
     ObjCProtocolDecl::static_kind(),
@@ -84521,6 +92291,16 @@ gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<ObjCCategoryDecl> ObjCCategoryDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCCategoryDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kObjCCategoryDeclDerivedKinds[] = {
     ObjCCategoryDecl::static_kind(),
 };
@@ -84742,6 +92522,16 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCProtocolDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kObjCProtocolDeclDerivedKinds[] = {
     ObjCProtocolDecl::static_kind(),
 };
@@ -84924,6 +92714,16 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::redeclarations(void) const 
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCInterfaceDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kObjCInterfaceDeclDerivedKinds[] = {
@@ -85309,6 +93109,16 @@ gap::generator<ObjCImplDecl> ObjCImplDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<ObjCImplDecl> ObjCImplDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCImplDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kObjCImplDeclDerivedKinds[] = {
     ObjCImplementationDecl::static_kind(),
     ObjCCategoryImplDecl::static_kind(),
@@ -85456,6 +93266,16 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::redeclarations(void) 
   co_return;
 }
 
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCCategoryImplDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kObjCCategoryImplDeclDerivedKinds[] = {
     ObjCCategoryImplDecl::static_kind(),
 };
@@ -85584,6 +93404,16 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::redeclarations(vo
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCImplementationDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kObjCImplementationDeclDerivedKinds[] = {
@@ -85760,6 +93590,16 @@ gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::redeclarations(
   co_return;
 }
 
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ObjCCompatibleAliasDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kObjCCompatibleAliasDeclDerivedKinds[] = {
     ObjCCompatibleAliasDecl::static_kind(),
 };
@@ -85876,6 +93716,16 @@ gap::generator<NamespaceDecl> NamespaceDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<NamespaceDecl> NamespaceDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return NamespaceDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kNamespaceDeclDerivedKinds[] = {
@@ -85998,6 +93848,16 @@ gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::redeclarations(void) cons
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<NamespaceAliasDecl> NamespaceAliasDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return NamespaceAliasDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kNamespaceAliasDeclDerivedKinds[] = {
@@ -86130,6 +93990,16 @@ gap::generator<LinkageSpecDecl> LinkageSpecDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<LinkageSpecDecl> LinkageSpecDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return LinkageSpecDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kLinkageSpecDeclDerivedKinds[] = {
     LinkageSpecDecl::static_kind(),
 };
@@ -86246,6 +94116,16 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::red
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return LifetimeExtendedTemporaryDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kLifetimeExtendedTemporaryDeclDerivedKinds[] = {
@@ -86382,6 +94262,16 @@ gap::generator<ImportDecl> ImportDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<ImportDecl> ImportDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ImportDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kImportDeclDerivedKinds[] = {
     ImportDecl::static_kind(),
 };
@@ -86516,6 +94406,16 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::redeclarations(void) cons
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<FriendTemplateDecl> FriendTemplateDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return FriendTemplateDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kFriendTemplateDeclDerivedKinds[] = {
@@ -86660,6 +94560,16 @@ gap::generator<FriendDecl> FriendDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<FriendDecl> FriendDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return FriendDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kFriendDeclDerivedKinds[] = {
@@ -86826,6 +94736,16 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::redeclarations(void) const {
   co_return;
 }
 
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return FileScopeAsmDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kFileScopeAsmDeclDerivedKinds[] = {
     FileScopeAsmDecl::static_kind(),
 };
@@ -86948,6 +94868,16 @@ gap::generator<ExternCContextDecl> ExternCContextDecl::redeclarations(void) cons
   co_return;
 }
 
+std::optional<ExternCContextDecl> ExternCContextDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ExternCContextDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 static const DeclKind kExternCContextDeclDerivedKinds[] = {
     ExternCContextDecl::static_kind(),
 };
@@ -87064,6 +94994,16 @@ gap::generator<ExportDecl> ExportDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<ExportDecl> ExportDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return ExportDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kExportDeclDerivedKinds[] = {
@@ -87194,6 +95134,16 @@ gap::generator<EmptyDecl> EmptyDecl::redeclarations(void) const {
   // Wrong type?
   }
   co_return;
+}
+
+std::optional<EmptyDecl> EmptyDecl::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    return EmptyDecl::from(index.declaration(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 static const DeclKind kEmptyDeclDerivedKinds[] = {

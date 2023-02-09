@@ -41,7 +41,7 @@ class AnnotateAttr : public InheritableParamAttr {
   static gap::generator<AnnotateAttr> in(const Index &index);
   static gap::generator<AnnotateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AnnotateAttr> by(const Index &, EntityId);
+  static std::optional<AnnotateAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANNOTATE;

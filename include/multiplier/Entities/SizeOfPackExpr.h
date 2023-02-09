@@ -43,7 +43,7 @@ class SizeOfPackExpr : public Expr {
   static gap::generator<SizeOfPackExpr> in(const Index &index);
   static gap::generator<SizeOfPackExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SizeOfPackExpr> by(const Index &, EntityId);
+  static std::optional<SizeOfPackExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SIZE_OF_PACK_EXPR;

@@ -37,7 +37,7 @@ class NoEscapeAttr : public Attr {
   static gap::generator<NoEscapeAttr> in(const Index &index);
   static gap::generator<NoEscapeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoEscapeAttr> by(const Index &, EntityId);
+  static std::optional<NoEscapeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_ESCAPE;

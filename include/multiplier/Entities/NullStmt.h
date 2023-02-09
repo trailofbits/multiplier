@@ -37,7 +37,7 @@ class NullStmt : public Stmt {
   static gap::generator<NullStmt> in(const Index &index);
   static gap::generator<NullStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NullStmt> by(const Index &, EntityId);
+  static std::optional<NullStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::NULL_STMT;

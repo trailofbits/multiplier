@@ -39,7 +39,7 @@ class OMPScanDirective : public OMPExecutableDirective {
   static gap::generator<OMPScanDirective> in(const Index &index);
   static gap::generator<OMPScanDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPScanDirective> by(const Index &, EntityId);
+  static std::optional<OMPScanDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SCAN_DIRECTIVE;

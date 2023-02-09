@@ -39,7 +39,7 @@ class LTOVisibilityPublicAttr : public InheritableAttr {
   static gap::generator<LTOVisibilityPublicAttr> in(const Index &index);
   static gap::generator<LTOVisibilityPublicAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LTOVisibilityPublicAttr> by(const Index &, EntityId);
+  static std::optional<LTOVisibilityPublicAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LTO_VISIBILITY_PUBLIC;

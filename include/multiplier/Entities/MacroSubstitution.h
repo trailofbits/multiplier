@@ -36,7 +36,7 @@ class MacroSubstitution : public Macro {
   static gap::generator<MacroSubstitution> in(const Fragment &frag);
 
   static gap::generator<MacroSubstitution> in(const Index &index);
-  std::optional<MacroSubstitution> by(const Index &, EntityId);
+  static std::optional<MacroSubstitution> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::SUBSTITUTION;

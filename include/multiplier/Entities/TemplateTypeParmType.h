@@ -38,7 +38,7 @@ class TemplateTypeParmType : public Type {
   static gap::generator<TemplateTypeParmType> in(const Index &index);
   static gap::generator<TemplateTypeParmType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TemplateTypeParmType> by(const Index &, EntityId);
+  static std::optional<TemplateTypeParmType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TEMPLATE_TYPE_PARM;

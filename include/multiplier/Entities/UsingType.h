@@ -38,7 +38,7 @@ class UsingType : public Type {
   static gap::generator<UsingType> in(const Index &index);
   static gap::generator<UsingType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UsingType> by(const Index &, EntityId);
+  static std::optional<UsingType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::USING;

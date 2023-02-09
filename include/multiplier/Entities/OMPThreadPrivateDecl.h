@@ -40,7 +40,7 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   static gap::generator<OMPThreadPrivateDecl> in(const Index &index);
   static gap::generator<OMPThreadPrivateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPThreadPrivateDecl> by(const Index &, EntityId);
+  static std::optional<OMPThreadPrivateDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_THREAD_PRIVATE;

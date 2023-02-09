@@ -39,7 +39,7 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
   static gap::generator<ArmMveStrictPolymorphismAttr> in(const Index &index);
   static gap::generator<ArmMveStrictPolymorphismAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ArmMveStrictPolymorphismAttr> by(const Index &, EntityId);
+  static std::optional<ArmMveStrictPolymorphismAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_MVE_STRICT_POLYMORPHISM;

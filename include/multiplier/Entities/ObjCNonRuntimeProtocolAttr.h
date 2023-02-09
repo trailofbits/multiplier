@@ -37,7 +37,7 @@ class ObjCNonRuntimeProtocolAttr : public Attr {
   static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Index &index);
   static gap::generator<ObjCNonRuntimeProtocolAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCNonRuntimeProtocolAttr> by(const Index &, EntityId);
+  static std::optional<ObjCNonRuntimeProtocolAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL;

@@ -39,7 +39,7 @@ class NoDerefAttr : public TypeAttr {
   static gap::generator<NoDerefAttr> in(const Index &index);
   static gap::generator<NoDerefAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoDerefAttr> by(const Index &, EntityId);
+  static std::optional<NoDerefAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DEREF;

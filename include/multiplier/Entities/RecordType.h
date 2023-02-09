@@ -39,7 +39,7 @@ class RecordType : public TagType {
   static gap::generator<RecordType> in(const Index &index);
   static gap::generator<RecordType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RecordType> by(const Index &, EntityId);
+  static std::optional<RecordType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::RECORD;

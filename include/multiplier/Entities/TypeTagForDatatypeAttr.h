@@ -40,7 +40,7 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
   static gap::generator<TypeTagForDatatypeAttr> in(const Index &index);
   static gap::generator<TypeTagForDatatypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeTagForDatatypeAttr> by(const Index &, EntityId);
+  static std::optional<TypeTagForDatatypeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_TAG_FOR_DATATYPE;

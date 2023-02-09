@@ -37,7 +37,7 @@ class OMPDeclarativeDirectiveDecl : public Decl {
   static gap::generator<OMPDeclarativeDirectiveDecl> in(const Index &index);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPDeclarativeDirectiveDecl> by(const Index &, EntityId);
+  static std::optional<OMPDeclarativeDirectiveDecl> by_id(const Index &, EntityId);
 
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const std::optional<Decl> &decl);

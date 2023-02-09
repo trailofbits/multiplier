@@ -39,7 +39,7 @@ class CoroutineBodyStmt : public Stmt {
   static gap::generator<CoroutineBodyStmt> in(const Index &index);
   static gap::generator<CoroutineBodyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CoroutineBodyStmt> by(const Index &, EntityId);
+  static std::optional<CoroutineBodyStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COROUTINE_BODY_STMT;

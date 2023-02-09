@@ -46,7 +46,7 @@ class DecompositionDecl : public VarDecl {
   static gap::generator<DecompositionDecl> in(const Index &index);
   static gap::generator<DecompositionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DecompositionDecl> by(const Index &, EntityId);
+  static std::optional<DecompositionDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::DECOMPOSITION;

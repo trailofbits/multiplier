@@ -42,7 +42,7 @@ class SourceLocExpr : public Expr {
   static gap::generator<SourceLocExpr> in(const Index &index);
   static gap::generator<SourceLocExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SourceLocExpr> by(const Index &, EntityId);
+  static std::optional<SourceLocExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SOURCE_LOC_EXPR;

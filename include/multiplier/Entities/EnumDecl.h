@@ -46,7 +46,7 @@ class EnumDecl : public TagDecl {
   static gap::generator<EnumDecl> in(const Index &index);
   static gap::generator<EnumDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EnumDecl> by(const Index &, EntityId);
+  static std::optional<EnumDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM;

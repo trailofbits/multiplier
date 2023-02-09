@@ -44,7 +44,7 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   static gap::generator<BinaryConditionalOperator> in(const Index &index);
   static gap::generator<BinaryConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BinaryConditionalOperator> by(const Index &, EntityId);
+  static std::optional<BinaryConditionalOperator> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;

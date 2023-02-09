@@ -37,7 +37,7 @@ class ObjCAutoreleasePoolStmt : public Stmt {
   static gap::generator<ObjCAutoreleasePoolStmt> in(const Index &index);
   static gap::generator<ObjCAutoreleasePoolStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCAutoreleasePoolStmt> by(const Index &, EntityId);
+  static std::optional<ObjCAutoreleasePoolStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;

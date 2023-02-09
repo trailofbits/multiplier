@@ -38,7 +38,7 @@ class TemplateSpecializationType : public Type {
   static gap::generator<TemplateSpecializationType> in(const Index &index);
   static gap::generator<TemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TemplateSpecializationType> by(const Index &, EntityId);
+  static std::optional<TemplateSpecializationType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TEMPLATE_SPECIALIZATION;

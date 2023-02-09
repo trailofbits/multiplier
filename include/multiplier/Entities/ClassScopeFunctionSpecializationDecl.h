@@ -38,7 +38,7 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
   static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Index &index);
   static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ClassScopeFunctionSpecializationDecl> by(const Index &, EntityId);
+  static std::optional<ClassScopeFunctionSpecializationDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;

@@ -40,7 +40,7 @@ class CFGuardAttr : public InheritableAttr {
   static gap::generator<CFGuardAttr> in(const Index &index);
   static gap::generator<CFGuardAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CFGuardAttr> by(const Index &, EntityId);
+  static std::optional<CFGuardAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_GUARD;

@@ -51,7 +51,7 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   static gap::generator<ClassTemplateSpecializationDecl> in(const Index &index);
   static gap::generator<ClassTemplateSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ClassTemplateSpecializationDecl> by(const Index &, EntityId);
+  static std::optional<ClassTemplateSpecializationDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;

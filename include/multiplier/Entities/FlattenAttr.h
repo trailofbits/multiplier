@@ -39,7 +39,7 @@ class FlattenAttr : public InheritableAttr {
   static gap::generator<FlattenAttr> in(const Index &index);
   static gap::generator<FlattenAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FlattenAttr> by(const Index &, EntityId);
+  static std::optional<FlattenAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FLATTEN;

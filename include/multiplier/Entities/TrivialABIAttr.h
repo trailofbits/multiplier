@@ -39,7 +39,7 @@ class TrivialABIAttr : public InheritableAttr {
   static gap::generator<TrivialABIAttr> in(const Index &index);
   static gap::generator<TrivialABIAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TrivialABIAttr> by(const Index &, EntityId);
+  static std::optional<TrivialABIAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TRIVIAL_ABI;

@@ -40,7 +40,7 @@ class TestTypestateAttr : public InheritableAttr {
   static gap::generator<TestTypestateAttr> in(const Index &index);
   static gap::generator<TestTypestateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TestTypestateAttr> by(const Index &, EntityId);
+  static std::optional<TestTypestateAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TEST_TYPESTATE;

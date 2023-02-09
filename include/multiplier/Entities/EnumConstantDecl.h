@@ -42,7 +42,7 @@ class EnumConstantDecl : public ValueDecl {
   static gap::generator<EnumConstantDecl> in(const Index &index);
   static gap::generator<EnumConstantDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EnumConstantDecl> by(const Index &, EntityId);
+  static std::optional<EnumConstantDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM_CONSTANT;

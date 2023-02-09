@@ -38,7 +38,7 @@ class FileScopeAsmDecl : public Decl {
   static gap::generator<FileScopeAsmDecl> in(const Index &index);
   static gap::generator<FileScopeAsmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FileScopeAsmDecl> by(const Index &, EntityId);
+  static std::optional<FileScopeAsmDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FILE_SCOPE_ASM;

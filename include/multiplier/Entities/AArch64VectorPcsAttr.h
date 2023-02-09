@@ -39,7 +39,7 @@ class AArch64VectorPcsAttr : public InheritableAttr {
   static gap::generator<AArch64VectorPcsAttr> in(const Index &index);
   static gap::generator<AArch64VectorPcsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AArch64VectorPcsAttr> by(const Index &, EntityId);
+  static std::optional<AArch64VectorPcsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::A_ARCH64_VECTOR_PCS;

@@ -39,7 +39,7 @@ class SwiftNameAttr : public InheritableAttr {
   static gap::generator<SwiftNameAttr> in(const Index &index);
   static gap::generator<SwiftNameAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftNameAttr> by(const Index &, EntityId);
+  static std::optional<SwiftNameAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_NAME;

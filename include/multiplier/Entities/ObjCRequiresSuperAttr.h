@@ -39,7 +39,7 @@ class ObjCRequiresSuperAttr : public InheritableAttr {
   static gap::generator<ObjCRequiresSuperAttr> in(const Index &index);
   static gap::generator<ObjCRequiresSuperAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCRequiresSuperAttr> by(const Index &, EntityId);
+  static std::optional<ObjCRequiresSuperAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_REQUIRES_SUPER;

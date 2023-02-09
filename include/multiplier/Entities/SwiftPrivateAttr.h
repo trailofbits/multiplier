@@ -39,7 +39,7 @@ class SwiftPrivateAttr : public InheritableAttr {
   static gap::generator<SwiftPrivateAttr> in(const Index &index);
   static gap::generator<SwiftPrivateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftPrivateAttr> by(const Index &, EntityId);
+  static std::optional<SwiftPrivateAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_PRIVATE;

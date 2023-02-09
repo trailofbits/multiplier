@@ -37,7 +37,7 @@ class DeducedType : public Type {
   static gap::generator<DeducedType> in(const Index &index);
   static gap::generator<DeducedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DeducedType> by(const Index &, EntityId);
+  static std::optional<DeducedType> by_id(const Index &, EntityId);
 
   inline static std::optional<DeducedType> from(const Reference &r) {
     return from(r.as_type());

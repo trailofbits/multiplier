@@ -48,7 +48,7 @@ class LambdaExpr : public Expr {
   static gap::generator<LambdaExpr> in(const Index &index);
   static gap::generator<LambdaExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LambdaExpr> by(const Index &, EntityId);
+  static std::optional<LambdaExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LAMBDA_EXPR;

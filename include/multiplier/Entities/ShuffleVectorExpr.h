@@ -41,7 +41,7 @@ class ShuffleVectorExpr : public Expr {
   static gap::generator<ShuffleVectorExpr> in(const Index &index);
   static gap::generator<ShuffleVectorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ShuffleVectorExpr> by(const Index &, EntityId);
+  static std::optional<ShuffleVectorExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SHUFFLE_VECTOR_EXPR;

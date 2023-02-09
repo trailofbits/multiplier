@@ -40,7 +40,7 @@ class OMPDeclareVariantAttr : public InheritableAttr {
   static gap::generator<OMPDeclareVariantAttr> in(const Index &index);
   static gap::generator<OMPDeclareVariantAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPDeclareVariantAttr> by(const Index &, EntityId);
+  static std::optional<OMPDeclareVariantAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_VARIANT;

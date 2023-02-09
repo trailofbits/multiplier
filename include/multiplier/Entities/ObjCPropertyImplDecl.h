@@ -42,7 +42,7 @@ class ObjCPropertyImplDecl : public Decl {
   static gap::generator<ObjCPropertyImplDecl> in(const Index &index);
   static gap::generator<ObjCPropertyImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCPropertyImplDecl> by(const Index &, EntityId);
+  static std::optional<ObjCPropertyImplDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROPERTY_IMPL;

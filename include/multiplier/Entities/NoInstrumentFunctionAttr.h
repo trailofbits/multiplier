@@ -39,7 +39,7 @@ class NoInstrumentFunctionAttr : public InheritableAttr {
   static gap::generator<NoInstrumentFunctionAttr> in(const Index &index);
   static gap::generator<NoInstrumentFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoInstrumentFunctionAttr> by(const Index &, EntityId);
+  static std::optional<NoInstrumentFunctionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_INSTRUMENT_FUNCTION;

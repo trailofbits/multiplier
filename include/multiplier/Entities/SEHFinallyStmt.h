@@ -38,7 +38,7 @@ class SEHFinallyStmt : public Stmt {
   static gap::generator<SEHFinallyStmt> in(const Index &index);
   static gap::generator<SEHFinallyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SEHFinallyStmt> by(const Index &, EntityId);
+  static std::optional<SEHFinallyStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_FINALLY_STMT;

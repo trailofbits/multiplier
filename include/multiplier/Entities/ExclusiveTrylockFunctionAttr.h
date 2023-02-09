@@ -40,7 +40,7 @@ class ExclusiveTrylockFunctionAttr : public InheritableAttr {
   static gap::generator<ExclusiveTrylockFunctionAttr> in(const Index &index);
   static gap::generator<ExclusiveTrylockFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ExclusiveTrylockFunctionAttr> by(const Index &, EntityId);
+  static std::optional<ExclusiveTrylockFunctionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EXCLUSIVE_TRYLOCK_FUNCTION;

@@ -42,7 +42,7 @@ class DesignatedInitUpdateExpr : public Expr {
   static gap::generator<DesignatedInitUpdateExpr> in(const Index &index);
   static gap::generator<DesignatedInitUpdateExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DesignatedInitUpdateExpr> by(const Index &, EntityId);
+  static std::optional<DesignatedInitUpdateExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;

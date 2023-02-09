@@ -40,7 +40,7 @@ class SEHTryStmt : public Stmt {
   static gap::generator<SEHTryStmt> in(const Index &index);
   static gap::generator<SEHTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SEHTryStmt> by(const Index &, EntityId);
+  static std::optional<SEHTryStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_TRY_STMT;

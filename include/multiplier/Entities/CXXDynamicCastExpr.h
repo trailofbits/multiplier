@@ -47,7 +47,7 @@ class CXXDynamicCastExpr : public CXXNamedCastExpr {
   static gap::generator<CXXDynamicCastExpr> in(const Index &index);
   static gap::generator<CXXDynamicCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXDynamicCastExpr> by(const Index &, EntityId);
+  static std::optional<CXXDynamicCastExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DYNAMIC_CAST_EXPR;

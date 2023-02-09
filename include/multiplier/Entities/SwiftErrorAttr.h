@@ -40,7 +40,7 @@ class SwiftErrorAttr : public InheritableAttr {
   static gap::generator<SwiftErrorAttr> in(const Index &index);
   static gap::generator<SwiftErrorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftErrorAttr> by(const Index &, EntityId);
+  static std::optional<SwiftErrorAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ERROR;

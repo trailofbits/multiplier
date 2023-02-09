@@ -41,7 +41,7 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
   static gap::generator<ObjCIndirectCopyRestoreExpr> in(const Index &index);
   static gap::generator<ObjCIndirectCopyRestoreExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCIndirectCopyRestoreExpr> by(const Index &, EntityId);
+  static std::optional<ObjCIndirectCopyRestoreExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR;

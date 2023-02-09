@@ -42,7 +42,7 @@ class ObjCSubscriptRefExpr : public Expr {
   static gap::generator<ObjCSubscriptRefExpr> in(const Index &index);
   static gap::generator<ObjCSubscriptRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCSubscriptRefExpr> by(const Index &, EntityId);
+  static std::optional<ObjCSubscriptRefExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;

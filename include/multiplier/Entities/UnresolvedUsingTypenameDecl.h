@@ -41,7 +41,7 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   static gap::generator<UnresolvedUsingTypenameDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingTypenameDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UnresolvedUsingTypenameDecl> by(const Index &, EntityId);
+  static std::optional<UnresolvedUsingTypenameDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_TYPENAME;

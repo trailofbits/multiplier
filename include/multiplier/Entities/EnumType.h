@@ -39,7 +39,7 @@ class EnumType : public TagType {
   static gap::generator<EnumType> in(const Index &index);
   static gap::generator<EnumType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EnumType> by(const Index &, EntityId);
+  static std::optional<EnumType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ENUM;

@@ -39,7 +39,7 @@ class CXXTryStmt : public Stmt {
   static gap::generator<CXXTryStmt> in(const Index &index);
   static gap::generator<CXXTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXTryStmt> by(const Index &, EntityId);
+  static std::optional<CXXTryStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_TRY_STMT;

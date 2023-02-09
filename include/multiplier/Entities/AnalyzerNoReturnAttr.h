@@ -39,7 +39,7 @@ class AnalyzerNoReturnAttr : public InheritableAttr {
   static gap::generator<AnalyzerNoReturnAttr> in(const Index &index);
   static gap::generator<AnalyzerNoReturnAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AnalyzerNoReturnAttr> by(const Index &, EntityId);
+  static std::optional<AnalyzerNoReturnAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANALYZER_NO_RETURN;

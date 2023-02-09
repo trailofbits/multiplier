@@ -42,7 +42,7 @@ class BinaryOperator : public Expr {
   static gap::generator<BinaryOperator> in(const Index &index);
   static gap::generator<BinaryOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BinaryOperator> by(const Index &, EntityId);
+  static std::optional<BinaryOperator> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_OPERATOR;

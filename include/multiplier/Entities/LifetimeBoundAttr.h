@@ -39,7 +39,7 @@ class LifetimeBoundAttr : public InheritableAttr {
   static gap::generator<LifetimeBoundAttr> in(const Index &index);
   static gap::generator<LifetimeBoundAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LifetimeBoundAttr> by(const Index &, EntityId);
+  static std::optional<LifetimeBoundAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LIFETIME_BOUND;

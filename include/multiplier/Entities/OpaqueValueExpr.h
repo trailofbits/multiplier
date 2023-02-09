@@ -41,7 +41,7 @@ class OpaqueValueExpr : public Expr {
   static gap::generator<OpaqueValueExpr> in(const Index &index);
   static gap::generator<OpaqueValueExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OpaqueValueExpr> by(const Index &, EntityId);
+  static std::optional<OpaqueValueExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OPAQUE_VALUE_EXPR;

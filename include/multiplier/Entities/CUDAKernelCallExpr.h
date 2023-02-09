@@ -43,7 +43,7 @@ class CUDAKernelCallExpr : public CallExpr {
   static gap::generator<CUDAKernelCallExpr> in(const Index &index);
   static gap::generator<CUDAKernelCallExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CUDAKernelCallExpr> by(const Index &, EntityId);
+  static std::optional<CUDAKernelCallExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CUDA_KERNEL_CALL_EXPR;

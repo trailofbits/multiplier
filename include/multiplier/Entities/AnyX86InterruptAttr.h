@@ -39,7 +39,7 @@ class AnyX86InterruptAttr : public InheritableAttr {
   static gap::generator<AnyX86InterruptAttr> in(const Index &index);
   static gap::generator<AnyX86InterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AnyX86InterruptAttr> by(const Index &, EntityId);
+  static std::optional<AnyX86InterruptAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_INTERRUPT;

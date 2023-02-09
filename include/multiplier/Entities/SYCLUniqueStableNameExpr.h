@@ -41,7 +41,7 @@ class SYCLUniqueStableNameExpr : public Expr {
   static gap::generator<SYCLUniqueStableNameExpr> in(const Index &index);
   static gap::generator<SYCLUniqueStableNameExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SYCLUniqueStableNameExpr> by(const Index &, EntityId);
+  static std::optional<SYCLUniqueStableNameExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;

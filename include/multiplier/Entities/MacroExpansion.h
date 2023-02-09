@@ -40,7 +40,7 @@ class MacroExpansion : public MacroSubstitution {
   static gap::generator<MacroExpansion> in(const Fragment &frag);
 
   static gap::generator<MacroExpansion> in(const Index &index);
-  std::optional<MacroExpansion> by(const Index &, EntityId);
+  static std::optional<MacroExpansion> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::EXPANSION;

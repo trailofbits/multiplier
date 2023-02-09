@@ -42,7 +42,7 @@ class MSPropertyRefExpr : public Expr {
   static gap::generator<MSPropertyRefExpr> in(const Index &index);
   static gap::generator<MSPropertyRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSPropertyRefExpr> by(const Index &, EntityId);
+  static std::optional<MSPropertyRefExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_PROPERTY_REF_EXPR;

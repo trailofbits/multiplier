@@ -42,7 +42,7 @@ class CharacterLiteral : public Expr {
   static gap::generator<CharacterLiteral> in(const Index &index);
   static gap::generator<CharacterLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CharacterLiteral> by(const Index &, EntityId);
+  static std::optional<CharacterLiteral> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CHARACTER_LITERAL;

@@ -39,7 +39,7 @@ class OMPFlushDirective : public OMPExecutableDirective {
   static gap::generator<OMPFlushDirective> in(const Index &index);
   static gap::generator<OMPFlushDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPFlushDirective> by(const Index &, EntityId);
+  static std::optional<OMPFlushDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_FLUSH_DIRECTIVE;

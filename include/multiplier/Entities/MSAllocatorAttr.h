@@ -39,7 +39,7 @@ class MSAllocatorAttr : public InheritableAttr {
   static gap::generator<MSAllocatorAttr> in(const Index &index);
   static gap::generator<MSAllocatorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSAllocatorAttr> by(const Index &, EntityId);
+  static std::optional<MSAllocatorAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_ALLOCATOR;

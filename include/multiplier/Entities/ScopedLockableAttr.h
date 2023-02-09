@@ -39,7 +39,7 @@ class ScopedLockableAttr : public InheritableAttr {
   static gap::generator<ScopedLockableAttr> in(const Index &index);
   static gap::generator<ScopedLockableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ScopedLockableAttr> by(const Index &, EntityId);
+  static std::optional<ScopedLockableAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SCOPED_LOCKABLE;

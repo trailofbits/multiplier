@@ -43,7 +43,7 @@ class MSPropertyDecl : public DeclaratorDecl {
   static gap::generator<MSPropertyDecl> in(const Index &index);
   static gap::generator<MSPropertyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSPropertyDecl> by(const Index &, EntityId);
+  static std::optional<MSPropertyDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_PROPERTY;

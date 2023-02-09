@@ -37,7 +37,7 @@ class TypeAttr : public Attr {
   static gap::generator<TypeAttr> in(const Index &index);
   static gap::generator<TypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeAttr> by(const Index &, EntityId);
+  static std::optional<TypeAttr> by_id(const Index &, EntityId);
 
   inline static std::optional<TypeAttr> from(const Reference &r) {
     return from(r.as_attribute());

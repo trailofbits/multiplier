@@ -38,7 +38,7 @@ class TypeOfExprType : public Type {
   static gap::generator<TypeOfExprType> in(const Index &index);
   static gap::generator<TypeOfExprType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeOfExprType> by(const Index &, EntityId);
+  static std::optional<TypeOfExprType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPE_OF_EXPR;

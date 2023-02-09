@@ -39,7 +39,7 @@ class CFICanonicalJumpTableAttr : public InheritableAttr {
   static gap::generator<CFICanonicalJumpTableAttr> in(const Index &index);
   static gap::generator<CFICanonicalJumpTableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CFICanonicalJumpTableAttr> by(const Index &, EntityId);
+  static std::optional<CFICanonicalJumpTableAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CFI_CANONICAL_JUMP_TABLE;

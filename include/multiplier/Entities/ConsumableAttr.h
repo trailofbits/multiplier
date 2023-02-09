@@ -40,7 +40,7 @@ class ConsumableAttr : public InheritableAttr {
   static gap::generator<ConsumableAttr> in(const Index &index);
   static gap::generator<ConsumableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConsumableAttr> by(const Index &, EntityId);
+  static std::optional<ConsumableAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE;

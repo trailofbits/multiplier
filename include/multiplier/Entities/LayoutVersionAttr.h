@@ -39,7 +39,7 @@ class LayoutVersionAttr : public InheritableAttr {
   static gap::generator<LayoutVersionAttr> in(const Index &index);
   static gap::generator<LayoutVersionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LayoutVersionAttr> by(const Index &, EntityId);
+  static std::optional<LayoutVersionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LAYOUT_VERSION;

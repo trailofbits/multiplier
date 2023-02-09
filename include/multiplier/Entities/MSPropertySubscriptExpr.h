@@ -41,7 +41,7 @@ class MSPropertySubscriptExpr : public Expr {
   static gap::generator<MSPropertySubscriptExpr> in(const Index &index);
   static gap::generator<MSPropertySubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSPropertySubscriptExpr> by(const Index &, EntityId);
+  static std::optional<MSPropertySubscriptExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;

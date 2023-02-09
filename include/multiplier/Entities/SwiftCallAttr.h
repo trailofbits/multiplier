@@ -39,7 +39,7 @@ class SwiftCallAttr : public InheritableAttr {
   static gap::generator<SwiftCallAttr> in(const Index &index);
   static gap::generator<SwiftCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftCallAttr> by(const Index &, EntityId);
+  static std::optional<SwiftCallAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_CALL;

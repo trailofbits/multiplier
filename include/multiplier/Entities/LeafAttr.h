@@ -39,7 +39,7 @@ class LeafAttr : public InheritableAttr {
   static gap::generator<LeafAttr> in(const Index &index);
   static gap::generator<LeafAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LeafAttr> by(const Index &, EntityId);
+  static std::optional<LeafAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LEAF;

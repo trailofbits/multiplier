@@ -43,7 +43,7 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   static gap::generator<FunctionTemplateDecl> in(const Index &index);
   static gap::generator<FunctionTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FunctionTemplateDecl> by(const Index &, EntityId);
+  static std::optional<FunctionTemplateDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION_TEMPLATE;

@@ -38,7 +38,7 @@ class MacroStringify : public MacroSubstitution {
   static gap::generator<MacroStringify> in(const Fragment &frag);
 
   static gap::generator<MacroStringify> in(const Index &index);
-  std::optional<MacroStringify> by(const Index &, EntityId);
+  static std::optional<MacroStringify> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::STRINGIFY;

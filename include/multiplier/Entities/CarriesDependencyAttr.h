@@ -41,7 +41,7 @@ class CarriesDependencyAttr : public InheritableParamAttr {
   static gap::generator<CarriesDependencyAttr> in(const Index &index);
   static gap::generator<CarriesDependencyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CarriesDependencyAttr> by(const Index &, EntityId);
+  static std::optional<CarriesDependencyAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CARRIES_DEPENDENCY;

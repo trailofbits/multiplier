@@ -37,7 +37,7 @@ class CalledOnceAttr : public Attr {
   static gap::generator<CalledOnceAttr> in(const Index &index);
   static gap::generator<CalledOnceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CalledOnceAttr> by(const Index &, EntityId);
+  static std::optional<CalledOnceAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CALLED_ONCE;

@@ -38,7 +38,7 @@ class OtherMacroDirective : public MacroDirective {
   static gap::generator<OtherMacroDirective> in(const Fragment &frag);
 
   static gap::generator<OtherMacroDirective> in(const Index &index);
-  std::optional<OtherMacroDirective> by(const Index &, EntityId);
+  static std::optional<OtherMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::OTHER_DIRECTIVE;

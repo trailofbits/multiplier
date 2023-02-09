@@ -40,7 +40,7 @@ class ErrorAttr : public InheritableAttr {
   static gap::generator<ErrorAttr> in(const Index &index);
   static gap::generator<ErrorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ErrorAttr> by(const Index &, EntityId);
+  static std::optional<ErrorAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ERROR;

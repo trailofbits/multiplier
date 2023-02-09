@@ -37,7 +37,7 @@ class ObjCRuntimeNameAttr : public Attr {
   static gap::generator<ObjCRuntimeNameAttr> in(const Index &index);
   static gap::generator<ObjCRuntimeNameAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCRuntimeNameAttr> by(const Index &, EntityId);
+  static std::optional<ObjCRuntimeNameAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_RUNTIME_NAME;

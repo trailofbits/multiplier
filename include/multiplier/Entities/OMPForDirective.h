@@ -44,7 +44,7 @@ class OMPForDirective : public OMPLoopDirective {
   static gap::generator<OMPForDirective> in(const Index &index);
   static gap::generator<OMPForDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPForDirective> by(const Index &, EntityId);
+  static std::optional<OMPForDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_FOR_DIRECTIVE;

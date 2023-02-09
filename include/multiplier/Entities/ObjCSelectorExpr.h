@@ -41,7 +41,7 @@ class ObjCSelectorExpr : public Expr {
   static gap::generator<ObjCSelectorExpr> in(const Index &index);
   static gap::generator<ObjCSelectorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCSelectorExpr> by(const Index &, EntityId);
+  static std::optional<ObjCSelectorExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_SELECTOR_EXPR;

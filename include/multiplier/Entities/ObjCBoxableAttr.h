@@ -37,7 +37,7 @@ class ObjCBoxableAttr : public Attr {
   static gap::generator<ObjCBoxableAttr> in(const Index &index);
   static gap::generator<ObjCBoxableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCBoxableAttr> by(const Index &, EntityId);
+  static std::optional<ObjCBoxableAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_BOXABLE;

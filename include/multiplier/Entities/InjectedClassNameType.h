@@ -39,7 +39,7 @@ class InjectedClassNameType : public Type {
   static gap::generator<InjectedClassNameType> in(const Index &index);
   static gap::generator<InjectedClassNameType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<InjectedClassNameType> by(const Index &, EntityId);
+  static std::optional<InjectedClassNameType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::INJECTED_CLASS_NAME;

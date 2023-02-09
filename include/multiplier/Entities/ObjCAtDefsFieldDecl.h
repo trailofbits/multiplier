@@ -45,7 +45,7 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   static gap::generator<ObjCAtDefsFieldDecl> in(const Index &index);
   static gap::generator<ObjCAtDefsFieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCAtDefsFieldDecl> by(const Index &, EntityId);
+  static std::optional<ObjCAtDefsFieldDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_AT_DEFS_FIELD;

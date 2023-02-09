@@ -37,7 +37,7 @@ class ContinueStmt : public Stmt {
   static gap::generator<ContinueStmt> in(const Index &index);
   static gap::generator<ContinueStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ContinueStmt> by(const Index &, EntityId);
+  static std::optional<ContinueStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONTINUE_STMT;

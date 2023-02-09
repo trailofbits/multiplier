@@ -40,7 +40,7 @@ class CleanupAttr : public InheritableAttr {
   static gap::generator<CleanupAttr> in(const Index &index);
   static gap::generator<CleanupAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CleanupAttr> by(const Index &, EntityId);
+  static std::optional<CleanupAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CLEANUP;

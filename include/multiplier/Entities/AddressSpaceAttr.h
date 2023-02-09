@@ -39,7 +39,7 @@ class AddressSpaceAttr : public TypeAttr {
   static gap::generator<AddressSpaceAttr> in(const Index &index);
   static gap::generator<AddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AddressSpaceAttr> by(const Index &, EntityId);
+  static std::optional<AddressSpaceAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ADDRESS_SPACE;

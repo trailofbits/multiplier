@@ -39,7 +39,7 @@ class NSReturnsAutoreleasedAttr : public InheritableAttr {
   static gap::generator<NSReturnsAutoreleasedAttr> in(const Index &index);
   static gap::generator<NSReturnsAutoreleasedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NSReturnsAutoreleasedAttr> by(const Index &, EntityId);
+  static std::optional<NSReturnsAutoreleasedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_RETURNS_AUTORELEASED;

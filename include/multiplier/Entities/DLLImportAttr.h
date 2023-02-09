@@ -39,7 +39,7 @@ class DLLImportAttr : public InheritableAttr {
   static gap::generator<DLLImportAttr> in(const Index &index);
   static gap::generator<DLLImportAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DLLImportAttr> by(const Index &, EntityId);
+  static std::optional<DLLImportAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DLL_IMPORT;

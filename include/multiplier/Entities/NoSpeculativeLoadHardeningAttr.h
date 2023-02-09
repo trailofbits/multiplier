@@ -39,7 +39,7 @@ class NoSpeculativeLoadHardeningAttr : public InheritableAttr {
   static gap::generator<NoSpeculativeLoadHardeningAttr> in(const Index &index);
   static gap::generator<NoSpeculativeLoadHardeningAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoSpeculativeLoadHardeningAttr> by(const Index &, EntityId);
+  static std::optional<NoSpeculativeLoadHardeningAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_SPECULATIVE_LOAD_HARDENING;

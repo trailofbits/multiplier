@@ -39,7 +39,7 @@ class OMPMasterDirective : public OMPExecutableDirective {
   static gap::generator<OMPMasterDirective> in(const Index &index);
   static gap::generator<OMPMasterDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPMasterDirective> by(const Index &, EntityId);
+  static std::optional<OMPMasterDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASTER_DIRECTIVE;

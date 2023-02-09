@@ -38,7 +38,7 @@ class VectorType : public Type {
   static gap::generator<VectorType> in(const Index &index);
   static gap::generator<VectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<VectorType> by(const Index &, EntityId);
+  static std::optional<VectorType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::VECTOR;

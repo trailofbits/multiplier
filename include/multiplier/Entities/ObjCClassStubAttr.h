@@ -37,7 +37,7 @@ class ObjCClassStubAttr : public Attr {
   static gap::generator<ObjCClassStubAttr> in(const Index &index);
   static gap::generator<ObjCClassStubAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCClassStubAttr> by(const Index &, EntityId);
+  static std::optional<ObjCClassStubAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_CLASS_STUB;

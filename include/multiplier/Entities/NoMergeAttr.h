@@ -41,7 +41,7 @@ class NoMergeAttr : public DeclOrStmtAttr {
   static gap::generator<NoMergeAttr> in(const Index &index);
   static gap::generator<NoMergeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoMergeAttr> by(const Index &, EntityId);
+  static std::optional<NoMergeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_MERGE;

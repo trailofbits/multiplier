@@ -23,6 +23,7 @@
 #include "Entities/TemplateArgument.h"
 #include "Entities/TemplateParameterList.h"
 #include "Entities/Type.h"
+#include "File.h"
 #include "Fragment.h"
 #include "Iterator.h"
 #include "Query.h"
@@ -65,7 +66,7 @@ using FragmentIdList = std::vector<PackedFragmentId>;
 using DeclIdList = std::vector<PackedDeclId>;
 using RawEntityIdList = std::vector<RawEntityId>;
 
-using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
+using NamedEntity = std::variant<NamedDecl, DefineMacroDirective, File>;
 using NamedEntityList = std::vector<NamedEntity>;
 
 // Provides the APIs with entities.
@@ -203,8 +204,8 @@ class EntityProvider {
   References(const Ptr &, RawEntityId eid) = 0;
 
   // Find the entity ids matching the name
-  virtual void FindSymbol(const Ptr &, std::string name,
-                          RawEntityIdList &ids_out) = 0;
+  virtual gap::generator<RawEntityId> FindSymbol(
+      const Ptr &, std::string name) = 0;
 };
 
 #define MX_DECLARE_ENTITY_VARIANT(type_name, lower_name, enum_name, category) \

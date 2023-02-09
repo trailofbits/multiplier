@@ -43,7 +43,7 @@ class CXXDependentScopeMemberExpr : public Expr {
   static gap::generator<CXXDependentScopeMemberExpr> in(const Index &index);
   static gap::generator<CXXDependentScopeMemberExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXDependentScopeMemberExpr> by(const Index &, EntityId);
+  static std::optional<CXXDependentScopeMemberExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DEPENDENT_SCOPE_MEMBER_EXPR;

@@ -39,7 +39,7 @@ class CXXCatchStmt : public Stmt {
   static gap::generator<CXXCatchStmt> in(const Index &index);
   static gap::generator<CXXCatchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXCatchStmt> by(const Index &, EntityId);
+  static std::optional<CXXCatchStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_CATCH_STMT;

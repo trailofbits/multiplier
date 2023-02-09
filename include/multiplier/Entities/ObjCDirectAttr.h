@@ -37,7 +37,7 @@ class ObjCDirectAttr : public Attr {
   static gap::generator<ObjCDirectAttr> in(const Index &index);
   static gap::generator<ObjCDirectAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCDirectAttr> by(const Index &, EntityId);
+  static std::optional<ObjCDirectAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DIRECT;

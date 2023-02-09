@@ -39,7 +39,7 @@ class CFUnknownTransferAttr : public InheritableAttr {
   static gap::generator<CFUnknownTransferAttr> in(const Index &index);
   static gap::generator<CFUnknownTransferAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CFUnknownTransferAttr> by(const Index &, EntityId);
+  static std::optional<CFUnknownTransferAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_UNKNOWN_TRANSFER;

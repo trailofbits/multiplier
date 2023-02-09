@@ -39,7 +39,7 @@ class ArtificialAttr : public InheritableAttr {
   static gap::generator<ArtificialAttr> in(const Index &index);
   static gap::generator<ArtificialAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ArtificialAttr> by(const Index &, EntityId);
+  static std::optional<ArtificialAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARTIFICIAL;

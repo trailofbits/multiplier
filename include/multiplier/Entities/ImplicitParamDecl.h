@@ -46,7 +46,7 @@ class ImplicitParamDecl : public VarDecl {
   static gap::generator<ImplicitParamDecl> in(const Index &index);
   static gap::generator<ImplicitParamDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ImplicitParamDecl> by(const Index &, EntityId);
+  static std::optional<ImplicitParamDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPLICIT_PARAM;

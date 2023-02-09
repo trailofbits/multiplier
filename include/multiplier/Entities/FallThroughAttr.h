@@ -39,7 +39,7 @@ class FallThroughAttr : public StmtAttr {
   static gap::generator<FallThroughAttr> in(const Index &index);
   static gap::generator<FallThroughAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FallThroughAttr> by(const Index &, EntityId);
+  static std::optional<FallThroughAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FALL_THROUGH;

@@ -53,7 +53,7 @@ class VarDecl : public DeclaratorDecl {
   static gap::generator<VarDecl> in(const Index &index);
   static gap::generator<VarDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<VarDecl> by(const Index &, EntityId);
+  static std::optional<VarDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR;

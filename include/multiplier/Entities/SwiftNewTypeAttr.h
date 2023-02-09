@@ -41,7 +41,7 @@ class SwiftNewTypeAttr : public InheritableAttr {
   static gap::generator<SwiftNewTypeAttr> in(const Index &index);
   static gap::generator<SwiftNewTypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftNewTypeAttr> by(const Index &, EntityId);
+  static std::optional<SwiftNewTypeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_NEW_TYPE;

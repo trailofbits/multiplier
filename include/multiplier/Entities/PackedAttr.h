@@ -39,7 +39,7 @@ class PackedAttr : public InheritableAttr {
   static gap::generator<PackedAttr> in(const Index &index);
   static gap::generator<PackedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PackedAttr> by(const Index &, EntityId);
+  static std::optional<PackedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PACKED;

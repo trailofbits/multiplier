@@ -39,7 +39,7 @@ class AvailabilityAttr : public InheritableAttr {
   static gap::generator<AvailabilityAttr> in(const Index &index);
   static gap::generator<AvailabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AvailabilityAttr> by(const Index &, EntityId);
+  static std::optional<AvailabilityAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AVAILABILITY;

@@ -37,7 +37,7 @@ class SEHLeaveStmt : public Stmt {
   static gap::generator<SEHLeaveStmt> in(const Index &index);
   static gap::generator<SEHLeaveStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SEHLeaveStmt> by(const Index &, EntityId);
+  static std::optional<SEHLeaveStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_LEAVE_STMT;

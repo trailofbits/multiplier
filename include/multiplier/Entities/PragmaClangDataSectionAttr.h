@@ -39,7 +39,7 @@ class PragmaClangDataSectionAttr : public InheritableAttr {
   static gap::generator<PragmaClangDataSectionAttr> in(const Index &index);
   static gap::generator<PragmaClangDataSectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PragmaClangDataSectionAttr> by(const Index &, EntityId);
+  static std::optional<PragmaClangDataSectionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRAGMA_CLANG_DATA_SECTION;

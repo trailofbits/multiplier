@@ -39,7 +39,7 @@ class MSNoVTableAttr : public InheritableAttr {
   static gap::generator<MSNoVTableAttr> in(const Index &index);
   static gap::generator<MSNoVTableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSNoVTableAttr> by(const Index &, EntityId);
+  static std::optional<MSNoVTableAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_NO_V_TABLE;

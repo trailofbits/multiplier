@@ -39,7 +39,7 @@ class DeducedTemplateSpecializationType : public DeducedType {
   static gap::generator<DeducedTemplateSpecializationType> in(const Index &index);
   static gap::generator<DeducedTemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DeducedTemplateSpecializationType> by(const Index &, EntityId);
+  static std::optional<DeducedTemplateSpecializationType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEDUCED_TEMPLATE_SPECIALIZATION;

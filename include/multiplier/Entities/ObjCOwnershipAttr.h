@@ -39,7 +39,7 @@ class ObjCOwnershipAttr : public InheritableAttr {
   static gap::generator<ObjCOwnershipAttr> in(const Index &index);
   static gap::generator<ObjCOwnershipAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCOwnershipAttr> by(const Index &, EntityId);
+  static std::optional<ObjCOwnershipAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_OWNERSHIP;

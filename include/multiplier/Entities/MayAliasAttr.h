@@ -39,7 +39,7 @@ class MayAliasAttr : public InheritableAttr {
   static gap::generator<MayAliasAttr> in(const Index &index);
   static gap::generator<MayAliasAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MayAliasAttr> by(const Index &, EntityId);
+  static std::optional<MayAliasAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MAY_ALIAS;

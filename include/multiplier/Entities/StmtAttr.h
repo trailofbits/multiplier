@@ -37,7 +37,7 @@ class StmtAttr : public Attr {
   static gap::generator<StmtAttr> in(const Index &index);
   static gap::generator<StmtAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<StmtAttr> by(const Index &, EntityId);
+  static std::optional<StmtAttr> by_id(const Index &, EntityId);
 
   inline static std::optional<StmtAttr> from(const Reference &r) {
     return from(r.as_attribute());

@@ -37,7 +37,7 @@ class MatrixType : public Type {
   static gap::generator<MatrixType> in(const Index &index);
   static gap::generator<MatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MatrixType> by(const Index &, EntityId);
+  static std::optional<MatrixType> by_id(const Index &, EntityId);
 
   inline static std::optional<MatrixType> from(const Reference &r) {
     return from(r.as_type());

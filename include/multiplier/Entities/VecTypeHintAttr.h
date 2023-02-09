@@ -40,7 +40,7 @@ class VecTypeHintAttr : public InheritableAttr {
   static gap::generator<VecTypeHintAttr> in(const Index &index);
   static gap::generator<VecTypeHintAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<VecTypeHintAttr> by(const Index &, EntityId);
+  static std::optional<VecTypeHintAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::VEC_TYPE_HINT;

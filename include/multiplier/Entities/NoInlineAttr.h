@@ -41,7 +41,7 @@ class NoInlineAttr : public DeclOrStmtAttr {
   static gap::generator<NoInlineAttr> in(const Index &index);
   static gap::generator<NoInlineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoInlineAttr> by(const Index &, EntityId);
+  static std::optional<NoInlineAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_INLINE;

@@ -44,7 +44,7 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   static gap::generator<ObjCTypeParamDecl> in(const Index &index);
   static gap::generator<ObjCTypeParamDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCTypeParamDecl> by(const Index &, EntityId);
+  static std::optional<ObjCTypeParamDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_TYPE_PARAM;

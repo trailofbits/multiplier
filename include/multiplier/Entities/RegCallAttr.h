@@ -39,7 +39,7 @@ class RegCallAttr : public InheritableAttr {
   static gap::generator<RegCallAttr> in(const Index &index);
   static gap::generator<RegCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RegCallAttr> by(const Index &, EntityId);
+  static std::optional<RegCallAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REG_CALL;

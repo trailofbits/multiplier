@@ -39,7 +39,7 @@ class SPtrAttr : public TypeAttr {
   static gap::generator<SPtrAttr> in(const Index &index);
   static gap::generator<SPtrAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SPtrAttr> by(const Index &, EntityId);
+  static std::optional<SPtrAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::S_PTR;

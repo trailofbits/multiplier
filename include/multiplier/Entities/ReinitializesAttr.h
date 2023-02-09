@@ -39,7 +39,7 @@ class ReinitializesAttr : public InheritableAttr {
   static gap::generator<ReinitializesAttr> in(const Index &index);
   static gap::generator<ReinitializesAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ReinitializesAttr> by(const Index &, EntityId);
+  static std::optional<ReinitializesAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REINITIALIZES;

@@ -39,7 +39,7 @@ class IndirectGotoStmt : public Stmt {
   static gap::generator<IndirectGotoStmt> in(const Index &index);
   static gap::generator<IndirectGotoStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<IndirectGotoStmt> by(const Index &, EntityId);
+  static std::optional<IndirectGotoStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INDIRECT_GOTO_STMT;

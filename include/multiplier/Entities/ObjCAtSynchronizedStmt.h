@@ -39,7 +39,7 @@ class ObjCAtSynchronizedStmt : public Stmt {
   static gap::generator<ObjCAtSynchronizedStmt> in(const Index &index);
   static gap::generator<ObjCAtSynchronizedStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCAtSynchronizedStmt> by(const Index &, EntityId);
+  static std::optional<ObjCAtSynchronizedStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT;

@@ -40,7 +40,7 @@ class EnableIfAttr : public InheritableAttr {
   static gap::generator<EnableIfAttr> in(const Index &index);
   static gap::generator<EnableIfAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EnableIfAttr> by(const Index &, EntityId);
+  static std::optional<EnableIfAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENABLE_IF;

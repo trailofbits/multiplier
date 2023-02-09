@@ -41,7 +41,7 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
   static gap::generator<UnnamedGlobalConstantDecl> in(const Index &index);
   static gap::generator<UnnamedGlobalConstantDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UnnamedGlobalConstantDecl> by(const Index &, EntityId);
+  static std::optional<UnnamedGlobalConstantDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNNAMED_GLOBAL_CONSTANT;

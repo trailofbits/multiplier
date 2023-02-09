@@ -40,7 +40,7 @@ class BlockDecl : public Decl {
   static gap::generator<BlockDecl> in(const Index &index);
   static gap::generator<BlockDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BlockDecl> by(const Index &, EntityId);
+  static std::optional<BlockDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BLOCK;

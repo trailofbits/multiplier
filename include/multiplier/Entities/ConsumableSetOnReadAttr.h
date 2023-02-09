@@ -39,7 +39,7 @@ class ConsumableSetOnReadAttr : public InheritableAttr {
   static gap::generator<ConsumableSetOnReadAttr> in(const Index &index);
   static gap::generator<ConsumableSetOnReadAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConsumableSetOnReadAttr> by(const Index &, EntityId);
+  static std::optional<ConsumableSetOnReadAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE_SET_ON_READ;

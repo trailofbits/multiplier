@@ -40,7 +40,7 @@ class WhileStmt : public Stmt {
   static gap::generator<WhileStmt> in(const Index &index);
   static gap::generator<WhileStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<WhileStmt> by(const Index &, EntityId);
+  static std::optional<WhileStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::WHILE_STMT;

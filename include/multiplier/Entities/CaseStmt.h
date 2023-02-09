@@ -40,7 +40,7 @@ class CaseStmt : public SwitchCase {
   static gap::generator<CaseStmt> in(const Index &index);
   static gap::generator<CaseStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CaseStmt> by(const Index &, EntityId);
+  static std::optional<CaseStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CASE_STMT;

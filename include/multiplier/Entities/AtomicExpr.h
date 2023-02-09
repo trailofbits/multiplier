@@ -43,7 +43,7 @@ class AtomicExpr : public Expr {
   static gap::generator<AtomicExpr> in(const Index &index);
   static gap::generator<AtomicExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AtomicExpr> by(const Index &, EntityId);
+  static std::optional<AtomicExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ATOMIC_EXPR;

@@ -39,7 +39,7 @@ class NoDuplicateAttr : public InheritableAttr {
   static gap::generator<NoDuplicateAttr> in(const Index &index);
   static gap::generator<NoDuplicateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoDuplicateAttr> by(const Index &, EntityId);
+  static std::optional<NoDuplicateAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DUPLICATE;

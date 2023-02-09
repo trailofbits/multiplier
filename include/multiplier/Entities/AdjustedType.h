@@ -37,7 +37,7 @@ class AdjustedType : public Type {
   static gap::generator<AdjustedType> in(const Index &index);
   static gap::generator<AdjustedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AdjustedType> by(const Index &, EntityId);
+  static std::optional<AdjustedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ADJUSTED;

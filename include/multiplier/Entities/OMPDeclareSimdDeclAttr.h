@@ -39,7 +39,7 @@ class OMPDeclareSimdDeclAttr : public Attr {
   static gap::generator<OMPDeclareSimdDeclAttr> in(const Index &index);
   static gap::generator<OMPDeclareSimdDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPDeclareSimdDeclAttr> by(const Index &, EntityId);
+  static std::optional<OMPDeclareSimdDeclAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_SIMD_DECL;

@@ -39,7 +39,7 @@ class MSABIAttr : public InheritableAttr {
   static gap::generator<MSABIAttr> in(const Index &index);
   static gap::generator<MSABIAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSABIAttr> by(const Index &, EntityId);
+  static std::optional<MSABIAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MSABI;

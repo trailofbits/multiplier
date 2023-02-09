@@ -39,7 +39,7 @@ class TLSModelAttr : public InheritableAttr {
   static gap::generator<TLSModelAttr> in(const Index &index);
   static gap::generator<TLSModelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TLSModelAttr> by(const Index &, EntityId);
+  static std::optional<TLSModelAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TLS_MODEL;

@@ -40,7 +40,7 @@ class ConstInitAttr : public InheritableAttr {
   static gap::generator<ConstInitAttr> in(const Index &index);
   static gap::generator<ConstInitAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConstInitAttr> by(const Index &, EntityId);
+  static std::optional<ConstInitAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONST_INIT;

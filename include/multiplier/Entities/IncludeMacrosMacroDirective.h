@@ -40,7 +40,7 @@ class IncludeMacrosMacroDirective : public IncludeLikeMacroDirective {
   static gap::generator<IncludeMacrosMacroDirective> in(const Fragment &frag);
 
   static gap::generator<IncludeMacrosMacroDirective> in(const Index &index);
-  std::optional<IncludeMacrosMacroDirective> by(const Index &, EntityId);
+  static std::optional<IncludeMacrosMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::INCLUDE_MACROS_DIRECTIVE;

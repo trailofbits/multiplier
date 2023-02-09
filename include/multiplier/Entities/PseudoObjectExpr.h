@@ -41,7 +41,7 @@ class PseudoObjectExpr : public Expr {
   static gap::generator<PseudoObjectExpr> in(const Index &index);
   static gap::generator<PseudoObjectExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PseudoObjectExpr> by(const Index &, EntityId);
+  static std::optional<PseudoObjectExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PSEUDO_OBJECT_EXPR;

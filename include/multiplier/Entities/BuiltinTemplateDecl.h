@@ -41,7 +41,7 @@ class BuiltinTemplateDecl : public TemplateDecl {
   static gap::generator<BuiltinTemplateDecl> in(const Index &index);
   static gap::generator<BuiltinTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BuiltinTemplateDecl> by(const Index &, EntityId);
+  static std::optional<BuiltinTemplateDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BUILTIN_TEMPLATE;

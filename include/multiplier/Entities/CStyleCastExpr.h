@@ -45,7 +45,7 @@ class CStyleCastExpr : public ExplicitCastExpr {
   static gap::generator<CStyleCastExpr> in(const Index &index);
   static gap::generator<CStyleCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CStyleCastExpr> by(const Index &, EntityId);
+  static std::optional<CStyleCastExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::C_STYLE_CAST_EXPR;

@@ -39,7 +39,7 @@ class ObjCReturnsInnerPointerAttr : public InheritableAttr {
   static gap::generator<ObjCReturnsInnerPointerAttr> in(const Index &index);
   static gap::generator<ObjCReturnsInnerPointerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCReturnsInnerPointerAttr> by(const Index &, EntityId);
+  static std::optional<ObjCReturnsInnerPointerAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_RETURNS_INNER_POINTER;

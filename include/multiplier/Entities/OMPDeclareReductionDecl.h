@@ -43,7 +43,7 @@ class OMPDeclareReductionDecl : public ValueDecl {
   static gap::generator<OMPDeclareReductionDecl> in(const Index &index);
   static gap::generator<OMPDeclareReductionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPDeclareReductionDecl> by(const Index &, EntityId);
+  static std::optional<OMPDeclareReductionDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_REDUCTION;

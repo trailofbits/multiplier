@@ -39,7 +39,7 @@ class SYCLSpecialClassAttr : public InheritableAttr {
   static gap::generator<SYCLSpecialClassAttr> in(const Index &index);
   static gap::generator<SYCLSpecialClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SYCLSpecialClassAttr> by(const Index &, EntityId);
+  static std::optional<SYCLSpecialClassAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SYCL_SPECIAL_CLASS;

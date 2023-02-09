@@ -43,7 +43,7 @@ class CoyieldExpr : public CoroutineSuspendExpr {
   static gap::generator<CoyieldExpr> in(const Index &index);
   static gap::generator<CoyieldExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CoyieldExpr> by(const Index &, EntityId);
+  static std::optional<CoyieldExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COYIELD_EXPR;

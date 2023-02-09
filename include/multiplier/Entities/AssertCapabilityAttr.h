@@ -40,7 +40,7 @@ class AssertCapabilityAttr : public InheritableAttr {
   static gap::generator<AssertCapabilityAttr> in(const Index &index);
   static gap::generator<AssertCapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AssertCapabilityAttr> by(const Index &, EntityId);
+  static std::optional<AssertCapabilityAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSERT_CAPABILITY;

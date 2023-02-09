@@ -41,7 +41,7 @@ class MSInheritanceAttr : public InheritableAttr {
   static gap::generator<MSInheritanceAttr> in(const Index &index);
   static gap::generator<MSInheritanceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSInheritanceAttr> by(const Index &, EntityId);
+  static std::optional<MSInheritanceAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_INHERITANCE;

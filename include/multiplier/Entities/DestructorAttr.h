@@ -39,7 +39,7 @@ class DestructorAttr : public InheritableAttr {
   static gap::generator<DestructorAttr> in(const Index &index);
   static gap::generator<DestructorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DestructorAttr> by(const Index &, EntityId);
+  static std::optional<DestructorAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DESTRUCTOR;

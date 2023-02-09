@@ -39,7 +39,7 @@ class MinVectorWidthAttr : public InheritableAttr {
   static gap::generator<MinVectorWidthAttr> in(const Index &index);
   static gap::generator<MinVectorWidthAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MinVectorWidthAttr> by(const Index &, EntityId);
+  static std::optional<MinVectorWidthAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIN_VECTOR_WIDTH;

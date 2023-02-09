@@ -44,7 +44,7 @@ class ConstantExpr : public FullExpr {
   static gap::generator<ConstantExpr> in(const Index &index);
   static gap::generator<ConstantExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConstantExpr> by(const Index &, EntityId);
+  static std::optional<ConstantExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONSTANT_EXPR;

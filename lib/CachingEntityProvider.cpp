@@ -173,9 +173,9 @@ CachingEntityProvider::References(const Ptr &self, RawEntityId eid) {
   return next->References(self, eid);
 }
 
-void CachingEntityProvider::FindSymbol(
-    const Ptr &self, std::string name, std::vector<RawEntityId> &ids_out) {
-  return next->FindSymbol(self, std::move(name), ids_out);
+gap::generator<RawEntityId> CachingEntityProvider::FindSymbol(
+    const Ptr &self, std::string name) {
+  return next->FindSymbol(self, std::move(name));
 }
 
 // Returns an entity provider that gets entities from a UNIX domain socket.

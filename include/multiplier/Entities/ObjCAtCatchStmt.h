@@ -38,7 +38,7 @@ class ObjCAtCatchStmt : public Stmt {
   static gap::generator<ObjCAtCatchStmt> in(const Index &index);
   static gap::generator<ObjCAtCatchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCAtCatchStmt> by(const Index &, EntityId);
+  static std::optional<ObjCAtCatchStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_CATCH_STMT;

@@ -41,7 +41,7 @@ class FloatingLiteral : public Expr {
   static gap::generator<FloatingLiteral> in(const Index &index);
   static gap::generator<FloatingLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FloatingLiteral> by(const Index &, EntityId);
+  static std::optional<FloatingLiteral> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FLOATING_LITERAL;

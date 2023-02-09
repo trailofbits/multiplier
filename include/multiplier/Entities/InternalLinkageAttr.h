@@ -39,7 +39,7 @@ class InternalLinkageAttr : public InheritableAttr {
   static gap::generator<InternalLinkageAttr> in(const Index &index);
   static gap::generator<InternalLinkageAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<InternalLinkageAttr> by(const Index &, EntityId);
+  static std::optional<InternalLinkageAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INTERNAL_LINKAGE;

@@ -39,7 +39,7 @@ class EnforceTCBAttr : public InheritableAttr {
   static gap::generator<EnforceTCBAttr> in(const Index &index);
   static gap::generator<EnforceTCBAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EnforceTCBAttr> by(const Index &, EntityId);
+  static std::optional<EnforceTCBAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENFORCE_TCB;

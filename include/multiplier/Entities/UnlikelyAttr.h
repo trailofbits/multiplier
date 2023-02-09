@@ -39,7 +39,7 @@ class UnlikelyAttr : public StmtAttr {
   static gap::generator<UnlikelyAttr> in(const Index &index);
   static gap::generator<UnlikelyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UnlikelyAttr> by(const Index &, EntityId);
+  static std::optional<UnlikelyAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UNLIKELY;

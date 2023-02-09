@@ -39,7 +39,7 @@ class ObjCSubclassingRestrictedAttr : public InheritableAttr {
   static gap::generator<ObjCSubclassingRestrictedAttr> in(const Index &index);
   static gap::generator<ObjCSubclassingRestrictedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCSubclassingRestrictedAttr> by(const Index &, EntityId);
+  static std::optional<ObjCSubclassingRestrictedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_SUBCLASSING_RESTRICTED;

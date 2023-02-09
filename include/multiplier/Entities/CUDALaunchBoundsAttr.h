@@ -40,7 +40,7 @@ class CUDALaunchBoundsAttr : public InheritableAttr {
   static gap::generator<CUDALaunchBoundsAttr> in(const Index &index);
   static gap::generator<CUDALaunchBoundsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CUDALaunchBoundsAttr> by(const Index &, EntityId);
+  static std::optional<CUDALaunchBoundsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_LAUNCH_BOUNDS;

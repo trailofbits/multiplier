@@ -41,7 +41,7 @@ class MatrixSubscriptExpr : public Expr {
   static gap::generator<MatrixSubscriptExpr> in(const Index &index);
   static gap::generator<MatrixSubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MatrixSubscriptExpr> by(const Index &, EntityId);
+  static std::optional<MatrixSubscriptExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MATRIX_SUBSCRIPT_EXPR;

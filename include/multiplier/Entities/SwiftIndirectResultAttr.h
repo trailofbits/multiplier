@@ -43,7 +43,7 @@ class SwiftIndirectResultAttr : public ParameterABIAttr {
   static gap::generator<SwiftIndirectResultAttr> in(const Index &index);
   static gap::generator<SwiftIndirectResultAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftIndirectResultAttr> by(const Index &, EntityId);
+  static std::optional<SwiftIndirectResultAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_INDIRECT_RESULT;

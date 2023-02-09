@@ -48,7 +48,7 @@ class ParmVarDecl : public VarDecl {
   static gap::generator<ParmVarDecl> in(const Index &index);
   static gap::generator<ParmVarDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ParmVarDecl> by(const Index &, EntityId);
+  static std::optional<ParmVarDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PARM_VAR;

@@ -39,7 +39,7 @@ class ExtVectorType : public VectorType {
   static gap::generator<ExtVectorType> in(const Index &index);
   static gap::generator<ExtVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ExtVectorType> by(const Index &, EntityId);
+  static std::optional<ExtVectorType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::EXT_VECTOR;

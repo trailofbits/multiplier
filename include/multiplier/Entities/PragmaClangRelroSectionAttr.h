@@ -39,7 +39,7 @@ class PragmaClangRelroSectionAttr : public InheritableAttr {
   static gap::generator<PragmaClangRelroSectionAttr> in(const Index &index);
   static gap::generator<PragmaClangRelroSectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PragmaClangRelroSectionAttr> by(const Index &, EntityId);
+  static std::optional<PragmaClangRelroSectionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRAGMA_CLANG_RELRO_SECTION;

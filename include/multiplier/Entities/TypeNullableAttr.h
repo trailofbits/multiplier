@@ -39,7 +39,7 @@ class TypeNullableAttr : public TypeAttr {
   static gap::generator<TypeNullableAttr> in(const Index &index);
   static gap::generator<TypeNullableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeNullableAttr> by(const Index &, EntityId);
+  static std::optional<TypeNullableAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_NULLABLE;

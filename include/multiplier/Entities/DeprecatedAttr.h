@@ -39,7 +39,7 @@ class DeprecatedAttr : public InheritableAttr {
   static gap::generator<DeprecatedAttr> in(const Index &index);
   static gap::generator<DeprecatedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DeprecatedAttr> by(const Index &, EntityId);
+  static std::optional<DeprecatedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DEPRECATED;

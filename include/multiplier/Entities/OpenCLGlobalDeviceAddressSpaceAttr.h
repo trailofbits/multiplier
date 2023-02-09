@@ -39,7 +39,7 @@ class OpenCLGlobalDeviceAddressSpaceAttr : public TypeAttr {
   static gap::generator<OpenCLGlobalDeviceAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGlobalDeviceAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OpenCLGlobalDeviceAddressSpaceAttr> by(const Index &, EntityId);
+  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;

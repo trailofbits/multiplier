@@ -43,7 +43,7 @@ class OMPTargetTeamsGenericLoopDirective : public OMPLoopDirective {
   static gap::generator<OMPTargetTeamsGenericLoopDirective> in(const Index &index);
   static gap::generator<OMPTargetTeamsGenericLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPTargetTeamsGenericLoopDirective> by(const Index &, EntityId);
+  static std::optional<OMPTargetTeamsGenericLoopDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_GENERIC_LOOP_DIRECTIVE;

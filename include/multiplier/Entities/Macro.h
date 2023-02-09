@@ -70,7 +70,7 @@ class Macro {
   static gap::generator<Macro> in(const Fragment &frag);
 
   static gap::generator<Macro> in(const Index &index);
-  std::optional<Macro> by(const Index &, EntityId);
+  static std::optional<Macro> by_id(const Index &, EntityId);
 
   static gap::generator<Macro> containing(const Macro &macro);
   bool contains(const Macro &macro);

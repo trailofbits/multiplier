@@ -38,7 +38,7 @@ class DoStmt : public Stmt {
   static gap::generator<DoStmt> in(const Index &index);
   static gap::generator<DoStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DoStmt> by(const Index &, EntityId);
+  static std::optional<DoStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DO_STMT;

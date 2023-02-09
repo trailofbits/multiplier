@@ -40,7 +40,7 @@ class EndIfMacroDirective : public ConditionalMacroDirective {
   static gap::generator<EndIfMacroDirective> in(const Fragment &frag);
 
   static gap::generator<EndIfMacroDirective> in(const Index &index);
-  std::optional<EndIfMacroDirective> by(const Index &, EntityId);
+  static std::optional<EndIfMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::END_IF_DIRECTIVE;

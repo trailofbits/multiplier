@@ -41,7 +41,7 @@ class CFConsumedAttr : public InheritableParamAttr {
   static gap::generator<CFConsumedAttr> in(const Index &index);
   static gap::generator<CFConsumedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CFConsumedAttr> by(const Index &, EntityId);
+  static std::optional<CFConsumedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_CONSUMED;

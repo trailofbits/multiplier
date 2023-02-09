@@ -39,7 +39,7 @@ class AnnotateTypeAttr : public TypeAttr {
   static gap::generator<AnnotateTypeAttr> in(const Index &index);
   static gap::generator<AnnotateTypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AnnotateTypeAttr> by(const Index &, EntityId);
+  static std::optional<AnnotateTypeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANNOTATE_TYPE;

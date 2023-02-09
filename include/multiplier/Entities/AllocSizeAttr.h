@@ -39,7 +39,7 @@ class AllocSizeAttr : public InheritableAttr {
   static gap::generator<AllocSizeAttr> in(const Index &index);
   static gap::generator<AllocSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AllocSizeAttr> by(const Index &, EntityId);
+  static std::optional<AllocSizeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALLOC_SIZE;

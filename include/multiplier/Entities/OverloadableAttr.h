@@ -37,7 +37,7 @@ class OverloadableAttr : public Attr {
   static gap::generator<OverloadableAttr> in(const Index &index);
   static gap::generator<OverloadableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OverloadableAttr> by(const Index &, EntityId);
+  static std::optional<OverloadableAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OVERLOADABLE;

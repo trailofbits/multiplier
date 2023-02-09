@@ -43,7 +43,7 @@ class OMPSimdDirective : public OMPLoopDirective {
   static gap::generator<OMPSimdDirective> in(const Index &index);
   static gap::generator<OMPSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPSimdDirective> by(const Index &, EntityId);
+  static std::optional<OMPSimdDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SIMD_DIRECTIVE;

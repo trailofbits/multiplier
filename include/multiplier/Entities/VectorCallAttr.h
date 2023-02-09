@@ -39,7 +39,7 @@ class VectorCallAttr : public InheritableAttr {
   static gap::generator<VectorCallAttr> in(const Index &index);
   static gap::generator<VectorCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<VectorCallAttr> by(const Index &, EntityId);
+  static std::optional<VectorCallAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::VECTOR_CALL;

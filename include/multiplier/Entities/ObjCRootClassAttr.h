@@ -39,7 +39,7 @@ class ObjCRootClassAttr : public InheritableAttr {
   static gap::generator<ObjCRootClassAttr> in(const Index &index);
   static gap::generator<ObjCRootClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCRootClassAttr> by(const Index &, EntityId);
+  static std::optional<ObjCRootClassAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_ROOT_CLASS;

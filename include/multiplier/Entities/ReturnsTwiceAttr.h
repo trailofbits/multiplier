@@ -39,7 +39,7 @@ class ReturnsTwiceAttr : public InheritableAttr {
   static gap::generator<ReturnsTwiceAttr> in(const Index &index);
   static gap::generator<ReturnsTwiceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ReturnsTwiceAttr> by(const Index &, EntityId);
+  static std::optional<ReturnsTwiceAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RETURNS_TWICE;

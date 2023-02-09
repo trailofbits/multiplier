@@ -37,7 +37,7 @@ class LoaderUninitializedAttr : public Attr {
   static gap::generator<LoaderUninitializedAttr> in(const Index &index);
   static gap::generator<LoaderUninitializedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LoaderUninitializedAttr> by(const Index &, EntityId);
+  static std::optional<LoaderUninitializedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOADER_UNINITIALIZED;

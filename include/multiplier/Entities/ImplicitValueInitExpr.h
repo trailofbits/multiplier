@@ -41,7 +41,7 @@ class ImplicitValueInitExpr : public Expr {
   static gap::generator<ImplicitValueInitExpr> in(const Index &index);
   static gap::generator<ImplicitValueInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ImplicitValueInitExpr> by(const Index &, EntityId);
+  static std::optional<ImplicitValueInitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IMPLICIT_VALUE_INIT_EXPR;

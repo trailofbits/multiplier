@@ -41,7 +41,7 @@ class ObjCContainerDecl : public NamedDecl {
   static gap::generator<ObjCContainerDecl> in(const Index &index);
   static gap::generator<ObjCContainerDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCContainerDecl> by(const Index &, EntityId);
+  static std::optional<ObjCContainerDecl> by_id(const Index &, EntityId);
 
   static gap::generator<ObjCContainerDecl> containing(const Decl &decl);
   static gap::generator<ObjCContainerDecl> containing(const std::optional<Decl> &decl);

@@ -39,7 +39,7 @@ class NoDestroyAttr : public InheritableAttr {
   static gap::generator<NoDestroyAttr> in(const Index &index);
   static gap::generator<NoDestroyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoDestroyAttr> by(const Index &, EntityId);
+  static std::optional<NoDestroyAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DESTROY;

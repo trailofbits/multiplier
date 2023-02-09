@@ -37,7 +37,7 @@ class ExternCContextDecl : public Decl {
   static gap::generator<ExternCContextDecl> in(const Index &index);
   static gap::generator<ExternCContextDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ExternCContextDecl> by(const Index &, EntityId);
+  static std::optional<ExternCContextDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXTERN_C_CONTEXT;

@@ -38,7 +38,7 @@ class MacroVAOpt : public MacroSubstitution {
   static gap::generator<MacroVAOpt> in(const Fragment &frag);
 
   static gap::generator<MacroVAOpt> in(const Index &index);
-  std::optional<MacroVAOpt> by(const Index &, EntityId);
+  static std::optional<MacroVAOpt> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::VA_OPT;

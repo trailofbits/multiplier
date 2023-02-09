@@ -39,7 +39,7 @@ class OMPTargetExitDataDirective : public OMPExecutableDirective {
   static gap::generator<OMPTargetExitDataDirective> in(const Index &index);
   static gap::generator<OMPTargetExitDataDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPTargetExitDataDirective> by(const Index &, EntityId);
+  static std::optional<OMPTargetExitDataDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_EXIT_DATA_DIRECTIVE;

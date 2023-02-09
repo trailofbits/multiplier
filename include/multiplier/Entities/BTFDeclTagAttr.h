@@ -39,7 +39,7 @@ class BTFDeclTagAttr : public InheritableAttr {
   static gap::generator<BTFDeclTagAttr> in(const Index &index);
   static gap::generator<BTFDeclTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BTFDeclTagAttr> by(const Index &, EntityId);
+  static std::optional<BTFDeclTagAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BTF_DECL_TAG;

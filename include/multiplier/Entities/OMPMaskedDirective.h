@@ -39,7 +39,7 @@ class OMPMaskedDirective : public OMPExecutableDirective {
   static gap::generator<OMPMaskedDirective> in(const Index &index);
   static gap::generator<OMPMaskedDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPMaskedDirective> by(const Index &, EntityId);
+  static std::optional<OMPMaskedDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASKED_DIRECTIVE;

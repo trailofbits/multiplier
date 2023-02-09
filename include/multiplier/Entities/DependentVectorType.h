@@ -39,7 +39,7 @@ class DependentVectorType : public Type {
   static gap::generator<DependentVectorType> in(const Index &index);
   static gap::generator<DependentVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DependentVectorType> by(const Index &, EntityId);
+  static std::optional<DependentVectorType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_VECTOR;

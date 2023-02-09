@@ -38,7 +38,7 @@ class CoreturnStmt : public Stmt {
   static gap::generator<CoreturnStmt> in(const Index &index);
   static gap::generator<CoreturnStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CoreturnStmt> by(const Index &, EntityId);
+  static std::optional<CoreturnStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CORETURN_STMT;

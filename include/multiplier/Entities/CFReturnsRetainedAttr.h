@@ -39,7 +39,7 @@ class CFReturnsRetainedAttr : public InheritableAttr {
   static gap::generator<CFReturnsRetainedAttr> in(const Index &index);
   static gap::generator<CFReturnsRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CFReturnsRetainedAttr> by(const Index &, EntityId);
+  static std::optional<CFReturnsRetainedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_RETURNS_RETAINED;

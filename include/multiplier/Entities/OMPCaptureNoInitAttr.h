@@ -39,7 +39,7 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
   static gap::generator<OMPCaptureNoInitAttr> in(const Index &index);
   static gap::generator<OMPCaptureNoInitAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPCaptureNoInitAttr> by(const Index &, EntityId);
+  static std::optional<OMPCaptureNoInitAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_CAPTURE_NO_INIT;

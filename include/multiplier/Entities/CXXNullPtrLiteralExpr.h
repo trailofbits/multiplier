@@ -41,7 +41,7 @@ class CXXNullPtrLiteralExpr : public Expr {
   static gap::generator<CXXNullPtrLiteralExpr> in(const Index &index);
   static gap::generator<CXXNullPtrLiteralExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXNullPtrLiteralExpr> by(const Index &, EntityId);
+  static std::optional<CXXNullPtrLiteralExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NULL_PTR_LITERAL_EXPR;

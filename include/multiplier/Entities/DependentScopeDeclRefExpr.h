@@ -41,7 +41,7 @@ class DependentScopeDeclRefExpr : public Expr {
   static gap::generator<DependentScopeDeclRefExpr> in(const Index &index);
   static gap::generator<DependentScopeDeclRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DependentScopeDeclRefExpr> by(const Index &, EntityId);
+  static std::optional<DependentScopeDeclRefExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR;

@@ -36,7 +36,7 @@ class MacroArgument : public Macro {
   static gap::generator<MacroArgument> in(const Fragment &frag);
 
   static gap::generator<MacroArgument> in(const Index &index);
-  std::optional<MacroArgument> by(const Index &, EntityId);
+  static std::optional<MacroArgument> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::ARGUMENT;

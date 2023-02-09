@@ -41,7 +41,7 @@ class ReleaseHandleAttr : public InheritableParamAttr {
   static gap::generator<ReleaseHandleAttr> in(const Index &index);
   static gap::generator<ReleaseHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ReleaseHandleAttr> by(const Index &, EntityId);
+  static std::optional<ReleaseHandleAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RELEASE_HANDLE;

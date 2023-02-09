@@ -38,7 +38,7 @@ class MacroConcatenate : public MacroSubstitution {
   static gap::generator<MacroConcatenate> in(const Fragment &frag);
 
   static gap::generator<MacroConcatenate> in(const Index &index);
-  std::optional<MacroConcatenate> by(const Index &, EntityId);
+  static std::optional<MacroConcatenate> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::CONCATENATE;

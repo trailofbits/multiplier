@@ -39,7 +39,7 @@ class AssertExclusiveLockAttr : public InheritableAttr {
   static gap::generator<AssertExclusiveLockAttr> in(const Index &index);
   static gap::generator<AssertExclusiveLockAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AssertExclusiveLockAttr> by(const Index &, EntityId);
+  static std::optional<AssertExclusiveLockAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSERT_EXCLUSIVE_LOCK;

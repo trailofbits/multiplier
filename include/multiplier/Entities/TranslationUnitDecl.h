@@ -37,7 +37,7 @@ class TranslationUnitDecl : public Decl {
   static gap::generator<TranslationUnitDecl> in(const Index &index);
   static gap::generator<TranslationUnitDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TranslationUnitDecl> by(const Index &, EntityId);
+  static std::optional<TranslationUnitDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TRANSLATION_UNIT;

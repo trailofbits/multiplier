@@ -41,7 +41,7 @@ class OMPIteratorExpr : public Expr {
   static gap::generator<OMPIteratorExpr> in(const Index &index);
   static gap::generator<OMPIteratorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPIteratorExpr> by(const Index &, EntityId);
+  static std::optional<OMPIteratorExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ITERATOR_EXPR;

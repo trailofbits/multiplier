@@ -39,7 +39,7 @@ class C11NoReturnAttr : public InheritableAttr {
   static gap::generator<C11NoReturnAttr> in(const Index &index);
   static gap::generator<C11NoReturnAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<C11NoReturnAttr> by(const Index &, EntityId);
+  static std::optional<C11NoReturnAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::C11_NO_RETURN;

@@ -39,7 +39,7 @@ class ObjCExternallyRetainedAttr : public InheritableAttr {
   static gap::generator<ObjCExternallyRetainedAttr> in(const Index &index);
   static gap::generator<ObjCExternallyRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCExternallyRetainedAttr> by(const Index &, EntityId);
+  static std::optional<ObjCExternallyRetainedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_EXTERNALLY_RETAINED;

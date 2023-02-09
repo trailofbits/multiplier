@@ -41,7 +41,7 @@ class CXXBindTemporaryExpr : public Expr {
   static gap::generator<CXXBindTemporaryExpr> in(const Index &index);
   static gap::generator<CXXBindTemporaryExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXBindTemporaryExpr> by(const Index &, EntityId);
+  static std::optional<CXXBindTemporaryExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_BIND_TEMPORARY_EXPR;

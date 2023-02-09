@@ -37,7 +37,7 @@ class SwitchCase : public Stmt {
   static gap::generator<SwitchCase> in(const Index &index);
   static gap::generator<SwitchCase> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwitchCase> by(const Index &, EntityId);
+  static std::optional<SwitchCase> by_id(const Index &, EntityId);
 
   static gap::generator<SwitchCase> containing(const Decl &decl);
   static gap::generator<SwitchCase> containing(const std::optional<Decl> &decl);

@@ -40,7 +40,7 @@ class OMPAtomicDirective : public OMPExecutableDirective {
   static gap::generator<OMPAtomicDirective> in(const Index &index);
   static gap::generator<OMPAtomicDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPAtomicDirective> by(const Index &, EntityId);
+  static std::optional<OMPAtomicDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ATOMIC_DIRECTIVE;

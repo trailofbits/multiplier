@@ -40,7 +40,7 @@ class ConstantArrayType : public ArrayType {
   static gap::generator<ConstantArrayType> in(const Index &index);
   static gap::generator<ConstantArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConstantArrayType> by(const Index &, EntityId);
+  static std::optional<ConstantArrayType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CONSTANT_ARRAY;

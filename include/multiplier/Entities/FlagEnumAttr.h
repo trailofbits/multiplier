@@ -39,7 +39,7 @@ class FlagEnumAttr : public InheritableAttr {
   static gap::generator<FlagEnumAttr> in(const Index &index);
   static gap::generator<FlagEnumAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FlagEnumAttr> by(const Index &, EntityId);
+  static std::optional<FlagEnumAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FLAG_ENUM;

@@ -42,7 +42,7 @@ class UsingEnumDecl : public BaseUsingDecl {
   static gap::generator<UsingEnumDecl> in(const Index &index);
   static gap::generator<UsingEnumDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UsingEnumDecl> by(const Index &, EntityId);
+  static std::optional<UsingEnumDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_ENUM;

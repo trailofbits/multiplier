@@ -59,7 +59,7 @@ class CXXRecordDecl : public RecordDecl {
   static gap::generator<CXXRecordDecl> in(const Index &index);
   static gap::generator<CXXRecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXRecordDecl> by(const Index &, EntityId);
+  static std::optional<CXXRecordDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_RECORD;

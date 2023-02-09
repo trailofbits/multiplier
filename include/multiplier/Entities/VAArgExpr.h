@@ -42,7 +42,7 @@ class VAArgExpr : public Expr {
   static gap::generator<VAArgExpr> in(const Index &index);
   static gap::generator<VAArgExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<VAArgExpr> by(const Index &, EntityId);
+  static std::optional<VAArgExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::VA_ARG_EXPR;

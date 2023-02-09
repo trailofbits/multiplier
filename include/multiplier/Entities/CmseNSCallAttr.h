@@ -39,7 +39,7 @@ class CmseNSCallAttr : public TypeAttr {
   static gap::generator<CmseNSCallAttr> in(const Index &index);
   static gap::generator<CmseNSCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CmseNSCallAttr> by(const Index &, EntityId);
+  static std::optional<CmseNSCallAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CMSE_NS_CALL;

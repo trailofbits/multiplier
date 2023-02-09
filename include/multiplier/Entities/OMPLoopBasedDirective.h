@@ -39,7 +39,7 @@ class OMPLoopBasedDirective : public OMPExecutableDirective {
   static gap::generator<OMPLoopBasedDirective> in(const Index &index);
   static gap::generator<OMPLoopBasedDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPLoopBasedDirective> by(const Index &, EntityId);
+  static std::optional<OMPLoopBasedDirective> by_id(const Index &, EntityId);
 
   static gap::generator<OMPLoopBasedDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopBasedDirective> containing(const std::optional<Decl> &decl);

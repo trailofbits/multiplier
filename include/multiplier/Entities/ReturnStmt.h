@@ -39,7 +39,7 @@ class ReturnStmt : public Stmt {
   static gap::generator<ReturnStmt> in(const Index &index);
   static gap::generator<ReturnStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ReturnStmt> by(const Index &, EntityId);
+  static std::optional<ReturnStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::RETURN_STMT;

@@ -43,7 +43,7 @@ class CXXInheritedCtorInitExpr : public Expr {
   static gap::generator<CXXInheritedCtorInitExpr> in(const Index &index);
   static gap::generator<CXXInheritedCtorInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXInheritedCtorInitExpr> by(const Index &, EntityId);
+  static std::optional<CXXInheritedCtorInitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_INHERITED_CTOR_INIT_EXPR;

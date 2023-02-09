@@ -41,7 +41,7 @@ class FixedPointLiteral : public Expr {
   static gap::generator<FixedPointLiteral> in(const Index &index);
   static gap::generator<FixedPointLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FixedPointLiteral> by(const Index &, EntityId);
+  static std::optional<FixedPointLiteral> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FIXED_POINT_LITERAL;

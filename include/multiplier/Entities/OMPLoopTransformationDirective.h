@@ -41,7 +41,7 @@ class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
   static gap::generator<OMPLoopTransformationDirective> in(const Index &index);
   static gap::generator<OMPLoopTransformationDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPLoopTransformationDirective> by(const Index &, EntityId);
+  static std::optional<OMPLoopTransformationDirective> by_id(const Index &, EntityId);
 
   static gap::generator<OMPLoopTransformationDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopTransformationDirective> containing(const std::optional<Decl> &decl);

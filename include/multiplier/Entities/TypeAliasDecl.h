@@ -44,7 +44,7 @@ class TypeAliasDecl : public TypedefNameDecl {
   static gap::generator<TypeAliasDecl> in(const Index &index);
   static gap::generator<TypeAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeAliasDecl> by(const Index &, EntityId);
+  static std::optional<TypeAliasDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPE_ALIAS;

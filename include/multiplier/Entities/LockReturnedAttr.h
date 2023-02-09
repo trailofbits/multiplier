@@ -40,7 +40,7 @@ class LockReturnedAttr : public InheritableAttr {
   static gap::generator<LockReturnedAttr> in(const Index &index);
   static gap::generator<LockReturnedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LockReturnedAttr> by(const Index &, EntityId);
+  static std::optional<LockReturnedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOCK_RETURNED;

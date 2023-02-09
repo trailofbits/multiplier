@@ -37,7 +37,7 @@ class OMPCaptureKindAttr : public Attr {
   static gap::generator<OMPCaptureKindAttr> in(const Index &index);
   static gap::generator<OMPCaptureKindAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPCaptureKindAttr> by(const Index &, EntityId);
+  static std::optional<OMPCaptureKindAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_CAPTURE_KIND;

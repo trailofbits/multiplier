@@ -40,7 +40,7 @@ class AttributedStmt : public ValueStmt {
   static gap::generator<AttributedStmt> in(const Index &index);
   static gap::generator<AttributedStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AttributedStmt> by(const Index &, EntityId);
+  static std::optional<AttributedStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ATTRIBUTED_STMT;

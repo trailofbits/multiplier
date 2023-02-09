@@ -39,7 +39,7 @@ class PatchableFunctionEntryAttr : public InheritableAttr {
   static gap::generator<PatchableFunctionEntryAttr> in(const Index &index);
   static gap::generator<PatchableFunctionEntryAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PatchableFunctionEntryAttr> by(const Index &, EntityId);
+  static std::optional<PatchableFunctionEntryAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PATCHABLE_FUNCTION_ENTRY;

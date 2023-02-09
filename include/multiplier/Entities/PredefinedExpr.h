@@ -43,7 +43,7 @@ class PredefinedExpr : public Expr {
   static gap::generator<PredefinedExpr> in(const Index &index);
   static gap::generator<PredefinedExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PredefinedExpr> by(const Index &, EntityId);
+  static std::optional<PredefinedExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PREDEFINED_EXPR;

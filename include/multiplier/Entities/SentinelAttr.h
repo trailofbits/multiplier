@@ -39,7 +39,7 @@ class SentinelAttr : public InheritableAttr {
   static gap::generator<SentinelAttr> in(const Index &index);
   static gap::generator<SentinelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SentinelAttr> by(const Index &, EntityId);
+  static std::optional<SentinelAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SENTINEL;

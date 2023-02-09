@@ -41,7 +41,7 @@ class OSConsumedAttr : public InheritableParamAttr {
   static gap::generator<OSConsumedAttr> in(const Index &index);
   static gap::generator<OSConsumedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OSConsumedAttr> by(const Index &, EntityId);
+  static std::optional<OSConsumedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_CONSUMED;

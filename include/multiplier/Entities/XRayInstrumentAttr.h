@@ -40,7 +40,7 @@ class XRayInstrumentAttr : public InheritableAttr {
   static gap::generator<XRayInstrumentAttr> in(const Index &index);
   static gap::generator<XRayInstrumentAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<XRayInstrumentAttr> by(const Index &, EntityId);
+  static std::optional<XRayInstrumentAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::X_RAY_INSTRUMENT;

@@ -34,8 +34,7 @@ static std::optional<mx::FunctionDecl> StrchrEntityExists(
 
 void TaintTrack(mx::FunctionDecl &func, TaintMap &map) {
   for (mx::Reference ref : func.references()) {
-    auto taint_source = ref.as_statement();
-    for (mx::CallExpr call : mx::CallExpr::containing(*taint_source)) {
+    for (mx::CallExpr call : mx::CallExpr::containing(ref.as_statement())) {
       auto orig_decl = call.direct_callee();
       if (!orig_decl) {
         continue;
@@ -101,7 +100,7 @@ extern "C" int main(int argc, char *argv[]) {
       continue;
     }
 
-    std::optional<mx::Decl> source = index.declaration(decl_source_id);
+    std::optional<mx::ValueDecl> source = mx::ValueDecl::by_id(index, decl_source_id);
     std::unordered_set<mx::RawEntityId> highlight_ids =
         FileTokenIdsFor(source->tokens());
 
@@ -117,8 +116,14 @@ extern "C" int main(int argc, char *argv[]) {
           FileTokenIdsFor(sink.tokens());
       highlight_ids.insert(sink_ids.begin(), sink_ids.end());
 
+      mx::Fragment fragment = mx::Fragment::containing(sink);
+      auto file = mx::File::containing(fragment);
+
       std::cout
-          << "\t" << sink.id() << " " << sink.tokens().file_tokens().data()
+          << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
+          << fragment.id() << '\t'
+          << sink.id() << '\t'
+          << sink.tokens().file_tokens().data()
           << std::endl;
     }
 

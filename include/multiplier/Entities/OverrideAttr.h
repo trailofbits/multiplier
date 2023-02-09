@@ -39,7 +39,7 @@ class OverrideAttr : public InheritableAttr {
   static gap::generator<OverrideAttr> in(const Index &index);
   static gap::generator<OverrideAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OverrideAttr> by(const Index &, EntityId);
+  static std::optional<OverrideAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OVERRIDE;

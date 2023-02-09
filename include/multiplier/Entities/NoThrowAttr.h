@@ -39,7 +39,7 @@ class NoThrowAttr : public InheritableAttr {
   static gap::generator<NoThrowAttr> in(const Index &index);
   static gap::generator<NoThrowAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoThrowAttr> by(const Index &, EntityId);
+  static std::optional<NoThrowAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_THROW;

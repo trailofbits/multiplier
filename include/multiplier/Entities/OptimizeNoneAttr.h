@@ -39,7 +39,7 @@ class OptimizeNoneAttr : public InheritableAttr {
   static gap::generator<OptimizeNoneAttr> in(const Index &index);
   static gap::generator<OptimizeNoneAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OptimizeNoneAttr> by(const Index &, EntityId);
+  static std::optional<OptimizeNoneAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPTIMIZE_NONE;

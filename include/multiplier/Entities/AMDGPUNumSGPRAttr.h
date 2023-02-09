@@ -39,7 +39,7 @@ class AMDGPUNumSGPRAttr : public InheritableAttr {
   static gap::generator<AMDGPUNumSGPRAttr> in(const Index &index);
   static gap::generator<AMDGPUNumSGPRAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AMDGPUNumSGPRAttr> by(const Index &, EntityId);
+  static std::optional<AMDGPUNumSGPRAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_NUM_SGPR;

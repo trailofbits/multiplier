@@ -40,7 +40,7 @@ class IBOutletCollectionAttr : public InheritableAttr {
   static gap::generator<IBOutletCollectionAttr> in(const Index &index);
   static gap::generator<IBOutletCollectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<IBOutletCollectionAttr> by(const Index &, EntityId);
+  static std::optional<IBOutletCollectionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_OUTLET_COLLECTION;

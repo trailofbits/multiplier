@@ -37,7 +37,7 @@ class ObjCRuntimeVisibleAttr : public Attr {
   static gap::generator<ObjCRuntimeVisibleAttr> in(const Index &index);
   static gap::generator<ObjCRuntimeVisibleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCRuntimeVisibleAttr> by(const Index &, EntityId);
+  static std::optional<ObjCRuntimeVisibleAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_RUNTIME_VISIBLE;

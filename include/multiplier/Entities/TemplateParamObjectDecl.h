@@ -41,7 +41,7 @@ class TemplateParamObjectDecl : public ValueDecl {
   static gap::generator<TemplateParamObjectDecl> in(const Index &index);
   static gap::generator<TemplateParamObjectDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TemplateParamObjectDecl> by(const Index &, EntityId);
+  static std::optional<TemplateParamObjectDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_PARAM_OBJECT;

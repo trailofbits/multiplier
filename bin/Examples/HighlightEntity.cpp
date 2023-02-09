@@ -12,7 +12,6 @@
 #include <multiplier/AST.h>
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print");
-DEFINE_bool(unparsed, false, "Show original source code?");
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
@@ -24,7 +23,7 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  mx::Index index = InitExample();
+  mx::Index index = InitExample(true);
   
   mx::TokenRange entity_tokens;
   std::optional<mx::Fragment> fragment;
@@ -83,22 +82,7 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   // Print out the tokens of this fragment as they appear in the file.
-  if (FLAGS_unparsed) {
-    RenderFragment(std::cout, *fragment, entity_tokens, "", true);
-
-  // Print out the tokens of this fragment that were actually parsed. These
-  // are post-macro expansion tokens, and generally don't include whitespace
-  // or comments. There can be empty tokens, however.
-  } else {
-    for (mx::Token token : fragment->parsed_tokens()) {
-      if (entity_tokens.index_of(token)) {
-        HighlightToken(std::cout, std::move(token));
-      } else {
-        PrintToken(std::cout, std::move(token));
-      }
-      std::cout << ' ';
-    }
-  }
+  RenderFragment(std::cout, *fragment, entity_tokens, "", true);
   std::cout << '\n';
 
   return EXIT_SUCCESS;

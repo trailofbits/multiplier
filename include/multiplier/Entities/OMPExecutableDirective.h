@@ -38,7 +38,7 @@ class OMPExecutableDirective : public Stmt {
   static gap::generator<OMPExecutableDirective> in(const Index &index);
   static gap::generator<OMPExecutableDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPExecutableDirective> by(const Index &, EntityId);
+  static std::optional<OMPExecutableDirective> by_id(const Index &, EntityId);
 
   static gap::generator<OMPExecutableDirective> containing(const Decl &decl);
   static gap::generator<OMPExecutableDirective> containing(const std::optional<Decl> &decl);

@@ -39,7 +39,7 @@ class AMDGPUKernelCallAttr : public InheritableAttr {
   static gap::generator<AMDGPUKernelCallAttr> in(const Index &index);
   static gap::generator<AMDGPUKernelCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AMDGPUKernelCallAttr> by(const Index &, EntityId);
+  static std::optional<AMDGPUKernelCallAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_KERNEL_CALL;

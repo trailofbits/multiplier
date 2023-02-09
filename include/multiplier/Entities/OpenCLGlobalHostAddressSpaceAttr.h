@@ -39,7 +39,7 @@ class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
   static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGlobalHostAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OpenCLGlobalHostAddressSpaceAttr> by(const Index &, EntityId);
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;

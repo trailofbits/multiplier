@@ -39,7 +39,7 @@ class M68kInterruptAttr : public InheritableAttr {
   static gap::generator<M68kInterruptAttr> in(const Index &index);
   static gap::generator<M68kInterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<M68kInterruptAttr> by(const Index &, EntityId);
+  static std::optional<M68kInterruptAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::M68K_INTERRUPT;

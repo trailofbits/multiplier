@@ -39,7 +39,7 @@ class CUDADeviceBuiltinSurfaceTypeAttr : public InheritableAttr {
   static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const Index &index);
   static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CUDADeviceBuiltinSurfaceTypeAttr> by(const Index &, EntityId);
+  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;

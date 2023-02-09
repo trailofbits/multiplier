@@ -40,7 +40,7 @@ class OMPParallelMaskedDirective : public OMPExecutableDirective {
   static gap::generator<OMPParallelMaskedDirective> in(const Index &index);
   static gap::generator<OMPParallelMaskedDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPParallelMaskedDirective> by(const Index &, EntityId);
+  static std::optional<OMPParallelMaskedDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASKED_DIRECTIVE;

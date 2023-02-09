@@ -39,7 +39,7 @@ class AnyX86NoCallerSavedRegistersAttr : public InheritableAttr {
   static gap::generator<AnyX86NoCallerSavedRegistersAttr> in(const Index &index);
   static gap::generator<AnyX86NoCallerSavedRegistersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AnyX86NoCallerSavedRegistersAttr> by(const Index &, EntityId);
+  static std::optional<AnyX86NoCallerSavedRegistersAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;

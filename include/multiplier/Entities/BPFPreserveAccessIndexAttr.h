@@ -39,7 +39,7 @@ class BPFPreserveAccessIndexAttr : public InheritableAttr {
   static gap::generator<BPFPreserveAccessIndexAttr> in(const Index &index);
   static gap::generator<BPFPreserveAccessIndexAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BPFPreserveAccessIndexAttr> by(const Index &, EntityId);
+  static std::optional<BPFPreserveAccessIndexAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BPF_PRESERVE_ACCESS_INDEX;

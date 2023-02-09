@@ -39,7 +39,7 @@ class ConvergentAttr : public InheritableAttr {
   static gap::generator<ConvergentAttr> in(const Index &index);
   static gap::generator<ConvergentAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConvergentAttr> by(const Index &, EntityId);
+  static std::optional<ConvergentAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONVERGENT;

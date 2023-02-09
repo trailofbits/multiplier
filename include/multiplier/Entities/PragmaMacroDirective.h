@@ -38,7 +38,7 @@ class PragmaMacroDirective : public MacroDirective {
   static gap::generator<PragmaMacroDirective> in(const Fragment &frag);
 
   static gap::generator<PragmaMacroDirective> in(const Index &index);
-  std::optional<PragmaMacroDirective> by(const Index &, EntityId);
+  static std::optional<PragmaMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::PRAGMA_DIRECTIVE;

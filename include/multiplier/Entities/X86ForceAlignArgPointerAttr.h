@@ -39,7 +39,7 @@ class X86ForceAlignArgPointerAttr : public InheritableAttr {
   static gap::generator<X86ForceAlignArgPointerAttr> in(const Index &index);
   static gap::generator<X86ForceAlignArgPointerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<X86ForceAlignArgPointerAttr> by(const Index &, EntityId);
+  static std::optional<X86ForceAlignArgPointerAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::X86_FORCE_ALIGN_ARG_POINTER;

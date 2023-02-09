@@ -39,7 +39,7 @@ class CallableWhenAttr : public InheritableAttr {
   static gap::generator<CallableWhenAttr> in(const Index &index);
   static gap::generator<CallableWhenAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CallableWhenAttr> by(const Index &, EntityId);
+  static std::optional<CallableWhenAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CALLABLE_WHEN;

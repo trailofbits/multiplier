@@ -38,7 +38,7 @@ class DependentSizedExtVectorType : public Type {
   static gap::generator<DependentSizedExtVectorType> in(const Index &index);
   static gap::generator<DependentSizedExtVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DependentSizedExtVectorType> by(const Index &, EntityId);
+  static std::optional<DependentSizedExtVectorType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_SIZED_EXT_VECTOR;

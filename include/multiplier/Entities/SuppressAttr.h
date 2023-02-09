@@ -39,7 +39,7 @@ class SuppressAttr : public StmtAttr {
   static gap::generator<SuppressAttr> in(const Index &index);
   static gap::generator<SuppressAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SuppressAttr> by(const Index &, EntityId);
+  static std::optional<SuppressAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SUPPRESS;

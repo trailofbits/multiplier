@@ -43,7 +43,7 @@ class OMPTargetParallelGenericLoopDirective : public OMPLoopDirective {
   static gap::generator<OMPTargetParallelGenericLoopDirective> in(const Index &index);
   static gap::generator<OMPTargetParallelGenericLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPTargetParallelGenericLoopDirective> by(const Index &, EntityId);
+  static std::optional<OMPTargetParallelGenericLoopDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_PARALLEL_GENERIC_LOOP_DIRECTIVE;

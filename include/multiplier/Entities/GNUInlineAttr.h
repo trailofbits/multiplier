@@ -39,7 +39,7 @@ class GNUInlineAttr : public InheritableAttr {
   static gap::generator<GNUInlineAttr> in(const Index &index);
   static gap::generator<GNUInlineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<GNUInlineAttr> by(const Index &, EntityId);
+  static std::optional<GNUInlineAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::GNU_INLINE;

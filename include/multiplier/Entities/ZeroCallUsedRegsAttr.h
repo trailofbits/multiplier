@@ -40,7 +40,7 @@ class ZeroCallUsedRegsAttr : public InheritableAttr {
   static gap::generator<ZeroCallUsedRegsAttr> in(const Index &index);
   static gap::generator<ZeroCallUsedRegsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ZeroCallUsedRegsAttr> by(const Index &, EntityId);
+  static std::optional<ZeroCallUsedRegsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ZERO_CALL_USED_REGS;

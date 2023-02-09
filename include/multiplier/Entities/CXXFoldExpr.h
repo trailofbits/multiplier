@@ -43,7 +43,7 @@ class CXXFoldExpr : public Expr {
   static gap::generator<CXXFoldExpr> in(const Index &index);
   static gap::generator<CXXFoldExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXFoldExpr> by(const Index &, EntityId);
+  static std::optional<CXXFoldExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FOLD_EXPR;

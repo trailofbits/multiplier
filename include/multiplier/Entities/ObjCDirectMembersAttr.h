@@ -37,7 +37,7 @@ class ObjCDirectMembersAttr : public Attr {
   static gap::generator<ObjCDirectMembersAttr> in(const Index &index);
   static gap::generator<ObjCDirectMembersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCDirectMembersAttr> by(const Index &, EntityId);
+  static std::optional<ObjCDirectMembersAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DIRECT_MEMBERS;

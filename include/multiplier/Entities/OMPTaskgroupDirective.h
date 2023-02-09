@@ -40,7 +40,7 @@ class OMPTaskgroupDirective : public OMPExecutableDirective {
   static gap::generator<OMPTaskgroupDirective> in(const Index &index);
   static gap::generator<OMPTaskgroupDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPTaskgroupDirective> by(const Index &, EntityId);
+  static std::optional<OMPTaskgroupDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKGROUP_DIRECTIVE;

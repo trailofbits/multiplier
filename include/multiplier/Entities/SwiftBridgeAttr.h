@@ -39,7 +39,7 @@ class SwiftBridgeAttr : public InheritableAttr {
   static gap::generator<SwiftBridgeAttr> in(const Index &index);
   static gap::generator<SwiftBridgeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftBridgeAttr> by(const Index &, EntityId);
+  static std::optional<SwiftBridgeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_BRIDGE;

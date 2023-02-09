@@ -37,7 +37,7 @@ class IFuncAttr : public Attr {
   static gap::generator<IFuncAttr> in(const Index &index);
   static gap::generator<IFuncAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<IFuncAttr> by(const Index &, EntityId);
+  static std::optional<IFuncAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::I_FUNC;

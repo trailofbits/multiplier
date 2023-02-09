@@ -37,7 +37,7 @@ class ExportDecl : public Decl {
   static gap::generator<ExportDecl> in(const Index &index);
   static gap::generator<ExportDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ExportDecl> by(const Index &, EntityId);
+  static std::optional<ExportDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXPORT;

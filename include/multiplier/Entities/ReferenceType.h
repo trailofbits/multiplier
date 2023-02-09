@@ -37,7 +37,7 @@ class ReferenceType : public Type {
   static gap::generator<ReferenceType> in(const Index &index);
   static gap::generator<ReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ReferenceType> by(const Index &, EntityId);
+  static std::optional<ReferenceType> by_id(const Index &, EntityId);
 
   inline static std::optional<ReferenceType> from(const Reference &r) {
     return from(r.as_type());

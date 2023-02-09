@@ -41,7 +41,7 @@ class CXXNoexceptExpr : public Expr {
   static gap::generator<CXXNoexceptExpr> in(const Index &index);
   static gap::generator<CXXNoexceptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXNoexceptExpr> by(const Index &, EntityId);
+  static std::optional<CXXNoexceptExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NOEXCEPT_EXPR;

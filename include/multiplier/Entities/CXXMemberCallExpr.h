@@ -46,7 +46,7 @@ class CXXMemberCallExpr : public CallExpr {
   static gap::generator<CXXMemberCallExpr> in(const Index &index);
   static gap::generator<CXXMemberCallExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXMemberCallExpr> by(const Index &, EntityId);
+  static std::optional<CXXMemberCallExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_MEMBER_CALL_EXPR;

@@ -39,7 +39,7 @@ class NoDebugAttr : public InheritableAttr {
   static gap::generator<NoDebugAttr> in(const Index &index);
   static gap::generator<NoDebugAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoDebugAttr> by(const Index &, EntityId);
+  static std::optional<NoDebugAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DEBUG;

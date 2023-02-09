@@ -39,7 +39,7 @@ class InheritableParamAttr : public InheritableAttr {
   static gap::generator<InheritableParamAttr> in(const Index &index);
   static gap::generator<InheritableParamAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<InheritableParamAttr> by(const Index &, EntityId);
+  static std::optional<InheritableParamAttr> by_id(const Index &, EntityId);
 
   inline static std::optional<InheritableParamAttr> from(const Reference &r) {
     return from(r.as_attribute());

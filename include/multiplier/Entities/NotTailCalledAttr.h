@@ -39,7 +39,7 @@ class NotTailCalledAttr : public InheritableAttr {
   static gap::generator<NotTailCalledAttr> in(const Index &index);
   static gap::generator<NotTailCalledAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NotTailCalledAttr> by(const Index &, EntityId);
+  static std::optional<NotTailCalledAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NOT_TAIL_CALLED;

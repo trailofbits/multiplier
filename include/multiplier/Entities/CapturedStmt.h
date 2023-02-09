@@ -40,7 +40,7 @@ class CapturedStmt : public Stmt {
   static gap::generator<CapturedStmt> in(const Index &index);
   static gap::generator<CapturedStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CapturedStmt> by(const Index &, EntityId);
+  static std::optional<CapturedStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CAPTURED_STMT;

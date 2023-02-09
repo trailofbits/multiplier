@@ -45,7 +45,7 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   static gap::generator<ObjCImplementationDecl> in(const Index &index);
   static gap::generator<ObjCImplementationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCImplementationDecl> by(const Index &, EntityId);
+  static std::optional<ObjCImplementationDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_IMPLEMENTATION;

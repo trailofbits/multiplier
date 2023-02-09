@@ -39,7 +39,7 @@ class AssumptionAttr : public InheritableAttr {
   static gap::generator<AssumptionAttr> in(const Index &index);
   static gap::generator<AssumptionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AssumptionAttr> by(const Index &, EntityId);
+  static std::optional<AssumptionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSUMPTION;

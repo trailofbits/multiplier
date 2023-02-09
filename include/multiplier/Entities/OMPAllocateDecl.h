@@ -40,7 +40,7 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   static gap::generator<OMPAllocateDecl> in(const Index &index);
   static gap::generator<OMPAllocateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPAllocateDecl> by(const Index &, EntityId);
+  static std::optional<OMPAllocateDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_ALLOCATE;

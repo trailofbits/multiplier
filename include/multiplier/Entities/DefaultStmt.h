@@ -39,7 +39,7 @@ class DefaultStmt : public SwitchCase {
   static gap::generator<DefaultStmt> in(const Index &index);
   static gap::generator<DefaultStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DefaultStmt> by(const Index &, EntityId);
+  static std::optional<DefaultStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEFAULT_STMT;

@@ -39,7 +39,7 @@ class DeclOrStmtAttr : public InheritableAttr {
   static gap::generator<DeclOrStmtAttr> in(const Index &index);
   static gap::generator<DeclOrStmtAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DeclOrStmtAttr> by(const Index &, EntityId);
+  static std::optional<DeclOrStmtAttr> by_id(const Index &, EntityId);
 
   inline static std::optional<DeclOrStmtAttr> from(const Reference &r) {
     return from(r.as_attribute());

@@ -40,7 +40,7 @@ class FunctionReturnThunksAttr : public InheritableAttr {
   static gap::generator<FunctionReturnThunksAttr> in(const Index &index);
   static gap::generator<FunctionReturnThunksAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FunctionReturnThunksAttr> by(const Index &, EntityId);
+  static std::optional<FunctionReturnThunksAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FUNCTION_RETURN_THUNKS;

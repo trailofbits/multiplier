@@ -40,7 +40,7 @@ class BlocksAttr : public InheritableAttr {
   static gap::generator<BlocksAttr> in(const Index &index);
   static gap::generator<BlocksAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BlocksAttr> by(const Index &, EntityId);
+  static std::optional<BlocksAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BLOCKS;

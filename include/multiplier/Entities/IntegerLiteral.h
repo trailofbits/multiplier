@@ -41,7 +41,7 @@ class IntegerLiteral : public Expr {
   static gap::generator<IntegerLiteral> in(const Index &index);
   static gap::generator<IntegerLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<IntegerLiteral> by(const Index &, EntityId);
+  static std::optional<IntegerLiteral> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INTEGER_LITERAL;

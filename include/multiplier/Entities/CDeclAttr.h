@@ -39,7 +39,7 @@ class CDeclAttr : public InheritableAttr {
   static gap::generator<CDeclAttr> in(const Index &index);
   static gap::generator<CDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CDeclAttr> by(const Index &, EntityId);
+  static std::optional<CDeclAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::C_DECL;

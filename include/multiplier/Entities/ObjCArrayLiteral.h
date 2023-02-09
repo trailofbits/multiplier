@@ -42,7 +42,7 @@ class ObjCArrayLiteral : public Expr {
   static gap::generator<ObjCArrayLiteral> in(const Index &index);
   static gap::generator<ObjCArrayLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCArrayLiteral> by(const Index &, EntityId);
+  static std::optional<ObjCArrayLiteral> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ARRAY_LITERAL;

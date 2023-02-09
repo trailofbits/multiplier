@@ -39,7 +39,7 @@ class StdCallAttr : public InheritableAttr {
   static gap::generator<StdCallAttr> in(const Index &index);
   static gap::generator<StdCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<StdCallAttr> by(const Index &, EntityId);
+  static std::optional<StdCallAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::STD_CALL;

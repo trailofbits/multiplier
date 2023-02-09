@@ -39,7 +39,7 @@ class SYCLKernelAttr : public InheritableAttr {
   static gap::generator<SYCLKernelAttr> in(const Index &index);
   static gap::generator<SYCLKernelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SYCLKernelAttr> by(const Index &, EntityId);
+  static std::optional<SYCLKernelAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SYCL_KERNEL;

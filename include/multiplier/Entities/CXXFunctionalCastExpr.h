@@ -45,7 +45,7 @@ class CXXFunctionalCastExpr : public ExplicitCastExpr {
   static gap::generator<CXXFunctionalCastExpr> in(const Index &index);
   static gap::generator<CXXFunctionalCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXFunctionalCastExpr> by(const Index &, EntityId);
+  static std::optional<CXXFunctionalCastExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FUNCTIONAL_CAST_EXPR;

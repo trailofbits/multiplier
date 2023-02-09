@@ -39,7 +39,7 @@ class NoAliasAttr : public InheritableAttr {
   static gap::generator<NoAliasAttr> in(const Index &index);
   static gap::generator<NoAliasAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoAliasAttr> by(const Index &, EntityId);
+  static std::optional<NoAliasAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_ALIAS;

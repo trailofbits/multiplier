@@ -40,7 +40,7 @@ class AssumeAlignedAttr : public InheritableAttr {
   static gap::generator<AssumeAlignedAttr> in(const Index &index);
   static gap::generator<AssumeAlignedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AssumeAlignedAttr> by(const Index &, EntityId);
+  static std::optional<AssumeAlignedAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSUME_ALIGNED;

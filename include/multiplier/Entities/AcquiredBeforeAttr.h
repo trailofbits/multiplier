@@ -39,7 +39,7 @@ class AcquiredBeforeAttr : public InheritableAttr {
   static gap::generator<AcquiredBeforeAttr> in(const Index &index);
   static gap::generator<AcquiredBeforeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AcquiredBeforeAttr> by(const Index &, EntityId);
+  static std::optional<AcquiredBeforeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ACQUIRED_BEFORE;

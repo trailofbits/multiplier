@@ -40,7 +40,7 @@ class MipsShortCallAttr : public InheritableAttr {
   static gap::generator<MipsShortCallAttr> in(const Index &index);
   static gap::generator<MipsShortCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MipsShortCallAttr> by(const Index &, EntityId);
+  static std::optional<MipsShortCallAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIPS_SHORT_CALL;

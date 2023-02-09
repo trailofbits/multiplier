@@ -67,7 +67,7 @@ class Attr {
   static gap::generator<Attr> in(const Index &index);
   static gap::generator<Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<Attr> by(const Index &, EntityId);
+  static std::optional<Attr> by_id(const Index &, EntityId);
 
   inline static std::optional<Attr> from(const Attr &self) {
     return self;

@@ -39,7 +39,7 @@ class RandomizeLayoutAttr : public InheritableAttr {
   static gap::generator<RandomizeLayoutAttr> in(const Index &index);
   static gap::generator<RandomizeLayoutAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RandomizeLayoutAttr> by(const Index &, EntityId);
+  static std::optional<RandomizeLayoutAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RANDOMIZE_LAYOUT;

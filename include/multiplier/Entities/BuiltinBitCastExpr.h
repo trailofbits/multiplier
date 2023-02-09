@@ -45,7 +45,7 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
   static gap::generator<BuiltinBitCastExpr> in(const Index &index);
   static gap::generator<BuiltinBitCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BuiltinBitCastExpr> by(const Index &, EntityId);
+  static std::optional<BuiltinBitCastExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BUILTIN_BIT_CAST_EXPR;

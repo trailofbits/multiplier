@@ -39,7 +39,7 @@ class ObjCPreciseLifetimeAttr : public InheritableAttr {
   static gap::generator<ObjCPreciseLifetimeAttr> in(const Index &index);
   static gap::generator<ObjCPreciseLifetimeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCPreciseLifetimeAttr> by(const Index &, EntityId);
+  static std::optional<ObjCPreciseLifetimeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_PRECISE_LIFETIME;

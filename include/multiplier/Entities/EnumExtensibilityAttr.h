@@ -40,7 +40,7 @@ class EnumExtensibilityAttr : public InheritableAttr {
   static gap::generator<EnumExtensibilityAttr> in(const Index &index);
   static gap::generator<EnumExtensibilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EnumExtensibilityAttr> by(const Index &, EntityId);
+  static std::optional<EnumExtensibilityAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENUM_EXTENSIBILITY;

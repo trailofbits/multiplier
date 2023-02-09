@@ -39,7 +39,7 @@ class PragmaClangRodataSectionAttr : public InheritableAttr {
   static gap::generator<PragmaClangRodataSectionAttr> in(const Index &index);
   static gap::generator<PragmaClangRodataSectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PragmaClangRodataSectionAttr> by(const Index &, EntityId);
+  static std::optional<PragmaClangRodataSectionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRAGMA_CLANG_RODATA_SECTION;

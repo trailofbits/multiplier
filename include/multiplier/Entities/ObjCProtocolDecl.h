@@ -42,7 +42,7 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   static gap::generator<ObjCProtocolDecl> in(const Index &index);
   static gap::generator<ObjCProtocolDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCProtocolDecl> by(const Index &, EntityId);
+  static std::optional<ObjCProtocolDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROTOCOL;

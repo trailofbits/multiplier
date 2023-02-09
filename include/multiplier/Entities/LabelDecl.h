@@ -40,7 +40,7 @@ class LabelDecl : public NamedDecl {
   static gap::generator<LabelDecl> in(const Index &index);
   static gap::generator<LabelDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LabelDecl> by(const Index &, EntityId);
+  static std::optional<LabelDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LABEL;

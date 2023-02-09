@@ -41,7 +41,7 @@ class ParenListExpr : public Expr {
   static gap::generator<ParenListExpr> in(const Index &index);
   static gap::generator<ParenListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ParenListExpr> by(const Index &, EntityId);
+  static std::optional<ParenListExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PAREN_LIST_EXPR;

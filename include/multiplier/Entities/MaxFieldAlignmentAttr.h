@@ -39,7 +39,7 @@ class MaxFieldAlignmentAttr : public InheritableAttr {
   static gap::generator<MaxFieldAlignmentAttr> in(const Index &index);
   static gap::generator<MaxFieldAlignmentAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MaxFieldAlignmentAttr> by(const Index &, EntityId);
+  static std::optional<MaxFieldAlignmentAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MAX_FIELD_ALIGNMENT;

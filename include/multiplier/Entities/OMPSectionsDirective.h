@@ -40,7 +40,7 @@ class OMPSectionsDirective : public OMPExecutableDirective {
   static gap::generator<OMPSectionsDirective> in(const Index &index);
   static gap::generator<OMPSectionsDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPSectionsDirective> by(const Index &, EntityId);
+  static std::optional<OMPSectionsDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SECTIONS_DIRECTIVE;

@@ -42,7 +42,7 @@ class ObjCProtocolExpr : public Expr {
   static gap::generator<ObjCProtocolExpr> in(const Index &index);
   static gap::generator<ObjCProtocolExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCProtocolExpr> by(const Index &, EntityId);
+  static std::optional<ObjCProtocolExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_PROTOCOL_EXPR;

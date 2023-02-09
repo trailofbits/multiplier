@@ -42,7 +42,7 @@ class ObjCStringLiteral : public Expr {
   static gap::generator<ObjCStringLiteral> in(const Index &index);
   static gap::generator<ObjCStringLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCStringLiteral> by(const Index &, EntityId);
+  static std::optional<ObjCStringLiteral> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_STRING_LITERAL;

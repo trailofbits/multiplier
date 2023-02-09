@@ -41,7 +41,7 @@ class IfStmt : public Stmt {
   static gap::generator<IfStmt> in(const Index &index);
   static gap::generator<IfStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<IfStmt> by(const Index &, EntityId);
+  static std::optional<IfStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IF_STMT;

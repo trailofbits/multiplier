@@ -39,7 +39,7 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   static gap::generator<OMPRequiresDecl> in(const Index &index);
   static gap::generator<OMPRequiresDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPRequiresDecl> by(const Index &, EntityId);
+  static std::optional<OMPRequiresDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_REQUIRES;

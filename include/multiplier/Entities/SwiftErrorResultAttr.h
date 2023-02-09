@@ -43,7 +43,7 @@ class SwiftErrorResultAttr : public ParameterABIAttr {
   static gap::generator<SwiftErrorResultAttr> in(const Index &index);
   static gap::generator<SwiftErrorResultAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftErrorResultAttr> by(const Index &, EntityId);
+  static std::optional<SwiftErrorResultAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ERROR_RESULT;

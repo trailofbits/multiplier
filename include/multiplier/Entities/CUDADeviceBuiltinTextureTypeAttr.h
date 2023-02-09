@@ -39,7 +39,7 @@ class CUDADeviceBuiltinTextureTypeAttr : public InheritableAttr {
   static gap::generator<CUDADeviceBuiltinTextureTypeAttr> in(const Index &index);
   static gap::generator<CUDADeviceBuiltinTextureTypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CUDADeviceBuiltinTextureTypeAttr> by(const Index &, EntityId);
+  static std::optional<CUDADeviceBuiltinTextureTypeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE;

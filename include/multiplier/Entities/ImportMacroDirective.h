@@ -40,7 +40,7 @@ class ImportMacroDirective : public IncludeLikeMacroDirective {
   static gap::generator<ImportMacroDirective> in(const Fragment &frag);
 
   static gap::generator<ImportMacroDirective> in(const Index &index);
-  std::optional<ImportMacroDirective> by(const Index &, EntityId);
+  static std::optional<ImportMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::IMPORT_DIRECTIVE;

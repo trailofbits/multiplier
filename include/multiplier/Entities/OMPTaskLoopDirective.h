@@ -43,7 +43,7 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
   static gap::generator<OMPTaskLoopDirective> in(const Index &index);
   static gap::generator<OMPTaskLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPTaskLoopDirective> by(const Index &, EntityId);
+  static std::optional<OMPTaskLoopDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASK_LOOP_DIRECTIVE;

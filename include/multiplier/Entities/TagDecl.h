@@ -44,7 +44,7 @@ class TagDecl : public TypeDecl {
   static gap::generator<TagDecl> in(const Index &index);
   static gap::generator<TagDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TagDecl> by(const Index &, EntityId);
+  static std::optional<TagDecl> by_id(const Index &, EntityId);
 
   static gap::generator<TagDecl> containing(const Decl &decl);
   static gap::generator<TagDecl> containing(const std::optional<Decl> &decl);

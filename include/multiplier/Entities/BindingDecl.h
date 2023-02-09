@@ -43,7 +43,7 @@ class BindingDecl : public ValueDecl {
   static gap::generator<BindingDecl> in(const Index &index);
   static gap::generator<BindingDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BindingDecl> by(const Index &, EntityId);
+  static std::optional<BindingDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BINDING;

@@ -37,7 +37,7 @@ class ObjCNonLazyClassAttr : public Attr {
   static gap::generator<ObjCNonLazyClassAttr> in(const Index &index);
   static gap::generator<ObjCNonLazyClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCNonLazyClassAttr> by(const Index &, EntityId);
+  static std::optional<ObjCNonLazyClassAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_NON_LAZY_CLASS;

@@ -39,7 +39,7 @@ class TransparentUnionAttr : public InheritableAttr {
   static gap::generator<TransparentUnionAttr> in(const Index &index);
   static gap::generator<TransparentUnionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TransparentUnionAttr> by(const Index &, EntityId);
+  static std::optional<TransparentUnionAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TRANSPARENT_UNION;

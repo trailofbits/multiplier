@@ -41,7 +41,7 @@ class RecoveryExpr : public Expr {
   static gap::generator<RecoveryExpr> in(const Index &index);
   static gap::generator<RecoveryExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RecoveryExpr> by(const Index &, EntityId);
+  static std::optional<RecoveryExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::RECOVERY_EXPR;

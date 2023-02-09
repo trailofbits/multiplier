@@ -42,7 +42,7 @@ class UnaryOperator : public Expr {
   static gap::generator<UnaryOperator> in(const Index &index);
   static gap::generator<UnaryOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<UnaryOperator> by(const Index &, EntityId);
+  static std::optional<UnaryOperator> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_OPERATOR;

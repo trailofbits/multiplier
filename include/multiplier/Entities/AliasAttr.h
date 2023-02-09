@@ -37,7 +37,7 @@ class AliasAttr : public Attr {
   static gap::generator<AliasAttr> in(const Index &index);
   static gap::generator<AliasAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AliasAttr> by(const Index &, EntityId);
+  static std::optional<AliasAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIAS;

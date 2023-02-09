@@ -40,7 +40,7 @@ class PtGuardedByAttr : public InheritableAttr {
   static gap::generator<PtGuardedByAttr> in(const Index &index);
   static gap::generator<PtGuardedByAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<PtGuardedByAttr> by(const Index &, EntityId);
+  static std::optional<PtGuardedByAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PT_GUARDED_BY;

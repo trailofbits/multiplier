@@ -42,7 +42,7 @@ class DependentCoawaitExpr : public Expr {
   static gap::generator<DependentCoawaitExpr> in(const Index &index);
   static gap::generator<DependentCoawaitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DependentCoawaitExpr> by(const Index &, EntityId);
+  static std::optional<DependentCoawaitExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEPENDENT_COAWAIT_EXPR;

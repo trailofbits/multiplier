@@ -42,7 +42,7 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
   static gap::generator<AlwaysInlineAttr> in(const Index &index);
   static gap::generator<AlwaysInlineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AlwaysInlineAttr> by(const Index &, EntityId);
+  static std::optional<AlwaysInlineAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALWAYS_INLINE;

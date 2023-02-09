@@ -47,7 +47,7 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
   static gap::generator<CXXReinterpretCastExpr> in(const Index &index);
   static gap::generator<CXXReinterpretCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXReinterpretCastExpr> by(const Index &, EntityId);
+  static std::optional<CXXReinterpretCastExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_REINTERPRET_CAST_EXPR;

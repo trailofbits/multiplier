@@ -43,7 +43,7 @@ class ExprWithCleanups : public FullExpr {
   static gap::generator<ExprWithCleanups> in(const Index &index);
   static gap::generator<ExprWithCleanups> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ExprWithCleanups> by(const Index &, EntityId);
+  static std::optional<ExprWithCleanups> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXPR_WITH_CLEANUPS;

@@ -38,7 +38,7 @@ class DecltypeType : public Type {
   static gap::generator<DecltypeType> in(const Index &index);
   static gap::generator<DecltypeType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<DecltypeType> by(const Index &, EntityId);
+  static std::optional<DecltypeType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DECLTYPE;

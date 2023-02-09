@@ -43,7 +43,7 @@ class ConditionalOperator : public AbstractConditionalOperator {
   static gap::generator<ConditionalOperator> in(const Index &index);
   static gap::generator<ConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ConditionalOperator> by(const Index &, EntityId);
+  static std::optional<ConditionalOperator> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONDITIONAL_OPERATOR;

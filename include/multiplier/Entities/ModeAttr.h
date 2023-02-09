@@ -37,7 +37,7 @@ class ModeAttr : public Attr {
   static gap::generator<ModeAttr> in(const Index &index);
   static gap::generator<ModeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ModeAttr> by(const Index &, EntityId);
+  static std::optional<ModeAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MODE;

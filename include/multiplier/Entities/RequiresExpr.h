@@ -43,7 +43,7 @@ class RequiresExpr : public Expr {
   static gap::generator<RequiresExpr> in(const Index &index);
   static gap::generator<RequiresExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RequiresExpr> by(const Index &, EntityId);
+  static std::optional<RequiresExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::REQUIRES_EXPR;

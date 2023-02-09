@@ -41,7 +41,7 @@ class OffsetOfExpr : public Expr {
   static gap::generator<OffsetOfExpr> in(const Index &index);
   static gap::generator<OffsetOfExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OffsetOfExpr> by(const Index &, EntityId);
+  static std::optional<OffsetOfExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OFFSET_OF_EXPR;

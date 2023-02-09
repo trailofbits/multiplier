@@ -40,7 +40,7 @@ class TypeDecl : public NamedDecl {
   static gap::generator<TypeDecl> in(const Index &index);
   static gap::generator<TypeDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<TypeDecl> by(const Index &, EntityId);
+  static std::optional<TypeDecl> by_id(const Index &, EntityId);
 
   static gap::generator<TypeDecl> containing(const Decl &decl);
   static gap::generator<TypeDecl> containing(const std::optional<Decl> &decl);

@@ -37,7 +37,7 @@ class ComplexType : public Type {
   static gap::generator<ComplexType> in(const Index &index);
   static gap::generator<ComplexType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ComplexType> by(const Index &, EntityId);
+  static std::optional<ComplexType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::COMPLEX;

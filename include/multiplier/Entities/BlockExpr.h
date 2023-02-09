@@ -43,7 +43,7 @@ class BlockExpr : public Expr {
   static gap::generator<BlockExpr> in(const Index &index);
   static gap::generator<BlockExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<BlockExpr> by(const Index &, EntityId);
+  static std::optional<BlockExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BLOCK_EXPR;

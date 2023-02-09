@@ -39,7 +39,7 @@ class NoStackProtectorAttr : public InheritableAttr {
   static gap::generator<NoStackProtectorAttr> in(const Index &index);
   static gap::generator<NoStackProtectorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NoStackProtectorAttr> by(const Index &, EntityId);
+  static std::optional<NoStackProtectorAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_STACK_PROTECTOR;

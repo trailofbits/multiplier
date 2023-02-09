@@ -42,7 +42,7 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
   static gap::generator<SubstNonTypeTemplateParmPackExpr> in(const Index &index);
   static gap::generator<SubstNonTypeTemplateParmPackExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SubstNonTypeTemplateParmPackExpr> by(const Index &, EntityId);
+  static std::optional<SubstNonTypeTemplateParmPackExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_PACK_EXPR;

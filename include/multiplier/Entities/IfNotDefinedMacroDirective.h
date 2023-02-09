@@ -40,7 +40,7 @@ class IfNotDefinedMacroDirective : public ConditionalMacroDirective {
   static gap::generator<IfNotDefinedMacroDirective> in(const Fragment &frag);
 
   static gap::generator<IfNotDefinedMacroDirective> in(const Index &index);
-  std::optional<IfNotDefinedMacroDirective> by(const Index &, EntityId);
+  static std::optional<IfNotDefinedMacroDirective> by_id(const Index &, EntityId);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::IF_NOT_DEFINED_DIRECTIVE;

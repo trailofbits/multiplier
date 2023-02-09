@@ -40,7 +40,7 @@ class AMDGPUWavesPerEUAttr : public InheritableAttr {
   static gap::generator<AMDGPUWavesPerEUAttr> in(const Index &index);
   static gap::generator<AMDGPUWavesPerEUAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<AMDGPUWavesPerEUAttr> by(const Index &, EntityId);
+  static std::optional<AMDGPUWavesPerEUAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_WAVES_PER_EU;

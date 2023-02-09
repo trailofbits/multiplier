@@ -39,7 +39,7 @@ class OpenCLKernelAttr : public InheritableAttr {
   static gap::generator<OpenCLKernelAttr> in(const Index &index);
   static gap::generator<OpenCLKernelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OpenCLKernelAttr> by(const Index &, EntityId);
+  static std::optional<OpenCLKernelAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_KERNEL;

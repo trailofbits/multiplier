@@ -37,7 +37,7 @@ class InitSegAttr : public Attr {
   static gap::generator<InitSegAttr> in(const Index &index);
   static gap::generator<InitSegAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<InitSegAttr> by(const Index &, EntityId);
+  static std::optional<InitSegAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_SEG;

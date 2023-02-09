@@ -39,7 +39,7 @@ class XRayLogArgsAttr : public InheritableAttr {
   static gap::generator<XRayLogArgsAttr> in(const Index &index);
   static gap::generator<XRayLogArgsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<XRayLogArgsAttr> by(const Index &, EntityId);
+  static std::optional<XRayLogArgsAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::X_RAY_LOG_ARGS;

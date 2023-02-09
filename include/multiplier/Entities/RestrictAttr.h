@@ -40,7 +40,7 @@ class RestrictAttr : public InheritableAttr {
   static gap::generator<RestrictAttr> in(const Index &index);
   static gap::generator<RestrictAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<RestrictAttr> by(const Index &, EntityId);
+  static std::optional<RestrictAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RESTRICT;

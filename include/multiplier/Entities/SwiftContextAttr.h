@@ -43,7 +43,7 @@ class SwiftContextAttr : public ParameterABIAttr {
   static gap::generator<SwiftContextAttr> in(const Index &index);
   static gap::generator<SwiftContextAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftContextAttr> by(const Index &, EntityId);
+  static std::optional<SwiftContextAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_CONTEXT;

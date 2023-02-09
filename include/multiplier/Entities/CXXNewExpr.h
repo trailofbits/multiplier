@@ -45,7 +45,7 @@ class CXXNewExpr : public Expr {
   static gap::generator<CXXNewExpr> in(const Index &index);
   static gap::generator<CXXNewExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXNewExpr> by(const Index &, EntityId);
+  static std::optional<CXXNewExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NEW_EXPR;

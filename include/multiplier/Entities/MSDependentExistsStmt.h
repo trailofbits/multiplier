@@ -38,7 +38,7 @@ class MSDependentExistsStmt : public Stmt {
   static gap::generator<MSDependentExistsStmt> in(const Index &index);
   static gap::generator<MSDependentExistsStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSDependentExistsStmt> by(const Index &, EntityId);
+  static std::optional<MSDependentExistsStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_DEPENDENT_EXISTS_STMT;

@@ -39,7 +39,7 @@ class EmptyBasesAttr : public InheritableAttr {
   static gap::generator<EmptyBasesAttr> in(const Index &index);
   static gap::generator<EmptyBasesAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<EmptyBasesAttr> by(const Index &, EntityId);
+  static std::optional<EmptyBasesAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EMPTY_BASES;

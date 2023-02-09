@@ -37,7 +37,7 @@ class LinkageSpecDecl : public Decl {
   static gap::generator<LinkageSpecDecl> in(const Index &index);
   static gap::generator<LinkageSpecDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<LinkageSpecDecl> by(const Index &, EntityId);
+  static std::optional<LinkageSpecDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LINKAGE_SPEC;

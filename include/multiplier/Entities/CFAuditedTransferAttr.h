@@ -39,7 +39,7 @@ class CFAuditedTransferAttr : public InheritableAttr {
   static gap::generator<CFAuditedTransferAttr> in(const Index &index);
   static gap::generator<CFAuditedTransferAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CFAuditedTransferAttr> by(const Index &, EntityId);
+  static std::optional<CFAuditedTransferAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_AUDITED_TRANSFER;

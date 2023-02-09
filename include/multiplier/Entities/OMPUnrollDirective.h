@@ -43,7 +43,7 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
   static gap::generator<OMPUnrollDirective> in(const Index &index);
   static gap::generator<OMPUnrollDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPUnrollDirective> by(const Index &, EntityId);
+  static std::optional<OMPUnrollDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_UNROLL_DIRECTIVE;

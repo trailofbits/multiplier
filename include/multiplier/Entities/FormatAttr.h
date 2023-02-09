@@ -39,7 +39,7 @@ class FormatAttr : public InheritableAttr {
   static gap::generator<FormatAttr> in(const Index &index);
   static gap::generator<FormatAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<FormatAttr> by(const Index &, EntityId);
+  static std::optional<FormatAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FORMAT;

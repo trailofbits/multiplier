@@ -45,7 +45,7 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   static gap::generator<NonTypeTemplateParmDecl> in(const Index &index);
   static gap::generator<NonTypeTemplateParmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<NonTypeTemplateParmDecl> by(const Index &, EntityId);
+  static std::optional<NonTypeTemplateParmDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NON_TYPE_TEMPLATE_PARM;

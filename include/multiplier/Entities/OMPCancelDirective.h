@@ -39,7 +39,7 @@ class OMPCancelDirective : public OMPExecutableDirective {
   static gap::generator<OMPCancelDirective> in(const Index &index);
   static gap::generator<OMPCancelDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPCancelDirective> by(const Index &, EntityId);
+  static std::optional<OMPCancelDirective> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANCEL_DIRECTIVE;

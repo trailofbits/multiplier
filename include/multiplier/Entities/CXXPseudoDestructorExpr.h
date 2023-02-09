@@ -42,7 +42,7 @@ class CXXPseudoDestructorExpr : public Expr {
   static gap::generator<CXXPseudoDestructorExpr> in(const Index &index);
   static gap::generator<CXXPseudoDestructorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXPseudoDestructorExpr> by(const Index &, EntityId);
+  static std::optional<CXXPseudoDestructorExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR;

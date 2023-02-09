@@ -40,7 +40,7 @@ class MSVtorDispAttr : public InheritableAttr {
   static gap::generator<MSVtorDispAttr> in(const Index &index);
   static gap::generator<MSVtorDispAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<MSVtorDispAttr> by(const Index &, EntityId);
+  static std::optional<MSVtorDispAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_VTOR_DISP;

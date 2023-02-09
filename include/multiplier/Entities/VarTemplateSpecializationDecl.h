@@ -49,7 +49,7 @@ class VarTemplateSpecializationDecl : public VarDecl {
   static gap::generator<VarTemplateSpecializationDecl> in(const Index &index);
   static gap::generator<VarTemplateSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<VarTemplateSpecializationDecl> by(const Index &, EntityId);
+  static std::optional<VarTemplateSpecializationDecl> by_id(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE_SPECIALIZATION;

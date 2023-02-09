@@ -41,7 +41,7 @@ class OMPAllocateDeclAttr : public InheritableAttr {
   static gap::generator<OMPAllocateDeclAttr> in(const Index &index);
   static gap::generator<OMPAllocateDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPAllocateDeclAttr> by(const Index &, EntityId);
+  static std::optional<OMPAllocateDeclAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_ALLOCATE_DECL;

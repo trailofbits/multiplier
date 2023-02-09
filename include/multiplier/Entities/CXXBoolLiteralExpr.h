@@ -41,7 +41,7 @@ class CXXBoolLiteralExpr : public Expr {
   static gap::generator<CXXBoolLiteralExpr> in(const Index &index);
   static gap::generator<CXXBoolLiteralExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<CXXBoolLiteralExpr> by(const Index &, EntityId);
+  static std::optional<CXXBoolLiteralExpr> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_BOOL_LITERAL_EXPR;

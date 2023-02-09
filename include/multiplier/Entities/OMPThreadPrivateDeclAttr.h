@@ -39,7 +39,7 @@ class OMPThreadPrivateDeclAttr : public InheritableAttr {
   static gap::generator<OMPThreadPrivateDeclAttr> in(const Index &index);
   static gap::generator<OMPThreadPrivateDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<OMPThreadPrivateDeclAttr> by(const Index &, EntityId);
+  static std::optional<OMPThreadPrivateDeclAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_THREAD_PRIVATE_DECL;

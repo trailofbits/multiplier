@@ -39,7 +39,7 @@ class ObjCAtTryStmt : public Stmt {
   static gap::generator<ObjCAtTryStmt> in(const Index &index);
   static gap::generator<ObjCAtTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCAtTryStmt> by(const Index &, EntityId);
+  static std::optional<ObjCAtTryStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_TRY_STMT;

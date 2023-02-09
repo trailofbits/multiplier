@@ -37,7 +37,7 @@ class ObjCAtFinallyStmt : public Stmt {
   static gap::generator<ObjCAtFinallyStmt> in(const Index &index);
   static gap::generator<ObjCAtFinallyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<ObjCAtFinallyStmt> by(const Index &, EntityId);
+  static std::optional<ObjCAtFinallyStmt> by_id(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_FINALLY_STMT;

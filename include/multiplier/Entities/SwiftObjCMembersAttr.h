@@ -37,7 +37,7 @@ class SwiftObjCMembersAttr : public Attr {
   static gap::generator<SwiftObjCMembersAttr> in(const Index &index);
   static gap::generator<SwiftObjCMembersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  std::optional<SwiftObjCMembersAttr> by(const Index &, EntityId);
+  static std::optional<SwiftObjCMembersAttr> by_id(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_OBJ_C_MEMBERS;
