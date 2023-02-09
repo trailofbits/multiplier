@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class DependentNameType : public TypeWithKeyword {
   friend class Type;
  public:
   static gap::generator<DependentNameType> in(const Fragment &frag);
+  static gap::generator<DependentNameType> in(const Index &index);
   static gap::generator<DependentNameType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<DependentNameType> by(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_NAME;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentNameType> from(const Reference &r) {
     return from(r.as_type());
   }

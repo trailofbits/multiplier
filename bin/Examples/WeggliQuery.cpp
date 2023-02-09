@@ -59,7 +59,7 @@ static void DumpMatch(const mx::WeggliQueryMatch &match) {
     }
   }
 
-  PrintUnparsedTokens(std::cout, frag.preprocessed_code(), match);
+  RenderFragment(std::cout, frag, match, "\t\t", true);
 
   std::cout << "\n\n";
 }

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class CalledOnceAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<CalledOnceAttr> in(const Fragment &frag);
+  static gap::generator<CalledOnceAttr> in(const Index &index);
   static gap::generator<CalledOnceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<CalledOnceAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CALLED_ONCE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<CalledOnceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

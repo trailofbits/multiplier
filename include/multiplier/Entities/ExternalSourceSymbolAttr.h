@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ExternalSourceSymbolAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ExternalSourceSymbolAttr> in(const Fragment &frag);
+  static gap::generator<ExternalSourceSymbolAttr> in(const Index &index);
   static gap::generator<ExternalSourceSymbolAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ExternalSourceSymbolAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EXTERNAL_SOURCE_SYMBOL;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ExternalSourceSymbolAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

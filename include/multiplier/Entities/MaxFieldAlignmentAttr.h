@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class MaxFieldAlignmentAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MaxFieldAlignmentAttr> in(const Fragment &frag);
+  static gap::generator<MaxFieldAlignmentAttr> in(const Index &index);
   static gap::generator<MaxFieldAlignmentAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<MaxFieldAlignmentAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MAX_FIELD_ALIGNMENT;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MaxFieldAlignmentAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

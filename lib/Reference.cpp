@@ -40,7 +40,8 @@ std::pair<OpaqueImplPtr, EntityCategory> ReferencedEntity(
               EntityCategory::enum_name}; \
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
-                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER)
+                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
+                                MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER
 
   // It's a reference to a parsed token resident in a fragment.
@@ -183,6 +184,7 @@ std::optional<Token> Reference::as_token(void) const noexcept {
 
 MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER)
 

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class CXXUnresolvedConstructExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXUnresolvedConstructExpr> in(const Fragment &frag);
+  static gap::generator<CXXUnresolvedConstructExpr> in(const Index &index);
   static gap::generator<CXXUnresolvedConstructExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<CXXUnresolvedConstructExpr> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXUnresolvedConstructExpr> containing(const Decl &decl);
+  static gap::generator<CXXUnresolvedConstructExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<CXXUnresolvedConstructExpr> containing(const Stmt &stmt);
+  static gap::generator<CXXUnresolvedConstructExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

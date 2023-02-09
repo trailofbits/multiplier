@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class CXXRewrittenBinaryOperator : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXRewrittenBinaryOperator> in(const Fragment &frag);
+  static gap::generator<CXXRewrittenBinaryOperator> in(const Index &index);
   static gap::generator<CXXRewrittenBinaryOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<CXXRewrittenBinaryOperator> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXRewrittenBinaryOperator> containing(const Decl &decl);
+  static gap::generator<CXXRewrittenBinaryOperator> containing(const std::optional<Decl> &decl);
+
   static gap::generator<CXXRewrittenBinaryOperator> containing(const Stmt &stmt);
+  static gap::generator<CXXRewrittenBinaryOperator> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

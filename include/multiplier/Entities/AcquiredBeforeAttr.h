@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class AcquiredBeforeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AcquiredBeforeAttr> in(const Fragment &frag);
+  static gap::generator<AcquiredBeforeAttr> in(const Index &index);
   static gap::generator<AcquiredBeforeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<AcquiredBeforeAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ACQUIRED_BEFORE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AcquiredBeforeAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

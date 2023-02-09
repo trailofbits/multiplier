@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class DecayedType : public AdjustedType {
   friend class Type;
  public:
   static gap::generator<DecayedType> in(const Fragment &frag);
+  static gap::generator<DecayedType> in(const Index &index);
   static gap::generator<DecayedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<DecayedType> by(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DECAYED;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DecayedType> from(const Reference &r) {
     return from(r.as_type());
   }

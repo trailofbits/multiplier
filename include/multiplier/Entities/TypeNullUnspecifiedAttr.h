@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class TypeNullUnspecifiedAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<TypeNullUnspecifiedAttr> in(const Fragment &frag);
+  static gap::generator<TypeNullUnspecifiedAttr> in(const Index &index);
   static gap::generator<TypeNullUnspecifiedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<TypeNullUnspecifiedAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_NULL_UNSPECIFIED;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<TypeNullUnspecifiedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -134,6 +134,7 @@ const char *EnumeratorName(EntityCategory e) noexcept {
     MX_FOR_EACH_ENTITY_CATEGORY(MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
+                                MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME)
 #undef MX_ENTITY_CASE_NAME
   }

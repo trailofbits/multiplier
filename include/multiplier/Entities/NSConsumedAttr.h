@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,14 +38,15 @@ class NSConsumedAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<NSConsumedAttr> in(const Fragment &frag);
+  static gap::generator<NSConsumedAttr> in(const Index &index);
   static gap::generator<NSConsumedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<NSConsumedAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_CONSUMED;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NSConsumedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

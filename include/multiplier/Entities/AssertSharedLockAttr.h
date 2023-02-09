@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class AssertSharedLockAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AssertSharedLockAttr> in(const Fragment &frag);
+  static gap::generator<AssertSharedLockAttr> in(const Index &index);
   static gap::generator<AssertSharedLockAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<AssertSharedLockAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSERT_SHARED_LOCK;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AssertSharedLockAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

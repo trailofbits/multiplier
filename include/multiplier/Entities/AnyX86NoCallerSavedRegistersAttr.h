@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class AnyX86NoCallerSavedRegistersAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AnyX86NoCallerSavedRegistersAttr> in(const Fragment &frag);
+  static gap::generator<AnyX86NoCallerSavedRegistersAttr> in(const Index &index);
   static gap::generator<AnyX86NoCallerSavedRegistersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<AnyX86NoCallerSavedRegistersAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -243,6 +243,7 @@ std::optional<File> File::containing(const WeggliQueryMatch &match) {
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DEFINE_CONTAINING,
                               MX_DEFINE_CONTAINING)
 #undef MX_DEFINE_CONTAINING
 

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ArcWeakrefUnavailableAttr> in(const Fragment &frag);
+  static gap::generator<ArcWeakrefUnavailableAttr> in(const Index &index);
   static gap::generator<ArcWeakrefUnavailableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ArcWeakrefUnavailableAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARC_WEAKREF_UNAVAILABLE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ArcWeakrefUnavailableAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

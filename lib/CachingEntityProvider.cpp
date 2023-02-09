@@ -178,38 +178,6 @@ void CachingEntityProvider::FindSymbol(
   return next->FindSymbol(self, std::move(name), ids_out);
 }
 
-#define DEFINE_GETTERS(type_name, lower_name, enum_name, category) \
-    gap::generator<type_name ## ImplPtr> \
-    CachingEntityProvider::type_name ## sFor( \
-        const Ptr &ep, PackedFragmentId id) { \
-      return next->type_name ## sFor(ep, id); \
-    } \
-    \
-    type_name ## ImplPtr CachingEntityProvider::type_name ## For( \
-        const Ptr &ep, RawEntityId raw_id) { \
-      type_name ## ImplPtr ptr; \
-      std::lock_guard<std::recursive_mutex> locker(lock); \
-      if (auto it = lower_name ## s.find(raw_id); \
-          it != lower_name ## s.end()) { \
-        ptr = it->second.lock(); \
-      } \
-      \
-      if (!ptr) { \
-        ptr = next->type_name ## For(ep, raw_id); \
-        lower_name ## s[raw_id] = ptr; \
-      } \
-      \
-      entities.emplace_back(ptr, ptr.get()); \
-      \
-      return ptr; \
-    }
-
-  MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_GETTERS,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              DEFINE_GETTERS,
-                              DEFINE_GETTERS)
-#undef DEFINE_GETTERS
-
 // Returns an entity provider that gets entities from a UNIX domain socket.
 EntityProvider::Ptr EntityProvider::in_memory_cache(
     Ptr next, unsigned timeout_s_) {
@@ -251,5 +219,77 @@ EntityProvider::Ptr EntityProvider::in_memory_cache(
   reclaimer_thread.detach();
   return ret;
 }
+
+#define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
+    type_name ## ImplPtr CachingEntityProvider::type_name ## For( \
+        const Ptr &self, RawEntityId raw_id) { \
+      if (raw_id == kInvalidEntityId) { \
+        return {}; \
+      } \
+      do { \
+        std::lock_guard<std::recursive_mutex> locker(lock); \
+        if (auto it = lower_name ## s.find(raw_id); \
+            it != lower_name ## s.end()) { \
+          if (type_name ## ImplPtr ptr = it->second.lock()) { \
+            entities.emplace_back(ptr, ptr.get()); \
+            return ptr; \
+          } \
+        } \
+      } while (false); \
+      \
+      type_name ## ImplPtr ptr = next->type_name ## For(self, raw_id); \
+      if (!ptr) { \
+        return ptr; \
+      } \
+      \
+      std::lock_guard<std::recursive_mutex> locker(lock); \
+      lower_name ## s[raw_id] = ptr; \
+      entities.emplace_back(ptr, ptr.get()); \
+      \
+      return ptr; \
+    } \
+    \
+    gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
+        const Ptr &self) { \
+      return next->type_name ## sFor(self); \
+    }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER)
+#undef MX_DECLARE_ENTITY_GETTER
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+  gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
+      const Ptr &self, type_name ## Kind kind) { \
+    return next->type_name ## sFor(self, kind); \
+  } \
+  \
+  gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
+      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) { \
+    return next->type_name ## sFor(self, kind, frag_id); \
+  }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+  gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
+      const Ptr &self, PackedFragmentId frag_id) { \
+    return next->type_name ## sFor(self, frag_id); \
+  }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_DECLARE_ENTITY_LISTERS)
+#undef MX_DECLARE_ENTITY_LISTERS
 
 }  // namespace mx

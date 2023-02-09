@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class SwiftObjCMembersAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<SwiftObjCMembersAttr> in(const Fragment &frag);
+  static gap::generator<SwiftObjCMembersAttr> in(const Index &index);
   static gap::generator<SwiftObjCMembersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<SwiftObjCMembersAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_OBJ_C_MEMBERS;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SwiftObjCMembersAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

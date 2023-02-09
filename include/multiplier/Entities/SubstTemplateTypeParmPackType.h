@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -34,14 +35,15 @@ class SubstTemplateTypeParmPackType : public Type {
   friend class Type;
  public:
   static gap::generator<SubstTemplateTypeParmPackType> in(const Fragment &frag);
+  static gap::generator<SubstTemplateTypeParmPackType> in(const Index &index);
   static gap::generator<SubstTemplateTypeParmPackType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<SubstTemplateTypeParmPackType> by(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::SUBST_TEMPLATE_TYPE_PARM_PACK;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<SubstTemplateTypeParmPackType> from(const Reference &r) {
     return from(r.as_type());
   }

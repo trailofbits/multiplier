@@ -67,22 +67,44 @@ void InvalidEntityProvider::FindSymbol(
   ids_out.clear();
 }
 
-#define DEFINE_ENTITY_METHODS(type_name, lower_name, enum_name, category) \
-    gap::generator<type_name ## ImplPtr> \
-    InvalidEntityProvider::type_name ## sFor(const Ptr &, PackedFragmentId) { \
-      co_return; \
-    } \
-    \
+#define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
     type_name ## ImplPtr InvalidEntityProvider::type_name ## For( \
-        const Ptr &, RawEntityId) { \
-      return {}; \
-    }
+        const Ptr &, RawEntityId) { return {}; } \
+    \
+    gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
+        const Ptr &) { co_return; }
 
-  MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_ENTITY_METHODS,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              DEFINE_ENTITY_METHODS,
-                              DEFINE_ENTITY_METHODS)
-#undef DEFINE_ENTITY_METHODS
+MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER)
+#undef MX_DECLARE_ENTITY_GETTER
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+  gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
+      const Ptr &, type_name ## Kind) { co_return; } \
+  \
+  gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
+      const Ptr &, type_name ## Kind, PackedFragmentId) { co_return; }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+  gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
+      const Ptr &, PackedFragmentId) { co_return; }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_DECLARE_ENTITY_LISTERS)
+#undef MX_DECLARE_ENTITY_LISTERS
 
 Index::Index(void)
     : impl(std::make_shared<InvalidEntityProvider>()) {}

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class PointerType : public Type {
   friend class Type;
  public:
   static gap::generator<PointerType> in(const Fragment &frag);
+  static gap::generator<PointerType> in(const Index &index);
   static gap::generator<PointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<PointerType> by(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::POINTER;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<PointerType> from(const Reference &r) {
     return from(r.as_type());
   }

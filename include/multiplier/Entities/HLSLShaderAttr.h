@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,14 +37,15 @@ class HLSLShaderAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<HLSLShaderAttr> in(const Fragment &frag);
+  static gap::generator<HLSLShaderAttr> in(const Index &index);
   static gap::generator<HLSLShaderAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<HLSLShaderAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSL_SHADER;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<HLSLShaderAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

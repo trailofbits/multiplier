@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,14 +37,15 @@ class ConstantArrayType : public ArrayType {
   friend class Type;
  public:
   static gap::generator<ConstantArrayType> in(const Fragment &frag);
+  static gap::generator<ConstantArrayType> in(const Index &index);
   static gap::generator<ConstantArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ConstantArrayType> by(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CONSTANT_ARRAY;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<ConstantArrayType> from(const Reference &r) {
     return from(r.as_type());
   }

@@ -40,6 +40,36 @@ extern "C" int main(int argc, char *argv[]) {
     fragment.emplace(mx::Fragment::containing(entity));
     entity_tokens = entity.tokens();
 
+  } else if (std::holds_alternative<mx::Attr>(maybe_entity)) {
+    auto entity = std::get<mx::Attr>(maybe_entity);
+    fragment.emplace(mx::Fragment::containing(entity));
+    entity_tokens = entity.tokens();
+
+//  } else if (std::holds_alternative<mx::Macro>(maybe_entity)) {
+//    auto entity = std::get<mx::Macro>(maybe_entity);
+//    fragment.emplace(mx::Fragment::containing(entity));
+//    entity_tokens = entity.tokens();
+
+  } else if (std::holds_alternative<mx::CXXBaseSpecifier>(maybe_entity)) {
+    auto entity = std::get<mx::CXXBaseSpecifier>(maybe_entity);
+    fragment.emplace(mx::Fragment::containing(entity));
+    entity_tokens = entity.tokens();
+
+  } else if (std::holds_alternative<mx::Designator>(maybe_entity)) {
+    auto entity = std::get<mx::Designator>(maybe_entity);
+    fragment.emplace(mx::Fragment::containing(entity));
+    entity_tokens = entity.tokens();
+
+//  } else if (std::holds_alternative<mx::TemplateArgument>(maybe_entity)) {
+//    auto entity = std::get<mx::TemplateArgument>(maybe_entity);
+//    fragment.emplace(mx::Fragment::containing(entity));
+//    entity_tokens = entity.tokens();
+
+  } else if (std::holds_alternative<mx::TemplateParameterList>(maybe_entity)) {
+    auto entity = std::get<mx::TemplateParameterList>(maybe_entity);
+    fragment.emplace(mx::Fragment::containing(entity));
+    entity_tokens = entity.tokens();
+
   } else if (std::holds_alternative<mx::Token>(maybe_entity)) {
     auto entity = std::get<mx::Token>(maybe_entity);
     fragment = mx::Fragment::containing(entity);
@@ -54,8 +84,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   // Print out the tokens of this fragment as they appear in the file.
   if (FLAGS_unparsed) {
-    PrintUnparsedTokens(std::cout, fragment->preprocessed_code(),
-                        entity_tokens);
+    RenderFragment(std::cout, *fragment, entity_tokens, "", true);
 
   // Print out the tokens of this fragment that were actually parsed. These
   // are post-macro expansion tokens, and generally don't include whitespace

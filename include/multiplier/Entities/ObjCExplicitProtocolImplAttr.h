@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCExplicitProtocolImplAttr> in(const Fragment &frag);
+  static gap::generator<ObjCExplicitProtocolImplAttr> in(const Index &index);
   static gap::generator<ObjCExplicitProtocolImplAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ObjCExplicitProtocolImplAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_EXPLICIT_PROTOCOL_IMPL;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCExplicitProtocolImplAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -43,16 +44,20 @@ class CXXDynamicCastExpr : public CXXNamedCastExpr {
   friend class Stmt;
  public:
   static gap::generator<CXXDynamicCastExpr> in(const Fragment &frag);
+  static gap::generator<CXXDynamicCastExpr> in(const Index &index);
   static gap::generator<CXXDynamicCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<CXXDynamicCastExpr> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DYNAMIC_CAST_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXDynamicCastExpr> containing(const Decl &decl);
+  static gap::generator<CXXDynamicCastExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<CXXDynamicCastExpr> containing(const Stmt &stmt);
+  static gap::generator<CXXDynamicCastExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

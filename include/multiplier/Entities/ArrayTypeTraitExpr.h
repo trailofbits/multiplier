@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -39,16 +40,20 @@ class ArrayTypeTraitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ArrayTypeTraitExpr> in(const Fragment &frag);
+  static gap::generator<ArrayTypeTraitExpr> in(const Index &index);
   static gap::generator<ArrayTypeTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ArrayTypeTraitExpr> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_TYPE_TRAIT_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ArrayTypeTraitExpr> containing(const Decl &decl);
+  static gap::generator<ArrayTypeTraitExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<ArrayTypeTraitExpr> containing(const Stmt &stmt);
+  static gap::generator<ArrayTypeTraitExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

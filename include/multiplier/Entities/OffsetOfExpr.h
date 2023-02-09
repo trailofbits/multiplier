@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,16 +38,20 @@ class OffsetOfExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OffsetOfExpr> in(const Fragment &frag);
+  static gap::generator<OffsetOfExpr> in(const Index &index);
   static gap::generator<OffsetOfExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<OffsetOfExpr> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OFFSET_OF_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OffsetOfExpr> containing(const Decl &decl);
+  static gap::generator<OffsetOfExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OffsetOfExpr> containing(const Stmt &stmt);
+  static gap::generator<OffsetOfExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

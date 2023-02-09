@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class EnforceTCBLeafAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<EnforceTCBLeafAttr> in(const Fragment &frag);
+  static gap::generator<EnforceTCBLeafAttr> in(const Index &index);
   static gap::generator<EnforceTCBLeafAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<EnforceTCBLeafAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENFORCE_TCB_LEAF;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<EnforceTCBLeafAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

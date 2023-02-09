@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -39,16 +40,20 @@ class OMPTargetTeamsGenericLoopDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTargetTeamsGenericLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPTargetTeamsGenericLoopDirective> in(const Index &index);
   static gap::generator<OMPTargetTeamsGenericLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<OMPTargetTeamsGenericLoopDirective> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_GENERIC_LOOP_DIRECTIVE;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPTargetTeamsGenericLoopDirective> containing(const Decl &decl);
+  static gap::generator<OMPTargetTeamsGenericLoopDirective> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OMPTargetTeamsGenericLoopDirective> containing(const Stmt &stmt);
+  static gap::generator<OMPTargetTeamsGenericLoopDirective> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

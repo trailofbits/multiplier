@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class DLLImportStaticLocalAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DLLImportStaticLocalAttr> in(const Fragment &frag);
+  static gap::generator<DLLImportStaticLocalAttr> in(const Index &index);
   static gap::generator<DLLImportStaticLocalAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<DLLImportStaticLocalAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DLL_IMPORT_STATIC_LOCAL;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<DLLImportStaticLocalAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

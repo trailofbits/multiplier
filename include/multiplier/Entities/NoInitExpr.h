@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,16 +38,20 @@ class NoInitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<NoInitExpr> in(const Fragment &frag);
+  static gap::generator<NoInitExpr> in(const Index &index);
   static gap::generator<NoInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<NoInitExpr> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::NO_INIT_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<NoInitExpr> containing(const Decl &decl);
+  static gap::generator<NoInitExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<NoInitExpr> containing(const Stmt &stmt);
+  static gap::generator<NoInitExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

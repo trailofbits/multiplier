@@ -7,10 +7,11 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iomanip>
+#include <multiplier/AST.h>
 #include <sstream>
+#include <unordered_set>
 
 #include "Index.h"
-#include <multiplier/AST.h>
 
 DECLARE_bool(help);
 DEFINE_string(db, "", "Database file");
@@ -45,66 +46,25 @@ void PrintToken(std::ostream &os, mx::Token token) {
   os << token.data(); 
 }
 
-bool ContainsHighlightedTokens(gap::generator<mx::MacroOrToken> nodes,
-                               const mx::TokenRange &entity_tokens) {
-  for (mx::MacroOrToken node : nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      if (entity_tokens.index_of(std::get<mx::Token>(node))) {
-        return true;
-      }
-    } else if (auto sub = mx::MacroSubstitution::from(
-                   std::get<mx::Macro>(node))) {
-      if (ContainsHighlightedTokens(sub->replacement_children(),
-                                    entity_tokens)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-// TODO(pag): This whole thing is broken, because you can't ask top-down if a
-//            parsed token is inside of a substitution; you can only ask if a
-//            token derived from a parsed token is in the right range.
-void PrintUnparsedTokens(
-    std::ostream &os, gap::generator<mx::MacroOrToken> nodes,
-    const mx::TokenRange &entity_tokens, bool force_highlight) {
-
-  for (mx::MacroOrToken &node : nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      mx::Token &token = std::get<mx::Token>(node);
-      if (force_highlight || entity_tokens.index_of(token)) {
-        HighlightToken(os, std::move(token));
-      } else {
-        PrintToken(os, std::move(token));
-      }
-    } else {
-      mx::Macro &macro = std::get<mx::Macro>(node);
-      auto sub_force_highlight = force_highlight;
-      if (!sub_force_highlight) {
-        if (auto sub = mx::MacroSubstitution::from(macro)) {
-          sub_force_highlight = ContainsHighlightedTokens(
-              sub->replacement_children(), entity_tokens);
-        }
-      }
-      PrintUnparsedTokens(os, macro.children(), entity_tokens,
-                          sub_force_highlight);
-    }
-  }
-}
-
 void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
-                    const mx::TokenRange &entity_tokens,
+                    std::unordered_set<mx::RawEntityId> highlight_token_ids,
                     std::string indent, bool print_line_numbers) {
+
   auto location = fragment.file_tokens().begin()->location(location_cache);
   if (!location) {
     return;
   }
-
   auto line_number = location->first;
   std::stringstream ss;
   std::string sep = indent;
-  PrintUnparsedTokens(ss, fragment.preprocessed_code(), entity_tokens);
+
+  for (mx::Token file_tok : fragment.file_tokens()) {
+    if (highlight_token_ids.count(file_tok.id().Pack())) {
+      HighlightToken(ss, file_tok);
+    } else {
+      PrintToken(ss, file_tok);
+    }
+  }
 
   auto render_line_number = print_line_numbers;
 
@@ -127,4 +87,35 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
       sep.clear();
     }
   }
+}
+
+void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
+                    const mx::TokenRange &entity_tokens,
+                    std::string indent, bool print_line_numbers) {
+
+  // Collect the file tokens associated with `entity_tokens`.
+  std::unordered_set<mx::RawEntityId> token_ids;
+  for (mx::Token tok : entity_tokens) {
+    if (auto file_tok = tok.file_token()) {
+      token_ids.insert(file_tok.id().Pack());
+    } else {
+      std::optional<mx::Macro> last_macro;
+      for (mx::Macro macro : mx::Macro::containing(tok)) {
+        last_macro.reset();
+        last_macro.emplace(std::move(macro));
+      }
+      if (last_macro) {
+        for (mx::MacroOrToken use : last_macro->children()) {
+          if (std::holds_alternative<mx::Token>(use)) {
+            if (auto use_file_tok = std::get<mx::Token>(use).file_token()) {
+              token_ids.insert(use_file_tok.id().Pack());
+            }
+          }
+        }
+      }
+    }
+  }
+
+  RenderFragment(os, fragment, std::move(token_ids), indent,
+                 print_line_numbers);
 }

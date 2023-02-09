@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class UnaryOperator : public Expr {
   friend class Stmt;
  public:
   static gap::generator<UnaryOperator> in(const Fragment &frag);
+  static gap::generator<UnaryOperator> in(const Index &index);
   static gap::generator<UnaryOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<UnaryOperator> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_OPERATOR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<UnaryOperator> containing(const Decl &decl);
+  static gap::generator<UnaryOperator> containing(const std::optional<Decl> &decl);
+
   static gap::generator<UnaryOperator> containing(const Stmt &stmt);
+  static gap::generator<UnaryOperator> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

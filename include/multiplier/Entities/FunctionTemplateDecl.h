@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -39,16 +40,20 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   friend class Decl;
  public:
   static gap::generator<FunctionTemplateDecl> in(const Fragment &frag);
+  static gap::generator<FunctionTemplateDecl> in(const Index &index);
   static gap::generator<FunctionTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<FunctionTemplateDecl> by(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION_TEMPLATE;
   }
 
-  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<FunctionTemplateDecl> containing(const Decl &decl);
+  static gap::generator<FunctionTemplateDecl> containing(const std::optional<Decl> &decl);
+
   static gap::generator<FunctionTemplateDecl> containing(const Stmt &stmt);
+  static gap::generator<FunctionTemplateDecl> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

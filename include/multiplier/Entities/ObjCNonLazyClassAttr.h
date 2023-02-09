@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class ObjCNonLazyClassAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCNonLazyClassAttr> in(const Fragment &frag);
+  static gap::generator<ObjCNonLazyClassAttr> in(const Index &index);
   static gap::generator<ObjCNonLazyClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ObjCNonLazyClassAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_NON_LAZY_CLASS;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCNonLazyClassAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

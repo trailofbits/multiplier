@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class ObjCDictionaryLiteral : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCDictionaryLiteral> in(const Fragment &frag);
+  static gap::generator<ObjCDictionaryLiteral> in(const Index &index);
   static gap::generator<ObjCDictionaryLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ObjCDictionaryLiteral> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_DICTIONARY_LITERAL;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCDictionaryLiteral> containing(const Decl &decl);
+  static gap::generator<ObjCDictionaryLiteral> containing(const std::optional<Decl> &decl);
+
   static gap::generator<ObjCDictionaryLiteral> containing(const Stmt &stmt);
+  static gap::generator<ObjCDictionaryLiteral> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

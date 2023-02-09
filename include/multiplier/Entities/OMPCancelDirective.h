@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,16 +36,20 @@ class OMPCancelDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPCancelDirective> in(const Fragment &frag);
+  static gap::generator<OMPCancelDirective> in(const Index &index);
   static gap::generator<OMPCancelDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<OMPCancelDirective> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANCEL_DIRECTIVE;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPCancelDirective> containing(const Decl &decl);
+  static gap::generator<OMPCancelDirective> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OMPCancelDirective> containing(const Stmt &stmt);
+  static gap::generator<OMPCancelDirective> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

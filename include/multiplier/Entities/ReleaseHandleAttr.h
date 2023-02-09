@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,14 +38,15 @@ class ReleaseHandleAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<ReleaseHandleAttr> in(const Fragment &frag);
+  static gap::generator<ReleaseHandleAttr> in(const Index &index);
   static gap::generator<ReleaseHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ReleaseHandleAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RELEASE_HANDLE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ReleaseHandleAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

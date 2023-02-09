@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class DesignatedInitUpdateExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<DesignatedInitUpdateExpr> in(const Fragment &frag);
+  static gap::generator<DesignatedInitUpdateExpr> in(const Index &index);
   static gap::generator<DesignatedInitUpdateExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<DesignatedInitUpdateExpr> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<DesignatedInitUpdateExpr> containing(const Decl &decl);
+  static gap::generator<DesignatedInitUpdateExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<DesignatedInitUpdateExpr> containing(const Stmt &stmt);
+  static gap::generator<DesignatedInitUpdateExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

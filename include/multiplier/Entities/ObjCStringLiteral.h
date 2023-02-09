@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class ObjCStringLiteral : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCStringLiteral> in(const Fragment &frag);
+  static gap::generator<ObjCStringLiteral> in(const Index &index);
   static gap::generator<ObjCStringLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ObjCStringLiteral> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_STRING_LITERAL;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<ObjCStringLiteral> containing(const Decl &decl);
+  static gap::generator<ObjCStringLiteral> containing(const std::optional<Decl> &decl);
+
   static gap::generator<ObjCStringLiteral> containing(const Stmt &stmt);
+  static gap::generator<ObjCStringLiteral> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

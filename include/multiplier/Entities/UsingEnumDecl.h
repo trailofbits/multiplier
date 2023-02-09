@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -38,16 +39,20 @@ class UsingEnumDecl : public BaseUsingDecl {
   friend class Decl;
  public:
   static gap::generator<UsingEnumDecl> in(const Fragment &frag);
+  static gap::generator<UsingEnumDecl> in(const Index &index);
   static gap::generator<UsingEnumDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<UsingEnumDecl> by(const Index &, EntityId);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::USING_ENUM;
   }
 
-  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<UsingEnumDecl> containing(const Decl &decl);
+  static gap::generator<UsingEnumDecl> containing(const std::optional<Decl> &decl);
+
   static gap::generator<UsingEnumDecl> containing(const Stmt &stmt);
+  static gap::generator<UsingEnumDecl> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

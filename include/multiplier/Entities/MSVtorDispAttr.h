@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,14 +37,15 @@ class MSVtorDispAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MSVtorDispAttr> in(const Fragment &frag);
+  static gap::generator<MSVtorDispAttr> in(const Index &index);
   static gap::generator<MSVtorDispAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<MSVtorDispAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_VTOR_DISP;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<MSVtorDispAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

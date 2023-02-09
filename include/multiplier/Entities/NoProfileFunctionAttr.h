@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class NoProfileFunctionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoProfileFunctionAttr> in(const Fragment &frag);
+  static gap::generator<NoProfileFunctionAttr> in(const Index &index);
   static gap::generator<NoProfileFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<NoProfileFunctionAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_PROFILE_FUNCTION;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<NoProfileFunctionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

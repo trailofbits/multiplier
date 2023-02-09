@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,14 +37,15 @@ class ArgumentWithTypeTagAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ArgumentWithTypeTagAttr> in(const Fragment &frag);
+  static gap::generator<ArgumentWithTypeTagAttr> in(const Index &index);
   static gap::generator<ArgumentWithTypeTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ArgumentWithTypeTagAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARGUMENT_WITH_TYPE_TAG;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ArgumentWithTypeTagAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

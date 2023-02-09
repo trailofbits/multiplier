@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -39,16 +40,20 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPUnrollDirective> in(const Fragment &frag);
+  static gap::generator<OMPUnrollDirective> in(const Index &index);
   static gap::generator<OMPUnrollDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<OMPUnrollDirective> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_UNROLL_DIRECTIVE;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<OMPUnrollDirective> containing(const Decl &decl);
+  static gap::generator<OMPUnrollDirective> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OMPUnrollDirective> containing(const Stmt &stmt);
+  static gap::generator<OMPUnrollDirective> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

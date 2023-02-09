@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,14 +37,15 @@ class IBOutletCollectionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<IBOutletCollectionAttr> in(const Fragment &frag);
+  static gap::generator<IBOutletCollectionAttr> in(const Index &index);
   static gap::generator<IBOutletCollectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<IBOutletCollectionAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_OUTLET_COLLECTION;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<IBOutletCollectionAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

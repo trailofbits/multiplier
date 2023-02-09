@@ -103,6 +103,7 @@ class File {
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_CONTAINING,
+                              MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING)
 #undef MX_DECLARE_CONTAINING
 

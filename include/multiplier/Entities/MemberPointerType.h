@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -34,14 +35,15 @@ class MemberPointerType : public Type {
   friend class Type;
  public:
   static gap::generator<MemberPointerType> in(const Fragment &frag);
+  static gap::generator<MemberPointerType> in(const Index &index);
   static gap::generator<MemberPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<MemberPointerType> by(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::MEMBER_POINTER;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<MemberPointerType> from(const Reference &r) {
     return from(r.as_type());
   }

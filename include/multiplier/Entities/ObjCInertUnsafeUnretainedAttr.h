@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const Fragment &frag);
+  static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const Index &index);
   static gap::generator<ObjCInertUnsafeUnretainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ObjCInertUnsafeUnretainedAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

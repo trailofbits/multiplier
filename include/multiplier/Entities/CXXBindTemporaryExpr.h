@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -37,16 +38,20 @@ class CXXBindTemporaryExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXBindTemporaryExpr> in(const Fragment &frag);
+  static gap::generator<CXXBindTemporaryExpr> in(const Index &index);
   static gap::generator<CXXBindTemporaryExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<CXXBindTemporaryExpr> by(const Index &, EntityId);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_BIND_TEMPORARY_EXPR;
   }
 
-  static gap::generator<StmtKind> derived_kinds(void);
   static gap::generator<CXXBindTemporaryExpr> containing(const Decl &decl);
+  static gap::generator<CXXBindTemporaryExpr> containing(const std::optional<Decl> &decl);
+
   static gap::generator<CXXBindTemporaryExpr> containing(const Stmt &stmt);
+  static gap::generator<CXXBindTemporaryExpr> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

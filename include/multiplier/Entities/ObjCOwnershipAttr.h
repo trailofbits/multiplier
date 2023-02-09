@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ObjCOwnershipAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCOwnershipAttr> in(const Fragment &frag);
+  static gap::generator<ObjCOwnershipAttr> in(const Index &index);
   static gap::generator<ObjCOwnershipAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ObjCOwnershipAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_OWNERSHIP;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCOwnershipAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

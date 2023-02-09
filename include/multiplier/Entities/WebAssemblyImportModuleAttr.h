@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<WebAssemblyImportModuleAttr> in(const Fragment &frag);
+  static gap::generator<WebAssemblyImportModuleAttr> in(const Index &index);
   static gap::generator<WebAssemblyImportModuleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<WebAssemblyImportModuleAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEB_ASSEMBLY_IMPORT_MODULE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<WebAssemblyImportModuleAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

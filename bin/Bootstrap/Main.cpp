@@ -731,7 +731,7 @@ class CodeGenerator {
       const std::string &class_name, const std::string &api_name,
       const std::string &method_name, const std::string &nth_entity_reader,
       std::set<std::string> &fwd_decls, std::set<std::string> &needed_decls,
-      const std::string& base_name);
+      const std::string &base_name);
 
   void RunOnVector(
       std::ostream &os, SpecificEntityStorage &storage,
@@ -739,7 +739,7 @@ class CodeGenerator {
       const std::string &class_name, const std::string &api_name,
       const std::string &method_name, const std::string &nth_entity_reader,
       bool optional, std::set<std::string> &fwd_decls,
-      std::set<std::string> &needed_decls, const std::string& base_name);
+      std::set<std::string> &needed_decls, const std::string &base_name);
 
  public:
   CodeGenerator(char *argv[]);
@@ -1024,8 +1024,8 @@ void CodeGenerator::RunOnOptional(
     const std::optional<pasta::RecordDecl> &record,
     const std::string &class_name, const std::string &api_name,
     const std::string &method_name,
-    const std::string &nth_entity_reader, std::set<std::string>& fwd_decls,
-    std::set<std::string>& needed_decls, const std::string& base_name) {
+    const std::string &nth_entity_reader, std::set<std::string> &fwd_decls,
+    std::set<std::string> &needed_decls, const std::string &base_name) {
 
   std::optional<std::string> element_name =
       GetFirstTemplateParameterType(record);
@@ -1717,6 +1717,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     ClassHierarchy *cls, MethodListPtr parent_methods) {
   auto seen_methods = std::make_shared<MethodList>(*parent_methods);
   auto class_name = cls->record.Name();
+  std::string lower_name;
   std::set<std::string> forward_decls;
   std::set<std::string> needed_decls;
   std::stringstream class_os;
@@ -1726,8 +1727,11 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   forward_decls.insert(class_name);
 
-#define DECLARE_IS_A(name, lower_name) \
-    const auto is_ ## lower_name = g ## name ## Names.count(class_name);
+#define DECLARE_IS_A(name, lower_name_) \
+    const auto is_ ## lower_name_ = g ## name ## Names.count(class_name); \
+    if (is_ ## lower_name_) { \
+      lower_name = #lower_name_; \
+    }
 
   FOR_EACH_ENTITY_CATEGORY(DECLARE_IS_A)
 #undef DECLARE_IS_A
@@ -1770,6 +1774,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     << "#include <filesystem>\n"
     << "#include <memory>\n"
     << "#include <optional>\n"
+    << "#include <span>\n"
     << "#include <vector>\n\n"
     << "#include <gap/core/generator.hpp>\n"
     << "#include \"../Iterator.h\"\n"
@@ -1988,12 +1993,12 @@ MethodListPtr CodeGenerator::RunOnClass(
   auto dont_serialize = !!gUnserializableTypes.count(class_name);
 
   if (cls->base) {
-    std::string base_name = cls->base->record.Name();
-    needed_decls.insert(base_name);
+    std::string base_class_name = cls->base->record.Name();
+    needed_decls.insert(base_class_name);
 
     // Inheritance.
     class_os
-        << " : public " << base_name << " {\n"
+        << " : public " << base_class_name << " {\n"
         << " private:\n"
         << FriendOf(class_os, class_name, "FragmentImpl");
 
@@ -2008,14 +2013,14 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (!dont_serialize) {
       if (is_macro) {
         serialize_cpp_os
-            << "  Serialize" << base_name << "(es, b, e, tt);\n";
+            << "  Serialize" << base_class_name << "(es, b, e, tt);\n";
       } else {
         serialize_cpp_os
-            << "  Serialize" << base_name << "(es, b, e, nullptr);\n";
+            << "  Serialize" << base_class_name << "(es, b, e, nullptr);\n";
       }
 
       serialize_inc_os
-          << "  MX_VISIT_BASE(" << class_name << ", " << base_name << ")\n";
+          << "  MX_VISIT_BASE(" << class_name << ", " << base_class_name << ")\n";
     }
 
     class_os
@@ -2023,7 +2028,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     late_class_os
         << "static_assert(sizeof(" << class_name
-        << ") == sizeof(" << base_name << "));\n\n";
+        << ") == sizeof(" << base_class_name << "));\n\n";
 
   // Things like `TemplateParameterList`, that aren't themselves entities, but
   // are derived from entities in fragments, and link to entities in fragments,
@@ -2109,6 +2114,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "Type")
         << FriendOf(class_os, class_name, class_name + "Impl")
         << "  std::shared_ptr<const " << class_name << "Impl> impl;\n"
+        << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);\n"
+        << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);\n"
         << " public:\n"
         << "  " << class_name << "(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << "(const " << class_name << " &) = default;\n"
@@ -2117,6 +2124,16 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  /* implicit */ inline " << class_name
         << "(std::shared_ptr<const " << class_name << "Impl> impl_)\n"
         << "      : impl(std::move(impl_)) {}\n\n";
+
+    lib_cpp_os
+        << "inline const std::shared_ptr<EntityProvider> &"
+        << class_name << "::entity_provider_of(const Index &index_) {\n"
+        << "  return index_.impl;\n"
+        << "}\n\n"
+        << "inline const std::shared_ptr<EntityProvider> &"
+        << class_name << "::entity_provider_of(const Fragment &frag_) {\n"
+        << "  return frag_.impl->ep;\n"
+        << "}\n\n";
 
     forward_decls.insert("Reference");
     forward_decls.insert(class_name + "Impl");
@@ -2138,9 +2155,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Decl> definition(void) const;\n"
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
-          << "  gap::generator<Decl> redeclarations(void) const;\n"
-          << " protected:\n"
-          << "  static gap::generator<Decl> in_internal(const Fragment &fragment);\n\n"
+          << "  gap::generator<Decl> redeclarations(void) const;\n\n"
           << " public:\n";
 
       seen_methods->emplace("uses");  // Manual.
@@ -2168,8 +2183,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<PackedDeclId> referenced_declaration_id(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
-          << " protected:\n"
-          << "  static gap::generator<Stmt> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
       // `Stmt::referenced_declaration`.
@@ -2216,16 +2229,12 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (class_name == "Type") {
       class_os
-          << " protected:\n"
-          << "  static gap::generator<Type> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
       seen_methods->emplace("uses");  // Manual.
     
     } else if (class_name == "Attr") {
       class_os
-          << " protected:\n"
-          << "  static gap::generator<Attr> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
       seen_methods->emplace("uses");  // Manual.
@@ -2233,7 +2242,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     } else if (class_name == "Macro") {
       class_os
           << " protected:\n"
-          << "  static gap::generator<Macro> in_internal(const Fragment &fragment);\n"
           << "  static gap::generator<Macro> containing_internal(const Token &token);\n\n"
           << " public:\n";
 
@@ -2255,29 +2263,35 @@ MethodListPtr CodeGenerator::RunOnClass(
     abort();
   }
 
+  if (class_name == base_name &&
+      (is_declaration || is_statement || is_attribute || is_type || is_macro)) {
+    class_os
+        << "  static gap::generator<"
+        << class_name << "> in(const Fragment &frag, std::span<"
+        << class_name << "Kind> kinds);\n"
+        << "  static gap::generator<"
+        << class_name << "> in(const Index &index, std::span<"
+        << class_name << "Kind> kinds);\n";
+  }
+
   // NOTE(pag): Macro containing a token is handled later.
   if (is_declaration || is_statement || is_attribute || is_type) {
 
     class_os
         << "  static gap::generator<"
         << class_name << "> in(const Fragment &frag);\n"
+        << "  static gap::generator<"
+        << class_name << "> in(const Index &index);\n"
         << "  static gap::generator<" << class_name
         << "> containing(const Token &tok);\n"
-        << "  bool contains(const Token &tok) const;\n\n";
+        << "  bool contains(const Token &tok) const;\n"
+        << "  std::optional<" << class_name << "> by(const Index &, EntityId);\n\n";
 
     lib_cpp_os
-        << "gap::generator<"
-        << class_name << "> " << class_name << "::in(const Fragment &frag) {\n"
-        << "  for (auto e : in_internal(frag)) {\n"
-        << "    if (auto d = from(e)) {\n"
-        << "      co_yield *d;\n"
-        << "    }\n"
-        << "  }\n"
-        << "}\n\n"
         << "gap::generator<" << class_name
         << "> " << class_name << "::containing(const Token &tok) {\n"
         << "  for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {\n"
-        << "    if (auto d = from(*ctx)) {\n"
+        << "    if (auto d = " << class_name << "::from(*ctx)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
@@ -2293,17 +2307,10 @@ MethodListPtr CodeGenerator::RunOnClass(
   } else if (is_macro) {
     class_os
         << "  static gap::generator<" << class_name
-        << "> in(const Fragment &frag);\n\n";
-
-    lib_cpp_os
-        << "gap::generator<" << class_name
-        << "> " << class_name << "::in(const Fragment &frag) {\n"
-        << "  for (auto m : in_internal(frag)) {\n"
-        << "    if (auto d = from(m)) {\n"
-        << "      co_yield std::move(d.value());\n"
-        << "    }\n"
-        << "  }\n"
-        << "}\n\n";
+        << "> in(const Fragment &frag);\n\n"
+        << "  static gap::generator<"
+        << class_name << "> in(const Index &index);\n"
+        << "  std::optional<" << class_name << "> by(const Index &, EntityId);\n\n";
   }
 
   if (is_declaration) {
@@ -2319,11 +2326,14 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
-        << "  static gap::generator<DeclKind> derived_kinds(void);\n"
         << "  static gap::generator<" << class_name
         << "> containing(const Decl &decl);\n"
         << "  static gap::generator<" << class_name
-        << "> containing(const Stmt &stmt);\n\n"
+        << "> containing(const std::optional<Decl> &decl);\n\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const Stmt &stmt);\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const std::optional<Stmt> &stmt);\n\n"
         << "  bool contains(const Decl &decl);\n"
         << "  bool contains(const Stmt &stmt);\n\n";
 
@@ -2331,16 +2341,32 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Decl &decl) {\n"
         << "  for (auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {\n"
-        << "    if (auto d = from(*ancestor)) {\n"
+        << "    if (auto d = " << class_name << "::from(*ancestor)) {\n"
         << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
+        << "}\n\n"
+        << "gap::generator<" << class_name
+        << "> " << class_name << "::containing(const std::optional<Decl> &decl) {\n"
+        << "  if (decl.has_value()) {\n"
+        << "    for (auto res : containing(decl.value())) {\n"
+        << "      co_yield res;\n"
         << "    }\n"
         << "  }\n"
         << "}\n\n"
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Stmt &stmt) {\n"
         << "  for (auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {\n"
-        << "    if (auto d = from(*ancestor)) {\n"
+        << "    if (auto d = " << class_name << "::from(*ancestor)) {\n"
         << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
+        << "}\n\n"
+        << "gap::generator<" << class_name
+        << "> " << class_name << "::containing(const std::optional<Stmt> &stmt) {\n"
+        << "  if (stmt.has_value()) {\n"
+        << "    for (auto res : containing(stmt.value())) {\n"
+        << "      co_yield res;\n"
         << "    }\n"
         << "  }\n"
         << "}\n\n"
@@ -2369,11 +2395,14 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
-        << "  static gap::generator<StmtKind> derived_kinds(void);\n"
         << "  static gap::generator<" << class_name
         << "> containing(const Decl &decl);\n"
         << "  static gap::generator<" << class_name
-        << "> containing(const Stmt &stmt);\n\n"
+        << "> containing(const std::optional<Decl> &decl);\n\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const Stmt &stmt);\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const std::optional<Stmt> &stmt);\n\n"
         << "  bool contains(const Decl &decl);\n"
         << "  bool contains(const Stmt &stmt);\n\n";
 
@@ -2381,16 +2410,32 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Decl &decl) {\n"
         << "  for (auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {\n"
-        << "    if (auto d = from(*ancestor)) {\n"
+        << "    if (auto d = " << class_name << "::from(*ancestor)) {\n"
         << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
+        << "}\n\n"
+        << "gap::generator<" << class_name
+        << "> " << class_name << "::containing(const std::optional<Decl> &decl) {\n"
+        << "  if (decl.has_value()) {\n"
+        << "    for (auto res : containing(decl.value())) {\n"
+        << "      co_yield res;\n"
         << "    }\n"
         << "  }\n"
         << "}\n\n"
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Stmt &stmt) {\n"
         << "  for (auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {\n"
-        << "    if (auto d = from(*ancestor)) {\n"
+        << "    if (auto d = " << class_name << "::from(*ancestor)) {\n"
         << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
+        << "}\n\n"
+        << "gap::generator<" << class_name
+        << "> " << class_name << "::containing(const std::optional<Stmt> &stmt) {\n"
+        << "  if (stmt.has_value()) {\n"
+        << "    for (auto res : containing(stmt.value())) {\n"
+        << "      co_yield res;\n"
         << "    }\n"
         << "  }\n"
         << "}\n\n"
@@ -2419,9 +2464,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n\n";
     }
 
-    class_os
-        << "  static gap::generator<TypeKind> derived_kinds(void);\n";
-  
   } else if (is_attribute) {
     if (is_concrete) {
       auto snake_name = CapitalCaseToSnakeCase(class_name);
@@ -2433,9 +2475,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << SnakeCaseToEnumCase(snake_name) << ";\n"
           << "  }\n\n";
     }
-
-    class_os
-        << "  static gap::generator<AttrKind> derived_kinds(void);\n";
 
   } else if (is_macro) {
     if (is_concrete) {
@@ -2460,7 +2499,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
-        << "  static gap::generator<MacroKind> derived_kinds(void);\n"
         << "  static gap::generator<" << class_name
         << "> containing(const Macro &macro);\n"
         << "  bool contains(const Macro &macro);\n\n"
@@ -2472,7 +2510,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Macro &macro) {\n"
         << "  for (auto impl = macro.parent(); impl; impl = impl->parent()) {\n"
-        << "    if (auto d = from(*impl)) {\n"
+        << "    if (auto d = " << class_name << "::from(*impl)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
@@ -2494,7 +2532,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Token &token) {\n"
         << "  for (auto m : Macro::containing_internal(token)) {\n"
-        << "    if (auto d = from(m)) {\n"
+        << "    if (auto d = " << class_name << "::from(m)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
@@ -2562,31 +2600,120 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // Make a generator for all of the derived kinds of this particular entity.
   if (is_declaration || is_statement || is_attribute || is_type || is_macro) {
-    lib_cpp_os
-        << "static const " << base_name << "Kind k"
-        << class_name << "DerivedKinds[] = {\n";
-    std::vector<const ClassHierarchy *> wl;
-    wl.push_back(cls);
 
-    for (auto i = 0u; i < wl.size(); ++i) {
-      const ClassHierarchy *c = wl[i];
-      std::string c_name = c->record.Name();
-      if (gConcreteClassNames.count(c_name)) {
-        lib_cpp_os << "    " << c_name << "::static_kind(),\n";
+    if (class_name == base_name) {
+      lib_cpp_os
+          << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const Index &index) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(index);\n"
+          << "  for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep)) {\n"
+          << "    if (std::optional<" << class_name << "> e = "
+          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+          << "      co_yield std::move(e.value());\n"
+          << "    }\n"
+          << "  }\n"
+          << "}\n\n"
+          << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const Fragment &frag) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(frag);\n"
+          << "  PackedFragmentId frag_id = frag.id();\n"
+          << "  for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep, frag_id)) {\n"
+          << "    if (std::optional<" << class_name << "> e = "
+          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+          << "      co_yield std::move(e.value());\n"
+          << "    }\n"
+          << "  }\n"
+          << "}\n\n"
+          << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const Index &index, std::span<" << class_name << "Kind> kinds) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(index);\n"
+          << "  for (" << base_name << "Kind k : kinds) {\n"
+          << "    for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep, k)) {\n"
+          << "      co_yield " << base_name << "(std::move(eptr));\n"
+          << "    }\n"
+          << "  }\n"
+          << "}\n\n"
+          << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const Fragment &frag, std::span<" << class_name << "Kind> kinds) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(frag);\n"
+          << "  PackedFragmentId frag_id = frag.id();\n"
+          << "  for (" << base_name << "Kind k : kinds) {\n"
+          << "    for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep, k, frag_id)) {\n"
+          << "      co_yield " << base_name << "(std::move(eptr));\n"
+          << "    }\n"
+          << "  }\n"
+          << "}\n\n"
+          << "std::optional<" << class_name << "> " << class_name << "::by(const Index &index, EntityId eid) {\n"
+          << "  VariantId vid = eid.Unpack();\n"
+          << "  if (std::holds_alternative<" << base_name << "Id>(vid)) {\n";
+
+      if (base_name == class_name) {
+        lib_cpp_os
+            << "    index." << lower_name << "(eid.Pack());\n";
+      } else {
+        lib_cpp_os
+            << "    return " << class_name << "::from(index."
+            << lower_name << "(eid.Pack()));\n";
       }
-      for (const ClassHierarchy *d : c->derived) {
-        wl.push_back(d);
+
+      lib_cpp_os
+          << "  } else if (std::holds_alternative<InvalidId>(vid)) {\n"
+          << "    assert(eid.Pack() == kInvalidEntityId);\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n";
+    } else {
+      lib_cpp_os
+          << "static const " << base_name << "Kind k"
+          << class_name << "DerivedKinds[] = {\n";
+
+      std::vector<const ClassHierarchy *> wl;
+      wl.push_back(cls);
+
+      for (auto i = 0u; i < wl.size(); ++i) {
+        const ClassHierarchy *c = wl[i];
+        std::string c_name = c->record.Name();
+        if (gConcreteClassNames.count(c_name)) {
+          lib_cpp_os << "    " << c_name << "::static_kind(),\n";
+        }
+        for (const ClassHierarchy *d : c->derived) {
+          wl.push_back(d);
+        }
       }
+      lib_cpp_os
+          << "};\n\n"
+          << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const Index &index) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(index);\n"
+          << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
+          << "    for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep, k)) {\n"
+          << "      if (std::optional<" << class_name << "> e = "
+          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+          << "        co_yield std::move(e.value());\n"
+          << "      }\n"
+          << "    }\n"
+          << "  }\n"
+          << "}\n\n"
+          << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const Fragment &frag) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(frag);\n"
+          << "  PackedFragmentId frag_id = frag.id();\n"
+          << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
+          << "    for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep, k, frag_id)) {\n"
+          << "      if (std::optional<" << class_name << "> e = "
+          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+          << "        co_yield std::move(e.value());\n"
+          << "      }\n"
+          << "    }\n"
+          << "  }\n"
+          << "}\n\n";
     }
-
-    lib_cpp_os
-        << "};\n\n"
-        << "gap::generator<" << base_name << "Kind> " << class_name
-        << "::derived_kinds(void) {\n"
-        << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
-        << "    co_yield k;\n"
-        << "  }\n"
-        << "}\n\n";
   }
 
   // Derived classes have optional conversion operators with all of their

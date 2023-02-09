@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,14 +37,15 @@ class OpenCLConstantAddressSpaceAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<OpenCLConstantAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLConstantAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLConstantAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<OpenCLConstantAddressSpaceAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_CONSTANT_ADDRESS_SPACE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OpenCLConstantAddressSpaceAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

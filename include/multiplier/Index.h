@@ -55,6 +55,7 @@ class WeggliQueryMatch;
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_IMPL_CLASS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_FORWARD_DECLARE_IMPL_CLASS,
+                              MX_FORWARD_DECLARE_IMPL_CLASS,
                               MX_FORWARD_DECLARE_IMPL_CLASS)
 #undef MX_FORWARD_DECLARE_IMPL_CLASS
 
@@ -143,11 +144,8 @@ class EntityProvider {
   Token TokenFor(const Ptr &, const std::shared_ptr<const TokenReader> &,
                  RawEntityId id);
 
-#define MX_DECLARE_ENTITY_METHODS(type_name, lower_name, enum_name, category) \
+#define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
     friend class type_name ## Impl; \
-    \
-    virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, PackedFragmentId id) = 0; \
     \
     virtual type_name ## ImplPtr type_name ## For( \
         const Ptr &ep, RawEntityId id) = 0; \
@@ -155,13 +153,41 @@ class EntityProvider {
     inline type_name ## ImplPtr type_name ## For( \
         const Ptr &ep, Packed ## type_name ## Id id) { \
       return ep->type_name ## For(ep, id.Pack()); \
-    }
+    } \
+    virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &ep) = 0;
 
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_METHODS,
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                               MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DECLARE_ENTITY_METHODS,
-                              MX_DECLARE_ENTITY_METHODS)
-#undef MX_DECLARE_ENTITY_METHODS
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER)
+#undef MX_DECLARE_ENTITY_GETTER
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+    virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &, type_name ## Kind kind) = 0; \
+    \
+    virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &, type_name ## Kind kind, PackedFragmentId id) = 0;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+    virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &, PackedFragmentId id) = 0;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
+                              MX_DECLARE_ENTITY_LISTERS)
+#undef MX_DECLARE_ENTITY_LISTERS
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   virtual FragmentIdList FragmentsCoveringTokens(
@@ -188,6 +214,7 @@ using VariantEntity = std::variant<
     NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT)>;
 #undef MX_DECLARE_ENTITY_VARIANT
 
@@ -210,10 +237,18 @@ const char *EnumeratorName(IndexStatus);
 // Access to the indexed code.
 class Index {
  private:
-  friend class File;
-  friend class Fragment;
   friend class Reference;
   friend class ReferenceKind;
+
+#define MX_FRIEND(type_name, ln, e, c) \
+    friend class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND)
+#undef MX_FRIEND
 
   EntityProvider::Ptr impl;
 
@@ -259,7 +294,8 @@ class Index {
   }
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DECLARE_GETTER, MX_DECLARE_GETTER)
+                              MX_DECLARE_GETTER, MX_DECLARE_GETTER,
+                              MX_DECLARE_GETTER)
 #undef MX_DECLARE_GETTER
 
   // Download a fragment based off of an entity ID.
@@ -307,5 +343,30 @@ class Index {
   // NOTE(pag): This might return redeclarations.
   gap::generator<NamedEntity> query_entities(std::string name) const;
 };
+
+template <typename T>
+std::optional<T> Reference::as(void) const noexcept {
+  constexpr EntityCategory c = T::static_category();
+  if constexpr (EntityCategory::NOT_AN_ENTITY == c) {
+    return std::nullopt;
+
+#define MX_REFERENCE_AS(type_name, lower_name, enum_name, category) \
+  } else if constexpr (EntityCategory::enum_name == c) { \
+    if (category_ == c) { \
+      return T::from(as_ ## lower_name()); \
+    } else { \
+      return std::nullopt; \
+    }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
+                            MX_REFERENCE_AS,
+                            MX_REFERENCE_AS,
+                            MX_REFERENCE_AS,
+                            MX_REFERENCE_AS)
+#undef MX_REFERENCE_AS
+  } else {
+    return std::nullopt;  // Unreachable.
+  }
+}
 
 }  // namespace mx

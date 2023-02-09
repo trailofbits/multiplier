@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,11 +37,13 @@ class MacroStringify : public MacroSubstitution {
  public:
   static gap::generator<MacroStringify> in(const Fragment &frag);
 
+  static gap::generator<MacroStringify> in(const Index &index);
+  std::optional<MacroStringify> by(const Index &, EntityId);
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::STRINGIFY;
   }
 
-  static gap::generator<MacroKind> derived_kinds(void);
   static gap::generator<MacroStringify> containing(const Macro &macro);
   bool contains(const Macro &macro);
 

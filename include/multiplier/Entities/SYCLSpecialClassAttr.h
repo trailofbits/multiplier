@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class SYCLSpecialClassAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SYCLSpecialClassAttr> in(const Fragment &frag);
+  static gap::generator<SYCLSpecialClassAttr> in(const Index &index);
   static gap::generator<SYCLSpecialClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<SYCLSpecialClassAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SYCL_SPECIAL_CLASS;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<SYCLSpecialClassAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

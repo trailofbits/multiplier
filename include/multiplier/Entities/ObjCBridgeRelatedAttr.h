@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class ObjCBridgeRelatedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCBridgeRelatedAttr> in(const Fragment &frag);
+  static gap::generator<ObjCBridgeRelatedAttr> in(const Index &index);
   static gap::generator<ObjCBridgeRelatedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ObjCBridgeRelatedAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_BRIDGE_RELATED;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ObjCBridgeRelatedAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class Ptr32Attr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<Ptr32Attr> in(const Fragment &frag);
+  static gap::generator<Ptr32Attr> in(const Index &index);
   static gap::generator<Ptr32Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<Ptr32Attr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PTR32;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<Ptr32Attr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,12 +34,16 @@ class OMPDeclarativeDirectiveDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<OMPDeclarativeDirectiveDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclarativeDirectiveDecl> in(const Index &index);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<OMPDeclarativeDirectiveDecl> by(const Index &, EntityId);
 
-  static gap::generator<DeclKind> derived_kinds(void);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Decl &decl);
+  static gap::generator<OMPDeclarativeDirectiveDecl> containing(const std::optional<Decl> &decl);
+
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Stmt &stmt);
+  static gap::generator<OMPDeclarativeDirectiveDecl> containing(const std::optional<Stmt> &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -31,19 +31,19 @@ enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
 #define MX_IGNORE_ENTITY_CATEGORY(type_name, lower_name, enum_name, category)
-#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, frag_, frag_offset) \
-    frag_offset(Decl, declaration, DECLARATION, 1) \
-    frag_offset(Stmt, statement, STATEMENT, 2) \
-    frag_offset(Type, type, TYPE, 3) \
-    frag_offset(Attr, attribute, ATTRIBUTE, 4) \
-    frag_offset(Macro, macro, MACRO, 5) \
+#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, frag_, frag_offset_, pseudo_) \
+    frag_offset_(Decl, declaration, DECLARATION, 1) \
+    frag_offset_(Stmt, statement, STATEMENT, 2) \
+    frag_offset_(Type, type, TYPE, 3) \
+    frag_offset_(Attr, attribute, ATTRIBUTE, 4) \
+    frag_offset_(Macro, macro, MACRO, 5) \
     frag_(Fragment, fragment, FRAGMENT, 6) \
     file_(File, file, FILE, 7) \
     token_(Token, token, TOKEN, 8) \
-    frag_offset(TemplateArgument, template_argument, TEMPLATE_ARGUMENT, 9) \
-    frag_offset(TemplateParameterList, template_parameter_list, TEMPLATE_PARAMETER_LIST, 10) \
-    frag_offset(CXXBaseSpecifier, cxx_base_specifier, CXX_BASE_SPECIFIER, 11) \
-    frag_offset(Designator, designator, DESIGNATOR, 12)
+    pseudo_(TemplateArgument, template_argument, TEMPLATE_ARGUMENT, 9) \
+    pseudo_(TemplateParameterList, template_parameter_list, TEMPLATE_PARAMETER_LIST, 10) \
+    pseudo_(CXXBaseSpecifier, cxx_base_specifier, CXX_BASE_SPECIFIER, 11) \
+    pseudo_(Designator, designator, DESIGNATOR, 12)
 
 #define MX_DECLARE_ENTITY_CLASS(type, lower, enum_, val) \
     class type;\
@@ -51,6 +51,7 @@ enum class TypeKind : unsigned char;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CLASS,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS)
 #undef MX_DECLARE_ENTITY_CLASS
@@ -61,6 +62,7 @@ enum class EntityCategory {
   NOT_AN_ENTITY,
 #define MX_DECLARE_ENTITY_CATEGORY_ENUM(type, lower, enum_, val) enum_ = val,
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CATEGORY_ENUM,
+                              MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM)
@@ -104,6 +106,7 @@ using SignedEntityOffset = int32_t;
 inline static constexpr unsigned NumEnumerators(EntityCategory) {
 #define MX_COUNT_ENTITY_CATEGORIES(...) + 1u
   return 1 MX_FOR_EACH_ENTITY_CATEGORY(MX_COUNT_ENTITY_CATEGORIES,
+                                       MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES);
@@ -333,6 +336,7 @@ using VariantId = std::variant<
     MX_FOR_EACH_ENTITY_CATEGORY(MX_ENTITY_ID_VARIANT,
                                 MX_IGNORE_ENTITY_CATEGORY,
                                 MX_ENTITY_ID_VARIANT,
+                                MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT)
     ParsedTokenId, MacroTokenId, FileTokenId>;
 #undef MX_ENTITY_ID_VARIANT
@@ -517,6 +521,7 @@ struct EntityTypeImpl;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_MAP_ENTITY_TYPE,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE)
 #undef MX_MAP_ENTITY_TYPE

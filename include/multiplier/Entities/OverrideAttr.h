@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,14 +36,15 @@ class OverrideAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OverrideAttr> in(const Fragment &frag);
+  static gap::generator<OverrideAttr> in(const Index &index);
   static gap::generator<OverrideAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<OverrideAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OVERRIDE;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<OverrideAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

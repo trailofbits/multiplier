@@ -320,6 +320,7 @@ struct EntityRecord {
 MX_FOR_EACH_ENTITY_CATEGORY(MX_CREATE_ENTITY_VIEW,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_CREATE_ENTITY_VIEW,
+                            MX_CREATE_ENTITY_VIEW,
                             MX_CREATE_ENTITY_VIEW)
 #undef MX_CREATE_ENTITY_VIEW
       };

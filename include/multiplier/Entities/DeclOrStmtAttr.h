@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -35,10 +36,11 @@ class DeclOrStmtAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DeclOrStmtAttr> in(const Fragment &frag);
+  static gap::generator<DeclOrStmtAttr> in(const Index &index);
   static gap::generator<DeclOrStmtAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<DeclOrStmtAttr> by(const Index &, EntityId);
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<DeclOrStmtAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class BlockPointerType : public Type {
   friend class Type;
  public:
   static gap::generator<BlockPointerType> in(const Fragment &frag);
+  static gap::generator<BlockPointerType> in(const Index &index);
   static gap::generator<BlockPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<BlockPointerType> by(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BLOCK_POINTER;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<BlockPointerType> from(const Reference &r) {
     return from(r.as_type());
   }

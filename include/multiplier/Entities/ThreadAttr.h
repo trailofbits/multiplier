@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -33,14 +34,15 @@ class ThreadAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ThreadAttr> in(const Fragment &frag);
+  static gap::generator<ThreadAttr> in(const Index &index);
   static gap::generator<ThreadAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<ThreadAttr> by(const Index &, EntityId);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::THREAD;
   }
 
-  static gap::generator<AttrKind> derived_kinds(void);
   inline static std::optional<ThreadAttr> from(const Reference &r) {
     return from(r.as_attribute());
   }

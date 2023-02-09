@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include <gap/core/generator.hpp>
@@ -36,14 +37,15 @@ class DependentSizedMatrixType : public MatrixType {
   friend class Type;
  public:
   static gap::generator<DependentSizedMatrixType> in(const Fragment &frag);
+  static gap::generator<DependentSizedMatrixType> in(const Index &index);
   static gap::generator<DependentSizedMatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+  std::optional<DependentSizedMatrixType> by(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_SIZED_MATRIX;
   }
 
-  static gap::generator<TypeKind> derived_kinds(void);
   inline static std::optional<DependentSizedMatrixType> from(const Reference &r) {
     return from(r.as_type());
   }
