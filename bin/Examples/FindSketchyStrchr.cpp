@@ -32,6 +32,15 @@ static std::optional<mx::FunctionDecl> StrchrEntityExists(
   return std::nullopt;
 }
 
+// TODO(pag): This is a band-aid fix to Issue #286.
+static mx::PackedDeclId CanonicalId(mx::ValueDecl vd) {
+  if (vd.kind() == mx::DeclKind::PARM_VAR) {
+    return vd.id();
+  } else {
+    return vd.canonical_declaration().id();
+  }
+}
+
 void TaintTrack(mx::FunctionDecl &func, TaintMap &map) {
   for (mx::Reference ref : func.references()) {
     for (mx::CallExpr call : mx::CallExpr::containing(ref.as_statement())) {
@@ -57,13 +66,9 @@ void TaintTrack(mx::FunctionDecl &func, TaintMap &map) {
         continue;
       }
 
-      // Originating declaration source (parameter or variable declaration)
-      mx::ValueDecl decl_source = ptr_arg->declaration();
-      mx::PackedDeclId decl_source_id = decl_source.canonical_declaration().id();
-
       // Save instances of the strchr call corresponding to the original
       // declaration
-      map[decl_source_id].push_back(call);
+      map[CanonicalId(ptr_arg->declaration())].push_back(call);
     }
   }
 }
@@ -100,9 +105,13 @@ extern "C" int main(int argc, char *argv[]) {
       continue;
     }
 
-    std::optional<mx::ValueDecl> source = mx::ValueDecl::by_id(index, decl_source_id);
+    std::optional<mx::ValueDecl> source = mx::ValueDecl::by_id(
+        index, decl_source_id);
     std::unordered_set<mx::RawEntityId> highlight_ids =
         FileTokenIdsFor(source->tokens());
+
+    mx::Fragment fragment = mx::Fragment::containing(*source);
+    auto file = mx::File::containing(fragment);
 
     std::cout
         << "Variable source (id: " << decl_source_id << "): '"
@@ -115,9 +124,6 @@ extern "C" int main(int argc, char *argv[]) {
       std::unordered_set<mx::RawEntityId> sink_ids =
           FileTokenIdsFor(sink.tokens());
       highlight_ids.insert(sink_ids.begin(), sink_ids.end());
-
-      mx::Fragment fragment = mx::Fragment::containing(sink);
-      auto file = mx::File::containing(fragment);
 
       std::cout
           << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
