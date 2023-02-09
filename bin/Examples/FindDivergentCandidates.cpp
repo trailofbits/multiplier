@@ -94,6 +94,8 @@ static void FindDivergentCandidates(mx::Index index) {
             }
           }
           if (mem_access && used_out_of_loop) {
+            auto toks = FileTokenIdsFor(decl.tokens());
+
             // Found a candidate - let's print stuff about it.
             std::cout << "-------------------" << std::endl;
             std::cout << "candidate decl: " << decl.tokens().data() << std::endl;
@@ -110,12 +112,20 @@ static void FindDivergentCandidates(mx::Index index) {
                   << outside_uses.front().tokens().data()
                   << std::endl;
 
+            for (mx::ArraySubscriptExpr access : mem_accesses) {
+              auto access_toks = FileTokenIdsFor(access.tokens());
+              toks.insert(access_toks.begin(), access_toks.end());
+            }
+
+            for (mx::Stmt outside : outside_uses) {
+              auto outside_toks = FileTokenIdsFor(outside.tokens());
+              toks.insert(outside_toks.begin(), outside_toks.end());
+            }
+
             if (FLAGS_show_locations) {
               std::cout << std::endl;
-              if (auto toks = decl.tokens()) {
-                RenderFragment(std::cout, mx::Fragment::containing(decl),
-                               toks, "\t", true);
-              }
+              RenderFragment(std::cout, mx::Fragment::containing(decl),
+                             toks, "\t", true);
               std::cout << std::endl;
             }
           }

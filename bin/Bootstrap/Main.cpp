@@ -2285,7 +2285,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  static gap::generator<" << class_name
         << "> containing(const Token &tok);\n"
         << "  bool contains(const Token &tok) const;\n"
-        << "  std::optional<" << class_name << "> by(const Index &, EntityId);\n\n";
+        << "  static std::optional<" << class_name << "> by_id(const Index &, EntityId);\n\n";
 
     lib_cpp_os
         << "gap::generator<" << class_name
@@ -2647,7 +2647,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    }\n"
           << "  }\n"
           << "}\n\n"
-          << "std::optional<" << class_name << "> " << class_name << "::by(const Index &index, EntityId eid) {\n"
+          << "std::optional<" << class_name << "> " << class_name << "::by_id(const Index &index, EntityId eid) {\n"
           << "  VariantId vid = eid.Unpack();\n"
           << "  if (std::holds_alternative<" << base_name << "Id>(vid)) {\n";
 

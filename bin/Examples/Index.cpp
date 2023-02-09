@@ -46,6 +46,33 @@ void PrintToken(std::ostream &os, mx::Token token) {
   os << token.data(); 
 }
 
+// Collect the file tokens associated with `entity_tokens`.
+std::unordered_set<mx::RawEntityId> FileTokenIdsFor(
+    const mx::TokenRange &entity_tokens) {
+  std::unordered_set<mx::RawEntityId> token_ids;
+  for (mx::Token tok : entity_tokens) {
+    if (auto file_tok = tok.file_token()) {
+      token_ids.insert(file_tok.id().Pack());
+    } else {
+      std::optional<mx::Macro> last_macro;
+      for (mx::Macro macro : mx::Macro::containing(tok)) {
+        last_macro.reset();
+        last_macro.emplace(std::move(macro));
+      }
+      if (last_macro) {
+        for (mx::MacroOrToken use : last_macro->children()) {
+          if (std::holds_alternative<mx::Token>(use)) {
+            if (auto use_file_tok = std::get<mx::Token>(use).file_token()) {
+              token_ids.insert(use_file_tok.id().Pack());
+            }
+          }
+        }
+      }
+    }
+  }
+  return token_ids;
+}
+
 void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
                     std::unordered_set<mx::RawEntityId> highlight_token_ids,
                     std::string indent, bool print_line_numbers) {
@@ -92,30 +119,6 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
 void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
                     const mx::TokenRange &entity_tokens,
                     std::string indent, bool print_line_numbers) {
-
-  // Collect the file tokens associated with `entity_tokens`.
-  std::unordered_set<mx::RawEntityId> token_ids;
-  for (mx::Token tok : entity_tokens) {
-    if (auto file_tok = tok.file_token()) {
-      token_ids.insert(file_tok.id().Pack());
-    } else {
-      std::optional<mx::Macro> last_macro;
-      for (mx::Macro macro : mx::Macro::containing(tok)) {
-        last_macro.reset();
-        last_macro.emplace(std::move(macro));
-      }
-      if (last_macro) {
-        for (mx::MacroOrToken use : last_macro->children()) {
-          if (std::holds_alternative<mx::Token>(use)) {
-            if (auto use_file_tok = std::get<mx::Token>(use).file_token()) {
-              token_ids.insert(use_file_tok.id().Pack());
-            }
-          }
-        }
-      }
-    }
-  }
-
-  RenderFragment(os, fragment, std::move(token_ids), indent,
+  RenderFragment(os, fragment, FileTokenIdsFor(entity_tokens), indent,
                  print_line_numbers);
 }

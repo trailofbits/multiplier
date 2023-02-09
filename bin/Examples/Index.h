@@ -24,6 +24,9 @@ void HighlightToken(std::ostream &os, mx::Token token);
 
 void PrintToken(std::ostream &os, mx::Token token);
 
+std::unordered_set<mx::RawEntityId> FileTokenIdsFor(
+    const mx::TokenRange &entity_tokens);
+
 void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
                     const mx::TokenRange &entity_tokens,
                     std::string indent="", bool print_line_numbers=false);
