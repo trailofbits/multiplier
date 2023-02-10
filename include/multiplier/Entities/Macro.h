@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "MacroKind.h"
 
 namespace mx {
@@ -50,6 +51,8 @@ class Macro {
   Macro(const Macro &) = default;
   Macro &operator=(Macro &&) noexcept = default;
   Macro &operator=(const Macro &) = default;
+
+  inline std::strong_ordering operator<=>(const Macro &rhs) const { return id() <=> rhs.id(); }
 
   /* implicit */ inline Macro(std::shared_ptr<const MacroImpl> impl_)
       : impl(std::move(impl_)) {}

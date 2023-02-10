@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "LangAS.h"
 #include "Linkage.h"
 #include "NullabilityKind.h"
@@ -67,6 +68,8 @@ class Type {
   Type(const Type &) = default;
   Type &operator=(Type &&) noexcept = default;
   Type &operator=(const Type &) = default;
+
+  inline std::strong_ordering operator<=>(const Type &rhs) const { return id() <=> rhs.id(); }
 
   /* implicit */ inline Type(std::shared_ptr<const TypeImpl> impl_)
       : impl(std::move(impl_)) {}

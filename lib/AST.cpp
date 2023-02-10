@@ -42520,7 +42520,6 @@ std::optional<Stmt> Stmt::parent_statement(void) const {
   }
   return std::nullopt;
 }
-
 inline const std::shared_ptr<EntityProvider> &Stmt::entity_provider_of(const Index &index_) {
   return index_.impl;
 }
@@ -42602,14 +42601,16 @@ gap::generator<Stmt> Stmt::containing(const std::optional<Stmt> &stmt) {
 
 bool Stmt::contains(const Decl &decl) {
   for (auto &parent : Stmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool Stmt::contains(const Stmt &stmt) {
   for (auto &parent : Stmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -42742,14 +42743,16 @@ gap::generator<SEHTryStmt> SEHTryStmt::containing(const std::optional<Stmt> &stm
 
 bool SEHTryStmt::contains(const Decl &decl) {
   for (auto &parent : SEHTryStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SEHTryStmt::contains(const Stmt &stmt) {
   for (auto &parent : SEHTryStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -42877,14 +42880,16 @@ gap::generator<SEHLeaveStmt> SEHLeaveStmt::containing(const std::optional<Stmt> 
 
 bool SEHLeaveStmt::contains(const Decl &decl) {
   for (auto &parent : SEHLeaveStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SEHLeaveStmt::contains(const Stmt &stmt) {
   for (auto &parent : SEHLeaveStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -42988,14 +42993,16 @@ gap::generator<SEHFinallyStmt> SEHFinallyStmt::containing(const std::optional<St
 
 bool SEHFinallyStmt::contains(const Decl &decl) {
   for (auto &parent : SEHFinallyStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SEHFinallyStmt::contains(const Stmt &stmt) {
   for (auto &parent : SEHFinallyStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -43104,14 +43111,16 @@ gap::generator<SEHExceptStmt> SEHExceptStmt::containing(const std::optional<Stmt
 
 bool SEHExceptStmt::contains(const Decl &decl) {
   for (auto &parent : SEHExceptStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SEHExceptStmt::contains(const Stmt &stmt) {
   for (auto &parent : SEHExceptStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -43225,14 +43234,16 @@ gap::generator<ReturnStmt> ReturnStmt::containing(const std::optional<Stmt> &stm
 
 bool ReturnStmt::contains(const Decl &decl) {
   for (auto &parent : ReturnStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ReturnStmt::contains(const Stmt &stmt) {
   for (auto &parent : ReturnStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -43362,14 +43373,16 @@ gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::containing(const st
 
 bool ObjCForCollectionStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCForCollectionStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCForCollectionStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCForCollectionStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -43492,14 +43505,16 @@ gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::containing(cons
 
 bool ObjCAutoreleasePoolStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAutoreleasePoolStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCAutoreleasePoolStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAutoreleasePoolStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -43608,14 +43623,16 @@ gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::containing(const std::optional<Stmt
 
 bool ObjCAtTryStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtTryStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCAtTryStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtTryStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -43752,14 +43769,16 @@ gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::containing(const std::optional<
 
 bool ObjCAtThrowStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtThrowStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCAtThrowStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtThrowStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -43868,14 +43887,16 @@ gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::containing(const 
 
 bool ObjCAtSynchronizedStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtSynchronizedStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCAtSynchronizedStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtSynchronizedStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -43989,14 +44010,16 @@ gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::containing(const std::optio
 
 bool ObjCAtFinallyStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtFinallyStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCAtFinallyStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtFinallyStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -44105,14 +44128,16 @@ gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::containing(const std::optional<
 
 bool ObjCAtCatchStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtCatchStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCAtCatchStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtCatchStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -44234,14 +44259,16 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::containing(const 
 
 bool OMPExecutableDirective::contains(const Decl &decl) {
   for (auto &parent : OMPExecutableDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPExecutableDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPExecutableDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -44507,14 +44534,16 @@ gap::generator<OMPDispatchDirective> OMPDispatchDirective::containing(const std:
 
 bool OMPDispatchDirective::contains(const Decl &decl) {
   for (auto &parent : OMPDispatchDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDispatchDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPDispatchDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -44622,14 +44651,16 @@ gap::generator<OMPDepobjDirective> OMPDepobjDirective::containing(const std::opt
 
 bool OMPDepobjDirective::contains(const Decl &decl) {
   for (auto &parent : OMPDepobjDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDepobjDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPDepobjDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -44733,14 +44764,16 @@ gap::generator<OMPCriticalDirective> OMPCriticalDirective::containing(const std:
 
 bool OMPCriticalDirective::contains(const Decl &decl) {
   for (auto &parent : OMPCriticalDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPCriticalDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPCriticalDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -44844,14 +44877,16 @@ gap::generator<OMPCancellationPointDirective> OMPCancellationPointDirective::con
 
 bool OMPCancellationPointDirective::contains(const Decl &decl) {
   for (auto &parent : OMPCancellationPointDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPCancellationPointDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPCancellationPointDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -44955,14 +44990,16 @@ gap::generator<OMPCancelDirective> OMPCancelDirective::containing(const std::opt
 
 bool OMPCancelDirective::contains(const Decl &decl) {
   for (auto &parent : OMPCancelDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPCancelDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPCancelDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -45066,14 +45103,16 @@ gap::generator<OMPBarrierDirective> OMPBarrierDirective::containing(const std::o
 
 bool OMPBarrierDirective::contains(const Decl &decl) {
   for (auto &parent : OMPBarrierDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPBarrierDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPBarrierDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -45177,14 +45216,16 @@ gap::generator<OMPAtomicDirective> OMPAtomicDirective::containing(const std::opt
 
 bool OMPAtomicDirective::contains(const Decl &decl) {
   for (auto &parent : OMPAtomicDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPAtomicDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPAtomicDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -45335,14 +45376,16 @@ gap::generator<OMPTeamsDirective> OMPTeamsDirective::containing(const std::optio
 
 bool OMPTeamsDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTeamsDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTeamsDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -45446,14 +45489,16 @@ gap::generator<OMPTaskyieldDirective> OMPTaskyieldDirective::containing(const st
 
 bool OMPTaskyieldDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskyieldDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTaskyieldDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskyieldDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -45557,14 +45602,16 @@ gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::containing(const std:
 
 bool OMPTaskwaitDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskwaitDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTaskwaitDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskwaitDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -45668,14 +45715,16 @@ gap::generator<OMPTaskgroupDirective> OMPTaskgroupDirective::containing(const st
 
 bool OMPTaskgroupDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskgroupDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTaskgroupDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskgroupDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -45784,14 +45833,16 @@ gap::generator<OMPTaskDirective> OMPTaskDirective::containing(const std::optiona
 
 bool OMPTaskDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTaskDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -45899,14 +45950,16 @@ gap::generator<OMPTargetUpdateDirective> OMPTargetUpdateDirective::containing(co
 
 bool OMPTargetUpdateDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetUpdateDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetUpdateDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetUpdateDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46010,14 +46063,16 @@ gap::generator<OMPTargetTeamsDirective> OMPTargetTeamsDirective::containing(cons
 
 bool OMPTargetTeamsDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetTeamsDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetTeamsDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46121,14 +46176,16 @@ gap::generator<OMPTargetParallelDirective> OMPTargetParallelDirective::containin
 
 bool OMPTargetParallelDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetParallelDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetParallelDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46241,14 +46298,16 @@ gap::generator<OMPTargetExitDataDirective> OMPTargetExitDataDirective::containin
 
 bool OMPTargetExitDataDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetExitDataDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetExitDataDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetExitDataDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46352,14 +46411,16 @@ gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::contain
 
 bool OMPTargetEnterDataDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetEnterDataDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetEnterDataDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetEnterDataDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46463,14 +46524,16 @@ gap::generator<OMPTargetDirective> OMPTargetDirective::containing(const std::opt
 
 bool OMPTargetDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46574,14 +46637,16 @@ gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::containing(const 
 
 bool OMPTargetDataDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetDataDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetDataDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetDataDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46685,14 +46750,16 @@ gap::generator<OMPSingleDirective> OMPSingleDirective::containing(const std::opt
 
 bool OMPSingleDirective::contains(const Decl &decl) {
   for (auto &parent : OMPSingleDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPSingleDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPSingleDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46796,14 +46863,16 @@ gap::generator<OMPSectionsDirective> OMPSectionsDirective::containing(const std:
 
 bool OMPSectionsDirective::contains(const Decl &decl) {
   for (auto &parent : OMPSectionsDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPSectionsDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPSectionsDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -46916,14 +46985,16 @@ gap::generator<OMPSectionDirective> OMPSectionDirective::containing(const std::o
 
 bool OMPSectionDirective::contains(const Decl &decl) {
   for (auto &parent : OMPSectionDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPSectionDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPSectionDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47031,14 +47102,16 @@ gap::generator<OMPScanDirective> OMPScanDirective::containing(const std::optiona
 
 bool OMPScanDirective::contains(const Decl &decl) {
   for (auto &parent : OMPScanDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPScanDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPScanDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47142,14 +47215,16 @@ gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::conta
 
 bool OMPParallelSectionsDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelSectionsDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelSectionsDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelSectionsDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47262,14 +47337,16 @@ gap::generator<OMPParallelMasterDirective> OMPParallelMasterDirective::containin
 
 bool OMPParallelMasterDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelMasterDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMasterDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelMasterDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47378,14 +47455,16 @@ gap::generator<OMPParallelMaskedDirective> OMPParallelMaskedDirective::containin
 
 bool OMPParallelMaskedDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelMaskedDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMaskedDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelMaskedDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47494,14 +47573,16 @@ gap::generator<OMPParallelDirective> OMPParallelDirective::containing(const std:
 
 bool OMPParallelDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47614,14 +47695,16 @@ gap::generator<OMPOrderedDirective> OMPOrderedDirective::containing(const std::o
 
 bool OMPOrderedDirective::contains(const Decl &decl) {
   for (auto &parent : OMPOrderedDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPOrderedDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPOrderedDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47725,14 +47808,16 @@ gap::generator<OMPMetaDirective> OMPMetaDirective::containing(const std::optiona
 
 bool OMPMetaDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMetaDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPMetaDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMetaDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47841,14 +47926,16 @@ gap::generator<OMPMasterDirective> OMPMasterDirective::containing(const std::opt
 
 bool OMPMasterDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMasterDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPMasterDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMasterDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -47952,14 +48039,16 @@ gap::generator<OMPMaskedDirective> OMPMaskedDirective::containing(const std::opt
 
 bool OMPMaskedDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMaskedDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPMaskedDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMaskedDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -48063,14 +48152,16 @@ gap::generator<OMPLoopBasedDirective> OMPLoopBasedDirective::containing(const st
 
 bool OMPLoopBasedDirective::contains(const Decl &decl) {
   for (auto &parent : OMPLoopBasedDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPLoopBasedDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPLoopBasedDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -48246,14 +48337,16 @@ gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::c
 
 bool OMPLoopTransformationDirective::contains(const Decl &decl) {
   for (auto &parent : OMPLoopTransformationDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPLoopTransformationDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPLoopTransformationDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -48373,14 +48466,16 @@ gap::generator<OMPUnrollDirective> OMPUnrollDirective::containing(const std::opt
 
 bool OMPUnrollDirective::contains(const Decl &decl) {
   for (auto &parent : OMPUnrollDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPUnrollDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPUnrollDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -48492,14 +48587,16 @@ gap::generator<OMPTileDirective> OMPTileDirective::containing(const std::optiona
 
 bool OMPTileDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTileDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTileDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTileDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -48611,14 +48708,16 @@ gap::generator<OMPLoopDirective> OMPLoopDirective::containing(const std::optiona
 
 bool OMPLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -49128,14 +49227,16 @@ gap::generator<OMPGenericLoopDirective> OMPGenericLoopDirective::containing(cons
 
 bool OMPGenericLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPGenericLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -49247,14 +49348,16 @@ gap::generator<OMPForSimdDirective> OMPForSimdDirective::containing(const std::o
 
 bool OMPForSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPForSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -49366,14 +49469,16 @@ gap::generator<OMPForDirective> OMPForDirective::containing(const std::optional<
 
 bool OMPForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -49494,14 +49599,16 @@ gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::containin
 
 bool OMPDistributeSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPDistributeSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPDistributeSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -49613,14 +49720,16 @@ gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSi
 
 bool OMPDistributeParallelForSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPDistributeParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPDistributeParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -49732,14 +49841,16 @@ gap::generator<OMPDistributeParallelForDirective> OMPDistributeParallelForDirect
 
 bool OMPDistributeParallelForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPDistributeParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeParallelForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPDistributeParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -49860,14 +49971,16 @@ gap::generator<OMPDistributeDirective> OMPDistributeDirective::containing(const 
 
 bool OMPDistributeDirective::contains(const Decl &decl) {
   for (auto &parent : OMPDistributeDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPDistributeDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -49979,14 +50092,16 @@ gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::conta
 
 bool OMPTeamsGenericLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTeamsGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsGenericLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTeamsGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -50098,14 +50213,16 @@ gap::generator<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective:
 
 bool OMPTeamsDistributeSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTeamsDistributeSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTeamsDistributeSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -50217,14 +50334,16 @@ gap::generator<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributePar
 
 bool OMPTeamsDistributeParallelForSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTeamsDistributeParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTeamsDistributeParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -50336,14 +50455,16 @@ gap::generator<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParalle
 
 bool OMPTeamsDistributeParallelForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTeamsDistributeParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTeamsDistributeParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -50464,14 +50585,16 @@ gap::generator<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::contain
 
 bool OMPTeamsDistributeDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTeamsDistributeDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDistributeDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTeamsDistributeDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -50583,14 +50706,16 @@ gap::generator<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::containing(co
 
 bool OMPTaskLoopSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTaskLoopSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -50702,14 +50827,16 @@ gap::generator<OMPTaskLoopDirective> OMPTaskLoopDirective::containing(const std:
 
 bool OMPTaskLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTaskLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -50825,14 +50952,16 @@ gap::generator<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDire
 
 bool OMPTargetTeamsGenericLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetTeamsGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsGenericLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetTeamsGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -50944,14 +51073,16 @@ gap::generator<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSi
 
 bool OMPTargetTeamsDistributeSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetTeamsDistributeSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetTeamsDistributeSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -51063,14 +51194,16 @@ gap::generator<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsD
 
 bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -51182,14 +51315,16 @@ gap::generator<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistr
 
 bool OMPTargetTeamsDistributeParallelForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -51310,14 +51445,16 @@ gap::generator<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirect
 
 bool OMPTargetTeamsDistributeDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetTeamsDistributeDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetTeamsDistributeDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -51429,14 +51566,16 @@ gap::generator<OMPTargetSimdDirective> OMPTargetSimdDirective::containing(const 
 
 bool OMPTargetSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -51548,14 +51687,16 @@ gap::generator<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLo
 
 bool OMPTargetParallelGenericLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetParallelGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelGenericLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetParallelGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -51667,14 +51808,16 @@ gap::generator<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirect
 
 bool OMPTargetParallelForSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelForSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -51786,14 +51929,16 @@ gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::con
 
 bool OMPTargetParallelForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -51914,14 +52059,16 @@ gap::generator<OMPSimdDirective> OMPSimdDirective::containing(const std::optiona
 
 bool OMPSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -52033,14 +52180,16 @@ gap::generator<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoop
 
 bool OMPParallelMasterTaskLoopSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelMasterTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelMasterTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -52152,14 +52301,16 @@ gap::generator<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDire
 
 bool OMPParallelMasterTaskLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelMasterTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMasterTaskLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelMasterTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -52275,14 +52426,16 @@ gap::generator<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoop
 
 bool OMPParallelMaskedTaskLoopSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelMaskedTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelMaskedTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -52394,14 +52547,16 @@ gap::generator<OMPParallelMaskedTaskLoopDirective> OMPParallelMaskedTaskLoopDire
 
 bool OMPParallelMaskedTaskLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelMaskedTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMaskedTaskLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelMaskedTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -52517,14 +52672,16 @@ gap::generator<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective:
 
 bool OMPParallelGenericLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelGenericLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -52636,14 +52793,16 @@ gap::generator<OMPParallelForSimdDirective> OMPParallelForSimdDirective::contain
 
 bool OMPParallelForSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelForSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -52755,14 +52914,16 @@ gap::generator<OMPParallelForDirective> OMPParallelForDirective::containing(cons
 
 bool OMPParallelForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPParallelForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -52883,14 +53044,16 @@ gap::generator<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::c
 
 bool OMPMasterTaskLoopSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMasterTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMasterTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53002,14 +53165,16 @@ gap::generator<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::containin
 
 bool OMPMasterTaskLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMasterTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPMasterTaskLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMasterTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53125,14 +53290,16 @@ gap::generator<OMPMaskedTaskLoopSimdDirective> OMPMaskedTaskLoopSimdDirective::c
 
 bool OMPMaskedTaskLoopSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMaskedTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMaskedTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53244,14 +53411,16 @@ gap::generator<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::containin
 
 bool OMPMaskedTaskLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMaskedTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPMaskedTaskLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMaskedTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53367,14 +53536,16 @@ gap::generator<OMPInteropDirective> OMPInteropDirective::containing(const std::o
 
 bool OMPInteropDirective::contains(const Decl &decl) {
   for (auto &parent : OMPInteropDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPInteropDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPInteropDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53478,14 +53649,16 @@ gap::generator<OMPFlushDirective> OMPFlushDirective::containing(const std::optio
 
 bool OMPFlushDirective::contains(const Decl &decl) {
   for (auto &parent : OMPFlushDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPFlushDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPFlushDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53589,14 +53762,16 @@ gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::containing(const std::optiona
 
 bool OMPCanonicalLoop::contains(const Decl &decl) {
   for (auto &parent : OMPCanonicalLoop::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPCanonicalLoop::contains(const Stmt &stmt) {
   for (auto &parent : OMPCanonicalLoop::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53716,14 +53891,16 @@ gap::generator<NullStmt> NullStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool NullStmt::contains(const Decl &decl) {
   for (auto &parent : NullStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool NullStmt::contains(const Stmt &stmt) {
   for (auto &parent : NullStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53831,14 +54008,16 @@ gap::generator<MSDependentExistsStmt> MSDependentExistsStmt::containing(const st
 
 bool MSDependentExistsStmt::contains(const Decl &decl) {
   for (auto &parent : MSDependentExistsStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MSDependentExistsStmt::contains(const Stmt &stmt) {
   for (auto &parent : MSDependentExistsStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -53955,14 +54134,16 @@ gap::generator<IndirectGotoStmt> IndirectGotoStmt::containing(const std::optiona
 
 bool IndirectGotoStmt::contains(const Decl &decl) {
   for (auto &parent : IndirectGotoStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool IndirectGotoStmt::contains(const Stmt &stmt) {
   for (auto &parent : IndirectGotoStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -54088,14 +54269,16 @@ gap::generator<IfStmt> IfStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool IfStmt::contains(const Decl &decl) {
   for (auto &parent : IfStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool IfStmt::contains(const Stmt &stmt) {
   for (auto &parent : IfStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -54309,14 +54492,16 @@ gap::generator<GotoStmt> GotoStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool GotoStmt::contains(const Decl &decl) {
   for (auto &parent : GotoStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool GotoStmt::contains(const Stmt &stmt) {
   for (auto &parent : GotoStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -54429,14 +54614,16 @@ gap::generator<ForStmt> ForStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool ForStmt::contains(const Decl &decl) {
   for (auto &parent : ForStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ForStmt::contains(const Stmt &stmt) {
   for (auto &parent : ForStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -54618,14 +54805,16 @@ gap::generator<DoStmt> DoStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool DoStmt::contains(const Decl &decl) {
   for (auto &parent : DoStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DoStmt::contains(const Stmt &stmt) {
   for (auto &parent : DoStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -54747,14 +54936,16 @@ gap::generator<DeclStmt> DeclStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool DeclStmt::contains(const Decl &decl) {
   for (auto &parent : DeclStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DeclStmt::contains(const Stmt &stmt) {
   for (auto &parent : DeclStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -54892,14 +55083,16 @@ gap::generator<CoroutineBodyStmt> CoroutineBodyStmt::containing(const std::optio
 
 bool CoroutineBodyStmt::contains(const Decl &decl) {
   for (auto &parent : CoroutineBodyStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CoroutineBodyStmt::contains(const Stmt &stmt) {
   for (auto &parent : CoroutineBodyStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -55089,14 +55282,16 @@ gap::generator<CoreturnStmt> CoreturnStmt::containing(const std::optional<Stmt> 
 
 bool CoreturnStmt::contains(const Decl &decl) {
   for (auto &parent : CoreturnStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CoreturnStmt::contains(const Stmt &stmt) {
   for (auto &parent : CoreturnStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -55214,14 +55409,16 @@ gap::generator<ContinueStmt> ContinueStmt::containing(const std::optional<Stmt> 
 
 bool ContinueStmt::contains(const Decl &decl) {
   for (auto &parent : ContinueStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ContinueStmt::contains(const Stmt &stmt) {
   for (auto &parent : ContinueStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -55325,14 +55522,16 @@ gap::generator<CompoundStmt> CompoundStmt::containing(const std::optional<Stmt> 
 
 bool CompoundStmt::contains(const Decl &decl) {
   for (auto &parent : CompoundStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CompoundStmt::contains(const Stmt &stmt) {
   for (auto &parent : CompoundStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -55457,14 +55656,16 @@ gap::generator<CapturedStmt> CapturedStmt::containing(const std::optional<Stmt> 
 
 bool CapturedStmt::contains(const Decl &decl) {
   for (auto &parent : CapturedStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CapturedStmt::contains(const Stmt &stmt) {
   for (auto &parent : CapturedStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -55583,14 +55784,16 @@ gap::generator<CXXTryStmt> CXXTryStmt::containing(const std::optional<Stmt> &stm
 
 bool CXXTryStmt::contains(const Decl &decl) {
   for (auto &parent : CXXTryStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXTryStmt::contains(const Stmt &stmt) {
   for (auto &parent : CXXTryStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -55722,14 +55925,16 @@ gap::generator<CXXForRangeStmt> CXXForRangeStmt::containing(const std::optional<
 
 bool CXXForRangeStmt::contains(const Decl &decl) {
   for (auto &parent : CXXForRangeStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXForRangeStmt::contains(const Stmt &stmt) {
   for (auto &parent : CXXForRangeStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -55903,14 +56108,16 @@ gap::generator<CXXCatchStmt> CXXCatchStmt::containing(const std::optional<Stmt> 
 
 bool CXXCatchStmt::contains(const Decl &decl) {
   for (auto &parent : CXXCatchStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXCatchStmt::contains(const Stmt &stmt) {
   for (auto &parent : CXXCatchStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -56037,14 +56244,16 @@ gap::generator<BreakStmt> BreakStmt::containing(const std::optional<Stmt> &stmt)
 
 bool BreakStmt::contains(const Decl &decl) {
   for (auto &parent : BreakStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BreakStmt::contains(const Stmt &stmt) {
   for (auto &parent : BreakStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -56148,14 +56357,16 @@ gap::generator<AsmStmt> AsmStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool AsmStmt::contains(const Decl &decl) {
   for (auto &parent : AsmStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool AsmStmt::contains(const Stmt &stmt) {
   for (auto &parent : AsmStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -56420,14 +56631,16 @@ gap::generator<MSAsmStmt> MSAsmStmt::containing(const std::optional<Stmt> &stmt)
 
 bool MSAsmStmt::contains(const Decl &decl) {
   for (auto &parent : MSAsmStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MSAsmStmt::contains(const Stmt &stmt) {
   for (auto &parent : MSAsmStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -56585,14 +56798,16 @@ gap::generator<GCCAsmStmt> GCCAsmStmt::containing(const std::optional<Stmt> &stm
 
 bool GCCAsmStmt::contains(const Decl &decl) {
   for (auto &parent : GCCAsmStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool GCCAsmStmt::contains(const Stmt &stmt) {
   for (auto &parent : GCCAsmStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -56878,14 +57093,16 @@ gap::generator<WhileStmt> WhileStmt::containing(const std::optional<Stmt> &stmt)
 
 bool WhileStmt::contains(const Decl &decl) {
   for (auto &parent : WhileStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool WhileStmt::contains(const Stmt &stmt) {
   for (auto &parent : WhileStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -57037,14 +57254,16 @@ gap::generator<ValueStmt> ValueStmt::containing(const std::optional<Stmt> &stmt)
 
 bool ValueStmt::contains(const Decl &decl) {
   for (auto &parent : ValueStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ValueStmt::contains(const Stmt &stmt) {
   for (auto &parent : ValueStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -57405,14 +57624,16 @@ gap::generator<LabelStmt> LabelStmt::containing(const std::optional<Stmt> &stmt)
 
 bool LabelStmt::contains(const Decl &decl) {
   for (auto &parent : LabelStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool LabelStmt::contains(const Stmt &stmt) {
   for (auto &parent : LabelStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -57539,14 +57760,16 @@ gap::generator<Expr> Expr::containing(const std::optional<Stmt> &stmt) {
 
 bool Expr::contains(const Decl &decl) {
   for (auto &parent : Expr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool Expr::contains(const Stmt &stmt) {
   for (auto &parent : Expr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -58129,14 +58352,16 @@ gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::containing(co
 
 bool DesignatedInitUpdateExpr::contains(const Decl &decl) {
   for (auto &parent : DesignatedInitUpdateExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DesignatedInitUpdateExpr::contains(const Stmt &stmt) {
   for (auto &parent : DesignatedInitUpdateExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -58254,14 +58479,16 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::containing(const std::opt
 
 bool DesignatedInitExpr::contains(const Decl &decl) {
   for (auto &parent : DesignatedInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DesignatedInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : DesignatedInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -58435,14 +58662,16 @@ gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::containing(
 
 bool DependentScopeDeclRefExpr::contains(const Decl &decl) {
   for (auto &parent : DependentScopeDeclRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DependentScopeDeclRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : DependentScopeDeclRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -58570,14 +58799,16 @@ gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::containing(const std:
 
 bool DependentCoawaitExpr::contains(const Decl &decl) {
   for (auto &parent : DependentCoawaitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DependentCoawaitExpr::contains(const Stmt &stmt) {
   for (auto &parent : DependentCoawaitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -58699,14 +58930,16 @@ gap::generator<DeclRefExpr> DeclRefExpr::containing(const std::optional<Stmt> &s
 
 bool DeclRefExpr::contains(const Decl &decl) {
   for (auto &parent : DeclRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DeclRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : DeclRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -58864,14 +59097,16 @@ gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::containing(const std:
 
 bool CoroutineSuspendExpr::contains(const Decl &decl) {
   for (auto &parent : CoroutineSuspendExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CoroutineSuspendExpr::contains(const Stmt &stmt) {
   for (auto &parent : CoroutineSuspendExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -59015,14 +59250,16 @@ gap::generator<CoawaitExpr> CoawaitExpr::containing(const std::optional<Stmt> &s
 
 bool CoawaitExpr::contains(const Decl &decl) {
   for (auto &parent : CoawaitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CoawaitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CoawaitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -59138,14 +59375,16 @@ gap::generator<CoyieldExpr> CoyieldExpr::containing(const std::optional<Stmt> &s
 
 bool CoyieldExpr::contains(const Decl &decl) {
   for (auto &parent : CoyieldExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CoyieldExpr::contains(const Stmt &stmt) {
   for (auto &parent : CoyieldExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -59257,14 +59496,16 @@ gap::generator<ConvertVectorExpr> ConvertVectorExpr::containing(const std::optio
 
 bool ConvertVectorExpr::contains(const Decl &decl) {
   for (auto &parent : ConvertVectorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ConvertVectorExpr::contains(const Stmt &stmt) {
   for (auto &parent : ConvertVectorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -59385,14 +59626,16 @@ gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::containing(
 
 bool ConceptSpecializationExpr::contains(const Decl &decl) {
   for (auto &parent : ConceptSpecializationExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ConceptSpecializationExpr::contains(const Stmt &stmt) {
   for (auto &parent : ConceptSpecializationExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -59525,14 +59768,16 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::containing(const std::o
 
 bool CompoundLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : CompoundLiteralExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CompoundLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : CompoundLiteralExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -59653,14 +59898,16 @@ gap::generator<ChooseExpr> ChooseExpr::containing(const std::optional<Stmt> &stm
 
 bool ChooseExpr::contains(const Decl &decl) {
   for (auto &parent : ChooseExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ChooseExpr::contains(const Stmt &stmt) {
   for (auto &parent : ChooseExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -59804,14 +60051,16 @@ gap::generator<CharacterLiteral> CharacterLiteral::containing(const std::optiona
 
 bool CharacterLiteral::contains(const Decl &decl) {
   for (auto &parent : CharacterLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CharacterLiteral::contains(const Stmt &stmt) {
   for (auto &parent : CharacterLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -59927,14 +60176,16 @@ gap::generator<CastExpr> CastExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool CastExpr::contains(const Decl &decl) {
   for (auto &parent : CastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -60109,14 +60360,16 @@ gap::generator<ImplicitCastExpr> ImplicitCastExpr::containing(const std::optiona
 
 bool ImplicitCastExpr::contains(const Decl &decl) {
   for (auto &parent : ImplicitCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ImplicitCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : ImplicitCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -60232,14 +60485,16 @@ gap::generator<ExplicitCastExpr> ExplicitCastExpr::containing(const std::optiona
 
 bool ExplicitCastExpr::contains(const Decl &decl) {
   for (auto &parent : ExplicitCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ExplicitCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : ExplicitCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -60372,14 +60627,16 @@ gap::generator<CXXNamedCastExpr> CXXNamedCastExpr::containing(const std::optiona
 
 bool CXXNamedCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXNamedCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXNamedCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXNamedCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -60521,14 +60778,16 @@ gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::containing(const std::opt
 
 bool CXXDynamicCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXDynamicCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXDynamicCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXDynamicCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -60652,14 +60911,16 @@ gap::generator<CXXConstCastExpr> CXXConstCastExpr::containing(const std::optiona
 
 bool CXXConstCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXConstCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXConstCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXConstCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -60779,14 +61040,16 @@ gap::generator<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::containing(const std:
 
 bool CXXAddrspaceCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXAddrspaceCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXAddrspaceCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXAddrspaceCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -60906,14 +61169,16 @@ gap::generator<CXXStaticCastExpr> CXXStaticCastExpr::containing(const std::optio
 
 bool CXXStaticCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXStaticCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXStaticCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXStaticCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -61033,14 +61298,16 @@ gap::generator<CXXReinterpretCastExpr> CXXReinterpretCastExpr::containing(const 
 
 bool CXXReinterpretCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXReinterpretCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXReinterpretCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXReinterpretCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -61160,14 +61427,16 @@ gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::containing(const st
 
 bool CXXFunctionalCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXFunctionalCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXFunctionalCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXFunctionalCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -61295,14 +61564,16 @@ gap::generator<CStyleCastExpr> CStyleCastExpr::containing(const std::optional<St
 
 bool CStyleCastExpr::contains(const Decl &decl) {
   for (auto &parent : CStyleCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CStyleCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CStyleCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -61426,14 +61697,16 @@ gap::generator<BuiltinBitCastExpr> BuiltinBitCastExpr::containing(const std::opt
 
 bool BuiltinBitCastExpr::contains(const Decl &decl) {
   for (auto &parent : BuiltinBitCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BuiltinBitCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : BuiltinBitCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -61549,14 +61822,16 @@ gap::generator<ObjCBridgedCastExpr> ObjCBridgedCastExpr::containing(const std::o
 
 bool ObjCBridgedCastExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCBridgedCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCBridgedCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCBridgedCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -61689,14 +61964,16 @@ gap::generator<CallExpr> CallExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool CallExpr::contains(const Decl &decl) {
   for (auto &parent : CallExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CallExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -61916,14 +62193,16 @@ gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::containing(const std::o
 
 bool CXXOperatorCallExpr::contains(const Decl &decl) {
   for (auto &parent : CXXOperatorCallExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXOperatorCallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXOperatorCallExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -62055,14 +62334,16 @@ gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::containing(const std::optio
 
 bool CXXMemberCallExpr::contains(const Decl &decl) {
   for (auto &parent : CXXMemberCallExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXMemberCallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXMemberCallExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -62202,14 +62483,16 @@ gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::containing(const std::opt
 
 bool CUDAKernelCallExpr::contains(const Decl &decl) {
   for (auto &parent : CUDAKernelCallExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CUDAKernelCallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CUDAKernelCallExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -62326,14 +62609,16 @@ gap::generator<UserDefinedLiteral> UserDefinedLiteral::containing(const std::opt
 
 bool UserDefinedLiteral::contains(const Decl &decl) {
   for (auto &parent : UserDefinedLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UserDefinedLiteral::contains(const Stmt &stmt) {
   for (auto &parent : UserDefinedLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -62458,14 +62743,16 @@ gap::generator<CXXUuidofExpr> CXXUuidofExpr::containing(const std::optional<Stmt
 
 bool CXXUuidofExpr::contains(const Decl &decl) {
   for (auto &parent : CXXUuidofExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXUuidofExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXUuidofExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -62605,14 +62892,16 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::containin
 
 bool CXXUnresolvedConstructExpr::contains(const Decl &decl) {
   for (auto &parent : CXXUnresolvedConstructExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXUnresolvedConstructExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXUnresolvedConstructExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -62760,14 +63049,16 @@ gap::generator<CXXTypeidExpr> CXXTypeidExpr::containing(const std::optional<Stmt
 
 bool CXXTypeidExpr::contains(const Decl &decl) {
   for (auto &parent : CXXTypeidExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXTypeidExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXTypeidExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -62915,14 +63206,16 @@ gap::generator<CXXThrowExpr> CXXThrowExpr::containing(const std::optional<Stmt> 
 
 bool CXXThrowExpr::contains(const Decl &decl) {
   for (auto &parent : CXXThrowExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXThrowExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXThrowExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -63051,14 +63344,16 @@ gap::generator<CXXThisExpr> CXXThisExpr::containing(const std::optional<Stmt> &s
 
 bool CXXThisExpr::contains(const Decl &decl) {
   for (auto &parent : CXXThisExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXThisExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXThisExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -63174,14 +63469,16 @@ gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::containing(
 
 bool CXXStdInitializerListExpr::contains(const Decl &decl) {
   for (auto &parent : CXXStdInitializerListExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXStdInitializerListExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXStdInitializerListExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -63294,14 +63591,16 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::containing(const 
 
 bool CXXScalarValueInitExpr::contains(const Decl &decl) {
   for (auto &parent : CXXScalarValueInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXScalarValueInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXScalarValueInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -63413,14 +63712,16 @@ gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::containin
 
 bool CXXRewrittenBinaryOperator::contains(const Decl &decl) {
   for (auto &parent : CXXRewrittenBinaryOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXRewrittenBinaryOperator::contains(const Stmt &stmt) {
   for (auto &parent : CXXRewrittenBinaryOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -63572,14 +63873,16 @@ gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::containing(cons
 
 bool CXXPseudoDestructorExpr::contains(const Decl &decl) {
   for (auto &parent : CXXPseudoDestructorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXPseudoDestructorExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXPseudoDestructorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -63734,14 +64037,16 @@ gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::containing(const st
 
 bool CXXNullPtrLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : CXXNullPtrLiteralExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXNullPtrLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXNullPtrLiteralExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -63853,14 +64158,16 @@ gap::generator<CXXNoexceptExpr> CXXNoexceptExpr::containing(const std::optional<
 
 bool CXXNoexceptExpr::contains(const Decl &decl) {
   for (auto &parent : CXXNoexceptExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXNoexceptExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXNoexceptExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -63977,14 +64284,16 @@ gap::generator<CXXNewExpr> CXXNewExpr::containing(const std::optional<Stmt> &stm
 
 bool CXXNewExpr::contains(const Decl &decl) {
   for (auto &parent : CXXNewExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXNewExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXNewExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -64211,14 +64520,16 @@ gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::containing(co
 
 bool CXXInheritedCtorInitExpr::contains(const Decl &decl) {
   for (auto &parent : CXXInheritedCtorInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXInheritedCtorInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXInheritedCtorInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -64347,14 +64658,16 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::containing(const std::optional<Stmt> &s
 
 bool CXXFoldExpr::contains(const Decl &decl) {
   for (auto &parent : CXXFoldExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXFoldExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXFoldExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -64520,14 +64833,16 @@ gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::contain
 
 bool CXXDependentScopeMemberExpr::contains(const Decl &decl) {
   for (auto &parent : CXXDependentScopeMemberExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXDependentScopeMemberExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXDependentScopeMemberExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -64702,14 +65017,16 @@ gap::generator<CXXDeleteExpr> CXXDeleteExpr::containing(const std::optional<Stmt
 
 bool CXXDeleteExpr::contains(const Decl &decl) {
   for (auto &parent : CXXDeleteExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXDeleteExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXDeleteExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -64848,14 +65165,16 @@ gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::containing(const std::opt
 
 bool CXXDefaultInitExpr::contains(const Decl &decl) {
   for (auto &parent : CXXDefaultInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXDefaultInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXDefaultInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -64985,14 +65304,16 @@ gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::containing(const std::optio
 
 bool CXXDefaultArgExpr::contains(const Decl &decl) {
   for (auto &parent : CXXDefaultArgExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXDefaultArgExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXDefaultArgExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -65114,14 +65435,16 @@ gap::generator<CXXConstructExpr> CXXConstructExpr::containing(const std::optiona
 
 bool CXXConstructExpr::contains(const Decl &decl) {
   for (auto &parent : CXXConstructExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXConstructExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXConstructExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -65292,14 +65615,16 @@ gap::generator<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::containing(const 
 
 bool CXXTemporaryObjectExpr::contains(const Decl &decl) {
   for (auto &parent : CXXTemporaryObjectExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXTemporaryObjectExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXTemporaryObjectExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -65411,14 +65736,16 @@ gap::generator<CXXBoolLiteralExpr> CXXBoolLiteralExpr::containing(const std::opt
 
 bool CXXBoolLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : CXXBoolLiteralExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXBoolLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXBoolLiteralExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -65534,14 +65861,16 @@ gap::generator<CXXBindTemporaryExpr> CXXBindTemporaryExpr::containing(const std:
 
 bool CXXBindTemporaryExpr::contains(const Decl &decl) {
   for (auto &parent : CXXBindTemporaryExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXBindTemporaryExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXBindTemporaryExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -65654,14 +65983,16 @@ gap::generator<BlockExpr> BlockExpr::containing(const std::optional<Stmt> &stmt)
 
 bool BlockExpr::contains(const Decl &decl) {
   for (auto &parent : BlockExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BlockExpr::contains(const Stmt &stmt) {
   for (auto &parent : BlockExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -65788,14 +66119,16 @@ gap::generator<BinaryOperator> BinaryOperator::containing(const std::optional<St
 
 bool BinaryOperator::contains(const Decl &decl) {
   for (auto &parent : BinaryOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BinaryOperator::contains(const Stmt &stmt) {
   for (auto &parent : BinaryOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -65984,14 +66317,16 @@ gap::generator<CompoundAssignOperator> CompoundAssignOperator::containing(const 
 
 bool CompoundAssignOperator::contains(const Decl &decl) {
   for (auto &parent : CompoundAssignOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CompoundAssignOperator::contains(const Stmt &stmt) {
   for (auto &parent : CompoundAssignOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -66113,14 +66448,16 @@ gap::generator<AtomicExpr> AtomicExpr::containing(const std::optional<Stmt> &stm
 
 bool AtomicExpr::contains(const Decl &decl) {
   for (auto &parent : AtomicExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool AtomicExpr::contains(const Stmt &stmt) {
   for (auto &parent : AtomicExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -66355,14 +66692,16 @@ gap::generator<AsTypeExpr> AsTypeExpr::containing(const std::optional<Stmt> &stm
 
 bool AsTypeExpr::contains(const Decl &decl) {
   for (auto &parent : AsTypeExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool AsTypeExpr::contains(const Stmt &stmt) {
   for (auto &parent : AsTypeExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -66483,14 +66822,16 @@ gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::containing(const std::opt
 
 bool ArrayTypeTraitExpr::contains(const Decl &decl) {
   for (auto &parent : ArrayTypeTraitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ArrayTypeTraitExpr::contains(const Stmt &stmt) {
   for (auto &parent : ArrayTypeTraitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -66612,14 +66953,16 @@ gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::containing(const std::opt
 
 bool ArraySubscriptExpr::contains(const Decl &decl) {
   for (auto &parent : ArraySubscriptExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ArraySubscriptExpr::contains(const Stmt &stmt) {
   for (auto &parent : ArraySubscriptExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -66751,14 +67094,16 @@ gap::generator<ArrayInitLoopExpr> ArrayInitLoopExpr::containing(const std::optio
 
 bool ArrayInitLoopExpr::contains(const Decl &decl) {
   for (auto &parent : ArrayInitLoopExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ArrayInitLoopExpr::contains(const Stmt &stmt) {
   for (auto &parent : ArrayInitLoopExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -66876,14 +67221,16 @@ gap::generator<ArrayInitIndexExpr> ArrayInitIndexExpr::containing(const std::opt
 
 bool ArrayInitIndexExpr::contains(const Decl &decl) {
   for (auto &parent : ArrayInitIndexExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ArrayInitIndexExpr::contains(const Stmt &stmt) {
   for (auto &parent : ArrayInitIndexExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -66991,14 +67338,16 @@ gap::generator<AddrLabelExpr> AddrLabelExpr::containing(const std::optional<Stmt
 
 bool AddrLabelExpr::contains(const Decl &decl) {
   for (auto &parent : AddrLabelExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool AddrLabelExpr::contains(const Stmt &stmt) {
   for (auto &parent : AddrLabelExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -67119,14 +67468,16 @@ gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::contain
 
 bool AbstractConditionalOperator::contains(const Decl &decl) {
   for (auto &parent : AbstractConditionalOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool AbstractConditionalOperator::contains(const Stmt &stmt) {
   for (auto &parent : AbstractConditionalOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -67259,14 +67610,16 @@ gap::generator<ConditionalOperator> ConditionalOperator::containing(const std::o
 
 bool ConditionalOperator::contains(const Decl &decl) {
   for (auto &parent : ConditionalOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ConditionalOperator::contains(const Stmt &stmt) {
   for (auto &parent : ConditionalOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -67388,14 +67741,16 @@ gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::containing(
 
 bool BinaryConditionalOperator::contains(const Decl &decl) {
   for (auto &parent : BinaryConditionalOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BinaryConditionalOperator::contains(const Stmt &stmt) {
   for (auto &parent : BinaryConditionalOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -67517,14 +67872,16 @@ gap::generator<VAArgExpr> VAArgExpr::containing(const std::optional<Stmt> &stmt)
 
 bool VAArgExpr::contains(const Decl &decl) {
   for (auto &parent : VAArgExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool VAArgExpr::contains(const Stmt &stmt) {
   for (auto &parent : VAArgExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -67654,14 +68011,16 @@ gap::generator<UnaryOperator> UnaryOperator::containing(const std::optional<Stmt
 
 bool UnaryOperator::contains(const Decl &decl) {
   for (auto &parent : UnaryOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UnaryOperator::contains(const Stmt &stmt) {
   for (auto &parent : UnaryOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -67814,14 +68173,16 @@ gap::generator<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::containing(co
 
 bool UnaryExprOrTypeTraitExpr::contains(const Decl &decl) {
   for (auto &parent : UnaryExprOrTypeTraitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UnaryExprOrTypeTraitExpr::contains(const Stmt &stmt) {
   for (auto &parent : UnaryExprOrTypeTraitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -67976,14 +68337,16 @@ gap::generator<TypoExpr> TypoExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool TypoExpr::contains(const Decl &decl) {
   for (auto &parent : TypoExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TypoExpr::contains(const Stmt &stmt) {
   for (auto &parent : TypoExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -68091,14 +68454,16 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::containing(const std::optional<Stmt
 
 bool TypeTraitExpr::contains(const Decl &decl) {
   for (auto &parent : TypeTraitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TypeTraitExpr::contains(const Stmt &stmt) {
   for (auto &parent : TypeTraitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -68240,14 +68605,16 @@ gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExp
 
 bool SubstNonTypeTemplateParmPackExpr::contains(const Decl &decl) {
   for (auto &parent : SubstNonTypeTemplateParmPackExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SubstNonTypeTemplateParmPackExpr::contains(const Stmt &stmt) {
   for (auto &parent : SubstNonTypeTemplateParmPackExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -68364,14 +68731,16 @@ gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::conta
 
 bool SubstNonTypeTemplateParmExpr::contains(const Decl &decl) {
   for (auto &parent : SubstNonTypeTemplateParmExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SubstNonTypeTemplateParmExpr::contains(const Stmt &stmt) {
   for (auto &parent : SubstNonTypeTemplateParmExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -68502,14 +68871,16 @@ gap::generator<StringLiteral> StringLiteral::containing(const std::optional<Stmt
 
 bool StringLiteral::contains(const Decl &decl) {
   for (auto &parent : StringLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool StringLiteral::contains(const Stmt &stmt) {
   for (auto &parent : StringLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -68678,14 +69049,16 @@ gap::generator<StmtExpr> StmtExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool StmtExpr::contains(const Decl &decl) {
   for (auto &parent : StmtExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool StmtExpr::contains(const Stmt &stmt) {
   for (auto &parent : StmtExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -68806,14 +69179,16 @@ gap::generator<SourceLocExpr> SourceLocExpr::containing(const std::optional<Stmt
 
 bool SourceLocExpr::contains(const Decl &decl) {
   for (auto &parent : SourceLocExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SourceLocExpr::contains(const Stmt &stmt) {
   for (auto &parent : SourceLocExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -68938,14 +69313,16 @@ gap::generator<SizeOfPackExpr> SizeOfPackExpr::containing(const std::optional<St
 
 bool SizeOfPackExpr::contains(const Decl &decl) {
   for (auto &parent : SizeOfPackExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SizeOfPackExpr::contains(const Stmt &stmt) {
   for (auto &parent : SizeOfPackExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -69099,14 +69476,16 @@ gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::containing(const std::optio
 
 bool ShuffleVectorExpr::contains(const Decl &decl) {
   for (auto &parent : ShuffleVectorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ShuffleVectorExpr::contains(const Stmt &stmt) {
   for (auto &parent : ShuffleVectorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -69222,14 +69601,16 @@ gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::containing(co
 
 bool SYCLUniqueStableNameExpr::contains(const Decl &decl) {
   for (auto &parent : SYCLUniqueStableNameExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SYCLUniqueStableNameExpr::contains(const Stmt &stmt) {
   for (auto &parent : SYCLUniqueStableNameExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -69354,14 +69735,16 @@ gap::generator<RequiresExpr> RequiresExpr::containing(const std::optional<Stmt> 
 
 bool RequiresExpr::contains(const Decl &decl) {
   for (auto &parent : RequiresExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool RequiresExpr::contains(const Stmt &stmt) {
   for (auto &parent : RequiresExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -69509,14 +69892,16 @@ gap::generator<RecoveryExpr> RecoveryExpr::containing(const std::optional<Stmt> 
 
 bool RecoveryExpr::contains(const Decl &decl) {
   for (auto &parent : RecoveryExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool RecoveryExpr::contains(const Stmt &stmt) {
   for (auto &parent : RecoveryExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -69647,14 +70032,16 @@ gap::generator<PseudoObjectExpr> PseudoObjectExpr::containing(const std::optiona
 
 bool PseudoObjectExpr::contains(const Decl &decl) {
   for (auto &parent : PseudoObjectExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool PseudoObjectExpr::contains(const Stmt &stmt) {
   for (auto &parent : PseudoObjectExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -69818,14 +70205,16 @@ gap::generator<PredefinedExpr> PredefinedExpr::containing(const std::optional<St
 
 bool PredefinedExpr::contains(const Decl &decl) {
   for (auto &parent : PredefinedExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool PredefinedExpr::contains(const Stmt &stmt) {
   for (auto &parent : PredefinedExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -69951,14 +70340,16 @@ gap::generator<ParenListExpr> ParenListExpr::containing(const std::optional<Stmt
 
 bool ParenListExpr::contains(const Decl &decl) {
   for (auto &parent : ParenListExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ParenListExpr::contains(const Stmt &stmt) {
   for (auto &parent : ParenListExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -70097,14 +70488,16 @@ gap::generator<ParenExpr> ParenExpr::containing(const std::optional<Stmt> &stmt)
 
 bool ParenExpr::contains(const Decl &decl) {
   for (auto &parent : ParenExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ParenExpr::contains(const Stmt &stmt) {
   for (auto &parent : ParenExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -70225,14 +70618,16 @@ gap::generator<PackExpansionExpr> PackExpansionExpr::containing(const std::optio
 
 bool PackExpansionExpr::contains(const Decl &decl) {
   for (auto &parent : PackExpansionExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool PackExpansionExpr::contains(const Stmt &stmt) {
   for (auto &parent : PackExpansionExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -70358,14 +70753,16 @@ gap::generator<OverloadExpr> OverloadExpr::containing(const std::optional<Stmt> 
 
 bool OverloadExpr::contains(const Decl &decl) {
   for (auto &parent : OverloadExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OverloadExpr::contains(const Stmt &stmt) {
   for (auto &parent : OverloadExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -70512,14 +70909,16 @@ gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::containing(const std:
 
 bool UnresolvedMemberExpr::contains(const Decl &decl) {
   for (auto &parent : UnresolvedMemberExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UnresolvedMemberExpr::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedMemberExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -70661,14 +71060,16 @@ gap::generator<UnresolvedLookupExpr> UnresolvedLookupExpr::containing(const std:
 
 bool UnresolvedLookupExpr::contains(const Decl &decl) {
   for (auto &parent : UnresolvedLookupExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UnresolvedLookupExpr::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedLookupExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -70788,14 +71189,16 @@ gap::generator<OpaqueValueExpr> OpaqueValueExpr::containing(const std::optional<
 
 bool OpaqueValueExpr::contains(const Decl &decl) {
   for (auto &parent : OpaqueValueExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OpaqueValueExpr::contains(const Stmt &stmt) {
   for (auto &parent : OpaqueValueExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -70916,14 +71319,16 @@ gap::generator<OffsetOfExpr> OffsetOfExpr::containing(const std::optional<Stmt> 
 
 bool OffsetOfExpr::contains(const Decl &decl) {
   for (auto &parent : OffsetOfExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OffsetOfExpr::contains(const Stmt &stmt) {
   for (auto &parent : OffsetOfExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -71039,14 +71444,16 @@ gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::containing(const std:
 
 bool ObjCSubscriptRefExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCSubscriptRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCSubscriptRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCSubscriptRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -71177,14 +71584,16 @@ gap::generator<ObjCStringLiteral> ObjCStringLiteral::containing(const std::optio
 
 bool ObjCStringLiteral::contains(const Decl &decl) {
   for (auto &parent : ObjCStringLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCStringLiteral::contains(const Stmt &stmt) {
   for (auto &parent : ObjCStringLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -71301,14 +71710,16 @@ gap::generator<ObjCSelectorExpr> ObjCSelectorExpr::containing(const std::optiona
 
 bool ObjCSelectorExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCSelectorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCSelectorExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCSelectorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -71424,14 +71835,16 @@ gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::containing(const std::optiona
 
 bool ObjCProtocolExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCProtocolExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCProtocolExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCProtocolExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -71556,14 +71969,16 @@ gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::containing(const std::o
 
 bool ObjCPropertyRefExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCPropertyRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCPropertyRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -71742,14 +72157,16 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const std::optional<
 
 bool ObjCMessageExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCMessageExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCMessageExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCMessageExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -71992,14 +72409,16 @@ gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::containing(const std::optional<
 
 bool ObjCIvarRefExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCIvarRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCIvarRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCIvarRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -72133,14 +72552,16 @@ gap::generator<ObjCIsaExpr> ObjCIsaExpr::containing(const std::optional<Stmt> &s
 
 bool ObjCIsaExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCIsaExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCIsaExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCIsaExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -72269,14 +72690,16 @@ gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::contain
 
 bool ObjCIndirectCopyRestoreExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCIndirectCopyRestoreExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCIndirectCopyRestoreExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCIndirectCopyRestoreExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -72393,14 +72816,16 @@ gap::generator<ObjCEncodeExpr> ObjCEncodeExpr::containing(const std::optional<St
 
 bool ObjCEncodeExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCEncodeExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCEncodeExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCEncodeExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -72521,14 +72946,16 @@ gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::containing(const st
 
 bool ObjCDictionaryLiteral::contains(const Decl &decl) {
   for (auto &parent : ObjCDictionaryLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCDictionaryLiteral::contains(const Stmt &stmt) {
   for (auto &parent : ObjCDictionaryLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -72641,14 +73068,16 @@ gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::containing(const std::optional<Stmt
 
 bool ObjCBoxedExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCBoxedExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCBoxedExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCBoxedExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -72774,14 +73203,16 @@ gap::generator<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::containing(const std::o
 
 bool ObjCBoolLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCBoolLiteralExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCBoolLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCBoolLiteralExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -72897,14 +73328,16 @@ gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::containing(
 
 bool ObjCAvailabilityCheckExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCAvailabilityCheckExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCAvailabilityCheckExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAvailabilityCheckExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -73016,14 +73449,16 @@ gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::containing(const std::optiona
 
 bool ObjCArrayLiteral::contains(const Decl &decl) {
   for (auto &parent : ObjCArrayLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCArrayLiteral::contains(const Stmt &stmt) {
   for (auto &parent : ObjCArrayLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -73159,14 +73594,16 @@ gap::generator<OMPIteratorExpr> OMPIteratorExpr::containing(const std::optional<
 
 bool OMPIteratorExpr::contains(const Decl &decl) {
   for (auto &parent : OMPIteratorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPIteratorExpr::contains(const Stmt &stmt) {
   for (auto &parent : OMPIteratorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -73286,14 +73723,16 @@ gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::containing(const std::o
 
 bool OMPArrayShapingExpr::contains(const Decl &decl) {
   for (auto &parent : OMPArrayShapingExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPArrayShapingExpr::contains(const Stmt &stmt) {
   for (auto &parent : OMPArrayShapingExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -73437,14 +73876,16 @@ gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::containing(const std::o
 
 bool OMPArraySectionExpr::contains(const Decl &decl) {
   for (auto &parent : OMPArraySectionExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPArraySectionExpr::contains(const Stmt &stmt) {
   for (auto &parent : OMPArraySectionExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -73584,14 +74025,16 @@ gap::generator<NoInitExpr> NoInitExpr::containing(const std::optional<Stmt> &stm
 
 bool NoInitExpr::contains(const Decl &decl) {
   for (auto &parent : NoInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool NoInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : NoInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -73699,14 +74142,16 @@ gap::generator<MemberExpr> MemberExpr::containing(const std::optional<Stmt> &stm
 
 bool MemberExpr::contains(const Decl &decl) {
   for (auto &parent : MemberExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MemberExpr::contains(const Stmt &stmt) {
   for (auto &parent : MemberExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -73872,14 +74317,16 @@ gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::containing(const std::o
 
 bool MatrixSubscriptExpr::contains(const Decl &decl) {
   for (auto &parent : MatrixSubscriptExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MatrixSubscriptExpr::contains(const Stmt &stmt) {
   for (auto &parent : MatrixSubscriptExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -74010,14 +74457,16 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::containing(co
 
 bool MaterializeTemporaryExpr::contains(const Decl &decl) {
   for (auto &parent : MaterializeTemporaryExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MaterializeTemporaryExpr::contains(const Stmt &stmt) {
   for (auto &parent : MaterializeTemporaryExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -74168,14 +74617,16 @@ gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::containing(cons
 
 bool MSPropertySubscriptExpr::contains(const Decl &decl) {
   for (auto &parent : MSPropertySubscriptExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MSPropertySubscriptExpr::contains(const Stmt &stmt) {
   for (auto &parent : MSPropertySubscriptExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -74297,14 +74748,16 @@ gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::containing(const std::optio
 
 bool MSPropertyRefExpr::contains(const Decl &decl) {
   for (auto &parent : MSPropertyRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MSPropertyRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : MSPropertyRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -74434,14 +74887,16 @@ gap::generator<LambdaExpr> LambdaExpr::containing(const std::optional<Stmt> &stm
 
 bool LambdaExpr::contains(const Decl &decl) {
   for (auto &parent : LambdaExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool LambdaExpr::contains(const Stmt &stmt) {
   for (auto &parent : LambdaExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -74660,14 +75115,16 @@ gap::generator<IntegerLiteral> IntegerLiteral::containing(const std::optional<St
 
 bool IntegerLiteral::contains(const Decl &decl) {
   for (auto &parent : IntegerLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool IntegerLiteral::contains(const Stmt &stmt) {
   for (auto &parent : IntegerLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -74779,14 +75236,16 @@ gap::generator<InitListExpr> InitListExpr::containing(const std::optional<Stmt> 
 
 bool InitListExpr::contains(const Decl &decl) {
   for (auto &parent : InitListExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool InitListExpr::contains(const Stmt &stmt) {
   for (auto &parent : InitListExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -75010,14 +75469,16 @@ gap::generator<ImplicitValueInitExpr> ImplicitValueInitExpr::containing(const st
 
 bool ImplicitValueInitExpr::contains(const Decl &decl) {
   for (auto &parent : ImplicitValueInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ImplicitValueInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : ImplicitValueInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -75125,14 +75586,16 @@ gap::generator<ImaginaryLiteral> ImaginaryLiteral::containing(const std::optiona
 
 bool ImaginaryLiteral::contains(const Decl &decl) {
   for (auto &parent : ImaginaryLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ImaginaryLiteral::contains(const Stmt &stmt) {
   for (auto &parent : ImaginaryLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -75245,14 +75708,16 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::containing(const std:
 
 bool GenericSelectionExpr::contains(const Decl &decl) {
   for (auto &parent : GenericSelectionExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool GenericSelectionExpr::contains(const Stmt &stmt) {
   for (auto &parent : GenericSelectionExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -75409,14 +75874,16 @@ gap::generator<GNUNullExpr> GNUNullExpr::containing(const std::optional<Stmt> &s
 
 bool GNUNullExpr::contains(const Decl &decl) {
   for (auto &parent : GNUNullExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool GNUNullExpr::contains(const Stmt &stmt) {
   for (auto &parent : GNUNullExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -75528,14 +75995,16 @@ gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::containing(const std:
 
 bool FunctionParmPackExpr::contains(const Decl &decl) {
   for (auto &parent : FunctionParmPackExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FunctionParmPackExpr::contains(const Stmt &stmt) {
   for (auto &parent : FunctionParmPackExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -75675,14 +76144,16 @@ gap::generator<FullExpr> FullExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool FullExpr::contains(const Decl &decl) {
   for (auto &parent : FullExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FullExpr::contains(const Stmt &stmt) {
   for (auto &parent : FullExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -75797,14 +76268,16 @@ gap::generator<ExprWithCleanups> ExprWithCleanups::containing(const std::optiona
 
 bool ExprWithCleanups::contains(const Decl &decl) {
   for (auto &parent : ExprWithCleanups::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ExprWithCleanups::contains(const Stmt &stmt) {
   for (auto &parent : ExprWithCleanups::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -75920,14 +76393,16 @@ gap::generator<ConstantExpr> ConstantExpr::containing(const std::optional<Stmt> 
 
 bool ConstantExpr::contains(const Decl &decl) {
   for (auto &parent : ConstantExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ConstantExpr::contains(const Stmt &stmt) {
   for (auto &parent : ConstantExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -76051,14 +76526,16 @@ gap::generator<FloatingLiteral> FloatingLiteral::containing(const std::optional<
 
 bool FloatingLiteral::contains(const Decl &decl) {
   for (auto &parent : FloatingLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FloatingLiteral::contains(const Stmt &stmt) {
   for (auto &parent : FloatingLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -76174,14 +76651,16 @@ gap::generator<FixedPointLiteral> FixedPointLiteral::containing(const std::optio
 
 bool FixedPointLiteral::contains(const Decl &decl) {
   for (auto &parent : FixedPointLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FixedPointLiteral::contains(const Stmt &stmt) {
   for (auto &parent : FixedPointLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -76293,14 +76772,16 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::containing(const std:
 
 bool ExtVectorElementExpr::contains(const Decl &decl) {
   for (auto &parent : ExtVectorElementExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ExtVectorElementExpr::contains(const Stmt &stmt) {
   for (auto &parent : ExtVectorElementExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -76425,14 +76906,16 @@ gap::generator<ExpressionTraitExpr> ExpressionTraitExpr::containing(const std::o
 
 bool ExpressionTraitExpr::contains(const Decl &decl) {
   for (auto &parent : ExpressionTraitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ExpressionTraitExpr::contains(const Stmt &stmt) {
   for (auto &parent : ExpressionTraitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -76553,14 +77036,16 @@ gap::generator<AttributedStmt> AttributedStmt::containing(const std::optional<St
 
 bool AttributedStmt::contains(const Decl &decl) {
   for (auto &parent : AttributedStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool AttributedStmt::contains(const Stmt &stmt) {
   for (auto &parent : AttributedStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -76694,14 +77179,16 @@ gap::generator<SwitchStmt> SwitchStmt::containing(const std::optional<Stmt> &stm
 
 bool SwitchStmt::contains(const Decl &decl) {
   for (auto &parent : SwitchStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SwitchStmt::contains(const Stmt &stmt) {
   for (auto &parent : SwitchStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -76887,14 +77374,16 @@ gap::generator<SwitchCase> SwitchCase::containing(const std::optional<Stmt> &stm
 
 bool SwitchCase::contains(const Decl &decl) {
   for (auto &parent : SwitchCase::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool SwitchCase::contains(const Stmt &stmt) {
   for (auto &parent : SwitchCase::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -77022,14 +77511,16 @@ gap::generator<DefaultStmt> DefaultStmt::containing(const std::optional<Stmt> &s
 
 bool DefaultStmt::contains(const Decl &decl) {
   for (auto &parent : DefaultStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DefaultStmt::contains(const Stmt &stmt) {
   for (auto &parent : DefaultStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -77137,14 +77628,16 @@ gap::generator<CaseStmt> CaseStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool CaseStmt::contains(const Decl &decl) {
   for (auto &parent : CaseStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CaseStmt::contains(const Stmt &stmt) {
   for (auto &parent : CaseStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -77251,7 +77744,6 @@ std::optional<Stmt> Decl::parent_statement(void) const {
   }
   return std::nullopt;
 }
-
 inline const std::shared_ptr<EntityProvider> &Decl::entity_provider_of(const Index &index_) {
   return index_.impl;
 }
@@ -77310,14 +77802,16 @@ gap::generator<Decl> Decl::containing(const std::optional<Stmt> &stmt) {
 
 bool Decl::contains(const Decl &decl) {
   for (auto &parent : Decl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool Decl::contains(const Stmt &stmt) {
   for (auto &parent : Decl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -77647,14 +78141,16 @@ gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializ
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -77775,14 +78271,16 @@ gap::generator<CapturedDecl> CapturedDecl::containing(const std::optional<Stmt> 
 
 bool CapturedDecl::contains(const Decl &decl) {
   for (auto &parent : CapturedDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CapturedDecl::contains(const Stmt &stmt) {
   for (auto &parent : CapturedDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -77935,14 +78433,16 @@ gap::generator<BlockDecl> BlockDecl::containing(const std::optional<Stmt> &stmt)
 
 bool BlockDecl::contains(const Decl &decl) {
   for (auto &parent : BlockDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BlockDecl::contains(const Stmt &stmt) {
   for (auto &parent : BlockDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -78164,14 +78664,16 @@ gap::generator<AccessSpecDecl> AccessSpecDecl::containing(const std::optional<St
 
 bool AccessSpecDecl::contains(const Decl &decl) {
   for (auto &parent : AccessSpecDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool AccessSpecDecl::contains(const Stmt &stmt) {
   for (auto &parent : AccessSpecDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -78291,14 +78793,16 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::contain
 
 bool OMPDeclarativeDirectiveDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclarativeDirectiveDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDeclarativeDirectiveDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclarativeDirectiveDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -78414,14 +78918,16 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::containing(const std:
 
 bool OMPThreadPrivateDecl::contains(const Decl &decl) {
   for (auto &parent : OMPThreadPrivateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPThreadPrivateDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPThreadPrivateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -78560,14 +79066,16 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::containing(const std::optional<
 
 bool OMPRequiresDecl::contains(const Decl &decl) {
   for (auto &parent : OMPRequiresDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPRequiresDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPRequiresDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -78683,14 +79191,16 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::containing(const std::optional<
 
 bool OMPAllocateDecl::contains(const Decl &decl) {
   for (auto &parent : OMPAllocateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPAllocateDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPAllocateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -78829,14 +79339,16 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::containing(const std::o
 
 bool TranslationUnitDecl::contains(const Decl &decl) {
   for (auto &parent : TranslationUnitDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TranslationUnitDecl::contains(const Stmt &stmt) {
   for (auto &parent : TranslationUnitDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -78957,14 +79469,16 @@ gap::generator<StaticAssertDecl> StaticAssertDecl::containing(const std::optiona
 
 bool StaticAssertDecl::contains(const Decl &decl) {
   for (auto &parent : StaticAssertDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool StaticAssertDecl::contains(const Stmt &stmt) {
   for (auto &parent : StaticAssertDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -79094,14 +79608,16 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::containing(const std:
 
 bool RequiresExprBodyDecl::contains(const Decl &decl) {
   for (auto &parent : RequiresExprBodyDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool RequiresExprBodyDecl::contains(const Stmt &stmt) {
   for (auto &parent : RequiresExprBodyDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -79222,14 +79738,16 @@ gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::containing(co
 
 bool PragmaDetectMismatchDecl::contains(const Decl &decl) {
   for (auto &parent : PragmaDetectMismatchDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool PragmaDetectMismatchDecl::contains(const Stmt &stmt) {
   for (auto &parent : PragmaDetectMismatchDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -79351,14 +79869,16 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::containing(const std::optio
 
 bool PragmaCommentDecl::contains(const Decl &decl) {
   for (auto &parent : PragmaCommentDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool PragmaCommentDecl::contains(const Stmt &stmt) {
   for (auto &parent : PragmaCommentDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -79479,14 +79999,16 @@ gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::containing(const std:
 
 bool ObjCPropertyImplDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCPropertyImplDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyImplDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCPropertyImplDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -79640,14 +80162,16 @@ gap::generator<NamedDecl> NamedDecl::containing(const std::optional<Stmt> &stmt)
 
 bool NamedDecl::contains(const Decl &decl) {
   for (auto &parent : NamedDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool NamedDecl::contains(const Stmt &stmt) {
   for (auto &parent : NamedDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -79945,14 +80469,16 @@ gap::generator<LabelDecl> LabelDecl::containing(const std::optional<Stmt> &stmt)
 
 bool LabelDecl::contains(const Decl &decl) {
   for (auto &parent : LabelDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool LabelDecl::contains(const Stmt &stmt) {
   for (auto &parent : LabelDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -80090,14 +80616,16 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::containing(const std::optional<Stmt
 
 bool BaseUsingDecl::contains(const Decl &decl) {
   for (auto &parent : BaseUsingDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BaseUsingDecl::contains(const Stmt &stmt) {
   for (auto &parent : BaseUsingDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -80238,14 +80766,16 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::containing(const std::optional<Stmt
 
 bool UsingEnumDecl::contains(const Decl &decl) {
   for (auto &parent : UsingEnumDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UsingEnumDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingEnumDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -80378,14 +80908,16 @@ gap::generator<UsingDecl> UsingDecl::containing(const std::optional<Stmt> &stmt)
 
 bool UsingDecl::contains(const Decl &decl) {
   for (auto &parent : UsingDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UsingDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -80517,14 +81049,16 @@ gap::generator<ValueDecl> ValueDecl::containing(const std::optional<Stmt> &stmt)
 
 bool ValueDecl::contains(const Decl &decl) {
   for (auto &parent : ValueDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ValueDecl::contains(const Stmt &stmt) {
   for (auto &parent : ValueDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -80701,14 +81235,16 @@ gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::containing(co
 
 bool UnresolvedUsingValueDecl::contains(const Decl &decl) {
   for (auto &parent : UnresolvedUsingValueDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingValueDecl::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedUsingValueDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -80844,14 +81380,16 @@ gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::containing(
 
 bool UnnamedGlobalConstantDecl::contains(const Decl &decl) {
   for (auto &parent : UnnamedGlobalConstantDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UnnamedGlobalConstantDecl::contains(const Stmt &stmt) {
   for (auto &parent : UnnamedGlobalConstantDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -80971,14 +81509,16 @@ gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::containing(cons
 
 bool TemplateParamObjectDecl::contains(const Decl &decl) {
   for (auto &parent : TemplateParamObjectDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TemplateParamObjectDecl::contains(const Stmt &stmt) {
   for (auto &parent : TemplateParamObjectDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -81098,14 +81638,16 @@ gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::containing(cons
 
 bool OMPDeclareReductionDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclareReductionDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDeclareReductionDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclareReductionDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -81268,14 +81810,16 @@ gap::generator<MSGuidDecl> MSGuidDecl::containing(const std::optional<Stmt> &stm
 
 bool MSGuidDecl::contains(const Decl &decl) {
   for (auto &parent : MSGuidDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MSGuidDecl::contains(const Stmt &stmt) {
   for (auto &parent : MSGuidDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -81395,14 +81939,16 @@ gap::generator<IndirectFieldDecl> IndirectFieldDecl::containing(const std::optio
 
 bool IndirectFieldDecl::contains(const Decl &decl) {
   for (auto &parent : IndirectFieldDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool IndirectFieldDecl::contains(const Stmt &stmt) {
   for (auto &parent : IndirectFieldDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -81561,14 +82107,16 @@ gap::generator<EnumConstantDecl> EnumConstantDecl::containing(const std::optiona
 
 bool EnumConstantDecl::contains(const Decl &decl) {
   for (auto &parent : EnumConstantDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool EnumConstantDecl::contains(const Stmt &stmt) {
   for (auto &parent : EnumConstantDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -81701,14 +82249,16 @@ gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const std::optional<St
 
 bool DeclaratorDecl::contains(const Decl &decl) {
   for (auto &parent : DeclaratorDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DeclaratorDecl::contains(const Stmt &stmt) {
   for (auto &parent : DeclaratorDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -81912,14 +82462,16 @@ gap::generator<VarDecl> VarDecl::containing(const std::optional<Stmt> &stmt) {
 
 bool VarDecl::contains(const Decl &decl) {
   for (auto &parent : VarDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool VarDecl::contains(const Stmt &stmt) {
   for (auto &parent : VarDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -82323,14 +82875,16 @@ gap::generator<ParmVarDecl> ParmVarDecl::containing(const std::optional<Stmt> &s
 
 bool ParmVarDecl::contains(const Decl &decl) {
   for (auto &parent : ParmVarDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ParmVarDecl::contains(const Stmt &stmt) {
   for (auto &parent : ParmVarDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -82526,14 +83080,16 @@ gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::containing(const std::o
 
 bool OMPCapturedExprDecl::contains(const Decl &decl) {
   for (auto &parent : OMPCapturedExprDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPCapturedExprDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPCapturedExprDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -82661,14 +83217,16 @@ gap::generator<ImplicitParamDecl> ImplicitParamDecl::containing(const std::optio
 
 bool ImplicitParamDecl::contains(const Decl &decl) {
   for (auto &parent : ImplicitParamDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ImplicitParamDecl::contains(const Stmt &stmt) {
   for (auto &parent : ImplicitParamDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -82800,14 +83358,16 @@ gap::generator<DecompositionDecl> DecompositionDecl::containing(const std::optio
 
 bool DecompositionDecl::contains(const Decl &decl) {
   for (auto &parent : DecompositionDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool DecompositionDecl::contains(const Stmt &stmt) {
   for (auto &parent : DecompositionDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -82958,14 +83518,16 @@ gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::con
 
 bool VarTemplateSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : VarTemplateSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool VarTemplateSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : VarTemplateSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -83171,14 +83733,16 @@ gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializ
 
 bool VarTemplatePartialSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : VarTemplatePartialSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool VarTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : VarTemplatePartialSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -83324,14 +83888,16 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::containing(cons
 
 bool NonTypeTemplateParmDecl::contains(const Decl &decl) {
   for (auto &parent : NonTypeTemplateParmDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool NonTypeTemplateParmDecl::contains(const Stmt &stmt) {
   for (auto &parent : NonTypeTemplateParmDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -83535,14 +84101,16 @@ gap::generator<MSPropertyDecl> MSPropertyDecl::containing(const std::optional<St
 
 bool MSPropertyDecl::contains(const Decl &decl) {
   for (auto &parent : MSPropertyDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool MSPropertyDecl::contains(const Stmt &stmt) {
   for (auto &parent : MSPropertyDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -83674,14 +84242,16 @@ gap::generator<FunctionDecl> FunctionDecl::containing(const std::optional<Stmt> 
 
 bool FunctionDecl::contains(const Decl &decl) {
   for (auto &parent : FunctionDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FunctionDecl::contains(const Stmt &stmt) {
   for (auto &parent : FunctionDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -84248,14 +84818,16 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::containing(const std::optional<Stmt
 
 bool CXXMethodDecl::contains(const Decl &decl) {
   for (auto &parent : CXXMethodDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXMethodDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXMethodDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -84474,14 +85046,16 @@ gap::generator<CXXDestructorDecl> CXXDestructorDecl::containing(const std::optio
 
 bool CXXDestructorDecl::contains(const Decl &decl) {
   for (auto &parent : CXXDestructorDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXDestructorDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXDestructorDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -84639,14 +85213,16 @@ gap::generator<CXXConversionDecl> CXXConversionDecl::containing(const std::optio
 
 bool CXXConversionDecl::contains(const Decl &decl) {
   for (auto &parent : CXXConversionDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXConversionDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXConversionDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -84791,14 +85367,16 @@ gap::generator<CXXConstructorDecl> CXXConstructorDecl::containing(const std::opt
 
 bool CXXConstructorDecl::contains(const Decl &decl) {
   for (auto &parent : CXXConstructorDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXConstructorDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXConstructorDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -84963,14 +85541,16 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const st
 
 bool CXXDeductionGuideDecl::contains(const Decl &decl) {
   for (auto &parent : CXXDeductionGuideDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXDeductionGuideDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXDeductionGuideDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -85116,14 +85696,16 @@ gap::generator<FieldDecl> FieldDecl::containing(const std::optional<Stmt> &stmt)
 
 bool FieldDecl::contains(const Decl &decl) {
   for (auto &parent : FieldDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FieldDecl::contains(const Stmt &stmt) {
   for (auto &parent : FieldDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -85326,14 +85908,16 @@ gap::generator<ObjCIvarDecl> ObjCIvarDecl::containing(const std::optional<Stmt> 
 
 bool ObjCIvarDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCIvarDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCIvarDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCIvarDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -85483,14 +86067,16 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::containing(const std::o
 
 bool ObjCAtDefsFieldDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCAtDefsFieldDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCAtDefsFieldDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtDefsFieldDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -85618,14 +86204,16 @@ gap::generator<BindingDecl> BindingDecl::containing(const std::optional<Stmt> &s
 
 bool BindingDecl::contains(const Decl &decl) {
   for (auto &parent : BindingDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BindingDecl::contains(const Stmt &stmt) {
   for (auto &parent : BindingDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -85760,14 +86348,16 @@ gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDec
 
 bool OMPDeclarativeDirectiveValueDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclarativeDirectiveValueDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDeclarativeDirectiveValueDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclarativeDirectiveValueDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -85887,14 +86477,16 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::containing(const std:
 
 bool OMPDeclareMapperDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclareMapperDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool OMPDeclareMapperDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclareMapperDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -86032,14 +86624,16 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::containing(const std::optional<
 
 bool UsingShadowDecl::contains(const Decl &decl) {
   for (auto &parent : UsingShadowDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UsingShadowDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingShadowDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -86180,14 +86774,16 @@ gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::containin
 
 bool ConstructorUsingShadowDecl::contains(const Decl &decl) {
   for (auto &parent : ConstructorUsingShadowDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ConstructorUsingShadowDecl::contains(const Stmt &stmt) {
   for (auto &parent : ConstructorUsingShadowDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -86347,14 +86943,16 @@ gap::generator<UsingPackDecl> UsingPackDecl::containing(const std::optional<Stmt
 
 bool UsingPackDecl::contains(const Decl &decl) {
   for (auto &parent : UsingPackDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UsingPackDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingPackDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -86498,14 +87096,16 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::containing(const std::opt
 
 bool UsingDirectiveDecl::contains(const Decl &decl) {
   for (auto &parent : UsingDirectiveDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UsingDirectiveDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingDirectiveDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -86638,14 +87238,16 @@ gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::contain
 
 bool UnresolvedUsingIfExistsDecl::contains(const Decl &decl) {
   for (auto &parent : UnresolvedUsingIfExistsDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingIfExistsDecl::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedUsingIfExistsDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -86761,14 +87363,16 @@ gap::generator<TypeDecl> TypeDecl::containing(const std::optional<Stmt> &stmt) {
 
 bool TypeDecl::contains(const Decl &decl) {
   for (auto &parent : TypeDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TypeDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypeDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -86915,14 +87519,16 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::containing(const std:
 
 bool TemplateTypeParmDecl::contains(const Decl &decl) {
   for (auto &parent : TemplateTypeParmDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TemplateTypeParmDecl::contains(const Stmt &stmt) {
   for (auto &parent : TemplateTypeParmDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -87096,14 +87702,16 @@ gap::generator<TagDecl> TagDecl::containing(const std::optional<Stmt> &stmt) {
 
 bool TagDecl::contains(const Decl &decl) {
   for (auto &parent : TagDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TagDecl::contains(const Stmt &stmt) {
   for (auto &parent : TagDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -87351,14 +87959,16 @@ gap::generator<RecordDecl> RecordDecl::containing(const std::optional<Stmt> &stm
 
 bool RecordDecl::contains(const Decl &decl) {
   for (auto &parent : RecordDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool RecordDecl::contains(const Stmt &stmt) {
   for (auto &parent : RecordDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -87595,14 +88205,16 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const std::optional<Stmt
 
 bool CXXRecordDecl::contains(const Decl &decl) {
   for (auto &parent : CXXRecordDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool CXXRecordDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXRecordDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -88866,14 +89478,16 @@ gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl:
 
 bool ClassTemplateSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ClassTemplateSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ClassTemplateSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassTemplateSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -89095,14 +89709,16 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
 
 bool ClassTemplatePartialSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ClassTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -89262,14 +89878,16 @@ gap::generator<EnumDecl> EnumDecl::containing(const std::optional<Stmt> &stmt) {
 
 bool EnumDecl::contains(const Decl &decl) {
   for (auto &parent : EnumDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool EnumDecl::contains(const Stmt &stmt) {
   for (auto &parent : EnumDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -89514,14 +90132,16 @@ gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::contain
 
 bool UnresolvedUsingTypenameDecl::contains(const Decl &decl) {
   for (auto &parent : UnresolvedUsingTypenameDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingTypenameDecl::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedUsingTypenameDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -89657,14 +90277,16 @@ gap::generator<TypedefNameDecl> TypedefNameDecl::containing(const std::optional<
 
 bool TypedefNameDecl::contains(const Decl &decl) {
   for (auto &parent : TypedefNameDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TypedefNameDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypedefNameDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -89814,14 +90436,16 @@ gap::generator<TypedefDecl> TypedefDecl::containing(const std::optional<Stmt> &s
 
 bool TypedefDecl::contains(const Decl &decl) {
   for (auto &parent : TypedefDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TypedefDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypedefDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -89945,14 +90569,16 @@ gap::generator<TypeAliasDecl> TypeAliasDecl::containing(const std::optional<Stmt
 
 bool TypeAliasDecl::contains(const Decl &decl) {
   for (auto &parent : TypeAliasDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TypeAliasDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypeAliasDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -90089,14 +90715,16 @@ gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::containing(const std::optio
 
 bool ObjCTypeParamDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCTypeParamDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCTypeParamDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCTypeParamDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -90236,14 +90864,16 @@ gap::generator<TemplateDecl> TemplateDecl::containing(const std::optional<Stmt> 
 
 bool TemplateDecl::contains(const Decl &decl) {
   for (auto &parent : TemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : TemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -90385,14 +91015,16 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::containing(co
 
 bool RedeclarableTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : RedeclarableTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool RedeclarableTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : RedeclarableTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -90527,14 +91159,16 @@ gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::containing(const std:
 
 bool FunctionTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : FunctionTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FunctionTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : FunctionTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -90666,14 +91300,16 @@ gap::generator<ClassTemplateDecl> ClassTemplateDecl::containing(const std::optio
 
 bool ClassTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : ClassTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ClassTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -90801,14 +91437,16 @@ gap::generator<VarTemplateDecl> VarTemplateDecl::containing(const std::optional<
 
 bool VarTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : VarTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool VarTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : VarTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -90936,14 +91574,16 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::containing(const st
 
 bool TypeAliasTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : TypeAliasTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TypeAliasTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypeAliasTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -91067,14 +91707,16 @@ gap::generator<ConceptDecl> ConceptDecl::containing(const std::optional<Stmt> &s
 
 bool ConceptDecl::contains(const Decl &decl) {
   for (auto &parent : ConceptDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ConceptDecl::contains(const Stmt &stmt) {
   for (auto &parent : ConceptDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -91203,14 +91845,16 @@ gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::containing(const std::o
 
 bool BuiltinTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : BuiltinTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool BuiltinTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : BuiltinTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -91330,14 +91974,16 @@ gap::generator<TemplateTemplateParmDecl> TemplateTemplateParmDecl::containing(co
 
 bool TemplateTemplateParmDecl::contains(const Decl &decl) {
   for (auto &parent : TemplateTemplateParmDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool TemplateTemplateParmDecl::contains(const Stmt &stmt) {
   for (auto &parent : TemplateTemplateParmDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -91477,14 +92123,16 @@ gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::containing(const std::optiona
 
 bool ObjCPropertyDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCPropertyDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCPropertyDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -91676,14 +92324,16 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::containing(const std::optional<St
 
 bool ObjCMethodDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCMethodDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCMethodDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCMethodDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -91980,14 +92630,16 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::containing(const std::optio
 
 bool ObjCContainerDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCContainerDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCContainerDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCContainerDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -92267,14 +92919,16 @@ gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::containing(const std::optiona
 
 bool ObjCCategoryDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCCategoryDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCCategoryDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCCategoryDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -92498,14 +93152,16 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::containing(const std::optiona
 
 bool ObjCProtocolDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCProtocolDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCProtocolDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCProtocolDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -92692,14 +93348,16 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::containing(const std::optio
 
 bool ObjCInterfaceDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCInterfaceDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCInterfaceDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCInterfaceDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -93085,14 +93743,16 @@ gap::generator<ObjCImplDecl> ObjCImplDecl::containing(const std::optional<Stmt> 
 
 bool ObjCImplDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCImplDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCImplDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCImplDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -93242,14 +93902,16 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::containing(const std:
 
 bool ObjCCategoryImplDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCCategoryImplDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCCategoryImplDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCCategoryImplDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -93382,14 +94044,16 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::containing(const 
 
 bool ObjCImplementationDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCImplementationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCImplementationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCImplementationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -93566,14 +94230,16 @@ gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::containing(cons
 
 bool ObjCCompatibleAliasDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCCompatibleAliasDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ObjCCompatibleAliasDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCCompatibleAliasDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -93694,14 +94360,16 @@ gap::generator<NamespaceDecl> NamespaceDecl::containing(const std::optional<Stmt
 
 bool NamespaceDecl::contains(const Decl &decl) {
   for (auto &parent : NamespaceDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool NamespaceDecl::contains(const Stmt &stmt) {
   for (auto &parent : NamespaceDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -93826,14 +94494,16 @@ gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::containing(const std::opt
 
 bool NamespaceAliasDecl::contains(const Decl &decl) {
   for (auto &parent : NamespaceAliasDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool NamespaceAliasDecl::contains(const Stmt &stmt) {
   for (auto &parent : NamespaceAliasDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -93966,14 +94636,16 @@ gap::generator<LinkageSpecDecl> LinkageSpecDecl::containing(const std::optional<
 
 bool LinkageSpecDecl::contains(const Decl &decl) {
   for (auto &parent : LinkageSpecDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool LinkageSpecDecl::contains(const Stmt &stmt) {
   for (auto &parent : LinkageSpecDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -94094,14 +94766,16 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::con
 
 bool LifetimeExtendedTemporaryDecl::contains(const Decl &decl) {
   for (auto &parent : LifetimeExtendedTemporaryDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool LifetimeExtendedTemporaryDecl::contains(const Stmt &stmt) {
   for (auto &parent : LifetimeExtendedTemporaryDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -94238,14 +94912,16 @@ gap::generator<ImportDecl> ImportDecl::containing(const std::optional<Stmt> &stm
 
 bool ImportDecl::contains(const Decl &decl) {
   for (auto &parent : ImportDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ImportDecl::contains(const Stmt &stmt) {
   for (auto &parent : ImportDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -94384,14 +95060,16 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::containing(const std::opt
 
 bool FriendTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : FriendTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FriendTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : FriendTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -94538,14 +95216,16 @@ gap::generator<FriendDecl> FriendDecl::containing(const std::optional<Stmt> &stm
 
 bool FriendDecl::contains(const Decl &decl) {
   for (auto &parent : FriendDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FriendDecl::contains(const Stmt &stmt) {
   for (auto &parent : FriendDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -94712,14 +95392,16 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::containing(const std::optiona
 
 bool FileScopeAsmDecl::contains(const Decl &decl) {
   for (auto &parent : FileScopeAsmDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool FileScopeAsmDecl::contains(const Stmt &stmt) {
   for (auto &parent : FileScopeAsmDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -94844,14 +95526,16 @@ gap::generator<ExternCContextDecl> ExternCContextDecl::containing(const std::opt
 
 bool ExternCContextDecl::contains(const Decl &decl) {
   for (auto &parent : ExternCContextDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ExternCContextDecl::contains(const Stmt &stmt) {
   for (auto &parent : ExternCContextDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -94972,14 +95656,16 @@ gap::generator<ExportDecl> ExportDecl::containing(const std::optional<Stmt> &stm
 
 bool ExportDecl::contains(const Decl &decl) {
   for (auto &parent : ExportDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool ExportDecl::contains(const Stmt &stmt) {
   for (auto &parent : ExportDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
@@ -95112,14 +95798,16 @@ gap::generator<EmptyDecl> EmptyDecl::containing(const std::optional<Stmt> &stmt)
 
 bool EmptyDecl::contains(const Decl &decl) {
   for (auto &parent : EmptyDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }
 
 bool EmptyDecl::contains(const Stmt &stmt) {
   for (auto &parent : EmptyDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    auto eq = parent <=> *this;
+    if (eq == 0) { return true; }
   }
   return false;
 }

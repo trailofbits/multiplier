@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "AccessSpecifier.h"
 #include "AvailabilityResult.h"
 #include "DeclCategory.h"
@@ -59,6 +60,8 @@ class Decl {
   Decl &operator=(Decl &&) noexcept = default;
   Decl &operator=(const Decl &) = default;
 
+  inline std::strong_ordering operator<=>(const Decl &rhs) const { return canonical_declaration().id() <=> rhs.canonical_declaration().id(); }
+
   /* implicit */ inline Decl(std::shared_ptr<const DeclImpl> impl_)
       : impl(std::move(impl_)) {}
 
@@ -75,7 +78,6 @@ class Decl {
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;
   gap::generator<Decl> redeclarations(void) const;
-
  public:
   static gap::generator<Decl> in(const Fragment &frag, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const Index &index, std::span<DeclKind> kinds);

@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
 
@@ -53,6 +54,8 @@ class TemplateArgument {
   TemplateArgument(const TemplateArgument &) = default;
   TemplateArgument &operator=(TemplateArgument &&) noexcept = default;
   TemplateArgument &operator=(const TemplateArgument &) = default;
+
+  inline std::strong_ordering operator<=>(const TemplateArgument &rhs) const { return id() <=> rhs.id(); }
 
   /* implicit */ inline TemplateArgument(std::shared_ptr<const TemplateArgumentImpl> impl_)
       : impl(std::move(impl_)) {}

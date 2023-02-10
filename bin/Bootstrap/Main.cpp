@@ -2057,7 +2057,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  b." << cd_setter_name << "(es.ParentDeclId(e));\n"
           << "  b." << cs_setter_name << "(es.ParentStmtId(e));\n";
 
-      // `Decl::is_definition`.
+      // `Decl::is_definition`
       if (class_name == "Decl") {
         const auto def = storage.AddMethod("Bool");
         auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
@@ -2095,7 +2095,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    assert(false);\n"
           << "  }\n"
           << "  return std::nullopt;\n"
-          << "}\n\n";
+          << "}\n";
     }
 
     class_os
@@ -2121,6 +2121,18 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  " << class_name << "(const " << class_name << " &) = default;\n"
         << "  " << class_name << " &operator=(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << " &operator=(const " << class_name << " &) = default;\n\n"
+        << "  inline std::strong_ordering operator<=>(const " << class_name << " &rhs) const {";
+
+      // Equality on Decls need to be tested in its canonicalized form
+      if (class_name == "Decl") {
+        class_os
+          << " return canonical_declaration().id() <=> rhs.canonical_declaration().id(); }\n\n";
+      } else {
+        class_os
+          << " return id() <=> rhs.id(); }\n\n";
+      }
+
+      class_os
         << "  /* implicit */ inline " << class_name
         << "(std::shared_ptr<const " << class_name << "Impl> impl_)\n"
         << "      : impl(std::move(impl_)) {}\n\n";
@@ -2155,7 +2167,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Decl> definition(void) const;\n"
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
-          << "  gap::generator<Decl> redeclarations(void) const;\n\n"
+          << "  gap::generator<Decl> redeclarations(void) const;\n"
           << " public:\n";
 
       seen_methods->emplace("uses");  // Manual.
@@ -2372,13 +2384,15 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    auto eq = parent <=> *this;\n"
+        << "    if (eq == 0) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    auto eq = parent <=> *this;\n"
+        << "    if (eq == 0) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2441,13 +2455,15 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    auto eq = parent <=> *this;\n"
+        << "    if (eq == 0) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    auto eq = parent <=> *this;\n"
+        << "    if (eq == 0) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -3381,8 +3397,20 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
   }
 
+  // Additional special methods for specific derived classes go here
+
+  // `FunctionDecl::callers`.
+  if (class_name == "FunctionDecl") {
+    forward_decls.insert("CallExpr");
+    class_os
+      << "  gap::generator<CallExpr> callers(void) const;\n";
+  }
+
   class_os << "};\n\n";
 
+  if (class_name == base_name) {
+    os << "#include <compare>\n\n";
+  }
   for (auto needed : needed_decls) {
     os << "#include \"" << needed << ".h\"\n";
   }

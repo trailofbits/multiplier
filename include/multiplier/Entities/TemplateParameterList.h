@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "PseudoKind.h"
 
 namespace mx {
@@ -52,6 +53,8 @@ class TemplateParameterList {
   TemplateParameterList(const TemplateParameterList &) = default;
   TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
   TemplateParameterList &operator=(const TemplateParameterList &) = default;
+
+  inline std::strong_ordering operator<=>(const TemplateParameterList &rhs) const { return id() <=> rhs.id(); }
 
   /* implicit */ inline TemplateParameterList(std::shared_ptr<const TemplateParameterListImpl> impl_)
       : impl(std::move(impl_)) {}

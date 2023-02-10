@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "PseudoKind.h"
 
 namespace mx {
@@ -51,6 +52,8 @@ class Designator {
   Designator(const Designator &) = default;
   Designator &operator=(Designator &&) noexcept = default;
   Designator &operator=(const Designator &) = default;
+
+  inline std::strong_ordering operator<=>(const Designator &rhs) const { return id() <=> rhs.id(); }
 
   /* implicit */ inline Designator(std::shared_ptr<const DesignatorImpl> impl_)
       : impl(std::move(impl_)) {}
