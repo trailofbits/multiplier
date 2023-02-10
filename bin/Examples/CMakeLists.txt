@@ -74,3 +74,13 @@ target_link_libraries("mx-dump-json"
   PRIVATE
     LLVMCore LLVMSupport
 )
+
+target_compile_definitions("mx-track-null-termination"
+  PRIVATE
+    "MX_ENABLE_SOURCEIR"
+)
+
+target_link_libraries("mx-track-null-termination"
+  INTERFACE
+    "mx-mlir"
+)

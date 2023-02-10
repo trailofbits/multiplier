@@ -19,6 +19,7 @@ static const std::unordered_map<std::string_view, unsigned int> kTaintSinks = {
   {"strlen", 0u},  
 };
 
+/*
 static void TrackPotentialSink(const mx::CallExpr call_expr) {
   std::optional<mx::FunctionDecl> func_decl = call_expr.direct_callee();
   if (!func_decl) {
@@ -45,12 +46,20 @@ static void TrackPotentialSink(const mx::CallExpr call_expr) {
   // TODO: at this point generate a backward slice of the parameter
   std::cout << risky_call << " " << decl->tokens().data() << std::endl;
 }
+*/
 
 
 static void TrackNullTermination(mx::Fragment fragment) {
+  if (auto mlir = fragment.source_ir(); mlir) {
+      std::cout << *mlir;
+  }
+  std::cout << std::endl;
+
+  /*
   for (mx::CallExpr call_expr : mx::CallExpr::in(fragment)) {
     TrackPotentialSink(call_expr);
   }
+  */
 }
 
 extern "C" int main(int argc, char *argv[]) {
