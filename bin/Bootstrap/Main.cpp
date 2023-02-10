@@ -2075,6 +2075,19 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  b." << def_setter_name << "(IsDefinition(e));\n";
       }
 
+      // TODO: figure out how to re-emit correctly
+      if (class_name == "Decl") {
+        const auto def = storage.AddMethod("UInt64");
+        auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
+
+        serialize_inc_os
+          << "  MX_VISIT_ENUM(Decl, kind, " << def
+          << ", MX_APPLY_FUNC, Kind, DeclKind, NthDecl)\n";
+
+        serialize_cpp_os
+          << "  b." << def_setter_name << "(Kind(e));\n";
+      }
+
       lib_cpp_os
           << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
           << "  if (auto id = impl->reader." << cd_getter_name << "(); "
