@@ -12,6 +12,7 @@
 #include <multiplier/Entities/Type.h>
 
 #include "File.h"
+#include "SourceIR.h"
 
 namespace mx {
 
@@ -425,15 +426,6 @@ bool ReadParsedTokensFromFragment::Equals(const class TokenReader *that_) const 
   return true;
 }
 
-std::string_view FragmentImpl::SourceIR(void) const & noexcept {
-  if (reader.hasMlir()) {
-    if (auto mlir = reader.getMlir(); auto size = mlir.size()) {
-      return std::string_view(mlir.cStr(), size);
-    }
-  }
-  return {};
-}
-
 std::string_view FragmentImpl::Data(void) const & noexcept {
   if (reader.hasTokenData()) {
     if (auto toks = reader.getTokenData(); auto size = toks.size()) {
@@ -601,6 +593,15 @@ TokenRange FragmentImpl::TokenRangeFor(
   }
 
   return TokenRange();
+}
+
+std::string_view FragmentImpl::SourceIR(void) const & noexcept {
+  if (reader.hasMlir()) {
+    if (auto mlir = reader.getMlir(); auto size = mlir.size()) {
+      return std::string_view(mlir.cStr(), size);
+    }
+  }
+  return {};
 }
 
 }  // namespace mx

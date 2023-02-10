@@ -113,7 +113,7 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   }
 
   auto flags = mlir::OpPrintingFlags();
-  flags.enableDebugInfo(true);
+  flags.enableDebugInfo(false);
 
   mlir::MLIRContext context(impl->registry);
   CodeGeneratorVisitor codegen(ast, &context, em);
