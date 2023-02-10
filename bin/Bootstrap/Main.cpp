@@ -2168,7 +2168,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
           << "  gap::generator<Decl> redeclarations(void) const;\n"
-          << "  gap::generator<Decl> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
       seen_methods->emplace("uses");  // Manual.
@@ -3409,6 +3408,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   class_os << "};\n\n";
 
+  if (class_name == base_name) {
+    os << "#include <compare>\n\n";
+  }
   for (auto needed : needed_decls) {
     os << "#include \"" << needed << ".h\"\n";
   }
@@ -3468,8 +3470,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#include <multiplier/AST.h>\n"
-      << "#include <cassert>\n"
-      << "#include <compare>\n\n"
+      << "#include <cassert>\n\n"
       << "#include \"Attr.h\"\n"
       << "#include \"Decl.h\"\n"
       << "#include \"File.h\"\n"

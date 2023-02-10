@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "LangAS.h"
 #include "Linkage.h"
 #include "NullabilityKind.h"

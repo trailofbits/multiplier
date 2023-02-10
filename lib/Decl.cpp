@@ -83,14 +83,6 @@ gap::generator<Reference> Decl::references(void) const {
   }
 }
 
-gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
-  FragmentId fid(fragment.impl->fragment_id);
-  const EntityProvider::Ptr &ep = fragment.impl->ep;
-  for (DeclImplPtr reader : ep->DeclsFor(ep, fid)) {
-    co_yield Decl(std::move(reader));
-  }
-}
-
 // Grab all call expressions of this FunctionDecl
 gap::generator<CallExpr> FunctionDecl::callers() const {
   for (Reference ref : references()) {

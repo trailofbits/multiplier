@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "AccessSpecifier.h"
 #include "AvailabilityResult.h"
 #include "DeclCategory.h"
@@ -77,8 +78,6 @@ class Decl {
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;
   gap::generator<Decl> redeclarations(void) const;
-  gap::generator<Decl> in_internal(const Fragment &fragment);
-
  public:
   static gap::generator<Decl> in(const Fragment &frag, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const Index &index, std::span<DeclKind> kinds);

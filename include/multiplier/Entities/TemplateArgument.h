@@ -21,6 +21,7 @@
 #include "../Types.h"
 #include "../Token.h"
 
+#include <compare>
 #include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
 

@@ -8,7 +8,6 @@
 
 #include <multiplier/AST.h>
 #include <cassert>
-#include <compare>
 
 #include "Attr.h"
 #include "Decl.h"
