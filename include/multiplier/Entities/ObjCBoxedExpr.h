@@ -39,6 +39,7 @@ class ObjCBoxedExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCBoxedExpr> in(const Fragment &frag);
+  static gap::generator<ObjCBoxedExpr> in(const File &file);
   static gap::generator<ObjCBoxedExpr> in(const Index &index);
   static gap::generator<ObjCBoxedExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class ObjCBoxedExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCBoxedExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCBoxedExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ObjCBoxedExpr> from(const Expr &parent);
-
-  inline static std::optional<ObjCBoxedExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ObjCBoxedExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCBoxedExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ObjCBoxedExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ObjCBoxedExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCBoxedExpr> from(const Stmt &parent);
 
   inline static std::optional<ObjCBoxedExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class ObjCBoxedExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCBoxedExpr> from(const Reference &r) {
+    return ObjCBoxedExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCBoxedExpr> from(const TokenContext &t) {
+    return ObjCBoxedExpr::from(t.as_statement());
   }
 
   Token at_token(void) const;

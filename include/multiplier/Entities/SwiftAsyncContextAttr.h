@@ -40,6 +40,7 @@ class SwiftAsyncContextAttr : public ParameterABIAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftAsyncContextAttr> in(const Fragment &frag);
+  static gap::generator<SwiftAsyncContextAttr> in(const File &file);
   static gap::generator<SwiftAsyncContextAttr> in(const Index &index);
   static gap::generator<SwiftAsyncContextAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -47,44 +48,6 @@ class SwiftAsyncContextAttr : public ParameterABIAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ASYNC_CONTEXT;
-  }
-
-  inline static std::optional<SwiftAsyncContextAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftAsyncContextAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SwiftAsyncContextAttr> from(const ParameterABIAttr &parent);
-
-  inline static std::optional<SwiftAsyncContextAttr> from(const std::optional<ParameterABIAttr> &parent) {
-    if (parent) {
-      return SwiftAsyncContextAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<SwiftAsyncContextAttr> from(const InheritableParamAttr &parent);
-
-  inline static std::optional<SwiftAsyncContextAttr> from(const std::optional<InheritableParamAttr> &parent) {
-    if (parent) {
-      return SwiftAsyncContextAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<SwiftAsyncContextAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SwiftAsyncContextAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SwiftAsyncContextAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SwiftAsyncContextAttr> from(const Attr &parent);
@@ -95,6 +58,14 @@ class SwiftAsyncContextAttr : public ParameterABIAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftAsyncContextAttr> from(const Reference &r) {
+    return SwiftAsyncContextAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftAsyncContextAttr> from(const TokenContext &t) {
+    return SwiftAsyncContextAttr::from(t.as_attribute());
   }
 
 };

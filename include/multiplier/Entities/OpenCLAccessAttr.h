@@ -35,6 +35,7 @@ class OpenCLAccessAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<OpenCLAccessAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLAccessAttr> in(const File &file);
   static gap::generator<OpenCLAccessAttr> in(const Index &index);
   static gap::generator<OpenCLAccessAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class OpenCLAccessAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_ACCESS;
-  }
-
-  inline static std::optional<OpenCLAccessAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLAccessAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<OpenCLAccessAttr> from(const Attr &parent);
@@ -60,6 +53,14 @@ class OpenCLAccessAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OpenCLAccessAttr> from(const Reference &r) {
+    return OpenCLAccessAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OpenCLAccessAttr> from(const TokenContext &t) {
+    return OpenCLAccessAttr::from(t.as_attribute());
   }
 
   OpenCLAccessAttrSpelling semantic_spelling(void) const;

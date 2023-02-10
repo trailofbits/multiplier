@@ -37,6 +37,7 @@ class AMDGPUWavesPerEUAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AMDGPUWavesPerEUAttr> in(const Fragment &frag);
+  static gap::generator<AMDGPUWavesPerEUAttr> in(const File &file);
   static gap::generator<AMDGPUWavesPerEUAttr> in(const Index &index);
   static gap::generator<AMDGPUWavesPerEUAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class AMDGPUWavesPerEUAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_WAVES_PER_EU;
-  }
-
-  inline static std::optional<AMDGPUWavesPerEUAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AMDGPUWavesPerEUAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AMDGPUWavesPerEUAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AMDGPUWavesPerEUAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AMDGPUWavesPerEUAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AMDGPUWavesPerEUAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class AMDGPUWavesPerEUAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AMDGPUWavesPerEUAttr> from(const Reference &r) {
+    return AMDGPUWavesPerEUAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AMDGPUWavesPerEUAttr> from(const TokenContext &t) {
+    return AMDGPUWavesPerEUAttr::from(t.as_attribute());
   }
 
   Expr max(void) const;

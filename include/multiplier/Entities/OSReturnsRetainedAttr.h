@@ -36,6 +36,7 @@ class OSReturnsRetainedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OSReturnsRetainedAttr> in(const Fragment &frag);
+  static gap::generator<OSReturnsRetainedAttr> in(const File &file);
   static gap::generator<OSReturnsRetainedAttr> in(const Index &index);
   static gap::generator<OSReturnsRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class OSReturnsRetainedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_RETURNS_RETAINED;
-  }
-
-  inline static std::optional<OSReturnsRetainedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OSReturnsRetainedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OSReturnsRetainedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OSReturnsRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OSReturnsRetainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OSReturnsRetainedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class OSReturnsRetainedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OSReturnsRetainedAttr> from(const Reference &r) {
+    return OSReturnsRetainedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OSReturnsRetainedAttr> from(const TokenContext &t) {
+    return OSReturnsRetainedAttr::from(t.as_attribute());
   }
 
 };

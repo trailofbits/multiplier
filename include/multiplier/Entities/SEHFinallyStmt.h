@@ -35,6 +35,7 @@ class SEHFinallyStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<SEHFinallyStmt> in(const Fragment &frag);
+  static gap::generator<SEHFinallyStmt> in(const File &file);
   static gap::generator<SEHFinallyStmt> in(const Index &index);
   static gap::generator<SEHFinallyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class SEHFinallyStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SEHFinallyStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SEHFinallyStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<SEHFinallyStmt> from(const Stmt &parent);
 
   inline static std::optional<SEHFinallyStmt> from(const std::optional<Stmt> &parent) {
@@ -69,6 +62,14 @@ class SEHFinallyStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SEHFinallyStmt> from(const Reference &r) {
+    return SEHFinallyStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<SEHFinallyStmt> from(const TokenContext &t) {
+    return SEHFinallyStmt::from(t.as_statement());
   }
 
   CompoundStmt block(void) const;

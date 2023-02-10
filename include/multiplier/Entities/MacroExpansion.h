@@ -38,6 +38,7 @@ class MacroExpansion : public MacroSubstitution {
   friend class Macro;
  public:
   static gap::generator<MacroExpansion> in(const Fragment &frag);
+  static gap::generator<MacroExpansion> in(const File &file);
 
   static gap::generator<MacroExpansion> in(const Index &index);
   static std::optional<MacroExpansion> by_id(const Index &, EntityId);
@@ -52,24 +53,6 @@ class MacroExpansion : public MacroSubstitution {
   static gap::generator<MacroExpansion> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroExpansion> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroExpansion> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<MacroExpansion> from(const MacroSubstitution &parent);
-
-  inline static std::optional<MacroExpansion> from(const std::optional<MacroSubstitution> &parent) {
-    if (parent) {
-      return MacroExpansion::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MacroExpansion> from(const Macro &parent);
 
   inline static std::optional<MacroExpansion> from(const std::optional<Macro> &parent) {
@@ -78,6 +61,14 @@ class MacroExpansion : public MacroSubstitution {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MacroExpansion> from(const Reference &r) {
+    return MacroExpansion::from(r.as_macro());
+  }
+
+  inline static std::optional<MacroExpansion> from(const TokenContext &t) {
+    return MacroExpansion::from(t.as_macro());
   }
 
   std::optional<DefineMacroDirective> definition(void) const;

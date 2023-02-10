@@ -41,6 +41,7 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCTypeParamDecl> in(const Fragment &frag);
+  static gap::generator<ObjCTypeParamDecl> in(const File &file);
   static gap::generator<ObjCTypeParamDecl> in(const Index &index);
   static gap::generator<ObjCTypeParamDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -60,44 +61,6 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCTypeParamDecl> redeclarations(void) const;
-  inline static std::optional<ObjCTypeParamDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCTypeParamDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCTypeParamDecl> from(const TypedefNameDecl &parent);
-
-  inline static std::optional<ObjCTypeParamDecl> from(const std::optional<TypedefNameDecl> &parent) {
-    if (parent) {
-      return ObjCTypeParamDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCTypeParamDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<ObjCTypeParamDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return ObjCTypeParamDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCTypeParamDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCTypeParamDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCTypeParamDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCTypeParamDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCTypeParamDecl> from(const std::optional<Decl> &parent) {
@@ -106,6 +69,14 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCTypeParamDecl> from(const Reference &r) {
+    return ObjCTypeParamDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCTypeParamDecl> from(const TokenContext &t) {
+    return ObjCTypeParamDecl::from(t.as_declaration());
   }
 
   Token colon_token(void) const;

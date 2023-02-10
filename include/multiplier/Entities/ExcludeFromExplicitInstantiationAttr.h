@@ -36,6 +36,7 @@ class ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ExcludeFromExplicitInstantiationAttr> in(const Fragment &frag);
+  static gap::generator<ExcludeFromExplicitInstantiationAttr> in(const File &file);
   static gap::generator<ExcludeFromExplicitInstantiationAttr> in(const Index &index);
   static gap::generator<ExcludeFromExplicitInstantiationAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
-  }
-
-  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ExcludeFromExplicitInstantiationAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ExcludeFromExplicitInstantiationAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Reference &r) {
+    return ExcludeFromExplicitInstantiationAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const TokenContext &t) {
+    return ExcludeFromExplicitInstantiationAttr::from(t.as_attribute());
   }
 
 };

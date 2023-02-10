@@ -34,6 +34,7 @@ class BreakStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<BreakStmt> in(const Fragment &frag);
+  static gap::generator<BreakStmt> in(const File &file);
   static gap::generator<BreakStmt> in(const Index &index);
   static gap::generator<BreakStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -52,14 +53,6 @@ class BreakStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<BreakStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<BreakStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<BreakStmt> from(const Stmt &parent);
 
   inline static std::optional<BreakStmt> from(const std::optional<Stmt> &parent) {
@@ -68,6 +61,14 @@ class BreakStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BreakStmt> from(const Reference &r) {
+    return BreakStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<BreakStmt> from(const TokenContext &t) {
+    return BreakStmt::from(t.as_statement());
   }
 
   Token break_token(void) const;

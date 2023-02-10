@@ -38,6 +38,7 @@ class LifetimeExtendedTemporaryDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<LifetimeExtendedTemporaryDecl> in(const Fragment &frag);
+  static gap::generator<LifetimeExtendedTemporaryDecl> in(const File &file);
   static gap::generator<LifetimeExtendedTemporaryDecl> in(const Index &index);
   static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,14 +58,6 @@ class LifetimeExtendedTemporaryDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<LifetimeExtendedTemporaryDecl> redeclarations(void) const;
-  inline static std::optional<LifetimeExtendedTemporaryDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<LifetimeExtendedTemporaryDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
 
   inline static std::optional<LifetimeExtendedTemporaryDecl> from(const std::optional<Decl> &parent) {
@@ -73,6 +66,14 @@ class LifetimeExtendedTemporaryDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LifetimeExtendedTemporaryDecl> from(const Reference &r) {
+    return LifetimeExtendedTemporaryDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<LifetimeExtendedTemporaryDecl> from(const TokenContext &t) {
+    return LifetimeExtendedTemporaryDecl::from(t.as_declaration());
   }
 
   gap::generator<Stmt> children(void) const;

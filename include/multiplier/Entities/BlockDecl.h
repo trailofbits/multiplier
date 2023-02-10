@@ -37,6 +37,7 @@ class BlockDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<BlockDecl> in(const Fragment &frag);
+  static gap::generator<BlockDecl> in(const File &file);
   static gap::generator<BlockDecl> in(const Index &index);
   static gap::generator<BlockDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,14 +57,6 @@ class BlockDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<BlockDecl> redeclarations(void) const;
-  inline static std::optional<BlockDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<BlockDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<BlockDecl> from(const Decl &parent);
 
   inline static std::optional<BlockDecl> from(const std::optional<Decl> &parent) {
@@ -72,6 +65,14 @@ class BlockDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BlockDecl> from(const Reference &r) {
+    return BlockDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<BlockDecl> from(const TokenContext &t) {
+    return BlockDecl::from(t.as_declaration());
   }
 
   bool block_missing_return_type(void) const;

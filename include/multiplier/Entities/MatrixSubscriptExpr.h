@@ -38,6 +38,7 @@ class MatrixSubscriptExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<MatrixSubscriptExpr> in(const Fragment &frag);
+  static gap::generator<MatrixSubscriptExpr> in(const File &file);
   static gap::generator<MatrixSubscriptExpr> in(const Index &index);
   static gap::generator<MatrixSubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class MatrixSubscriptExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<MatrixSubscriptExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<MatrixSubscriptExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<MatrixSubscriptExpr> from(const Expr &parent);
-
-  inline static std::optional<MatrixSubscriptExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return MatrixSubscriptExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<MatrixSubscriptExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<MatrixSubscriptExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return MatrixSubscriptExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MatrixSubscriptExpr> from(const Stmt &parent);
 
   inline static std::optional<MatrixSubscriptExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class MatrixSubscriptExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MatrixSubscriptExpr> from(const Reference &r) {
+    return MatrixSubscriptExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<MatrixSubscriptExpr> from(const TokenContext &t) {
+    return MatrixSubscriptExpr::from(t.as_statement());
   }
 
   Expr base(void) const;

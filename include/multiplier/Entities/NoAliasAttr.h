@@ -36,6 +36,7 @@ class NoAliasAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoAliasAttr> in(const Fragment &frag);
+  static gap::generator<NoAliasAttr> in(const File &file);
   static gap::generator<NoAliasAttr> in(const Index &index);
   static gap::generator<NoAliasAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoAliasAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_ALIAS;
-  }
-
-  inline static std::optional<NoAliasAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoAliasAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoAliasAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoAliasAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoAliasAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoAliasAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoAliasAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoAliasAttr> from(const Reference &r) {
+    return NoAliasAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoAliasAttr> from(const TokenContext &t) {
+    return NoAliasAttr::from(t.as_attribute());
   }
 
 };

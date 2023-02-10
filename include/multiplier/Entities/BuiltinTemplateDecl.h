@@ -38,6 +38,7 @@ class BuiltinTemplateDecl : public TemplateDecl {
   friend class Decl;
  public:
   static gap::generator<BuiltinTemplateDecl> in(const Fragment &frag);
+  static gap::generator<BuiltinTemplateDecl> in(const File &file);
   static gap::generator<BuiltinTemplateDecl> in(const Index &index);
   static gap::generator<BuiltinTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class BuiltinTemplateDecl : public TemplateDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<BuiltinTemplateDecl> redeclarations(void) const;
-  inline static std::optional<BuiltinTemplateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<BuiltinTemplateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<BuiltinTemplateDecl> from(const TemplateDecl &parent);
-
-  inline static std::optional<BuiltinTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
-    if (parent) {
-      return BuiltinTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BuiltinTemplateDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<BuiltinTemplateDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return BuiltinTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<BuiltinTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<BuiltinTemplateDecl> from(const std::optional<Decl> &parent) {
@@ -93,6 +66,14 @@ class BuiltinTemplateDecl : public TemplateDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BuiltinTemplateDecl> from(const Reference &r) {
+    return BuiltinTemplateDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<BuiltinTemplateDecl> from(const TokenContext &t) {
+    return BuiltinTemplateDecl::from(t.as_declaration());
   }
 
 };

@@ -36,6 +36,7 @@ class AnyX86InterruptAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AnyX86InterruptAttr> in(const Fragment &frag);
+  static gap::generator<AnyX86InterruptAttr> in(const File &file);
   static gap::generator<AnyX86InterruptAttr> in(const Index &index);
   static gap::generator<AnyX86InterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AnyX86InterruptAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_INTERRUPT;
-  }
-
-  inline static std::optional<AnyX86InterruptAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AnyX86InterruptAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AnyX86InterruptAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AnyX86InterruptAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AnyX86InterruptAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AnyX86InterruptAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AnyX86InterruptAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AnyX86InterruptAttr> from(const Reference &r) {
+    return AnyX86InterruptAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AnyX86InterruptAttr> from(const TokenContext &t) {
+    return AnyX86InterruptAttr::from(t.as_attribute());
   }
 
 };

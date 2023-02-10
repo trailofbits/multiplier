@@ -35,6 +35,7 @@ class UsingType : public Type {
   friend class Type;
  public:
   static gap::generator<UsingType> in(const Fragment &frag);
+  static gap::generator<UsingType> in(const File &file);
   static gap::generator<UsingType> in(const Index &index);
   static gap::generator<UsingType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class UsingType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::USING;
-  }
-
-  inline static std::optional<UsingType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<UsingType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<UsingType> from(const Type &parent);
@@ -60,6 +53,14 @@ class UsingType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UsingType> from(const Reference &r) {
+    return UsingType::from(r.as_type());
+  }
+
+  inline static std::optional<UsingType> from(const TokenContext &t) {
+    return UsingType::from(t.as_type());
   }
 
   Type desugar(void) const;

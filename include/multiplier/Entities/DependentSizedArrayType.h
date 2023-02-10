@@ -37,6 +37,7 @@ class DependentSizedArrayType : public ArrayType {
   friend class Type;
  public:
   static gap::generator<DependentSizedArrayType> in(const Fragment &frag);
+  static gap::generator<DependentSizedArrayType> in(const File &file);
   static gap::generator<DependentSizedArrayType> in(const Index &index);
   static gap::generator<DependentSizedArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class DependentSizedArrayType : public ArrayType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_SIZED_ARRAY;
-  }
-
-  inline static std::optional<DependentSizedArrayType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DependentSizedArrayType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<DependentSizedArrayType> from(const ArrayType &parent);
-
-  inline static std::optional<DependentSizedArrayType> from(const std::optional<ArrayType> &parent) {
-    if (parent) {
-      return DependentSizedArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DependentSizedArrayType> from(const Type &parent);
@@ -72,6 +55,14 @@ class DependentSizedArrayType : public ArrayType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DependentSizedArrayType> from(const Reference &r) {
+    return DependentSizedArrayType::from(r.as_type());
+  }
+
+  inline static std::optional<DependentSizedArrayType> from(const TokenContext &t) {
+    return DependentSizedArrayType::from(t.as_type());
   }
 
   Type desugar(void) const;

@@ -38,6 +38,7 @@ class NoInlineAttr : public DeclOrStmtAttr {
   friend class Attr;
  public:
   static gap::generator<NoInlineAttr> in(const Fragment &frag);
+  static gap::generator<NoInlineAttr> in(const File &file);
   static gap::generator<NoInlineAttr> in(const Index &index);
   static gap::generator<NoInlineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,34 +46,6 @@ class NoInlineAttr : public DeclOrStmtAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_INLINE;
-  }
-
-  inline static std::optional<NoInlineAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoInlineAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoInlineAttr> from(const DeclOrStmtAttr &parent);
-
-  inline static std::optional<NoInlineAttr> from(const std::optional<DeclOrStmtAttr> &parent) {
-    if (parent) {
-      return NoInlineAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<NoInlineAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoInlineAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoInlineAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoInlineAttr> from(const Attr &parent);
@@ -83,6 +56,14 @@ class NoInlineAttr : public DeclOrStmtAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoInlineAttr> from(const Reference &r) {
+    return NoInlineAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoInlineAttr> from(const TokenContext &t) {
+    return NoInlineAttr::from(t.as_attribute());
   }
 
   bool is_clang_no_inline(void) const;

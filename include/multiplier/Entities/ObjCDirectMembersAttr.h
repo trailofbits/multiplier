@@ -34,6 +34,7 @@ class ObjCDirectMembersAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCDirectMembersAttr> in(const Fragment &frag);
+  static gap::generator<ObjCDirectMembersAttr> in(const File &file);
   static gap::generator<ObjCDirectMembersAttr> in(const Index &index);
   static gap::generator<ObjCDirectMembersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ObjCDirectMembersAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DIRECT_MEMBERS;
-  }
-
-  inline static std::optional<ObjCDirectMembersAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCDirectMembersAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCDirectMembersAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ObjCDirectMembersAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCDirectMembersAttr> from(const Reference &r) {
+    return ObjCDirectMembersAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCDirectMembersAttr> from(const TokenContext &t) {
+    return ObjCDirectMembersAttr::from(t.as_attribute());
   }
 
 };

@@ -39,6 +39,7 @@ class ArrayInitLoopExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ArrayInitLoopExpr> in(const Fragment &frag);
+  static gap::generator<ArrayInitLoopExpr> in(const File &file);
   static gap::generator<ArrayInitLoopExpr> in(const Index &index);
   static gap::generator<ArrayInitLoopExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class ArrayInitLoopExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ArrayInitLoopExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ArrayInitLoopExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ArrayInitLoopExpr> from(const Expr &parent);
-
-  inline static std::optional<ArrayInitLoopExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ArrayInitLoopExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ArrayInitLoopExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ArrayInitLoopExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ArrayInitLoopExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ArrayInitLoopExpr> from(const Stmt &parent);
 
   inline static std::optional<ArrayInitLoopExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class ArrayInitLoopExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ArrayInitLoopExpr> from(const Reference &r) {
+    return ArrayInitLoopExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ArrayInitLoopExpr> from(const TokenContext &t) {
+    return ArrayInitLoopExpr::from(t.as_statement());
   }
 
   OpaqueValueExpr common_expression(void) const;

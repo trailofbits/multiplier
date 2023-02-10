@@ -266,7 +266,7 @@ struct ReferenceRecord {
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS references_by_target
-         ON reference(to_entity_id))"};
+         ON reference(to_entity_id, from_entity_id))"};
 
   // NOTE(pag): Reference id `0` is the id of an "explicit code reference."
   static constexpr const char *kInsertStatement =

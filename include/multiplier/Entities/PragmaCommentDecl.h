@@ -35,6 +35,7 @@ class PragmaCommentDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<PragmaCommentDecl> in(const Fragment &frag);
+  static gap::generator<PragmaCommentDecl> in(const File &file);
   static gap::generator<PragmaCommentDecl> in(const Index &index);
   static gap::generator<PragmaCommentDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class PragmaCommentDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<PragmaCommentDecl> redeclarations(void) const;
-  inline static std::optional<PragmaCommentDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<PragmaCommentDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<PragmaCommentDecl> from(const Decl &parent);
 
   inline static std::optional<PragmaCommentDecl> from(const std::optional<Decl> &parent) {
@@ -70,6 +63,14 @@ class PragmaCommentDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PragmaCommentDecl> from(const Reference &r) {
+    return PragmaCommentDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<PragmaCommentDecl> from(const TokenContext &t) {
+    return PragmaCommentDecl::from(t.as_declaration());
   }
 
   std::string_view argument(void) const;

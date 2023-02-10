@@ -36,6 +36,7 @@ class MSABIAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MSABIAttr> in(const Fragment &frag);
+  static gap::generator<MSABIAttr> in(const File &file);
   static gap::generator<MSABIAttr> in(const Index &index);
   static gap::generator<MSABIAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class MSABIAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MSABI;
-  }
-
-  inline static std::optional<MSABIAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MSABIAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MSABIAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<MSABIAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return MSABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MSABIAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class MSABIAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MSABIAttr> from(const Reference &r) {
+    return MSABIAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<MSABIAttr> from(const TokenContext &t) {
+    return MSABIAttr::from(t.as_attribute());
   }
 
 };

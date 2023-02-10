@@ -35,6 +35,7 @@ class TemplateSpecializationType : public Type {
   friend class Type;
  public:
   static gap::generator<TemplateSpecializationType> in(const Fragment &frag);
+  static gap::generator<TemplateSpecializationType> in(const File &file);
   static gap::generator<TemplateSpecializationType> in(const Index &index);
   static gap::generator<TemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class TemplateSpecializationType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TEMPLATE_SPECIALIZATION;
-  }
-
-  inline static std::optional<TemplateSpecializationType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TemplateSpecializationType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<TemplateSpecializationType> from(const Type &parent);
@@ -60,6 +53,14 @@ class TemplateSpecializationType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TemplateSpecializationType> from(const Reference &r) {
+    return TemplateSpecializationType::from(r.as_type());
+  }
+
+  inline static std::optional<TemplateSpecializationType> from(const TokenContext &t) {
+    return TemplateSpecializationType::from(t.as_type());
   }
 
   Type desugar(void) const;

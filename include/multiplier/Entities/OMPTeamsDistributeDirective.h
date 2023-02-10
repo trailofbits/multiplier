@@ -40,6 +40,7 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTeamsDistributeDirective> in(const Fragment &frag);
+  static gap::generator<OMPTeamsDistributeDirective> in(const File &file);
   static gap::generator<OMPTeamsDistributeDirective> in(const Index &index);
   static gap::generator<OMPTeamsDistributeDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPTeamsDistributeDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTeamsDistributeDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPTeamsDistributeDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPTeamsDistributeDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPTeamsDistributeDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPTeamsDistributeDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPTeamsDistributeDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPTeamsDistributeDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPTeamsDistributeDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPTeamsDistributeDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPTeamsDistributeDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPTeamsDistributeDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPTeamsDistributeDirective> from(const Reference &r) {
+    return OMPTeamsDistributeDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPTeamsDistributeDirective> from(const TokenContext &t) {
+    return OMPTeamsDistributeDirective::from(t.as_statement());
   }
 
 };

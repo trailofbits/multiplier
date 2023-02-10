@@ -42,6 +42,7 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   friend class Decl;
  public:
   static gap::generator<NonTypeTemplateParmDecl> in(const Fragment &frag);
+  static gap::generator<NonTypeTemplateParmDecl> in(const File &file);
   static gap::generator<NonTypeTemplateParmDecl> in(const Index &index);
   static gap::generator<NonTypeTemplateParmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -61,44 +62,6 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<NonTypeTemplateParmDecl> redeclarations(void) const;
-  inline static std::optional<NonTypeTemplateParmDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<NonTypeTemplateParmDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<NonTypeTemplateParmDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return NonTypeTemplateParmDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<NonTypeTemplateParmDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return NonTypeTemplateParmDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<NonTypeTemplateParmDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return NonTypeTemplateParmDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<NonTypeTemplateParmDecl> from(const Decl &parent);
 
   inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<Decl> &parent) {
@@ -107,6 +70,14 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NonTypeTemplateParmDecl> from(const Reference &r) {
+    return NonTypeTemplateParmDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<NonTypeTemplateParmDecl> from(const TokenContext &t) {
+    return NonTypeTemplateParmDecl::from(t.as_declaration());
   }
 
   bool default_argument_was_inherited(void) const;

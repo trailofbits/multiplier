@@ -36,6 +36,7 @@ class TrivialABIAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TrivialABIAttr> in(const Fragment &frag);
+  static gap::generator<TrivialABIAttr> in(const File &file);
   static gap::generator<TrivialABIAttr> in(const Index &index);
   static gap::generator<TrivialABIAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class TrivialABIAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TRIVIAL_ABI;
-  }
-
-  inline static std::optional<TrivialABIAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TrivialABIAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TrivialABIAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<TrivialABIAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return TrivialABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TrivialABIAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class TrivialABIAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TrivialABIAttr> from(const Reference &r) {
+    return TrivialABIAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<TrivialABIAttr> from(const TokenContext &t) {
+    return TrivialABIAttr::from(t.as_attribute());
   }
 
 };

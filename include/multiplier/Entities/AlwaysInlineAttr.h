@@ -39,6 +39,7 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
   friend class Attr;
  public:
   static gap::generator<AlwaysInlineAttr> in(const Fragment &frag);
+  static gap::generator<AlwaysInlineAttr> in(const File &file);
   static gap::generator<AlwaysInlineAttr> in(const Index &index);
   static gap::generator<AlwaysInlineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -46,34 +47,6 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALWAYS_INLINE;
-  }
-
-  inline static std::optional<AlwaysInlineAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AlwaysInlineAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AlwaysInlineAttr> from(const DeclOrStmtAttr &parent);
-
-  inline static std::optional<AlwaysInlineAttr> from(const std::optional<DeclOrStmtAttr> &parent) {
-    if (parent) {
-      return AlwaysInlineAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<AlwaysInlineAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AlwaysInlineAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AlwaysInlineAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AlwaysInlineAttr> from(const Attr &parent);
@@ -84,6 +57,14 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AlwaysInlineAttr> from(const Reference &r) {
+    return AlwaysInlineAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AlwaysInlineAttr> from(const TokenContext &t) {
+    return AlwaysInlineAttr::from(t.as_attribute());
   }
 
   AlwaysInlineAttrSpelling semantic_spelling(void) const;

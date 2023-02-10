@@ -36,6 +36,7 @@ class DLLExportAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DLLExportAttr> in(const Fragment &frag);
+  static gap::generator<DLLExportAttr> in(const File &file);
   static gap::generator<DLLExportAttr> in(const Index &index);
   static gap::generator<DLLExportAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class DLLExportAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DLL_EXPORT;
-  }
-
-  inline static std::optional<DLLExportAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<DLLExportAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<DLLExportAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<DLLExportAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return DLLExportAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DLLExportAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class DLLExportAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DLLExportAttr> from(const Reference &r) {
+    return DLLExportAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<DLLExportAttr> from(const TokenContext &t) {
+    return DLLExportAttr::from(t.as_attribute());
   }
 
 };

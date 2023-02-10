@@ -37,6 +37,7 @@ class AssumeAlignedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AssumeAlignedAttr> in(const Fragment &frag);
+  static gap::generator<AssumeAlignedAttr> in(const File &file);
   static gap::generator<AssumeAlignedAttr> in(const Index &index);
   static gap::generator<AssumeAlignedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class AssumeAlignedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSUME_ALIGNED;
-  }
-
-  inline static std::optional<AssumeAlignedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AssumeAlignedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AssumeAlignedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AssumeAlignedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AssumeAlignedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AssumeAlignedAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class AssumeAlignedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AssumeAlignedAttr> from(const Reference &r) {
+    return AssumeAlignedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AssumeAlignedAttr> from(const TokenContext &t) {
+    return AssumeAlignedAttr::from(t.as_attribute());
   }
 
   Expr alignment(void) const;

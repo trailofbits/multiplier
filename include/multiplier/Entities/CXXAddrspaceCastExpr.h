@@ -44,6 +44,7 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
   friend class Stmt;
  public:
   static gap::generator<CXXAddrspaceCastExpr> in(const Fragment &frag);
+  static gap::generator<CXXAddrspaceCastExpr> in(const File &file);
   static gap::generator<CXXAddrspaceCastExpr> in(const Index &index);
   static gap::generator<CXXAddrspaceCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -62,64 +63,6 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXAddrspaceCastExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXAddrspaceCastExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXAddrspaceCastExpr> from(const CXXNamedCastExpr &parent);
-
-  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<CXXNamedCastExpr> &parent) {
-    if (parent) {
-      return CXXAddrspaceCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXAddrspaceCastExpr> from(const ExplicitCastExpr &parent);
-
-  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
-    if (parent) {
-      return CXXAddrspaceCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXAddrspaceCastExpr> from(const CastExpr &parent);
-
-  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<CastExpr> &parent) {
-    if (parent) {
-      return CXXAddrspaceCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXAddrspaceCastExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXAddrspaceCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXAddrspaceCastExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXAddrspaceCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXAddrspaceCastExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXAddrspaceCastExpr> from(const std::optional<Stmt> &parent) {
@@ -128,6 +71,14 @@ class CXXAddrspaceCastExpr : public CXXNamedCastExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXAddrspaceCastExpr> from(const Reference &r) {
+    return CXXAddrspaceCastExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXAddrspaceCastExpr> from(const TokenContext &t) {
+    return CXXAddrspaceCastExpr::from(t.as_statement());
   }
 
 };

@@ -36,6 +36,7 @@ class EmptyBasesAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<EmptyBasesAttr> in(const Fragment &frag);
+  static gap::generator<EmptyBasesAttr> in(const File &file);
   static gap::generator<EmptyBasesAttr> in(const Index &index);
   static gap::generator<EmptyBasesAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class EmptyBasesAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EMPTY_BASES;
-  }
-
-  inline static std::optional<EmptyBasesAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<EmptyBasesAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<EmptyBasesAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<EmptyBasesAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return EmptyBasesAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<EmptyBasesAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class EmptyBasesAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<EmptyBasesAttr> from(const Reference &r) {
+    return EmptyBasesAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<EmptyBasesAttr> from(const TokenContext &t) {
+    return EmptyBasesAttr::from(t.as_attribute());
   }
 
 };

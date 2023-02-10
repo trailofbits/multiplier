@@ -38,6 +38,7 @@ class EndIfMacroDirective : public ConditionalMacroDirective {
   friend class Macro;
  public:
   static gap::generator<EndIfMacroDirective> in(const Fragment &frag);
+  static gap::generator<EndIfMacroDirective> in(const File &file);
 
   static gap::generator<EndIfMacroDirective> in(const Index &index);
   static std::optional<EndIfMacroDirective> by_id(const Index &, EntityId);
@@ -52,34 +53,6 @@ class EndIfMacroDirective : public ConditionalMacroDirective {
   static gap::generator<EndIfMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<EndIfMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<EndIfMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<EndIfMacroDirective> from(const ConditionalMacroDirective &parent);
-
-  inline static std::optional<EndIfMacroDirective> from(const std::optional<ConditionalMacroDirective> &parent) {
-    if (parent) {
-      return EndIfMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<EndIfMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<EndIfMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return EndIfMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<EndIfMacroDirective> from(const Macro &parent);
 
   inline static std::optional<EndIfMacroDirective> from(const std::optional<Macro> &parent) {
@@ -88,6 +61,14 @@ class EndIfMacroDirective : public ConditionalMacroDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<EndIfMacroDirective> from(const Reference &r) {
+    return EndIfMacroDirective::from(r.as_macro());
+  }
+
+  inline static std::optional<EndIfMacroDirective> from(const TokenContext &t) {
+    return EndIfMacroDirective::from(t.as_macro());
   }
 
 };

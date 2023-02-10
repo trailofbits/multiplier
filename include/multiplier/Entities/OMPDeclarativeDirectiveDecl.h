@@ -34,6 +34,7 @@ class OMPDeclarativeDirectiveDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<OMPDeclarativeDirectiveDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclarativeDirectiveDecl> in(const File &file);
   static gap::generator<OMPDeclarativeDirectiveDecl> in(const Index &index);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -49,14 +50,6 @@ class OMPDeclarativeDirectiveDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<OMPDeclarativeDirectiveDecl> redeclarations(void) const;
-  inline static std::optional<OMPDeclarativeDirectiveDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPDeclarativeDirectiveDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<OMPDeclarativeDirectiveDecl> from(const Decl &parent);
 
   inline static std::optional<OMPDeclarativeDirectiveDecl> from(const std::optional<Decl> &parent) {
@@ -65,6 +58,14 @@ class OMPDeclarativeDirectiveDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPDeclarativeDirectiveDecl> from(const Reference &r) {
+    return OMPDeclarativeDirectiveDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<OMPDeclarativeDirectiveDecl> from(const TokenContext &t) {
+    return OMPDeclarativeDirectiveDecl::from(t.as_declaration());
   }
 
 };

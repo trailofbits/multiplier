@@ -36,6 +36,7 @@ class LikelyAttr : public StmtAttr {
   friend class Attr;
  public:
   static gap::generator<LikelyAttr> in(const Fragment &frag);
+  static gap::generator<LikelyAttr> in(const File &file);
   static gap::generator<LikelyAttr> in(const Index &index);
   static gap::generator<LikelyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class LikelyAttr : public StmtAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LIKELY;
-  }
-
-  inline static std::optional<LikelyAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<LikelyAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<LikelyAttr> from(const StmtAttr &parent);
-
-  inline static std::optional<LikelyAttr> from(const std::optional<StmtAttr> &parent) {
-    if (parent) {
-      return LikelyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<LikelyAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class LikelyAttr : public StmtAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LikelyAttr> from(const Reference &r) {
+    return LikelyAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<LikelyAttr> from(const TokenContext &t) {
+    return LikelyAttr::from(t.as_attribute());
   }
 
 };

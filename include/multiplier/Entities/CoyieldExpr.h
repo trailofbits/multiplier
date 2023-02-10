@@ -40,6 +40,7 @@ class CoyieldExpr : public CoroutineSuspendExpr {
   friend class Stmt;
  public:
   static gap::generator<CoyieldExpr> in(const Fragment &frag);
+  static gap::generator<CoyieldExpr> in(const File &file);
   static gap::generator<CoyieldExpr> in(const Index &index);
   static gap::generator<CoyieldExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class CoyieldExpr : public CoroutineSuspendExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CoyieldExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CoyieldExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CoyieldExpr> from(const CoroutineSuspendExpr &parent);
-
-  inline static std::optional<CoyieldExpr> from(const std::optional<CoroutineSuspendExpr> &parent) {
-    if (parent) {
-      return CoyieldExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CoyieldExpr> from(const Expr &parent);
-
-  inline static std::optional<CoyieldExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CoyieldExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CoyieldExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CoyieldExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CoyieldExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CoyieldExpr> from(const Stmt &parent);
 
   inline static std::optional<CoyieldExpr> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class CoyieldExpr : public CoroutineSuspendExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CoyieldExpr> from(const Reference &r) {
+    return CoyieldExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CoyieldExpr> from(const TokenContext &t) {
+    return CoyieldExpr::from(t.as_statement());
   }
 
 };

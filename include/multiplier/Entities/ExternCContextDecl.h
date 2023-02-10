@@ -34,6 +34,7 @@ class ExternCContextDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<ExternCContextDecl> in(const Fragment &frag);
+  static gap::generator<ExternCContextDecl> in(const File &file);
   static gap::generator<ExternCContextDecl> in(const Index &index);
   static gap::generator<ExternCContextDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class ExternCContextDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ExternCContextDecl> redeclarations(void) const;
-  inline static std::optional<ExternCContextDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ExternCContextDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<ExternCContextDecl> from(const Decl &parent);
 
   inline static std::optional<ExternCContextDecl> from(const std::optional<Decl> &parent) {
@@ -69,6 +62,14 @@ class ExternCContextDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ExternCContextDecl> from(const Reference &r) {
+    return ExternCContextDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ExternCContextDecl> from(const TokenContext &t) {
+    return ExternCContextDecl::from(t.as_declaration());
   }
 
   gap::generator<Decl> declarations_in_context(void) const;

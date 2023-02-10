@@ -36,6 +36,7 @@ class OMPDeclareSimdDeclAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<OMPDeclareSimdDeclAttr> in(const Fragment &frag);
+  static gap::generator<OMPDeclareSimdDeclAttr> in(const File &file);
   static gap::generator<OMPDeclareSimdDeclAttr> in(const Index &index);
   static gap::generator<OMPDeclareSimdDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,14 +44,6 @@ class OMPDeclareSimdDeclAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_SIMD_DECL;
-  }
-
-  inline static std::optional<OMPDeclareSimdDeclAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OMPDeclareSimdDeclAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<OMPDeclareSimdDeclAttr> from(const Attr &parent);
@@ -61,6 +54,14 @@ class OMPDeclareSimdDeclAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPDeclareSimdDeclAttr> from(const Reference &r) {
+    return OMPDeclareSimdDeclAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OMPDeclareSimdDeclAttr> from(const TokenContext &t) {
+    return OMPDeclareSimdDeclAttr::from(t.as_attribute());
   }
 
   OMPDeclareSimdDeclAttrBranchStateTy branch_state(void) const;

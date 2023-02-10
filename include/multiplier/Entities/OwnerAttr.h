@@ -37,6 +37,7 @@ class OwnerAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OwnerAttr> in(const Fragment &frag);
+  static gap::generator<OwnerAttr> in(const File &file);
   static gap::generator<OwnerAttr> in(const Index &index);
   static gap::generator<OwnerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class OwnerAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OWNER;
-  }
-
-  inline static std::optional<OwnerAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OwnerAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OwnerAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OwnerAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OwnerAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OwnerAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class OwnerAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OwnerAttr> from(const Reference &r) {
+    return OwnerAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OwnerAttr> from(const TokenContext &t) {
+    return OwnerAttr::from(t.as_attribute());
   }
 
   Type deref_type(void) const;

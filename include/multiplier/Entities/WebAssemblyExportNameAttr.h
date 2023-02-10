@@ -36,6 +36,7 @@ class WebAssemblyExportNameAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<WebAssemblyExportNameAttr> in(const Fragment &frag);
+  static gap::generator<WebAssemblyExportNameAttr> in(const File &file);
   static gap::generator<WebAssemblyExportNameAttr> in(const Index &index);
   static gap::generator<WebAssemblyExportNameAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class WebAssemblyExportNameAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEB_ASSEMBLY_EXPORT_NAME;
-  }
-
-  inline static std::optional<WebAssemblyExportNameAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<WebAssemblyExportNameAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<WebAssemblyExportNameAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<WebAssemblyExportNameAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return WebAssemblyExportNameAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<WebAssemblyExportNameAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class WebAssemblyExportNameAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<WebAssemblyExportNameAttr> from(const Reference &r) {
+    return WebAssemblyExportNameAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<WebAssemblyExportNameAttr> from(const TokenContext &t) {
+    return WebAssemblyExportNameAttr::from(t.as_attribute());
   }
 
   std::string_view export_name(void) const;

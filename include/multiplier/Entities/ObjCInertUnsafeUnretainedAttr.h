@@ -36,6 +36,7 @@ class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const Fragment &frag);
+  static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const File &file);
   static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const Index &index);
   static gap::generator<ObjCInertUnsafeUnretainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
-  }
-
-  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCInertUnsafeUnretainedAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return ObjCInertUnsafeUnretainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Reference &r) {
+    return ObjCInertUnsafeUnretainedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const TokenContext &t) {
+    return ObjCInertUnsafeUnretainedAttr::from(t.as_attribute());
   }
 
 };

@@ -34,6 +34,7 @@ class SwitchCase : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<SwitchCase> in(const Fragment &frag);
+  static gap::generator<SwitchCase> in(const File &file);
   static gap::generator<SwitchCase> in(const Index &index);
   static gap::generator<SwitchCase> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -48,14 +49,6 @@ class SwitchCase : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SwitchCase> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SwitchCase> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<SwitchCase> from(const Stmt &parent);
 
   inline static std::optional<SwitchCase> from(const std::optional<Stmt> &parent) {
@@ -64,6 +57,14 @@ class SwitchCase : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwitchCase> from(const Reference &r) {
+    return SwitchCase::from(r.as_statement());
+  }
+
+  inline static std::optional<SwitchCase> from(const TokenContext &t) {
+    return SwitchCase::from(t.as_statement());
   }
 
   Token colon_token(void) const;

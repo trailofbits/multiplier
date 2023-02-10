@@ -22,6 +22,7 @@
 #include "../Token.h"
 
 #include <compare>
+
 #include "AttrKind.h"
 
 namespace mx {
@@ -45,6 +46,7 @@ class Attr {
   std::shared_ptr<const AttrImpl> impl;
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
  public:
   Attr(Attr &&) noexcept = default;
   Attr(const Attr &) = default;
@@ -65,8 +67,10 @@ class Attr {
 
  public:
   static gap::generator<Attr> in(const Fragment &frag, std::span<AttrKind> kinds);
+  static gap::generator<Attr> in(const File &file, std::span<AttrKind> kinds);
   static gap::generator<Attr> in(const Index &index, std::span<AttrKind> kinds);
   static gap::generator<Attr> in(const Fragment &frag);
+  static gap::generator<Attr> in(const File &file);
   static gap::generator<Attr> in(const Index &index);
   static gap::generator<Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;

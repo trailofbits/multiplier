@@ -37,6 +37,7 @@ class FunctionReturnThunksAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<FunctionReturnThunksAttr> in(const Fragment &frag);
+  static gap::generator<FunctionReturnThunksAttr> in(const File &file);
   static gap::generator<FunctionReturnThunksAttr> in(const Index &index);
   static gap::generator<FunctionReturnThunksAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class FunctionReturnThunksAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FUNCTION_RETURN_THUNKS;
-  }
-
-  inline static std::optional<FunctionReturnThunksAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<FunctionReturnThunksAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<FunctionReturnThunksAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<FunctionReturnThunksAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return FunctionReturnThunksAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FunctionReturnThunksAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class FunctionReturnThunksAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FunctionReturnThunksAttr> from(const Reference &r) {
+    return FunctionReturnThunksAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<FunctionReturnThunksAttr> from(const TokenContext &t) {
+    return FunctionReturnThunksAttr::from(t.as_attribute());
   }
 
   FunctionReturnThunksAttrKind thunk_type(void) const;

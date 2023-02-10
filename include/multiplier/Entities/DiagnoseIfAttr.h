@@ -39,6 +39,7 @@ class DiagnoseIfAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DiagnoseIfAttr> in(const Fragment &frag);
+  static gap::generator<DiagnoseIfAttr> in(const File &file);
   static gap::generator<DiagnoseIfAttr> in(const Index &index);
   static gap::generator<DiagnoseIfAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -46,24 +47,6 @@ class DiagnoseIfAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DIAGNOSE_IF;
-  }
-
-  inline static std::optional<DiagnoseIfAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<DiagnoseIfAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<DiagnoseIfAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<DiagnoseIfAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return DiagnoseIfAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DiagnoseIfAttr> from(const Attr &parent);
@@ -74,6 +57,14 @@ class DiagnoseIfAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DiagnoseIfAttr> from(const Reference &r) {
+    return DiagnoseIfAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<DiagnoseIfAttr> from(const TokenContext &t) {
+    return DiagnoseIfAttr::from(t.as_attribute());
   }
 
   bool argument_dependent(void) const;

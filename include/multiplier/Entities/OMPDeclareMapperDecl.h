@@ -41,6 +41,7 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   friend class Decl;
  public:
   static gap::generator<OMPDeclareMapperDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclareMapperDecl> in(const File &file);
   static gap::generator<OMPDeclareMapperDecl> in(const Index &index);
   static gap::generator<OMPDeclareMapperDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -60,44 +61,6 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<OMPDeclareMapperDecl> redeclarations(void) const;
-  inline static std::optional<OMPDeclareMapperDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<OMPDeclareMapperDecl> from(const OMPDeclarativeDirectiveValueDecl &parent);
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<OMPDeclarativeDirectiveValueDecl> &parent) {
-    if (parent) {
-      return OMPDeclareMapperDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPDeclareMapperDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return OMPDeclareMapperDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPDeclareMapperDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return OMPDeclareMapperDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
 
   inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<Decl> &parent) {
@@ -106,6 +69,14 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPDeclareMapperDecl> from(const Reference &r) {
+    return OMPDeclareMapperDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<OMPDeclareMapperDecl> from(const TokenContext &t) {
+    return OMPDeclareMapperDecl::from(t.as_declaration());
   }
 
   Expr mapper_variable_reference(void) const;

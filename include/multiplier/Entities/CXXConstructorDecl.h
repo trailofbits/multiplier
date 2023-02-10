@@ -44,6 +44,7 @@ class CXXConstructorDecl : public CXXMethodDecl {
   friend class Decl;
  public:
   static gap::generator<CXXConstructorDecl> in(const Fragment &frag);
+  static gap::generator<CXXConstructorDecl> in(const File &file);
   static gap::generator<CXXConstructorDecl> in(const Index &index);
   static gap::generator<CXXConstructorDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -63,64 +64,6 @@ class CXXConstructorDecl : public CXXMethodDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<CXXConstructorDecl> redeclarations(void) const;
-  inline static std::optional<CXXConstructorDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXConstructorDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<CXXConstructorDecl> from(const CXXMethodDecl &parent);
-
-  inline static std::optional<CXXConstructorDecl> from(const std::optional<CXXMethodDecl> &parent) {
-    if (parent) {
-      return CXXConstructorDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXConstructorDecl> from(const FunctionDecl &parent);
-
-  inline static std::optional<CXXConstructorDecl> from(const std::optional<FunctionDecl> &parent) {
-    if (parent) {
-      return CXXConstructorDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXConstructorDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<CXXConstructorDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return CXXConstructorDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXConstructorDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<CXXConstructorDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return CXXConstructorDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXConstructorDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<CXXConstructorDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return CXXConstructorDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXConstructorDecl> from(const Decl &parent);
 
   inline static std::optional<CXXConstructorDecl> from(const std::optional<Decl> &parent) {
@@ -129,6 +72,14 @@ class CXXConstructorDecl : public CXXMethodDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXConstructorDecl> from(const Reference &r) {
+    return CXXConstructorDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<CXXConstructorDecl> from(const TokenContext &t) {
+    return CXXConstructorDecl::from(t.as_declaration());
   }
 
   std::optional<CXXConstructorDecl> target_constructor(void) const;

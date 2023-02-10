@@ -37,6 +37,7 @@ class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AMDGPUFlatWorkGroupSizeAttr> in(const Fragment &frag);
+  static gap::generator<AMDGPUFlatWorkGroupSizeAttr> in(const File &file);
   static gap::generator<AMDGPUFlatWorkGroupSizeAttr> in(const Index &index);
   static gap::generator<AMDGPUFlatWorkGroupSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
-  }
-
-  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AMDGPUFlatWorkGroupSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Reference &r) {
+    return AMDGPUFlatWorkGroupSizeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const TokenContext &t) {
+    return AMDGPUFlatWorkGroupSizeAttr::from(t.as_attribute());
   }
 
   Expr max(void) const;

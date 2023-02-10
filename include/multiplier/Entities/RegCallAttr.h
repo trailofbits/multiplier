@@ -36,6 +36,7 @@ class RegCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<RegCallAttr> in(const Fragment &frag);
+  static gap::generator<RegCallAttr> in(const File &file);
   static gap::generator<RegCallAttr> in(const Index &index);
   static gap::generator<RegCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class RegCallAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REG_CALL;
-  }
-
-  inline static std::optional<RegCallAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<RegCallAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<RegCallAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<RegCallAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return RegCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<RegCallAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class RegCallAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RegCallAttr> from(const Reference &r) {
+    return RegCallAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<RegCallAttr> from(const TokenContext &t) {
+    return RegCallAttr::from(t.as_attribute());
   }
 
 };

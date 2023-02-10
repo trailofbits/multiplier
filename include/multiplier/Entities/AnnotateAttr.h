@@ -38,6 +38,7 @@ class AnnotateAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<AnnotateAttr> in(const Fragment &frag);
+  static gap::generator<AnnotateAttr> in(const File &file);
   static gap::generator<AnnotateAttr> in(const Index &index);
   static gap::generator<AnnotateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,34 +46,6 @@ class AnnotateAttr : public InheritableParamAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANNOTATE;
-  }
-
-  inline static std::optional<AnnotateAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AnnotateAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AnnotateAttr> from(const InheritableParamAttr &parent);
-
-  inline static std::optional<AnnotateAttr> from(const std::optional<InheritableParamAttr> &parent) {
-    if (parent) {
-      return AnnotateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<AnnotateAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AnnotateAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AnnotateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AnnotateAttr> from(const Attr &parent);
@@ -83,6 +56,14 @@ class AnnotateAttr : public InheritableParamAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AnnotateAttr> from(const Reference &r) {
+    return AnnotateAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AnnotateAttr> from(const TokenContext &t) {
+    return AnnotateAttr::from(t.as_attribute());
   }
 
   std::string_view annotation(void) const;

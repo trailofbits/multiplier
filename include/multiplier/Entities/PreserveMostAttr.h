@@ -36,6 +36,7 @@ class PreserveMostAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PreserveMostAttr> in(const Fragment &frag);
+  static gap::generator<PreserveMostAttr> in(const File &file);
   static gap::generator<PreserveMostAttr> in(const Index &index);
   static gap::generator<PreserveMostAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class PreserveMostAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRESERVE_MOST;
-  }
-
-  inline static std::optional<PreserveMostAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PreserveMostAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PreserveMostAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PreserveMostAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PreserveMostAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PreserveMostAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class PreserveMostAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PreserveMostAttr> from(const Reference &r) {
+    return PreserveMostAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PreserveMostAttr> from(const TokenContext &t) {
+    return PreserveMostAttr::from(t.as_attribute());
   }
 
 };

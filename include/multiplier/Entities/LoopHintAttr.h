@@ -38,6 +38,7 @@ class LoopHintAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<LoopHintAttr> in(const Fragment &frag);
+  static gap::generator<LoopHintAttr> in(const File &file);
   static gap::generator<LoopHintAttr> in(const Index &index);
   static gap::generator<LoopHintAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,14 +46,6 @@ class LoopHintAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOOP_HINT;
-  }
-
-  inline static std::optional<LoopHintAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<LoopHintAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<LoopHintAttr> from(const Attr &parent);
@@ -63,6 +56,14 @@ class LoopHintAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LoopHintAttr> from(const Reference &r) {
+    return LoopHintAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<LoopHintAttr> from(const TokenContext &t) {
+    return LoopHintAttr::from(t.as_attribute());
   }
 
   LoopHintAttrOptionType option(void) const;

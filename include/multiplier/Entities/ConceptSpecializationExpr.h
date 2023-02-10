@@ -39,6 +39,7 @@ class ConceptSpecializationExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ConceptSpecializationExpr> in(const Fragment &frag);
+  static gap::generator<ConceptSpecializationExpr> in(const File &file);
   static gap::generator<ConceptSpecializationExpr> in(const Index &index);
   static gap::generator<ConceptSpecializationExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class ConceptSpecializationExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ConceptSpecializationExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ConceptSpecializationExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ConceptSpecializationExpr> from(const Expr &parent);
-
-  inline static std::optional<ConceptSpecializationExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ConceptSpecializationExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ConceptSpecializationExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ConceptSpecializationExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ConceptSpecializationExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ConceptSpecializationExpr> from(const Stmt &parent);
 
   inline static std::optional<ConceptSpecializationExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class ConceptSpecializationExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ConceptSpecializationExpr> from(const Reference &r) {
+    return ConceptSpecializationExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ConceptSpecializationExpr> from(const TokenContext &t) {
+    return ConceptSpecializationExpr::from(t.as_statement());
   }
 
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;

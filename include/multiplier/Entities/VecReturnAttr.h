@@ -36,6 +36,7 @@ class VecReturnAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<VecReturnAttr> in(const Fragment &frag);
+  static gap::generator<VecReturnAttr> in(const File &file);
   static gap::generator<VecReturnAttr> in(const Index &index);
   static gap::generator<VecReturnAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class VecReturnAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::VEC_RETURN;
-  }
-
-  inline static std::optional<VecReturnAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<VecReturnAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<VecReturnAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<VecReturnAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return VecReturnAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<VecReturnAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class VecReturnAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<VecReturnAttr> from(const Reference &r) {
+    return VecReturnAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<VecReturnAttr> from(const TokenContext &t) {
+    return VecReturnAttr::from(t.as_attribute());
   }
 
 };

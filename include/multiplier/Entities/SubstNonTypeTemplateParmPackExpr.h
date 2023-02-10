@@ -39,6 +39,7 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<SubstNonTypeTemplateParmPackExpr> in(const Fragment &frag);
+  static gap::generator<SubstNonTypeTemplateParmPackExpr> in(const File &file);
   static gap::generator<SubstNonTypeTemplateParmPackExpr> in(const Index &index);
   static gap::generator<SubstNonTypeTemplateParmPackExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Expr &parent);
-
-  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return SubstNonTypeTemplateParmPackExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<SubstNonTypeTemplateParmPackExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return SubstNonTypeTemplateParmPackExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Stmt &parent);
 
   inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Reference &r) {
+    return SubstNonTypeTemplateParmPackExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<SubstNonTypeTemplateParmPackExpr> from(const TokenContext &t) {
+    return SubstNonTypeTemplateParmPackExpr::from(t.as_statement());
   }
 
   NonTypeTemplateParmDecl parameter_pack(void) const;

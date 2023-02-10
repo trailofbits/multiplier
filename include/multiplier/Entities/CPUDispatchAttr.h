@@ -36,6 +36,7 @@ class CPUDispatchAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CPUDispatchAttr> in(const Fragment &frag);
+  static gap::generator<CPUDispatchAttr> in(const File &file);
   static gap::generator<CPUDispatchAttr> in(const Index &index);
   static gap::generator<CPUDispatchAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CPUDispatchAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CPU_DISPATCH;
-  }
-
-  inline static std::optional<CPUDispatchAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CPUDispatchAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CPUDispatchAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CPUDispatchAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CPUDispatchAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CPUDispatchAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CPUDispatchAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CPUDispatchAttr> from(const Reference &r) {
+    return CPUDispatchAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CPUDispatchAttr> from(const TokenContext &t) {
+    return CPUDispatchAttr::from(t.as_attribute());
   }
 
 };

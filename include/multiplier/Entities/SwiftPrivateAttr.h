@@ -36,6 +36,7 @@ class SwiftPrivateAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftPrivateAttr> in(const Fragment &frag);
+  static gap::generator<SwiftPrivateAttr> in(const File &file);
   static gap::generator<SwiftPrivateAttr> in(const Index &index);
   static gap::generator<SwiftPrivateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SwiftPrivateAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_PRIVATE;
-  }
-
-  inline static std::optional<SwiftPrivateAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftPrivateAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SwiftPrivateAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SwiftPrivateAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SwiftPrivateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SwiftPrivateAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SwiftPrivateAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftPrivateAttr> from(const Reference &r) {
+    return SwiftPrivateAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftPrivateAttr> from(const TokenContext &t) {
+    return SwiftPrivateAttr::from(t.as_attribute());
   }
 
 };

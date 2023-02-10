@@ -36,6 +36,7 @@ class RecordType : public TagType {
   friend class Type;
  public:
   static gap::generator<RecordType> in(const Fragment &frag);
+  static gap::generator<RecordType> in(const File &file);
   static gap::generator<RecordType> in(const Index &index);
   static gap::generator<RecordType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class RecordType : public TagType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::RECORD;
-  }
-
-  inline static std::optional<RecordType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<RecordType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<RecordType> from(const TagType &parent);
-
-  inline static std::optional<RecordType> from(const std::optional<TagType> &parent) {
-    if (parent) {
-      return RecordType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<RecordType> from(const Type &parent);
@@ -71,6 +54,14 @@ class RecordType : public TagType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RecordType> from(const Reference &r) {
+    return RecordType::from(r.as_type());
+  }
+
+  inline static std::optional<RecordType> from(const TokenContext &t) {
+    return RecordType::from(t.as_type());
   }
 
   Type desugar(void) const;

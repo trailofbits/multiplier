@@ -34,6 +34,7 @@ class TranslationUnitDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<TranslationUnitDecl> in(const Fragment &frag);
+  static gap::generator<TranslationUnitDecl> in(const File &file);
   static gap::generator<TranslationUnitDecl> in(const Index &index);
   static gap::generator<TranslationUnitDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class TranslationUnitDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<TranslationUnitDecl> redeclarations(void) const;
-  inline static std::optional<TranslationUnitDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TranslationUnitDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<TranslationUnitDecl> from(const Decl &parent);
 
   inline static std::optional<TranslationUnitDecl> from(const std::optional<Decl> &parent) {
@@ -69,6 +62,14 @@ class TranslationUnitDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TranslationUnitDecl> from(const Reference &r) {
+    return TranslationUnitDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<TranslationUnitDecl> from(const TokenContext &t) {
+    return TranslationUnitDecl::from(t.as_declaration());
   }
 
   gap::generator<Decl> declarations_in_context(void) const;

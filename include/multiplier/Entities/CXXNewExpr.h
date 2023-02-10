@@ -42,6 +42,7 @@ class CXXNewExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXNewExpr> in(const Fragment &frag);
+  static gap::generator<CXXNewExpr> in(const File &file);
   static gap::generator<CXXNewExpr> in(const Index &index);
   static gap::generator<CXXNewExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -60,34 +61,6 @@ class CXXNewExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXNewExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXNewExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXNewExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXNewExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXNewExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXNewExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXNewExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXNewExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXNewExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXNewExpr> from(const std::optional<Stmt> &parent) {
@@ -96,6 +69,14 @@ class CXXNewExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXNewExpr> from(const Reference &r) {
+    return CXXNewExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXNewExpr> from(const TokenContext &t) {
+    return CXXNewExpr::from(t.as_statement());
   }
 
   bool does_usual_array_delete_want_size(void) const;

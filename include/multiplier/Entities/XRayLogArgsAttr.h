@@ -36,6 +36,7 @@ class XRayLogArgsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<XRayLogArgsAttr> in(const Fragment &frag);
+  static gap::generator<XRayLogArgsAttr> in(const File &file);
   static gap::generator<XRayLogArgsAttr> in(const Index &index);
   static gap::generator<XRayLogArgsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class XRayLogArgsAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::X_RAY_LOG_ARGS;
-  }
-
-  inline static std::optional<XRayLogArgsAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<XRayLogArgsAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<XRayLogArgsAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<XRayLogArgsAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return XRayLogArgsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<XRayLogArgsAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class XRayLogArgsAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<XRayLogArgsAttr> from(const Reference &r) {
+    return XRayLogArgsAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<XRayLogArgsAttr> from(const TokenContext &t) {
+    return XRayLogArgsAttr::from(t.as_attribute());
   }
 
 };

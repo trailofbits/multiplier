@@ -34,6 +34,7 @@ class AccessSpecDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<AccessSpecDecl> in(const Fragment &frag);
+  static gap::generator<AccessSpecDecl> in(const File &file);
   static gap::generator<AccessSpecDecl> in(const Index &index);
   static gap::generator<AccessSpecDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class AccessSpecDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<AccessSpecDecl> redeclarations(void) const;
-  inline static std::optional<AccessSpecDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<AccessSpecDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<AccessSpecDecl> from(const Decl &parent);
 
   inline static std::optional<AccessSpecDecl> from(const std::optional<Decl> &parent) {
@@ -69,6 +62,14 @@ class AccessSpecDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AccessSpecDecl> from(const Reference &r) {
+    return AccessSpecDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<AccessSpecDecl> from(const TokenContext &t) {
+    return AccessSpecDecl::from(t.as_declaration());
   }
 
   Token access_specifier_token(void) const;

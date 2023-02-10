@@ -36,6 +36,7 @@ class ConsumableSetOnReadAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ConsumableSetOnReadAttr> in(const Fragment &frag);
+  static gap::generator<ConsumableSetOnReadAttr> in(const File &file);
   static gap::generator<ConsumableSetOnReadAttr> in(const Index &index);
   static gap::generator<ConsumableSetOnReadAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ConsumableSetOnReadAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE_SET_ON_READ;
-  }
-
-  inline static std::optional<ConsumableSetOnReadAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ConsumableSetOnReadAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ConsumableSetOnReadAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ConsumableSetOnReadAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ConsumableSetOnReadAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ConsumableSetOnReadAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ConsumableSetOnReadAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ConsumableSetOnReadAttr> from(const Reference &r) {
+    return ConsumableSetOnReadAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ConsumableSetOnReadAttr> from(const TokenContext &t) {
+    return ConsumableSetOnReadAttr::from(t.as_attribute());
   }
 
 };

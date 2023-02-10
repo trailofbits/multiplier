@@ -36,6 +36,7 @@ class NoDerefAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<NoDerefAttr> in(const Fragment &frag);
+  static gap::generator<NoDerefAttr> in(const File &file);
   static gap::generator<NoDerefAttr> in(const Index &index);
   static gap::generator<NoDerefAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoDerefAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DEREF;
-  }
-
-  inline static std::optional<NoDerefAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoDerefAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoDerefAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<NoDerefAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return NoDerefAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoDerefAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoDerefAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoDerefAttr> from(const Reference &r) {
+    return NoDerefAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoDerefAttr> from(const TokenContext &t) {
+    return NoDerefAttr::from(t.as_attribute());
   }
 
 };

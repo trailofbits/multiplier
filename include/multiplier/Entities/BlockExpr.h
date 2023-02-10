@@ -40,6 +40,7 @@ class BlockExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<BlockExpr> in(const Fragment &frag);
+  static gap::generator<BlockExpr> in(const File &file);
   static gap::generator<BlockExpr> in(const Index &index);
   static gap::generator<BlockExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class BlockExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<BlockExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<BlockExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<BlockExpr> from(const Expr &parent);
-
-  inline static std::optional<BlockExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return BlockExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BlockExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<BlockExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return BlockExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<BlockExpr> from(const Stmt &parent);
 
   inline static std::optional<BlockExpr> from(const std::optional<Stmt> &parent) {
@@ -94,6 +67,14 @@ class BlockExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BlockExpr> from(const Reference &r) {
+    return BlockExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<BlockExpr> from(const TokenContext &t) {
+    return BlockExpr::from(t.as_statement());
   }
 
   BlockDecl block_declaration(void) const;

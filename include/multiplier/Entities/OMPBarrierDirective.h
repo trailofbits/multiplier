@@ -36,6 +36,7 @@ class OMPBarrierDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPBarrierDirective> in(const Fragment &frag);
+  static gap::generator<OMPBarrierDirective> in(const File &file);
   static gap::generator<OMPBarrierDirective> in(const Index &index);
   static gap::generator<OMPBarrierDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class OMPBarrierDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPBarrierDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPBarrierDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPBarrierDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPBarrierDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPBarrierDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPBarrierDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPBarrierDirective> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class OMPBarrierDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPBarrierDirective> from(const Reference &r) {
+    return OMPBarrierDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPBarrierDirective> from(const TokenContext &t) {
+    return OMPBarrierDirective::from(t.as_statement());
   }
 
 };

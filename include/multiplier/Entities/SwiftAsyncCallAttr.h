@@ -36,6 +36,7 @@ class SwiftAsyncCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftAsyncCallAttr> in(const Fragment &frag);
+  static gap::generator<SwiftAsyncCallAttr> in(const File &file);
   static gap::generator<SwiftAsyncCallAttr> in(const Index &index);
   static gap::generator<SwiftAsyncCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SwiftAsyncCallAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ASYNC_CALL;
-  }
-
-  inline static std::optional<SwiftAsyncCallAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftAsyncCallAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SwiftAsyncCallAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SwiftAsyncCallAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SwiftAsyncCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SwiftAsyncCallAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SwiftAsyncCallAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftAsyncCallAttr> from(const Reference &r) {
+    return SwiftAsyncCallAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftAsyncCallAttr> from(const TokenContext &t) {
+    return SwiftAsyncCallAttr::from(t.as_attribute());
   }
 
 };

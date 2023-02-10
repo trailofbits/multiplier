@@ -35,6 +35,7 @@ class DependentAddressSpaceType : public Type {
   friend class Type;
  public:
   static gap::generator<DependentAddressSpaceType> in(const Fragment &frag);
+  static gap::generator<DependentAddressSpaceType> in(const File &file);
   static gap::generator<DependentAddressSpaceType> in(const Index &index);
   static gap::generator<DependentAddressSpaceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class DependentAddressSpaceType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_ADDRESS_SPACE;
-  }
-
-  inline static std::optional<DependentAddressSpaceType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DependentAddressSpaceType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<DependentAddressSpaceType> from(const Type &parent);
@@ -60,6 +53,14 @@ class DependentAddressSpaceType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DependentAddressSpaceType> from(const Reference &r) {
+    return DependentAddressSpaceType::from(r.as_type());
+  }
+
+  inline static std::optional<DependentAddressSpaceType> from(const TokenContext &t) {
+    return DependentAddressSpaceType::from(t.as_type());
   }
 
   Type desugar(void) const;

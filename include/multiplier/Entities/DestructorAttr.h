@@ -36,6 +36,7 @@ class DestructorAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DestructorAttr> in(const Fragment &frag);
+  static gap::generator<DestructorAttr> in(const File &file);
   static gap::generator<DestructorAttr> in(const Index &index);
   static gap::generator<DestructorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class DestructorAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DESTRUCTOR;
-  }
-
-  inline static std::optional<DestructorAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<DestructorAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<DestructorAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<DestructorAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return DestructorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DestructorAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class DestructorAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DestructorAttr> from(const Reference &r) {
+    return DestructorAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<DestructorAttr> from(const TokenContext &t) {
+    return DestructorAttr::from(t.as_attribute());
   }
 
 };

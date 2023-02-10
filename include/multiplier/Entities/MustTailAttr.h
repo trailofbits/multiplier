@@ -36,6 +36,7 @@ class MustTailAttr : public StmtAttr {
   friend class Attr;
  public:
   static gap::generator<MustTailAttr> in(const Fragment &frag);
+  static gap::generator<MustTailAttr> in(const File &file);
   static gap::generator<MustTailAttr> in(const Index &index);
   static gap::generator<MustTailAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class MustTailAttr : public StmtAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MUST_TAIL;
-  }
-
-  inline static std::optional<MustTailAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MustTailAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MustTailAttr> from(const StmtAttr &parent);
-
-  inline static std::optional<MustTailAttr> from(const std::optional<StmtAttr> &parent) {
-    if (parent) {
-      return MustTailAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MustTailAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class MustTailAttr : public StmtAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MustTailAttr> from(const Reference &r) {
+    return MustTailAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<MustTailAttr> from(const TokenContext &t) {
+    return MustTailAttr::from(t.as_attribute());
   }
 
 };

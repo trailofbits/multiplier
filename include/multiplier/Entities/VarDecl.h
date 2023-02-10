@@ -50,6 +50,7 @@ class VarDecl : public DeclaratorDecl {
   friend class Decl;
  public:
   static gap::generator<VarDecl> in(const Fragment &frag);
+  static gap::generator<VarDecl> in(const File &file);
   static gap::generator<VarDecl> in(const Index &index);
   static gap::generator<VarDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -69,44 +70,6 @@ class VarDecl : public DeclaratorDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<VarDecl> redeclarations(void) const;
-  inline static std::optional<VarDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<VarDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<VarDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<VarDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return VarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<VarDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return VarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<VarDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return VarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<VarDecl> from(const Decl &parent);
 
   inline static std::optional<VarDecl> from(const std::optional<Decl> &parent) {
@@ -115,6 +78,14 @@ class VarDecl : public DeclaratorDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<VarDecl> from(const Reference &r) {
+    return VarDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<VarDecl> from(const TokenContext &t) {
+    return VarDecl::from(t.as_declaration());
   }
 
   std::optional<VarDecl> acting_definition(void) const;

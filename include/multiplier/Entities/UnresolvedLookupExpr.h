@@ -40,6 +40,7 @@ class UnresolvedLookupExpr : public OverloadExpr {
   friend class Stmt;
  public:
   static gap::generator<UnresolvedLookupExpr> in(const Fragment &frag);
+  static gap::generator<UnresolvedLookupExpr> in(const File &file);
   static gap::generator<UnresolvedLookupExpr> in(const Index &index);
   static gap::generator<UnresolvedLookupExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class UnresolvedLookupExpr : public OverloadExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<UnresolvedLookupExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<UnresolvedLookupExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<UnresolvedLookupExpr> from(const OverloadExpr &parent);
-
-  inline static std::optional<UnresolvedLookupExpr> from(const std::optional<OverloadExpr> &parent) {
-    if (parent) {
-      return UnresolvedLookupExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedLookupExpr> from(const Expr &parent);
-
-  inline static std::optional<UnresolvedLookupExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return UnresolvedLookupExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedLookupExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<UnresolvedLookupExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return UnresolvedLookupExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UnresolvedLookupExpr> from(const Stmt &parent);
 
   inline static std::optional<UnresolvedLookupExpr> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class UnresolvedLookupExpr : public OverloadExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnresolvedLookupExpr> from(const Reference &r) {
+    return UnresolvedLookupExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<UnresolvedLookupExpr> from(const TokenContext &t) {
+    return UnresolvedLookupExpr::from(t.as_statement());
   }
 
   bool is_overloaded(void) const;

@@ -22,6 +22,7 @@
 #include "../Token.h"
 
 #include <compare>
+
 #include "StmtKind.h"
 
 namespace mx {
@@ -45,6 +46,7 @@ class Stmt {
   std::shared_ptr<const StmtImpl> impl;
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
  public:
   Stmt(Stmt &&) noexcept = default;
   Stmt(const Stmt &) = default;
@@ -69,8 +71,10 @@ class Stmt {
   std::optional<Decl> referenced_declaration(void) const;
  public:
   static gap::generator<Stmt> in(const Fragment &frag, std::span<StmtKind> kinds);
+  static gap::generator<Stmt> in(const File &file, std::span<StmtKind> kinds);
   static gap::generator<Stmt> in(const Index &index, std::span<StmtKind> kinds);
   static gap::generator<Stmt> in(const Fragment &frag);
+  static gap::generator<Stmt> in(const File &file);
   static gap::generator<Stmt> in(const Index &index);
   static gap::generator<Stmt> containing(const Token &tok);
   bool contains(const Token &tok) const;

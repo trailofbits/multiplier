@@ -36,6 +36,7 @@ class LocksExcludedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<LocksExcludedAttr> in(const Fragment &frag);
+  static gap::generator<LocksExcludedAttr> in(const File &file);
   static gap::generator<LocksExcludedAttr> in(const Index &index);
   static gap::generator<LocksExcludedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class LocksExcludedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOCKS_EXCLUDED;
-  }
-
-  inline static std::optional<LocksExcludedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<LocksExcludedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<LocksExcludedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<LocksExcludedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return LocksExcludedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<LocksExcludedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class LocksExcludedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LocksExcludedAttr> from(const Reference &r) {
+    return LocksExcludedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<LocksExcludedAttr> from(const TokenContext &t) {
+    return LocksExcludedAttr::from(t.as_attribute());
   }
 
 };

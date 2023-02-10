@@ -38,6 +38,7 @@ class GNUNullExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<GNUNullExpr> in(const Fragment &frag);
+  static gap::generator<GNUNullExpr> in(const File &file);
   static gap::generator<GNUNullExpr> in(const Index &index);
   static gap::generator<GNUNullExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class GNUNullExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<GNUNullExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<GNUNullExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<GNUNullExpr> from(const Expr &parent);
-
-  inline static std::optional<GNUNullExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return GNUNullExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<GNUNullExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<GNUNullExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return GNUNullExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<GNUNullExpr> from(const Stmt &parent);
 
   inline static std::optional<GNUNullExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class GNUNullExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<GNUNullExpr> from(const Reference &r) {
+    return GNUNullExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<GNUNullExpr> from(const TokenContext &t) {
+    return GNUNullExpr::from(t.as_statement());
   }
 
   Token token_token(void) const;

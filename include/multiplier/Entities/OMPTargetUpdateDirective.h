@@ -36,6 +36,7 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTargetUpdateDirective> in(const Fragment &frag);
+  static gap::generator<OMPTargetUpdateDirective> in(const File &file);
   static gap::generator<OMPTargetUpdateDirective> in(const Index &index);
   static gap::generator<OMPTargetUpdateDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPTargetUpdateDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTargetUpdateDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPTargetUpdateDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPTargetUpdateDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPTargetUpdateDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPTargetUpdateDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPTargetUpdateDirective> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class OMPTargetUpdateDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPTargetUpdateDirective> from(const Reference &r) {
+    return OMPTargetUpdateDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPTargetUpdateDirective> from(const TokenContext &t) {
+    return OMPTargetUpdateDirective::from(t.as_statement());
   }
 
 };

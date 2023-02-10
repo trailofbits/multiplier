@@ -37,6 +37,7 @@ class MipsLongCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MipsLongCallAttr> in(const Fragment &frag);
+  static gap::generator<MipsLongCallAttr> in(const File &file);
   static gap::generator<MipsLongCallAttr> in(const Index &index);
   static gap::generator<MipsLongCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class MipsLongCallAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIPS_LONG_CALL;
-  }
-
-  inline static std::optional<MipsLongCallAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MipsLongCallAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MipsLongCallAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<MipsLongCallAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return MipsLongCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MipsLongCallAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class MipsLongCallAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MipsLongCallAttr> from(const Reference &r) {
+    return MipsLongCallAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<MipsLongCallAttr> from(const TokenContext &t) {
+    return MipsLongCallAttr::from(t.as_attribute());
   }
 
   MipsLongCallAttrSpelling semantic_spelling(void) const;

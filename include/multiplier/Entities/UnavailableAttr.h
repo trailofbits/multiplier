@@ -37,6 +37,7 @@ class UnavailableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<UnavailableAttr> in(const Fragment &frag);
+  static gap::generator<UnavailableAttr> in(const File &file);
   static gap::generator<UnavailableAttr> in(const Index &index);
   static gap::generator<UnavailableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class UnavailableAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UNAVAILABLE;
-  }
-
-  inline static std::optional<UnavailableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<UnavailableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<UnavailableAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<UnavailableAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return UnavailableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<UnavailableAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class UnavailableAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnavailableAttr> from(const Reference &r) {
+    return UnavailableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<UnavailableAttr> from(const TokenContext &t) {
+    return UnavailableAttr::from(t.as_attribute());
   }
 
   UnavailableAttrImplicitReason implicit_reason(void) const;

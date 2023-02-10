@@ -36,6 +36,7 @@ class CFReturnsNotRetainedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CFReturnsNotRetainedAttr> in(const Fragment &frag);
+  static gap::generator<CFReturnsNotRetainedAttr> in(const File &file);
   static gap::generator<CFReturnsNotRetainedAttr> in(const Index &index);
   static gap::generator<CFReturnsNotRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CFReturnsNotRetainedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_RETURNS_NOT_RETAINED;
-  }
-
-  inline static std::optional<CFReturnsNotRetainedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CFReturnsNotRetainedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CFReturnsNotRetainedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CFReturnsNotRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CFReturnsNotRetainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CFReturnsNotRetainedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CFReturnsNotRetainedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CFReturnsNotRetainedAttr> from(const Reference &r) {
+    return CFReturnsNotRetainedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CFReturnsNotRetainedAttr> from(const TokenContext &t) {
+    return CFReturnsNotRetainedAttr::from(t.as_attribute());
   }
 
 };

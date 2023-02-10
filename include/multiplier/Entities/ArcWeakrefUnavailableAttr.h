@@ -36,6 +36,7 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ArcWeakrefUnavailableAttr> in(const Fragment &frag);
+  static gap::generator<ArcWeakrefUnavailableAttr> in(const File &file);
   static gap::generator<ArcWeakrefUnavailableAttr> in(const Index &index);
   static gap::generator<ArcWeakrefUnavailableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARC_WEAKREF_UNAVAILABLE;
-  }
-
-  inline static std::optional<ArcWeakrefUnavailableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ArcWeakrefUnavailableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ArcWeakrefUnavailableAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ArcWeakrefUnavailableAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ArcWeakrefUnavailableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ArcWeakrefUnavailableAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ArcWeakrefUnavailableAttr> from(const Reference &r) {
+    return ArcWeakrefUnavailableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ArcWeakrefUnavailableAttr> from(const TokenContext &t) {
+    return ArcWeakrefUnavailableAttr::from(t.as_attribute());
   }
 
 };

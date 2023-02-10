@@ -38,6 +38,7 @@ class ChooseExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ChooseExpr> in(const Fragment &frag);
+  static gap::generator<ChooseExpr> in(const File &file);
   static gap::generator<ChooseExpr> in(const Index &index);
   static gap::generator<ChooseExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class ChooseExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ChooseExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ChooseExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ChooseExpr> from(const Expr &parent);
-
-  inline static std::optional<ChooseExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ChooseExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ChooseExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ChooseExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ChooseExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ChooseExpr> from(const Stmt &parent);
 
   inline static std::optional<ChooseExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class ChooseExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ChooseExpr> from(const Reference &r) {
+    return ChooseExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ChooseExpr> from(const TokenContext &t) {
+    return ChooseExpr::from(t.as_statement());
   }
 
   Token builtin_token(void) const;

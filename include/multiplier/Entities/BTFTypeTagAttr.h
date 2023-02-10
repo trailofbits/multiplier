@@ -36,6 +36,7 @@ class BTFTypeTagAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<BTFTypeTagAttr> in(const Fragment &frag);
+  static gap::generator<BTFTypeTagAttr> in(const File &file);
   static gap::generator<BTFTypeTagAttr> in(const Index &index);
   static gap::generator<BTFTypeTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class BTFTypeTagAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BTF_TYPE_TAG;
-  }
-
-  inline static std::optional<BTFTypeTagAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<BTFTypeTagAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<BTFTypeTagAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<BTFTypeTagAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return BTFTypeTagAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<BTFTypeTagAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class BTFTypeTagAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BTFTypeTagAttr> from(const Reference &r) {
+    return BTFTypeTagAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<BTFTypeTagAttr> from(const TokenContext &t) {
+    return BTFTypeTagAttr::from(t.as_attribute());
   }
 
   std::string_view btf_type_tag(void) const;

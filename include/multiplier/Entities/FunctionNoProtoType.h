@@ -36,6 +36,7 @@ class FunctionNoProtoType : public FunctionType {
   friend class Type;
  public:
   static gap::generator<FunctionNoProtoType> in(const Fragment &frag);
+  static gap::generator<FunctionNoProtoType> in(const File &file);
   static gap::generator<FunctionNoProtoType> in(const Index &index);
   static gap::generator<FunctionNoProtoType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class FunctionNoProtoType : public FunctionType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::FUNCTION_NO_PROTO;
-  }
-
-  inline static std::optional<FunctionNoProtoType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<FunctionNoProtoType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<FunctionNoProtoType> from(const FunctionType &parent);
-
-  inline static std::optional<FunctionNoProtoType> from(const std::optional<FunctionType> &parent) {
-    if (parent) {
-      return FunctionNoProtoType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FunctionNoProtoType> from(const Type &parent);
@@ -71,6 +54,14 @@ class FunctionNoProtoType : public FunctionType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FunctionNoProtoType> from(const Reference &r) {
+    return FunctionNoProtoType::from(r.as_type());
+  }
+
+  inline static std::optional<FunctionNoProtoType> from(const TokenContext &t) {
+    return FunctionNoProtoType::from(t.as_type());
   }
 
   Type desugar(void) const;

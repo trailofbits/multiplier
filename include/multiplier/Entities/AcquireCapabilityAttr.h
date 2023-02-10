@@ -37,6 +37,7 @@ class AcquireCapabilityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AcquireCapabilityAttr> in(const Fragment &frag);
+  static gap::generator<AcquireCapabilityAttr> in(const File &file);
   static gap::generator<AcquireCapabilityAttr> in(const Index &index);
   static gap::generator<AcquireCapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class AcquireCapabilityAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ACQUIRE_CAPABILITY;
-  }
-
-  inline static std::optional<AcquireCapabilityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AcquireCapabilityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AcquireCapabilityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AcquireCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AcquireCapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AcquireCapabilityAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class AcquireCapabilityAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AcquireCapabilityAttr> from(const Reference &r) {
+    return AcquireCapabilityAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AcquireCapabilityAttr> from(const TokenContext &t) {
+    return AcquireCapabilityAttr::from(t.as_attribute());
   }
 
   AcquireCapabilityAttrSpelling semantic_spelling(void) const;

@@ -36,6 +36,7 @@ class Ptr64Attr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<Ptr64Attr> in(const Fragment &frag);
+  static gap::generator<Ptr64Attr> in(const File &file);
   static gap::generator<Ptr64Attr> in(const Index &index);
   static gap::generator<Ptr64Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class Ptr64Attr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PTR64;
-  }
-
-  inline static std::optional<Ptr64Attr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<Ptr64Attr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<Ptr64Attr> from(const TypeAttr &parent);
-
-  inline static std::optional<Ptr64Attr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return Ptr64Attr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<Ptr64Attr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class Ptr64Attr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<Ptr64Attr> from(const Reference &r) {
+    return Ptr64Attr::from(r.as_attribute());
+  }
+
+  inline static std::optional<Ptr64Attr> from(const TokenContext &t) {
+    return Ptr64Attr::from(t.as_attribute());
   }
 
 };

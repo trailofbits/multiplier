@@ -36,6 +36,7 @@ class CUDAHostAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CUDAHostAttr> in(const Fragment &frag);
+  static gap::generator<CUDAHostAttr> in(const File &file);
   static gap::generator<CUDAHostAttr> in(const Index &index);
   static gap::generator<CUDAHostAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CUDAHostAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_HOST;
-  }
-
-  inline static std::optional<CUDAHostAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CUDAHostAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CUDAHostAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CUDAHostAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CUDAHostAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CUDAHostAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CUDAHostAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CUDAHostAttr> from(const Reference &r) {
+    return CUDAHostAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CUDAHostAttr> from(const TokenContext &t) {
+    return CUDAHostAttr::from(t.as_attribute());
   }
 
 };

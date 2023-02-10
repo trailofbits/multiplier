@@ -39,6 +39,7 @@ class OverloadExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OverloadExpr> in(const Fragment &frag);
+  static gap::generator<OverloadExpr> in(const File &file);
   static gap::generator<OverloadExpr> in(const Index &index);
   static gap::generator<OverloadExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,34 +54,6 @@ class OverloadExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OverloadExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OverloadExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OverloadExpr> from(const Expr &parent);
-
-  inline static std::optional<OverloadExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return OverloadExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OverloadExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<OverloadExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return OverloadExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OverloadExpr> from(const Stmt &parent);
 
   inline static std::optional<OverloadExpr> from(const std::optional<Stmt> &parent) {
@@ -89,6 +62,14 @@ class OverloadExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OverloadExpr> from(const Reference &r) {
+    return OverloadExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<OverloadExpr> from(const TokenContext &t) {
+    return OverloadExpr::from(t.as_statement());
   }
 
   Token l_angle_token(void) const;

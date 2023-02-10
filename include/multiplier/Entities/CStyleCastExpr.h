@@ -42,6 +42,7 @@ class CStyleCastExpr : public ExplicitCastExpr {
   friend class Stmt;
  public:
   static gap::generator<CStyleCastExpr> in(const Fragment &frag);
+  static gap::generator<CStyleCastExpr> in(const File &file);
   static gap::generator<CStyleCastExpr> in(const Index &index);
   static gap::generator<CStyleCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -60,54 +61,6 @@ class CStyleCastExpr : public ExplicitCastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CStyleCastExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CStyleCastExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CStyleCastExpr> from(const ExplicitCastExpr &parent);
-
-  inline static std::optional<CStyleCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
-    if (parent) {
-      return CStyleCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CStyleCastExpr> from(const CastExpr &parent);
-
-  inline static std::optional<CStyleCastExpr> from(const std::optional<CastExpr> &parent) {
-    if (parent) {
-      return CStyleCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CStyleCastExpr> from(const Expr &parent);
-
-  inline static std::optional<CStyleCastExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CStyleCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CStyleCastExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CStyleCastExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CStyleCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CStyleCastExpr> from(const Stmt &parent);
 
   inline static std::optional<CStyleCastExpr> from(const std::optional<Stmt> &parent) {
@@ -116,6 +69,14 @@ class CStyleCastExpr : public ExplicitCastExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CStyleCastExpr> from(const Reference &r) {
+    return CStyleCastExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CStyleCastExpr> from(const TokenContext &t) {
+    return CStyleCastExpr::from(t.as_statement());
   }
 
   Token l_paren_token(void) const;

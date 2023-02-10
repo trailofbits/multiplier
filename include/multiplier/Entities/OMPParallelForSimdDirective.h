@@ -40,6 +40,7 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPParallelForSimdDirective> in(const Fragment &frag);
+  static gap::generator<OMPParallelForSimdDirective> in(const File &file);
   static gap::generator<OMPParallelForSimdDirective> in(const Index &index);
   static gap::generator<OMPParallelForSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPParallelForSimdDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPParallelForSimdDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPParallelForSimdDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPParallelForSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPParallelForSimdDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPParallelForSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPParallelForSimdDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPParallelForSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPParallelForSimdDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPParallelForSimdDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPParallelForSimdDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPParallelForSimdDirective> from(const Reference &r) {
+    return OMPParallelForSimdDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPParallelForSimdDirective> from(const TokenContext &t) {
+    return OMPParallelForSimdDirective::from(t.as_statement());
   }
 
 };

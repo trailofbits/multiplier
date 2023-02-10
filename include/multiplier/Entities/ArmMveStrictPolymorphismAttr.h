@@ -36,6 +36,7 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<ArmMveStrictPolymorphismAttr> in(const Fragment &frag);
+  static gap::generator<ArmMveStrictPolymorphismAttr> in(const File &file);
   static gap::generator<ArmMveStrictPolymorphismAttr> in(const Index &index);
   static gap::generator<ArmMveStrictPolymorphismAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_MVE_STRICT_POLYMORPHISM;
-  }
-
-  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ArmMveStrictPolymorphismAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return ArmMveStrictPolymorphismAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ArmMveStrictPolymorphismAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const Reference &r) {
+    return ArmMveStrictPolymorphismAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const TokenContext &t) {
+    return ArmMveStrictPolymorphismAttr::from(t.as_attribute());
   }
 
 };

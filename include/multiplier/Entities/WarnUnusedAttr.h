@@ -36,6 +36,7 @@ class WarnUnusedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<WarnUnusedAttr> in(const Fragment &frag);
+  static gap::generator<WarnUnusedAttr> in(const File &file);
   static gap::generator<WarnUnusedAttr> in(const Index &index);
   static gap::generator<WarnUnusedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class WarnUnusedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WARN_UNUSED;
-  }
-
-  inline static std::optional<WarnUnusedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<WarnUnusedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<WarnUnusedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<WarnUnusedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return WarnUnusedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<WarnUnusedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class WarnUnusedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<WarnUnusedAttr> from(const Reference &r) {
+    return WarnUnusedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<WarnUnusedAttr> from(const TokenContext &t) {
+    return WarnUnusedAttr::from(t.as_attribute());
   }
 
 };

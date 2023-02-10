@@ -37,6 +37,7 @@ class CapturedStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CapturedStmt> in(const Fragment &frag);
+  static gap::generator<CapturedStmt> in(const File &file);
   static gap::generator<CapturedStmt> in(const Index &index);
   static gap::generator<CapturedStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,14 +56,6 @@ class CapturedStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CapturedStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CapturedStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<CapturedStmt> from(const Stmt &parent);
 
   inline static std::optional<CapturedStmt> from(const std::optional<Stmt> &parent) {
@@ -71,6 +64,14 @@ class CapturedStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CapturedStmt> from(const Reference &r) {
+    return CapturedStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<CapturedStmt> from(const TokenContext &t) {
+    return CapturedStmt::from(t.as_statement());
   }
 
   CapturedDecl captured_declaration(void) const;

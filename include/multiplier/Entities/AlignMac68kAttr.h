@@ -36,6 +36,7 @@ class AlignMac68kAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AlignMac68kAttr> in(const Fragment &frag);
+  static gap::generator<AlignMac68kAttr> in(const File &file);
   static gap::generator<AlignMac68kAttr> in(const Index &index);
   static gap::generator<AlignMac68kAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AlignMac68kAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGN_MAC68K;
-  }
-
-  inline static std::optional<AlignMac68kAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AlignMac68kAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AlignMac68kAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AlignMac68kAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AlignMac68kAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AlignMac68kAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AlignMac68kAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AlignMac68kAttr> from(const Reference &r) {
+    return AlignMac68kAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AlignMac68kAttr> from(const TokenContext &t) {
+    return AlignMac68kAttr::from(t.as_attribute());
   }
 
 };

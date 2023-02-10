@@ -38,6 +38,7 @@ class CFConsumedAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<CFConsumedAttr> in(const Fragment &frag);
+  static gap::generator<CFConsumedAttr> in(const File &file);
   static gap::generator<CFConsumedAttr> in(const Index &index);
   static gap::generator<CFConsumedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,34 +46,6 @@ class CFConsumedAttr : public InheritableParamAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_CONSUMED;
-  }
-
-  inline static std::optional<CFConsumedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CFConsumedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CFConsumedAttr> from(const InheritableParamAttr &parent);
-
-  inline static std::optional<CFConsumedAttr> from(const std::optional<InheritableParamAttr> &parent) {
-    if (parent) {
-      return CFConsumedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CFConsumedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CFConsumedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CFConsumedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CFConsumedAttr> from(const Attr &parent);
@@ -83,6 +56,14 @@ class CFConsumedAttr : public InheritableParamAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CFConsumedAttr> from(const Reference &r) {
+    return CFConsumedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CFConsumedAttr> from(const TokenContext &t) {
+    return CFConsumedAttr::from(t.as_attribute());
   }
 
 };

@@ -37,6 +37,7 @@ class SEHTryStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<SEHTryStmt> in(const Fragment &frag);
+  static gap::generator<SEHTryStmt> in(const File &file);
   static gap::generator<SEHTryStmt> in(const Index &index);
   static gap::generator<SEHTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,14 +56,6 @@ class SEHTryStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SEHTryStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SEHTryStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<SEHTryStmt> from(const Stmt &parent);
 
   inline static std::optional<SEHTryStmt> from(const std::optional<Stmt> &parent) {
@@ -71,6 +64,14 @@ class SEHTryStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SEHTryStmt> from(const Reference &r) {
+    return SEHTryStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<SEHTryStmt> from(const TokenContext &t) {
+    return SEHTryStmt::from(t.as_statement());
   }
 
   SEHExceptStmt except_handler(void) const;

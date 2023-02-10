@@ -38,6 +38,7 @@ class ObjCObjectPointerType : public Type {
   friend class Type;
  public:
   static gap::generator<ObjCObjectPointerType> in(const Fragment &frag);
+  static gap::generator<ObjCObjectPointerType> in(const File &file);
   static gap::generator<ObjCObjectPointerType> in(const Index &index);
   static gap::generator<ObjCObjectPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,14 +46,6 @@ class ObjCObjectPointerType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_OBJECT_POINTER;
-  }
-
-  inline static std::optional<ObjCObjectPointerType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ObjCObjectPointerType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<ObjCObjectPointerType> from(const Type &parent);
@@ -63,6 +56,14 @@ class ObjCObjectPointerType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCObjectPointerType> from(const Reference &r) {
+    return ObjCObjectPointerType::from(r.as_type());
+  }
+
+  inline static std::optional<ObjCObjectPointerType> from(const TokenContext &t) {
+    return ObjCObjectPointerType::from(t.as_type());
   }
 
   Type desugar(void) const;

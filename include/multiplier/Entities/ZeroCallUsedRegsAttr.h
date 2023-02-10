@@ -37,6 +37,7 @@ class ZeroCallUsedRegsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ZeroCallUsedRegsAttr> in(const Fragment &frag);
+  static gap::generator<ZeroCallUsedRegsAttr> in(const File &file);
   static gap::generator<ZeroCallUsedRegsAttr> in(const Index &index);
   static gap::generator<ZeroCallUsedRegsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ZeroCallUsedRegsAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ZERO_CALL_USED_REGS;
-  }
-
-  inline static std::optional<ZeroCallUsedRegsAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ZeroCallUsedRegsAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ZeroCallUsedRegsAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ZeroCallUsedRegsAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ZeroCallUsedRegsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ZeroCallUsedRegsAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class ZeroCallUsedRegsAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ZeroCallUsedRegsAttr> from(const Reference &r) {
+    return ZeroCallUsedRegsAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ZeroCallUsedRegsAttr> from(const TokenContext &t) {
+    return ZeroCallUsedRegsAttr::from(t.as_attribute());
   }
 
   ZeroCallUsedRegsAttrZeroCallUsedRegsKind zero_call_used_regs(void) const;

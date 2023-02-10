@@ -35,6 +35,7 @@ class VectorType : public Type {
   friend class Type;
  public:
   static gap::generator<VectorType> in(const Fragment &frag);
+  static gap::generator<VectorType> in(const File &file);
   static gap::generator<VectorType> in(const Index &index);
   static gap::generator<VectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class VectorType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::VECTOR;
-  }
-
-  inline static std::optional<VectorType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<VectorType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<VectorType> from(const Type &parent);
@@ -60,6 +53,14 @@ class VectorType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<VectorType> from(const Reference &r) {
+    return VectorType::from(r.as_type());
+  }
+
+  inline static std::optional<VectorType> from(const TokenContext &t) {
+    return VectorType::from(t.as_type());
   }
 
   Type desugar(void) const;

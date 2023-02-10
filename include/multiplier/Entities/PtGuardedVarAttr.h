@@ -36,6 +36,7 @@ class PtGuardedVarAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PtGuardedVarAttr> in(const Fragment &frag);
+  static gap::generator<PtGuardedVarAttr> in(const File &file);
   static gap::generator<PtGuardedVarAttr> in(const Index &index);
   static gap::generator<PtGuardedVarAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class PtGuardedVarAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PT_GUARDED_VAR;
-  }
-
-  inline static std::optional<PtGuardedVarAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PtGuardedVarAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PtGuardedVarAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PtGuardedVarAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PtGuardedVarAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PtGuardedVarAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class PtGuardedVarAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PtGuardedVarAttr> from(const Reference &r) {
+    return PtGuardedVarAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PtGuardedVarAttr> from(const TokenContext &t) {
+    return PtGuardedVarAttr::from(t.as_attribute());
   }
 
 };

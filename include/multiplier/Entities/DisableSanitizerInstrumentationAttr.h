@@ -36,6 +36,7 @@ class DisableSanitizerInstrumentationAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DisableSanitizerInstrumentationAttr> in(const Fragment &frag);
+  static gap::generator<DisableSanitizerInstrumentationAttr> in(const File &file);
   static gap::generator<DisableSanitizerInstrumentationAttr> in(const Index &index);
   static gap::generator<DisableSanitizerInstrumentationAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class DisableSanitizerInstrumentationAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DISABLE_SANITIZER_INSTRUMENTATION;
-  }
-
-  inline static std::optional<DisableSanitizerInstrumentationAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<DisableSanitizerInstrumentationAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<DisableSanitizerInstrumentationAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<DisableSanitizerInstrumentationAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return DisableSanitizerInstrumentationAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DisableSanitizerInstrumentationAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class DisableSanitizerInstrumentationAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DisableSanitizerInstrumentationAttr> from(const Reference &r) {
+    return DisableSanitizerInstrumentationAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<DisableSanitizerInstrumentationAttr> from(const TokenContext &t) {
+    return DisableSanitizerInstrumentationAttr::from(t.as_attribute());
   }
 
 };

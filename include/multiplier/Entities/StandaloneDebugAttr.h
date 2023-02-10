@@ -36,6 +36,7 @@ class StandaloneDebugAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<StandaloneDebugAttr> in(const Fragment &frag);
+  static gap::generator<StandaloneDebugAttr> in(const File &file);
   static gap::generator<StandaloneDebugAttr> in(const Index &index);
   static gap::generator<StandaloneDebugAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class StandaloneDebugAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::STANDALONE_DEBUG;
-  }
-
-  inline static std::optional<StandaloneDebugAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<StandaloneDebugAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<StandaloneDebugAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<StandaloneDebugAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return StandaloneDebugAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<StandaloneDebugAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class StandaloneDebugAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<StandaloneDebugAttr> from(const Reference &r) {
+    return StandaloneDebugAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<StandaloneDebugAttr> from(const TokenContext &t) {
+    return StandaloneDebugAttr::from(t.as_attribute());
   }
 
 };

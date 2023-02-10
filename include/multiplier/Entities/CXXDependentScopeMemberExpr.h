@@ -40,6 +40,7 @@ class CXXDependentScopeMemberExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXDependentScopeMemberExpr> in(const Fragment &frag);
+  static gap::generator<CXXDependentScopeMemberExpr> in(const File &file);
   static gap::generator<CXXDependentScopeMemberExpr> in(const Index &index);
   static gap::generator<CXXDependentScopeMemberExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class CXXDependentScopeMemberExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXDependentScopeMemberExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXDependentScopeMemberExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXDependentScopeMemberExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXDependentScopeMemberExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXDependentScopeMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXDependentScopeMemberExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXDependentScopeMemberExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXDependentScopeMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXDependentScopeMemberExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXDependentScopeMemberExpr> from(const std::optional<Stmt> &parent) {
@@ -94,6 +67,14 @@ class CXXDependentScopeMemberExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXDependentScopeMemberExpr> from(const Reference &r) {
+    return CXXDependentScopeMemberExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXDependentScopeMemberExpr> from(const TokenContext &t) {
+    return CXXDependentScopeMemberExpr::from(t.as_statement());
   }
 
   std::optional<Expr> base(void) const;

@@ -37,6 +37,7 @@ class RequiresCapabilityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<RequiresCapabilityAttr> in(const Fragment &frag);
+  static gap::generator<RequiresCapabilityAttr> in(const File &file);
   static gap::generator<RequiresCapabilityAttr> in(const Index &index);
   static gap::generator<RequiresCapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class RequiresCapabilityAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REQUIRES_CAPABILITY;
-  }
-
-  inline static std::optional<RequiresCapabilityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<RequiresCapabilityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<RequiresCapabilityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<RequiresCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return RequiresCapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<RequiresCapabilityAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class RequiresCapabilityAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RequiresCapabilityAttr> from(const Reference &r) {
+    return RequiresCapabilityAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<RequiresCapabilityAttr> from(const TokenContext &t) {
+    return RequiresCapabilityAttr::from(t.as_attribute());
   }
 
   RequiresCapabilityAttrSpelling semantic_spelling(void) const;

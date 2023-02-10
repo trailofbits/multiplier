@@ -37,6 +37,7 @@ class SectionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SectionAttr> in(const Fragment &frag);
+  static gap::generator<SectionAttr> in(const File &file);
   static gap::generator<SectionAttr> in(const Index &index);
   static gap::generator<SectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class SectionAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SECTION;
-  }
-
-  inline static std::optional<SectionAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SectionAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SectionAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SectionAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SectionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SectionAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class SectionAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SectionAttr> from(const Reference &r) {
+    return SectionAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SectionAttr> from(const TokenContext &t) {
+    return SectionAttr::from(t.as_attribute());
   }
 
   std::string_view name(void) const;

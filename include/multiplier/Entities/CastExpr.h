@@ -41,6 +41,7 @@ class CastExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CastExpr> in(const Fragment &frag);
+  static gap::generator<CastExpr> in(const File &file);
   static gap::generator<CastExpr> in(const Index &index);
   static gap::generator<CastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,34 +56,6 @@ class CastExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CastExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CastExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CastExpr> from(const Expr &parent);
-
-  inline static std::optional<CastExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CastExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CastExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CastExpr> from(const Stmt &parent);
 
   inline static std::optional<CastExpr> from(const std::optional<Stmt> &parent) {
@@ -91,6 +64,14 @@ class CastExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CastExpr> from(const Reference &r) {
+    return CastExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CastExpr> from(const TokenContext &t) {
+    return CastExpr::from(t.as_statement());
   }
 
   CastKind cast_kind(void) const;

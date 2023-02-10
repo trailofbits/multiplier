@@ -37,6 +37,7 @@ class FinalAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<FinalAttr> in(const Fragment &frag);
+  static gap::generator<FinalAttr> in(const File &file);
   static gap::generator<FinalAttr> in(const Index &index);
   static gap::generator<FinalAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class FinalAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FINAL;
-  }
-
-  inline static std::optional<FinalAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<FinalAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<FinalAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<FinalAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return FinalAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FinalAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class FinalAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FinalAttr> from(const Reference &r) {
+    return FinalAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<FinalAttr> from(const TokenContext &t) {
+    return FinalAttr::from(t.as_attribute());
   }
 
   FinalAttrSpelling semantic_spelling(void) const;

@@ -431,7 +431,7 @@ jobs:
         sudo apt-get install -y \
              gpg wget curl zip unzip tar git pkg-config \
              ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear libtool autoconf flex bison \
+             doctest-dev clang-15 libtool autoconf flex bison \
              libncurses-dev libssl-dev libelf-dev
         mkdir src
         mkdir build
@@ -451,13 +451,15 @@ jobs:
         curl --silent --location \
           https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.6.tar.xz | tar xJ -C '${{ github.workspace }}/src'
         cd '${{ github.workspace }}/src/linux-6.1.6'
-        make CC="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang" defconfig
-        bear -- make CC="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang"
+        PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" make LLVM=1 defconfig
+        PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" make LLVM=1 compile_commands.json
+        PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" env > env_vars.txt
 
     - name: Index Linux
       run: |
         chmod +x install/bin/*
         $INSTALL_DIR/bin/mx-index \
+          --env '${{ github.workspace }}/src/linux-6.1.6/env_vars.txt' \
           --db /tmp/linux-6.1.6.mx \
           --target '${{ github.workspace }}/src/linux-6.1.6/compile_commands.json'
 

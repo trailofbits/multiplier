@@ -36,6 +36,7 @@ class OpenCLKernelAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OpenCLKernelAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLKernelAttr> in(const File &file);
   static gap::generator<OpenCLKernelAttr> in(const Index &index);
   static gap::generator<OpenCLKernelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class OpenCLKernelAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_KERNEL;
-  }
-
-  inline static std::optional<OpenCLKernelAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLKernelAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OpenCLKernelAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OpenCLKernelAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OpenCLKernelAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OpenCLKernelAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class OpenCLKernelAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OpenCLKernelAttr> from(const Reference &r) {
+    return OpenCLKernelAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OpenCLKernelAttr> from(const TokenContext &t) {
+    return OpenCLKernelAttr::from(t.as_attribute());
   }
 
 };

@@ -36,6 +36,7 @@ class WeakRefAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<WeakRefAttr> in(const Fragment &frag);
+  static gap::generator<WeakRefAttr> in(const File &file);
   static gap::generator<WeakRefAttr> in(const Index &index);
   static gap::generator<WeakRefAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class WeakRefAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEAK_REF;
-  }
-
-  inline static std::optional<WeakRefAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<WeakRefAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<WeakRefAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<WeakRefAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return WeakRefAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<WeakRefAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class WeakRefAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<WeakRefAttr> from(const Reference &r) {
+    return WeakRefAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<WeakRefAttr> from(const TokenContext &t) {
+    return WeakRefAttr::from(t.as_attribute());
   }
 
   std::string_view aliasee(void) const;

@@ -36,6 +36,7 @@ class OptimizeNoneAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OptimizeNoneAttr> in(const Fragment &frag);
+  static gap::generator<OptimizeNoneAttr> in(const File &file);
   static gap::generator<OptimizeNoneAttr> in(const Index &index);
   static gap::generator<OptimizeNoneAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class OptimizeNoneAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPTIMIZE_NONE;
-  }
-
-  inline static std::optional<OptimizeNoneAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OptimizeNoneAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OptimizeNoneAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OptimizeNoneAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OptimizeNoneAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OptimizeNoneAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class OptimizeNoneAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OptimizeNoneAttr> from(const Reference &r) {
+    return OptimizeNoneAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OptimizeNoneAttr> from(const TokenContext &t) {
+    return OptimizeNoneAttr::from(t.as_attribute());
   }
 
 };

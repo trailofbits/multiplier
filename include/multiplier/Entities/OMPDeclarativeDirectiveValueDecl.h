@@ -38,6 +38,7 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const File &file);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const Index &index);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,34 +54,6 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<OMPDeclarativeDirectiveValueDecl> redeclarations(void) const;
-  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<OMPDeclarativeDirectiveValueDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return OMPDeclarativeDirectiveValueDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPDeclarativeDirectiveValueDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return OMPDeclarativeDirectiveValueDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Decl &parent);
 
   inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const std::optional<Decl> &parent) {
@@ -89,6 +62,14 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Reference &r) {
+    return OMPDeclarativeDirectiveValueDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const TokenContext &t) {
+    return OMPDeclarativeDirectiveValueDecl::from(t.as_declaration());
   }
 
 };

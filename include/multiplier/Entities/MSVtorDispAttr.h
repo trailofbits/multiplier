@@ -37,6 +37,7 @@ class MSVtorDispAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MSVtorDispAttr> in(const Fragment &frag);
+  static gap::generator<MSVtorDispAttr> in(const File &file);
   static gap::generator<MSVtorDispAttr> in(const Index &index);
   static gap::generator<MSVtorDispAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class MSVtorDispAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_VTOR_DISP;
-  }
-
-  inline static std::optional<MSVtorDispAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MSVtorDispAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MSVtorDispAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<MSVtorDispAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return MSVtorDispAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MSVtorDispAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class MSVtorDispAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MSVtorDispAttr> from(const Reference &r) {
+    return MSVtorDispAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<MSVtorDispAttr> from(const TokenContext &t) {
+    return MSVtorDispAttr::from(t.as_attribute());
   }
 
   MSVtorDispMode vtor_disp_mode(void) const;

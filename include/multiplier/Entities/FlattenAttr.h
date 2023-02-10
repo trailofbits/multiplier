@@ -36,6 +36,7 @@ class FlattenAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<FlattenAttr> in(const Fragment &frag);
+  static gap::generator<FlattenAttr> in(const File &file);
   static gap::generator<FlattenAttr> in(const Index &index);
   static gap::generator<FlattenAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class FlattenAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FLATTEN;
-  }
-
-  inline static std::optional<FlattenAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<FlattenAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<FlattenAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<FlattenAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return FlattenAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FlattenAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class FlattenAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FlattenAttr> from(const Reference &r) {
+    return FlattenAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<FlattenAttr> from(const TokenContext &t) {
+    return FlattenAttr::from(t.as_attribute());
   }
 
 };

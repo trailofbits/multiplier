@@ -38,6 +38,7 @@ class SwitchStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<SwitchStmt> in(const Fragment &frag);
+  static gap::generator<SwitchStmt> in(const File &file);
   static gap::generator<SwitchStmt> in(const Index &index);
   static gap::generator<SwitchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,14 +57,6 @@ class SwitchStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SwitchStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SwitchStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<SwitchStmt> from(const Stmt &parent);
 
   inline static std::optional<SwitchStmt> from(const std::optional<Stmt> &parent) {
@@ -72,6 +65,14 @@ class SwitchStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwitchStmt> from(const Reference &r) {
+    return SwitchStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<SwitchStmt> from(const TokenContext &t) {
+    return SwitchStmt::from(t.as_statement());
   }
 
   Stmt body(void) const;

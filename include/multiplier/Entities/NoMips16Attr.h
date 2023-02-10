@@ -36,6 +36,7 @@ class NoMips16Attr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoMips16Attr> in(const Fragment &frag);
+  static gap::generator<NoMips16Attr> in(const File &file);
   static gap::generator<NoMips16Attr> in(const Index &index);
   static gap::generator<NoMips16Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoMips16Attr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_MIPS16;
-  }
-
-  inline static std::optional<NoMips16Attr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoMips16Attr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoMips16Attr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoMips16Attr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoMips16Attr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoMips16Attr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoMips16Attr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoMips16Attr> from(const Reference &r) {
+    return NoMips16Attr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoMips16Attr> from(const TokenContext &t) {
+    return NoMips16Attr::from(t.as_attribute());
   }
 
 };

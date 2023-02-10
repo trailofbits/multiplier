@@ -37,6 +37,7 @@ class IBOutletCollectionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<IBOutletCollectionAttr> in(const Fragment &frag);
+  static gap::generator<IBOutletCollectionAttr> in(const File &file);
   static gap::generator<IBOutletCollectionAttr> in(const Index &index);
   static gap::generator<IBOutletCollectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class IBOutletCollectionAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_OUTLET_COLLECTION;
-  }
-
-  inline static std::optional<IBOutletCollectionAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<IBOutletCollectionAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<IBOutletCollectionAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<IBOutletCollectionAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return IBOutletCollectionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<IBOutletCollectionAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class IBOutletCollectionAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<IBOutletCollectionAttr> from(const Reference &r) {
+    return IBOutletCollectionAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<IBOutletCollectionAttr> from(const TokenContext &t) {
+    return IBOutletCollectionAttr::from(t.as_attribute());
   }
 
   Type interface(void) const;

@@ -39,6 +39,7 @@ class UnaryOperator : public Expr {
   friend class Stmt;
  public:
   static gap::generator<UnaryOperator> in(const Fragment &frag);
+  static gap::generator<UnaryOperator> in(const File &file);
   static gap::generator<UnaryOperator> in(const Index &index);
   static gap::generator<UnaryOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class UnaryOperator : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<UnaryOperator> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<UnaryOperator> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<UnaryOperator> from(const Expr &parent);
-
-  inline static std::optional<UnaryOperator> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return UnaryOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnaryOperator> from(const ValueStmt &parent);
-
-  inline static std::optional<UnaryOperator> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return UnaryOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UnaryOperator> from(const Stmt &parent);
 
   inline static std::optional<UnaryOperator> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class UnaryOperator : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnaryOperator> from(const Reference &r) {
+    return UnaryOperator::from(r.as_statement());
+  }
+
+  inline static std::optional<UnaryOperator> from(const TokenContext &t) {
+    return UnaryOperator::from(t.as_statement());
   }
 
   bool can_overflow(void) const;

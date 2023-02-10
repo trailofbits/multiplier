@@ -36,6 +36,7 @@ class UninitializedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<UninitializedAttr> in(const Fragment &frag);
+  static gap::generator<UninitializedAttr> in(const File &file);
   static gap::generator<UninitializedAttr> in(const Index &index);
   static gap::generator<UninitializedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class UninitializedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UNINITIALIZED;
-  }
-
-  inline static std::optional<UninitializedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<UninitializedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<UninitializedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<UninitializedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return UninitializedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<UninitializedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class UninitializedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UninitializedAttr> from(const Reference &r) {
+    return UninitializedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<UninitializedAttr> from(const TokenContext &t) {
+    return UninitializedAttr::from(t.as_attribute());
   }
 
 };

@@ -39,6 +39,7 @@ class BinaryOperator : public Expr {
   friend class Stmt;
  public:
   static gap::generator<BinaryOperator> in(const Fragment &frag);
+  static gap::generator<BinaryOperator> in(const File &file);
   static gap::generator<BinaryOperator> in(const Index &index);
   static gap::generator<BinaryOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class BinaryOperator : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<BinaryOperator> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<BinaryOperator> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<BinaryOperator> from(const Expr &parent);
-
-  inline static std::optional<BinaryOperator> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return BinaryOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BinaryOperator> from(const ValueStmt &parent);
-
-  inline static std::optional<BinaryOperator> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return BinaryOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<BinaryOperator> from(const Stmt &parent);
 
   inline static std::optional<BinaryOperator> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class BinaryOperator : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BinaryOperator> from(const Reference &r) {
+    return BinaryOperator::from(r.as_statement());
+  }
+
+  inline static std::optional<BinaryOperator> from(const TokenContext &t) {
+    return BinaryOperator::from(t.as_statement());
   }
 
   Expr lhs(void) const;

@@ -34,18 +34,11 @@ class DeducedType : public Type {
   friend class Type;
  public:
   static gap::generator<DeducedType> in(const Fragment &frag);
+  static gap::generator<DeducedType> in(const File &file);
   static gap::generator<DeducedType> in(const Index &index);
   static gap::generator<DeducedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DeducedType> by_id(const Index &, EntityId);
-
-  inline static std::optional<DeducedType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DeducedType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
 
   static std::optional<DeducedType> from(const Type &parent);
 
@@ -55,6 +48,14 @@ class DeducedType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DeducedType> from(const Reference &r) {
+    return DeducedType::from(r.as_type());
+  }
+
+  inline static std::optional<DeducedType> from(const TokenContext &t) {
+    return DeducedType::from(t.as_type());
   }
 
   Type desugar(void) const;

@@ -41,6 +41,7 @@ class UserDefinedLiteral : public CallExpr {
   friend class Stmt;
  public:
   static gap::generator<UserDefinedLiteral> in(const Fragment &frag);
+  static gap::generator<UserDefinedLiteral> in(const File &file);
   static gap::generator<UserDefinedLiteral> in(const Index &index);
   static gap::generator<UserDefinedLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class UserDefinedLiteral : public CallExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<UserDefinedLiteral> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<UserDefinedLiteral> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<UserDefinedLiteral> from(const CallExpr &parent);
-
-  inline static std::optional<UserDefinedLiteral> from(const std::optional<CallExpr> &parent) {
-    if (parent) {
-      return UserDefinedLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UserDefinedLiteral> from(const Expr &parent);
-
-  inline static std::optional<UserDefinedLiteral> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return UserDefinedLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UserDefinedLiteral> from(const ValueStmt &parent);
-
-  inline static std::optional<UserDefinedLiteral> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return UserDefinedLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UserDefinedLiteral> from(const Stmt &parent);
 
   inline static std::optional<UserDefinedLiteral> from(const std::optional<Stmt> &parent) {
@@ -105,6 +68,14 @@ class UserDefinedLiteral : public CallExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UserDefinedLiteral> from(const Reference &r) {
+    return UserDefinedLiteral::from(r.as_statement());
+  }
+
+  inline static std::optional<UserDefinedLiteral> from(const TokenContext &t) {
+    return UserDefinedLiteral::from(t.as_statement());
   }
 
   Expr cooked_literal(void) const;

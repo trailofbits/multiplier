@@ -37,6 +37,7 @@ class PcsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PcsAttr> in(const Fragment &frag);
+  static gap::generator<PcsAttr> in(const File &file);
   static gap::generator<PcsAttr> in(const Index &index);
   static gap::generator<PcsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class PcsAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PCS;
-  }
-
-  inline static std::optional<PcsAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PcsAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PcsAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PcsAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PcsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PcsAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class PcsAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PcsAttr> from(const Reference &r) {
+    return PcsAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PcsAttr> from(const TokenContext &t) {
+    return PcsAttr::from(t.as_attribute());
   }
 
   PcsAttrPCSType pcs(void) const;

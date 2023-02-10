@@ -34,6 +34,7 @@ class AdjustedType : public Type {
   friend class Type;
  public:
   static gap::generator<AdjustedType> in(const Fragment &frag);
+  static gap::generator<AdjustedType> in(const File &file);
   static gap::generator<AdjustedType> in(const Index &index);
   static gap::generator<AdjustedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class AdjustedType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ADJUSTED;
-  }
-
-  inline static std::optional<AdjustedType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<AdjustedType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<AdjustedType> from(const Type &parent);
@@ -59,6 +52,14 @@ class AdjustedType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AdjustedType> from(const Reference &r) {
+    return AdjustedType::from(r.as_type());
+  }
+
+  inline static std::optional<AdjustedType> from(const TokenContext &t) {
+    return AdjustedType::from(t.as_type());
   }
 
   Type desugar(void) const;

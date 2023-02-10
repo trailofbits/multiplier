@@ -36,6 +36,7 @@ class FlagEnumAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<FlagEnumAttr> in(const Fragment &frag);
+  static gap::generator<FlagEnumAttr> in(const File &file);
   static gap::generator<FlagEnumAttr> in(const Index &index);
   static gap::generator<FlagEnumAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class FlagEnumAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FLAG_ENUM;
-  }
-
-  inline static std::optional<FlagEnumAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<FlagEnumAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<FlagEnumAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<FlagEnumAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return FlagEnumAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FlagEnumAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class FlagEnumAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FlagEnumAttr> from(const Reference &r) {
+    return FlagEnumAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<FlagEnumAttr> from(const TokenContext &t) {
+    return FlagEnumAttr::from(t.as_attribute());
   }
 
 };

@@ -39,6 +39,7 @@ class DesignatedInitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<DesignatedInitExpr> in(const Fragment &frag);
+  static gap::generator<DesignatedInitExpr> in(const File &file);
   static gap::generator<DesignatedInitExpr> in(const Index &index);
   static gap::generator<DesignatedInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class DesignatedInitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<DesignatedInitExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<DesignatedInitExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<DesignatedInitExpr> from(const Expr &parent);
-
-  inline static std::optional<DesignatedInitExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return DesignatedInitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<DesignatedInitExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<DesignatedInitExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return DesignatedInitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<DesignatedInitExpr> from(const Stmt &parent);
 
   inline static std::optional<DesignatedInitExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class DesignatedInitExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DesignatedInitExpr> from(const Reference &r) {
+    return DesignatedInitExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<DesignatedInitExpr> from(const TokenContext &t) {
+    return DesignatedInitExpr::from(t.as_statement());
   }
 
   std::optional<Designator> nth_designator(unsigned n) const;

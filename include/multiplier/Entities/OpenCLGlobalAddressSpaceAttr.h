@@ -37,6 +37,7 @@ class OpenCLGlobalAddressSpaceAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const File &file);
   static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGlobalAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class OpenCLGlobalAddressSpaceAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GLOBAL_ADDRESS_SPACE;
-  }
-
-  inline static std::optional<OpenCLGlobalAddressSpaceAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLGlobalAddressSpaceAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OpenCLGlobalAddressSpaceAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<OpenCLGlobalAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return OpenCLGlobalAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OpenCLGlobalAddressSpaceAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class OpenCLGlobalAddressSpaceAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OpenCLGlobalAddressSpaceAttr> from(const Reference &r) {
+    return OpenCLGlobalAddressSpaceAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OpenCLGlobalAddressSpaceAttr> from(const TokenContext &t) {
+    return OpenCLGlobalAddressSpaceAttr::from(t.as_attribute());
   }
 
   OpenCLGlobalAddressSpaceAttrSpelling semantic_spelling(void) const;

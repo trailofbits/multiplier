@@ -34,6 +34,7 @@ class NoBuiltinAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<NoBuiltinAttr> in(const Fragment &frag);
+  static gap::generator<NoBuiltinAttr> in(const File &file);
   static gap::generator<NoBuiltinAttr> in(const Index &index);
   static gap::generator<NoBuiltinAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class NoBuiltinAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_BUILTIN;
-  }
-
-  inline static std::optional<NoBuiltinAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoBuiltinAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<NoBuiltinAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class NoBuiltinAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoBuiltinAttr> from(const Reference &r) {
+    return NoBuiltinAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoBuiltinAttr> from(const TokenContext &t) {
+    return NoBuiltinAttr::from(t.as_attribute());
   }
 
 };

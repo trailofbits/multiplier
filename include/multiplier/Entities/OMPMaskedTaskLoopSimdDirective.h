@@ -40,6 +40,7 @@ class OMPMaskedTaskLoopSimdDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPMaskedTaskLoopSimdDirective> in(const Fragment &frag);
+  static gap::generator<OMPMaskedTaskLoopSimdDirective> in(const File &file);
   static gap::generator<OMPMaskedTaskLoopSimdDirective> in(const Index &index);
   static gap::generator<OMPMaskedTaskLoopSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPMaskedTaskLoopSimdDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPMaskedTaskLoopSimdDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPMaskedTaskLoopSimdDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPMaskedTaskLoopSimdDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPMaskedTaskLoopSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPMaskedTaskLoopSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPMaskedTaskLoopSimdDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPMaskedTaskLoopSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPMaskedTaskLoopSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPMaskedTaskLoopSimdDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPMaskedTaskLoopSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPMaskedTaskLoopSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPMaskedTaskLoopSimdDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPMaskedTaskLoopSimdDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPMaskedTaskLoopSimdDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPMaskedTaskLoopSimdDirective> from(const Reference &r) {
+    return OMPMaskedTaskLoopSimdDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPMaskedTaskLoopSimdDirective> from(const TokenContext &t) {
+    return OMPMaskedTaskLoopSimdDirective::from(t.as_statement());
   }
 
 };

@@ -36,6 +36,7 @@ class ExtVectorType : public VectorType {
   friend class Type;
  public:
   static gap::generator<ExtVectorType> in(const Fragment &frag);
+  static gap::generator<ExtVectorType> in(const File &file);
   static gap::generator<ExtVectorType> in(const Index &index);
   static gap::generator<ExtVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ExtVectorType : public VectorType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::EXT_VECTOR;
-  }
-
-  inline static std::optional<ExtVectorType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ExtVectorType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<ExtVectorType> from(const VectorType &parent);
-
-  inline static std::optional<ExtVectorType> from(const std::optional<VectorType> &parent) {
-    if (parent) {
-      return ExtVectorType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ExtVectorType> from(const Type &parent);
@@ -71,6 +54,14 @@ class ExtVectorType : public VectorType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ExtVectorType> from(const Reference &r) {
+    return ExtVectorType::from(r.as_type());
+  }
+
+  inline static std::optional<ExtVectorType> from(const TokenContext &t) {
+    return ExtVectorType::from(t.as_type());
   }
 
 };

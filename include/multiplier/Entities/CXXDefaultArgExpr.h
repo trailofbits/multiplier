@@ -39,6 +39,7 @@ class CXXDefaultArgExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXDefaultArgExpr> in(const Fragment &frag);
+  static gap::generator<CXXDefaultArgExpr> in(const File &file);
   static gap::generator<CXXDefaultArgExpr> in(const Index &index);
   static gap::generator<CXXDefaultArgExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class CXXDefaultArgExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXDefaultArgExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXDefaultArgExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXDefaultArgExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXDefaultArgExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXDefaultArgExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXDefaultArgExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXDefaultArgExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXDefaultArgExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXDefaultArgExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXDefaultArgExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class CXXDefaultArgExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXDefaultArgExpr> from(const Reference &r) {
+    return CXXDefaultArgExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXDefaultArgExpr> from(const TokenContext &t) {
+    return CXXDefaultArgExpr::from(t.as_statement());
   }
 
   Expr expression(void) const;

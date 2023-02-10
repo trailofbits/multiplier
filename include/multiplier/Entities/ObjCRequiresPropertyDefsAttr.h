@@ -36,6 +36,7 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Fragment &frag);
+  static gap::generator<ObjCRequiresPropertyDefsAttr> in(const File &file);
   static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Index &index);
   static gap::generator<ObjCRequiresPropertyDefsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFS;
-  }
-
-  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCRequiresPropertyDefsAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCRequiresPropertyDefsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCRequiresPropertyDefsAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const Reference &r) {
+    return ObjCRequiresPropertyDefsAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const TokenContext &t) {
+    return ObjCRequiresPropertyDefsAttr::from(t.as_attribute());
   }
 
 };

@@ -34,6 +34,7 @@ class ObjCClassStubAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCClassStubAttr> in(const Fragment &frag);
+  static gap::generator<ObjCClassStubAttr> in(const File &file);
   static gap::generator<ObjCClassStubAttr> in(const Index &index);
   static gap::generator<ObjCClassStubAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ObjCClassStubAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_CLASS_STUB;
-  }
-
-  inline static std::optional<ObjCClassStubAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCClassStubAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCClassStubAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ObjCClassStubAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCClassStubAttr> from(const Reference &r) {
+    return ObjCClassStubAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCClassStubAttr> from(const TokenContext &t) {
+    return ObjCClassStubAttr::from(t.as_attribute());
   }
 
 };

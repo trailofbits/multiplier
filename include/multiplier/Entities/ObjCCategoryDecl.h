@@ -43,6 +43,7 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCCategoryDecl> in(const Fragment &frag);
+  static gap::generator<ObjCCategoryDecl> in(const File &file);
   static gap::generator<ObjCCategoryDecl> in(const Index &index);
   static gap::generator<ObjCCategoryDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -62,34 +63,6 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCCategoryDecl> redeclarations(void) const;
-  inline static std::optional<ObjCCategoryDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCCategoryDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCCategoryDecl> from(const ObjCContainerDecl &parent);
-
-  inline static std::optional<ObjCCategoryDecl> from(const std::optional<ObjCContainerDecl> &parent) {
-    if (parent) {
-      return ObjCCategoryDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCCategoryDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCCategoryDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCCategoryDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCCategoryDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCCategoryDecl> from(const std::optional<Decl> &parent) {
@@ -98,6 +71,14 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCCategoryDecl> from(const Reference &r) {
+    return ObjCCategoryDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCCategoryDecl> from(const TokenContext &t) {
+    return ObjCCategoryDecl::from(t.as_declaration());
   }
 
   bool is_class_extension(void) const;

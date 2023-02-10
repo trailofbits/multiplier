@@ -34,6 +34,7 @@ class OverloadableAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<OverloadableAttr> in(const Fragment &frag);
+  static gap::generator<OverloadableAttr> in(const File &file);
   static gap::generator<OverloadableAttr> in(const Index &index);
   static gap::generator<OverloadableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class OverloadableAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OVERLOADABLE;
-  }
-
-  inline static std::optional<OverloadableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OverloadableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<OverloadableAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class OverloadableAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OverloadableAttr> from(const Reference &r) {
+    return OverloadableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OverloadableAttr> from(const TokenContext &t) {
+    return OverloadableAttr::from(t.as_attribute());
   }
 
 };

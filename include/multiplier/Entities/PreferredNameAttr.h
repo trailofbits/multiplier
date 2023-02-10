@@ -37,6 +37,7 @@ class PreferredNameAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PreferredNameAttr> in(const Fragment &frag);
+  static gap::generator<PreferredNameAttr> in(const File &file);
   static gap::generator<PreferredNameAttr> in(const Index &index);
   static gap::generator<PreferredNameAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class PreferredNameAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PREFERRED_NAME;
-  }
-
-  inline static std::optional<PreferredNameAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PreferredNameAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PreferredNameAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PreferredNameAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PreferredNameAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PreferredNameAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class PreferredNameAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PreferredNameAttr> from(const Reference &r) {
+    return PreferredNameAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PreferredNameAttr> from(const TokenContext &t) {
+    return PreferredNameAttr::from(t.as_attribute());
   }
 
   Type typedef_type(void) const;

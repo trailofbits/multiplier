@@ -34,6 +34,7 @@ class BitIntType : public Type {
   friend class Type;
  public:
   static gap::generator<BitIntType> in(const Fragment &frag);
+  static gap::generator<BitIntType> in(const File &file);
   static gap::generator<BitIntType> in(const Index &index);
   static gap::generator<BitIntType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class BitIntType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BIT_INT;
-  }
-
-  inline static std::optional<BitIntType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<BitIntType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<BitIntType> from(const Type &parent);
@@ -59,6 +52,14 @@ class BitIntType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BitIntType> from(const Reference &r) {
+    return BitIntType::from(r.as_type());
+  }
+
+  inline static std::optional<BitIntType> from(const TokenContext &t) {
+    return BitIntType::from(t.as_type());
   }
 
   Type desugar(void) const;

@@ -36,6 +36,7 @@ class ScopedLockableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ScopedLockableAttr> in(const Fragment &frag);
+  static gap::generator<ScopedLockableAttr> in(const File &file);
   static gap::generator<ScopedLockableAttr> in(const Index &index);
   static gap::generator<ScopedLockableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ScopedLockableAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SCOPED_LOCKABLE;
-  }
-
-  inline static std::optional<ScopedLockableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ScopedLockableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ScopedLockableAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ScopedLockableAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ScopedLockableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ScopedLockableAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ScopedLockableAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ScopedLockableAttr> from(const Reference &r) {
+    return ScopedLockableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ScopedLockableAttr> from(const TokenContext &t) {
+    return ScopedLockableAttr::from(t.as_attribute());
   }
 
 };

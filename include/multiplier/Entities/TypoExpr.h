@@ -38,6 +38,7 @@ class TypoExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<TypoExpr> in(const Fragment &frag);
+  static gap::generator<TypoExpr> in(const File &file);
   static gap::generator<TypoExpr> in(const Index &index);
   static gap::generator<TypoExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class TypoExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<TypoExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<TypoExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<TypoExpr> from(const Expr &parent);
-
-  inline static std::optional<TypoExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return TypoExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypoExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<TypoExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return TypoExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<TypoExpr> from(const Stmt &parent);
 
   inline static std::optional<TypoExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class TypoExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypoExpr> from(const Reference &r) {
+    return TypoExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<TypoExpr> from(const TokenContext &t) {
+    return TypoExpr::from(t.as_statement());
   }
 
 };

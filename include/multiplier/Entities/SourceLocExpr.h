@@ -39,6 +39,7 @@ class SourceLocExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<SourceLocExpr> in(const Fragment &frag);
+  static gap::generator<SourceLocExpr> in(const File &file);
   static gap::generator<SourceLocExpr> in(const Index &index);
   static gap::generator<SourceLocExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class SourceLocExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SourceLocExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SourceLocExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<SourceLocExpr> from(const Expr &parent);
-
-  inline static std::optional<SourceLocExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return SourceLocExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<SourceLocExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<SourceLocExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return SourceLocExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<SourceLocExpr> from(const Stmt &parent);
 
   inline static std::optional<SourceLocExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class SourceLocExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SourceLocExpr> from(const Reference &r) {
+    return SourceLocExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<SourceLocExpr> from(const TokenContext &t) {
+    return SourceLocExpr::from(t.as_statement());
   }
 
   std::string_view builtin_string(void) const;

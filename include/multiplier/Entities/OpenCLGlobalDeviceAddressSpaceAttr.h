@@ -36,6 +36,7 @@ class OpenCLGlobalDeviceAddressSpaceAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<OpenCLGlobalDeviceAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLGlobalDeviceAddressSpaceAttr> in(const File &file);
   static gap::generator<OpenCLGlobalDeviceAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGlobalDeviceAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class OpenCLGlobalDeviceAddressSpaceAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;
-  }
-
-  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return OpenCLGlobalDeviceAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class OpenCLGlobalDeviceAddressSpaceAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const Reference &r) {
+    return OpenCLGlobalDeviceAddressSpaceAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const TokenContext &t) {
+    return OpenCLGlobalDeviceAddressSpaceAttr::from(t.as_attribute());
   }
 
 };

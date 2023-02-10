@@ -38,6 +38,7 @@ class OMPAllocateDeclAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OMPAllocateDeclAttr> in(const Fragment &frag);
+  static gap::generator<OMPAllocateDeclAttr> in(const File &file);
   static gap::generator<OMPAllocateDeclAttr> in(const Index &index);
   static gap::generator<OMPAllocateDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,24 +46,6 @@ class OMPAllocateDeclAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_ALLOCATE_DECL;
-  }
-
-  inline static std::optional<OMPAllocateDeclAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OMPAllocateDeclAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OMPAllocateDeclAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OMPAllocateDeclAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OMPAllocateDeclAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OMPAllocateDeclAttr> from(const Attr &parent);
@@ -73,6 +56,14 @@ class OMPAllocateDeclAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPAllocateDeclAttr> from(const Reference &r) {
+    return OMPAllocateDeclAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OMPAllocateDeclAttr> from(const TokenContext &t) {
+    return OMPAllocateDeclAttr::from(t.as_attribute());
   }
 
   Expr alignment(void) const;

@@ -37,6 +37,7 @@ class CaseStmt : public SwitchCase {
   friend class Stmt;
  public:
   static gap::generator<CaseStmt> in(const Fragment &frag);
+  static gap::generator<CaseStmt> in(const File &file);
   static gap::generator<CaseStmt> in(const Index &index);
   static gap::generator<CaseStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class CaseStmt : public SwitchCase {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CaseStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CaseStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CaseStmt> from(const SwitchCase &parent);
-
-  inline static std::optional<CaseStmt> from(const std::optional<SwitchCase> &parent) {
-    if (parent) {
-      return CaseStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CaseStmt> from(const Stmt &parent);
 
   inline static std::optional<CaseStmt> from(const std::optional<Stmt> &parent) {
@@ -81,6 +64,14 @@ class CaseStmt : public SwitchCase {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CaseStmt> from(const Reference &r) {
+    return CaseStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<CaseStmt> from(const TokenContext &t) {
+    return CaseStmt::from(t.as_statement());
   }
 
   bool case_statement_is_gnu_range(void) const;

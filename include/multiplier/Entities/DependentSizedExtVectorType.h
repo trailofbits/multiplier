@@ -35,6 +35,7 @@ class DependentSizedExtVectorType : public Type {
   friend class Type;
  public:
   static gap::generator<DependentSizedExtVectorType> in(const Fragment &frag);
+  static gap::generator<DependentSizedExtVectorType> in(const File &file);
   static gap::generator<DependentSizedExtVectorType> in(const Index &index);
   static gap::generator<DependentSizedExtVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class DependentSizedExtVectorType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_SIZED_EXT_VECTOR;
-  }
-
-  inline static std::optional<DependentSizedExtVectorType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DependentSizedExtVectorType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<DependentSizedExtVectorType> from(const Type &parent);
@@ -60,6 +53,14 @@ class DependentSizedExtVectorType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DependentSizedExtVectorType> from(const Reference &r) {
+    return DependentSizedExtVectorType::from(r.as_type());
+  }
+
+  inline static std::optional<DependentSizedExtVectorType> from(const TokenContext &t) {
+    return DependentSizedExtVectorType::from(t.as_type());
   }
 
   Type desugar(void) const;

@@ -36,6 +36,7 @@ class NoSpeculativeLoadHardeningAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoSpeculativeLoadHardeningAttr> in(const Fragment &frag);
+  static gap::generator<NoSpeculativeLoadHardeningAttr> in(const File &file);
   static gap::generator<NoSpeculativeLoadHardeningAttr> in(const Index &index);
   static gap::generator<NoSpeculativeLoadHardeningAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoSpeculativeLoadHardeningAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_SPECULATIVE_LOAD_HARDENING;
-  }
-
-  inline static std::optional<NoSpeculativeLoadHardeningAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoSpeculativeLoadHardeningAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoSpeculativeLoadHardeningAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoSpeculativeLoadHardeningAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoSpeculativeLoadHardeningAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoSpeculativeLoadHardeningAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoSpeculativeLoadHardeningAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoSpeculativeLoadHardeningAttr> from(const Reference &r) {
+    return NoSpeculativeLoadHardeningAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoSpeculativeLoadHardeningAttr> from(const TokenContext &t) {
+    return NoSpeculativeLoadHardeningAttr::from(t.as_attribute());
   }
 
 };

@@ -38,6 +38,7 @@ class IfMacroDirective : public ConditionalMacroDirective {
   friend class Macro;
  public:
   static gap::generator<IfMacroDirective> in(const Fragment &frag);
+  static gap::generator<IfMacroDirective> in(const File &file);
 
   static gap::generator<IfMacroDirective> in(const Index &index);
   static std::optional<IfMacroDirective> by_id(const Index &, EntityId);
@@ -52,34 +53,6 @@ class IfMacroDirective : public ConditionalMacroDirective {
   static gap::generator<IfMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<IfMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<IfMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<IfMacroDirective> from(const ConditionalMacroDirective &parent);
-
-  inline static std::optional<IfMacroDirective> from(const std::optional<ConditionalMacroDirective> &parent) {
-    if (parent) {
-      return IfMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<IfMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<IfMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return IfMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<IfMacroDirective> from(const Macro &parent);
 
   inline static std::optional<IfMacroDirective> from(const std::optional<Macro> &parent) {
@@ -88,6 +61,14 @@ class IfMacroDirective : public ConditionalMacroDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<IfMacroDirective> from(const Reference &r) {
+    return IfMacroDirective::from(r.as_macro());
+  }
+
+  inline static std::optional<IfMacroDirective> from(const TokenContext &t) {
+    return IfMacroDirective::from(t.as_macro());
   }
 
 };

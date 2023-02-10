@@ -34,6 +34,7 @@ class MacroSubstitution : public Macro {
   friend class Macro;
  public:
   static gap::generator<MacroSubstitution> in(const Fragment &frag);
+  static gap::generator<MacroSubstitution> in(const File &file);
 
   static gap::generator<MacroSubstitution> in(const Index &index);
   static std::optional<MacroSubstitution> by_id(const Index &, EntityId);
@@ -48,14 +49,6 @@ class MacroSubstitution : public Macro {
   static gap::generator<MacroSubstitution> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroSubstitution> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroSubstitution> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
   static std::optional<MacroSubstitution> from(const Macro &parent);
 
   inline static std::optional<MacroSubstitution> from(const std::optional<Macro> &parent) {
@@ -64,6 +57,14 @@ class MacroSubstitution : public Macro {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MacroSubstitution> from(const Reference &r) {
+    return MacroSubstitution::from(r.as_macro());
+  }
+
+  inline static std::optional<MacroSubstitution> from(const TokenContext &t) {
+    return MacroSubstitution::from(t.as_macro());
   }
 
   gap::generator<MacroOrToken> replacement_children(void) const;

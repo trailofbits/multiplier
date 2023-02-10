@@ -34,18 +34,11 @@ class ReferenceType : public Type {
   friend class Type;
  public:
   static gap::generator<ReferenceType> in(const Fragment &frag);
+  static gap::generator<ReferenceType> in(const File &file);
   static gap::generator<ReferenceType> in(const Index &index);
   static gap::generator<ReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ReferenceType> by_id(const Index &, EntityId);
-
-  inline static std::optional<ReferenceType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ReferenceType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
 
   static std::optional<ReferenceType> from(const Type &parent);
 
@@ -55,6 +48,14 @@ class ReferenceType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ReferenceType> from(const Reference &r) {
+    return ReferenceType::from(r.as_type());
+  }
+
+  inline static std::optional<ReferenceType> from(const TokenContext &t) {
+    return ReferenceType::from(t.as_type());
   }
 
   Type pointee_type_as_written(void) const;

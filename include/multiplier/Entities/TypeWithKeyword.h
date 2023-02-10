@@ -35,18 +35,11 @@ class TypeWithKeyword : public Type {
   friend class Type;
  public:
   static gap::generator<TypeWithKeyword> in(const Fragment &frag);
+  static gap::generator<TypeWithKeyword> in(const File &file);
   static gap::generator<TypeWithKeyword> in(const Index &index);
   static gap::generator<TypeWithKeyword> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeWithKeyword> by_id(const Index &, EntityId);
-
-  inline static std::optional<TypeWithKeyword> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TypeWithKeyword> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
 
   static std::optional<TypeWithKeyword> from(const Type &parent);
 
@@ -56,6 +49,14 @@ class TypeWithKeyword : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypeWithKeyword> from(const Reference &r) {
+    return TypeWithKeyword::from(r.as_type());
+  }
+
+  inline static std::optional<TypeWithKeyword> from(const TokenContext &t) {
+    return TypeWithKeyword::from(t.as_type());
   }
 
   ElaboratedTypeKeyword keyword(void) const;

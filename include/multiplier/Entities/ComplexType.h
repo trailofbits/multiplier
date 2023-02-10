@@ -34,6 +34,7 @@ class ComplexType : public Type {
   friend class Type;
  public:
   static gap::generator<ComplexType> in(const Fragment &frag);
+  static gap::generator<ComplexType> in(const File &file);
   static gap::generator<ComplexType> in(const Index &index);
   static gap::generator<ComplexType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ComplexType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::COMPLEX;
-  }
-
-  inline static std::optional<ComplexType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ComplexType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<ComplexType> from(const Type &parent);
@@ -59,6 +52,14 @@ class ComplexType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ComplexType> from(const Reference &r) {
+    return ComplexType::from(r.as_type());
+  }
+
+  inline static std::optional<ComplexType> from(const TokenContext &t) {
+    return ComplexType::from(t.as_type());
   }
 
   Type desugar(void) const;

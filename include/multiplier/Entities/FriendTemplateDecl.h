@@ -37,6 +37,7 @@ class FriendTemplateDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<FriendTemplateDecl> in(const Fragment &frag);
+  static gap::generator<FriendTemplateDecl> in(const File &file);
   static gap::generator<FriendTemplateDecl> in(const Index &index);
   static gap::generator<FriendTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,14 +57,6 @@ class FriendTemplateDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<FriendTemplateDecl> redeclarations(void) const;
-  inline static std::optional<FriendTemplateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<FriendTemplateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<FriendTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<FriendTemplateDecl> from(const std::optional<Decl> &parent) {
@@ -72,6 +65,14 @@ class FriendTemplateDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FriendTemplateDecl> from(const Reference &r) {
+    return FriendTemplateDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<FriendTemplateDecl> from(const TokenContext &t) {
+    return FriendTemplateDecl::from(t.as_declaration());
   }
 
   NamedDecl friend_declaration(void) const;

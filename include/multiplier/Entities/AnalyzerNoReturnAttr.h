@@ -36,6 +36,7 @@ class AnalyzerNoReturnAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AnalyzerNoReturnAttr> in(const Fragment &frag);
+  static gap::generator<AnalyzerNoReturnAttr> in(const File &file);
   static gap::generator<AnalyzerNoReturnAttr> in(const Index &index);
   static gap::generator<AnalyzerNoReturnAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AnalyzerNoReturnAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANALYZER_NO_RETURN;
-  }
-
-  inline static std::optional<AnalyzerNoReturnAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AnalyzerNoReturnAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AnalyzerNoReturnAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AnalyzerNoReturnAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AnalyzerNoReturnAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AnalyzerNoReturnAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AnalyzerNoReturnAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AnalyzerNoReturnAttr> from(const Reference &r) {
+    return AnalyzerNoReturnAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AnalyzerNoReturnAttr> from(const TokenContext &t) {
+    return AnalyzerNoReturnAttr::from(t.as_attribute());
   }
 
 };

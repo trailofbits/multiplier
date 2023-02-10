@@ -34,6 +34,7 @@ class ObjCNonLazyClassAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCNonLazyClassAttr> in(const Fragment &frag);
+  static gap::generator<ObjCNonLazyClassAttr> in(const File &file);
   static gap::generator<ObjCNonLazyClassAttr> in(const Index &index);
   static gap::generator<ObjCNonLazyClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ObjCNonLazyClassAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_NON_LAZY_CLASS;
-  }
-
-  inline static std::optional<ObjCNonLazyClassAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCNonLazyClassAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCNonLazyClassAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ObjCNonLazyClassAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCNonLazyClassAttr> from(const Reference &r) {
+    return ObjCNonLazyClassAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCNonLazyClassAttr> from(const TokenContext &t) {
+    return ObjCNonLazyClassAttr::from(t.as_attribute());
   }
 
 };

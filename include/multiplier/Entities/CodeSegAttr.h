@@ -36,6 +36,7 @@ class CodeSegAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CodeSegAttr> in(const Fragment &frag);
+  static gap::generator<CodeSegAttr> in(const File &file);
   static gap::generator<CodeSegAttr> in(const Index &index);
   static gap::generator<CodeSegAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CodeSegAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CODE_SEG;
-  }
-
-  inline static std::optional<CodeSegAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CodeSegAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CodeSegAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CodeSegAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CodeSegAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CodeSegAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CodeSegAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CodeSegAttr> from(const Reference &r) {
+    return CodeSegAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CodeSegAttr> from(const TokenContext &t) {
+    return CodeSegAttr::from(t.as_attribute());
   }
 
   std::string_view name(void) const;

@@ -35,6 +35,7 @@ class UnaryTransformType : public Type {
   friend class Type;
  public:
   static gap::generator<UnaryTransformType> in(const Fragment &frag);
+  static gap::generator<UnaryTransformType> in(const File &file);
   static gap::generator<UnaryTransformType> in(const Index &index);
   static gap::generator<UnaryTransformType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class UnaryTransformType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::UNARY_TRANSFORM;
-  }
-
-  inline static std::optional<UnaryTransformType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<UnaryTransformType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<UnaryTransformType> from(const Type &parent);
@@ -60,6 +53,14 @@ class UnaryTransformType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnaryTransformType> from(const Reference &r) {
+    return UnaryTransformType::from(r.as_type());
+  }
+
+  inline static std::optional<UnaryTransformType> from(const TokenContext &t) {
+    return UnaryTransformType::from(t.as_type());
   }
 
   Type desugar(void) const;

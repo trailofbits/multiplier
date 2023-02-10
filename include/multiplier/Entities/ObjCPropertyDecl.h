@@ -42,6 +42,7 @@ class ObjCPropertyDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCPropertyDecl> in(const Fragment &frag);
+  static gap::generator<ObjCPropertyDecl> in(const File &file);
   static gap::generator<ObjCPropertyDecl> in(const Index &index);
   static gap::generator<ObjCPropertyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -61,24 +62,6 @@ class ObjCPropertyDecl : public NamedDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCPropertyDecl> redeclarations(void) const;
-  inline static std::optional<ObjCPropertyDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCPropertyDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCPropertyDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCPropertyDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCPropertyDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCPropertyDecl> from(const std::optional<Decl> &parent) {
@@ -87,6 +70,14 @@ class ObjCPropertyDecl : public NamedDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCPropertyDecl> from(const Reference &r) {
+    return ObjCPropertyDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCPropertyDecl> from(const TokenContext &t) {
+    return ObjCPropertyDecl::from(t.as_declaration());
   }
 
   Token at_token(void) const;

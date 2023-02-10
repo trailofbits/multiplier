@@ -42,6 +42,7 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCImplementationDecl> in(const Fragment &frag);
+  static gap::generator<ObjCImplementationDecl> in(const File &file);
   static gap::generator<ObjCImplementationDecl> in(const Index &index);
   static gap::generator<ObjCImplementationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -61,44 +62,6 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCImplementationDecl> redeclarations(void) const;
-  inline static std::optional<ObjCImplementationDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCImplementationDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCImplementationDecl> from(const ObjCImplDecl &parent);
-
-  inline static std::optional<ObjCImplementationDecl> from(const std::optional<ObjCImplDecl> &parent) {
-    if (parent) {
-      return ObjCImplementationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCImplementationDecl> from(const ObjCContainerDecl &parent);
-
-  inline static std::optional<ObjCImplementationDecl> from(const std::optional<ObjCContainerDecl> &parent) {
-    if (parent) {
-      return ObjCImplementationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCImplementationDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCImplementationDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCImplementationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCImplementationDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCImplementationDecl> from(const std::optional<Decl> &parent) {
@@ -107,6 +70,14 @@ class ObjCImplementationDecl : public ObjCImplDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCImplementationDecl> from(const Reference &r) {
+    return ObjCImplementationDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCImplementationDecl> from(const TokenContext &t) {
+    return ObjCImplementationDecl::from(t.as_declaration());
   }
 
   Token instance_variable_l_brace_token(void) const;

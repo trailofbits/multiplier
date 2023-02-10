@@ -38,6 +38,7 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<UnresolvedUsingValueDecl> in(const Fragment &frag);
+  static gap::generator<UnresolvedUsingValueDecl> in(const File &file);
   static gap::generator<UnresolvedUsingValueDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<UnresolvedUsingValueDecl> redeclarations(void) const;
-  inline static std::optional<UnresolvedUsingValueDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<UnresolvedUsingValueDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return UnresolvedUsingValueDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedUsingValueDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return UnresolvedUsingValueDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UnresolvedUsingValueDecl> from(const Decl &parent);
 
   inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<Decl> &parent) {
@@ -93,6 +66,14 @@ class UnresolvedUsingValueDecl : public ValueDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnresolvedUsingValueDecl> from(const Reference &r) {
+    return UnresolvedUsingValueDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &t) {
+    return UnresolvedUsingValueDecl::from(t.as_declaration());
   }
 
   Token ellipsis_token(void) const;

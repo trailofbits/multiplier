@@ -36,6 +36,7 @@ class DefaultStmt : public SwitchCase {
   friend class Stmt;
  public:
   static gap::generator<DefaultStmt> in(const Fragment &frag);
+  static gap::generator<DefaultStmt> in(const File &file);
   static gap::generator<DefaultStmt> in(const Index &index);
   static gap::generator<DefaultStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class DefaultStmt : public SwitchCase {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<DefaultStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<DefaultStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<DefaultStmt> from(const SwitchCase &parent);
-
-  inline static std::optional<DefaultStmt> from(const std::optional<SwitchCase> &parent) {
-    if (parent) {
-      return DefaultStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<DefaultStmt> from(const Stmt &parent);
 
   inline static std::optional<DefaultStmt> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class DefaultStmt : public SwitchCase {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DefaultStmt> from(const Reference &r) {
+    return DefaultStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<DefaultStmt> from(const TokenContext &t) {
+    return DefaultStmt::from(t.as_statement());
   }
 
   Token default_token(void) const;

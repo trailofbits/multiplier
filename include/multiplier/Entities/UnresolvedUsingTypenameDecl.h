@@ -38,6 +38,7 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   friend class Decl;
  public:
   static gap::generator<UnresolvedUsingTypenameDecl> in(const Fragment &frag);
+  static gap::generator<UnresolvedUsingTypenameDecl> in(const File &file);
   static gap::generator<UnresolvedUsingTypenameDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingTypenameDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<UnresolvedUsingTypenameDecl> redeclarations(void) const;
-  inline static std::optional<UnresolvedUsingTypenameDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<UnresolvedUsingTypenameDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<UnresolvedUsingTypenameDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<UnresolvedUsingTypenameDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return UnresolvedUsingTypenameDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedUsingTypenameDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<UnresolvedUsingTypenameDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return UnresolvedUsingTypenameDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent);
 
   inline static std::optional<UnresolvedUsingTypenameDecl> from(const std::optional<Decl> &parent) {
@@ -93,6 +66,14 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnresolvedUsingTypenameDecl> from(const Reference &r) {
+    return UnresolvedUsingTypenameDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<UnresolvedUsingTypenameDecl> from(const TokenContext &t) {
+    return UnresolvedUsingTypenameDecl::from(t.as_declaration());
   }
 
   Token ellipsis_token(void) const;

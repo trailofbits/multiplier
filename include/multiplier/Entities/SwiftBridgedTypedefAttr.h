@@ -36,6 +36,7 @@ class SwiftBridgedTypedefAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftBridgedTypedefAttr> in(const Fragment &frag);
+  static gap::generator<SwiftBridgedTypedefAttr> in(const File &file);
   static gap::generator<SwiftBridgedTypedefAttr> in(const Index &index);
   static gap::generator<SwiftBridgedTypedefAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SwiftBridgedTypedefAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_BRIDGED_TYPEDEF;
-  }
-
-  inline static std::optional<SwiftBridgedTypedefAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftBridgedTypedefAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SwiftBridgedTypedefAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SwiftBridgedTypedefAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SwiftBridgedTypedefAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SwiftBridgedTypedefAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SwiftBridgedTypedefAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftBridgedTypedefAttr> from(const Reference &r) {
+    return SwiftBridgedTypedefAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftBridgedTypedefAttr> from(const TokenContext &t) {
+    return SwiftBridgedTypedefAttr::from(t.as_attribute());
   }
 
 };

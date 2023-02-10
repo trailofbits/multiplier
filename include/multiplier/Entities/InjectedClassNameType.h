@@ -36,6 +36,7 @@ class InjectedClassNameType : public Type {
   friend class Type;
  public:
   static gap::generator<InjectedClassNameType> in(const Fragment &frag);
+  static gap::generator<InjectedClassNameType> in(const File &file);
   static gap::generator<InjectedClassNameType> in(const Index &index);
   static gap::generator<InjectedClassNameType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,14 +44,6 @@ class InjectedClassNameType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::INJECTED_CLASS_NAME;
-  }
-
-  inline static std::optional<InjectedClassNameType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<InjectedClassNameType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<InjectedClassNameType> from(const Type &parent);
@@ -61,6 +54,14 @@ class InjectedClassNameType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<InjectedClassNameType> from(const Reference &r) {
+    return InjectedClassNameType::from(r.as_type());
+  }
+
+  inline static std::optional<InjectedClassNameType> from(const TokenContext &t) {
+    return InjectedClassNameType::from(t.as_type());
   }
 
   Type desugar(void) const;

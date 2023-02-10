@@ -36,6 +36,7 @@ class AllocAlignAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AllocAlignAttr> in(const Fragment &frag);
+  static gap::generator<AllocAlignAttr> in(const File &file);
   static gap::generator<AllocAlignAttr> in(const Index &index);
   static gap::generator<AllocAlignAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AllocAlignAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALLOC_ALIGN;
-  }
-
-  inline static std::optional<AllocAlignAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AllocAlignAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AllocAlignAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AllocAlignAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AllocAlignAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AllocAlignAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AllocAlignAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AllocAlignAttr> from(const Reference &r) {
+    return AllocAlignAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AllocAlignAttr> from(const TokenContext &t) {
+    return AllocAlignAttr::from(t.as_attribute());
   }
 
 };

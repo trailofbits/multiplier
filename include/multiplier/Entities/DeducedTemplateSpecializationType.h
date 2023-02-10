@@ -36,6 +36,7 @@ class DeducedTemplateSpecializationType : public DeducedType {
   friend class Type;
  public:
   static gap::generator<DeducedTemplateSpecializationType> in(const Fragment &frag);
+  static gap::generator<DeducedTemplateSpecializationType> in(const File &file);
   static gap::generator<DeducedTemplateSpecializationType> in(const Index &index);
   static gap::generator<DeducedTemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class DeducedTemplateSpecializationType : public DeducedType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEDUCED_TEMPLATE_SPECIALIZATION;
-  }
-
-  inline static std::optional<DeducedTemplateSpecializationType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<DeducedTemplateSpecializationType> from(const DeducedType &parent);
-
-  inline static std::optional<DeducedTemplateSpecializationType> from(const std::optional<DeducedType> &parent) {
-    if (parent) {
-      return DeducedTemplateSpecializationType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DeducedTemplateSpecializationType> from(const Type &parent);
@@ -71,6 +54,14 @@ class DeducedTemplateSpecializationType : public DeducedType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DeducedTemplateSpecializationType> from(const Reference &r) {
+    return DeducedTemplateSpecializationType::from(r.as_type());
+  }
+
+  inline static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &t) {
+    return DeducedTemplateSpecializationType::from(t.as_type());
   }
 
 };

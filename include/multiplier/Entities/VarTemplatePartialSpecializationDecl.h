@@ -45,6 +45,7 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   friend class Decl;
  public:
   static gap::generator<VarTemplatePartialSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<VarTemplatePartialSpecializationDecl> in(const File &file);
   static gap::generator<VarTemplatePartialSpecializationDecl> in(const Index &index);
   static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -64,64 +65,6 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   bool contains(const Stmt &stmt);
 
   gap::generator<VarTemplatePartialSpecializationDecl> redeclarations(void) const;
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<VarTemplatePartialSpecializationDecl> from(const VarTemplateSpecializationDecl &parent);
-
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<VarTemplateSpecializationDecl> &parent) {
-    if (parent) {
-      return VarTemplatePartialSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplatePartialSpecializationDecl> from(const VarDecl &parent);
-
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<VarDecl> &parent) {
-    if (parent) {
-      return VarTemplatePartialSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplatePartialSpecializationDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return VarTemplatePartialSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplatePartialSpecializationDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return VarTemplatePartialSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplatePartialSpecializationDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return VarTemplatePartialSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<VarTemplatePartialSpecializationDecl> from(const Decl &parent);
 
   inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<Decl> &parent) {
@@ -130,6 +73,14 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const Reference &r) {
+    return VarTemplatePartialSpecializationDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &t) {
+    return VarTemplatePartialSpecializationDecl::from(t.as_declaration());
   }
 
   VarTemplatePartialSpecializationDecl instantiated_from_member(void) const;

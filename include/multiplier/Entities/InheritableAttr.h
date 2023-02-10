@@ -34,18 +34,11 @@ class InheritableAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<InheritableAttr> in(const Fragment &frag);
+  static gap::generator<InheritableAttr> in(const File &file);
   static gap::generator<InheritableAttr> in(const Index &index);
   static gap::generator<InheritableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InheritableAttr> by_id(const Index &, EntityId);
-
-  inline static std::optional<InheritableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<InheritableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
 
   static std::optional<InheritableAttr> from(const Attr &parent);
 
@@ -55,6 +48,14 @@ class InheritableAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<InheritableAttr> from(const Reference &r) {
+    return InheritableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<InheritableAttr> from(const TokenContext &t) {
+    return InheritableAttr::from(t.as_attribute());
   }
 
   bool should_inherit_even_if_already_present(void) const;

@@ -38,6 +38,7 @@ class IncludeMacroDirective : public IncludeLikeMacroDirective {
   friend class Macro;
  public:
   static gap::generator<IncludeMacroDirective> in(const Fragment &frag);
+  static gap::generator<IncludeMacroDirective> in(const File &file);
 
   static gap::generator<IncludeMacroDirective> in(const Index &index);
   static std::optional<IncludeMacroDirective> by_id(const Index &, EntityId);
@@ -52,34 +53,6 @@ class IncludeMacroDirective : public IncludeLikeMacroDirective {
   static gap::generator<IncludeMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<IncludeMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<IncludeMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<IncludeMacroDirective> from(const IncludeLikeMacroDirective &parent);
-
-  inline static std::optional<IncludeMacroDirective> from(const std::optional<IncludeLikeMacroDirective> &parent) {
-    if (parent) {
-      return IncludeMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<IncludeMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<IncludeMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return IncludeMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<IncludeMacroDirective> from(const Macro &parent);
 
   inline static std::optional<IncludeMacroDirective> from(const std::optional<Macro> &parent) {
@@ -88,6 +61,14 @@ class IncludeMacroDirective : public IncludeLikeMacroDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<IncludeMacroDirective> from(const Reference &r) {
+    return IncludeMacroDirective::from(r.as_macro());
+  }
+
+  inline static std::optional<IncludeMacroDirective> from(const TokenContext &t) {
+    return IncludeMacroDirective::from(t.as_macro());
   }
 
 };

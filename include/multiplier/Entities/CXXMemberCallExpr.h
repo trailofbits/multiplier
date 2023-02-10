@@ -43,6 +43,7 @@ class CXXMemberCallExpr : public CallExpr {
   friend class Stmt;
  public:
   static gap::generator<CXXMemberCallExpr> in(const Fragment &frag);
+  static gap::generator<CXXMemberCallExpr> in(const File &file);
   static gap::generator<CXXMemberCallExpr> in(const Index &index);
   static gap::generator<CXXMemberCallExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -61,44 +62,6 @@ class CXXMemberCallExpr : public CallExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXMemberCallExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXMemberCallExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXMemberCallExpr> from(const CallExpr &parent);
-
-  inline static std::optional<CXXMemberCallExpr> from(const std::optional<CallExpr> &parent) {
-    if (parent) {
-      return CXXMemberCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMemberCallExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXMemberCallExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXMemberCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMemberCallExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXMemberCallExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXMemberCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXMemberCallExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXMemberCallExpr> from(const std::optional<Stmt> &parent) {
@@ -107,6 +70,14 @@ class CXXMemberCallExpr : public CallExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXMemberCallExpr> from(const Reference &r) {
+    return CXXMemberCallExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXMemberCallExpr> from(const TokenContext &t) {
+    return CXXMemberCallExpr::from(t.as_statement());
   }
 
   Expr implicit_object_argument(void) const;

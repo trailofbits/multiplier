@@ -41,6 +41,7 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCCategoryImplDecl> in(const Fragment &frag);
+  static gap::generator<ObjCCategoryImplDecl> in(const File &file);
   static gap::generator<ObjCCategoryImplDecl> in(const Index &index);
   static gap::generator<ObjCCategoryImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -60,44 +61,6 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCCategoryImplDecl> redeclarations(void) const;
-  inline static std::optional<ObjCCategoryImplDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCCategoryImplDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCCategoryImplDecl> from(const ObjCImplDecl &parent);
-
-  inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<ObjCImplDecl> &parent) {
-    if (parent) {
-      return ObjCCategoryImplDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCCategoryImplDecl> from(const ObjCContainerDecl &parent);
-
-  inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<ObjCContainerDecl> &parent) {
-    if (parent) {
-      return ObjCCategoryImplDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCCategoryImplDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCCategoryImplDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCCategoryImplDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<Decl> &parent) {
@@ -106,6 +69,14 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCCategoryImplDecl> from(const Reference &r) {
+    return ObjCCategoryImplDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCCategoryImplDecl> from(const TokenContext &t) {
+    return ObjCCategoryImplDecl::from(t.as_declaration());
   }
 
   ObjCCategoryDecl category_declaration(void) const;

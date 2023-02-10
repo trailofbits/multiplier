@@ -40,6 +40,7 @@ class CXXInheritedCtorInitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXInheritedCtorInitExpr> in(const Fragment &frag);
+  static gap::generator<CXXInheritedCtorInitExpr> in(const File &file);
   static gap::generator<CXXInheritedCtorInitExpr> in(const Index &index);
   static gap::generator<CXXInheritedCtorInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class CXXInheritedCtorInitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXInheritedCtorInitExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXInheritedCtorInitExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXInheritedCtorInitExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXInheritedCtorInitExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXInheritedCtorInitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXInheritedCtorInitExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXInheritedCtorInitExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXInheritedCtorInitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXInheritedCtorInitExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXInheritedCtorInitExpr> from(const std::optional<Stmt> &parent) {
@@ -94,6 +67,14 @@ class CXXInheritedCtorInitExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXInheritedCtorInitExpr> from(const Reference &r) {
+    return CXXInheritedCtorInitExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXInheritedCtorInitExpr> from(const TokenContext &t) {
+    return CXXInheritedCtorInitExpr::from(t.as_statement());
   }
 
   bool constructs_virtual_base(void) const;

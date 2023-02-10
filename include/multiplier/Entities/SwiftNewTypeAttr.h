@@ -38,6 +38,7 @@ class SwiftNewTypeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftNewTypeAttr> in(const Fragment &frag);
+  static gap::generator<SwiftNewTypeAttr> in(const File &file);
   static gap::generator<SwiftNewTypeAttr> in(const Index &index);
   static gap::generator<SwiftNewTypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,24 +46,6 @@ class SwiftNewTypeAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_NEW_TYPE;
-  }
-
-  inline static std::optional<SwiftNewTypeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftNewTypeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SwiftNewTypeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SwiftNewTypeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SwiftNewTypeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SwiftNewTypeAttr> from(const Attr &parent);
@@ -73,6 +56,14 @@ class SwiftNewTypeAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftNewTypeAttr> from(const Reference &r) {
+    return SwiftNewTypeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftNewTypeAttr> from(const TokenContext &t) {
+    return SwiftNewTypeAttr::from(t.as_attribute());
   }
 
   SwiftNewTypeAttrNewtypeKind newtype_kind(void) const;

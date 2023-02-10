@@ -38,6 +38,7 @@ class FixedPointLiteral : public Expr {
   friend class Stmt;
  public:
   static gap::generator<FixedPointLiteral> in(const Fragment &frag);
+  static gap::generator<FixedPointLiteral> in(const File &file);
   static gap::generator<FixedPointLiteral> in(const Index &index);
   static gap::generator<FixedPointLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class FixedPointLiteral : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<FixedPointLiteral> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<FixedPointLiteral> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<FixedPointLiteral> from(const Expr &parent);
-
-  inline static std::optional<FixedPointLiteral> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return FixedPointLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<FixedPointLiteral> from(const ValueStmt &parent);
-
-  inline static std::optional<FixedPointLiteral> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return FixedPointLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<FixedPointLiteral> from(const Stmt &parent);
 
   inline static std::optional<FixedPointLiteral> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class FixedPointLiteral : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FixedPointLiteral> from(const Reference &r) {
+    return FixedPointLiteral::from(r.as_statement());
+  }
+
+  inline static std::optional<FixedPointLiteral> from(const TokenContext &t) {
+    return FixedPointLiteral::from(t.as_statement());
   }
 
   Token token(void) const;

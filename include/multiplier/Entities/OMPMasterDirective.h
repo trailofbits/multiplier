@@ -36,6 +36,7 @@ class OMPMasterDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPMasterDirective> in(const Fragment &frag);
+  static gap::generator<OMPMasterDirective> in(const File &file);
   static gap::generator<OMPMasterDirective> in(const Index &index);
   static gap::generator<OMPMasterDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class OMPMasterDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPMasterDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPMasterDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPMasterDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPMasterDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPMasterDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPMasterDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPMasterDirective> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class OMPMasterDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPMasterDirective> from(const Reference &r) {
+    return OMPMasterDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPMasterDirective> from(const TokenContext &t) {
+    return OMPMasterDirective::from(t.as_statement());
   }
 
 };

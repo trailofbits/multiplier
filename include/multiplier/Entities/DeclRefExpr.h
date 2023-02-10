@@ -41,6 +41,7 @@ class DeclRefExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<DeclRefExpr> in(const Fragment &frag);
+  static gap::generator<DeclRefExpr> in(const File &file);
   static gap::generator<DeclRefExpr> in(const Index &index);
   static gap::generator<DeclRefExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,34 +60,6 @@ class DeclRefExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<DeclRefExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<DeclRefExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<DeclRefExpr> from(const Expr &parent);
-
-  inline static std::optional<DeclRefExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return DeclRefExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<DeclRefExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<DeclRefExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return DeclRefExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<DeclRefExpr> from(const Stmt &parent);
 
   inline static std::optional<DeclRefExpr> from(const std::optional<Stmt> &parent) {
@@ -95,6 +68,14 @@ class DeclRefExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DeclRefExpr> from(const Reference &r) {
+    return DeclRefExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<DeclRefExpr> from(const TokenContext &t) {
+    return DeclRefExpr::from(t.as_statement());
   }
 
   ValueDecl declaration(void) const;

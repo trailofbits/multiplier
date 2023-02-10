@@ -37,6 +37,7 @@ class EnableIfAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<EnableIfAttr> in(const Fragment &frag);
+  static gap::generator<EnableIfAttr> in(const File &file);
   static gap::generator<EnableIfAttr> in(const Index &index);
   static gap::generator<EnableIfAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class EnableIfAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENABLE_IF;
-  }
-
-  inline static std::optional<EnableIfAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<EnableIfAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<EnableIfAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<EnableIfAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return EnableIfAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<EnableIfAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class EnableIfAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<EnableIfAttr> from(const Reference &r) {
+    return EnableIfAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<EnableIfAttr> from(const TokenContext &t) {
+    return EnableIfAttr::from(t.as_attribute());
   }
 
   Expr condition(void) const;

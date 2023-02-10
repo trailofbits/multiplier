@@ -34,6 +34,7 @@ class PackExpansionType : public Type {
   friend class Type;
  public:
   static gap::generator<PackExpansionType> in(const Fragment &frag);
+  static gap::generator<PackExpansionType> in(const File &file);
   static gap::generator<PackExpansionType> in(const Index &index);
   static gap::generator<PackExpansionType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class PackExpansionType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::PACK_EXPANSION;
-  }
-
-  inline static std::optional<PackExpansionType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<PackExpansionType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<PackExpansionType> from(const Type &parent);
@@ -59,6 +52,14 @@ class PackExpansionType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PackExpansionType> from(const Reference &r) {
+    return PackExpansionType::from(r.as_type());
+  }
+
+  inline static std::optional<PackExpansionType> from(const TokenContext &t) {
+    return PackExpansionType::from(t.as_type());
   }
 
   Type desugar(void) const;

@@ -37,6 +37,7 @@ class ReturnTypestateAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ReturnTypestateAttr> in(const Fragment &frag);
+  static gap::generator<ReturnTypestateAttr> in(const File &file);
   static gap::generator<ReturnTypestateAttr> in(const Index &index);
   static gap::generator<ReturnTypestateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ReturnTypestateAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RETURN_TYPESTATE;
-  }
-
-  inline static std::optional<ReturnTypestateAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ReturnTypestateAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ReturnTypestateAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ReturnTypestateAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ReturnTypestateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ReturnTypestateAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class ReturnTypestateAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ReturnTypestateAttr> from(const Reference &r) {
+    return ReturnTypestateAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ReturnTypestateAttr> from(const TokenContext &t) {
+    return ReturnTypestateAttr::from(t.as_attribute());
   }
 
   ReturnTypestateAttrConsumedState state(void) const;

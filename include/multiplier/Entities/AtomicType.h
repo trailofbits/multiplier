@@ -34,6 +34,7 @@ class AtomicType : public Type {
   friend class Type;
  public:
   static gap::generator<AtomicType> in(const Fragment &frag);
+  static gap::generator<AtomicType> in(const File &file);
   static gap::generator<AtomicType> in(const Index &index);
   static gap::generator<AtomicType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class AtomicType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ATOMIC;
-  }
-
-  inline static std::optional<AtomicType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<AtomicType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<AtomicType> from(const Type &parent);
@@ -59,6 +52,14 @@ class AtomicType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AtomicType> from(const Reference &r) {
+    return AtomicType::from(r.as_type());
+  }
+
+  inline static std::optional<AtomicType> from(const TokenContext &t) {
+    return AtomicType::from(t.as_type());
   }
 
   Type desugar(void) const;

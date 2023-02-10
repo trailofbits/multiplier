@@ -41,6 +41,7 @@ class OMPDistributeParallelForDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPDistributeParallelForDirective> in(const Fragment &frag);
+  static gap::generator<OMPDistributeParallelForDirective> in(const File &file);
   static gap::generator<OMPDistributeParallelForDirective> in(const Index &index);
   static gap::generator<OMPDistributeParallelForDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class OMPDistributeParallelForDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPDistributeParallelForDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPDistributeParallelForDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPDistributeParallelForDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPDistributeParallelForDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPDistributeParallelForDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPDistributeParallelForDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPDistributeParallelForDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPDistributeParallelForDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPDistributeParallelForDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPDistributeParallelForDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPDistributeParallelForDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPDistributeParallelForDirective> from(const std::optional<Stmt> &parent) {
@@ -105,6 +68,14 @@ class OMPDistributeParallelForDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPDistributeParallelForDirective> from(const Reference &r) {
+    return OMPDistributeParallelForDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPDistributeParallelForDirective> from(const TokenContext &t) {
+    return OMPDistributeParallelForDirective::from(t.as_statement());
   }
 
   Expr task_reduction_reference_expression(void) const;

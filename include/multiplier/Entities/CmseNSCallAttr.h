@@ -36,6 +36,7 @@ class CmseNSCallAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<CmseNSCallAttr> in(const Fragment &frag);
+  static gap::generator<CmseNSCallAttr> in(const File &file);
   static gap::generator<CmseNSCallAttr> in(const Index &index);
   static gap::generator<CmseNSCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CmseNSCallAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CMSE_NS_CALL;
-  }
-
-  inline static std::optional<CmseNSCallAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CmseNSCallAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CmseNSCallAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<CmseNSCallAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return CmseNSCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CmseNSCallAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CmseNSCallAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CmseNSCallAttr> from(const Reference &r) {
+    return CmseNSCallAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CmseNSCallAttr> from(const TokenContext &t) {
+    return CmseNSCallAttr::from(t.as_attribute());
   }
 
 };

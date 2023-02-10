@@ -36,6 +36,7 @@ class CoroutineBodyStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CoroutineBodyStmt> in(const Fragment &frag);
+  static gap::generator<CoroutineBodyStmt> in(const File &file);
   static gap::generator<CoroutineBodyStmt> in(const Index &index);
   static gap::generator<CoroutineBodyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class CoroutineBodyStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CoroutineBodyStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CoroutineBodyStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<CoroutineBodyStmt> from(const Stmt &parent);
 
   inline static std::optional<CoroutineBodyStmt> from(const std::optional<Stmt> &parent) {
@@ -70,6 +63,14 @@ class CoroutineBodyStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CoroutineBodyStmt> from(const Reference &r) {
+    return CoroutineBodyStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<CoroutineBodyStmt> from(const TokenContext &t) {
+    return CoroutineBodyStmt::from(t.as_statement());
   }
 
   Expr allocate(void) const;

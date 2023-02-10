@@ -36,6 +36,7 @@ class ObjCPreciseLifetimeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCPreciseLifetimeAttr> in(const Fragment &frag);
+  static gap::generator<ObjCPreciseLifetimeAttr> in(const File &file);
   static gap::generator<ObjCPreciseLifetimeAttr> in(const Index &index);
   static gap::generator<ObjCPreciseLifetimeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCPreciseLifetimeAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_PRECISE_LIFETIME;
-  }
-
-  inline static std::optional<ObjCPreciseLifetimeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCPreciseLifetimeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCPreciseLifetimeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCPreciseLifetimeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCPreciseLifetimeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCPreciseLifetimeAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCPreciseLifetimeAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCPreciseLifetimeAttr> from(const Reference &r) {
+    return ObjCPreciseLifetimeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCPreciseLifetimeAttr> from(const TokenContext &t) {
+    return ObjCPreciseLifetimeAttr::from(t.as_attribute());
   }
 
 };

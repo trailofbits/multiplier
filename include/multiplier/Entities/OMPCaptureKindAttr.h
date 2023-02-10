@@ -34,6 +34,7 @@ class OMPCaptureKindAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<OMPCaptureKindAttr> in(const Fragment &frag);
+  static gap::generator<OMPCaptureKindAttr> in(const File &file);
   static gap::generator<OMPCaptureKindAttr> in(const Index &index);
   static gap::generator<OMPCaptureKindAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class OMPCaptureKindAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_CAPTURE_KIND;
-  }
-
-  inline static std::optional<OMPCaptureKindAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OMPCaptureKindAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<OMPCaptureKindAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class OMPCaptureKindAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPCaptureKindAttr> from(const Reference &r) {
+    return OMPCaptureKindAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OMPCaptureKindAttr> from(const TokenContext &t) {
+    return OMPCaptureKindAttr::from(t.as_attribute());
   }
 
 };

@@ -40,6 +40,7 @@ class BindingDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<BindingDecl> in(const Fragment &frag);
+  static gap::generator<BindingDecl> in(const File &file);
   static gap::generator<BindingDecl> in(const Index &index);
   static gap::generator<BindingDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,34 +60,6 @@ class BindingDecl : public ValueDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<BindingDecl> redeclarations(void) const;
-  inline static std::optional<BindingDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<BindingDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<BindingDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<BindingDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return BindingDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BindingDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<BindingDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return BindingDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<BindingDecl> from(const Decl &parent);
 
   inline static std::optional<BindingDecl> from(const std::optional<Decl> &parent) {
@@ -95,6 +68,14 @@ class BindingDecl : public ValueDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BindingDecl> from(const Reference &r) {
+    return BindingDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<BindingDecl> from(const TokenContext &t) {
+    return BindingDecl::from(t.as_declaration());
   }
 
   Expr binding(void) const;

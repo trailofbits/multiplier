@@ -34,6 +34,7 @@ class SEHLeaveStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<SEHLeaveStmt> in(const Fragment &frag);
+  static gap::generator<SEHLeaveStmt> in(const File &file);
   static gap::generator<SEHLeaveStmt> in(const Index &index);
   static gap::generator<SEHLeaveStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -52,14 +53,6 @@ class SEHLeaveStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SEHLeaveStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SEHLeaveStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<SEHLeaveStmt> from(const Stmt &parent);
 
   inline static std::optional<SEHLeaveStmt> from(const std::optional<Stmt> &parent) {
@@ -68,6 +61,14 @@ class SEHLeaveStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SEHLeaveStmt> from(const Reference &r) {
+    return SEHLeaveStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<SEHLeaveStmt> from(const TokenContext &t) {
+    return SEHLeaveStmt::from(t.as_statement());
   }
 
   Token leave_token(void) const;

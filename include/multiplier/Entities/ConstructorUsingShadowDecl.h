@@ -39,6 +39,7 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   friend class Decl;
  public:
   static gap::generator<ConstructorUsingShadowDecl> in(const Fragment &frag);
+  static gap::generator<ConstructorUsingShadowDecl> in(const File &file);
   static gap::generator<ConstructorUsingShadowDecl> in(const Index &index);
   static gap::generator<ConstructorUsingShadowDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ConstructorUsingShadowDecl> redeclarations(void) const;
-  inline static std::optional<ConstructorUsingShadowDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ConstructorUsingShadowDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ConstructorUsingShadowDecl> from(const UsingShadowDecl &parent);
-
-  inline static std::optional<ConstructorUsingShadowDecl> from(const std::optional<UsingShadowDecl> &parent) {
-    if (parent) {
-      return ConstructorUsingShadowDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ConstructorUsingShadowDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ConstructorUsingShadowDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ConstructorUsingShadowDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent);
 
   inline static std::optional<ConstructorUsingShadowDecl> from(const std::optional<Decl> &parent) {
@@ -94,6 +67,14 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ConstructorUsingShadowDecl> from(const Reference &r) {
+    return ConstructorUsingShadowDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ConstructorUsingShadowDecl> from(const TokenContext &t) {
+    return ConstructorUsingShadowDecl::from(t.as_declaration());
   }
 
   bool constructs_virtual_base(void) const;

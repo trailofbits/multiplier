@@ -36,6 +36,7 @@ class ObjCIndependentClassAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCIndependentClassAttr> in(const Fragment &frag);
+  static gap::generator<ObjCIndependentClassAttr> in(const File &file);
   static gap::generator<ObjCIndependentClassAttr> in(const Index &index);
   static gap::generator<ObjCIndependentClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCIndependentClassAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_INDEPENDENT_CLASS;
-  }
-
-  inline static std::optional<ObjCIndependentClassAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCIndependentClassAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCIndependentClassAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCIndependentClassAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCIndependentClassAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCIndependentClassAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCIndependentClassAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCIndependentClassAttr> from(const Reference &r) {
+    return ObjCIndependentClassAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCIndependentClassAttr> from(const TokenContext &t) {
+    return ObjCIndependentClassAttr::from(t.as_attribute());
   }
 
 };

@@ -34,6 +34,7 @@ class ObjCNonRuntimeProtocolAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Fragment &frag);
+  static gap::generator<ObjCNonRuntimeProtocolAttr> in(const File &file);
   static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Index &index);
   static gap::generator<ObjCNonRuntimeProtocolAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ObjCNonRuntimeProtocolAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL;
-  }
-
-  inline static std::optional<ObjCNonRuntimeProtocolAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCNonRuntimeProtocolAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCNonRuntimeProtocolAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ObjCNonRuntimeProtocolAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCNonRuntimeProtocolAttr> from(const Reference &r) {
+    return ObjCNonRuntimeProtocolAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCNonRuntimeProtocolAttr> from(const TokenContext &t) {
+    return ObjCNonRuntimeProtocolAttr::from(t.as_attribute());
   }
 
 };

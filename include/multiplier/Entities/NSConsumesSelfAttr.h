@@ -36,6 +36,7 @@ class NSConsumesSelfAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NSConsumesSelfAttr> in(const Fragment &frag);
+  static gap::generator<NSConsumesSelfAttr> in(const File &file);
   static gap::generator<NSConsumesSelfAttr> in(const Index &index);
   static gap::generator<NSConsumesSelfAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NSConsumesSelfAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_CONSUMES_SELF;
-  }
-
-  inline static std::optional<NSConsumesSelfAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NSConsumesSelfAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NSConsumesSelfAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NSConsumesSelfAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NSConsumesSelfAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NSConsumesSelfAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NSConsumesSelfAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NSConsumesSelfAttr> from(const Reference &r) {
+    return NSConsumesSelfAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NSConsumesSelfAttr> from(const TokenContext &t) {
+    return NSConsumesSelfAttr::from(t.as_attribute());
   }
 
 };

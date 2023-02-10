@@ -34,6 +34,7 @@ class SwiftObjCMembersAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<SwiftObjCMembersAttr> in(const Fragment &frag);
+  static gap::generator<SwiftObjCMembersAttr> in(const File &file);
   static gap::generator<SwiftObjCMembersAttr> in(const Index &index);
   static gap::generator<SwiftObjCMembersAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class SwiftObjCMembersAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_OBJ_C_MEMBERS;
-  }
-
-  inline static std::optional<SwiftObjCMembersAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftObjCMembersAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<SwiftObjCMembersAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class SwiftObjCMembersAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftObjCMembersAttr> from(const Reference &r) {
+    return SwiftObjCMembersAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftObjCMembersAttr> from(const TokenContext &t) {
+    return SwiftObjCMembersAttr::from(t.as_attribute());
   }
 
 };

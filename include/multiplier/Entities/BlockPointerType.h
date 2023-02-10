@@ -34,6 +34,7 @@ class BlockPointerType : public Type {
   friend class Type;
  public:
   static gap::generator<BlockPointerType> in(const Fragment &frag);
+  static gap::generator<BlockPointerType> in(const File &file);
   static gap::generator<BlockPointerType> in(const Index &index);
   static gap::generator<BlockPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class BlockPointerType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BLOCK_POINTER;
-  }
-
-  inline static std::optional<BlockPointerType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<BlockPointerType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<BlockPointerType> from(const Type &parent);
@@ -59,6 +52,14 @@ class BlockPointerType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BlockPointerType> from(const Reference &r) {
+    return BlockPointerType::from(r.as_type());
+  }
+
+  inline static std::optional<BlockPointerType> from(const TokenContext &t) {
+    return BlockPointerType::from(t.as_type());
   }
 
   Type desugar(void) const;

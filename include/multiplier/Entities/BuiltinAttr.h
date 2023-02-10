@@ -36,6 +36,7 @@ class BuiltinAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<BuiltinAttr> in(const Fragment &frag);
+  static gap::generator<BuiltinAttr> in(const File &file);
   static gap::generator<BuiltinAttr> in(const Index &index);
   static gap::generator<BuiltinAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class BuiltinAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BUILTIN;
-  }
-
-  inline static std::optional<BuiltinAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<BuiltinAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<BuiltinAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<BuiltinAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return BuiltinAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<BuiltinAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class BuiltinAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BuiltinAttr> from(const Reference &r) {
+    return BuiltinAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<BuiltinAttr> from(const TokenContext &t) {
+    return BuiltinAttr::from(t.as_attribute());
   }
 
 };

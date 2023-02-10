@@ -40,6 +40,7 @@ class CUDAKernelCallExpr : public CallExpr {
   friend class Stmt;
  public:
   static gap::generator<CUDAKernelCallExpr> in(const Fragment &frag);
+  static gap::generator<CUDAKernelCallExpr> in(const File &file);
   static gap::generator<CUDAKernelCallExpr> in(const Index &index);
   static gap::generator<CUDAKernelCallExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class CUDAKernelCallExpr : public CallExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CUDAKernelCallExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CUDAKernelCallExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CUDAKernelCallExpr> from(const CallExpr &parent);
-
-  inline static std::optional<CUDAKernelCallExpr> from(const std::optional<CallExpr> &parent) {
-    if (parent) {
-      return CUDAKernelCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CUDAKernelCallExpr> from(const Expr &parent);
-
-  inline static std::optional<CUDAKernelCallExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CUDAKernelCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CUDAKernelCallExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CUDAKernelCallExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CUDAKernelCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CUDAKernelCallExpr> from(const Stmt &parent);
 
   inline static std::optional<CUDAKernelCallExpr> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class CUDAKernelCallExpr : public CallExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CUDAKernelCallExpr> from(const Reference &r) {
+    return CUDAKernelCallExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CUDAKernelCallExpr> from(const TokenContext &t) {
+    return CUDAKernelCallExpr::from(t.as_statement());
   }
 
   CallExpr config(void) const;

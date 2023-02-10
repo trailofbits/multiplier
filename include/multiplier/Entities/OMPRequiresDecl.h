@@ -36,6 +36,7 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   friend class Decl;
  public:
   static gap::generator<OMPRequiresDecl> in(const Fragment &frag);
+  static gap::generator<OMPRequiresDecl> in(const File &file);
   static gap::generator<OMPRequiresDecl> in(const Index &index);
   static gap::generator<OMPRequiresDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<OMPRequiresDecl> redeclarations(void) const;
-  inline static std::optional<OMPRequiresDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPRequiresDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<OMPRequiresDecl> from(const OMPDeclarativeDirectiveDecl &parent);
-
-  inline static std::optional<OMPRequiresDecl> from(const std::optional<OMPDeclarativeDirectiveDecl> &parent) {
-    if (parent) {
-      return OMPRequiresDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPRequiresDecl> from(const Decl &parent);
 
   inline static std::optional<OMPRequiresDecl> from(const std::optional<Decl> &parent) {
@@ -81,6 +64,14 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPRequiresDecl> from(const Reference &r) {
+    return OMPRequiresDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<OMPRequiresDecl> from(const TokenContext &t) {
+    return OMPRequiresDecl::from(t.as_declaration());
   }
 
 };

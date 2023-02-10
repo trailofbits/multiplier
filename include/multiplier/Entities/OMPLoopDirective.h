@@ -39,6 +39,7 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPLoopDirective> in(const File &file);
   static gap::generator<OMPLoopDirective> in(const Index &index);
   static gap::generator<OMPLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,34 +54,6 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPLoopDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPLoopDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPLoopDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPLoopDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPLoopDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPLoopDirective> from(const std::optional<Stmt> &parent) {
@@ -89,6 +62,14 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPLoopDirective> from(const Reference &r) {
+    return OMPLoopDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPLoopDirective> from(const TokenContext &t) {
+    return OMPLoopDirective::from(t.as_statement());
   }
 
   std::optional<Expr> nth_counter(unsigned n) const;

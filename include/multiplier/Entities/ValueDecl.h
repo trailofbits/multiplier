@@ -37,6 +37,7 @@ class ValueDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<ValueDecl> in(const Fragment &frag);
+  static gap::generator<ValueDecl> in(const File &file);
   static gap::generator<ValueDecl> in(const Index &index);
   static gap::generator<ValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -52,24 +53,6 @@ class ValueDecl : public NamedDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ValueDecl> redeclarations(void) const;
-  inline static std::optional<ValueDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ValueDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ValueDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ValueDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ValueDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ValueDecl> from(const Decl &parent);
 
   inline static std::optional<ValueDecl> from(const std::optional<Decl> &parent) {
@@ -78,6 +61,14 @@ class ValueDecl : public NamedDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ValueDecl> from(const Reference &r) {
+    return ValueDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ValueDecl> from(const TokenContext &t) {
+    return ValueDecl::from(t.as_declaration());
   }
 
   Type type(void) const;

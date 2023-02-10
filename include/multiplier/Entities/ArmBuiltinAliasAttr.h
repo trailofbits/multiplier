@@ -36,6 +36,7 @@ class ArmBuiltinAliasAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ArmBuiltinAliasAttr> in(const Fragment &frag);
+  static gap::generator<ArmBuiltinAliasAttr> in(const File &file);
   static gap::generator<ArmBuiltinAliasAttr> in(const Index &index);
   static gap::generator<ArmBuiltinAliasAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ArmBuiltinAliasAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_BUILTIN_ALIAS;
-  }
-
-  inline static std::optional<ArmBuiltinAliasAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ArmBuiltinAliasAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ArmBuiltinAliasAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ArmBuiltinAliasAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ArmBuiltinAliasAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ArmBuiltinAliasAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ArmBuiltinAliasAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ArmBuiltinAliasAttr> from(const Reference &r) {
+    return ArmBuiltinAliasAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ArmBuiltinAliasAttr> from(const TokenContext &t) {
+    return ArmBuiltinAliasAttr::from(t.as_attribute());
   }
 
 };

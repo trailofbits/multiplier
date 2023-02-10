@@ -34,6 +34,7 @@ class ObjCRuntimeNameAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCRuntimeNameAttr> in(const Fragment &frag);
+  static gap::generator<ObjCRuntimeNameAttr> in(const File &file);
   static gap::generator<ObjCRuntimeNameAttr> in(const Index &index);
   static gap::generator<ObjCRuntimeNameAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ObjCRuntimeNameAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_RUNTIME_NAME;
-  }
-
-  inline static std::optional<ObjCRuntimeNameAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCRuntimeNameAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCRuntimeNameAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ObjCRuntimeNameAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCRuntimeNameAttr> from(const Reference &r) {
+    return ObjCRuntimeNameAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCRuntimeNameAttr> from(const TokenContext &t) {
+    return ObjCRuntimeNameAttr::from(t.as_attribute());
   }
 
   std::string_view metadata_name(void) const;

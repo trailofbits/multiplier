@@ -38,6 +38,7 @@ class ObjCContainerDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCContainerDecl> in(const Fragment &frag);
+  static gap::generator<ObjCContainerDecl> in(const File &file);
   static gap::generator<ObjCContainerDecl> in(const Index &index);
   static gap::generator<ObjCContainerDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,24 +54,6 @@ class ObjCContainerDecl : public NamedDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCContainerDecl> redeclarations(void) const;
-  inline static std::optional<ObjCContainerDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCContainerDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCContainerDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCContainerDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCContainerDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCContainerDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCContainerDecl> from(const std::optional<Decl> &parent) {
@@ -79,6 +62,14 @@ class ObjCContainerDecl : public NamedDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCContainerDecl> from(const Reference &r) {
+    return ObjCContainerDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCContainerDecl> from(const TokenContext &t) {
+    return ObjCContainerDecl::from(t.as_declaration());
   }
 
   std::optional<ObjCMethodDecl> nth_class_method(unsigned n) const;

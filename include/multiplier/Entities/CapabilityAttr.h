@@ -37,6 +37,7 @@ class CapabilityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CapabilityAttr> in(const Fragment &frag);
+  static gap::generator<CapabilityAttr> in(const File &file);
   static gap::generator<CapabilityAttr> in(const Index &index);
   static gap::generator<CapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class CapabilityAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CAPABILITY;
-  }
-
-  inline static std::optional<CapabilityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CapabilityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CapabilityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CapabilityAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class CapabilityAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CapabilityAttr> from(const Reference &r) {
+    return CapabilityAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CapabilityAttr> from(const TokenContext &t) {
+    return CapabilityAttr::from(t.as_attribute());
   }
 
   std::string_view name(void) const;

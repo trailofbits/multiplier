@@ -22,6 +22,7 @@
 #include "../Token.h"
 
 #include <compare>
+
 #include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
 
@@ -49,6 +50,7 @@ class TemplateArgument {
   std::shared_ptr<const TemplateArgumentImpl> impl;
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
  public:
   TemplateArgument(TemplateArgument &&) noexcept = default;
   TemplateArgument(const TemplateArgument &) = default;

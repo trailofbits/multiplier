@@ -37,6 +37,7 @@ class TestTypestateAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TestTypestateAttr> in(const Fragment &frag);
+  static gap::generator<TestTypestateAttr> in(const File &file);
   static gap::generator<TestTypestateAttr> in(const Index &index);
   static gap::generator<TestTypestateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class TestTypestateAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TEST_TYPESTATE;
-  }
-
-  inline static std::optional<TestTypestateAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TestTypestateAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TestTypestateAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<TestTypestateAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return TestTypestateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TestTypestateAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class TestTypestateAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TestTypestateAttr> from(const Reference &r) {
+    return TestTypestateAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<TestTypestateAttr> from(const TokenContext &t) {
+    return TestTypestateAttr::from(t.as_attribute());
   }
 
   TestTypestateAttrConsumedState test_state(void) const;

@@ -37,6 +37,7 @@ class AttributedStmt : public ValueStmt {
   friend class Stmt;
  public:
   static gap::generator<AttributedStmt> in(const Fragment &frag);
+  static gap::generator<AttributedStmt> in(const File &file);
   static gap::generator<AttributedStmt> in(const Index &index);
   static gap::generator<AttributedStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class AttributedStmt : public ValueStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<AttributedStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<AttributedStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<AttributedStmt> from(const ValueStmt &parent);
-
-  inline static std::optional<AttributedStmt> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return AttributedStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<AttributedStmt> from(const Stmt &parent);
 
   inline static std::optional<AttributedStmt> from(const std::optional<Stmt> &parent) {
@@ -81,6 +64,14 @@ class AttributedStmt : public ValueStmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AttributedStmt> from(const Reference &r) {
+    return AttributedStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<AttributedStmt> from(const TokenContext &t) {
+    return AttributedStmt::from(t.as_statement());
   }
 
   Token attribute_token(void) const;

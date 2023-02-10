@@ -44,6 +44,7 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCInterfaceDecl> in(const Fragment &frag);
+  static gap::generator<ObjCInterfaceDecl> in(const File &file);
   static gap::generator<ObjCInterfaceDecl> in(const Index &index);
   static gap::generator<ObjCInterfaceDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -63,34 +64,6 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCInterfaceDecl> redeclarations(void) const;
-  inline static std::optional<ObjCInterfaceDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCInterfaceDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
-
-  inline static std::optional<ObjCInterfaceDecl> from(const std::optional<ObjCContainerDecl> &parent) {
-    if (parent) {
-      return ObjCInterfaceDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCInterfaceDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCInterfaceDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCInterfaceDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCInterfaceDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCInterfaceDecl> from(const std::optional<Decl> &parent) {
@@ -99,6 +72,14 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCInterfaceDecl> from(const Reference &r) {
+    return ObjCInterfaceDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCInterfaceDecl> from(const TokenContext &t) {
+    return ObjCInterfaceDecl::from(t.as_declaration());
   }
 
   std::optional<ObjCProtocolDecl> nth_all_referenced_protocol(unsigned n) const;

@@ -35,6 +35,7 @@ class GotoStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<GotoStmt> in(const Fragment &frag);
+  static gap::generator<GotoStmt> in(const File &file);
   static gap::generator<GotoStmt> in(const Index &index);
   static gap::generator<GotoStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class GotoStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<GotoStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<GotoStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<GotoStmt> from(const Stmt &parent);
 
   inline static std::optional<GotoStmt> from(const std::optional<Stmt> &parent) {
@@ -69,6 +62,14 @@ class GotoStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<GotoStmt> from(const Reference &r) {
+    return GotoStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<GotoStmt> from(const TokenContext &t) {
+    return GotoStmt::from(t.as_statement());
   }
 
   Token goto_token(void) const;

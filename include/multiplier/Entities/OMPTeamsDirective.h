@@ -36,6 +36,7 @@ class OMPTeamsDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTeamsDirective> in(const Fragment &frag);
+  static gap::generator<OMPTeamsDirective> in(const File &file);
   static gap::generator<OMPTeamsDirective> in(const Index &index);
   static gap::generator<OMPTeamsDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class OMPTeamsDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPTeamsDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTeamsDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPTeamsDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPTeamsDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPTeamsDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPTeamsDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPTeamsDirective> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class OMPTeamsDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPTeamsDirective> from(const Reference &r) {
+    return OMPTeamsDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPTeamsDirective> from(const TokenContext &t) {
+    return OMPTeamsDirective::from(t.as_statement());
   }
 
 };

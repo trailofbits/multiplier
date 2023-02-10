@@ -38,6 +38,7 @@ class NoMergeAttr : public DeclOrStmtAttr {
   friend class Attr;
  public:
   static gap::generator<NoMergeAttr> in(const Fragment &frag);
+  static gap::generator<NoMergeAttr> in(const File &file);
   static gap::generator<NoMergeAttr> in(const Index &index);
   static gap::generator<NoMergeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,34 +46,6 @@ class NoMergeAttr : public DeclOrStmtAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_MERGE;
-  }
-
-  inline static std::optional<NoMergeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoMergeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoMergeAttr> from(const DeclOrStmtAttr &parent);
-
-  inline static std::optional<NoMergeAttr> from(const std::optional<DeclOrStmtAttr> &parent) {
-    if (parent) {
-      return NoMergeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<NoMergeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoMergeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoMergeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoMergeAttr> from(const Attr &parent);
@@ -83,6 +56,14 @@ class NoMergeAttr : public DeclOrStmtAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoMergeAttr> from(const Reference &r) {
+    return NoMergeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoMergeAttr> from(const TokenContext &t) {
+    return NoMergeAttr::from(t.as_attribute());
   }
 
 };

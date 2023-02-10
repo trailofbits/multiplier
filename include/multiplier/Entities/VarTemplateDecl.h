@@ -40,6 +40,7 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
   friend class Decl;
  public:
   static gap::generator<VarTemplateDecl> in(const Fragment &frag);
+  static gap::generator<VarTemplateDecl> in(const File &file);
   static gap::generator<VarTemplateDecl> in(const Index &index);
   static gap::generator<VarTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<VarTemplateDecl> redeclarations(void) const;
-  inline static std::optional<VarTemplateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<VarTemplateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<VarTemplateDecl> from(const RedeclarableTemplateDecl &parent);
-
-  inline static std::optional<VarTemplateDecl> from(const std::optional<RedeclarableTemplateDecl> &parent) {
-    if (parent) {
-      return VarTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplateDecl> from(const TemplateDecl &parent);
-
-  inline static std::optional<VarTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
-    if (parent) {
-      return VarTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplateDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<VarTemplateDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return VarTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<VarTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<VarTemplateDecl> from(const std::optional<Decl> &parent) {
@@ -105,6 +68,14 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<VarTemplateDecl> from(const Reference &r) {
+    return VarTemplateDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<VarTemplateDecl> from(const TokenContext &t) {
+    return VarTemplateDecl::from(t.as_declaration());
   }
 
   bool is_this_declaration_a_definition(void) const;

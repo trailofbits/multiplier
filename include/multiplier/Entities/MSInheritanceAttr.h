@@ -38,6 +38,7 @@ class MSInheritanceAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MSInheritanceAttr> in(const Fragment &frag);
+  static gap::generator<MSInheritanceAttr> in(const File &file);
   static gap::generator<MSInheritanceAttr> in(const Index &index);
   static gap::generator<MSInheritanceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,24 +46,6 @@ class MSInheritanceAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_INHERITANCE;
-  }
-
-  inline static std::optional<MSInheritanceAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MSInheritanceAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MSInheritanceAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<MSInheritanceAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return MSInheritanceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MSInheritanceAttr> from(const Attr &parent);
@@ -73,6 +56,14 @@ class MSInheritanceAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MSInheritanceAttr> from(const Reference &r) {
+    return MSInheritanceAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<MSInheritanceAttr> from(const TokenContext &t) {
+    return MSInheritanceAttr::from(t.as_attribute());
   }
 
   bool best_case(void) const;

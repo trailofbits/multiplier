@@ -35,18 +35,11 @@ class FunctionType : public Type {
   friend class Type;
  public:
   static gap::generator<FunctionType> in(const Fragment &frag);
+  static gap::generator<FunctionType> in(const File &file);
   static gap::generator<FunctionType> in(const Index &index);
   static gap::generator<FunctionType> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<FunctionType> by_id(const Index &, EntityId);
-
-  inline static std::optional<FunctionType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<FunctionType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
 
   static std::optional<FunctionType> from(const Type &parent);
 
@@ -56,6 +49,14 @@ class FunctionType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FunctionType> from(const Reference &r) {
+    return FunctionType::from(r.as_type());
+  }
+
+  inline static std::optional<FunctionType> from(const TokenContext &t) {
+    return FunctionType::from(t.as_type());
   }
 
   CallingConv call_conv(void) const;

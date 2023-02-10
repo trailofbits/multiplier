@@ -36,6 +36,7 @@ class ObjCRootClassAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCRootClassAttr> in(const Fragment &frag);
+  static gap::generator<ObjCRootClassAttr> in(const File &file);
   static gap::generator<ObjCRootClassAttr> in(const Index &index);
   static gap::generator<ObjCRootClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCRootClassAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_ROOT_CLASS;
-  }
-
-  inline static std::optional<ObjCRootClassAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCRootClassAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCRootClassAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCRootClassAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCRootClassAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCRootClassAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCRootClassAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCRootClassAttr> from(const Reference &r) {
+    return ObjCRootClassAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCRootClassAttr> from(const TokenContext &t) {
+    return ObjCRootClassAttr::from(t.as_attribute());
   }
 
 };

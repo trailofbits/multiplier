@@ -36,6 +36,7 @@ class LValueReferenceType : public ReferenceType {
   friend class Type;
  public:
   static gap::generator<LValueReferenceType> in(const Fragment &frag);
+  static gap::generator<LValueReferenceType> in(const File &file);
   static gap::generator<LValueReferenceType> in(const Index &index);
   static gap::generator<LValueReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class LValueReferenceType : public ReferenceType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::L_VALUE_REFERENCE;
-  }
-
-  inline static std::optional<LValueReferenceType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<LValueReferenceType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<LValueReferenceType> from(const ReferenceType &parent);
-
-  inline static std::optional<LValueReferenceType> from(const std::optional<ReferenceType> &parent) {
-    if (parent) {
-      return LValueReferenceType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<LValueReferenceType> from(const Type &parent);
@@ -71,6 +54,14 @@ class LValueReferenceType : public ReferenceType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LValueReferenceType> from(const Reference &r) {
+    return LValueReferenceType::from(r.as_type());
+  }
+
+  inline static std::optional<LValueReferenceType> from(const TokenContext &t) {
+    return LValueReferenceType::from(t.as_type());
   }
 
   Type desugar(void) const;

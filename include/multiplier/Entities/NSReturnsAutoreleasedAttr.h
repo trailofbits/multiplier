@@ -36,6 +36,7 @@ class NSReturnsAutoreleasedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NSReturnsAutoreleasedAttr> in(const Fragment &frag);
+  static gap::generator<NSReturnsAutoreleasedAttr> in(const File &file);
   static gap::generator<NSReturnsAutoreleasedAttr> in(const Index &index);
   static gap::generator<NSReturnsAutoreleasedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NSReturnsAutoreleasedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_RETURNS_AUTORELEASED;
-  }
-
-  inline static std::optional<NSReturnsAutoreleasedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NSReturnsAutoreleasedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NSReturnsAutoreleasedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NSReturnsAutoreleasedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NSReturnsAutoreleasedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NSReturnsAutoreleasedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NSReturnsAutoreleasedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NSReturnsAutoreleasedAttr> from(const Reference &r) {
+    return NSReturnsAutoreleasedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NSReturnsAutoreleasedAttr> from(const TokenContext &t) {
+    return NSReturnsAutoreleasedAttr::from(t.as_attribute());
   }
 
 };

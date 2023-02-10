@@ -38,6 +38,7 @@ class RedeclarableTemplateDecl : public TemplateDecl {
   friend class Decl;
  public:
   static gap::generator<RedeclarableTemplateDecl> in(const Fragment &frag);
+  static gap::generator<RedeclarableTemplateDecl> in(const File &file);
   static gap::generator<RedeclarableTemplateDecl> in(const Index &index);
   static gap::generator<RedeclarableTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,34 +54,6 @@ class RedeclarableTemplateDecl : public TemplateDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<RedeclarableTemplateDecl> redeclarations(void) const;
-  inline static std::optional<RedeclarableTemplateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<RedeclarableTemplateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<RedeclarableTemplateDecl> from(const TemplateDecl &parent);
-
-  inline static std::optional<RedeclarableTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
-    if (parent) {
-      return RedeclarableTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<RedeclarableTemplateDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<RedeclarableTemplateDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return RedeclarableTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<RedeclarableTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<RedeclarableTemplateDecl> from(const std::optional<Decl> &parent) {
@@ -89,6 +62,14 @@ class RedeclarableTemplateDecl : public TemplateDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RedeclarableTemplateDecl> from(const Reference &r) {
+    return RedeclarableTemplateDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<RedeclarableTemplateDecl> from(const TokenContext &t) {
+    return RedeclarableTemplateDecl::from(t.as_declaration());
   }
 
   RedeclarableTemplateDecl instantiated_from_member_template(void) const;

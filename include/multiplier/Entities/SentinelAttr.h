@@ -36,6 +36,7 @@ class SentinelAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SentinelAttr> in(const Fragment &frag);
+  static gap::generator<SentinelAttr> in(const File &file);
   static gap::generator<SentinelAttr> in(const Index &index);
   static gap::generator<SentinelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SentinelAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SENTINEL;
-  }
-
-  inline static std::optional<SentinelAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SentinelAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SentinelAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SentinelAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SentinelAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SentinelAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SentinelAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SentinelAttr> from(const Reference &r) {
+    return SentinelAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SentinelAttr> from(const TokenContext &t) {
+    return SentinelAttr::from(t.as_attribute());
   }
 
 };

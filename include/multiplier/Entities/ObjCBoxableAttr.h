@@ -34,6 +34,7 @@ class ObjCBoxableAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCBoxableAttr> in(const Fragment &frag);
+  static gap::generator<ObjCBoxableAttr> in(const File &file);
   static gap::generator<ObjCBoxableAttr> in(const Index &index);
   static gap::generator<ObjCBoxableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ObjCBoxableAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_BOXABLE;
-  }
-
-  inline static std::optional<ObjCBoxableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCBoxableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCBoxableAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ObjCBoxableAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCBoxableAttr> from(const Reference &r) {
+    return ObjCBoxableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCBoxableAttr> from(const TokenContext &t) {
+    return ObjCBoxableAttr::from(t.as_attribute());
   }
 
 };

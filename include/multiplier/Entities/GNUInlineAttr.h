@@ -36,6 +36,7 @@ class GNUInlineAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<GNUInlineAttr> in(const Fragment &frag);
+  static gap::generator<GNUInlineAttr> in(const File &file);
   static gap::generator<GNUInlineAttr> in(const Index &index);
   static gap::generator<GNUInlineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class GNUInlineAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::GNU_INLINE;
-  }
-
-  inline static std::optional<GNUInlineAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<GNUInlineAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<GNUInlineAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<GNUInlineAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return GNUInlineAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<GNUInlineAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class GNUInlineAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<GNUInlineAttr> from(const Reference &r) {
+    return GNUInlineAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<GNUInlineAttr> from(const TokenContext &t) {
+    return GNUInlineAttr::from(t.as_attribute());
   }
 
 };

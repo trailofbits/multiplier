@@ -36,6 +36,7 @@ class OMPMetaDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPMetaDirective> in(const Fragment &frag);
+  static gap::generator<OMPMetaDirective> in(const File &file);
   static gap::generator<OMPMetaDirective> in(const Index &index);
   static gap::generator<OMPMetaDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class OMPMetaDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPMetaDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPMetaDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPMetaDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPMetaDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPMetaDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPMetaDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPMetaDirective> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class OMPMetaDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPMetaDirective> from(const Reference &r) {
+    return OMPMetaDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPMetaDirective> from(const TokenContext &t) {
+    return OMPMetaDirective::from(t.as_statement());
   }
 
   Stmt if_statement(void) const;

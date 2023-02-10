@@ -39,6 +39,7 @@ class TemplateTypeParmDecl : public TypeDecl {
   friend class Decl;
  public:
   static gap::generator<TemplateTypeParmDecl> in(const Fragment &frag);
+  static gap::generator<TemplateTypeParmDecl> in(const File &file);
   static gap::generator<TemplateTypeParmDecl> in(const Index &index);
   static gap::generator<TemplateTypeParmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class TemplateTypeParmDecl : public TypeDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<TemplateTypeParmDecl> redeclarations(void) const;
-  inline static std::optional<TemplateTypeParmDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TemplateTypeParmDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TemplateTypeParmDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<TemplateTypeParmDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return TemplateTypeParmDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TemplateTypeParmDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TemplateTypeParmDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TemplateTypeParmDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<TemplateTypeParmDecl> from(const Decl &parent);
 
   inline static std::optional<TemplateTypeParmDecl> from(const std::optional<Decl> &parent) {
@@ -94,6 +67,14 @@ class TemplateTypeParmDecl : public TypeDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TemplateTypeParmDecl> from(const Reference &r) {
+    return TemplateTypeParmDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<TemplateTypeParmDecl> from(const TokenContext &t) {
+    return TemplateTypeParmDecl::from(t.as_declaration());
   }
 
   bool default_argument_was_inherited(void) const;

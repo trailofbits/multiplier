@@ -36,6 +36,7 @@ class ObjCNSObjectAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCNSObjectAttr> in(const Fragment &frag);
+  static gap::generator<ObjCNSObjectAttr> in(const File &file);
   static gap::generator<ObjCNSObjectAttr> in(const Index &index);
   static gap::generator<ObjCNSObjectAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCNSObjectAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_CNS_OBJECT;
-  }
-
-  inline static std::optional<ObjCNSObjectAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCNSObjectAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCNSObjectAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCNSObjectAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCNSObjectAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCNSObjectAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCNSObjectAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCNSObjectAttr> from(const Reference &r) {
+    return ObjCNSObjectAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCNSObjectAttr> from(const TokenContext &t) {
+    return ObjCNSObjectAttr::from(t.as_attribute());
   }
 
 };

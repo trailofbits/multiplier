@@ -38,6 +38,7 @@ class CarriesDependencyAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<CarriesDependencyAttr> in(const Fragment &frag);
+  static gap::generator<CarriesDependencyAttr> in(const File &file);
   static gap::generator<CarriesDependencyAttr> in(const Index &index);
   static gap::generator<CarriesDependencyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,34 +46,6 @@ class CarriesDependencyAttr : public InheritableParamAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CARRIES_DEPENDENCY;
-  }
-
-  inline static std::optional<CarriesDependencyAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CarriesDependencyAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CarriesDependencyAttr> from(const InheritableParamAttr &parent);
-
-  inline static std::optional<CarriesDependencyAttr> from(const std::optional<InheritableParamAttr> &parent) {
-    if (parent) {
-      return CarriesDependencyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CarriesDependencyAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CarriesDependencyAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CarriesDependencyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CarriesDependencyAttr> from(const Attr &parent);
@@ -83,6 +56,14 @@ class CarriesDependencyAttr : public InheritableParamAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CarriesDependencyAttr> from(const Reference &r) {
+    return CarriesDependencyAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CarriesDependencyAttr> from(const TokenContext &t) {
+    return CarriesDependencyAttr::from(t.as_attribute());
   }
 
 };

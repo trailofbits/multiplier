@@ -36,6 +36,7 @@ class IBActionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<IBActionAttr> in(const Fragment &frag);
+  static gap::generator<IBActionAttr> in(const File &file);
   static gap::generator<IBActionAttr> in(const Index &index);
   static gap::generator<IBActionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class IBActionAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_ACTION;
-  }
-
-  inline static std::optional<IBActionAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<IBActionAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<IBActionAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<IBActionAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return IBActionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<IBActionAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class IBActionAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<IBActionAttr> from(const Reference &r) {
+    return IBActionAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<IBActionAttr> from(const TokenContext &t) {
+    return IBActionAttr::from(t.as_attribute());
   }
 
 };

@@ -36,6 +36,7 @@ class NoInstrumentFunctionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoInstrumentFunctionAttr> in(const Fragment &frag);
+  static gap::generator<NoInstrumentFunctionAttr> in(const File &file);
   static gap::generator<NoInstrumentFunctionAttr> in(const Index &index);
   static gap::generator<NoInstrumentFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoInstrumentFunctionAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_INSTRUMENT_FUNCTION;
-  }
-
-  inline static std::optional<NoInstrumentFunctionAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoInstrumentFunctionAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoInstrumentFunctionAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoInstrumentFunctionAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoInstrumentFunctionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoInstrumentFunctionAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoInstrumentFunctionAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoInstrumentFunctionAttr> from(const Reference &r) {
+    return NoInstrumentFunctionAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoInstrumentFunctionAttr> from(const TokenContext &t) {
+    return NoInstrumentFunctionAttr::from(t.as_attribute());
   }
 
 };

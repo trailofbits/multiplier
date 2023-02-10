@@ -40,6 +40,7 @@ class ExprWithCleanups : public FullExpr {
   friend class Stmt;
  public:
   static gap::generator<ExprWithCleanups> in(const Fragment &frag);
+  static gap::generator<ExprWithCleanups> in(const File &file);
   static gap::generator<ExprWithCleanups> in(const Index &index);
   static gap::generator<ExprWithCleanups> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class ExprWithCleanups : public FullExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ExprWithCleanups> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ExprWithCleanups> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ExprWithCleanups> from(const FullExpr &parent);
-
-  inline static std::optional<ExprWithCleanups> from(const std::optional<FullExpr> &parent) {
-    if (parent) {
-      return ExprWithCleanups::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ExprWithCleanups> from(const Expr &parent);
-
-  inline static std::optional<ExprWithCleanups> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ExprWithCleanups::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ExprWithCleanups> from(const ValueStmt &parent);
-
-  inline static std::optional<ExprWithCleanups> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ExprWithCleanups::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ExprWithCleanups> from(const Stmt &parent);
 
   inline static std::optional<ExprWithCleanups> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class ExprWithCleanups : public FullExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ExprWithCleanups> from(const Reference &r) {
+    return ExprWithCleanups::from(r.as_statement());
+  }
+
+  inline static std::optional<ExprWithCleanups> from(const TokenContext &t) {
+    return ExprWithCleanups::from(t.as_statement());
   }
 
   bool cleanups_have_side_effects(void) const;

@@ -43,6 +43,7 @@ class FieldDecl : public DeclaratorDecl {
   friend class Decl;
  public:
   static gap::generator<FieldDecl> in(const Fragment &frag);
+  static gap::generator<FieldDecl> in(const File &file);
   static gap::generator<FieldDecl> in(const Index &index);
   static gap::generator<FieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -62,44 +63,6 @@ class FieldDecl : public DeclaratorDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<FieldDecl> redeclarations(void) const;
-  inline static std::optional<FieldDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<FieldDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<FieldDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<FieldDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return FieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<FieldDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<FieldDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return FieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<FieldDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<FieldDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return FieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<FieldDecl> from(const Decl &parent);
 
   inline static std::optional<FieldDecl> from(const std::optional<Decl> &parent) {
@@ -108,6 +71,14 @@ class FieldDecl : public DeclaratorDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FieldDecl> from(const Reference &r) {
+    return FieldDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<FieldDecl> from(const TokenContext &t) {
+    return FieldDecl::from(t.as_declaration());
   }
 
   std::optional<Expr> bit_width(void) const;

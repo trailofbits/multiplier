@@ -36,6 +36,7 @@ class ObjCBridgeMutableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCBridgeMutableAttr> in(const Fragment &frag);
+  static gap::generator<ObjCBridgeMutableAttr> in(const File &file);
   static gap::generator<ObjCBridgeMutableAttr> in(const Index &index);
   static gap::generator<ObjCBridgeMutableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCBridgeMutableAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_BRIDGE_MUTABLE;
-  }
-
-  inline static std::optional<ObjCBridgeMutableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCBridgeMutableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCBridgeMutableAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCBridgeMutableAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCBridgeMutableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCBridgeMutableAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCBridgeMutableAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCBridgeMutableAttr> from(const Reference &r) {
+    return ObjCBridgeMutableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCBridgeMutableAttr> from(const TokenContext &t) {
+    return ObjCBridgeMutableAttr::from(t.as_attribute());
   }
 
 };

@@ -42,6 +42,7 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCAtDefsFieldDecl> in(const Fragment &frag);
+  static gap::generator<ObjCAtDefsFieldDecl> in(const File &file);
   static gap::generator<ObjCAtDefsFieldDecl> in(const Index &index);
   static gap::generator<ObjCAtDefsFieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -61,54 +62,6 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCAtDefsFieldDecl> redeclarations(void) const;
-  inline static std::optional<ObjCAtDefsFieldDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCAtDefsFieldDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCAtDefsFieldDecl> from(const FieldDecl &parent);
-
-  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<FieldDecl> &parent) {
-    if (parent) {
-      return ObjCAtDefsFieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCAtDefsFieldDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return ObjCAtDefsFieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCAtDefsFieldDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return ObjCAtDefsFieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCAtDefsFieldDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCAtDefsFieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCAtDefsFieldDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCAtDefsFieldDecl> from(const std::optional<Decl> &parent) {
@@ -117,6 +70,14 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCAtDefsFieldDecl> from(const Reference &r) {
+    return ObjCAtDefsFieldDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCAtDefsFieldDecl> from(const TokenContext &t) {
+    return ObjCAtDefsFieldDecl::from(t.as_declaration());
   }
 
 };

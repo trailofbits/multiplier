@@ -44,6 +44,7 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
   friend class Stmt;
  public:
   static gap::generator<CXXConstCastExpr> in(const Fragment &frag);
+  static gap::generator<CXXConstCastExpr> in(const File &file);
   static gap::generator<CXXConstCastExpr> in(const Index &index);
   static gap::generator<CXXConstCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -62,64 +63,6 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXConstCastExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXConstCastExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXConstCastExpr> from(const CXXNamedCastExpr &parent);
-
-  inline static std::optional<CXXConstCastExpr> from(const std::optional<CXXNamedCastExpr> &parent) {
-    if (parent) {
-      return CXXConstCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXConstCastExpr> from(const ExplicitCastExpr &parent);
-
-  inline static std::optional<CXXConstCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
-    if (parent) {
-      return CXXConstCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXConstCastExpr> from(const CastExpr &parent);
-
-  inline static std::optional<CXXConstCastExpr> from(const std::optional<CastExpr> &parent) {
-    if (parent) {
-      return CXXConstCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXConstCastExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXConstCastExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXConstCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXConstCastExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXConstCastExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXConstCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXConstCastExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXConstCastExpr> from(const std::optional<Stmt> &parent) {
@@ -128,6 +71,14 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXConstCastExpr> from(const Reference &r) {
+    return CXXConstCastExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXConstCastExpr> from(const TokenContext &t) {
+    return CXXConstCastExpr::from(t.as_statement());
   }
 
 };

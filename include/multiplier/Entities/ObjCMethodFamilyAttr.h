@@ -37,6 +37,7 @@ class ObjCMethodFamilyAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCMethodFamilyAttr> in(const Fragment &frag);
+  static gap::generator<ObjCMethodFamilyAttr> in(const File &file);
   static gap::generator<ObjCMethodFamilyAttr> in(const Index &index);
   static gap::generator<ObjCMethodFamilyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ObjCMethodFamilyAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_METHOD_FAMILY;
-  }
-
-  inline static std::optional<ObjCMethodFamilyAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCMethodFamilyAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCMethodFamilyAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCMethodFamilyAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCMethodFamilyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCMethodFamilyAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class ObjCMethodFamilyAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCMethodFamilyAttr> from(const Reference &r) {
+    return ObjCMethodFamilyAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCMethodFamilyAttr> from(const TokenContext &t) {
+    return ObjCMethodFamilyAttr::from(t.as_attribute());
   }
 
   ObjCMethodFamilyAttrFamilyKind family(void) const;

@@ -35,6 +35,7 @@ class ValueStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ValueStmt> in(const Fragment &frag);
+  static gap::generator<ValueStmt> in(const File &file);
   static gap::generator<ValueStmt> in(const Index &index);
   static gap::generator<ValueStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -49,14 +50,6 @@ class ValueStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ValueStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ValueStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<ValueStmt> from(const Stmt &parent);
 
   inline static std::optional<ValueStmt> from(const std::optional<Stmt> &parent) {
@@ -65,6 +58,14 @@ class ValueStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ValueStmt> from(const Reference &r) {
+    return ValueStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<ValueStmt> from(const TokenContext &t) {
+    return ValueStmt::from(t.as_statement());
   }
 
   std::optional<Expr> expression_statement(void) const;

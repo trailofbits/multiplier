@@ -35,6 +35,7 @@ class CapturedDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<CapturedDecl> in(const Fragment &frag);
+  static gap::generator<CapturedDecl> in(const File &file);
   static gap::generator<CapturedDecl> in(const Index &index);
   static gap::generator<CapturedDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class CapturedDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<CapturedDecl> redeclarations(void) const;
-  inline static std::optional<CapturedDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CapturedDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<CapturedDecl> from(const Decl &parent);
 
   inline static std::optional<CapturedDecl> from(const std::optional<Decl> &parent) {
@@ -70,6 +63,14 @@ class CapturedDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CapturedDecl> from(const Reference &r) {
+    return CapturedDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<CapturedDecl> from(const TokenContext &t) {
+    return CapturedDecl::from(t.as_declaration());
   }
 
   ImplicitParamDecl context_parameter(void) const;

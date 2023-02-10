@@ -41,6 +41,7 @@ class TagDecl : public TypeDecl {
   friend class Decl;
  public:
   static gap::generator<TagDecl> in(const Fragment &frag);
+  static gap::generator<TagDecl> in(const File &file);
   static gap::generator<TagDecl> in(const Index &index);
   static gap::generator<TagDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class TagDecl : public TypeDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<TagDecl> redeclarations(void) const;
-  inline static std::optional<TagDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TagDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TagDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<TagDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return TagDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TagDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TagDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TagDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<TagDecl> from(const Decl &parent);
 
   inline static std::optional<TagDecl> from(const std::optional<Decl> &parent) {
@@ -92,6 +65,14 @@ class TagDecl : public TypeDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TagDecl> from(const Reference &r) {
+    return TagDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<TagDecl> from(const TokenContext &t) {
+    return TagDecl::from(t.as_declaration());
   }
 
   TokenRange brace_range(void) const;

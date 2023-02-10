@@ -37,6 +37,7 @@ class PointerAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PointerAttr> in(const Fragment &frag);
+  static gap::generator<PointerAttr> in(const File &file);
   static gap::generator<PointerAttr> in(const Index &index);
   static gap::generator<PointerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class PointerAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::POINTER;
-  }
-
-  inline static std::optional<PointerAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PointerAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PointerAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PointerAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PointerAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PointerAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class PointerAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PointerAttr> from(const Reference &r) {
+    return PointerAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PointerAttr> from(const TokenContext &t) {
+    return PointerAttr::from(t.as_attribute());
   }
 
   Type deref_type(void) const;

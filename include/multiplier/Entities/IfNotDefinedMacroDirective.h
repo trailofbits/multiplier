@@ -38,6 +38,7 @@ class IfNotDefinedMacroDirective : public ConditionalMacroDirective {
   friend class Macro;
  public:
   static gap::generator<IfNotDefinedMacroDirective> in(const Fragment &frag);
+  static gap::generator<IfNotDefinedMacroDirective> in(const File &file);
 
   static gap::generator<IfNotDefinedMacroDirective> in(const Index &index);
   static std::optional<IfNotDefinedMacroDirective> by_id(const Index &, EntityId);
@@ -52,34 +53,6 @@ class IfNotDefinedMacroDirective : public ConditionalMacroDirective {
   static gap::generator<IfNotDefinedMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<IfNotDefinedMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<IfNotDefinedMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<IfNotDefinedMacroDirective> from(const ConditionalMacroDirective &parent);
-
-  inline static std::optional<IfNotDefinedMacroDirective> from(const std::optional<ConditionalMacroDirective> &parent) {
-    if (parent) {
-      return IfNotDefinedMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<IfNotDefinedMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<IfNotDefinedMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return IfNotDefinedMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<IfNotDefinedMacroDirective> from(const Macro &parent);
 
   inline static std::optional<IfNotDefinedMacroDirective> from(const std::optional<Macro> &parent) {
@@ -88,6 +61,14 @@ class IfNotDefinedMacroDirective : public ConditionalMacroDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<IfNotDefinedMacroDirective> from(const Reference &r) {
+    return IfNotDefinedMacroDirective::from(r.as_macro());
+  }
+
+  inline static std::optional<IfNotDefinedMacroDirective> from(const TokenContext &t) {
+    return IfNotDefinedMacroDirective::from(t.as_macro());
   }
 
 };

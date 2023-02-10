@@ -39,6 +39,7 @@ class ExpressionTraitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ExpressionTraitExpr> in(const Fragment &frag);
+  static gap::generator<ExpressionTraitExpr> in(const File &file);
   static gap::generator<ExpressionTraitExpr> in(const Index &index);
   static gap::generator<ExpressionTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class ExpressionTraitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ExpressionTraitExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ExpressionTraitExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ExpressionTraitExpr> from(const Expr &parent);
-
-  inline static std::optional<ExpressionTraitExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ExpressionTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ExpressionTraitExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ExpressionTraitExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ExpressionTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ExpressionTraitExpr> from(const Stmt &parent);
 
   inline static std::optional<ExpressionTraitExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class ExpressionTraitExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ExpressionTraitExpr> from(const Reference &r) {
+    return ExpressionTraitExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ExpressionTraitExpr> from(const TokenContext &t) {
+    return ExpressionTraitExpr::from(t.as_statement());
   }
 
   Expr queried_expression(void) const;

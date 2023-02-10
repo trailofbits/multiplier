@@ -36,6 +36,7 @@ class OMPFlushDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPFlushDirective> in(const Fragment &frag);
+  static gap::generator<OMPFlushDirective> in(const File &file);
   static gap::generator<OMPFlushDirective> in(const Index &index);
   static gap::generator<OMPFlushDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class OMPFlushDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPFlushDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPFlushDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPFlushDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPFlushDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPFlushDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPFlushDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPFlushDirective> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class OMPFlushDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPFlushDirective> from(const Reference &r) {
+    return OMPFlushDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPFlushDirective> from(const TokenContext &t) {
+    return OMPFlushDirective::from(t.as_statement());
   }
 
 };

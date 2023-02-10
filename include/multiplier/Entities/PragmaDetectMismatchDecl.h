@@ -34,6 +34,7 @@ class PragmaDetectMismatchDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<PragmaDetectMismatchDecl> in(const Fragment &frag);
+  static gap::generator<PragmaDetectMismatchDecl> in(const File &file);
   static gap::generator<PragmaDetectMismatchDecl> in(const Index &index);
   static gap::generator<PragmaDetectMismatchDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class PragmaDetectMismatchDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<PragmaDetectMismatchDecl> redeclarations(void) const;
-  inline static std::optional<PragmaDetectMismatchDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<PragmaDetectMismatchDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent);
 
   inline static std::optional<PragmaDetectMismatchDecl> from(const std::optional<Decl> &parent) {
@@ -69,6 +62,14 @@ class PragmaDetectMismatchDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PragmaDetectMismatchDecl> from(const Reference &r) {
+    return PragmaDetectMismatchDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<PragmaDetectMismatchDecl> from(const TokenContext &t) {
+    return PragmaDetectMismatchDecl::from(t.as_declaration());
   }
 
   std::string_view name(void) const;

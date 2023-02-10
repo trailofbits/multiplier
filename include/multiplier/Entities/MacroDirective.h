@@ -35,6 +35,7 @@ class MacroDirective : public Macro {
   friend class Macro;
  public:
   static gap::generator<MacroDirective> in(const Fragment &frag);
+  static gap::generator<MacroDirective> in(const File &file);
 
   static gap::generator<MacroDirective> in(const Index &index);
   static std::optional<MacroDirective> by_id(const Index &, EntityId);
@@ -45,14 +46,6 @@ class MacroDirective : public Macro {
   static gap::generator<MacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
   static std::optional<MacroDirective> from(const Macro &parent);
 
   inline static std::optional<MacroDirective> from(const std::optional<Macro> &parent) {
@@ -61,6 +54,14 @@ class MacroDirective : public Macro {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MacroDirective> from(const Reference &r) {
+    return MacroDirective::from(r.as_macro());
+  }
+
+  inline static std::optional<MacroDirective> from(const TokenContext &t) {
+    return MacroDirective::from(t.as_macro());
   }
 
   Token hash(void) const;

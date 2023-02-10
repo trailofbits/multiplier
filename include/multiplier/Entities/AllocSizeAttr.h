@@ -36,6 +36,7 @@ class AllocSizeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AllocSizeAttr> in(const Fragment &frag);
+  static gap::generator<AllocSizeAttr> in(const File &file);
   static gap::generator<AllocSizeAttr> in(const Index &index);
   static gap::generator<AllocSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AllocSizeAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALLOC_SIZE;
-  }
-
-  inline static std::optional<AllocSizeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AllocSizeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AllocSizeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AllocSizeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AllocSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AllocSizeAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AllocSizeAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AllocSizeAttr> from(const Reference &r) {
+    return AllocSizeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AllocSizeAttr> from(const TokenContext &t) {
+    return AllocSizeAttr::from(t.as_attribute());
   }
 
 };

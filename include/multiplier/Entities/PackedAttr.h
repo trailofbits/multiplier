@@ -36,6 +36,7 @@ class PackedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PackedAttr> in(const Fragment &frag);
+  static gap::generator<PackedAttr> in(const File &file);
   static gap::generator<PackedAttr> in(const Index &index);
   static gap::generator<PackedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class PackedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PACKED;
-  }
-
-  inline static std::optional<PackedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PackedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PackedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PackedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PackedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PackedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class PackedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PackedAttr> from(const Reference &r) {
+    return PackedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PackedAttr> from(const TokenContext &t) {
+    return PackedAttr::from(t.as_attribute());
   }
 
 };

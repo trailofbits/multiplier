@@ -39,6 +39,7 @@ class ConceptDecl : public TemplateDecl {
   friend class Decl;
  public:
   static gap::generator<ConceptDecl> in(const Fragment &frag);
+  static gap::generator<ConceptDecl> in(const File &file);
   static gap::generator<ConceptDecl> in(const Index &index);
   static gap::generator<ConceptDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class ConceptDecl : public TemplateDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ConceptDecl> redeclarations(void) const;
-  inline static std::optional<ConceptDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ConceptDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ConceptDecl> from(const TemplateDecl &parent);
-
-  inline static std::optional<ConceptDecl> from(const std::optional<TemplateDecl> &parent) {
-    if (parent) {
-      return ConceptDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ConceptDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ConceptDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ConceptDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ConceptDecl> from(const Decl &parent);
 
   inline static std::optional<ConceptDecl> from(const std::optional<Decl> &parent) {
@@ -94,6 +67,14 @@ class ConceptDecl : public TemplateDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ConceptDecl> from(const Reference &r) {
+    return ConceptDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ConceptDecl> from(const TokenContext &t) {
+    return ConceptDecl::from(t.as_declaration());
   }
 
   Expr constraint_expression(void) const;

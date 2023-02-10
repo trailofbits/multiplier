@@ -37,6 +37,7 @@ class ArgumentWithTypeTagAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ArgumentWithTypeTagAttr> in(const Fragment &frag);
+  static gap::generator<ArgumentWithTypeTagAttr> in(const File &file);
   static gap::generator<ArgumentWithTypeTagAttr> in(const Index &index);
   static gap::generator<ArgumentWithTypeTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ArgumentWithTypeTagAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARGUMENT_WITH_TYPE_TAG;
-  }
-
-  inline static std::optional<ArgumentWithTypeTagAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ArgumentWithTypeTagAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ArgumentWithTypeTagAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ArgumentWithTypeTagAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ArgumentWithTypeTagAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ArgumentWithTypeTagAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class ArgumentWithTypeTagAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ArgumentWithTypeTagAttr> from(const Reference &r) {
+    return ArgumentWithTypeTagAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ArgumentWithTypeTagAttr> from(const TokenContext &t) {
+    return ArgumentWithTypeTagAttr::from(t.as_attribute());
   }
 
   bool is_pointer(void) const;

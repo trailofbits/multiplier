@@ -40,6 +40,7 @@ class OMPForSimdDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPForSimdDirective> in(const Fragment &frag);
+  static gap::generator<OMPForSimdDirective> in(const File &file);
   static gap::generator<OMPForSimdDirective> in(const Index &index);
   static gap::generator<OMPForSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPForSimdDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPForSimdDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPForSimdDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPForSimdDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPForSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPForSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPForSimdDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPForSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPForSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPForSimdDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPForSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPForSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPForSimdDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPForSimdDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPForSimdDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPForSimdDirective> from(const Reference &r) {
+    return OMPForSimdDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPForSimdDirective> from(const TokenContext &t) {
+    return OMPForSimdDirective::from(t.as_statement());
   }
 
 };

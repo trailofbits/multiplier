@@ -68,6 +68,19 @@ static constexpr mx::BuiltinTypeKind kSignChangingKinds[][2] = {
     {mx::BuiltinTypeKind::S_CHAR, mx::BuiltinTypeKind::U_CHAR},
 };
 
+// Should we skip a result, e.g. froma `sizeof(blah)`.
+static bool ShouldSkip(const mx::Expr expr) {
+  if (auto lit = mx::IntegerLiteral::from(expr)) {
+    return !lit->token().data().starts_with('-');
+
+  // E.g. `sizeof`, `alignof`, etc.
+  } else if (mx::UnaryExprOrTypeTraitExpr::from(expr)) {
+    return true;
+
+  } else {
+    return false;
+  }
+}
 
 // Checks whether any arguments passed the provided call expression are used
 // as an implicit cast, specifically, from an unsigned long to a signed int
@@ -83,22 +96,27 @@ static constexpr mx::BuiltinTypeKind kSignChangingKinds[][2] = {
 // attempt to identify more instances of the vulnerable code pattern:
 // https://pwning.systems/posts/php_filter_var_shenanigans/
 static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
+  auto arg_index = 0u;
   for (mx::Expr argument : call_expr.arguments()) {
     if (std::optional<mx::CastExpr> cast_expr = mx::CastExpr::from(argument)) {
       if (cast_expr->cast_kind() != mx::CastKind::INTEGRAL_CAST) {
+        ++arg_index;
         continue;
       }
 
       if (auto implicit = mx::ImplicitCastExpr::from(argument)) {
         if (!FLAGS_show_implicit &&
             !(FLAGS_show_explicit && implicit->is_part_of_explicit_cast())) {
+          ++arg_index;
           continue;
         }
       } else if (mx::ExplicitCastExpr::from(argument)) {
         if (!FLAGS_show_explicit) {
+          ++arg_index;
           continue;
         }
       } else {
+        ++arg_index;
         continue;
       }
 
@@ -112,6 +130,7 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
       std::optional<mx::BuiltinType> dest_builtin =
           mx::BuiltinType::from(dest_type);
       if (!source_builtin || !dest_builtin) {
+        ++arg_index;
         continue;
       }
 
@@ -147,9 +166,17 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
       }
 
       // Didn't find.
+      ++arg_index;
       continue;
 
     found:
+
+      if (std::optional<mx::Expr> expr = mx::Expr::from(cast_expr)) {
+        if (ShouldSkip(expr->ignore_casts())) {
+          ++arg_index;
+          continue;
+        }
+      }
 
       mx::Fragment fragment = mx::Fragment::containing(call_expr);
       auto file = mx::File::containing(fragment);
@@ -182,6 +209,45 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
 
       if (FLAGS_highlight_use) {
         std::cout << std::endl;
+
+        // Print out a declaration of the function.
+        if (std::optional<mx::FunctionDecl> callee = call_expr.direct_callee()) {
+          std::cout << "Declaration:";
+          bool printed = false;
+          for (mx::FunctionDecl redecl : callee->redeclarations()) {
+            if (!redecl.is_definition()) {
+              mx::TokenRange param_toks;
+              if (auto param = redecl.nth_parameter(arg_index)) {
+                param_toks = param->tokens();
+              }
+              RenderFragment(std::cout, mx::Fragment::containing(redecl),
+                             param_toks, "\t", true);
+              printed = true;
+              break;
+            }
+          }
+
+          if (!printed) {
+            mx::TokenRange param_toks;
+            if (auto param = callee->nth_parameter(arg_index)) {
+              param_toks = param->tokens();
+            }
+
+            std::stringstream ss;
+            RenderFragment(ss, mx::Fragment::containing(*callee),
+                           param_toks, "\t", true);
+            for (char c : ss.str()) {
+              if (c == '{') {
+                std::cout << ";  // Stopped!\n";
+                break;
+              } else {
+                std::cout << c;
+              }
+            }
+          }
+          std::cout << "\nUse:";
+        }
+
         if (auto toks = call_expr.tokens()) {
           RenderFragment(std::cout, fragment, toks, "\t", true);
         }

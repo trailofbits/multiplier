@@ -35,18 +35,11 @@ class TagType : public Type {
   friend class Type;
  public:
   static gap::generator<TagType> in(const Fragment &frag);
+  static gap::generator<TagType> in(const File &file);
   static gap::generator<TagType> in(const Index &index);
   static gap::generator<TagType> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TagType> by_id(const Index &, EntityId);
-
-  inline static std::optional<TagType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TagType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
 
   static std::optional<TagType> from(const Type &parent);
 
@@ -56,6 +49,14 @@ class TagType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TagType> from(const Reference &r) {
+    return TagType::from(r.as_type());
+  }
+
+  inline static std::optional<TagType> from(const TokenContext &t) {
+    return TagType::from(t.as_type());
   }
 
   TagDecl declaration(void) const;

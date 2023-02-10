@@ -36,6 +36,7 @@ class OMPCanonicalLoop : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<OMPCanonicalLoop> in(const Fragment &frag);
+  static gap::generator<OMPCanonicalLoop> in(const File &file);
   static gap::generator<OMPCanonicalLoop> in(const Index &index);
   static gap::generator<OMPCanonicalLoop> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class OMPCanonicalLoop : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPCanonicalLoop> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPCanonicalLoop> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<OMPCanonicalLoop> from(const Stmt &parent);
 
   inline static std::optional<OMPCanonicalLoop> from(const std::optional<Stmt> &parent) {
@@ -70,6 +63,14 @@ class OMPCanonicalLoop : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPCanonicalLoop> from(const Reference &r) {
+    return OMPCanonicalLoop::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPCanonicalLoop> from(const TokenContext &t) {
+    return OMPCanonicalLoop::from(t.as_statement());
   }
 
   CapturedStmt distance_func(void) const;

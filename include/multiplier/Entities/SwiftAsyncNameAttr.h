@@ -36,6 +36,7 @@ class SwiftAsyncNameAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftAsyncNameAttr> in(const Fragment &frag);
+  static gap::generator<SwiftAsyncNameAttr> in(const File &file);
   static gap::generator<SwiftAsyncNameAttr> in(const Index &index);
   static gap::generator<SwiftAsyncNameAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SwiftAsyncNameAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ASYNC_NAME;
-  }
-
-  inline static std::optional<SwiftAsyncNameAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftAsyncNameAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SwiftAsyncNameAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SwiftAsyncNameAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SwiftAsyncNameAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SwiftAsyncNameAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SwiftAsyncNameAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftAsyncNameAttr> from(const Reference &r) {
+    return SwiftAsyncNameAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftAsyncNameAttr> from(const TokenContext &t) {
+    return SwiftAsyncNameAttr::from(t.as_attribute());
   }
 
   std::string_view name(void) const;

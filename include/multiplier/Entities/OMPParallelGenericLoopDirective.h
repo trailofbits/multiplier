@@ -40,6 +40,7 @@ class OMPParallelGenericLoopDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPParallelGenericLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPParallelGenericLoopDirective> in(const File &file);
   static gap::generator<OMPParallelGenericLoopDirective> in(const Index &index);
   static gap::generator<OMPParallelGenericLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPParallelGenericLoopDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPParallelGenericLoopDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPParallelGenericLoopDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPParallelGenericLoopDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPParallelGenericLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPParallelGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPParallelGenericLoopDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPParallelGenericLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPParallelGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPParallelGenericLoopDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPParallelGenericLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPParallelGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPParallelGenericLoopDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPParallelGenericLoopDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPParallelGenericLoopDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPParallelGenericLoopDirective> from(const Reference &r) {
+    return OMPParallelGenericLoopDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPParallelGenericLoopDirective> from(const TokenContext &t) {
+    return OMPParallelGenericLoopDirective::from(t.as_statement());
   }
 
 };

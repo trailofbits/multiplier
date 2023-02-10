@@ -36,6 +36,7 @@ class AMDGPUKernelCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AMDGPUKernelCallAttr> in(const Fragment &frag);
+  static gap::generator<AMDGPUKernelCallAttr> in(const File &file);
   static gap::generator<AMDGPUKernelCallAttr> in(const Index &index);
   static gap::generator<AMDGPUKernelCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AMDGPUKernelCallAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_KERNEL_CALL;
-  }
-
-  inline static std::optional<AMDGPUKernelCallAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AMDGPUKernelCallAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AMDGPUKernelCallAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AMDGPUKernelCallAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AMDGPUKernelCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AMDGPUKernelCallAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AMDGPUKernelCallAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AMDGPUKernelCallAttr> from(const Reference &r) {
+    return AMDGPUKernelCallAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AMDGPUKernelCallAttr> from(const TokenContext &t) {
+    return AMDGPUKernelCallAttr::from(t.as_attribute());
   }
 
 };

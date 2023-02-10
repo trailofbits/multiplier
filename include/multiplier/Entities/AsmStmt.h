@@ -35,6 +35,7 @@ class AsmStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<AsmStmt> in(const Fragment &frag);
+  static gap::generator<AsmStmt> in(const File &file);
   static gap::generator<AsmStmt> in(const Index &index);
   static gap::generator<AsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -49,14 +50,6 @@ class AsmStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<AsmStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<AsmStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<AsmStmt> from(const Stmt &parent);
 
   inline static std::optional<AsmStmt> from(const std::optional<Stmt> &parent) {
@@ -65,6 +58,14 @@ class AsmStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AsmStmt> from(const Reference &r) {
+    return AsmStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<AsmStmt> from(const TokenContext &t) {
+    return AsmStmt::from(t.as_statement());
   }
 
   std::string_view generate_assembly_string(void) const;

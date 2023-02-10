@@ -41,6 +41,7 @@ class TypeAliasDecl : public TypedefNameDecl {
   friend class Decl;
  public:
   static gap::generator<TypeAliasDecl> in(const Fragment &frag);
+  static gap::generator<TypeAliasDecl> in(const File &file);
   static gap::generator<TypeAliasDecl> in(const Index &index);
   static gap::generator<TypeAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -60,44 +61,6 @@ class TypeAliasDecl : public TypedefNameDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<TypeAliasDecl> redeclarations(void) const;
-  inline static std::optional<TypeAliasDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TypeAliasDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TypeAliasDecl> from(const TypedefNameDecl &parent);
-
-  inline static std::optional<TypeAliasDecl> from(const std::optional<TypedefNameDecl> &parent) {
-    if (parent) {
-      return TypeAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypeAliasDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<TypeAliasDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return TypeAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypeAliasDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TypeAliasDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TypeAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<TypeAliasDecl> from(const Decl &parent);
 
   inline static std::optional<TypeAliasDecl> from(const std::optional<Decl> &parent) {
@@ -106,6 +69,14 @@ class TypeAliasDecl : public TypedefNameDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypeAliasDecl> from(const Reference &r) {
+    return TypeAliasDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<TypeAliasDecl> from(const TokenContext &t) {
+    return TypeAliasDecl::from(t.as_declaration());
   }
 
   std::optional<TypeAliasTemplateDecl> described_alias_template(void) const;

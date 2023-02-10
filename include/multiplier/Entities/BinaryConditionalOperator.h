@@ -41,6 +41,7 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   friend class Stmt;
  public:
   static gap::generator<BinaryConditionalOperator> in(const Fragment &frag);
+  static gap::generator<BinaryConditionalOperator> in(const File &file);
   static gap::generator<BinaryConditionalOperator> in(const Index &index);
   static gap::generator<BinaryConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<BinaryConditionalOperator> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<BinaryConditionalOperator> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<BinaryConditionalOperator> from(const AbstractConditionalOperator &parent);
-
-  inline static std::optional<BinaryConditionalOperator> from(const std::optional<AbstractConditionalOperator> &parent) {
-    if (parent) {
-      return BinaryConditionalOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BinaryConditionalOperator> from(const Expr &parent);
-
-  inline static std::optional<BinaryConditionalOperator> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return BinaryConditionalOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BinaryConditionalOperator> from(const ValueStmt &parent);
-
-  inline static std::optional<BinaryConditionalOperator> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return BinaryConditionalOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<BinaryConditionalOperator> from(const Stmt &parent);
 
   inline static std::optional<BinaryConditionalOperator> from(const std::optional<Stmt> &parent) {
@@ -105,6 +68,14 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BinaryConditionalOperator> from(const Reference &r) {
+    return BinaryConditionalOperator::from(r.as_statement());
+  }
+
+  inline static std::optional<BinaryConditionalOperator> from(const TokenContext &t) {
+    return BinaryConditionalOperator::from(t.as_statement());
   }
 
   Expr common(void) const;

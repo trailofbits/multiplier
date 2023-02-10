@@ -15,16 +15,24 @@
 namespace mx {
 
 class EntityProvider;
-class File;
 class FileImpl;
 class FileLocationCache;
 class FileLocationCacheImpl;
-class Fragment;
 class FragmentImpl;
 class Index;
 class Reference;
 class RegexQueryMatch;
 class WeggliQueryMatch;
+
+#define MX_FORWARD_DECLARE(type_name, ln, e, c) \
+    class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE)
+#undef MX_FORWARD_DECLARE
 
 using FragmentIdList = std::vector<PackedFragmentId>;
 
@@ -71,7 +79,6 @@ class File {
   using Ptr = std::shared_ptr<const FileImpl>;
 
   friend class EntityProvider;
-  friend class Fragment;
   friend class FileLocationCache;
   friend class FileLocationCacheImpl;
   friend class FragmentImpl;
@@ -81,8 +88,17 @@ class File {
   friend class RegexQuery;
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
-  friend class Token;
   friend class WeggliQuery;
+
+#define MX_FRIEND(type_name, ln, e, c) \
+    friend class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND)
+#undef MX_FRIEND
 
   Ptr impl;
 

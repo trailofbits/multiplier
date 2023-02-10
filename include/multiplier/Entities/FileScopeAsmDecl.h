@@ -35,6 +35,7 @@ class FileScopeAsmDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<FileScopeAsmDecl> in(const Fragment &frag);
+  static gap::generator<FileScopeAsmDecl> in(const File &file);
   static gap::generator<FileScopeAsmDecl> in(const Index &index);
   static gap::generator<FileScopeAsmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class FileScopeAsmDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<FileScopeAsmDecl> redeclarations(void) const;
-  inline static std::optional<FileScopeAsmDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<FileScopeAsmDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<FileScopeAsmDecl> from(const Decl &parent);
 
   inline static std::optional<FileScopeAsmDecl> from(const std::optional<Decl> &parent) {
@@ -70,6 +63,14 @@ class FileScopeAsmDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FileScopeAsmDecl> from(const Reference &r) {
+    return FileScopeAsmDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<FileScopeAsmDecl> from(const TokenContext &t) {
+    return FileScopeAsmDecl::from(t.as_declaration());
   }
 
   Token assembly_token(void) const;

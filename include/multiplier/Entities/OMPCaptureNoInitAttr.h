@@ -36,6 +36,7 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OMPCaptureNoInitAttr> in(const Fragment &frag);
+  static gap::generator<OMPCaptureNoInitAttr> in(const File &file);
   static gap::generator<OMPCaptureNoInitAttr> in(const Index &index);
   static gap::generator<OMPCaptureNoInitAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_CAPTURE_NO_INIT;
-  }
-
-  inline static std::optional<OMPCaptureNoInitAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OMPCaptureNoInitAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OMPCaptureNoInitAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OMPCaptureNoInitAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OMPCaptureNoInitAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OMPCaptureNoInitAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPCaptureNoInitAttr> from(const Reference &r) {
+    return OMPCaptureNoInitAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OMPCaptureNoInitAttr> from(const TokenContext &t) {
+    return OMPCaptureNoInitAttr::from(t.as_attribute());
   }
 
 };

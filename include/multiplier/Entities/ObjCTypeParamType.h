@@ -35,6 +35,7 @@ class ObjCTypeParamType : public Type {
   friend class Type;
  public:
   static gap::generator<ObjCTypeParamType> in(const Fragment &frag);
+  static gap::generator<ObjCTypeParamType> in(const File &file);
   static gap::generator<ObjCTypeParamType> in(const Index &index);
   static gap::generator<ObjCTypeParamType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class ObjCTypeParamType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_TYPE_PARAM;
-  }
-
-  inline static std::optional<ObjCTypeParamType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ObjCTypeParamType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<ObjCTypeParamType> from(const Type &parent);
@@ -60,6 +53,14 @@ class ObjCTypeParamType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCTypeParamType> from(const Reference &r) {
+    return ObjCTypeParamType::from(r.as_type());
+  }
+
+  inline static std::optional<ObjCTypeParamType> from(const TokenContext &t) {
+    return ObjCTypeParamType::from(t.as_type());
   }
 
   Type desugar(void) const;

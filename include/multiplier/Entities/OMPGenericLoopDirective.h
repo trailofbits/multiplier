@@ -40,6 +40,7 @@ class OMPGenericLoopDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPGenericLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPGenericLoopDirective> in(const File &file);
   static gap::generator<OMPGenericLoopDirective> in(const Index &index);
   static gap::generator<OMPGenericLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPGenericLoopDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPGenericLoopDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPGenericLoopDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPGenericLoopDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPGenericLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPGenericLoopDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPGenericLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPGenericLoopDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPGenericLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPGenericLoopDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPGenericLoopDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPGenericLoopDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPGenericLoopDirective> from(const Reference &r) {
+    return OMPGenericLoopDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPGenericLoopDirective> from(const TokenContext &t) {
+    return OMPGenericLoopDirective::from(t.as_statement());
   }
 
 };

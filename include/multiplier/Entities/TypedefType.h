@@ -35,6 +35,7 @@ class TypedefType : public Type {
   friend class Type;
  public:
   static gap::generator<TypedefType> in(const Fragment &frag);
+  static gap::generator<TypedefType> in(const File &file);
   static gap::generator<TypedefType> in(const Index &index);
   static gap::generator<TypedefType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class TypedefType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPEDEF;
-  }
-
-  inline static std::optional<TypedefType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TypedefType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<TypedefType> from(const Type &parent);
@@ -60,6 +53,14 @@ class TypedefType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypedefType> from(const Reference &r) {
+    return TypedefType::from(r.as_type());
+  }
+
+  inline static std::optional<TypedefType> from(const TokenContext &t) {
+    return TypedefType::from(t.as_type());
   }
 
   Type desugar(void) const;

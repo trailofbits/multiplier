@@ -42,6 +42,7 @@ class OMPCapturedExprDecl : public VarDecl {
   friend class Decl;
  public:
   static gap::generator<OMPCapturedExprDecl> in(const Fragment &frag);
+  static gap::generator<OMPCapturedExprDecl> in(const File &file);
   static gap::generator<OMPCapturedExprDecl> in(const Index &index);
   static gap::generator<OMPCapturedExprDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -61,54 +62,6 @@ class OMPCapturedExprDecl : public VarDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<OMPCapturedExprDecl> redeclarations(void) const;
-  inline static std::optional<OMPCapturedExprDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPCapturedExprDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<OMPCapturedExprDecl> from(const VarDecl &parent);
-
-  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<VarDecl> &parent) {
-    if (parent) {
-      return OMPCapturedExprDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPCapturedExprDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return OMPCapturedExprDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPCapturedExprDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return OMPCapturedExprDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPCapturedExprDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<OMPCapturedExprDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return OMPCapturedExprDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPCapturedExprDecl> from(const Decl &parent);
 
   inline static std::optional<OMPCapturedExprDecl> from(const std::optional<Decl> &parent) {
@@ -117,6 +70,14 @@ class OMPCapturedExprDecl : public VarDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPCapturedExprDecl> from(const Reference &r) {
+    return OMPCapturedExprDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<OMPCapturedExprDecl> from(const TokenContext &t) {
+    return OMPCapturedExprDecl::from(t.as_declaration());
   }
 
 };

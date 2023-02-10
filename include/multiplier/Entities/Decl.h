@@ -22,6 +22,7 @@
 #include "../Token.h"
 
 #include <compare>
+
 #include "AccessSpecifier.h"
 #include "AvailabilityResult.h"
 #include "DeclCategory.h"
@@ -54,6 +55,7 @@ class Decl {
   std::shared_ptr<const DeclImpl> impl;
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
  public:
   Decl(Decl &&) noexcept = default;
   Decl(const Decl &) = default;
@@ -80,8 +82,10 @@ class Decl {
   gap::generator<Decl> redeclarations(void) const;
  public:
   static gap::generator<Decl> in(const Fragment &frag, std::span<DeclKind> kinds);
+  static gap::generator<Decl> in(const File &file, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const Index &index, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const Fragment &frag);
+  static gap::generator<Decl> in(const File &file);
   static gap::generator<Decl> in(const Index &index);
   static gap::generator<Decl> containing(const Token &tok);
   bool contains(const Token &tok) const;

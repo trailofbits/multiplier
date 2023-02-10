@@ -36,6 +36,7 @@ class NoDebugAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoDebugAttr> in(const Fragment &frag);
+  static gap::generator<NoDebugAttr> in(const File &file);
   static gap::generator<NoDebugAttr> in(const Index &index);
   static gap::generator<NoDebugAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoDebugAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DEBUG;
-  }
-
-  inline static std::optional<NoDebugAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoDebugAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoDebugAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoDebugAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoDebugAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoDebugAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoDebugAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoDebugAttr> from(const Reference &r) {
+    return NoDebugAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoDebugAttr> from(const TokenContext &t) {
+    return NoDebugAttr::from(t.as_attribute());
   }
 
 };

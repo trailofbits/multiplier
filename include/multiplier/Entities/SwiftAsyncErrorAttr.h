@@ -37,6 +37,7 @@ class SwiftAsyncErrorAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftAsyncErrorAttr> in(const Fragment &frag);
+  static gap::generator<SwiftAsyncErrorAttr> in(const File &file);
   static gap::generator<SwiftAsyncErrorAttr> in(const Index &index);
   static gap::generator<SwiftAsyncErrorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class SwiftAsyncErrorAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ASYNC_ERROR;
-  }
-
-  inline static std::optional<SwiftAsyncErrorAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftAsyncErrorAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SwiftAsyncErrorAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SwiftAsyncErrorAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SwiftAsyncErrorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SwiftAsyncErrorAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class SwiftAsyncErrorAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftAsyncErrorAttr> from(const Reference &r) {
+    return SwiftAsyncErrorAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftAsyncErrorAttr> from(const TokenContext &t) {
+    return SwiftAsyncErrorAttr::from(t.as_attribute());
   }
 
   SwiftAsyncErrorAttrConventionKind convention(void) const;

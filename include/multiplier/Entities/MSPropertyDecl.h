@@ -40,6 +40,7 @@ class MSPropertyDecl : public DeclaratorDecl {
   friend class Decl;
  public:
   static gap::generator<MSPropertyDecl> in(const Fragment &frag);
+  static gap::generator<MSPropertyDecl> in(const File &file);
   static gap::generator<MSPropertyDecl> in(const Index &index);
   static gap::generator<MSPropertyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class MSPropertyDecl : public DeclaratorDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<MSPropertyDecl> redeclarations(void) const;
-  inline static std::optional<MSPropertyDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<MSPropertyDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<MSPropertyDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<MSPropertyDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return MSPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<MSPropertyDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<MSPropertyDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return MSPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<MSPropertyDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<MSPropertyDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return MSPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MSPropertyDecl> from(const Decl &parent);
 
   inline static std::optional<MSPropertyDecl> from(const std::optional<Decl> &parent) {
@@ -105,6 +68,14 @@ class MSPropertyDecl : public DeclaratorDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MSPropertyDecl> from(const Reference &r) {
+    return MSPropertyDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<MSPropertyDecl> from(const TokenContext &t) {
+    return MSPropertyDecl::from(t.as_declaration());
   }
 
   bool has_getter(void) const;

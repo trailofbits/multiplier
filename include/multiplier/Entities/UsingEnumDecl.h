@@ -39,6 +39,7 @@ class UsingEnumDecl : public BaseUsingDecl {
   friend class Decl;
  public:
   static gap::generator<UsingEnumDecl> in(const Fragment &frag);
+  static gap::generator<UsingEnumDecl> in(const File &file);
   static gap::generator<UsingEnumDecl> in(const Index &index);
   static gap::generator<UsingEnumDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class UsingEnumDecl : public BaseUsingDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<UsingEnumDecl> redeclarations(void) const;
-  inline static std::optional<UsingEnumDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<UsingEnumDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<UsingEnumDecl> from(const BaseUsingDecl &parent);
-
-  inline static std::optional<UsingEnumDecl> from(const std::optional<BaseUsingDecl> &parent) {
-    if (parent) {
-      return UsingEnumDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UsingEnumDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<UsingEnumDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return UsingEnumDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UsingEnumDecl> from(const Decl &parent);
 
   inline static std::optional<UsingEnumDecl> from(const std::optional<Decl> &parent) {
@@ -94,6 +67,14 @@ class UsingEnumDecl : public BaseUsingDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UsingEnumDecl> from(const Reference &r) {
+    return UsingEnumDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<UsingEnumDecl> from(const TokenContext &t) {
+    return UsingEnumDecl::from(t.as_declaration());
   }
 
   EnumDecl enum_declaration(void) const;

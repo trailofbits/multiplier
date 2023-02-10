@@ -37,6 +37,7 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   friend class Decl;
  public:
   static gap::generator<OMPAllocateDecl> in(const Fragment &frag);
+  static gap::generator<OMPAllocateDecl> in(const File &file);
   static gap::generator<OMPAllocateDecl> in(const Index &index);
   static gap::generator<OMPAllocateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,24 +57,6 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<OMPAllocateDecl> redeclarations(void) const;
-  inline static std::optional<OMPAllocateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPAllocateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<OMPAllocateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
-
-  inline static std::optional<OMPAllocateDecl> from(const std::optional<OMPDeclarativeDirectiveDecl> &parent) {
-    if (parent) {
-      return OMPAllocateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPAllocateDecl> from(const Decl &parent);
 
   inline static std::optional<OMPAllocateDecl> from(const std::optional<Decl> &parent) {
@@ -82,6 +65,14 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPAllocateDecl> from(const Reference &r) {
+    return OMPAllocateDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<OMPAllocateDecl> from(const TokenContext &t) {
+    return OMPAllocateDecl::from(t.as_declaration());
   }
 
   std::optional<Expr> nth_varlist(unsigned n) const;

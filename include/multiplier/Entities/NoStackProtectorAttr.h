@@ -36,6 +36,7 @@ class NoStackProtectorAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoStackProtectorAttr> in(const Fragment &frag);
+  static gap::generator<NoStackProtectorAttr> in(const File &file);
   static gap::generator<NoStackProtectorAttr> in(const Index &index);
   static gap::generator<NoStackProtectorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoStackProtectorAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_STACK_PROTECTOR;
-  }
-
-  inline static std::optional<NoStackProtectorAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoStackProtectorAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoStackProtectorAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoStackProtectorAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoStackProtectorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoStackProtectorAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoStackProtectorAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoStackProtectorAttr> from(const Reference &r) {
+    return NoStackProtectorAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoStackProtectorAttr> from(const TokenContext &t) {
+    return NoStackProtectorAttr::from(t.as_attribute());
   }
 
 };

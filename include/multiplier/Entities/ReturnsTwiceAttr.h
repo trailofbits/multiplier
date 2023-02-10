@@ -36,6 +36,7 @@ class ReturnsTwiceAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ReturnsTwiceAttr> in(const Fragment &frag);
+  static gap::generator<ReturnsTwiceAttr> in(const File &file);
   static gap::generator<ReturnsTwiceAttr> in(const Index &index);
   static gap::generator<ReturnsTwiceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ReturnsTwiceAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RETURNS_TWICE;
-  }
-
-  inline static std::optional<ReturnsTwiceAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ReturnsTwiceAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ReturnsTwiceAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ReturnsTwiceAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ReturnsTwiceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ReturnsTwiceAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ReturnsTwiceAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ReturnsTwiceAttr> from(const Reference &r) {
+    return ReturnsTwiceAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ReturnsTwiceAttr> from(const TokenContext &t) {
+    return ReturnsTwiceAttr::from(t.as_attribute());
   }
 
 };

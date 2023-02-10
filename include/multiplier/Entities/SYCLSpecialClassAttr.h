@@ -36,6 +36,7 @@ class SYCLSpecialClassAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SYCLSpecialClassAttr> in(const Fragment &frag);
+  static gap::generator<SYCLSpecialClassAttr> in(const File &file);
   static gap::generator<SYCLSpecialClassAttr> in(const Index &index);
   static gap::generator<SYCLSpecialClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SYCLSpecialClassAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SYCL_SPECIAL_CLASS;
-  }
-
-  inline static std::optional<SYCLSpecialClassAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SYCLSpecialClassAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SYCLSpecialClassAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SYCLSpecialClassAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SYCLSpecialClassAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SYCLSpecialClassAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SYCLSpecialClassAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SYCLSpecialClassAttr> from(const Reference &r) {
+    return SYCLSpecialClassAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SYCLSpecialClassAttr> from(const TokenContext &t) {
+    return SYCLSpecialClassAttr::from(t.as_attribute());
   }
 
 };

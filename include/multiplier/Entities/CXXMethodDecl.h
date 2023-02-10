@@ -44,6 +44,7 @@ class CXXMethodDecl : public FunctionDecl {
   friend class Decl;
  public:
   static gap::generator<CXXMethodDecl> in(const Fragment &frag);
+  static gap::generator<CXXMethodDecl> in(const File &file);
   static gap::generator<CXXMethodDecl> in(const Index &index);
   static gap::generator<CXXMethodDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -63,54 +64,6 @@ class CXXMethodDecl : public FunctionDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<CXXMethodDecl> redeclarations(void) const;
-  inline static std::optional<CXXMethodDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXMethodDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<CXXMethodDecl> from(const FunctionDecl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<FunctionDecl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMethodDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMethodDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMethodDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXMethodDecl> from(const Decl &parent);
 
   inline static std::optional<CXXMethodDecl> from(const std::optional<Decl> &parent) {
@@ -119,6 +72,14 @@ class CXXMethodDecl : public FunctionDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXMethodDecl> from(const Reference &r) {
+    return CXXMethodDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<CXXMethodDecl> from(const TokenContext &t) {
+    return CXXMethodDecl::from(t.as_declaration());
   }
 
   RefQualifierKind reference_qualifier(void) const;

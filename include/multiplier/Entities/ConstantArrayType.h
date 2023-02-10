@@ -37,6 +37,7 @@ class ConstantArrayType : public ArrayType {
   friend class Type;
  public:
   static gap::generator<ConstantArrayType> in(const Fragment &frag);
+  static gap::generator<ConstantArrayType> in(const File &file);
   static gap::generator<ConstantArrayType> in(const Index &index);
   static gap::generator<ConstantArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ConstantArrayType : public ArrayType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CONSTANT_ARRAY;
-  }
-
-  inline static std::optional<ConstantArrayType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ConstantArrayType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<ConstantArrayType> from(const ArrayType &parent);
-
-  inline static std::optional<ConstantArrayType> from(const std::optional<ArrayType> &parent) {
-    if (parent) {
-      return ConstantArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ConstantArrayType> from(const Type &parent);
@@ -72,6 +55,14 @@ class ConstantArrayType : public ArrayType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ConstantArrayType> from(const Reference &r) {
+    return ConstantArrayType::from(r.as_type());
+  }
+
+  inline static std::optional<ConstantArrayType> from(const TokenContext &t) {
+    return ConstantArrayType::from(t.as_type());
   }
 
   Type desugar(void) const;

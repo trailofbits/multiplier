@@ -36,6 +36,7 @@ class SuppressAttr : public StmtAttr {
   friend class Attr;
  public:
   static gap::generator<SuppressAttr> in(const Fragment &frag);
+  static gap::generator<SuppressAttr> in(const File &file);
   static gap::generator<SuppressAttr> in(const Index &index);
   static gap::generator<SuppressAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SuppressAttr : public StmtAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SUPPRESS;
-  }
-
-  inline static std::optional<SuppressAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SuppressAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SuppressAttr> from(const StmtAttr &parent);
-
-  inline static std::optional<SuppressAttr> from(const std::optional<StmtAttr> &parent) {
-    if (parent) {
-      return SuppressAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SuppressAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SuppressAttr : public StmtAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SuppressAttr> from(const Reference &r) {
+    return SuppressAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SuppressAttr> from(const TokenContext &t) {
+    return SuppressAttr::from(t.as_attribute());
   }
 
 };

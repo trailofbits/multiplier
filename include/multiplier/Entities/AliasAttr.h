@@ -34,6 +34,7 @@ class AliasAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<AliasAttr> in(const Fragment &frag);
+  static gap::generator<AliasAttr> in(const File &file);
   static gap::generator<AliasAttr> in(const Index &index);
   static gap::generator<AliasAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class AliasAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIAS;
-  }
-
-  inline static std::optional<AliasAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AliasAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<AliasAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class AliasAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AliasAttr> from(const Reference &r) {
+    return AliasAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AliasAttr> from(const TokenContext &t) {
+    return AliasAttr::from(t.as_attribute());
   }
 
   std::string_view aliasee(void) const;

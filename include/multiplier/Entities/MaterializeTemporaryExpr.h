@@ -41,6 +41,7 @@ class MaterializeTemporaryExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<MaterializeTemporaryExpr> in(const Fragment &frag);
+  static gap::generator<MaterializeTemporaryExpr> in(const File &file);
   static gap::generator<MaterializeTemporaryExpr> in(const Index &index);
   static gap::generator<MaterializeTemporaryExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,34 +60,6 @@ class MaterializeTemporaryExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<MaterializeTemporaryExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<MaterializeTemporaryExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<MaterializeTemporaryExpr> from(const Expr &parent);
-
-  inline static std::optional<MaterializeTemporaryExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return MaterializeTemporaryExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<MaterializeTemporaryExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<MaterializeTemporaryExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return MaterializeTemporaryExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MaterializeTemporaryExpr> from(const Stmt &parent);
 
   inline static std::optional<MaterializeTemporaryExpr> from(const std::optional<Stmt> &parent) {
@@ -95,6 +68,14 @@ class MaterializeTemporaryExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MaterializeTemporaryExpr> from(const Reference &r) {
+    return MaterializeTemporaryExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<MaterializeTemporaryExpr> from(const TokenContext &t) {
+    return MaterializeTemporaryExpr::from(t.as_statement());
   }
 
   std::optional<ValueDecl> extending_declaration(void) const;

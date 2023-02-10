@@ -41,6 +41,7 @@ class FunctionProtoType : public FunctionType {
   friend class Type;
  public:
   static gap::generator<FunctionProtoType> in(const Fragment &frag);
+  static gap::generator<FunctionProtoType> in(const File &file);
   static gap::generator<FunctionProtoType> in(const Index &index);
   static gap::generator<FunctionProtoType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -48,24 +49,6 @@ class FunctionProtoType : public FunctionType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::FUNCTION_PROTO;
-  }
-
-  inline static std::optional<FunctionProtoType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<FunctionProtoType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<FunctionProtoType> from(const FunctionType &parent);
-
-  inline static std::optional<FunctionProtoType> from(const std::optional<FunctionType> &parent) {
-    if (parent) {
-      return FunctionProtoType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FunctionProtoType> from(const Type &parent);
@@ -76,6 +59,14 @@ class FunctionProtoType : public FunctionType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FunctionProtoType> from(const Reference &r) {
+    return FunctionProtoType::from(r.as_type());
+  }
+
+  inline static std::optional<FunctionProtoType> from(const TokenContext &t) {
+    return FunctionProtoType::from(t.as_type());
   }
 
   std::optional<CanThrowResult> can_throw(void) const;

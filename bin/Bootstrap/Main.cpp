@@ -2116,6 +2116,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  std::shared_ptr<const " << class_name << "Impl> impl;\n"
         << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);\n"
         << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);\n"
+        << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);\n"
         << " public:\n"
         << "  " << class_name << "(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << "(const " << class_name << " &) = default;\n"
@@ -2145,6 +2146,10 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "inline const std::shared_ptr<EntityProvider> &"
         << class_name << "::entity_provider_of(const Fragment &frag_) {\n"
         << "  return frag_.impl->ep;\n"
+        << "}\n\n"
+        << "inline const std::shared_ptr<EntityProvider> &"
+        << class_name << "::entity_provider_of(const File &file_) {\n"
+        << "  return file_.impl->ep;\n"
         << "}\n\n";
 
     forward_decls.insert("Reference");
@@ -2275,15 +2280,20 @@ MethodListPtr CodeGenerator::RunOnClass(
     abort();
   }
 
-  if (class_name == base_name &&
-      (is_declaration || is_statement || is_attribute || is_type || is_macro)) {
-    class_os
-        << "  static gap::generator<"
-        << class_name << "> in(const Fragment &frag, std::span<"
-        << class_name << "Kind> kinds);\n"
-        << "  static gap::generator<"
-        << class_name << "> in(const Index &index, std::span<"
-        << class_name << "Kind> kinds);\n";
+  // TODO(pag): Probably remove `is_type` eventually.
+  if (is_declaration || is_statement || is_attribute || is_type || is_macro) {
+    if (class_name == base_name) {
+      class_os
+          << "  static gap::generator<"
+          << class_name << "> in(const Fragment &frag, std::span<"
+          << class_name << "Kind> kinds);\n"
+          << "  static gap::generator<"
+          << class_name << "> in(const File &file, std::span<"
+          << class_name << "Kind> kinds);\n"
+          << "  static gap::generator<"
+          << class_name << "> in(const Index &index, std::span<"
+          << class_name << "Kind> kinds);\n";
+    }
   }
 
   // NOTE(pag): Macro containing a token is handled later.
@@ -2292,6 +2302,8 @@ MethodListPtr CodeGenerator::RunOnClass(
     class_os
         << "  static gap::generator<"
         << class_name << "> in(const Fragment &frag);\n"
+        << "  static gap::generator<"
+        << class_name << "> in(const File &file);\n"
         << "  static gap::generator<"
         << class_name << "> in(const Index &index);\n"
         << "  static gap::generator<" << class_name
@@ -2319,7 +2331,9 @@ MethodListPtr CodeGenerator::RunOnClass(
   } else if (is_macro) {
     class_os
         << "  static gap::generator<" << class_name
-        << "> in(const Fragment &frag);\n\n"
+        << "> in(const Fragment &frag);\n"
+        << "  static gap::generator<" << class_name
+        << "> in(const File &file);\n\n"
         << "  static gap::generator<"
         << class_name << "> in(const Index &index);\n"
         << "  static std::optional<" << class_name << "> by_id(const Index &, EntityId);\n\n";
@@ -2576,44 +2590,6 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n";
   }
 
-  // Conversions from token contexts and references to entities.
-  if (false) {
-#define DECLARE_DEFINE_FROM(type_name, lower_name) \
-    } else if (class_name == #type_name) { \
-      class_os \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const " << class_name << " &self) {\n" \
-          << "    return self;\n" \
-          << "  }\n\n" \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const std::optional<" << class_name \
-          << "> &self) {\n" \
-          << "    return self;\n" \
-          << "  }\n\n" \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const Reference &r) {\n" \
-          << "    return r.as_" #lower_name "();\n" \
-          << "  }\n\n" \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const TokenContext &t) {\n" \
-          << "    return t.as_" #lower_name "();\n" \
-          << "  }\n\n"; \
-      \
-    } else if (g ## type_name ## Names.count(class_name)) { \
-      class_os \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const Reference &r) {\n" \
-          << "    return from(r.as_" #lower_name "());\n" \
-          << "  }\n\n" \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const TokenContext &t) {\n" \
-          << "    return from(t.as_" #lower_name "());\n" \
-          << "  }\n\n";
-
-  FOR_EACH_ENTITY_CATEGORY(DECLARE_DEFINE_FROM)
-#undef DECLARE_DEFINE_FROM
-  }
-
   // Make a generator for all of the derived kinds of this particular entity.
   if (is_declaration || is_statement || is_attribute || is_type || is_macro) {
 
@@ -2665,6 +2641,20 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n"
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const File &file) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(file);\n"
+          << "  PackedFileId file_id = file.id();\n"
+          << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
+          << "    for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep, frag_id)) {\n"
+          << "      if (std::optional<" << class_name << "> e = "
+          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+          << "        co_yield std::move(e.value());\n"
+          << "      }\n"
+          << "    }\n"
+          << "  }\n"
+          << "}\n\n"
+          << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Index &index, std::span<" << class_name << "Kind> kinds) {\n"
           << "  const EntityProvider::Ptr &ep = entity_provider_of(index);\n"
           << "  for (" << base_name << "Kind k : kinds) {\n"
@@ -2684,8 +2674,36 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "      co_yield " << base_name << "(std::move(eptr));\n"
           << "    }\n"
           << "  }\n"
+          << "}\n\n"
+          << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const File &file, std::span<" << class_name << "Kind> kinds) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(file);\n"
+          << "  PackedFileId file_id = file.id();\n"
+          << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
+          << "    for (" << base_name << "Kind k : kinds) {\n"
+          << "      for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep, k, frag_id)) {\n"
+          << "        co_yield " << base_name << "(std::move(eptr));\n"
+          << "      }\n"
+          << "    }\n"
+          << "  }\n"
           << "}\n\n";
     } else {
+      // Derived classes have optional conversions that need to account for
+      // derived kinds.
+      class_os
+        << "  static std::optional<" << class_name << "> from(const "
+        << base_name << " &parent);\n\n"
+        << "  inline static std::optional<" << class_name
+        << "> from(const std::optional<"
+        << base_name << "> &parent) {\n"
+        << "    if (parent) {\n"
+        << "      return " << class_name << "::from(parent.value());\n"
+        << "    } else {\n"
+        << "      return std::nullopt;\n"
+        << "    }\n"
+        << "  }\n\n";
+
       lib_cpp_os
           << "static const " << base_name << "Kind k"
           << class_name << "DerivedKinds[] = {\n";
@@ -2705,6 +2723,21 @@ MethodListPtr CodeGenerator::RunOnClass(
       }
       lib_cpp_os
           << "};\n\n"
+          << "std::optional<" << class_name << "> " << class_name
+          << "::from(const " << base_name << "&parent) {\n"
+          << "  switch (parent.kind()) {\n";
+      for (const ClassHierarchy *c : wl) {
+        std::string c_name = c->record.Name();
+        if (gConcreteClassNames.count(c_name)) {
+          lib_cpp_os << "    case " << c_name << "::static_kind():\n";
+        }
+      }
+      lib_cpp_os
+          << "      return reinterpret_cast<const " << class_name << " &>(parent);\n"
+          << "    default:\n"
+          << "      return std::nullopt;\n"
+          << "  }\n"
+          << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Index &index) {\n"
           << "  const EntityProvider::Ptr &ep = entity_provider_of(index);\n"
@@ -2731,147 +2764,62 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "      }\n"
           << "    }\n"
           << "  }\n"
+          << "}\n\n"
+          << "gap::generator<" << class_name << "> " << class_name
+          << "::in(const File &file) {\n"
+          << "  const EntityProvider::Ptr &ep = entity_provider_of(file);\n"
+          << "  PackedFileId file_id = file.id();\n"
+          << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
+          << "    for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
+          << "      for (" << base_name << "ImplPtr eptr : ep->"
+          << base_name << "sFor(ep, k, frag_id)) {\n"
+          << "        if (std::optional<" << class_name << "> e = "
+          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+          << "          co_yield std::move(e.value());\n"
+          << "        }\n"
+          << "      }\n"
+          << "    }\n"
+          << "  }\n"
           << "}\n\n";
     }
   }
 
-  // Derived classes have optional conversion operators with all of their
-  // parents.
-  for (auto parent = cls->base; parent; parent = parent->base) {
-    std::string grand_parent_class_name = parent->record.Name();
-    class_os
-        << "  static std::optional<" << class_name << "> from(const "
-        << grand_parent_class_name << " &parent);\n\n"
-        << "  inline static std::optional<" << class_name
-        << "> from(const std::optional<"
-        << grand_parent_class_name << "> &parent) {\n"
-        << "    if (parent) {\n"
-        << "      return " << class_name << "::from(parent.value());\n"
-        << "    } else {\n"
-        << "      return std::nullopt;\n"
-        << "    }\n"
-        << "  }\n\n";
+  // Conversions from token contexts and references to entities.
+  if (false) {
+#define DECLARE_DEFINE_FROM(type_name, lower_name) \
+    } else if (class_name == #type_name) { \
+      class_os \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const " << class_name << " &self) {\n" \
+          << "    return self;\n" \
+          << "  }\n\n" \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const std::optional<" << class_name \
+          << "> &self) {\n" \
+          << "    return self;\n" \
+          << "  }\n\n" \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const Reference &r) {\n" \
+          << "    return r.as_" #lower_name "();\n" \
+          << "  }\n\n" \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const TokenContext &t) {\n" \
+          << "    return t.as_" #lower_name "();\n" \
+          << "  }\n\n"; \
+      \
+    } else if (g ## type_name ## Names.count(class_name)) { \
+      class_os \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const Reference &r) {\n" \
+          << "    return " << class_name << "::from(r.as_" #lower_name "());\n" \
+          << "  }\n\n" \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const TokenContext &t) {\n" \
+          << "    return " << class_name << "::from(t.as_" #lower_name "());\n" \
+          << "  }\n\n";
 
-    lib_cpp_os
-        << "std::optional<" << class_name << "> " << class_name
-        << "::from(const " << grand_parent_class_name << " &parent) {\n";
-
-    if (grand_parent_class_name != "Decl" &&
-        grand_parent_class_name != "Stmt" &&
-        grand_parent_class_name != "Type" &&
-        grand_parent_class_name != "Attr" &&
-        grand_parent_class_name != "Macro") {
-      if (is_declaration) {
-        lib_cpp_os
-            << "  return from(reinterpret_cast<const Decl &>(parent));\n"
-            << "}\n\n";
-
-      } else if (is_statement) {
-        lib_cpp_os
-            << "  return from(reinterpret_cast<const Stmt &>(parent));\n"
-            << "}\n\n";
-
-      } else if (is_type) {
-        lib_cpp_os
-            << "  return from(reinterpret_cast<const Type &>(parent));\n"
-            << "}\n\n";
-
-      } else if (is_attribute) {
-        lib_cpp_os
-            << "  return from(reinterpret_cast<const Attr &>(parent));\n"
-            << "}\n\n";
-
-      } else if (is_macro) {
-        lib_cpp_os
-            << "  return from(reinterpret_cast<const Macro &>(parent));\n"
-            << "}\n\n";
-
-      } else {
-        std::cerr
-            << "::from on " << class_name << " with grand parent "
-            << grand_parent_class_name << "\n";
-        abort();
-      }
-      continue;
-    }
-
-    lib_cpp_os
-        << "  switch (parent.kind()) {\n";
-
-    std::vector<ClassHierarchy *> children_work_list;
-    children_work_list.push_back(cls);
-    while (!children_work_list.empty()) {
-      auto grand_child_cls = children_work_list.back();
-      children_work_list.pop_back();
-      children_work_list.insert(children_work_list.end(),
-                                grand_child_cls->derived.begin(),
-                                grand_child_cls->derived.end());
-
-      std::string grand_child_class_name = grand_child_cls->record.Name();
-      if (gAbstractTypes.count(grand_child_class_name)) {
-        continue;
-      }
-
-      if (is_declaration) {
-        grand_child_class_name.pop_back();  // `l`
-        grand_child_class_name.pop_back();  // `c`
-        grand_child_class_name.pop_back();  // `e`
-        grand_child_class_name.pop_back();  // `D`
-        lib_cpp_os
-            << "    case mx::DeclKind::";
-
-      } else if (is_statement) {
-        lib_cpp_os
-            << "    case mx::StmtKind::";
-
-      } else if (is_type) {
-        grand_child_class_name.pop_back();  // `e`
-        grand_child_class_name.pop_back();  // `p`
-        grand_child_class_name.pop_back();  // `y`
-        grand_child_class_name.pop_back();  // `T`
-        lib_cpp_os
-            << "    case mx::TypeKind::";
-
-      } else if (is_attribute) {
-        grand_child_class_name.pop_back();  // `r`
-        grand_child_class_name.pop_back();  // `t`
-        grand_child_class_name.pop_back();  // `t`
-        grand_child_class_name.pop_back();  // `A`
-        lib_cpp_os
-            << "    case mx::AttrKind::";
-
-      } else if (is_macro) {
-
-        // NOTE(pag): Weird-ish format for macros.
-        if (grand_child_class_name.starts_with("Macro")) {
-          grand_child_class_name = grand_child_class_name.substr(5u);
-        } else if (grand_child_class_name.ends_with("MacroDirective")) {
-          grand_child_class_name = grand_child_class_name.substr(
-              0, grand_child_class_name.size() - 14u);
-          grand_child_class_name += "Directive";
-        }
-
-        lib_cpp_os
-            << "    case mx::MacroKind::";
-
-      } else {
-        std::cerr
-            << "switch on parent kind of " << class_name
-            << " with grand parent " << grand_parent_class_name << "\n";
-        abort();
-      }
-
-      std::string snake_name = CapitalCaseToSnakeCase(grand_child_class_name);
-      std::string enum_name = SnakeCaseToEnumCase(snake_name);
-      lib_cpp_os << enum_name << ":\n";
-    }
-
-    lib_cpp_os
-        << "      return reinterpret_cast<const " << class_name
-        << " &>(parent);\n"
-        << "    default: return std::nullopt;\n"
-        << "  }\n"
-        << "}\n\n";
+  FOR_EACH_ENTITY_CATEGORY(DECLARE_DEFINE_FROM)
+#undef DECLARE_DEFINE_FROM
   }
 
   auto methods = cls->record.Methods();

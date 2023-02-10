@@ -39,6 +39,7 @@ class ObjCArrayLiteral : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCArrayLiteral> in(const Fragment &frag);
+  static gap::generator<ObjCArrayLiteral> in(const File &file);
   static gap::generator<ObjCArrayLiteral> in(const Index &index);
   static gap::generator<ObjCArrayLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class ObjCArrayLiteral : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCArrayLiteral> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCArrayLiteral> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ObjCArrayLiteral> from(const Expr &parent);
-
-  inline static std::optional<ObjCArrayLiteral> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ObjCArrayLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCArrayLiteral> from(const ValueStmt &parent);
-
-  inline static std::optional<ObjCArrayLiteral> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ObjCArrayLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCArrayLiteral> from(const Stmt &parent);
 
   inline static std::optional<ObjCArrayLiteral> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class ObjCArrayLiteral : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCArrayLiteral> from(const Reference &r) {
+    return ObjCArrayLiteral::from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCArrayLiteral> from(const TokenContext &t) {
+    return ObjCArrayLiteral::from(t.as_statement());
   }
 
   ObjCMethodDecl array_with_objects_method(void) const;

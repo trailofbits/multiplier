@@ -43,6 +43,7 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
   friend class Stmt;
  public:
   static gap::generator<ObjCBridgedCastExpr> in(const Fragment &frag);
+  static gap::generator<ObjCBridgedCastExpr> in(const File &file);
   static gap::generator<ObjCBridgedCastExpr> in(const Index &index);
   static gap::generator<ObjCBridgedCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -61,54 +62,6 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCBridgedCastExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCBridgedCastExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ObjCBridgedCastExpr> from(const ExplicitCastExpr &parent);
-
-  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
-    if (parent) {
-      return ObjCBridgedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCBridgedCastExpr> from(const CastExpr &parent);
-
-  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<CastExpr> &parent) {
-    if (parent) {
-      return ObjCBridgedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCBridgedCastExpr> from(const Expr &parent);
-
-  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ObjCBridgedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCBridgedCastExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ObjCBridgedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCBridgedCastExpr> from(const Stmt &parent);
 
   inline static std::optional<ObjCBridgedCastExpr> from(const std::optional<Stmt> &parent) {
@@ -117,6 +70,14 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCBridgedCastExpr> from(const Reference &r) {
+    return ObjCBridgedCastExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCBridgedCastExpr> from(const TokenContext &t) {
+    return ObjCBridgedCastExpr::from(t.as_statement());
   }
 
   Token bridge_keyword_token(void) const;

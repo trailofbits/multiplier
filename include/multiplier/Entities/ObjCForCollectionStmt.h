@@ -35,6 +35,7 @@ class ObjCForCollectionStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ObjCForCollectionStmt> in(const Fragment &frag);
+  static gap::generator<ObjCForCollectionStmt> in(const File &file);
   static gap::generator<ObjCForCollectionStmt> in(const Index &index);
   static gap::generator<ObjCForCollectionStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class ObjCForCollectionStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCForCollectionStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCForCollectionStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<ObjCForCollectionStmt> from(const Stmt &parent);
 
   inline static std::optional<ObjCForCollectionStmt> from(const std::optional<Stmt> &parent) {
@@ -69,6 +62,14 @@ class ObjCForCollectionStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCForCollectionStmt> from(const Reference &r) {
+    return ObjCForCollectionStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCForCollectionStmt> from(const TokenContext &t) {
+    return ObjCForCollectionStmt::from(t.as_statement());
   }
 
   Stmt body(void) const;

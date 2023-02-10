@@ -36,6 +36,7 @@ class MinVectorWidthAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MinVectorWidthAttr> in(const Fragment &frag);
+  static gap::generator<MinVectorWidthAttr> in(const File &file);
   static gap::generator<MinVectorWidthAttr> in(const Index &index);
   static gap::generator<MinVectorWidthAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class MinVectorWidthAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIN_VECTOR_WIDTH;
-  }
-
-  inline static std::optional<MinVectorWidthAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MinVectorWidthAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MinVectorWidthAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<MinVectorWidthAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return MinVectorWidthAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MinVectorWidthAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class MinVectorWidthAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MinVectorWidthAttr> from(const Reference &r) {
+    return MinVectorWidthAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<MinVectorWidthAttr> from(const TokenContext &t) {
+    return MinVectorWidthAttr::from(t.as_attribute());
   }
 
 };

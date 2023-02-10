@@ -37,6 +37,7 @@ class RISCVInterruptAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<RISCVInterruptAttr> in(const Fragment &frag);
+  static gap::generator<RISCVInterruptAttr> in(const File &file);
   static gap::generator<RISCVInterruptAttr> in(const Index &index);
   static gap::generator<RISCVInterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class RISCVInterruptAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RISCV_INTERRUPT;
-  }
-
-  inline static std::optional<RISCVInterruptAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<RISCVInterruptAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<RISCVInterruptAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<RISCVInterruptAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return RISCVInterruptAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<RISCVInterruptAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class RISCVInterruptAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RISCVInterruptAttr> from(const Reference &r) {
+    return RISCVInterruptAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<RISCVInterruptAttr> from(const TokenContext &t) {
+    return RISCVInterruptAttr::from(t.as_attribute());
   }
 
   RISCVInterruptAttrInterruptType interrupt(void) const;

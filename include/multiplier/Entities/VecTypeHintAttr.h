@@ -37,6 +37,7 @@ class VecTypeHintAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<VecTypeHintAttr> in(const Fragment &frag);
+  static gap::generator<VecTypeHintAttr> in(const File &file);
   static gap::generator<VecTypeHintAttr> in(const Index &index);
   static gap::generator<VecTypeHintAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class VecTypeHintAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::VEC_TYPE_HINT;
-  }
-
-  inline static std::optional<VecTypeHintAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<VecTypeHintAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<VecTypeHintAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<VecTypeHintAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return VecTypeHintAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<VecTypeHintAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class VecTypeHintAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<VecTypeHintAttr> from(const Reference &r) {
+    return VecTypeHintAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<VecTypeHintAttr> from(const TokenContext &t) {
+    return VecTypeHintAttr::from(t.as_attribute());
   }
 
   Type type_hint(void) const;

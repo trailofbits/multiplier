@@ -37,6 +37,7 @@ class CleanupAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CleanupAttr> in(const Fragment &frag);
+  static gap::generator<CleanupAttr> in(const File &file);
   static gap::generator<CleanupAttr> in(const Index &index);
   static gap::generator<CleanupAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class CleanupAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CLEANUP;
-  }
-
-  inline static std::optional<CleanupAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CleanupAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CleanupAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CleanupAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CleanupAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CleanupAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class CleanupAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CleanupAttr> from(const Reference &r) {
+    return CleanupAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CleanupAttr> from(const TokenContext &t) {
+    return CleanupAttr::from(t.as_attribute());
   }
 
   FunctionDecl function_declaration(void) const;

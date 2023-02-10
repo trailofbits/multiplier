@@ -34,6 +34,7 @@ class InitSegAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<InitSegAttr> in(const Fragment &frag);
+  static gap::generator<InitSegAttr> in(const File &file);
   static gap::generator<InitSegAttr> in(const Index &index);
   static gap::generator<InitSegAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class InitSegAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_SEG;
-  }
-
-  inline static std::optional<InitSegAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<InitSegAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<InitSegAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class InitSegAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<InitSegAttr> from(const Reference &r) {
+    return InitSegAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<InitSegAttr> from(const TokenContext &t) {
+    return InitSegAttr::from(t.as_attribute());
   }
 
   std::string_view section(void) const;

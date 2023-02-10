@@ -34,6 +34,7 @@ class AbiTagAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<AbiTagAttr> in(const Fragment &frag);
+  static gap::generator<AbiTagAttr> in(const File &file);
   static gap::generator<AbiTagAttr> in(const Index &index);
   static gap::generator<AbiTagAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class AbiTagAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ABI_TAG;
-  }
-
-  inline static std::optional<AbiTagAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AbiTagAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<AbiTagAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class AbiTagAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AbiTagAttr> from(const Reference &r) {
+    return AbiTagAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AbiTagAttr> from(const TokenContext &t) {
+    return AbiTagAttr::from(t.as_attribute());
   }
 
 };

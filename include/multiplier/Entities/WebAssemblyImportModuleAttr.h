@@ -36,6 +36,7 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<WebAssemblyImportModuleAttr> in(const Fragment &frag);
+  static gap::generator<WebAssemblyImportModuleAttr> in(const File &file);
   static gap::generator<WebAssemblyImportModuleAttr> in(const Index &index);
   static gap::generator<WebAssemblyImportModuleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEB_ASSEMBLY_IMPORT_MODULE;
-  }
-
-  inline static std::optional<WebAssemblyImportModuleAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<WebAssemblyImportModuleAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<WebAssemblyImportModuleAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<WebAssemblyImportModuleAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return WebAssemblyImportModuleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<WebAssemblyImportModuleAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<WebAssemblyImportModuleAttr> from(const Reference &r) {
+    return WebAssemblyImportModuleAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<WebAssemblyImportModuleAttr> from(const TokenContext &t) {
+    return WebAssemblyImportModuleAttr::from(t.as_attribute());
   }
 
   std::string_view import_module(void) const;

@@ -36,6 +36,7 @@ class ConvergentAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ConvergentAttr> in(const Fragment &frag);
+  static gap::generator<ConvergentAttr> in(const File &file);
   static gap::generator<ConvergentAttr> in(const Index &index);
   static gap::generator<ConvergentAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ConvergentAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONVERGENT;
-  }
-
-  inline static std::optional<ConvergentAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ConvergentAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ConvergentAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ConvergentAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ConvergentAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ConvergentAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ConvergentAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ConvergentAttr> from(const Reference &r) {
+    return ConvergentAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ConvergentAttr> from(const TokenContext &t) {
+    return ConvergentAttr::from(t.as_attribute());
   }
 
 };

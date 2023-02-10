@@ -36,6 +36,7 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<HLSLSV_GroupIndexAttr> in(const Fragment &frag);
+  static gap::generator<HLSLSV_GroupIndexAttr> in(const File &file);
   static gap::generator<HLSLSV_GroupIndexAttr> in(const Index &index);
   static gap::generator<HLSLSV_GroupIndexAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSLSV__GROUP_INDEX;
-  }
-
-  inline static std::optional<HLSLSV_GroupIndexAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<HLSLSV_GroupIndexAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<HLSLSV_GroupIndexAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<HLSLSV_GroupIndexAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return HLSLSV_GroupIndexAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<HLSLSV_GroupIndexAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<HLSLSV_GroupIndexAttr> from(const Reference &r) {
+    return HLSLSV_GroupIndexAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<HLSLSV_GroupIndexAttr> from(const TokenContext &t) {
+    return HLSLSV_GroupIndexAttr::from(t.as_attribute());
   }
 
 };

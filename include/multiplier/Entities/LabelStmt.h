@@ -37,6 +37,7 @@ class LabelStmt : public ValueStmt {
   friend class Stmt;
  public:
   static gap::generator<LabelStmt> in(const Fragment &frag);
+  static gap::generator<LabelStmt> in(const File &file);
   static gap::generator<LabelStmt> in(const Index &index);
   static gap::generator<LabelStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class LabelStmt : public ValueStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<LabelStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<LabelStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<LabelStmt> from(const ValueStmt &parent);
-
-  inline static std::optional<LabelStmt> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return LabelStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<LabelStmt> from(const Stmt &parent);
 
   inline static std::optional<LabelStmt> from(const std::optional<Stmt> &parent) {
@@ -81,6 +64,14 @@ class LabelStmt : public ValueStmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LabelStmt> from(const Reference &r) {
+    return LabelStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<LabelStmt> from(const TokenContext &t) {
+    return LabelStmt::from(t.as_statement());
   }
 
   LabelDecl declaration(void) const;

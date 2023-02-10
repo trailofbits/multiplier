@@ -36,6 +36,7 @@ class TypeNullableAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<TypeNullableAttr> in(const Fragment &frag);
+  static gap::generator<TypeNullableAttr> in(const File &file);
   static gap::generator<TypeNullableAttr> in(const Index &index);
   static gap::generator<TypeNullableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class TypeNullableAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_NULLABLE;
-  }
-
-  inline static std::optional<TypeNullableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TypeNullableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TypeNullableAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<TypeNullableAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return TypeNullableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TypeNullableAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class TypeNullableAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypeNullableAttr> from(const Reference &r) {
+    return TypeNullableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<TypeNullableAttr> from(const TokenContext &t) {
+    return TypeNullableAttr::from(t.as_attribute());
   }
 
 };

@@ -34,6 +34,7 @@ class PipeType : public Type {
   friend class Type;
  public:
   static gap::generator<PipeType> in(const Fragment &frag);
+  static gap::generator<PipeType> in(const File &file);
   static gap::generator<PipeType> in(const Index &index);
   static gap::generator<PipeType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class PipeType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::PIPE;
-  }
-
-  inline static std::optional<PipeType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<PipeType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<PipeType> from(const Type &parent);
@@ -59,6 +52,14 @@ class PipeType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PipeType> from(const Reference &r) {
+    return PipeType::from(r.as_type());
+  }
+
+  inline static std::optional<PipeType> from(const TokenContext &t) {
+    return PipeType::from(t.as_type());
   }
 
   Type desugar(void) const;

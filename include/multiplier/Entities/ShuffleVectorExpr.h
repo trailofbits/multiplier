@@ -38,6 +38,7 @@ class ShuffleVectorExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ShuffleVectorExpr> in(const Fragment &frag);
+  static gap::generator<ShuffleVectorExpr> in(const File &file);
   static gap::generator<ShuffleVectorExpr> in(const Index &index);
   static gap::generator<ShuffleVectorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class ShuffleVectorExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ShuffleVectorExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ShuffleVectorExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ShuffleVectorExpr> from(const Expr &parent);
-
-  inline static std::optional<ShuffleVectorExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ShuffleVectorExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ShuffleVectorExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ShuffleVectorExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ShuffleVectorExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ShuffleVectorExpr> from(const Stmt &parent);
 
   inline static std::optional<ShuffleVectorExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class ShuffleVectorExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ShuffleVectorExpr> from(const Reference &r) {
+    return ShuffleVectorExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ShuffleVectorExpr> from(const TokenContext &t) {
+    return ShuffleVectorExpr::from(t.as_statement());
   }
 
   Token builtin_token(void) const;

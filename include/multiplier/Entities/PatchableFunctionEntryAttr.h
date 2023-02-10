@@ -36,6 +36,7 @@ class PatchableFunctionEntryAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PatchableFunctionEntryAttr> in(const Fragment &frag);
+  static gap::generator<PatchableFunctionEntryAttr> in(const File &file);
   static gap::generator<PatchableFunctionEntryAttr> in(const Index &index);
   static gap::generator<PatchableFunctionEntryAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class PatchableFunctionEntryAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PATCHABLE_FUNCTION_ENTRY;
-  }
-
-  inline static std::optional<PatchableFunctionEntryAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PatchableFunctionEntryAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PatchableFunctionEntryAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PatchableFunctionEntryAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PatchableFunctionEntryAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PatchableFunctionEntryAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class PatchableFunctionEntryAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PatchableFunctionEntryAttr> from(const Reference &r) {
+    return PatchableFunctionEntryAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PatchableFunctionEntryAttr> from(const TokenContext &t) {
+    return PatchableFunctionEntryAttr::from(t.as_attribute());
   }
 
 };

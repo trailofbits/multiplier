@@ -37,6 +37,7 @@ class CXX11NoReturnAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CXX11NoReturnAttr> in(const Fragment &frag);
+  static gap::generator<CXX11NoReturnAttr> in(const File &file);
   static gap::generator<CXX11NoReturnAttr> in(const Index &index);
   static gap::generator<CXX11NoReturnAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class CXX11NoReturnAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CXX11_NO_RETURN;
-  }
-
-  inline static std::optional<CXX11NoReturnAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CXX11NoReturnAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CXX11NoReturnAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CXX11NoReturnAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CXX11NoReturnAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CXX11NoReturnAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class CXX11NoReturnAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXX11NoReturnAttr> from(const Reference &r) {
+    return CXX11NoReturnAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CXX11NoReturnAttr> from(const TokenContext &t) {
+    return CXX11NoReturnAttr::from(t.as_attribute());
   }
 
   CXX11NoReturnAttrSpelling semantic_spelling(void) const;

@@ -56,6 +56,7 @@ class CXXRecordDecl : public RecordDecl {
   friend class Decl;
  public:
   static gap::generator<CXXRecordDecl> in(const Fragment &frag);
+  static gap::generator<CXXRecordDecl> in(const File &file);
   static gap::generator<CXXRecordDecl> in(const Index &index);
   static gap::generator<CXXRecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -75,54 +76,6 @@ class CXXRecordDecl : public RecordDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<CXXRecordDecl> redeclarations(void) const;
-  inline static std::optional<CXXRecordDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXRecordDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<CXXRecordDecl> from(const RecordDecl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<RecordDecl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXRecordDecl> from(const TagDecl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<TagDecl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXRecordDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXRecordDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXRecordDecl> from(const Decl &parent);
 
   inline static std::optional<CXXRecordDecl> from(const std::optional<Decl> &parent) {
@@ -131,6 +84,14 @@ class CXXRecordDecl : public RecordDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXRecordDecl> from(const Reference &r) {
+    return CXXRecordDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<CXXRecordDecl> from(const TokenContext &t) {
+    return CXXRecordDecl::from(t.as_declaration());
   }
 
   std::optional<bool> allow_const_default_initializer(void) const;

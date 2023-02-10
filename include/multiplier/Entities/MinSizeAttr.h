@@ -36,6 +36,7 @@ class MinSizeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MinSizeAttr> in(const Fragment &frag);
+  static gap::generator<MinSizeAttr> in(const File &file);
   static gap::generator<MinSizeAttr> in(const Index &index);
   static gap::generator<MinSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class MinSizeAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIN_SIZE;
-  }
-
-  inline static std::optional<MinSizeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MinSizeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MinSizeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<MinSizeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return MinSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MinSizeAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class MinSizeAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MinSizeAttr> from(const Reference &r) {
+    return MinSizeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<MinSizeAttr> from(const TokenContext &t) {
+    return MinSizeAttr::from(t.as_attribute());
   }
 
 };

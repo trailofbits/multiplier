@@ -37,6 +37,7 @@ class WhileStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<WhileStmt> in(const Fragment &frag);
+  static gap::generator<WhileStmt> in(const File &file);
   static gap::generator<WhileStmt> in(const Index &index);
   static gap::generator<WhileStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,14 +56,6 @@ class WhileStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<WhileStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<WhileStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<WhileStmt> from(const Stmt &parent);
 
   inline static std::optional<WhileStmt> from(const std::optional<Stmt> &parent) {
@@ -71,6 +64,14 @@ class WhileStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<WhileStmt> from(const Reference &r) {
+    return WhileStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<WhileStmt> from(const TokenContext &t) {
+    return WhileStmt::from(t.as_statement());
   }
 
   Stmt body(void) const;

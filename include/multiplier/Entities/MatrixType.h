@@ -34,18 +34,11 @@ class MatrixType : public Type {
   friend class Type;
  public:
   static gap::generator<MatrixType> in(const Fragment &frag);
+  static gap::generator<MatrixType> in(const File &file);
   static gap::generator<MatrixType> in(const Index &index);
   static gap::generator<MatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MatrixType> by_id(const Index &, EntityId);
-
-  inline static std::optional<MatrixType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<MatrixType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
 
   static std::optional<MatrixType> from(const Type &parent);
 
@@ -55,6 +48,14 @@ class MatrixType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MatrixType> from(const Reference &r) {
+    return MatrixType::from(r.as_type());
+  }
+
+  inline static std::optional<MatrixType> from(const TokenContext &t) {
+    return MatrixType::from(t.as_type());
   }
 
   Type desugar(void) const;

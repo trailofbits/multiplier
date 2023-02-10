@@ -35,18 +35,11 @@ class ArrayType : public Type {
   friend class Type;
  public:
   static gap::generator<ArrayType> in(const Fragment &frag);
+  static gap::generator<ArrayType> in(const File &file);
   static gap::generator<ArrayType> in(const Index &index);
   static gap::generator<ArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ArrayType> by_id(const Index &, EntityId);
-
-  inline static std::optional<ArrayType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ArrayType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
 
   static std::optional<ArrayType> from(const Type &parent);
 
@@ -56,6 +49,14 @@ class ArrayType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ArrayType> from(const Reference &r) {
+    return ArrayType::from(r.as_type());
+  }
+
+  inline static std::optional<ArrayType> from(const TokenContext &t) {
+    return ArrayType::from(t.as_type());
   }
 
   Type element_type(void) const;

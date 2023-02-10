@@ -36,28 +36,11 @@ class DeclOrStmtAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DeclOrStmtAttr> in(const Fragment &frag);
+  static gap::generator<DeclOrStmtAttr> in(const File &file);
   static gap::generator<DeclOrStmtAttr> in(const Index &index);
   static gap::generator<DeclOrStmtAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DeclOrStmtAttr> by_id(const Index &, EntityId);
-
-  inline static std::optional<DeclOrStmtAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<DeclOrStmtAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<DeclOrStmtAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<DeclOrStmtAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return DeclOrStmtAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
 
   static std::optional<DeclOrStmtAttr> from(const Attr &parent);
 
@@ -67,6 +50,14 @@ class DeclOrStmtAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DeclOrStmtAttr> from(const Reference &r) {
+    return DeclOrStmtAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<DeclOrStmtAttr> from(const TokenContext &t) {
+    return DeclOrStmtAttr::from(t.as_attribute());
   }
 
 };

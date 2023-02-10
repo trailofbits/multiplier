@@ -37,6 +37,7 @@ class ConsumableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ConsumableAttr> in(const Fragment &frag);
+  static gap::generator<ConsumableAttr> in(const File &file);
   static gap::generator<ConsumableAttr> in(const Index &index);
   static gap::generator<ConsumableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ConsumableAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE;
-  }
-
-  inline static std::optional<ConsumableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ConsumableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ConsumableAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ConsumableAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ConsumableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ConsumableAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class ConsumableAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ConsumableAttr> from(const Reference &r) {
+    return ConsumableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ConsumableAttr> from(const TokenContext &t) {
+    return ConsumableAttr::from(t.as_attribute());
   }
 
   ConsumableAttrConsumedState default_state(void) const;

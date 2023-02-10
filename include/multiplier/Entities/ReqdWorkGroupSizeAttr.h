@@ -36,6 +36,7 @@ class ReqdWorkGroupSizeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ReqdWorkGroupSizeAttr> in(const Fragment &frag);
+  static gap::generator<ReqdWorkGroupSizeAttr> in(const File &file);
   static gap::generator<ReqdWorkGroupSizeAttr> in(const Index &index);
   static gap::generator<ReqdWorkGroupSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ReqdWorkGroupSizeAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REQD_WORK_GROUP_SIZE;
-  }
-
-  inline static std::optional<ReqdWorkGroupSizeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ReqdWorkGroupSizeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ReqdWorkGroupSizeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ReqdWorkGroupSizeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ReqdWorkGroupSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ReqdWorkGroupSizeAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ReqdWorkGroupSizeAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ReqdWorkGroupSizeAttr> from(const Reference &r) {
+    return ReqdWorkGroupSizeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ReqdWorkGroupSizeAttr> from(const TokenContext &t) {
+    return ReqdWorkGroupSizeAttr::from(t.as_attribute());
   }
 
 };

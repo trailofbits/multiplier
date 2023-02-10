@@ -38,6 +38,7 @@ class GCCAsmStmt : public AsmStmt {
   friend class Stmt;
  public:
   static gap::generator<GCCAsmStmt> in(const Fragment &frag);
+  static gap::generator<GCCAsmStmt> in(const File &file);
   static gap::generator<GCCAsmStmt> in(const Index &index);
   static gap::generator<GCCAsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,24 +57,6 @@ class GCCAsmStmt : public AsmStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<GCCAsmStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<GCCAsmStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<GCCAsmStmt> from(const AsmStmt &parent);
-
-  inline static std::optional<GCCAsmStmt> from(const std::optional<AsmStmt> &parent) {
-    if (parent) {
-      return GCCAsmStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<GCCAsmStmt> from(const Stmt &parent);
 
   inline static std::optional<GCCAsmStmt> from(const std::optional<Stmt> &parent) {
@@ -82,6 +65,14 @@ class GCCAsmStmt : public AsmStmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<GCCAsmStmt> from(const Reference &r) {
+    return GCCAsmStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<GCCAsmStmt> from(const TokenContext &t) {
+    return GCCAsmStmt::from(t.as_statement());
   }
 
   StringLiteral assembly_string(void) const;

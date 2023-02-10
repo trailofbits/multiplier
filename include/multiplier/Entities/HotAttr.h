@@ -36,6 +36,7 @@ class HotAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<HotAttr> in(const Fragment &frag);
+  static gap::generator<HotAttr> in(const File &file);
   static gap::generator<HotAttr> in(const Index &index);
   static gap::generator<HotAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class HotAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HOT;
-  }
-
-  inline static std::optional<HotAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<HotAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<HotAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<HotAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return HotAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<HotAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class HotAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<HotAttr> from(const Reference &r) {
+    return HotAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<HotAttr> from(const TokenContext &t) {
+    return HotAttr::from(t.as_attribute());
   }
 
 };

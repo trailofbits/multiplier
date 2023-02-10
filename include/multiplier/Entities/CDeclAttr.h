@@ -36,6 +36,7 @@ class CDeclAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CDeclAttr> in(const Fragment &frag);
+  static gap::generator<CDeclAttr> in(const File &file);
   static gap::generator<CDeclAttr> in(const Index &index);
   static gap::generator<CDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CDeclAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::C_DECL;
-  }
-
-  inline static std::optional<CDeclAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CDeclAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CDeclAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CDeclAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CDeclAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CDeclAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CDeclAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CDeclAttr> from(const Reference &r) {
+    return CDeclAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CDeclAttr> from(const TokenContext &t) {
+    return CDeclAttr::from(t.as_attribute());
   }
 
 };

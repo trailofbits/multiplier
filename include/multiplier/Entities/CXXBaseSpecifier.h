@@ -22,6 +22,7 @@
 #include "../Token.h"
 
 #include <compare>
+
 #include "AccessSpecifier.h"
 #include "PseudoKind.h"
 #include "TagTypeKind.h"
@@ -50,6 +51,7 @@ class CXXBaseSpecifier {
   std::shared_ptr<const CXXBaseSpecifierImpl> impl;
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier(const CXXBaseSpecifier &) = default;

@@ -36,6 +36,7 @@ class LTOVisibilityPublicAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<LTOVisibilityPublicAttr> in(const Fragment &frag);
+  static gap::generator<LTOVisibilityPublicAttr> in(const File &file);
   static gap::generator<LTOVisibilityPublicAttr> in(const Index &index);
   static gap::generator<LTOVisibilityPublicAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class LTOVisibilityPublicAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LTO_VISIBILITY_PUBLIC;
-  }
-
-  inline static std::optional<LTOVisibilityPublicAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<LTOVisibilityPublicAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<LTOVisibilityPublicAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<LTOVisibilityPublicAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return LTOVisibilityPublicAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<LTOVisibilityPublicAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class LTOVisibilityPublicAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LTOVisibilityPublicAttr> from(const Reference &r) {
+    return LTOVisibilityPublicAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<LTOVisibilityPublicAttr> from(const TokenContext &t) {
+    return LTOVisibilityPublicAttr::from(t.as_attribute());
   }
 
 };

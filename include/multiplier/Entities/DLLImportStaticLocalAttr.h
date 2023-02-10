@@ -36,6 +36,7 @@ class DLLImportStaticLocalAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DLLImportStaticLocalAttr> in(const Fragment &frag);
+  static gap::generator<DLLImportStaticLocalAttr> in(const File &file);
   static gap::generator<DLLImportStaticLocalAttr> in(const Index &index);
   static gap::generator<DLLImportStaticLocalAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class DLLImportStaticLocalAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DLL_IMPORT_STATIC_LOCAL;
-  }
-
-  inline static std::optional<DLLImportStaticLocalAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<DLLImportStaticLocalAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<DLLImportStaticLocalAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<DLLImportStaticLocalAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return DLLImportStaticLocalAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DLLImportStaticLocalAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class DLLImportStaticLocalAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DLLImportStaticLocalAttr> from(const Reference &r) {
+    return DLLImportStaticLocalAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<DLLImportStaticLocalAttr> from(const TokenContext &t) {
+    return DLLImportStaticLocalAttr::from(t.as_attribute());
   }
 
 };

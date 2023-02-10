@@ -35,6 +35,7 @@ class BuiltinType : public Type {
   friend class Type;
  public:
   static gap::generator<BuiltinType> in(const Fragment &frag);
+  static gap::generator<BuiltinType> in(const File &file);
   static gap::generator<BuiltinType> in(const Index &index);
   static gap::generator<BuiltinType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class BuiltinType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN;
-  }
-
-  inline static std::optional<BuiltinType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<BuiltinType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<BuiltinType> from(const Type &parent);
@@ -60,6 +53,14 @@ class BuiltinType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BuiltinType> from(const Reference &r) {
+    return BuiltinType::from(r.as_type());
+  }
+
+  inline static std::optional<BuiltinType> from(const TokenContext &t) {
+    return BuiltinType::from(t.as_type());
   }
 
   Type desugar(void) const;

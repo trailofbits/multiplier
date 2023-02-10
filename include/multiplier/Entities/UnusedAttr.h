@@ -37,6 +37,7 @@ class UnusedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<UnusedAttr> in(const Fragment &frag);
+  static gap::generator<UnusedAttr> in(const File &file);
   static gap::generator<UnusedAttr> in(const Index &index);
   static gap::generator<UnusedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class UnusedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UNUSED;
-  }
-
-  inline static std::optional<UnusedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<UnusedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<UnusedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<UnusedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return UnusedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<UnusedAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class UnusedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnusedAttr> from(const Reference &r) {
+    return UnusedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<UnusedAttr> from(const TokenContext &t) {
+    return UnusedAttr::from(t.as_attribute());
   }
 
   UnusedAttrSpelling semantic_spelling(void) const;

@@ -35,6 +35,7 @@ class CoreturnStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CoreturnStmt> in(const Fragment &frag);
+  static gap::generator<CoreturnStmt> in(const File &file);
   static gap::generator<CoreturnStmt> in(const Index &index);
   static gap::generator<CoreturnStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class CoreturnStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CoreturnStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CoreturnStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<CoreturnStmt> from(const Stmt &parent);
 
   inline static std::optional<CoreturnStmt> from(const std::optional<Stmt> &parent) {
@@ -69,6 +62,14 @@ class CoreturnStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CoreturnStmt> from(const Reference &r) {
+    return CoreturnStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<CoreturnStmt> from(const TokenContext &t) {
+    return CoreturnStmt::from(t.as_statement());
   }
 
   Token keyword_token(void) const;

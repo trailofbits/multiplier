@@ -37,6 +37,7 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCCompatibleAliasDecl> in(const Fragment &frag);
+  static gap::generator<ObjCCompatibleAliasDecl> in(const File &file);
   static gap::generator<ObjCCompatibleAliasDecl> in(const Index &index);
   static gap::generator<ObjCCompatibleAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,24 +57,6 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCCompatibleAliasDecl> redeclarations(void) const;
-  inline static std::optional<ObjCCompatibleAliasDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCCompatibleAliasDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCCompatibleAliasDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCCompatibleAliasDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCCompatibleAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCCompatibleAliasDecl> from(const std::optional<Decl> &parent) {
@@ -82,6 +65,14 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCCompatibleAliasDecl> from(const Reference &r) {
+    return ObjCCompatibleAliasDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCCompatibleAliasDecl> from(const TokenContext &t) {
+    return ObjCCompatibleAliasDecl::from(t.as_declaration());
   }
 
   ObjCInterfaceDecl class_interface(void) const;

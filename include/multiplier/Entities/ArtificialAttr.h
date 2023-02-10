@@ -36,6 +36,7 @@ class ArtificialAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ArtificialAttr> in(const Fragment &frag);
+  static gap::generator<ArtificialAttr> in(const File &file);
   static gap::generator<ArtificialAttr> in(const Index &index);
   static gap::generator<ArtificialAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ArtificialAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARTIFICIAL;
-  }
-
-  inline static std::optional<ArtificialAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ArtificialAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ArtificialAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ArtificialAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ArtificialAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ArtificialAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ArtificialAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ArtificialAttr> from(const Reference &r) {
+    return ArtificialAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ArtificialAttr> from(const TokenContext &t) {
+    return ArtificialAttr::from(t.as_attribute());
   }
 
 };

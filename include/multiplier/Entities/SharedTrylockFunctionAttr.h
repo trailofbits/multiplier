@@ -37,6 +37,7 @@ class SharedTrylockFunctionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SharedTrylockFunctionAttr> in(const Fragment &frag);
+  static gap::generator<SharedTrylockFunctionAttr> in(const File &file);
   static gap::generator<SharedTrylockFunctionAttr> in(const Index &index);
   static gap::generator<SharedTrylockFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class SharedTrylockFunctionAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SHARED_TRYLOCK_FUNCTION;
-  }
-
-  inline static std::optional<SharedTrylockFunctionAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SharedTrylockFunctionAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SharedTrylockFunctionAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SharedTrylockFunctionAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SharedTrylockFunctionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SharedTrylockFunctionAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class SharedTrylockFunctionAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SharedTrylockFunctionAttr> from(const Reference &r) {
+    return SharedTrylockFunctionAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SharedTrylockFunctionAttr> from(const TokenContext &t) {
+    return SharedTrylockFunctionAttr::from(t.as_attribute());
   }
 
   Expr success_value(void) const;

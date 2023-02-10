@@ -37,6 +37,7 @@ class UuidAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<UuidAttr> in(const Fragment &frag);
+  static gap::generator<UuidAttr> in(const File &file);
   static gap::generator<UuidAttr> in(const Index &index);
   static gap::generator<UuidAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class UuidAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UUID;
-  }
-
-  inline static std::optional<UuidAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<UuidAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<UuidAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<UuidAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return UuidAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<UuidAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class UuidAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UuidAttr> from(const Reference &r) {
+    return UuidAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<UuidAttr> from(const TokenContext &t) {
+    return UuidAttr::from(t.as_attribute());
   }
 
   std::string_view guid(void) const;

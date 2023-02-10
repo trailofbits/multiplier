@@ -36,6 +36,7 @@ class MacroStringify : public MacroSubstitution {
   friend class Macro;
  public:
   static gap::generator<MacroStringify> in(const Fragment &frag);
+  static gap::generator<MacroStringify> in(const File &file);
 
   static gap::generator<MacroStringify> in(const Index &index);
   static std::optional<MacroStringify> by_id(const Index &, EntityId);
@@ -50,24 +51,6 @@ class MacroStringify : public MacroSubstitution {
   static gap::generator<MacroStringify> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroStringify> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroStringify> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<MacroStringify> from(const MacroSubstitution &parent);
-
-  inline static std::optional<MacroStringify> from(const std::optional<MacroSubstitution> &parent) {
-    if (parent) {
-      return MacroStringify::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MacroStringify> from(const Macro &parent);
 
   inline static std::optional<MacroStringify> from(const std::optional<Macro> &parent) {
@@ -76,6 +59,14 @@ class MacroStringify : public MacroSubstitution {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MacroStringify> from(const Reference &r) {
+    return MacroStringify::from(r.as_macro());
+  }
+
+  inline static std::optional<MacroStringify> from(const TokenContext &t) {
+    return MacroStringify::from(t.as_macro());
   }
 
 };

@@ -22,6 +22,7 @@
 #include "../Token.h"
 
 #include <compare>
+
 #include "LangAS.h"
 #include "Linkage.h"
 #include "NullabilityKind.h"
@@ -63,6 +64,7 @@ class Type {
   std::shared_ptr<const TypeImpl> impl;
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
  public:
   Type(Type &&) noexcept = default;
   Type(const Type &) = default;
@@ -83,8 +85,10 @@ class Type {
 
  public:
   static gap::generator<Type> in(const Fragment &frag, std::span<TypeKind> kinds);
+  static gap::generator<Type> in(const File &file, std::span<TypeKind> kinds);
   static gap::generator<Type> in(const Index &index, std::span<TypeKind> kinds);
   static gap::generator<Type> in(const Fragment &frag);
+  static gap::generator<Type> in(const File &file);
   static gap::generator<Type> in(const Index &index);
   static gap::generator<Type> containing(const Token &tok);
   bool contains(const Token &tok) const;

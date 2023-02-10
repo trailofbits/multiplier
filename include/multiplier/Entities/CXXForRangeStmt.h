@@ -37,6 +37,7 @@ class CXXForRangeStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CXXForRangeStmt> in(const Fragment &frag);
+  static gap::generator<CXXForRangeStmt> in(const File &file);
   static gap::generator<CXXForRangeStmt> in(const Index &index);
   static gap::generator<CXXForRangeStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,14 +56,6 @@ class CXXForRangeStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXForRangeStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXForRangeStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<CXXForRangeStmt> from(const Stmt &parent);
 
   inline static std::optional<CXXForRangeStmt> from(const std::optional<Stmt> &parent) {
@@ -71,6 +64,14 @@ class CXXForRangeStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXForRangeStmt> from(const Reference &r) {
+    return CXXForRangeStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXForRangeStmt> from(const TokenContext &t) {
+    return CXXForRangeStmt::from(t.as_statement());
   }
 
   DeclStmt begin_statement(void) const;

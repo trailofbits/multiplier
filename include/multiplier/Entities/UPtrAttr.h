@@ -36,6 +36,7 @@ class UPtrAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<UPtrAttr> in(const Fragment &frag);
+  static gap::generator<UPtrAttr> in(const File &file);
   static gap::generator<UPtrAttr> in(const Index &index);
   static gap::generator<UPtrAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class UPtrAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::U_PTR;
-  }
-
-  inline static std::optional<UPtrAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<UPtrAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<UPtrAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<UPtrAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return UPtrAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<UPtrAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class UPtrAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UPtrAttr> from(const Reference &r) {
+    return UPtrAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<UPtrAttr> from(const TokenContext &t) {
+    return UPtrAttr::from(t.as_attribute());
   }
 
 };

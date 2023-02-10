@@ -38,6 +38,7 @@ class OffsetOfExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OffsetOfExpr> in(const Fragment &frag);
+  static gap::generator<OffsetOfExpr> in(const File &file);
   static gap::generator<OffsetOfExpr> in(const Index &index);
   static gap::generator<OffsetOfExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class OffsetOfExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OffsetOfExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OffsetOfExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OffsetOfExpr> from(const Expr &parent);
-
-  inline static std::optional<OffsetOfExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return OffsetOfExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OffsetOfExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<OffsetOfExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return OffsetOfExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OffsetOfExpr> from(const Stmt &parent);
 
   inline static std::optional<OffsetOfExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class OffsetOfExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OffsetOfExpr> from(const Reference &r) {
+    return OffsetOfExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<OffsetOfExpr> from(const TokenContext &t) {
+    return OffsetOfExpr::from(t.as_statement());
   }
 
   Token operator_token(void) const;

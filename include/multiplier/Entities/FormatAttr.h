@@ -36,6 +36,7 @@ class FormatAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<FormatAttr> in(const Fragment &frag);
+  static gap::generator<FormatAttr> in(const File &file);
   static gap::generator<FormatAttr> in(const Index &index);
   static gap::generator<FormatAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class FormatAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FORMAT;
-  }
-
-  inline static std::optional<FormatAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<FormatAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<FormatAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<FormatAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return FormatAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FormatAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class FormatAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FormatAttr> from(const Reference &r) {
+    return FormatAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<FormatAttr> from(const TokenContext &t) {
+    return FormatAttr::from(t.as_attribute());
   }
 
 };

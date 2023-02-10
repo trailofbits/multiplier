@@ -36,6 +36,7 @@ class WeakAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<WeakAttr> in(const Fragment &frag);
+  static gap::generator<WeakAttr> in(const File &file);
   static gap::generator<WeakAttr> in(const Index &index);
   static gap::generator<WeakAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class WeakAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEAK;
-  }
-
-  inline static std::optional<WeakAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<WeakAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<WeakAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<WeakAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return WeakAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<WeakAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class WeakAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<WeakAttr> from(const Reference &r) {
+    return WeakAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<WeakAttr> from(const TokenContext &t) {
+    return WeakAttr::from(t.as_attribute());
   }
 
 };

@@ -36,6 +36,7 @@ class ObjCAtTryStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ObjCAtTryStmt> in(const Fragment &frag);
+  static gap::generator<ObjCAtTryStmt> in(const File &file);
   static gap::generator<ObjCAtTryStmt> in(const Index &index);
   static gap::generator<ObjCAtTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class ObjCAtTryStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCAtTryStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCAtTryStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<ObjCAtTryStmt> from(const Stmt &parent);
 
   inline static std::optional<ObjCAtTryStmt> from(const std::optional<Stmt> &parent) {
@@ -70,6 +63,14 @@ class ObjCAtTryStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCAtTryStmt> from(const Reference &r) {
+    return ObjCAtTryStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCAtTryStmt> from(const TokenContext &t) {
+    return ObjCAtTryStmt::from(t.as_statement());
   }
 
   Token at_try_token(void) const;

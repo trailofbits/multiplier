@@ -37,6 +37,7 @@ class MSAsmStmt : public AsmStmt {
   friend class Stmt;
  public:
   static gap::generator<MSAsmStmt> in(const Fragment &frag);
+  static gap::generator<MSAsmStmt> in(const File &file);
   static gap::generator<MSAsmStmt> in(const Index &index);
   static gap::generator<MSAsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class MSAsmStmt : public AsmStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<MSAsmStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<MSAsmStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<MSAsmStmt> from(const AsmStmt &parent);
-
-  inline static std::optional<MSAsmStmt> from(const std::optional<AsmStmt> &parent) {
-    if (parent) {
-      return MSAsmStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MSAsmStmt> from(const Stmt &parent);
 
   inline static std::optional<MSAsmStmt> from(const std::optional<Stmt> &parent) {
@@ -81,6 +64,14 @@ class MSAsmStmt : public AsmStmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MSAsmStmt> from(const Reference &r) {
+    return MSAsmStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<MSAsmStmt> from(const TokenContext &t) {
+    return MSAsmStmt::from(t.as_statement());
   }
 
   std::optional<std::string_view> nth_all_constraint(unsigned n) const;

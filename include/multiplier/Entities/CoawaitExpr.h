@@ -40,6 +40,7 @@ class CoawaitExpr : public CoroutineSuspendExpr {
   friend class Stmt;
  public:
   static gap::generator<CoawaitExpr> in(const Fragment &frag);
+  static gap::generator<CoawaitExpr> in(const File &file);
   static gap::generator<CoawaitExpr> in(const Index &index);
   static gap::generator<CoawaitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class CoawaitExpr : public CoroutineSuspendExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CoawaitExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CoawaitExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CoawaitExpr> from(const CoroutineSuspendExpr &parent);
-
-  inline static std::optional<CoawaitExpr> from(const std::optional<CoroutineSuspendExpr> &parent) {
-    if (parent) {
-      return CoawaitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CoawaitExpr> from(const Expr &parent);
-
-  inline static std::optional<CoawaitExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CoawaitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CoawaitExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CoawaitExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CoawaitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CoawaitExpr> from(const Stmt &parent);
 
   inline static std::optional<CoawaitExpr> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class CoawaitExpr : public CoroutineSuspendExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CoawaitExpr> from(const Reference &r) {
+    return CoawaitExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CoawaitExpr> from(const TokenContext &t) {
+    return CoawaitExpr::from(t.as_statement());
   }
 
   bool is_implicit(void) const;

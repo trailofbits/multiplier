@@ -38,6 +38,7 @@ class OMPArraySectionExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OMPArraySectionExpr> in(const Fragment &frag);
+  static gap::generator<OMPArraySectionExpr> in(const File &file);
   static gap::generator<OMPArraySectionExpr> in(const Index &index);
   static gap::generator<OMPArraySectionExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class OMPArraySectionExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPArraySectionExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPArraySectionExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPArraySectionExpr> from(const Expr &parent);
-
-  inline static std::optional<OMPArraySectionExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return OMPArraySectionExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPArraySectionExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<OMPArraySectionExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return OMPArraySectionExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPArraySectionExpr> from(const Stmt &parent);
 
   inline static std::optional<OMPArraySectionExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class OMPArraySectionExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPArraySectionExpr> from(const Reference &r) {
+    return OMPArraySectionExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPArraySectionExpr> from(const TokenContext &t) {
+    return OMPArraySectionExpr::from(t.as_statement());
   }
 
   Expr base(void) const;

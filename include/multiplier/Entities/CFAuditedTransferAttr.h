@@ -36,6 +36,7 @@ class CFAuditedTransferAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CFAuditedTransferAttr> in(const Fragment &frag);
+  static gap::generator<CFAuditedTransferAttr> in(const File &file);
   static gap::generator<CFAuditedTransferAttr> in(const Index &index);
   static gap::generator<CFAuditedTransferAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CFAuditedTransferAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_AUDITED_TRANSFER;
-  }
-
-  inline static std::optional<CFAuditedTransferAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CFAuditedTransferAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CFAuditedTransferAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CFAuditedTransferAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CFAuditedTransferAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CFAuditedTransferAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CFAuditedTransferAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CFAuditedTransferAttr> from(const Reference &r) {
+    return CFAuditedTransferAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CFAuditedTransferAttr> from(const TokenContext &t) {
+    return CFAuditedTransferAttr::from(t.as_attribute());
   }
 
 };

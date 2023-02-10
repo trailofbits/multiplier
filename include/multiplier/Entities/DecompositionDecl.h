@@ -43,6 +43,7 @@ class DecompositionDecl : public VarDecl {
   friend class Decl;
  public:
   static gap::generator<DecompositionDecl> in(const Fragment &frag);
+  static gap::generator<DecompositionDecl> in(const File &file);
   static gap::generator<DecompositionDecl> in(const Index &index);
   static gap::generator<DecompositionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -62,54 +63,6 @@ class DecompositionDecl : public VarDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<DecompositionDecl> redeclarations(void) const;
-  inline static std::optional<DecompositionDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<DecompositionDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<DecompositionDecl> from(const VarDecl &parent);
-
-  inline static std::optional<DecompositionDecl> from(const std::optional<VarDecl> &parent) {
-    if (parent) {
-      return DecompositionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<DecompositionDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<DecompositionDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return DecompositionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<DecompositionDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<DecompositionDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return DecompositionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<DecompositionDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<DecompositionDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return DecompositionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<DecompositionDecl> from(const Decl &parent);
 
   inline static std::optional<DecompositionDecl> from(const std::optional<Decl> &parent) {
@@ -118,6 +71,14 @@ class DecompositionDecl : public VarDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DecompositionDecl> from(const Reference &r) {
+    return DecompositionDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<DecompositionDecl> from(const TokenContext &t) {
+    return DecompositionDecl::from(t.as_declaration());
   }
 
   std::optional<BindingDecl> nth_binding(unsigned n) const;

@@ -44,6 +44,7 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   friend class Decl;
  public:
   static gap::generator<CXXDeductionGuideDecl> in(const Fragment &frag);
+  static gap::generator<CXXDeductionGuideDecl> in(const File &file);
   static gap::generator<CXXDeductionGuideDecl> in(const Index &index);
   static gap::generator<CXXDeductionGuideDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -63,54 +64,6 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<CXXDeductionGuideDecl> redeclarations(void) const;
-  inline static std::optional<CXXDeductionGuideDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<CXXDeductionGuideDecl> from(const FunctionDecl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<FunctionDecl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXDeductionGuideDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXDeductionGuideDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXDeductionGuideDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXDeductionGuideDecl> from(const Decl &parent);
 
   inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<Decl> &parent) {
@@ -119,6 +72,14 @@ class CXXDeductionGuideDecl : public FunctionDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXDeductionGuideDecl> from(const Reference &r) {
+    return CXXDeductionGuideDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<CXXDeductionGuideDecl> from(const TokenContext &t) {
+    return CXXDeductionGuideDecl::from(t.as_declaration());
   }
 
   CXXConstructorDecl corresponding_constructor(void) const;

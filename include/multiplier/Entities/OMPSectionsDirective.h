@@ -37,6 +37,7 @@ class OMPSectionsDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPSectionsDirective> in(const Fragment &frag);
+  static gap::generator<OMPSectionsDirective> in(const File &file);
   static gap::generator<OMPSectionsDirective> in(const Index &index);
   static gap::generator<OMPSectionsDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class OMPSectionsDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPSectionsDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPSectionsDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPSectionsDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPSectionsDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPSectionsDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPSectionsDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPSectionsDirective> from(const std::optional<Stmt> &parent) {
@@ -81,6 +64,14 @@ class OMPSectionsDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPSectionsDirective> from(const Reference &r) {
+    return OMPSectionsDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPSectionsDirective> from(const TokenContext &t) {
+    return OMPSectionsDirective::from(t.as_statement());
   }
 
   Expr task_reduction_reference_expression(void) const;

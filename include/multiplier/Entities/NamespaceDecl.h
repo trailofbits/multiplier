@@ -36,6 +36,7 @@ class NamespaceDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<NamespaceDecl> in(const Fragment &frag);
+  static gap::generator<NamespaceDecl> in(const File &file);
   static gap::generator<NamespaceDecl> in(const Index &index);
   static gap::generator<NamespaceDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class NamespaceDecl : public NamedDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<NamespaceDecl> redeclarations(void) const;
-  inline static std::optional<NamespaceDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<NamespaceDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<NamespaceDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<NamespaceDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return NamespaceDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<NamespaceDecl> from(const Decl &parent);
 
   inline static std::optional<NamespaceDecl> from(const std::optional<Decl> &parent) {
@@ -81,6 +64,14 @@ class NamespaceDecl : public NamedDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NamespaceDecl> from(const Reference &r) {
+    return NamespaceDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<NamespaceDecl> from(const TokenContext &t) {
+    return NamespaceDecl::from(t.as_declaration());
   }
 
   gap::generator<Decl> declarations_in_context(void) const;

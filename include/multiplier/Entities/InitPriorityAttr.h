@@ -36,6 +36,7 @@ class InitPriorityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<InitPriorityAttr> in(const Fragment &frag);
+  static gap::generator<InitPriorityAttr> in(const File &file);
   static gap::generator<InitPriorityAttr> in(const Index &index);
   static gap::generator<InitPriorityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class InitPriorityAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_PRIORITY;
-  }
-
-  inline static std::optional<InitPriorityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<InitPriorityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<InitPriorityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<InitPriorityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return InitPriorityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<InitPriorityAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class InitPriorityAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<InitPriorityAttr> from(const Reference &r) {
+    return InitPriorityAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<InitPriorityAttr> from(const TokenContext &t) {
+    return InitPriorityAttr::from(t.as_attribute());
   }
 
 };

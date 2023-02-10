@@ -48,6 +48,7 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   friend class Decl;
  public:
   static gap::generator<ClassTemplateSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<ClassTemplateSpecializationDecl> in(const File &file);
   static gap::generator<ClassTemplateSpecializationDecl> in(const Index &index);
   static gap::generator<ClassTemplateSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -67,64 +68,6 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ClassTemplateSpecializationDecl> redeclarations(void) const;
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ClassTemplateSpecializationDecl> from(const CXXRecordDecl &parent);
-
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<CXXRecordDecl> &parent) {
-    if (parent) {
-      return ClassTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ClassTemplateSpecializationDecl> from(const RecordDecl &parent);
-
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<RecordDecl> &parent) {
-    if (parent) {
-      return ClassTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ClassTemplateSpecializationDecl> from(const TagDecl &parent);
-
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<TagDecl> &parent) {
-    if (parent) {
-      return ClassTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ClassTemplateSpecializationDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return ClassTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ClassTemplateSpecializationDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ClassTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ClassTemplateSpecializationDecl> from(const Decl &parent);
 
   inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<Decl> &parent) {
@@ -133,6 +76,14 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const Reference &r) {
+    return ClassTemplateSpecializationDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &t) {
+    return ClassTemplateSpecializationDecl::from(t.as_declaration());
   }
 
   Token extern_token(void) const;

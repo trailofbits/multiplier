@@ -35,6 +35,7 @@ class MSDependentExistsStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<MSDependentExistsStmt> in(const Fragment &frag);
+  static gap::generator<MSDependentExistsStmt> in(const File &file);
   static gap::generator<MSDependentExistsStmt> in(const Index &index);
   static gap::generator<MSDependentExistsStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class MSDependentExistsStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<MSDependentExistsStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<MSDependentExistsStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<MSDependentExistsStmt> from(const Stmt &parent);
 
   inline static std::optional<MSDependentExistsStmt> from(const std::optional<Stmt> &parent) {
@@ -69,6 +62,14 @@ class MSDependentExistsStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MSDependentExistsStmt> from(const Reference &r) {
+    return MSDependentExistsStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<MSDependentExistsStmt> from(const TokenContext &t) {
+    return MSDependentExistsStmt::from(t.as_statement());
   }
 
   Token keyword_token(void) const;

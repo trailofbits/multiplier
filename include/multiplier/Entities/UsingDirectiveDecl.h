@@ -36,6 +36,7 @@ class UsingDirectiveDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<UsingDirectiveDecl> in(const Fragment &frag);
+  static gap::generator<UsingDirectiveDecl> in(const File &file);
   static gap::generator<UsingDirectiveDecl> in(const Index &index);
   static gap::generator<UsingDirectiveDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class UsingDirectiveDecl : public NamedDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<UsingDirectiveDecl> redeclarations(void) const;
-  inline static std::optional<UsingDirectiveDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<UsingDirectiveDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<UsingDirectiveDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<UsingDirectiveDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return UsingDirectiveDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UsingDirectiveDecl> from(const Decl &parent);
 
   inline static std::optional<UsingDirectiveDecl> from(const std::optional<Decl> &parent) {
@@ -81,6 +64,14 @@ class UsingDirectiveDecl : public NamedDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UsingDirectiveDecl> from(const Reference &r) {
+    return UsingDirectiveDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<UsingDirectiveDecl> from(const TokenContext &t) {
+    return UsingDirectiveDecl::from(t.as_declaration());
   }
 
   Token identifier_token(void) const;

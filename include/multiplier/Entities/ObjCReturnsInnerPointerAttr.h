@@ -36,6 +36,7 @@ class ObjCReturnsInnerPointerAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCReturnsInnerPointerAttr> in(const Fragment &frag);
+  static gap::generator<ObjCReturnsInnerPointerAttr> in(const File &file);
   static gap::generator<ObjCReturnsInnerPointerAttr> in(const Index &index);
   static gap::generator<ObjCReturnsInnerPointerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCReturnsInnerPointerAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_RETURNS_INNER_POINTER;
-  }
-
-  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCReturnsInnerPointerAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCReturnsInnerPointerAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCReturnsInnerPointerAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCReturnsInnerPointerAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const Reference &r) {
+    return ObjCReturnsInnerPointerAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const TokenContext &t) {
+    return ObjCReturnsInnerPointerAttr::from(t.as_attribute());
   }
 
 };

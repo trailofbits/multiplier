@@ -38,6 +38,7 @@ class MSGuidDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<MSGuidDecl> in(const Fragment &frag);
+  static gap::generator<MSGuidDecl> in(const File &file);
   static gap::generator<MSGuidDecl> in(const Index &index);
   static gap::generator<MSGuidDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class MSGuidDecl : public ValueDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<MSGuidDecl> redeclarations(void) const;
-  inline static std::optional<MSGuidDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<MSGuidDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<MSGuidDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<MSGuidDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return MSGuidDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<MSGuidDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<MSGuidDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return MSGuidDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MSGuidDecl> from(const Decl &parent);
 
   inline static std::optional<MSGuidDecl> from(const std::optional<Decl> &parent) {
@@ -93,6 +66,14 @@ class MSGuidDecl : public ValueDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MSGuidDecl> from(const Reference &r) {
+    return MSGuidDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<MSGuidDecl> from(const TokenContext &t) {
+    return MSGuidDecl::from(t.as_declaration());
   }
 
 };

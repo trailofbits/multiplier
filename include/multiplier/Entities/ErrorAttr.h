@@ -37,6 +37,7 @@ class ErrorAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ErrorAttr> in(const Fragment &frag);
+  static gap::generator<ErrorAttr> in(const File &file);
   static gap::generator<ErrorAttr> in(const Index &index);
   static gap::generator<ErrorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ErrorAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ERROR;
-  }
-
-  inline static std::optional<ErrorAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ErrorAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ErrorAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ErrorAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ErrorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ErrorAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class ErrorAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ErrorAttr> from(const Reference &r) {
+    return ErrorAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ErrorAttr> from(const TokenContext &t) {
+    return ErrorAttr::from(t.as_attribute());
   }
 
   ErrorAttrSpelling semantic_spelling(void) const;

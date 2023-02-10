@@ -38,6 +38,7 @@ class OwnershipAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OwnershipAttr> in(const Fragment &frag);
+  static gap::generator<OwnershipAttr> in(const File &file);
   static gap::generator<OwnershipAttr> in(const Index &index);
   static gap::generator<OwnershipAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,24 +46,6 @@ class OwnershipAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OWNERSHIP;
-  }
-
-  inline static std::optional<OwnershipAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OwnershipAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OwnershipAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OwnershipAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OwnershipAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OwnershipAttr> from(const Attr &parent);
@@ -73,6 +56,14 @@ class OwnershipAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OwnershipAttr> from(const Reference &r) {
+    return OwnershipAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OwnershipAttr> from(const TokenContext &t) {
+    return OwnershipAttr::from(t.as_attribute());
   }
 
   OwnershipAttrOwnershipKind own_kind(void) const;

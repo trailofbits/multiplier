@@ -44,6 +44,7 @@ class ObjCIvarDecl : public FieldDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCIvarDecl> in(const Fragment &frag);
+  static gap::generator<ObjCIvarDecl> in(const File &file);
   static gap::generator<ObjCIvarDecl> in(const Index &index);
   static gap::generator<ObjCIvarDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -63,54 +64,6 @@ class ObjCIvarDecl : public FieldDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCIvarDecl> redeclarations(void) const;
-  inline static std::optional<ObjCIvarDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCIvarDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCIvarDecl> from(const FieldDecl &parent);
-
-  inline static std::optional<ObjCIvarDecl> from(const std::optional<FieldDecl> &parent) {
-    if (parent) {
-      return ObjCIvarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCIvarDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<ObjCIvarDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return ObjCIvarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCIvarDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<ObjCIvarDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return ObjCIvarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCIvarDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCIvarDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCIvarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCIvarDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCIvarDecl> from(const std::optional<Decl> &parent) {
@@ -119,6 +72,14 @@ class ObjCIvarDecl : public FieldDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCIvarDecl> from(const Reference &r) {
+    return ObjCIvarDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCIvarDecl> from(const TokenContext &t) {
+    return ObjCIvarDecl::from(t.as_declaration());
   }
 
   ObjCIvarDeclAccessControl access_control(void) const;

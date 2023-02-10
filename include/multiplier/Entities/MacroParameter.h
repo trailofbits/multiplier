@@ -35,6 +35,7 @@ class MacroParameter : public Macro {
   friend class Macro;
  public:
   static gap::generator<MacroParameter> in(const Fragment &frag);
+  static gap::generator<MacroParameter> in(const File &file);
 
   static gap::generator<MacroParameter> in(const Index &index);
   static std::optional<MacroParameter> by_id(const Index &, EntityId);
@@ -49,14 +50,6 @@ class MacroParameter : public Macro {
   static gap::generator<MacroParameter> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroParameter> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroParameter> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
   static std::optional<MacroParameter> from(const Macro &parent);
 
   inline static std::optional<MacroParameter> from(const std::optional<Macro> &parent) {
@@ -65,6 +58,14 @@ class MacroParameter : public Macro {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MacroParameter> from(const Reference &r) {
+    return MacroParameter::from(r.as_macro());
+  }
+
+  inline static std::optional<MacroParameter> from(const TokenContext &t) {
+    return MacroParameter::from(t.as_macro());
   }
 
   Token variadic_dots(void) const;

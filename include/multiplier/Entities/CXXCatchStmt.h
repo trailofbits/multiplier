@@ -36,6 +36,7 @@ class CXXCatchStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CXXCatchStmt> in(const Fragment &frag);
+  static gap::generator<CXXCatchStmt> in(const File &file);
   static gap::generator<CXXCatchStmt> in(const Index &index);
   static gap::generator<CXXCatchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class CXXCatchStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXCatchStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXCatchStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
 
   inline static std::optional<CXXCatchStmt> from(const std::optional<Stmt> &parent) {
@@ -70,6 +63,14 @@ class CXXCatchStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXCatchStmt> from(const Reference &r) {
+    return CXXCatchStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXCatchStmt> from(const TokenContext &t) {
+    return CXXCatchStmt::from(t.as_statement());
   }
 
   Token catch_token(void) const;

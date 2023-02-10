@@ -36,6 +36,7 @@ class LeafAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<LeafAttr> in(const Fragment &frag);
+  static gap::generator<LeafAttr> in(const File &file);
   static gap::generator<LeafAttr> in(const Index &index);
   static gap::generator<LeafAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class LeafAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LEAF;
-  }
-
-  inline static std::optional<LeafAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<LeafAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<LeafAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<LeafAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return LeafAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<LeafAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class LeafAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LeafAttr> from(const Reference &r) {
+    return LeafAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<LeafAttr> from(const TokenContext &t) {
+    return LeafAttr::from(t.as_attribute());
   }
 
 };

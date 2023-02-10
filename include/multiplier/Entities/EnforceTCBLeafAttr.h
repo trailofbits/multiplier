@@ -36,6 +36,7 @@ class EnforceTCBLeafAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<EnforceTCBLeafAttr> in(const Fragment &frag);
+  static gap::generator<EnforceTCBLeafAttr> in(const File &file);
   static gap::generator<EnforceTCBLeafAttr> in(const Index &index);
   static gap::generator<EnforceTCBLeafAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class EnforceTCBLeafAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENFORCE_TCB_LEAF;
-  }
-
-  inline static std::optional<EnforceTCBLeafAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<EnforceTCBLeafAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<EnforceTCBLeafAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<EnforceTCBLeafAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return EnforceTCBLeafAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<EnforceTCBLeafAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class EnforceTCBLeafAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<EnforceTCBLeafAttr> from(const Reference &r) {
+    return EnforceTCBLeafAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<EnforceTCBLeafAttr> from(const TokenContext &t) {
+    return EnforceTCBLeafAttr::from(t.as_attribute());
   }
 
   std::string_view tcb_name(void) const;

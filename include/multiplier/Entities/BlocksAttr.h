@@ -37,6 +37,7 @@ class BlocksAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<BlocksAttr> in(const Fragment &frag);
+  static gap::generator<BlocksAttr> in(const File &file);
   static gap::generator<BlocksAttr> in(const Index &index);
   static gap::generator<BlocksAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class BlocksAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BLOCKS;
-  }
-
-  inline static std::optional<BlocksAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<BlocksAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<BlocksAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<BlocksAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return BlocksAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<BlocksAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class BlocksAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BlocksAttr> from(const Reference &r) {
+    return BlocksAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<BlocksAttr> from(const TokenContext &t) {
+    return BlocksAttr::from(t.as_attribute());
   }
 
   BlocksAttrBlockType type(void) const;

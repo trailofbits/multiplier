@@ -36,6 +36,7 @@ class AttributedType : public Type {
   friend class Type;
  public:
   static gap::generator<AttributedType> in(const Fragment &frag);
+  static gap::generator<AttributedType> in(const File &file);
   static gap::generator<AttributedType> in(const Index &index);
   static gap::generator<AttributedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,14 +44,6 @@ class AttributedType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ATTRIBUTED;
-  }
-
-  inline static std::optional<AttributedType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<AttributedType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<AttributedType> from(const Type &parent);
@@ -61,6 +54,14 @@ class AttributedType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AttributedType> from(const Reference &r) {
+    return AttributedType::from(r.as_type());
+  }
+
+  inline static std::optional<AttributedType> from(const TokenContext &t) {
+    return AttributedType::from(t.as_type());
   }
 
   Type desugar(void) const;

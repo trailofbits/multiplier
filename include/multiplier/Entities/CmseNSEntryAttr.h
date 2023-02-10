@@ -36,6 +36,7 @@ class CmseNSEntryAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CmseNSEntryAttr> in(const Fragment &frag);
+  static gap::generator<CmseNSEntryAttr> in(const File &file);
   static gap::generator<CmseNSEntryAttr> in(const Index &index);
   static gap::generator<CmseNSEntryAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CmseNSEntryAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CMSE_NS_ENTRY;
-  }
-
-  inline static std::optional<CmseNSEntryAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CmseNSEntryAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CmseNSEntryAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CmseNSEntryAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CmseNSEntryAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CmseNSEntryAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CmseNSEntryAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CmseNSEntryAttr> from(const Reference &r) {
+    return CmseNSEntryAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CmseNSEntryAttr> from(const TokenContext &t) {
+    return CmseNSEntryAttr::from(t.as_attribute());
   }
 
 };

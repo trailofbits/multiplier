@@ -36,6 +36,7 @@ class EnumType : public TagType {
   friend class Type;
  public:
   static gap::generator<EnumType> in(const Fragment &frag);
+  static gap::generator<EnumType> in(const File &file);
   static gap::generator<EnumType> in(const Index &index);
   static gap::generator<EnumType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class EnumType : public TagType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ENUM;
-  }
-
-  inline static std::optional<EnumType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<EnumType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<EnumType> from(const TagType &parent);
-
-  inline static std::optional<EnumType> from(const std::optional<TagType> &parent) {
-    if (parent) {
-      return EnumType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<EnumType> from(const Type &parent);
@@ -71,6 +54,14 @@ class EnumType : public TagType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<EnumType> from(const Reference &r) {
+    return EnumType::from(r.as_type());
+  }
+
+  inline static std::optional<EnumType> from(const TokenContext &t) {
+    return EnumType::from(t.as_type());
   }
 
   Type desugar(void) const;

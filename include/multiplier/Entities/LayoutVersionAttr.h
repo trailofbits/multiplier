@@ -36,6 +36,7 @@ class LayoutVersionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<LayoutVersionAttr> in(const Fragment &frag);
+  static gap::generator<LayoutVersionAttr> in(const File &file);
   static gap::generator<LayoutVersionAttr> in(const Index &index);
   static gap::generator<LayoutVersionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class LayoutVersionAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LAYOUT_VERSION;
-  }
-
-  inline static std::optional<LayoutVersionAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<LayoutVersionAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<LayoutVersionAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<LayoutVersionAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return LayoutVersionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<LayoutVersionAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class LayoutVersionAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LayoutVersionAttr> from(const Reference &r) {
+    return LayoutVersionAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<LayoutVersionAttr> from(const TokenContext &t) {
+    return LayoutVersionAttr::from(t.as_attribute());
   }
 
 };

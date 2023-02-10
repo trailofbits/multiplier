@@ -38,6 +38,7 @@ class ImplicitValueInitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ImplicitValueInitExpr> in(const Fragment &frag);
+  static gap::generator<ImplicitValueInitExpr> in(const File &file);
   static gap::generator<ImplicitValueInitExpr> in(const Index &index);
   static gap::generator<ImplicitValueInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class ImplicitValueInitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ImplicitValueInitExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ImplicitValueInitExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ImplicitValueInitExpr> from(const Expr &parent);
-
-  inline static std::optional<ImplicitValueInitExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ImplicitValueInitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ImplicitValueInitExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ImplicitValueInitExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ImplicitValueInitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ImplicitValueInitExpr> from(const Stmt &parent);
 
   inline static std::optional<ImplicitValueInitExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class ImplicitValueInitExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ImplicitValueInitExpr> from(const Reference &r) {
+    return ImplicitValueInitExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ImplicitValueInitExpr> from(const TokenContext &t) {
+    return ImplicitValueInitExpr::from(t.as_statement());
   }
 
 };

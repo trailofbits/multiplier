@@ -35,6 +35,7 @@ class ImportDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<ImportDecl> in(const Fragment &frag);
+  static gap::generator<ImportDecl> in(const File &file);
   static gap::generator<ImportDecl> in(const Index &index);
   static gap::generator<ImportDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class ImportDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ImportDecl> redeclarations(void) const;
-  inline static std::optional<ImportDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ImportDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<ImportDecl> from(const Decl &parent);
 
   inline static std::optional<ImportDecl> from(const std::optional<Decl> &parent) {
@@ -70,6 +63,14 @@ class ImportDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ImportDecl> from(const Reference &r) {
+    return ImportDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ImportDecl> from(const TokenContext &t) {
+    return ImportDecl::from(t.as_declaration());
   }
 
   std::optional<Token> nth_identifier_token(unsigned n) const;

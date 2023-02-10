@@ -36,6 +36,7 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTaskyieldDirective> in(const Fragment &frag);
+  static gap::generator<OMPTaskyieldDirective> in(const File &file);
   static gap::generator<OMPTaskyieldDirective> in(const Index &index);
   static gap::generator<OMPTaskyieldDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPTaskyieldDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTaskyieldDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPTaskyieldDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPTaskyieldDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPTaskyieldDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPTaskyieldDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPTaskyieldDirective> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class OMPTaskyieldDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPTaskyieldDirective> from(const Reference &r) {
+    return OMPTaskyieldDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPTaskyieldDirective> from(const TokenContext &t) {
+    return OMPTaskyieldDirective::from(t.as_statement());
   }
 
 };

@@ -36,6 +36,7 @@ class CallableWhenAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CallableWhenAttr> in(const Fragment &frag);
+  static gap::generator<CallableWhenAttr> in(const File &file);
   static gap::generator<CallableWhenAttr> in(const Index &index);
   static gap::generator<CallableWhenAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CallableWhenAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CALLABLE_WHEN;
-  }
-
-  inline static std::optional<CallableWhenAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CallableWhenAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CallableWhenAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CallableWhenAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CallableWhenAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CallableWhenAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CallableWhenAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CallableWhenAttr> from(const Reference &r) {
+    return CallableWhenAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CallableWhenAttr> from(const TokenContext &t) {
+    return CallableWhenAttr::from(t.as_attribute());
   }
 
 };

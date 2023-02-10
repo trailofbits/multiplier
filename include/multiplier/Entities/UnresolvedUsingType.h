@@ -35,6 +35,7 @@ class UnresolvedUsingType : public Type {
   friend class Type;
  public:
   static gap::generator<UnresolvedUsingType> in(const Fragment &frag);
+  static gap::generator<UnresolvedUsingType> in(const File &file);
   static gap::generator<UnresolvedUsingType> in(const Index &index);
   static gap::generator<UnresolvedUsingType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class UnresolvedUsingType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::UNRESOLVED_USING;
-  }
-
-  inline static std::optional<UnresolvedUsingType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<UnresolvedUsingType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<UnresolvedUsingType> from(const Type &parent);
@@ -60,6 +53,14 @@ class UnresolvedUsingType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnresolvedUsingType> from(const Reference &r) {
+    return UnresolvedUsingType::from(r.as_type());
+  }
+
+  inline static std::optional<UnresolvedUsingType> from(const TokenContext &t) {
+    return UnresolvedUsingType::from(t.as_type());
   }
 
   Type desugar(void) const;

@@ -36,6 +36,7 @@ class PragmaClangDataSectionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PragmaClangDataSectionAttr> in(const Fragment &frag);
+  static gap::generator<PragmaClangDataSectionAttr> in(const File &file);
   static gap::generator<PragmaClangDataSectionAttr> in(const Index &index);
   static gap::generator<PragmaClangDataSectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class PragmaClangDataSectionAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRAGMA_CLANG_DATA_SECTION;
-  }
-
-  inline static std::optional<PragmaClangDataSectionAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PragmaClangDataSectionAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PragmaClangDataSectionAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PragmaClangDataSectionAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PragmaClangDataSectionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PragmaClangDataSectionAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class PragmaClangDataSectionAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PragmaClangDataSectionAttr> from(const Reference &r) {
+    return PragmaClangDataSectionAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PragmaClangDataSectionAttr> from(const TokenContext &t) {
+    return PragmaClangDataSectionAttr::from(t.as_attribute());
   }
 
   std::string_view name(void) const;

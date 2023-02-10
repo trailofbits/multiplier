@@ -36,6 +36,7 @@ class CFICanonicalJumpTableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CFICanonicalJumpTableAttr> in(const Fragment &frag);
+  static gap::generator<CFICanonicalJumpTableAttr> in(const File &file);
   static gap::generator<CFICanonicalJumpTableAttr> in(const Index &index);
   static gap::generator<CFICanonicalJumpTableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CFICanonicalJumpTableAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CFI_CANONICAL_JUMP_TABLE;
-  }
-
-  inline static std::optional<CFICanonicalJumpTableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CFICanonicalJumpTableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CFICanonicalJumpTableAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CFICanonicalJumpTableAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CFICanonicalJumpTableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CFICanonicalJumpTableAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CFICanonicalJumpTableAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CFICanonicalJumpTableAttr> from(const Reference &r) {
+    return CFICanonicalJumpTableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CFICanonicalJumpTableAttr> from(const TokenContext &t) {
+    return CFICanonicalJumpTableAttr::from(t.as_attribute());
   }
 
 };

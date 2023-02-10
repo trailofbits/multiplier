@@ -36,6 +36,7 @@ class ConsumableAutoCastAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ConsumableAutoCastAttr> in(const Fragment &frag);
+  static gap::generator<ConsumableAutoCastAttr> in(const File &file);
   static gap::generator<ConsumableAutoCastAttr> in(const Index &index);
   static gap::generator<ConsumableAutoCastAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ConsumableAutoCastAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE_AUTO_CAST;
-  }
-
-  inline static std::optional<ConsumableAutoCastAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ConsumableAutoCastAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ConsumableAutoCastAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ConsumableAutoCastAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ConsumableAutoCastAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ConsumableAutoCastAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ConsumableAutoCastAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ConsumableAutoCastAttr> from(const Reference &r) {
+    return ConsumableAutoCastAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ConsumableAutoCastAttr> from(const TokenContext &t) {
+    return ConsumableAutoCastAttr::from(t.as_attribute());
   }
 
 };

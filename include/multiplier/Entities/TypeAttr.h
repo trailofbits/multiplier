@@ -34,18 +34,11 @@ class TypeAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<TypeAttr> in(const Fragment &frag);
+  static gap::generator<TypeAttr> in(const File &file);
   static gap::generator<TypeAttr> in(const Index &index);
   static gap::generator<TypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeAttr> by_id(const Index &, EntityId);
-
-  inline static std::optional<TypeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TypeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
 
   static std::optional<TypeAttr> from(const Attr &parent);
 
@@ -55,6 +48,14 @@ class TypeAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypeAttr> from(const Reference &r) {
+    return TypeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<TypeAttr> from(const TokenContext &t) {
+    return TypeAttr::from(t.as_attribute());
   }
 
 };

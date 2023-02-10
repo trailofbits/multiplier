@@ -35,6 +35,7 @@ class AlignValueAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<AlignValueAttr> in(const Fragment &frag);
+  static gap::generator<AlignValueAttr> in(const File &file);
   static gap::generator<AlignValueAttr> in(const Index &index);
   static gap::generator<AlignValueAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class AlignValueAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGN_VALUE;
-  }
-
-  inline static std::optional<AlignValueAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AlignValueAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<AlignValueAttr> from(const Attr &parent);
@@ -60,6 +53,14 @@ class AlignValueAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AlignValueAttr> from(const Reference &r) {
+    return AlignValueAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AlignValueAttr> from(const TokenContext &t) {
+    return AlignValueAttr::from(t.as_attribute());
   }
 
   Expr alignment(void) const;

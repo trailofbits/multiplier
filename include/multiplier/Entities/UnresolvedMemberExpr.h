@@ -41,6 +41,7 @@ class UnresolvedMemberExpr : public OverloadExpr {
   friend class Stmt;
  public:
   static gap::generator<UnresolvedMemberExpr> in(const Fragment &frag);
+  static gap::generator<UnresolvedMemberExpr> in(const File &file);
   static gap::generator<UnresolvedMemberExpr> in(const Index &index);
   static gap::generator<UnresolvedMemberExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class UnresolvedMemberExpr : public OverloadExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<UnresolvedMemberExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<UnresolvedMemberExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<UnresolvedMemberExpr> from(const OverloadExpr &parent);
-
-  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<OverloadExpr> &parent) {
-    if (parent) {
-      return UnresolvedMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedMemberExpr> from(const Expr &parent);
-
-  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return UnresolvedMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedMemberExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return UnresolvedMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UnresolvedMemberExpr> from(const Stmt &parent);
 
   inline static std::optional<UnresolvedMemberExpr> from(const std::optional<Stmt> &parent) {
@@ -105,6 +68,14 @@ class UnresolvedMemberExpr : public OverloadExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnresolvedMemberExpr> from(const Reference &r) {
+    return UnresolvedMemberExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<UnresolvedMemberExpr> from(const TokenContext &t) {
+    return UnresolvedMemberExpr::from(t.as_statement());
   }
 
   Expr base(void) const;

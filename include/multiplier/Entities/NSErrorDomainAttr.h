@@ -37,6 +37,7 @@ class NSErrorDomainAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NSErrorDomainAttr> in(const Fragment &frag);
+  static gap::generator<NSErrorDomainAttr> in(const File &file);
   static gap::generator<NSErrorDomainAttr> in(const Index &index);
   static gap::generator<NSErrorDomainAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class NSErrorDomainAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_ERROR_DOMAIN;
-  }
-
-  inline static std::optional<NSErrorDomainAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NSErrorDomainAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NSErrorDomainAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NSErrorDomainAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NSErrorDomainAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NSErrorDomainAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class NSErrorDomainAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NSErrorDomainAttr> from(const Reference &r) {
+    return NSErrorDomainAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NSErrorDomainAttr> from(const TokenContext &t) {
+    return NSErrorDomainAttr::from(t.as_attribute());
   }
 
   VarDecl error_domain(void) const;

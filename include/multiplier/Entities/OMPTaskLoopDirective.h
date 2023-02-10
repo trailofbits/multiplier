@@ -40,6 +40,7 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTaskLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPTaskLoopDirective> in(const File &file);
   static gap::generator<OMPTaskLoopDirective> in(const Index &index);
   static gap::generator<OMPTaskLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPTaskLoopDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTaskLoopDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPTaskLoopDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPTaskLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPTaskLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPTaskLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPTaskLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPTaskLoopDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPTaskLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPTaskLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPTaskLoopDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPTaskLoopDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPTaskLoopDirective> from(const Reference &r) {
+    return OMPTaskLoopDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPTaskLoopDirective> from(const TokenContext &t) {
+    return OMPTaskLoopDirective::from(t.as_statement());
   }
 
   bool has_cancel(void) const;

@@ -37,6 +37,7 @@ class CFGuardAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CFGuardAttr> in(const Fragment &frag);
+  static gap::generator<CFGuardAttr> in(const File &file);
   static gap::generator<CFGuardAttr> in(const Index &index);
   static gap::generator<CFGuardAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class CFGuardAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_GUARD;
-  }
-
-  inline static std::optional<CFGuardAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CFGuardAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CFGuardAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CFGuardAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CFGuardAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CFGuardAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class CFGuardAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CFGuardAttr> from(const Reference &r) {
+    return CFGuardAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CFGuardAttr> from(const TokenContext &t) {
+    return CFGuardAttr::from(t.as_attribute());
   }
 
   CFGuardAttrGuardArg guard(void) const;

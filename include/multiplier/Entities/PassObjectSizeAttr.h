@@ -39,6 +39,7 @@ class PassObjectSizeAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<PassObjectSizeAttr> in(const Fragment &frag);
+  static gap::generator<PassObjectSizeAttr> in(const File &file);
   static gap::generator<PassObjectSizeAttr> in(const Index &index);
   static gap::generator<PassObjectSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -46,34 +47,6 @@ class PassObjectSizeAttr : public InheritableParamAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PASS_OBJECT_SIZE;
-  }
-
-  inline static std::optional<PassObjectSizeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<PassObjectSizeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<PassObjectSizeAttr> from(const InheritableParamAttr &parent);
-
-  inline static std::optional<PassObjectSizeAttr> from(const std::optional<InheritableParamAttr> &parent) {
-    if (parent) {
-      return PassObjectSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<PassObjectSizeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<PassObjectSizeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return PassObjectSizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<PassObjectSizeAttr> from(const Attr &parent);
@@ -84,6 +57,14 @@ class PassObjectSizeAttr : public InheritableParamAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PassObjectSizeAttr> from(const Reference &r) {
+    return PassObjectSizeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<PassObjectSizeAttr> from(const TokenContext &t) {
+    return PassObjectSizeAttr::from(t.as_attribute());
   }
 
   PassObjectSizeAttrSpelling semantic_spelling(void) const;

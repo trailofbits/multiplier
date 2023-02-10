@@ -42,6 +42,7 @@ class Expr : public ValueStmt {
   friend class Stmt;
  public:
   static gap::generator<Expr> in(const Fragment &frag);
+  static gap::generator<Expr> in(const File &file);
   static gap::generator<Expr> in(const Index &index);
   static gap::generator<Expr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,24 +57,6 @@ class Expr : public ValueStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<Expr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<Expr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<Expr> from(const ValueStmt &parent);
-
-  inline static std::optional<Expr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return Expr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<Expr> from(const Stmt &parent);
 
   inline static std::optional<Expr> from(const std::optional<Stmt> &parent) {
@@ -82,6 +65,14 @@ class Expr : public ValueStmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<Expr> from(const Reference &r) {
+    return Expr::from(r.as_statement());
+  }
+
+  inline static std::optional<Expr> from(const TokenContext &t) {
+    return Expr::from(t.as_statement());
   }
 
   bool has_side_effects(void) const;

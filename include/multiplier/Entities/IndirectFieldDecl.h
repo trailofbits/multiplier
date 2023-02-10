@@ -40,6 +40,7 @@ class IndirectFieldDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<IndirectFieldDecl> in(const Fragment &frag);
+  static gap::generator<IndirectFieldDecl> in(const File &file);
   static gap::generator<IndirectFieldDecl> in(const Index &index);
   static gap::generator<IndirectFieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,34 +60,6 @@ class IndirectFieldDecl : public ValueDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<IndirectFieldDecl> redeclarations(void) const;
-  inline static std::optional<IndirectFieldDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<IndirectFieldDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<IndirectFieldDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<IndirectFieldDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return IndirectFieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<IndirectFieldDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<IndirectFieldDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return IndirectFieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<IndirectFieldDecl> from(const Decl &parent);
 
   inline static std::optional<IndirectFieldDecl> from(const std::optional<Decl> &parent) {
@@ -95,6 +68,14 @@ class IndirectFieldDecl : public ValueDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<IndirectFieldDecl> from(const Reference &r) {
+    return IndirectFieldDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<IndirectFieldDecl> from(const TokenContext &t) {
+    return IndirectFieldDecl::from(t.as_declaration());
   }
 
   gap::generator<NamedDecl> chain(void) const;

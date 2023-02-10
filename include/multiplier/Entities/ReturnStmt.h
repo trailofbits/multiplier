@@ -36,6 +36,7 @@ class ReturnStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ReturnStmt> in(const Fragment &frag);
+  static gap::generator<ReturnStmt> in(const File &file);
   static gap::generator<ReturnStmt> in(const Index &index);
   static gap::generator<ReturnStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class ReturnStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ReturnStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ReturnStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<ReturnStmt> from(const Stmt &parent);
 
   inline static std::optional<ReturnStmt> from(const std::optional<Stmt> &parent) {
@@ -70,6 +63,14 @@ class ReturnStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ReturnStmt> from(const Reference &r) {
+    return ReturnStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<ReturnStmt> from(const TokenContext &t) {
+    return ReturnStmt::from(t.as_statement());
   }
 
   std::optional<VarDecl> nrvo_candidate(void) const;

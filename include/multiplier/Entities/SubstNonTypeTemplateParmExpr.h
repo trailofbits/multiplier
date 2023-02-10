@@ -40,6 +40,7 @@ class SubstNonTypeTemplateParmExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<SubstNonTypeTemplateParmExpr> in(const Fragment &frag);
+  static gap::generator<SubstNonTypeTemplateParmExpr> in(const File &file);
   static gap::generator<SubstNonTypeTemplateParmExpr> in(const Index &index);
   static gap::generator<SubstNonTypeTemplateParmExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class SubstNonTypeTemplateParmExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<SubstNonTypeTemplateParmExpr> from(const Expr &parent);
-
-  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return SubstNonTypeTemplateParmExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<SubstNonTypeTemplateParmExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return SubstNonTypeTemplateParmExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<SubstNonTypeTemplateParmExpr> from(const Stmt &parent);
 
   inline static std::optional<SubstNonTypeTemplateParmExpr> from(const std::optional<Stmt> &parent) {
@@ -94,6 +67,14 @@ class SubstNonTypeTemplateParmExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const Reference &r) {
+    return SubstNonTypeTemplateParmExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const TokenContext &t) {
+    return SubstNonTypeTemplateParmExpr::from(t.as_statement());
   }
 
   Token name_token(void) const;

@@ -37,6 +37,7 @@ class HLSLShaderAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<HLSLShaderAttr> in(const Fragment &frag);
+  static gap::generator<HLSLShaderAttr> in(const File &file);
   static gap::generator<HLSLShaderAttr> in(const Index &index);
   static gap::generator<HLSLShaderAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class HLSLShaderAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSL_SHADER;
-  }
-
-  inline static std::optional<HLSLShaderAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<HLSLShaderAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<HLSLShaderAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<HLSLShaderAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return HLSLShaderAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<HLSLShaderAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class HLSLShaderAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<HLSLShaderAttr> from(const Reference &r) {
+    return HLSLShaderAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<HLSLShaderAttr> from(const TokenContext &t) {
+    return HLSLShaderAttr::from(t.as_attribute());
   }
 
   HLSLShaderAttrShaderType type(void) const;

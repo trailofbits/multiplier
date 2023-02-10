@@ -37,6 +37,7 @@ class OMPParallelDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPParallelDirective> in(const Fragment &frag);
+  static gap::generator<OMPParallelDirective> in(const File &file);
   static gap::generator<OMPParallelDirective> in(const Index &index);
   static gap::generator<OMPParallelDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -55,24 +56,6 @@ class OMPParallelDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPParallelDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPParallelDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPParallelDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPParallelDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPParallelDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPParallelDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPParallelDirective> from(const std::optional<Stmt> &parent) {
@@ -81,6 +64,14 @@ class OMPParallelDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPParallelDirective> from(const Reference &r) {
+    return OMPParallelDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPParallelDirective> from(const TokenContext &t) {
+    return OMPParallelDirective::from(t.as_statement());
   }
 
   Expr task_reduction_reference_expression(void) const;

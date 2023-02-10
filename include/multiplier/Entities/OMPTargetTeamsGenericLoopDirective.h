@@ -40,6 +40,7 @@ class OMPTargetTeamsGenericLoopDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTargetTeamsGenericLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPTargetTeamsGenericLoopDirective> in(const File &file);
   static gap::generator<OMPTargetTeamsGenericLoopDirective> in(const Index &index);
   static gap::generator<OMPTargetTeamsGenericLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPTargetTeamsGenericLoopDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPTargetTeamsGenericLoopDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTargetTeamsGenericLoopDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPTargetTeamsGenericLoopDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPTargetTeamsGenericLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPTargetTeamsGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPTargetTeamsGenericLoopDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPTargetTeamsGenericLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPTargetTeamsGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPTargetTeamsGenericLoopDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPTargetTeamsGenericLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPTargetTeamsGenericLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPTargetTeamsGenericLoopDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPTargetTeamsGenericLoopDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPTargetTeamsGenericLoopDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPTargetTeamsGenericLoopDirective> from(const Reference &r) {
+    return OMPTargetTeamsGenericLoopDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPTargetTeamsGenericLoopDirective> from(const TokenContext &t) {
+    return OMPTargetTeamsGenericLoopDirective::from(t.as_statement());
   }
 
 };

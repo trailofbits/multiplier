@@ -36,6 +36,7 @@ class FastCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<FastCallAttr> in(const Fragment &frag);
+  static gap::generator<FastCallAttr> in(const File &file);
   static gap::generator<FastCallAttr> in(const Index &index);
   static gap::generator<FastCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class FastCallAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FAST_CALL;
-  }
-
-  inline static std::optional<FastCallAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<FastCallAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<FastCallAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<FastCallAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return FastCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FastCallAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class FastCallAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FastCallAttr> from(const Reference &r) {
+    return FastCallAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<FastCallAttr> from(const TokenContext &t) {
+    return FastCallAttr::from(t.as_attribute());
   }
 
 };

@@ -36,6 +36,7 @@ class IncompleteArrayType : public ArrayType {
   friend class Type;
  public:
   static gap::generator<IncompleteArrayType> in(const Fragment &frag);
+  static gap::generator<IncompleteArrayType> in(const File &file);
   static gap::generator<IncompleteArrayType> in(const Index &index);
   static gap::generator<IncompleteArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class IncompleteArrayType : public ArrayType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::INCOMPLETE_ARRAY;
-  }
-
-  inline static std::optional<IncompleteArrayType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<IncompleteArrayType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<IncompleteArrayType> from(const ArrayType &parent);
-
-  inline static std::optional<IncompleteArrayType> from(const std::optional<ArrayType> &parent) {
-    if (parent) {
-      return IncompleteArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<IncompleteArrayType> from(const Type &parent);
@@ -71,6 +54,14 @@ class IncompleteArrayType : public ArrayType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<IncompleteArrayType> from(const Reference &r) {
+    return IncompleteArrayType::from(r.as_type());
+  }
+
+  inline static std::optional<IncompleteArrayType> from(const TokenContext &t) {
+    return IncompleteArrayType::from(t.as_type());
   }
 
   Type desugar(void) const;

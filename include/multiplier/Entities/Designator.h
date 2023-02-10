@@ -22,6 +22,7 @@
 #include "../Token.h"
 
 #include <compare>
+
 #include "PseudoKind.h"
 
 namespace mx {
@@ -47,6 +48,7 @@ class Designator {
   std::shared_ptr<const DesignatorImpl> impl;
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
  public:
   Designator(Designator &&) noexcept = default;
   Designator(const Designator &) = default;

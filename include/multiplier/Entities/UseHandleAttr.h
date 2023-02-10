@@ -38,6 +38,7 @@ class UseHandleAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<UseHandleAttr> in(const Fragment &frag);
+  static gap::generator<UseHandleAttr> in(const File &file);
   static gap::generator<UseHandleAttr> in(const Index &index);
   static gap::generator<UseHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,34 +46,6 @@ class UseHandleAttr : public InheritableParamAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::USE_HANDLE;
-  }
-
-  inline static std::optional<UseHandleAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<UseHandleAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<UseHandleAttr> from(const InheritableParamAttr &parent);
-
-  inline static std::optional<UseHandleAttr> from(const std::optional<InheritableParamAttr> &parent) {
-    if (parent) {
-      return UseHandleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UseHandleAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<UseHandleAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return UseHandleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<UseHandleAttr> from(const Attr &parent);
@@ -83,6 +56,14 @@ class UseHandleAttr : public InheritableParamAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UseHandleAttr> from(const Reference &r) {
+    return UseHandleAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<UseHandleAttr> from(const TokenContext &t) {
+    return UseHandleAttr::from(t.as_attribute());
   }
 
   std::string_view handle_type(void) const;

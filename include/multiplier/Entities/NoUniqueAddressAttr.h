@@ -36,6 +36,7 @@ class NoUniqueAddressAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoUniqueAddressAttr> in(const Fragment &frag);
+  static gap::generator<NoUniqueAddressAttr> in(const File &file);
   static gap::generator<NoUniqueAddressAttr> in(const Index &index);
   static gap::generator<NoUniqueAddressAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoUniqueAddressAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_UNIQUE_ADDRESS;
-  }
-
-  inline static std::optional<NoUniqueAddressAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoUniqueAddressAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoUniqueAddressAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoUniqueAddressAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoUniqueAddressAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoUniqueAddressAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoUniqueAddressAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoUniqueAddressAttr> from(const Reference &r) {
+    return NoUniqueAddressAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoUniqueAddressAttr> from(const TokenContext &t) {
+    return NoUniqueAddressAttr::from(t.as_attribute());
   }
 
 };

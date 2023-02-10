@@ -37,6 +37,7 @@ class ParamTypestateAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ParamTypestateAttr> in(const Fragment &frag);
+  static gap::generator<ParamTypestateAttr> in(const File &file);
   static gap::generator<ParamTypestateAttr> in(const Index &index);
   static gap::generator<ParamTypestateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ParamTypestateAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PARAM_TYPESTATE;
-  }
-
-  inline static std::optional<ParamTypestateAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ParamTypestateAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ParamTypestateAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ParamTypestateAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ParamTypestateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ParamTypestateAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class ParamTypestateAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ParamTypestateAttr> from(const Reference &r) {
+    return ParamTypestateAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ParamTypestateAttr> from(const TokenContext &t) {
+    return ParamTypestateAttr::from(t.as_attribute());
   }
 
   ParamTypestateAttrConsumedState parameter_state(void) const;

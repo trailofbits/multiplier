@@ -36,6 +36,7 @@ class OtherMacroDirective : public MacroDirective {
   friend class Macro;
  public:
   static gap::generator<OtherMacroDirective> in(const Fragment &frag);
+  static gap::generator<OtherMacroDirective> in(const File &file);
 
   static gap::generator<OtherMacroDirective> in(const Index &index);
   static std::optional<OtherMacroDirective> by_id(const Index &, EntityId);
@@ -50,24 +51,6 @@ class OtherMacroDirective : public MacroDirective {
   static gap::generator<OtherMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<OtherMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<OtherMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<OtherMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<OtherMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return OtherMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OtherMacroDirective> from(const Macro &parent);
 
   inline static std::optional<OtherMacroDirective> from(const std::optional<Macro> &parent) {
@@ -76,6 +59,14 @@ class OtherMacroDirective : public MacroDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OtherMacroDirective> from(const Reference &r) {
+    return OtherMacroDirective::from(r.as_macro());
+  }
+
+  inline static std::optional<OtherMacroDirective> from(const TokenContext &t) {
+    return OtherMacroDirective::from(t.as_macro());
   }
 
 };

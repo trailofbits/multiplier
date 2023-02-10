@@ -36,6 +36,7 @@ class TypeNonNullAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<TypeNonNullAttr> in(const Fragment &frag);
+  static gap::generator<TypeNonNullAttr> in(const File &file);
   static gap::generator<TypeNonNullAttr> in(const Index &index);
   static gap::generator<TypeNonNullAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class TypeNonNullAttr : public TypeAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_NON_NULL;
-  }
-
-  inline static std::optional<TypeNonNullAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TypeNonNullAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TypeNonNullAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<TypeNonNullAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return TypeNonNullAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TypeNonNullAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class TypeNonNullAttr : public TypeAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypeNonNullAttr> from(const Reference &r) {
+    return TypeNonNullAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<TypeNonNullAttr> from(const TokenContext &t) {
+    return TypeNonNullAttr::from(t.as_attribute());
   }
 
 };

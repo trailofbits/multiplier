@@ -40,6 +40,7 @@ class OMPTileDirective : public OMPLoopTransformationDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTileDirective> in(const Fragment &frag);
+  static gap::generator<OMPTileDirective> in(const File &file);
   static gap::generator<OMPTileDirective> in(const Index &index);
   static gap::generator<OMPTileDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPTileDirective : public OMPLoopTransformationDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPTileDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTileDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPTileDirective> from(const OMPLoopTransformationDirective &parent);
-
-  inline static std::optional<OMPTileDirective> from(const std::optional<OMPLoopTransformationDirective> &parent) {
-    if (parent) {
-      return OMPTileDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPTileDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPTileDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPTileDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPTileDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPTileDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPTileDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPTileDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPTileDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPTileDirective : public OMPLoopTransformationDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPTileDirective> from(const Reference &r) {
+    return OMPTileDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPTileDirective> from(const TokenContext &t) {
+    return OMPTileDirective::from(t.as_statement());
   }
 
 };

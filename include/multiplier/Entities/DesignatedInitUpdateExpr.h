@@ -39,6 +39,7 @@ class DesignatedInitUpdateExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<DesignatedInitUpdateExpr> in(const Fragment &frag);
+  static gap::generator<DesignatedInitUpdateExpr> in(const File &file);
   static gap::generator<DesignatedInitUpdateExpr> in(const Index &index);
   static gap::generator<DesignatedInitUpdateExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class DesignatedInitUpdateExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<DesignatedInitUpdateExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<DesignatedInitUpdateExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<DesignatedInitUpdateExpr> from(const Expr &parent);
-
-  inline static std::optional<DesignatedInitUpdateExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return DesignatedInitUpdateExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<DesignatedInitUpdateExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<DesignatedInitUpdateExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return DesignatedInitUpdateExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<DesignatedInitUpdateExpr> from(const Stmt &parent);
 
   inline static std::optional<DesignatedInitUpdateExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +66,14 @@ class DesignatedInitUpdateExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DesignatedInitUpdateExpr> from(const Reference &r) {
+    return DesignatedInitUpdateExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<DesignatedInitUpdateExpr> from(const TokenContext &t) {
+    return DesignatedInitUpdateExpr::from(t.as_statement());
   }
 
   Expr base(void) const;

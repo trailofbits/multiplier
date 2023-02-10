@@ -36,6 +36,7 @@ class UsedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<UsedAttr> in(const Fragment &frag);
+  static gap::generator<UsedAttr> in(const File &file);
   static gap::generator<UsedAttr> in(const Index &index);
   static gap::generator<UsedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class UsedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::USED;
-  }
-
-  inline static std::optional<UsedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<UsedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<UsedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<UsedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return UsedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<UsedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class UsedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UsedAttr> from(const Reference &r) {
+    return UsedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<UsedAttr> from(const TokenContext &t) {
+    return UsedAttr::from(t.as_attribute());
   }
 
 };

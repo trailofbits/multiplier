@@ -36,6 +36,7 @@ class MacroVAOpt : public MacroSubstitution {
   friend class Macro;
  public:
   static gap::generator<MacroVAOpt> in(const Fragment &frag);
+  static gap::generator<MacroVAOpt> in(const File &file);
 
   static gap::generator<MacroVAOpt> in(const Index &index);
   static std::optional<MacroVAOpt> by_id(const Index &, EntityId);
@@ -50,24 +51,6 @@ class MacroVAOpt : public MacroSubstitution {
   static gap::generator<MacroVAOpt> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroVAOpt> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroVAOpt> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<MacroVAOpt> from(const MacroSubstitution &parent);
-
-  inline static std::optional<MacroVAOpt> from(const std::optional<MacroSubstitution> &parent) {
-    if (parent) {
-      return MacroVAOpt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MacroVAOpt> from(const Macro &parent);
 
   inline static std::optional<MacroVAOpt> from(const std::optional<Macro> &parent) {
@@ -76,6 +59,14 @@ class MacroVAOpt : public MacroSubstitution {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MacroVAOpt> from(const Reference &r) {
+    return MacroVAOpt::from(r.as_macro());
+  }
+
+  inline static std::optional<MacroVAOpt> from(const TokenContext &t) {
+    return MacroVAOpt::from(t.as_macro());
   }
 
 };

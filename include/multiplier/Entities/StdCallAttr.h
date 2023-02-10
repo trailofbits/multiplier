@@ -36,6 +36,7 @@ class StdCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<StdCallAttr> in(const Fragment &frag);
+  static gap::generator<StdCallAttr> in(const File &file);
   static gap::generator<StdCallAttr> in(const Index &index);
   static gap::generator<StdCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class StdCallAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::STD_CALL;
-  }
-
-  inline static std::optional<StdCallAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<StdCallAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<StdCallAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<StdCallAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return StdCallAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<StdCallAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class StdCallAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<StdCallAttr> from(const Reference &r) {
+    return StdCallAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<StdCallAttr> from(const TokenContext &t) {
+    return StdCallAttr::from(t.as_attribute());
   }
 
 };

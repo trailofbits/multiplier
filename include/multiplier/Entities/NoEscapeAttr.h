@@ -34,6 +34,7 @@ class NoEscapeAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<NoEscapeAttr> in(const Fragment &frag);
+  static gap::generator<NoEscapeAttr> in(const File &file);
   static gap::generator<NoEscapeAttr> in(const Index &index);
   static gap::generator<NoEscapeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class NoEscapeAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_ESCAPE;
-  }
-
-  inline static std::optional<NoEscapeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoEscapeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<NoEscapeAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class NoEscapeAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoEscapeAttr> from(const Reference &r) {
+    return NoEscapeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoEscapeAttr> from(const TokenContext &t) {
+    return NoEscapeAttr::from(t.as_attribute());
   }
 
 };

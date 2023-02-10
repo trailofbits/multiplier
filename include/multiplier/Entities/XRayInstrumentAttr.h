@@ -37,6 +37,7 @@ class XRayInstrumentAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<XRayInstrumentAttr> in(const Fragment &frag);
+  static gap::generator<XRayInstrumentAttr> in(const File &file);
   static gap::generator<XRayInstrumentAttr> in(const Index &index);
   static gap::generator<XRayInstrumentAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class XRayInstrumentAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::X_RAY_INSTRUMENT;
-  }
-
-  inline static std::optional<XRayInstrumentAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<XRayInstrumentAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<XRayInstrumentAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<XRayInstrumentAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return XRayInstrumentAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<XRayInstrumentAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class XRayInstrumentAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<XRayInstrumentAttr> from(const Reference &r) {
+    return XRayInstrumentAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<XRayInstrumentAttr> from(const TokenContext &t) {
+    return XRayInstrumentAttr::from(t.as_attribute());
   }
 
   bool always_x_ray_instrument(void) const;

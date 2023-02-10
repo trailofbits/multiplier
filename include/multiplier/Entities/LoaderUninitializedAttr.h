@@ -34,6 +34,7 @@ class LoaderUninitializedAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<LoaderUninitializedAttr> in(const Fragment &frag);
+  static gap::generator<LoaderUninitializedAttr> in(const File &file);
   static gap::generator<LoaderUninitializedAttr> in(const Index &index);
   static gap::generator<LoaderUninitializedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class LoaderUninitializedAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOADER_UNINITIALIZED;
-  }
-
-  inline static std::optional<LoaderUninitializedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<LoaderUninitializedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<LoaderUninitializedAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class LoaderUninitializedAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<LoaderUninitializedAttr> from(const Reference &r) {
+    return LoaderUninitializedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<LoaderUninitializedAttr> from(const TokenContext &t) {
+    return LoaderUninitializedAttr::from(t.as_attribute());
   }
 
 };

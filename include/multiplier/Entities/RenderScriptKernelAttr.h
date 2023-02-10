@@ -34,6 +34,7 @@ class RenderScriptKernelAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<RenderScriptKernelAttr> in(const Fragment &frag);
+  static gap::generator<RenderScriptKernelAttr> in(const File &file);
   static gap::generator<RenderScriptKernelAttr> in(const Index &index);
   static gap::generator<RenderScriptKernelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class RenderScriptKernelAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RENDER_SCRIPT_KERNEL;
-  }
-
-  inline static std::optional<RenderScriptKernelAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<RenderScriptKernelAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<RenderScriptKernelAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class RenderScriptKernelAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RenderScriptKernelAttr> from(const Reference &r) {
+    return RenderScriptKernelAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<RenderScriptKernelAttr> from(const TokenContext &t) {
+    return RenderScriptKernelAttr::from(t.as_attribute());
   }
 
 };

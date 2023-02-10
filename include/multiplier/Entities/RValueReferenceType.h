@@ -36,6 +36,7 @@ class RValueReferenceType : public ReferenceType {
   friend class Type;
  public:
   static gap::generator<RValueReferenceType> in(const Fragment &frag);
+  static gap::generator<RValueReferenceType> in(const File &file);
   static gap::generator<RValueReferenceType> in(const Index &index);
   static gap::generator<RValueReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class RValueReferenceType : public ReferenceType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::R_VALUE_REFERENCE;
-  }
-
-  inline static std::optional<RValueReferenceType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<RValueReferenceType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<RValueReferenceType> from(const ReferenceType &parent);
-
-  inline static std::optional<RValueReferenceType> from(const std::optional<ReferenceType> &parent) {
-    if (parent) {
-      return RValueReferenceType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<RValueReferenceType> from(const Type &parent);
@@ -71,6 +54,14 @@ class RValueReferenceType : public ReferenceType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RValueReferenceType> from(const Reference &r) {
+    return RValueReferenceType::from(r.as_type());
+  }
+
+  inline static std::optional<RValueReferenceType> from(const TokenContext &t) {
+    return RValueReferenceType::from(t.as_type());
   }
 
   Type desugar(void) const;

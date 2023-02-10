@@ -40,6 +40,7 @@ class ImplicitCastExpr : public CastExpr {
   friend class Stmt;
  public:
   static gap::generator<ImplicitCastExpr> in(const Fragment &frag);
+  static gap::generator<ImplicitCastExpr> in(const File &file);
   static gap::generator<ImplicitCastExpr> in(const Index &index);
   static gap::generator<ImplicitCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class ImplicitCastExpr : public CastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ImplicitCastExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ImplicitCastExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ImplicitCastExpr> from(const CastExpr &parent);
-
-  inline static std::optional<ImplicitCastExpr> from(const std::optional<CastExpr> &parent) {
-    if (parent) {
-      return ImplicitCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ImplicitCastExpr> from(const Expr &parent);
-
-  inline static std::optional<ImplicitCastExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ImplicitCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ImplicitCastExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ImplicitCastExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ImplicitCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ImplicitCastExpr> from(const Stmt &parent);
 
   inline static std::optional<ImplicitCastExpr> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class ImplicitCastExpr : public CastExpr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ImplicitCastExpr> from(const Reference &r) {
+    return ImplicitCastExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ImplicitCastExpr> from(const TokenContext &t) {
+    return ImplicitCastExpr::from(t.as_statement());
   }
 
   bool is_part_of_explicit_cast(void) const;

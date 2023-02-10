@@ -36,6 +36,7 @@ class MSNoVTableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MSNoVTableAttr> in(const Fragment &frag);
+  static gap::generator<MSNoVTableAttr> in(const File &file);
   static gap::generator<MSNoVTableAttr> in(const Index &index);
   static gap::generator<MSNoVTableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class MSNoVTableAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_NO_V_TABLE;
-  }
-
-  inline static std::optional<MSNoVTableAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MSNoVTableAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MSNoVTableAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<MSNoVTableAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return MSNoVTableAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MSNoVTableAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class MSNoVTableAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MSNoVTableAttr> from(const Reference &r) {
+    return MSNoVTableAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<MSNoVTableAttr> from(const TokenContext &t) {
+    return MSNoVTableAttr::from(t.as_attribute());
   }
 
 };

@@ -40,6 +40,7 @@ class TypedefDecl : public TypedefNameDecl {
   friend class Decl;
  public:
   static gap::generator<TypedefDecl> in(const Fragment &frag);
+  static gap::generator<TypedefDecl> in(const File &file);
   static gap::generator<TypedefDecl> in(const Index &index);
   static gap::generator<TypedefDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class TypedefDecl : public TypedefNameDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<TypedefDecl> redeclarations(void) const;
-  inline static std::optional<TypedefDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TypedefDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TypedefDecl> from(const TypedefNameDecl &parent);
-
-  inline static std::optional<TypedefDecl> from(const std::optional<TypedefNameDecl> &parent) {
-    if (parent) {
-      return TypedefDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypedefDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<TypedefDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return TypedefDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypedefDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TypedefDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TypedefDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<TypedefDecl> from(const Decl &parent);
 
   inline static std::optional<TypedefDecl> from(const std::optional<Decl> &parent) {
@@ -105,6 +68,14 @@ class TypedefDecl : public TypedefNameDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypedefDecl> from(const Reference &r) {
+    return TypedefDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<TypedefDecl> from(const TokenContext &t) {
+    return TypedefDecl::from(t.as_declaration());
   }
 
 };

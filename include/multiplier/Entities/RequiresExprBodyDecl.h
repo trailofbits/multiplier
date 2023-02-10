@@ -34,6 +34,7 @@ class RequiresExprBodyDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<RequiresExprBodyDecl> in(const Fragment &frag);
+  static gap::generator<RequiresExprBodyDecl> in(const File &file);
   static gap::generator<RequiresExprBodyDecl> in(const Index &index);
   static gap::generator<RequiresExprBodyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class RequiresExprBodyDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<RequiresExprBodyDecl> redeclarations(void) const;
-  inline static std::optional<RequiresExprBodyDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<RequiresExprBodyDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
 
   inline static std::optional<RequiresExprBodyDecl> from(const std::optional<Decl> &parent) {
@@ -69,6 +62,14 @@ class RequiresExprBodyDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RequiresExprBodyDecl> from(const Reference &r) {
+    return RequiresExprBodyDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<RequiresExprBodyDecl> from(const TokenContext &t) {
+    return RequiresExprBodyDecl::from(t.as_declaration());
   }
 
   gap::generator<Decl> declarations_in_context(void) const;

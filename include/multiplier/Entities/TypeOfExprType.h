@@ -35,6 +35,7 @@ class TypeOfExprType : public Type {
   friend class Type;
  public:
   static gap::generator<TypeOfExprType> in(const Fragment &frag);
+  static gap::generator<TypeOfExprType> in(const File &file);
   static gap::generator<TypeOfExprType> in(const Index &index);
   static gap::generator<TypeOfExprType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class TypeOfExprType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPE_OF_EXPR;
-  }
-
-  inline static std::optional<TypeOfExprType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TypeOfExprType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<TypeOfExprType> from(const Type &parent);
@@ -60,6 +53,14 @@ class TypeOfExprType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypeOfExprType> from(const Reference &r) {
+    return TypeOfExprType::from(r.as_type());
+  }
+
+  inline static std::optional<TypeOfExprType> from(const TokenContext &t) {
+    return TypeOfExprType::from(t.as_type());
   }
 
   Type desugar(void) const;

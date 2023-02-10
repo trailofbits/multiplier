@@ -39,6 +39,7 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCProtocolDecl> in(const Fragment &frag);
+  static gap::generator<ObjCProtocolDecl> in(const File &file);
   static gap::generator<ObjCProtocolDecl> in(const Index &index);
   static gap::generator<ObjCProtocolDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,34 +59,6 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCProtocolDecl> redeclarations(void) const;
-  inline static std::optional<ObjCProtocolDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCProtocolDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
-
-  inline static std::optional<ObjCProtocolDecl> from(const std::optional<ObjCContainerDecl> &parent) {
-    if (parent) {
-      return ObjCProtocolDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCProtocolDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCProtocolDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCProtocolDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCProtocolDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCProtocolDecl> from(const std::optional<Decl> &parent) {
@@ -94,6 +67,14 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCProtocolDecl> from(const Reference &r) {
+    return ObjCProtocolDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCProtocolDecl> from(const TokenContext &t) {
+    return ObjCProtocolDecl::from(t.as_declaration());
   }
 
   std::string_view obj_c_runtime_name_as_string(void) const;

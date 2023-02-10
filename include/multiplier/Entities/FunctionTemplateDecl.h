@@ -40,6 +40,7 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   friend class Decl;
  public:
   static gap::generator<FunctionTemplateDecl> in(const Fragment &frag);
+  static gap::generator<FunctionTemplateDecl> in(const File &file);
   static gap::generator<FunctionTemplateDecl> in(const Index &index);
   static gap::generator<FunctionTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<FunctionTemplateDecl> redeclarations(void) const;
-  inline static std::optional<FunctionTemplateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<FunctionTemplateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<FunctionTemplateDecl> from(const RedeclarableTemplateDecl &parent);
-
-  inline static std::optional<FunctionTemplateDecl> from(const std::optional<RedeclarableTemplateDecl> &parent) {
-    if (parent) {
-      return FunctionTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<FunctionTemplateDecl> from(const TemplateDecl &parent);
-
-  inline static std::optional<FunctionTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
-    if (parent) {
-      return FunctionTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<FunctionTemplateDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<FunctionTemplateDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return FunctionTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<FunctionTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<FunctionTemplateDecl> from(const std::optional<Decl> &parent) {
@@ -105,6 +68,14 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FunctionTemplateDecl> from(const Reference &r) {
+    return FunctionTemplateDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<FunctionTemplateDecl> from(const TokenContext &t) {
+    return FunctionTemplateDecl::from(t.as_declaration());
   }
 
   bool is_abbreviated(void) const;

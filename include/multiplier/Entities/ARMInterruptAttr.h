@@ -37,6 +37,7 @@ class ARMInterruptAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ARMInterruptAttr> in(const Fragment &frag);
+  static gap::generator<ARMInterruptAttr> in(const File &file);
   static gap::generator<ARMInterruptAttr> in(const Index &index);
   static gap::generator<ARMInterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ARMInterruptAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_INTERRUPT;
-  }
-
-  inline static std::optional<ARMInterruptAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ARMInterruptAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ARMInterruptAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ARMInterruptAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ARMInterruptAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ARMInterruptAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class ARMInterruptAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ARMInterruptAttr> from(const Reference &r) {
+    return ARMInterruptAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ARMInterruptAttr> from(const TokenContext &t) {
+    return ARMInterruptAttr::from(t.as_attribute());
   }
 
   ARMInterruptAttrInterruptType interrupt(void) const;

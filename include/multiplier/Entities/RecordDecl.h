@@ -42,6 +42,7 @@ class RecordDecl : public TagDecl {
   friend class Decl;
  public:
   static gap::generator<RecordDecl> in(const Fragment &frag);
+  static gap::generator<RecordDecl> in(const File &file);
   static gap::generator<RecordDecl> in(const Index &index);
   static gap::generator<RecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -61,44 +62,6 @@ class RecordDecl : public TagDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<RecordDecl> redeclarations(void) const;
-  inline static std::optional<RecordDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<RecordDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<RecordDecl> from(const TagDecl &parent);
-
-  inline static std::optional<RecordDecl> from(const std::optional<TagDecl> &parent) {
-    if (parent) {
-      return RecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<RecordDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<RecordDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return RecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<RecordDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<RecordDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return RecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<RecordDecl> from(const Decl &parent);
 
   inline static std::optional<RecordDecl> from(const std::optional<Decl> &parent) {
@@ -107,6 +70,14 @@ class RecordDecl : public TagDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<RecordDecl> from(const Reference &r) {
+    return RecordDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<RecordDecl> from(const TokenContext &t) {
+    return RecordDecl::from(t.as_declaration());
   }
 
   bool can_pass_in_registers(void) const;

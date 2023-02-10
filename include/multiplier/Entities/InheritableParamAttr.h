@@ -36,28 +36,11 @@ class InheritableParamAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<InheritableParamAttr> in(const Fragment &frag);
+  static gap::generator<InheritableParamAttr> in(const File &file);
   static gap::generator<InheritableParamAttr> in(const Index &index);
   static gap::generator<InheritableParamAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InheritableParamAttr> by_id(const Index &, EntityId);
-
-  inline static std::optional<InheritableParamAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<InheritableParamAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<InheritableParamAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<InheritableParamAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return InheritableParamAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
 
   static std::optional<InheritableParamAttr> from(const Attr &parent);
 
@@ -67,6 +50,14 @@ class InheritableParamAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<InheritableParamAttr> from(const Reference &r) {
+    return InheritableParamAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<InheritableParamAttr> from(const TokenContext &t) {
+    return InheritableParamAttr::from(t.as_attribute());
   }
 
 };

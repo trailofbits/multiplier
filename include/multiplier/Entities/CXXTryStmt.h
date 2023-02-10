@@ -36,6 +36,7 @@ class CXXTryStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CXXTryStmt> in(const Fragment &frag);
+  static gap::generator<CXXTryStmt> in(const File &file);
   static gap::generator<CXXTryStmt> in(const Index &index);
   static gap::generator<CXXTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class CXXTryStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXTryStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXTryStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<CXXTryStmt> from(const Stmt &parent);
 
   inline static std::optional<CXXTryStmt> from(const std::optional<Stmt> &parent) {
@@ -70,6 +63,14 @@ class CXXTryStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CXXTryStmt> from(const Reference &r) {
+    return CXXTryStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<CXXTryStmt> from(const TokenContext &t) {
+    return CXXTryStmt::from(t.as_statement());
   }
 
   CompoundStmt try_block(void) const;

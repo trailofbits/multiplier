@@ -39,6 +39,7 @@ class ObjCPropertyImplDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<ObjCPropertyImplDecl> in(const Fragment &frag);
+  static gap::generator<ObjCPropertyImplDecl> in(const File &file);
   static gap::generator<ObjCPropertyImplDecl> in(const Index &index);
   static gap::generator<ObjCPropertyImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,14 +59,6 @@ class ObjCPropertyImplDecl : public Decl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCPropertyImplDecl> redeclarations(void) const;
-  inline static std::optional<ObjCPropertyImplDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCPropertyImplDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
   static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCPropertyImplDecl> from(const std::optional<Decl> &parent) {
@@ -74,6 +67,14 @@ class ObjCPropertyImplDecl : public Decl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCPropertyImplDecl> from(const Reference &r) {
+    return ObjCPropertyImplDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCPropertyImplDecl> from(const TokenContext &t) {
+    return ObjCPropertyImplDecl::from(t.as_declaration());
   }
 
   Expr getter_cxx_constructor(void) const;

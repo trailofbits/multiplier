@@ -38,6 +38,7 @@ class ArraySubscriptExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ArraySubscriptExpr> in(const Fragment &frag);
+  static gap::generator<ArraySubscriptExpr> in(const File &file);
   static gap::generator<ArraySubscriptExpr> in(const Index &index);
   static gap::generator<ArraySubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class ArraySubscriptExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ArraySubscriptExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ArraySubscriptExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ArraySubscriptExpr> from(const Expr &parent);
-
-  inline static std::optional<ArraySubscriptExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ArraySubscriptExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ArraySubscriptExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ArraySubscriptExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ArraySubscriptExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ArraySubscriptExpr> from(const Stmt &parent);
 
   inline static std::optional<ArraySubscriptExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class ArraySubscriptExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ArraySubscriptExpr> from(const Reference &r) {
+    return ArraySubscriptExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ArraySubscriptExpr> from(const TokenContext &t) {
+    return ArraySubscriptExpr::from(t.as_statement());
   }
 
   Expr base(void) const;

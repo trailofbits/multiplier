@@ -38,6 +38,7 @@ class AbstractConditionalOperator : public Expr {
   friend class Stmt;
  public:
   static gap::generator<AbstractConditionalOperator> in(const Fragment &frag);
+  static gap::generator<AbstractConditionalOperator> in(const File &file);
   static gap::generator<AbstractConditionalOperator> in(const Index &index);
   static gap::generator<AbstractConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -52,34 +53,6 @@ class AbstractConditionalOperator : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<AbstractConditionalOperator> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<AbstractConditionalOperator> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<AbstractConditionalOperator> from(const Expr &parent);
-
-  inline static std::optional<AbstractConditionalOperator> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return AbstractConditionalOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<AbstractConditionalOperator> from(const ValueStmt &parent);
-
-  inline static std::optional<AbstractConditionalOperator> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return AbstractConditionalOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<AbstractConditionalOperator> from(const Stmt &parent);
 
   inline static std::optional<AbstractConditionalOperator> from(const std::optional<Stmt> &parent) {
@@ -88,6 +61,14 @@ class AbstractConditionalOperator : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AbstractConditionalOperator> from(const Reference &r) {
+    return AbstractConditionalOperator::from(r.as_statement());
+  }
+
+  inline static std::optional<AbstractConditionalOperator> from(const TokenContext &t) {
+    return AbstractConditionalOperator::from(t.as_statement());
   }
 
   Token colon_token(void) const;

@@ -34,6 +34,7 @@ class ThreadAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ThreadAttr> in(const Fragment &frag);
+  static gap::generator<ThreadAttr> in(const File &file);
   static gap::generator<ThreadAttr> in(const Index &index);
   static gap::generator<ThreadAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ThreadAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::THREAD;
-  }
-
-  inline static std::optional<ThreadAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ThreadAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ThreadAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ThreadAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ThreadAttr> from(const Reference &r) {
+    return ThreadAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ThreadAttr> from(const TokenContext &t) {
+    return ThreadAttr::from(t.as_attribute());
   }
 
 };

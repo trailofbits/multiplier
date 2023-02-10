@@ -37,6 +37,7 @@ class DependentSizedMatrixType : public MatrixType {
   friend class Type;
  public:
   static gap::generator<DependentSizedMatrixType> in(const Fragment &frag);
+  static gap::generator<DependentSizedMatrixType> in(const File &file);
   static gap::generator<DependentSizedMatrixType> in(const Index &index);
   static gap::generator<DependentSizedMatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class DependentSizedMatrixType : public MatrixType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_SIZED_MATRIX;
-  }
-
-  inline static std::optional<DependentSizedMatrixType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DependentSizedMatrixType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<DependentSizedMatrixType> from(const MatrixType &parent);
-
-  inline static std::optional<DependentSizedMatrixType> from(const std::optional<MatrixType> &parent) {
-    if (parent) {
-      return DependentSizedMatrixType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DependentSizedMatrixType> from(const Type &parent);
@@ -72,6 +55,14 @@ class DependentSizedMatrixType : public MatrixType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DependentSizedMatrixType> from(const Reference &r) {
+    return DependentSizedMatrixType::from(r.as_type());
+  }
+
+  inline static std::optional<DependentSizedMatrixType> from(const TokenContext &t) {
+    return DependentSizedMatrixType::from(t.as_type());
   }
 
   Token attribute_token(void) const;

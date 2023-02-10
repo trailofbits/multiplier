@@ -36,6 +36,7 @@ class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OSReturnsRetainedOnZeroAttr> in(const Fragment &frag);
+  static gap::generator<OSReturnsRetainedOnZeroAttr> in(const File &file);
   static gap::generator<OSReturnsRetainedOnZeroAttr> in(const Index &index);
   static gap::generator<OSReturnsRetainedOnZeroAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_RETURNS_RETAINED_ON_ZERO;
-  }
-
-  inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OSReturnsRetainedOnZeroAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OSReturnsRetainedOnZeroAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OSReturnsRetainedOnZeroAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const Reference &r) {
+    return OSReturnsRetainedOnZeroAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const TokenContext &t) {
+    return OSReturnsRetainedOnZeroAttr::from(t.as_attribute());
   }
 
 };

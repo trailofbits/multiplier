@@ -37,6 +37,7 @@ class AssertCapabilityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AssertCapabilityAttr> in(const Fragment &frag);
+  static gap::generator<AssertCapabilityAttr> in(const File &file);
   static gap::generator<AssertCapabilityAttr> in(const Index &index);
   static gap::generator<AssertCapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class AssertCapabilityAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSERT_CAPABILITY;
-  }
-
-  inline static std::optional<AssertCapabilityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AssertCapabilityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AssertCapabilityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AssertCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AssertCapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AssertCapabilityAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class AssertCapabilityAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AssertCapabilityAttr> from(const Reference &r) {
+    return AssertCapabilityAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AssertCapabilityAttr> from(const TokenContext &t) {
+    return AssertCapabilityAttr::from(t.as_attribute());
   }
 
   AssertCapabilityAttrSpelling semantic_spelling(void) const;

@@ -41,6 +41,7 @@ class OMPForDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPForDirective> in(const Fragment &frag);
+  static gap::generator<OMPForDirective> in(const File &file);
   static gap::generator<OMPForDirective> in(const Index &index);
   static gap::generator<OMPForDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -59,44 +60,6 @@ class OMPForDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPForDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPForDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPForDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPForDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPForDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPForDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPForDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPForDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPForDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPForDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPForDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPForDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPForDirective> from(const std::optional<Stmt> &parent) {
@@ -105,6 +68,14 @@ class OMPForDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPForDirective> from(const Reference &r) {
+    return OMPForDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPForDirective> from(const TokenContext &t) {
+    return OMPForDirective::from(t.as_statement());
   }
 
   Expr task_reduction_reference_expression(void) const;

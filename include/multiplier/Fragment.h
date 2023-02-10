@@ -18,11 +18,7 @@
 
 namespace mx {
 
-class Attr;
-class Decl;
 class EntityProvider;
-class File;
-class Fragment;
 class FragmentImpl;
 class Index;
 class InvalidEntityProvider;
@@ -30,16 +26,22 @@ class ReferenceIteratorImpl;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
-class Stmt;
-class Token;
-class Macro;
-class Type;
 class WeggliQuery;
 class WeggliQueryMatch;
 class WeggliQueryResult;
 class WeggliQueryResultImpl;
 class WeggliQueryResultIterator;
 class WeggliQueryResultIterator;
+
+#define MX_FORWARD_DECLARE(type_name, ln, e, c) \
+    class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE)
+#undef MX_FORWARD_DECLARE
 
 using MacroOrToken = std::variant<Macro, Token>;
 

@@ -36,6 +36,7 @@ class MacroConcatenate : public MacroSubstitution {
   friend class Macro;
  public:
   static gap::generator<MacroConcatenate> in(const Fragment &frag);
+  static gap::generator<MacroConcatenate> in(const File &file);
 
   static gap::generator<MacroConcatenate> in(const Index &index);
   static std::optional<MacroConcatenate> by_id(const Index &, EntityId);
@@ -50,24 +51,6 @@ class MacroConcatenate : public MacroSubstitution {
   static gap::generator<MacroConcatenate> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroConcatenate> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroConcatenate> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<MacroConcatenate> from(const MacroSubstitution &parent);
-
-  inline static std::optional<MacroConcatenate> from(const std::optional<MacroSubstitution> &parent) {
-    if (parent) {
-      return MacroConcatenate::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MacroConcatenate> from(const Macro &parent);
 
   inline static std::optional<MacroConcatenate> from(const std::optional<Macro> &parent) {
@@ -76,6 +59,14 @@ class MacroConcatenate : public MacroSubstitution {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MacroConcatenate> from(const Reference &r) {
+    return MacroConcatenate::from(r.as_macro());
+  }
+
+  inline static std::optional<MacroConcatenate> from(const TokenContext &t) {
+    return MacroConcatenate::from(t.as_macro());
   }
 
 };

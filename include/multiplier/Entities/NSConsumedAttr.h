@@ -38,6 +38,7 @@ class NSConsumedAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<NSConsumedAttr> in(const Fragment &frag);
+  static gap::generator<NSConsumedAttr> in(const File &file);
   static gap::generator<NSConsumedAttr> in(const Index &index);
   static gap::generator<NSConsumedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,34 +46,6 @@ class NSConsumedAttr : public InheritableParamAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_CONSUMED;
-  }
-
-  inline static std::optional<NSConsumedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NSConsumedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NSConsumedAttr> from(const InheritableParamAttr &parent);
-
-  inline static std::optional<NSConsumedAttr> from(const std::optional<InheritableParamAttr> &parent) {
-    if (parent) {
-      return NSConsumedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<NSConsumedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NSConsumedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NSConsumedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NSConsumedAttr> from(const Attr &parent);
@@ -83,6 +56,14 @@ class NSConsumedAttr : public InheritableParamAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NSConsumedAttr> from(const Reference &r) {
+    return NSConsumedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NSConsumedAttr> from(const TokenContext &t) {
+    return NSConsumedAttr::from(t.as_attribute());
   }
 
 };

@@ -36,6 +36,7 @@ class NoSanitizeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoSanitizeAttr> in(const Fragment &frag);
+  static gap::generator<NoSanitizeAttr> in(const File &file);
   static gap::generator<NoSanitizeAttr> in(const Index &index);
   static gap::generator<NoSanitizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoSanitizeAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_SANITIZE;
-  }
-
-  inline static std::optional<NoSanitizeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoSanitizeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoSanitizeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoSanitizeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoSanitizeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoSanitizeAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoSanitizeAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoSanitizeAttr> from(const Reference &r) {
+    return NoSanitizeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoSanitizeAttr> from(const TokenContext &t) {
+    return NoSanitizeAttr::from(t.as_attribute());
   }
 
   bool has_coverage(void) const;

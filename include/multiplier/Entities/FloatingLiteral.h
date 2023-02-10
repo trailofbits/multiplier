@@ -38,6 +38,7 @@ class FloatingLiteral : public Expr {
   friend class Stmt;
  public:
   static gap::generator<FloatingLiteral> in(const Fragment &frag);
+  static gap::generator<FloatingLiteral> in(const File &file);
   static gap::generator<FloatingLiteral> in(const Index &index);
   static gap::generator<FloatingLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class FloatingLiteral : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<FloatingLiteral> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<FloatingLiteral> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<FloatingLiteral> from(const Expr &parent);
-
-  inline static std::optional<FloatingLiteral> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return FloatingLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<FloatingLiteral> from(const ValueStmt &parent);
-
-  inline static std::optional<FloatingLiteral> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return FloatingLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<FloatingLiteral> from(const Stmt &parent);
 
   inline static std::optional<FloatingLiteral> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class FloatingLiteral : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FloatingLiteral> from(const Reference &r) {
+    return FloatingLiteral::from(r.as_statement());
+  }
+
+  inline static std::optional<FloatingLiteral> from(const TokenContext &t) {
+    return FloatingLiteral::from(t.as_statement());
   }
 
   Token token(void) const;

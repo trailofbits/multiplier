@@ -36,6 +36,7 @@ class TLSModelAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TLSModelAttr> in(const Fragment &frag);
+  static gap::generator<TLSModelAttr> in(const File &file);
   static gap::generator<TLSModelAttr> in(const Index &index);
   static gap::generator<TLSModelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class TLSModelAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TLS_MODEL;
-  }
-
-  inline static std::optional<TLSModelAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TLSModelAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TLSModelAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<TLSModelAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return TLSModelAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TLSModelAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class TLSModelAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TLSModelAttr> from(const Reference &r) {
+    return TLSModelAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<TLSModelAttr> from(const TokenContext &t) {
+    return TLSModelAttr::from(t.as_attribute());
   }
 
   std::string_view model(void) const;

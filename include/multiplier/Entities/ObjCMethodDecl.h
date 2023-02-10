@@ -45,6 +45,7 @@ class ObjCMethodDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCMethodDecl> in(const Fragment &frag);
+  static gap::generator<ObjCMethodDecl> in(const File &file);
   static gap::generator<ObjCMethodDecl> in(const Index &index);
   static gap::generator<ObjCMethodDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -64,24 +65,6 @@ class ObjCMethodDecl : public NamedDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<ObjCMethodDecl> redeclarations(void) const;
-  inline static std::optional<ObjCMethodDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCMethodDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCMethodDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCMethodDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCMethodDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCMethodDecl> from(const std::optional<Decl> &parent) {
@@ -90,6 +73,14 @@ class ObjCMethodDecl : public NamedDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCMethodDecl> from(const Reference &r) {
+    return ObjCMethodDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCMethodDecl> from(const TokenContext &t) {
+    return ObjCMethodDecl::from(t.as_declaration());
   }
 
   bool defined_in_ns_object(void) const;

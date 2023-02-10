@@ -34,6 +34,7 @@ class ObjCRuntimeVisibleAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCRuntimeVisibleAttr> in(const Fragment &frag);
+  static gap::generator<ObjCRuntimeVisibleAttr> in(const File &file);
   static gap::generator<ObjCRuntimeVisibleAttr> in(const Index &index);
   static gap::generator<ObjCRuntimeVisibleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ObjCRuntimeVisibleAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_RUNTIME_VISIBLE;
-  }
-
-  inline static std::optional<ObjCRuntimeVisibleAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCRuntimeVisibleAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCRuntimeVisibleAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ObjCRuntimeVisibleAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCRuntimeVisibleAttr> from(const Reference &r) {
+    return ObjCRuntimeVisibleAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCRuntimeVisibleAttr> from(const TokenContext &t) {
+    return ObjCRuntimeVisibleAttr::from(t.as_attribute());
   }
 
 };

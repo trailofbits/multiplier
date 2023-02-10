@@ -35,6 +35,7 @@ class ObjCAtCatchStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ObjCAtCatchStmt> in(const Fragment &frag);
+  static gap::generator<ObjCAtCatchStmt> in(const File &file);
   static gap::generator<ObjCAtCatchStmt> in(const Index &index);
   static gap::generator<ObjCAtCatchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -53,14 +54,6 @@ class ObjCAtCatchStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCAtCatchStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCAtCatchStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<ObjCAtCatchStmt> from(const Stmt &parent);
 
   inline static std::optional<ObjCAtCatchStmt> from(const std::optional<Stmt> &parent) {
@@ -69,6 +62,14 @@ class ObjCAtCatchStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCAtCatchStmt> from(const Reference &r) {
+    return ObjCAtCatchStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCAtCatchStmt> from(const TokenContext &t) {
+    return ObjCAtCatchStmt::from(t.as_statement());
   }
 
   Token at_catch_token(void) const;

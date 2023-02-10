@@ -37,6 +37,7 @@ class OMPDeclareVariantAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OMPDeclareVariantAttr> in(const Fragment &frag);
+  static gap::generator<OMPDeclareVariantAttr> in(const File &file);
   static gap::generator<OMPDeclareVariantAttr> in(const Index &index);
   static gap::generator<OMPDeclareVariantAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class OMPDeclareVariantAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_VARIANT;
-  }
-
-  inline static std::optional<OMPDeclareVariantAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OMPDeclareVariantAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OMPDeclareVariantAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OMPDeclareVariantAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OMPDeclareVariantAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OMPDeclareVariantAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class OMPDeclareVariantAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPDeclareVariantAttr> from(const Reference &r) {
+    return OMPDeclareVariantAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<OMPDeclareVariantAttr> from(const TokenContext &t) {
+    return OMPDeclareVariantAttr::from(t.as_attribute());
   }
 
   Expr variant_func_reference(void) const;

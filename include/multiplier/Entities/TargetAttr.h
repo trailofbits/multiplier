@@ -36,6 +36,7 @@ class TargetAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TargetAttr> in(const Fragment &frag);
+  static gap::generator<TargetAttr> in(const File &file);
   static gap::generator<TargetAttr> in(const Index &index);
   static gap::generator<TargetAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class TargetAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TARGET;
-  }
-
-  inline static std::optional<TargetAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TargetAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TargetAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<TargetAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return TargetAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TargetAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class TargetAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TargetAttr> from(const Reference &r) {
+    return TargetAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<TargetAttr> from(const TokenContext &t) {
+    return TargetAttr::from(t.as_attribute());
   }
 
   std::string_view architecture(void) const;

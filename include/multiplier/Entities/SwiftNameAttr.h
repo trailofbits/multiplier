@@ -36,6 +36,7 @@ class SwiftNameAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftNameAttr> in(const Fragment &frag);
+  static gap::generator<SwiftNameAttr> in(const File &file);
   static gap::generator<SwiftNameAttr> in(const Index &index);
   static gap::generator<SwiftNameAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SwiftNameAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_NAME;
-  }
-
-  inline static std::optional<SwiftNameAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftNameAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SwiftNameAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SwiftNameAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SwiftNameAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SwiftNameAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SwiftNameAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SwiftNameAttr> from(const Reference &r) {
+    return SwiftNameAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftNameAttr> from(const TokenContext &t) {
+    return SwiftNameAttr::from(t.as_attribute());
   }
 
   std::string_view name(void) const;

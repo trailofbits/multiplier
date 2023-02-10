@@ -36,6 +36,7 @@ class OMPTaskwaitDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTaskwaitDirective> in(const Fragment &frag);
+  static gap::generator<OMPTaskwaitDirective> in(const File &file);
   static gap::generator<OMPTaskwaitDirective> in(const Index &index);
   static gap::generator<OMPTaskwaitDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,24 +55,6 @@ class OMPTaskwaitDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPTaskwaitDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTaskwaitDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPTaskwaitDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPTaskwaitDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPTaskwaitDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPTaskwaitDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPTaskwaitDirective> from(const std::optional<Stmt> &parent) {
@@ -80,6 +63,14 @@ class OMPTaskwaitDirective : public OMPExecutableDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPTaskwaitDirective> from(const Reference &r) {
+    return OMPTaskwaitDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPTaskwaitDirective> from(const TokenContext &t) {
+    return OMPTaskwaitDirective::from(t.as_statement());
   }
 
 };

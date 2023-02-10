@@ -38,6 +38,7 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<UnnamedGlobalConstantDecl> in(const Fragment &frag);
+  static gap::generator<UnnamedGlobalConstantDecl> in(const File &file);
   static gap::generator<UnnamedGlobalConstantDecl> in(const Index &index);
   static gap::generator<UnnamedGlobalConstantDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -57,34 +58,6 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<UnnamedGlobalConstantDecl> redeclarations(void) const;
-  inline static std::optional<UnnamedGlobalConstantDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<UnnamedGlobalConstantDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<UnnamedGlobalConstantDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<UnnamedGlobalConstantDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return UnnamedGlobalConstantDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnnamedGlobalConstantDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<UnnamedGlobalConstantDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return UnnamedGlobalConstantDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UnnamedGlobalConstantDecl> from(const Decl &parent);
 
   inline static std::optional<UnnamedGlobalConstantDecl> from(const std::optional<Decl> &parent) {
@@ -93,6 +66,14 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<UnnamedGlobalConstantDecl> from(const Reference &r) {
+    return UnnamedGlobalConstantDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<UnnamedGlobalConstantDecl> from(const TokenContext &t) {
+    return UnnamedGlobalConstantDecl::from(t.as_declaration());
   }
 
 };

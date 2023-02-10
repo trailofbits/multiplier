@@ -36,6 +36,7 @@ class EnforceTCBAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<EnforceTCBAttr> in(const Fragment &frag);
+  static gap::generator<EnforceTCBAttr> in(const File &file);
   static gap::generator<EnforceTCBAttr> in(const Index &index);
   static gap::generator<EnforceTCBAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class EnforceTCBAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENFORCE_TCB;
-  }
-
-  inline static std::optional<EnforceTCBAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<EnforceTCBAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<EnforceTCBAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<EnforceTCBAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return EnforceTCBAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<EnforceTCBAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class EnforceTCBAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<EnforceTCBAttr> from(const Reference &r) {
+    return EnforceTCBAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<EnforceTCBAttr> from(const TokenContext &t) {
+    return EnforceTCBAttr::from(t.as_attribute());
   }
 
   std::string_view tcb_name(void) const;

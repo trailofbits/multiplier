@@ -22,6 +22,7 @@
 #include "../Token.h"
 
 #include <compare>
+
 #include "MacroKind.h"
 
 namespace mx {
@@ -46,6 +47,7 @@ class Macro {
   std::shared_ptr<const MacroImpl> impl;
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
   inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
  public:
   Macro(Macro &&) noexcept = default;
   Macro(const Macro &) = default;
@@ -69,8 +71,10 @@ class Macro {
 
  public:
   static gap::generator<Macro> in(const Fragment &frag, std::span<MacroKind> kinds);
+  static gap::generator<Macro> in(const File &file, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const Index &index, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const Fragment &frag);
+  static gap::generator<Macro> in(const File &file);
 
   static gap::generator<Macro> in(const Index &index);
   static std::optional<Macro> by_id(const Index &, EntityId);

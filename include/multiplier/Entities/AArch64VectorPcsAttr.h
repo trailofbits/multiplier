@@ -36,6 +36,7 @@ class AArch64VectorPcsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AArch64VectorPcsAttr> in(const Fragment &frag);
+  static gap::generator<AArch64VectorPcsAttr> in(const File &file);
   static gap::generator<AArch64VectorPcsAttr> in(const Index &index);
   static gap::generator<AArch64VectorPcsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AArch64VectorPcsAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::A_ARCH64_VECTOR_PCS;
-  }
-
-  inline static std::optional<AArch64VectorPcsAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AArch64VectorPcsAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AArch64VectorPcsAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AArch64VectorPcsAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AArch64VectorPcsAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AArch64VectorPcsAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AArch64VectorPcsAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AArch64VectorPcsAttr> from(const Reference &r) {
+    return AArch64VectorPcsAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AArch64VectorPcsAttr> from(const TokenContext &t) {
+    return AArch64VectorPcsAttr::from(t.as_attribute());
   }
 
 };

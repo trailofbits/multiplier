@@ -43,6 +43,7 @@ class EnumDecl : public TagDecl {
   friend class Decl;
  public:
   static gap::generator<EnumDecl> in(const Fragment &frag);
+  static gap::generator<EnumDecl> in(const File &file);
   static gap::generator<EnumDecl> in(const Index &index);
   static gap::generator<EnumDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -62,44 +63,6 @@ class EnumDecl : public TagDecl {
   bool contains(const Stmt &stmt);
 
   gap::generator<EnumDecl> redeclarations(void) const;
-  inline static std::optional<EnumDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<EnumDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<EnumDecl> from(const TagDecl &parent);
-
-  inline static std::optional<EnumDecl> from(const std::optional<TagDecl> &parent) {
-    if (parent) {
-      return EnumDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<EnumDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<EnumDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return EnumDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<EnumDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<EnumDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return EnumDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<EnumDecl> from(const Decl &parent);
 
   inline static std::optional<EnumDecl> from(const std::optional<Decl> &parent) {
@@ -108,6 +71,14 @@ class EnumDecl : public TagDecl {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<EnumDecl> from(const Reference &r) {
+    return EnumDecl::from(r.as_declaration());
+  }
+
+  inline static std::optional<EnumDecl> from(const TokenContext &t) {
+    return EnumDecl::from(t.as_declaration());
   }
 
   std::optional<EnumConstantDecl> nth_enumerator(unsigned n) const;

@@ -36,6 +36,7 @@ class SEHExceptStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<SEHExceptStmt> in(const Fragment &frag);
+  static gap::generator<SEHExceptStmt> in(const File &file);
   static gap::generator<SEHExceptStmt> in(const Index &index);
   static gap::generator<SEHExceptStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -54,14 +55,6 @@ class SEHExceptStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<SEHExceptStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<SEHExceptStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<SEHExceptStmt> from(const Stmt &parent);
 
   inline static std::optional<SEHExceptStmt> from(const std::optional<Stmt> &parent) {
@@ -70,6 +63,14 @@ class SEHExceptStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SEHExceptStmt> from(const Reference &r) {
+    return SEHExceptStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<SEHExceptStmt> from(const TokenContext &t) {
+    return SEHExceptStmt::from(t.as_statement());
   }
 
   CompoundStmt block(void) const;

@@ -36,6 +36,7 @@ class FallThroughAttr : public StmtAttr {
   friend class Attr;
  public:
   static gap::generator<FallThroughAttr> in(const Fragment &frag);
+  static gap::generator<FallThroughAttr> in(const File &file);
   static gap::generator<FallThroughAttr> in(const Index &index);
   static gap::generator<FallThroughAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class FallThroughAttr : public StmtAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FALL_THROUGH;
-  }
-
-  inline static std::optional<FallThroughAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<FallThroughAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<FallThroughAttr> from(const StmtAttr &parent);
-
-  inline static std::optional<FallThroughAttr> from(const std::optional<StmtAttr> &parent) {
-    if (parent) {
-      return FallThroughAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<FallThroughAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class FallThroughAttr : public StmtAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<FallThroughAttr> from(const Reference &r) {
+    return FallThroughAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<FallThroughAttr> from(const TokenContext &t) {
+    return FallThroughAttr::from(t.as_attribute());
   }
 
 };

@@ -34,6 +34,7 @@ class IFuncAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<IFuncAttr> in(const Fragment &frag);
+  static gap::generator<IFuncAttr> in(const File &file);
   static gap::generator<IFuncAttr> in(const Index &index);
   static gap::generator<IFuncAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class IFuncAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::I_FUNC;
-  }
-
-  inline static std::optional<IFuncAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<IFuncAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<IFuncAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class IFuncAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<IFuncAttr> from(const Reference &r) {
+    return IFuncAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<IFuncAttr> from(const TokenContext &t) {
+    return IFuncAttr::from(t.as_attribute());
   }
 
   std::string_view resolver(void) const;

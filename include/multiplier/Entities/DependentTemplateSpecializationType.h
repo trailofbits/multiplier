@@ -37,6 +37,7 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
   friend class Type;
  public:
   static gap::generator<DependentTemplateSpecializationType> in(const Fragment &frag);
+  static gap::generator<DependentTemplateSpecializationType> in(const File &file);
   static gap::generator<DependentTemplateSpecializationType> in(const Index &index);
   static gap::generator<DependentTemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_TEMPLATE_SPECIALIZATION;
-  }
-
-  inline static std::optional<DependentTemplateSpecializationType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DependentTemplateSpecializationType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<DependentTemplateSpecializationType> from(const TypeWithKeyword &parent);
-
-  inline static std::optional<DependentTemplateSpecializationType> from(const std::optional<TypeWithKeyword> &parent) {
-    if (parent) {
-      return DependentTemplateSpecializationType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DependentTemplateSpecializationType> from(const Type &parent);
@@ -72,6 +55,14 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<DependentTemplateSpecializationType> from(const Reference &r) {
+    return DependentTemplateSpecializationType::from(r.as_type());
+  }
+
+  inline static std::optional<DependentTemplateSpecializationType> from(const TokenContext &t) {
+    return DependentTemplateSpecializationType::from(t.as_type());
   }
 
   Type desugar(void) const;

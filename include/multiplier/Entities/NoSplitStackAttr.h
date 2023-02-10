@@ -36,6 +36,7 @@ class NoSplitStackAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoSplitStackAttr> in(const Fragment &frag);
+  static gap::generator<NoSplitStackAttr> in(const File &file);
   static gap::generator<NoSplitStackAttr> in(const Index &index);
   static gap::generator<NoSplitStackAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoSplitStackAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_SPLIT_STACK;
-  }
-
-  inline static std::optional<NoSplitStackAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoSplitStackAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoSplitStackAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoSplitStackAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoSplitStackAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoSplitStackAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoSplitStackAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoSplitStackAttr> from(const Reference &r) {
+    return NoSplitStackAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoSplitStackAttr> from(const TokenContext &t) {
+    return NoSplitStackAttr::from(t.as_attribute());
   }
 
 };

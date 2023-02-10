@@ -35,6 +35,7 @@ class TemplateTypeParmType : public Type {
   friend class Type;
  public:
   static gap::generator<TemplateTypeParmType> in(const Fragment &frag);
+  static gap::generator<TemplateTypeParmType> in(const File &file);
   static gap::generator<TemplateTypeParmType> in(const Index &index);
   static gap::generator<TemplateTypeParmType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class TemplateTypeParmType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TEMPLATE_TYPE_PARM;
-  }
-
-  inline static std::optional<TemplateTypeParmType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TemplateTypeParmType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<TemplateTypeParmType> from(const Type &parent);
@@ -60,6 +53,14 @@ class TemplateTypeParmType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TemplateTypeParmType> from(const Reference &r) {
+    return TemplateTypeParmType::from(r.as_type());
+  }
+
+  inline static std::optional<TemplateTypeParmType> from(const TokenContext &t) {
+    return TemplateTypeParmType::from(t.as_type());
   }
 
   Type desugar(void) const;

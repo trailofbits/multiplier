@@ -38,6 +38,7 @@ class PseudoObjectExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<PseudoObjectExpr> in(const Fragment &frag);
+  static gap::generator<PseudoObjectExpr> in(const File &file);
   static gap::generator<PseudoObjectExpr> in(const Index &index);
   static gap::generator<PseudoObjectExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class PseudoObjectExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<PseudoObjectExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<PseudoObjectExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<PseudoObjectExpr> from(const Expr &parent);
-
-  inline static std::optional<PseudoObjectExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return PseudoObjectExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<PseudoObjectExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<PseudoObjectExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return PseudoObjectExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<PseudoObjectExpr> from(const Stmt &parent);
 
   inline static std::optional<PseudoObjectExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class PseudoObjectExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<PseudoObjectExpr> from(const Reference &r) {
+    return PseudoObjectExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<PseudoObjectExpr> from(const TokenContext &t) {
+    return PseudoObjectExpr::from(t.as_statement());
   }
 
   Expr result_expression(void) const;

@@ -36,6 +36,7 @@ class ObjCSubclassingRestrictedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCSubclassingRestrictedAttr> in(const Fragment &frag);
+  static gap::generator<ObjCSubclassingRestrictedAttr> in(const File &file);
   static gap::generator<ObjCSubclassingRestrictedAttr> in(const Index &index);
   static gap::generator<ObjCSubclassingRestrictedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCSubclassingRestrictedAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_SUBCLASSING_RESTRICTED;
-  }
-
-  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCSubclassingRestrictedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCSubclassingRestrictedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCSubclassingRestrictedAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCSubclassingRestrictedAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const Reference &r) {
+    return ObjCSubclassingRestrictedAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const TokenContext &t) {
+    return ObjCSubclassingRestrictedAttr::from(t.as_attribute());
   }
 
 };

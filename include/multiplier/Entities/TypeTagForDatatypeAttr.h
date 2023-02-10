@@ -37,6 +37,7 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TypeTagForDatatypeAttr> in(const Fragment &frag);
+  static gap::generator<TypeTagForDatatypeAttr> in(const File &file);
   static gap::generator<TypeTagForDatatypeAttr> in(const Index &index);
   static gap::generator<TypeTagForDatatypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_TAG_FOR_DATATYPE;
-  }
-
-  inline static std::optional<TypeTagForDatatypeAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TypeTagForDatatypeAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TypeTagForDatatypeAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<TypeTagForDatatypeAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return TypeTagForDatatypeAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TypeTagForDatatypeAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<TypeTagForDatatypeAttr> from(const Reference &r) {
+    return TypeTagForDatatypeAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<TypeTagForDatatypeAttr> from(const TokenContext &t) {
+    return TypeTagForDatatypeAttr::from(t.as_attribute());
   }
 
   bool layout_compatible(void) const;

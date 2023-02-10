@@ -37,6 +37,7 @@ class ElaboratedType : public TypeWithKeyword {
   friend class Type;
  public:
   static gap::generator<ElaboratedType> in(const Fragment &frag);
+  static gap::generator<ElaboratedType> in(const File &file);
   static gap::generator<ElaboratedType> in(const Index &index);
   static gap::generator<ElaboratedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class ElaboratedType : public TypeWithKeyword {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ELABORATED;
-  }
-
-  inline static std::optional<ElaboratedType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ElaboratedType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<ElaboratedType> from(const TypeWithKeyword &parent);
-
-  inline static std::optional<ElaboratedType> from(const std::optional<TypeWithKeyword> &parent) {
-    if (parent) {
-      return ElaboratedType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ElaboratedType> from(const Type &parent);
@@ -72,6 +55,14 @@ class ElaboratedType : public TypeWithKeyword {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ElaboratedType> from(const Reference &r) {
+    return ElaboratedType::from(r.as_type());
+  }
+
+  inline static std::optional<ElaboratedType> from(const TokenContext &t) {
+    return ElaboratedType::from(t.as_type());
   }
 
   Type desugar(void) const;

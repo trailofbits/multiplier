@@ -34,6 +34,7 @@ class MacroQualifiedType : public Type {
   friend class Type;
  public:
   static gap::generator<MacroQualifiedType> in(const Fragment &frag);
+  static gap::generator<MacroQualifiedType> in(const File &file);
   static gap::generator<MacroQualifiedType> in(const Index &index);
   static gap::generator<MacroQualifiedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class MacroQualifiedType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::MACRO_QUALIFIED;
-  }
-
-  inline static std::optional<MacroQualifiedType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<MacroQualifiedType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<MacroQualifiedType> from(const Type &parent);
@@ -59,6 +52,14 @@ class MacroQualifiedType : public Type {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<MacroQualifiedType> from(const Reference &r) {
+    return MacroQualifiedType::from(r.as_type());
+  }
+
+  inline static std::optional<MacroQualifiedType> from(const TokenContext &t) {
+    return MacroQualifiedType::from(t.as_type());
   }
 
   Type desugar(void) const;

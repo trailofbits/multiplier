@@ -37,6 +37,7 @@ class SetTypestateAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SetTypestateAttr> in(const Fragment &frag);
+  static gap::generator<SetTypestateAttr> in(const File &file);
   static gap::generator<SetTypestateAttr> in(const Index &index);
   static gap::generator<SetTypestateAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class SetTypestateAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SET_TYPESTATE;
-  }
-
-  inline static std::optional<SetTypestateAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SetTypestateAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SetTypestateAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SetTypestateAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SetTypestateAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SetTypestateAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class SetTypestateAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SetTypestateAttr> from(const Reference &r) {
+    return SetTypestateAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SetTypestateAttr> from(const TokenContext &t) {
+    return SetTypestateAttr::from(t.as_attribute());
   }
 
   SetTypestateAttrConsumedState new_state(void) const;

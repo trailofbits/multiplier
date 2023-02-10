@@ -35,6 +35,7 @@ class BuiltinAliasAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<BuiltinAliasAttr> in(const Fragment &frag);
+  static gap::generator<BuiltinAliasAttr> in(const File &file);
   static gap::generator<BuiltinAliasAttr> in(const Index &index);
   static gap::generator<BuiltinAliasAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +43,6 @@ class BuiltinAliasAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BUILTIN_ALIAS;
-  }
-
-  inline static std::optional<BuiltinAliasAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<BuiltinAliasAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<BuiltinAliasAttr> from(const Attr &parent);
@@ -60,6 +53,14 @@ class BuiltinAliasAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<BuiltinAliasAttr> from(const Reference &r) {
+    return BuiltinAliasAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<BuiltinAliasAttr> from(const TokenContext &t) {
+    return BuiltinAliasAttr::from(t.as_attribute());
   }
 
   BuiltinAliasAttrSpelling semantic_spelling(void) const;

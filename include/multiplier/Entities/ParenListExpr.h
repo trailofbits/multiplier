@@ -38,6 +38,7 @@ class ParenListExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ParenListExpr> in(const Fragment &frag);
+  static gap::generator<ParenListExpr> in(const File &file);
   static gap::generator<ParenListExpr> in(const Index &index);
   static gap::generator<ParenListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class ParenListExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ParenListExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ParenListExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ParenListExpr> from(const Expr &parent);
-
-  inline static std::optional<ParenListExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ParenListExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ParenListExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ParenListExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ParenListExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ParenListExpr> from(const Stmt &parent);
 
   inline static std::optional<ParenListExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class ParenListExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ParenListExpr> from(const Reference &r) {
+    return ParenListExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<ParenListExpr> from(const TokenContext &t) {
+    return ParenListExpr::from(t.as_statement());
   }
 
   Token l_paren_token(void) const;

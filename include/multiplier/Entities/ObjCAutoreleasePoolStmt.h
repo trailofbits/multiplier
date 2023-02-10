@@ -34,6 +34,7 @@ class ObjCAutoreleasePoolStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ObjCAutoreleasePoolStmt> in(const Fragment &frag);
+  static gap::generator<ObjCAutoreleasePoolStmt> in(const File &file);
   static gap::generator<ObjCAutoreleasePoolStmt> in(const Index &index);
   static gap::generator<ObjCAutoreleasePoolStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -52,14 +53,6 @@ class ObjCAutoreleasePoolStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCAutoreleasePoolStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCAutoreleasePoolStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<ObjCAutoreleasePoolStmt> from(const Stmt &parent);
 
   inline static std::optional<ObjCAutoreleasePoolStmt> from(const std::optional<Stmt> &parent) {
@@ -68,6 +61,14 @@ class ObjCAutoreleasePoolStmt : public Stmt {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCAutoreleasePoolStmt> from(const Reference &r) {
+    return ObjCAutoreleasePoolStmt::from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCAutoreleasePoolStmt> from(const TokenContext &t) {
+    return ObjCAutoreleasePoolStmt::from(t.as_statement());
   }
 
   Token at_token(void) const;

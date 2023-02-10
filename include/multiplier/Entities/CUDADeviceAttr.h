@@ -36,6 +36,7 @@ class CUDADeviceAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CUDADeviceAttr> in(const Fragment &frag);
+  static gap::generator<CUDADeviceAttr> in(const File &file);
   static gap::generator<CUDADeviceAttr> in(const Index &index);
   static gap::generator<CUDADeviceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class CUDADeviceAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_DEVICE;
-  }
-
-  inline static std::optional<CUDADeviceAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CUDADeviceAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CUDADeviceAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CUDADeviceAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CUDADeviceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CUDADeviceAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class CUDADeviceAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CUDADeviceAttr> from(const Reference &r) {
+    return CUDADeviceAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<CUDADeviceAttr> from(const TokenContext &t) {
+    return CUDADeviceAttr::from(t.as_attribute());
   }
 
 };

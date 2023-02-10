@@ -39,6 +39,7 @@ class AutoType : public DeducedType {
   friend class Type;
  public:
   static gap::generator<AutoType> in(const Fragment &frag);
+  static gap::generator<AutoType> in(const File &file);
   static gap::generator<AutoType> in(const Index &index);
   static gap::generator<AutoType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -46,24 +47,6 @@ class AutoType : public DeducedType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::AUTO;
-  }
-
-  inline static std::optional<AutoType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<AutoType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<AutoType> from(const DeducedType &parent);
-
-  inline static std::optional<AutoType> from(const std::optional<DeducedType> &parent) {
-    if (parent) {
-      return AutoType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AutoType> from(const Type &parent);
@@ -74,6 +57,14 @@ class AutoType : public DeducedType {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AutoType> from(const Reference &r) {
+    return AutoType::from(r.as_type());
+  }
+
+  inline static std::optional<AutoType> from(const TokenContext &t) {
+    return AutoType::from(t.as_type());
   }
 
   AutoTypeKeyword keyword(void) const;

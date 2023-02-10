@@ -37,6 +37,7 @@ class VisibilityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<VisibilityAttr> in(const Fragment &frag);
+  static gap::generator<VisibilityAttr> in(const File &file);
   static gap::generator<VisibilityAttr> in(const Index &index);
   static gap::generator<VisibilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +45,6 @@ class VisibilityAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::VISIBILITY;
-  }
-
-  inline static std::optional<VisibilityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<VisibilityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<VisibilityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<VisibilityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return VisibilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<VisibilityAttr> from(const Attr &parent);
@@ -72,6 +55,14 @@ class VisibilityAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<VisibilityAttr> from(const Reference &r) {
+    return VisibilityAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<VisibilityAttr> from(const TokenContext &t) {
+    return VisibilityAttr::from(t.as_attribute());
   }
 
   VisibilityAttrVisibilityType visibility(void) const;

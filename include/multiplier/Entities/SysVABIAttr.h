@@ -36,6 +36,7 @@ class SysVABIAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SysVABIAttr> in(const Fragment &frag);
+  static gap::generator<SysVABIAttr> in(const File &file);
   static gap::generator<SysVABIAttr> in(const Index &index);
   static gap::generator<SysVABIAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class SysVABIAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SYS_VABI;
-  }
-
-  inline static std::optional<SysVABIAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<SysVABIAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<SysVABIAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<SysVABIAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return SysVABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<SysVABIAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class SysVABIAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<SysVABIAttr> from(const Reference &r) {
+    return SysVABIAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<SysVABIAttr> from(const TokenContext &t) {
+    return SysVABIAttr::from(t.as_attribute());
   }
 
 };

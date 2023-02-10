@@ -40,6 +40,7 @@ class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPParallelMasterTaskLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPParallelMasterTaskLoopDirective> in(const File &file);
   static gap::generator<OMPParallelMasterTaskLoopDirective> in(const Index &index);
   static gap::generator<OMPParallelMasterTaskLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -58,44 +59,6 @@ class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPParallelMasterTaskLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPParallelMasterTaskLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPParallelMasterTaskLoopDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPParallelMasterTaskLoopDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPParallelMasterTaskLoopDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const std::optional<Stmt> &parent) {
@@ -104,6 +67,14 @@ class OMPParallelMasterTaskLoopDirective : public OMPLoopDirective {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const Reference &r) {
+    return OMPParallelMasterTaskLoopDirective::from(r.as_statement());
+  }
+
+  inline static std::optional<OMPParallelMasterTaskLoopDirective> from(const TokenContext &t) {
+    return OMPParallelMasterTaskLoopDirective::from(t.as_statement());
   }
 
   bool has_cancel(void) const;

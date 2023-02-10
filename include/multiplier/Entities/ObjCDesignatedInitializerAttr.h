@@ -34,6 +34,7 @@ class ObjCDesignatedInitializerAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCDesignatedInitializerAttr> in(const Fragment &frag);
+  static gap::generator<ObjCDesignatedInitializerAttr> in(const File &file);
   static gap::generator<ObjCDesignatedInitializerAttr> in(const Index &index);
   static gap::generator<ObjCDesignatedInitializerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +42,6 @@ class ObjCDesignatedInitializerAttr : public Attr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DESIGNATED_INITIALIZER;
-  }
-
-  inline static std::optional<ObjCDesignatedInitializerAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCDesignatedInitializerAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCDesignatedInitializerAttr> from(const Attr &parent);
@@ -59,6 +52,14 @@ class ObjCDesignatedInitializerAttr : public Attr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCDesignatedInitializerAttr> from(const Reference &r) {
+    return ObjCDesignatedInitializerAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCDesignatedInitializerAttr> from(const TokenContext &t) {
+    return ObjCDesignatedInitializerAttr::from(t.as_attribute());
   }
 
 };

@@ -36,6 +36,7 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCExplicitProtocolImplAttr> in(const Fragment &frag);
+  static gap::generator<ObjCExplicitProtocolImplAttr> in(const File &file);
   static gap::generator<ObjCExplicitProtocolImplAttr> in(const Index &index);
   static gap::generator<ObjCExplicitProtocolImplAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_EXPLICIT_PROTOCOL_IMPL;
-  }
-
-  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ObjCExplicitProtocolImplAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ObjCExplicitProtocolImplAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ObjCExplicitProtocolImplAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const Reference &r) {
+    return ObjCExplicitProtocolImplAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const TokenContext &t) {
+    return ObjCExplicitProtocolImplAttr::from(t.as_attribute());
   }
 
 };

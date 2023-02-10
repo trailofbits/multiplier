@@ -36,6 +36,7 @@ class InternalLinkageAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<InternalLinkageAttr> in(const Fragment &frag);
+  static gap::generator<InternalLinkageAttr> in(const File &file);
   static gap::generator<InternalLinkageAttr> in(const Index &index);
   static gap::generator<InternalLinkageAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class InternalLinkageAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INTERNAL_LINKAGE;
-  }
-
-  inline static std::optional<InternalLinkageAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<InternalLinkageAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<InternalLinkageAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<InternalLinkageAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return InternalLinkageAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<InternalLinkageAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class InternalLinkageAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<InternalLinkageAttr> from(const Reference &r) {
+    return InternalLinkageAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<InternalLinkageAttr> from(const TokenContext &t) {
+    return InternalLinkageAttr::from(t.as_attribute());
   }
 
 };

@@ -36,6 +36,7 @@ class AcquireHandleAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AcquireHandleAttr> in(const Fragment &frag);
+  static gap::generator<AcquireHandleAttr> in(const File &file);
   static gap::generator<AcquireHandleAttr> in(const Index &index);
   static gap::generator<AcquireHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AcquireHandleAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ACQUIRE_HANDLE;
-  }
-
-  inline static std::optional<AcquireHandleAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AcquireHandleAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AcquireHandleAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AcquireHandleAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AcquireHandleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AcquireHandleAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AcquireHandleAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AcquireHandleAttr> from(const Reference &r) {
+    return AcquireHandleAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AcquireHandleAttr> from(const TokenContext &t) {
+    return AcquireHandleAttr::from(t.as_attribute());
   }
 
   std::string_view handle_type(void) const;

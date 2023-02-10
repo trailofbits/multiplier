@@ -38,6 +38,7 @@ class CompoundLiteralExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CompoundLiteralExpr> in(const Fragment &frag);
+  static gap::generator<CompoundLiteralExpr> in(const File &file);
   static gap::generator<CompoundLiteralExpr> in(const Index &index);
   static gap::generator<CompoundLiteralExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -56,34 +57,6 @@ class CompoundLiteralExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CompoundLiteralExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CompoundLiteralExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CompoundLiteralExpr> from(const Expr &parent);
-
-  inline static std::optional<CompoundLiteralExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CompoundLiteralExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CompoundLiteralExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CompoundLiteralExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CompoundLiteralExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CompoundLiteralExpr> from(const Stmt &parent);
 
   inline static std::optional<CompoundLiteralExpr> from(const std::optional<Stmt> &parent) {
@@ -92,6 +65,14 @@ class CompoundLiteralExpr : public Expr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<CompoundLiteralExpr> from(const Reference &r) {
+    return CompoundLiteralExpr::from(r.as_statement());
+  }
+
+  inline static std::optional<CompoundLiteralExpr> from(const TokenContext &t) {
+    return CompoundLiteralExpr::from(t.as_statement());
   }
 
   Expr initializer(void) const;

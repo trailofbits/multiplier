@@ -36,6 +36,7 @@ class AlwaysDestroyAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AlwaysDestroyAttr> in(const Fragment &frag);
+  static gap::generator<AlwaysDestroyAttr> in(const File &file);
   static gap::generator<AlwaysDestroyAttr> in(const Index &index);
   static gap::generator<AlwaysDestroyAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AlwaysDestroyAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALWAYS_DESTROY;
-  }
-
-  inline static std::optional<AlwaysDestroyAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AlwaysDestroyAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AlwaysDestroyAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AlwaysDestroyAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AlwaysDestroyAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AlwaysDestroyAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AlwaysDestroyAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AlwaysDestroyAttr> from(const Reference &r) {
+    return AlwaysDestroyAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AlwaysDestroyAttr> from(const TokenContext &t) {
+    return AlwaysDestroyAttr::from(t.as_attribute());
   }
 
 };

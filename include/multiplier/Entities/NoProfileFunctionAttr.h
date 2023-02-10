@@ -36,6 +36,7 @@ class NoProfileFunctionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoProfileFunctionAttr> in(const Fragment &frag);
+  static gap::generator<NoProfileFunctionAttr> in(const File &file);
   static gap::generator<NoProfileFunctionAttr> in(const Index &index);
   static gap::generator<NoProfileFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class NoProfileFunctionAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_PROFILE_FUNCTION;
-  }
-
-  inline static std::optional<NoProfileFunctionAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NoProfileFunctionAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NoProfileFunctionAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NoProfileFunctionAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NoProfileFunctionAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NoProfileFunctionAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class NoProfileFunctionAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<NoProfileFunctionAttr> from(const Reference &r) {
+    return NoProfileFunctionAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<NoProfileFunctionAttr> from(const TokenContext &t) {
+    return NoProfileFunctionAttr::from(t.as_attribute());
   }
 
 };

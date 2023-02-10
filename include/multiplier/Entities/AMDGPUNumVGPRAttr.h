@@ -36,6 +36,7 @@ class AMDGPUNumVGPRAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AMDGPUNumVGPRAttr> in(const Fragment &frag);
+  static gap::generator<AMDGPUNumVGPRAttr> in(const File &file);
   static gap::generator<AMDGPUNumVGPRAttr> in(const Index &index);
   static gap::generator<AMDGPUNumVGPRAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +44,6 @@ class AMDGPUNumVGPRAttr : public InheritableAttr {
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_NUM_VGPR;
-  }
-
-  inline static std::optional<AMDGPUNumVGPRAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AMDGPUNumVGPRAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AMDGPUNumVGPRAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AMDGPUNumVGPRAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AMDGPUNumVGPRAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AMDGPUNumVGPRAttr> from(const Attr &parent);
@@ -71,6 +54,14 @@ class AMDGPUNumVGPRAttr : public InheritableAttr {
     } else {
       return std::nullopt;
     }
+  }
+
+  inline static std::optional<AMDGPUNumVGPRAttr> from(const Reference &r) {
+    return AMDGPUNumVGPRAttr::from(r.as_attribute());
+  }
+
+  inline static std::optional<AMDGPUNumVGPRAttr> from(const TokenContext &t) {
+    return AMDGPUNumVGPRAttr::from(t.as_attribute());
   }
 
 };
