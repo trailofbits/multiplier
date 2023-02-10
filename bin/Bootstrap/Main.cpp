@@ -2057,7 +2057,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  b." << cd_setter_name << "(es.ParentDeclId(e));\n"
           << "  b." << cs_setter_name << "(es.ParentStmtId(e));\n";
 
-      // `Decl::is_definition` and Decl::operator<=>
+      // `Decl::is_definition`
       if (class_name == "Decl") {
         const auto def = storage.AddMethod("Bool");
         auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
