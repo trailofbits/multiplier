@@ -7,6 +7,8 @@
 #pragma once
 
 #include <multiplier/AST.capnp.h>
+#include <multiplier/Entities/CallExpr.h>
+#include <multiplier/Entities/FunctionDecl.h>
 #include <multiplier/Entities/Decl.h>
 
 #include "Entity.h"

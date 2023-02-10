@@ -50,6 +50,8 @@ class Stmt {
   Stmt &operator=(Stmt &&) noexcept = default;
   Stmt &operator=(const Stmt &) = default;
 
+  inline std::strong_ordering operator<=>(const Stmt &rhs) const { return id() <=> rhs.id(); }
+
   /* implicit */ inline Stmt(std::shared_ptr<const StmtImpl> impl_)
       : impl(std::move(impl_)) {}
 

@@ -33,6 +33,7 @@
 #include "TemplateSpecializationKind.h"
 
 namespace mx {
+class CallExpr;
 class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
@@ -201,6 +202,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool will_have_body(void) const;
   std::optional<Stmt> body(void) const;
   gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<CallExpr> callers(void) const;
 };
 
 static_assert(sizeof(FunctionDecl) == sizeof(DeclaratorDecl));

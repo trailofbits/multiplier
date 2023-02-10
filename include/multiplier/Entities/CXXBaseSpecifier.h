@@ -55,6 +55,8 @@ class CXXBaseSpecifier {
   CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
 
+  inline std::strong_ordering operator<=>(const CXXBaseSpecifier &rhs) const { return id() <=> rhs.id(); }
+
   /* implicit */ inline CXXBaseSpecifier(std::shared_ptr<const CXXBaseSpecifierImpl> impl_)
       : impl(std::move(impl_)) {}
 

@@ -50,6 +50,8 @@ class Attr {
   Attr &operator=(Attr &&) noexcept = default;
   Attr &operator=(const Attr &) = default;
 
+  inline std::strong_ordering operator<=>(const Attr &rhs) const { return id() <=> rhs.id(); }
+
   /* implicit */ inline Attr(std::shared_ptr<const AttrImpl> impl_)
       : impl(std::move(impl_)) {}
 
