@@ -34,3 +34,11 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
 void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
                     std::unordered_set<mx::RawEntityId> highlight_tokens_ids={},
                     std::string indent="", bool print_line_numbers=false);
+
+void RenderTokens(std::ostream &os, const mx::TokenRange &tokens,
+                  const mx::TokenRange &entity_tokens,
+                  std::string indent="", bool print_line_numbers=false);
+
+void RenderTokens(std::ostream &os, const mx::TokenRange &tokens,
+                    std::unordered_set<mx::RawEntityId> highlight_tokens_ids={},
+                    std::string indent="", bool print_line_numbers=false);

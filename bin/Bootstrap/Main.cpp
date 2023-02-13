@@ -1435,7 +1435,7 @@ void CodeGenerator::RunOnVector(
   } else {
 
     // Try to auto-generate an `nth_*` method.
-    if (api_name.ends_with('s')) {
+    if (api_name.ends_with('s') && gEntityClassNames.count(*element_name)) {
       auto singular_api = api_name;
       singular_api.pop_back();
       os
@@ -1445,13 +1445,39 @@ void CodeGenerator::RunOnVector(
       lib_cpp_os
           << "std::optional<" << cxx_element_name << "> " << class_name
           << "::nth_" << singular_api << "(unsigned n) const {\n"
-          << "  unsigned i = 0u;\n"
-          << "  for (auto ent : " << api_name << "()) {\n"
-          << "    if (i++ == n) {\n"
-          << "      return ent;\n"
-          << "    }\n"
+          << "  auto list = impl->reader." << getter_name << "();\n"
+          << "  if (n >= list.size()) {\n"
+          << "    return std::nullopt;\n"
           << "  }\n"
-          << "  return std::nullopt;\n"
+          << "  auto &ep = impl->ep;\n"
+          << "  auto v = list[n];\n";
+
+      if (false) {
+
+#define YIELD_ENTITY(name, lower_name) \
+      } else if (*element_name == #name) { \
+        lib_cpp_os \
+            << "  auto e = ep->" #name "For(ep, v);\n" \
+            << "  if (!e) {\n" \
+            << "    return std::nullopt;\n" \
+            << "  }\n" \
+            << "  return " << #name << "(std::move(e));\n"; \
+      \
+      } else if (g ## name ## Names.count(*element_name)) { \
+        lib_cpp_os \
+            << "  auto e = ep->" #name "For(ep, v);\n" \
+            << "  if (!e) {\n" \
+            << "    return std::nullopt;\n" \
+            << "  }\n" \
+            << "  return " << cxx_element_name << "::from(" #name << "(std::move(e)));\n";
+
+    YIELD_ENTITY(File, file)
+    YIELD_ENTITY(Token, token)
+    FOR_EACH_ENTITY_CATEGORY(YIELD_ENTITY)
+      }
+
+#undef YIELD_ENTITY
+      lib_cpp_os
           << "}\n\n";
     }
 
@@ -2109,14 +2135,21 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "Index")
         << FriendOf(class_os, class_name, "Macro")
         << FriendOf(class_os, class_name, "Reference")
+        << FriendOf(class_os, class_name, "SourceIR")
         << FriendOf(class_os, class_name, "Stmt")
         << FriendOf(class_os, class_name, "TokenContext")
         << FriendOf(class_os, class_name, "Type")
         << FriendOf(class_os, class_name, class_name + "Impl")
-        << "  std::shared_ptr<const " << class_name << "Impl> impl;\n"
-        << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);\n"
-        << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);\n"
-        << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);\n"
+        << "  std::shared_ptr<const " << class_name << "Impl> impl;\n";
+
+    if (class_name == base_name) {
+      class_os
+          << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);\n"
+          << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);\n"
+          << "  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);\n";
+    }
+
+    class_os
         << " public:\n"
         << "  " << class_name << "(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << "(const " << class_name << " &) = default;\n"
@@ -2138,21 +2171,24 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "(std::shared_ptr<const " << class_name << "Impl> impl_)\n"
         << "      : impl(std::move(impl_)) {}\n\n";
 
-    lib_cpp_os
-        << "inline const std::shared_ptr<EntityProvider> &"
-        << class_name << "::entity_provider_of(const Index &index_) {\n"
-        << "  return index_.impl;\n"
-        << "}\n\n"
-        << "inline const std::shared_ptr<EntityProvider> &"
-        << class_name << "::entity_provider_of(const Fragment &frag_) {\n"
-        << "  return frag_.impl->ep;\n"
-        << "}\n\n"
-        << "inline const std::shared_ptr<EntityProvider> &"
-        << class_name << "::entity_provider_of(const File &file_) {\n"
-        << "  return file_.impl->ep;\n"
-        << "}\n\n";
+    if (base_name == class_name) {
+      lib_cpp_os
+          << "inline const std::shared_ptr<EntityProvider> &"
+          << class_name << "::entity_provider_of(const Index &index_) {\n"
+          << "  return index_.impl;\n"
+          << "}\n\n"
+          << "inline const std::shared_ptr<EntityProvider> &"
+          << class_name << "::entity_provider_of(const Fragment &frag_) {\n"
+          << "  return frag_.impl->ep;\n"
+          << "}\n\n"
+          << "inline const std::shared_ptr<EntityProvider> &"
+          << class_name << "::entity_provider_of(const File &file_) {\n"
+          << "  return file_.impl->ep;\n"
+          << "}\n\n";
+    }
 
     forward_decls.insert("Reference");
+    forward_decls.insert("SourceIR");
     forward_decls.insert(class_name + "Impl");
 
     class_os

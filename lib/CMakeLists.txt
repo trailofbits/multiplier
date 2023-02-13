@@ -75,6 +75,7 @@ add_custom_target("copy_headers"
 set(api_headers
   "${source_include_dir}/AST.h"
   $<BUILD_INTERFACE:${source_include_dir}/Database.h>
+  "${source_include_dir}/Entity.h"
   "${source_include_dir}/File.h"
   "${source_include_dir}/Fragment.h"
   "${source_include_dir}/Index.h"

@@ -74,7 +74,6 @@ class MSAsmStmt : public AsmStmt {
     return MSAsmStmt::from(t.as_statement());
   }
 
-  std::optional<std::string_view> nth_all_constraint(unsigned n) const;
   gap::generator<std::string_view> all_constraints(void) const;
   std::optional<Expr> nth_all_expression(unsigned n) const;
   gap::generator<Expr> all_expressions(void) const;

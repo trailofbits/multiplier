@@ -80,11 +80,11 @@ struct FragmentFileRecord {
       {R"(CREATE TABLE IF NOT EXISTS fragment_file (
             fragment_id INTEGER NOT NULL PRIMARY KEY,
             file_id INTEGER NOT NULL
-          ) WITHOUT ROWID)"};
+          ) WITHOUT ROWID)",
+       R"(CREATE INDEX IF NOT EXISTS fragments_in_file
+          ON fragment_file(file_id))"};
 
-  static constexpr const char *kExitStatements[] = {
-      R"(CREATE INDEX IF NOT EXISTS fragments_in_file
-         ON fragment_file(file_id))"};
+  static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
       R"(INSERT OR IGNORE INTO fragment_file (fragment_id, file_id)
@@ -149,13 +149,13 @@ struct RedeclarationRecord {
             decl_id INTEGER NOT NULL,
             redecl_id INTEGER NOT NULL,
             PRIMARY KEY(decl_id, redecl_id)
-          ) WITHOUT ROWID)"};
+          ) WITHOUT ROWID)",
+       R"(CREATE INDEX IF NOT EXISTS redecl_id_from_decl_id
+          ON redeclaration(decl_id))",
+       R"(CREATE INDEX IF NOT EXISTS decl_id_from_redecl_id
+          ON redeclaration(redecl_id))"};
 
-  static constexpr const char *kExitStatements[] = {
-      R"(CREATE INDEX IF NOT EXISTS redecl_id_from_decl_id
-         ON redeclaration(decl_id))",
-      R"(CREATE INDEX IF NOT EXISTS decl_id_from_redecl_id
-         ON redeclaration(redecl_id))"};
+  static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
       R"(INSERT OR IGNORE INTO redeclaration (decl_id, redecl_id)
@@ -178,20 +178,20 @@ struct MangledNameRecord {
             entity_id INTEGER NOT NULL,
             data TEXT NOT NULL,
             PRIMARY KEY(entity_id)
-          ) WITHOUT ROWID)"};
+          ) WITHOUT ROWID)",
+       R"(CREATE INDEX IF NOT EXISTS mangled_name_from_entity_id
+          ON mangled_name(data))",
 
-  static constexpr const char *kExitStatements[] = {
-      R"(CREATE INDEX IF NOT EXISTS mangled_name_from_entity_id
-         ON mangled_name(data))",
+       // Mangle name data columns use space-delimited data. Having a view that
+       // can give us access to just the normal names is nifty when we're trying
+       // to diagnose issues where we have logically the same entity mangled to
+       // two different names, e.g. `static inline` functions in headers.
+       R"(CREATE VIEW IF NOT EXISTS base_mangled_name AS
+          SELECT m.entity_id AS entity_id,
+                 substr(m.data||' ', 0, instr(m.data||' ',' ')) AS data
+          FROM mangled_name AS m)"};
 
-      // Mangle name data columns use space-delimited data. Having a view that
-      // can give us access to just the normal names is nifty when we're trying
-      // to diagnose issues where we have logically the same entity mangled to
-      // two different names, e.g. `static inline` functions in headers.
-      R"(CREATE VIEW IF NOT EXISTS base_mangled_name AS
-         SELECT m.entity_id AS entity_id,
-                substr(m.data||' ', 0, instr(m.data||' ',' ')) AS data
-         FROM mangled_name AS m)"};
+  static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
       R"(INSERT INTO mangled_name (entity_id, data)
@@ -262,11 +262,12 @@ struct ReferenceRecord {
           ))",
 
        R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
-          VALUES (0, "Explicit code reference"))"};
+          VALUES (0, "Explicit code reference"))",
 
-  static constexpr const char *kExitStatements[] = {
-      R"(CREATE INDEX IF NOT EXISTS references_by_target
-         ON reference(to_entity_id, from_entity_id))"};
+       R"(CREATE INDEX IF NOT EXISTS references_by_target
+          ON reference(to_entity_id, from_entity_id))"};
+
+  static constexpr const char *kExitStatements[] = {nullptr};
 
   // NOTE(pag): Reference id `0` is the id of an "explicit code reference."
   static constexpr const char *kInsertStatement =
@@ -304,20 +305,18 @@ struct EntityRecord {
       {R"(CREATE TABLE IF NOT EXISTS entity (
             entity_id INTEGER PRIMARY KEY,
             data BLOB NOT NULL
-          ) WITHOUT ROWID)"};
+          ) WITHOUT ROWID)",
+       R"(CREATE INDEX IF NOT EXISTS entities_by_category
+          ON entity(entity_id_to_category(entity_id) ASC))",
 
-  static constexpr const char *kExitStatements[] = {
-      R"(CREATE INDEX IF NOT EXISTS entities_by_category
-         ON entity(entity_id_to_category(entity_id) ASC))",
+       R"(CREATE INDEX IF NOT EXISTS entities_by_fragment
+          ON entity(entity_id_to_category(entity_id) ASC,
+                    entity_id_to_fragment_id(entity_id) ASC))",
 
-      R"(CREATE INDEX IF NOT EXISTS entities_by_fragment
-         ON entity(entity_id_to_category(entity_id) ASC,
-                   entity_id_to_fragment_id(entity_id) ASC))",
-
-      R"(CREATE INDEX IF NOT EXISTS entities_by_kind
-         ON entity(entity_id_to_category(entity_id) ASC,
-                   entity_id_to_kind(entity_id) ASC,
-                   entity_id_to_fragment_id(entity_id) ASC))",
+       R"(CREATE INDEX IF NOT EXISTS entities_by_kind
+          ON entity(entity_id_to_category(entity_id) ASC,
+                    entity_id_to_kind(entity_id) ASC,
+                    entity_id_to_fragment_id(entity_id) ASC))",
 
 #define MX_CREATE_ENTITY_VIEW(type, name, enum_, id) \
      "CREATE VIEW IF NOT EXISTS " #name " AS " \
@@ -325,13 +324,15 @@ struct EntityRecord {
      "FROM entity " \
      "WHERE entity_id_to_category(entity_id) = " #id,
 
-MX_FOR_EACH_ENTITY_CATEGORY(MX_CREATE_ENTITY_VIEW,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_CREATE_ENTITY_VIEW,
-                            MX_CREATE_ENTITY_VIEW,
-                            MX_CREATE_ENTITY_VIEW)
-#undef MX_CREATE_ENTITY_VIEW
-      };
+      MX_FOR_EACH_ENTITY_CATEGORY(MX_CREATE_ENTITY_VIEW,
+                                  MX_IGNORE_ENTITY_CATEGORY,
+                                  MX_CREATE_ENTITY_VIEW,
+                                  MX_CREATE_ENTITY_VIEW,
+                                  MX_CREATE_ENTITY_VIEW)
+      #undef MX_CREATE_ENTITY_VIEW
+  };
+
+  static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
       "INSERT OR IGNORE INTO entity (entity_id, data) VALUES (?1, ?2)";

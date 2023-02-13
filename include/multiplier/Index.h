@@ -12,7 +12,6 @@
 #include <string_view>
 #include <vector>
 
-#include "Database.h"
 #include "Entities/Attr.h"
 #include "Entities/CXXBaseSpecifier.h"
 #include "Entities/DefineMacroDirective.h"
@@ -33,7 +32,6 @@ namespace mx {
 
 class CachingEntityProvider;
 class EntityProvider;
-class File;
 class Fragment;
 class IncludeLikeMacroDirective;
 class Index;
@@ -43,30 +41,15 @@ class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
 class RegexQueryMatch;
-class Token;
 class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
-
-#define MX_FORWARD_DECLARE_IMPL_CLASS(type_name, ln, e, c) \
-    class type_name ## Impl; \
-    using type_name ## ImplPtr = std::shared_ptr<const type_name ## Impl>; \
-    using Weak ## type_name ## ImplPtr = std::weak_ptr<const type_name ## Impl>;
-
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_IMPL_CLASS,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_FORWARD_DECLARE_IMPL_CLASS,
-                              MX_FORWARD_DECLARE_IMPL_CLASS,
-                              MX_FORWARD_DECLARE_IMPL_CLASS)
-#undef MX_FORWARD_DECLARE_IMPL_CLASS
 
 using FilePathEntry = std::pair<std::filesystem::path, PackedFileId>;
 using FilePathMap = std::map<std::filesystem::path, PackedFileId>;
 using FragmentIdList = std::vector<PackedFragmentId>;
 using DeclIdList = std::vector<PackedDeclId>;
 using RawEntityIdList = std::vector<RawEntityId>;
-
-using NamedEntity = std::variant<NamedDecl, DefineMacroDirective, File>;
 using NamedEntityList = std::vector<NamedEntity>;
 
 // Provides the APIs with entities.

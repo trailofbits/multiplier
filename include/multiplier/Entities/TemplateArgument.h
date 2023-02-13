@@ -28,6 +28,7 @@
 
 namespace mx {
 class Reference;
+class SourceIR;
 class TemplateArgument;
 class TemplateArgumentImpl;
 class Type;
@@ -43,6 +44,7 @@ class TemplateArgument {
   friend class Index;
   friend class Macro;
   friend class Reference;
+  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;

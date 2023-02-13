@@ -8,9 +8,10 @@
 
 #include <gap/core/generator.hpp>
 #include <memory>
-#include <multiplier/Types.h>
 #include <string>
 #include <string_view>
+
+#include "Entity.h"
 
 namespace mx {
 
@@ -18,16 +19,6 @@ class Index;
 class EntityProvider;
 class Reference;
 class ReferenceKindImpl;
-
-#define MX_FORWARD_DECLARE(type_name, lower_name, enum_name, category) \
-    class type_name;
-
-MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
-                            MX_FORWARD_DECLARE,
-                            MX_FORWARD_DECLARE,
-                            MX_FORWARD_DECLARE,
-                            MX_FORWARD_DECLARE)
-#undef MX_FORWARD_DECLARE
 
 using OpaqueImplPtr = std::shared_ptr<const void>;
 using ReferenceKindImplPtr = std::shared_ptr<const ReferenceKindImpl>;
@@ -126,6 +117,9 @@ class Reference {
 
   // Return the kind of this reference.
   ReferenceKind kind(void) const noexcept;
+
+  // Return this reference as a `VariantEntity`.
+  VariantEntity as_variant(void) const noexcept;
 
 #define MX_DECLARE_REF_GETTER(type_name, lower_name, enum_name, category) \
     std::optional<type_name> as_ ## lower_name (void) const noexcept;

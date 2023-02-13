@@ -27,6 +27,7 @@
 
 namespace mx {
 class Reference;
+class SourceIR;
 class Stmt;
 class StmtImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -40,6 +41,7 @@ class Stmt {
   friend class Index;
   friend class Macro;
   friend class Reference;
+  friend class SourceIR;
   friend class TokenContext;
   friend class Type;
   friend class StmtImpl;

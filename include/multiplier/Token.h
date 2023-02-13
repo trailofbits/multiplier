@@ -14,49 +14,25 @@
 
 #include "Iterator.h"
 #include "Reference.h"
-#include "Types.h"
 
 namespace mx {
 
-class Attr;
-class Decl;
-class DefineMacroDirective;
 class Designator;
 class EntityProvider;
-class File;
 class FileLocationCache;
-class Fragment;
-class FragmentImpl;
 class Index;
-class Macro;
-class NamedDecl;
 class Reference;
 class RegexQuery;
 class RegexQueryResultIterator;
-class Stmt;
 class TokenContext;
 class TokenRangeIterator;
 class TokenRange;
 class TokenReader;
-class Type;
 class WeggliQuery;
 class WeggliQueryResultIterator;
 
 enum class TokenKind : unsigned short;
 enum class TokenCategory : unsigned char;
-
-#define MX_DECLARE_ENTITY_VARIANT(type_name, lower_name, enum_name, category) \
-    , type_name
-
-using VariantEntity = std::variant<
-    NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT)>;
-#undef MX_DECLARE_ENTITY_VARIANT
-
-using TokenImplPtr = std::shared_ptr<const TokenReader>;
 
 // A single token, e.g. from a file or from a macro expansion.
 class Token {

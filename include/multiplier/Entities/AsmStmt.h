@@ -76,15 +76,12 @@ class AsmStmt : public Stmt {
   bool is_volatile(void) const;
   std::optional<Expr> nth_output(unsigned n) const;
   gap::generator<Expr> outputs(void) const;
-  std::optional<std::string_view> nth_output_constraint(unsigned n) const;
   gap::generator<std::string_view> output_constraints(void) const;
   std::optional<Expr> nth_output_expression(unsigned n) const;
   gap::generator<Expr> output_expressions(void) const;
-  std::optional<std::string_view> nth_input_constraint(unsigned n) const;
   gap::generator<std::string_view> input_constraints(void) const;
   std::optional<Expr> nth_input_expression(unsigned n) const;
   gap::generator<Expr> input_expressions(void) const;
-  std::optional<std::string_view> nth_clobber(unsigned n) const;
   gap::generator<std::string_view> clobbers(void) const;
 };
 

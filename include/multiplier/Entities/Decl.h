@@ -36,6 +36,7 @@ class Decl;
 class DeclImpl;
 class ExternalSourceSymbolAttr;
 class Reference;
+class SourceIR;
 class TemplateDecl;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -48,6 +49,7 @@ class Decl {
   friend class Index;
   friend class Macro;
   friend class Reference;
+  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;

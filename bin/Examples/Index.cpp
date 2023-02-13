@@ -89,22 +89,29 @@ std::unordered_set<mx::RawEntityId> FileTokenIdsFor(
   return token_ids;
 }
 
-void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
-                    std::unordered_set<mx::RawEntityId> highlight_token_ids,
-                    std::string indent, bool print_line_numbers) {
+void RenderTokens(std::ostream &os, const mx::TokenRange &tokens_,
+                  std::unordered_set<mx::RawEntityId> highlight_token_ids,
+                  std::string indent, bool print_line_numbers) {
+  mx::TokenRange tokens = tokens_.file_tokens();
+  if (tokens.empty()) {
+    return;
+  }
 
-  auto location = fragment.file_tokens().begin()->location(location_cache);
+  std::stringstream ss;
+  auto location = tokens.begin()->location(location_cache);
   unsigned line_number = 0;
   if (!location) {
     print_line_numbers = false;
   } else {
     line_number = location->first;
+    for (auto i = 1u; i < location->second; ++i) {
+      ss << ' ';
+    }
   }
 
-  std::stringstream ss;
   std::string sep = indent;
 
-  for (mx::Token file_tok : fragment.file_tokens()) {
+  for (mx::Token file_tok : tokens) {
     if (highlight_token_ids.count(file_tok.id().Pack())) {
       HighlightToken(ss, file_tok);
     } else {
@@ -115,7 +122,7 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
   auto render_line_number = print_line_numbers;
 
   if (print_line_numbers) {
-    auto file = mx::File::containing(fragment);
+    auto file = mx::File::containing(tokens);
     os
         << '\n' << sep << "         " << file_paths[file->id()].generic_string()
         << '\n' << sep << "         +---------------------------------------------\n";
@@ -137,9 +144,23 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
   }
 }
 
+void RenderTokens(std::ostream &os, const mx::TokenRange &tokens,
+                  const mx::TokenRange &entity_tokens,
+                  std::string indent, bool print_line_numbers) {
+  return RenderTokens(os, tokens, FileTokenIdsFor(entity_tokens),
+                      std::move(indent), print_line_numbers);
+}
+
+void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
+                    std::unordered_set<mx::RawEntityId> highlight_token_ids,
+                    std::string indent, bool print_line_numbers) {
+  return RenderTokens(os, fragment.file_tokens(), std::move(highlight_token_ids),
+                      std::move(indent), print_line_numbers);
+}
+
 void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
                     const mx::TokenRange &entity_tokens,
                     std::string indent, bool print_line_numbers) {
-  RenderFragment(os, fragment, FileTokenIdsFor(entity_tokens), indent,
-                 print_line_numbers);
+  return RenderTokens(os, fragment.file_tokens(), FileTokenIdsFor(entity_tokens),
+                      std::move(indent), print_line_numbers);
 }

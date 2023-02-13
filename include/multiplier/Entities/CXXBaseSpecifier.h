@@ -31,6 +31,7 @@ namespace mx {
 class CXXBaseSpecifier;
 class CXXBaseSpecifierImpl;
 class Reference;
+class SourceIR;
 class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -44,6 +45,7 @@ class CXXBaseSpecifier {
   friend class Index;
   friend class Macro;
   friend class Reference;
+  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;

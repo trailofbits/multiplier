@@ -29,6 +29,7 @@ namespace mx {
 class Macro;
 class MacroImpl;
 class Reference;
+class SourceIR;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
@@ -40,6 +41,7 @@ class Macro {
   friend class FragmentImpl;
   friend class Index;
   friend class Reference;
+  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;

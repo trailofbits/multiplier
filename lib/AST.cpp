@@ -7830,13 +7830,17 @@ TokenRange TemplateParameterList::tokens(void) const {
 }
 
 std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : parameters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal11();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return NamedDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<NamedDecl> TemplateParameterList::parameters(void) const {
@@ -8677,13 +8681,17 @@ std::optional<DefineMacroDirective> MacroExpansion::definition(void) const {
 }
 
 std::optional<MacroArgument> MacroExpansion::nth_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal5();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->MacroFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return MacroArgument::from(Macro(std::move(e)));
 }
 
 gap::generator<MacroArgument> MacroExpansion::arguments(void) const {
@@ -41853,13 +41861,17 @@ bool TemplateSpecializationType::is_type_alias(void) const {
 }
 
 std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal296();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
 }
 
 gap::generator<TemplateArgument> TemplateSpecializationType::template_arguments(void) const {
@@ -43145,13 +43157,17 @@ std::optional<Type> ObjCObjectType::super_class_type(void) const {
 }
 
 std::optional<Type> ObjCObjectType::nth_type_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : type_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal296();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TypeFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Type(std::move(e));
 }
 
 gap::generator<Type> ObjCObjectType::type_arguments(void) const {
@@ -43420,13 +43436,17 @@ Type ObjCObjectPointerType::super_class_type(void) const {
 }
 
 std::optional<Type> ObjCObjectPointerType::nth_type_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : type_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal296();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TypeFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Type(std::move(e));
 }
 
 gap::generator<Type> ObjCObjectPointerType::type_arguments(void) const {
@@ -43480,13 +43500,17 @@ bool ObjCObjectPointerType::is_unspecialized_as_written(void) const {
 }
 
 std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_qualifier(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : qualifiers()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal314();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCProtocolDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const {
@@ -43508,13 +43532,17 @@ ObjCObjectPointerType ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualif
 }
 
 std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_protocol(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : protocols()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal315();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCProtocolDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::protocols(void) const {
@@ -44340,13 +44368,17 @@ std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
 }
 
 std::optional<Type> FunctionProtoType::nth_parameter_type(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : parameter_types()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal296();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TypeFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Type(std::move(e));
 }
 
 gap::generator<Type> FunctionProtoType::parameter_types(void) const {
@@ -44414,13 +44446,17 @@ bool FunctionProtoType::is_variadic(void) const {
 }
 
 std::optional<Type> FunctionProtoType::nth_exception_type(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : exception_types()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal300();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TypeFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Type(std::move(e));
 }
 
 gap::generator<Type> FunctionProtoType::exception_types(void) const {
@@ -45174,13 +45210,17 @@ AutoTypeKeyword AutoType::keyword(void) const {
 }
 
 std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : type_constraint_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal296();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
 }
 
 gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const {
@@ -46922,13 +46962,17 @@ bool DependentTemplateSpecializationType::is_sugared(void) const {
 }
 
 std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_template_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal296();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
 }
 
 gap::generator<TemplateArgument> DependentTemplateSpecializationType::template_arguments(void) const {
@@ -49097,13 +49141,17 @@ Stmt ObjCAtTryStmt::try_body(void) const {
 }
 
 std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : catch_statements()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCAtCatchStmt::from(Stmt(std::move(e)));
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const {
@@ -54691,13 +54739,17 @@ gap::generator<OMPLoopDirective> OMPLoopDirective::in(const File &file) {
 }
 
 std::optional<Expr> OMPLoopDirective::nth_counter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : counters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPLoopDirective::counters(void) const {
@@ -54714,13 +54766,17 @@ gap::generator<Expr> OMPLoopDirective::counters(void) const {
 }
 
 std::optional<Expr> OMPLoopDirective::nth_dependent_counter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : dependent_counters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal26();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPLoopDirective::dependent_counters(void) const {
@@ -54737,13 +54793,17 @@ gap::generator<Expr> OMPLoopDirective::dependent_counters(void) const {
 }
 
 std::optional<Expr> OMPLoopDirective::nth_dependent_initializer(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : dependent_initializers()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal27();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPLoopDirective::dependent_initializers(void) const {
@@ -54760,13 +54820,17 @@ gap::generator<Expr> OMPLoopDirective::dependent_initializers(void) const {
 }
 
 std::optional<Expr> OMPLoopDirective::nth_final(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : finals()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal28();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPLoopDirective::finals(void) const {
@@ -54783,13 +54847,17 @@ gap::generator<Expr> OMPLoopDirective::finals(void) const {
 }
 
 std::optional<Expr> OMPLoopDirective::nth_finals_condition(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : finals_conditions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal29();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPLoopDirective::finals_conditions(void) const {
@@ -54956,13 +55024,17 @@ Expr OMPLoopDirective::upper_bound_variable(void) const {
 }
 
 std::optional<Expr> OMPLoopDirective::nth_initializer(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : initializers()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal53();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPLoopDirective::initializers(void) const {
@@ -54979,13 +55051,17 @@ gap::generator<Expr> OMPLoopDirective::initializers(void) const {
 }
 
 std::optional<Expr> OMPLoopDirective::nth_private_counter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : private_counters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal54();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPLoopDirective::private_counters(void) const {
@@ -55002,13 +55078,17 @@ gap::generator<Expr> OMPLoopDirective::private_counters(void) const {
 }
 
 std::optional<Expr> OMPLoopDirective::nth_update(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : updates()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal55();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPLoopDirective::updates(void) const {
@@ -61105,13 +61185,17 @@ gap::generator<DeclStmt> DeclStmt::in(const File &file) {
 }
 
 std::optional<Decl> DeclStmt::nth_declaration(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : declarations()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Decl(std::move(e));
 }
 
 gap::generator<Decl> DeclStmt::declarations(void) const {
@@ -61302,13 +61386,17 @@ Stmt CoroutineBodyStmt::initializer_suspend_statement(void) const {
 }
 
 std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : parameter_moves()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Stmt(std::move(e));
 }
 
 gap::generator<Stmt> CoroutineBodyStmt::parameter_moves(void) const {
@@ -62052,13 +62140,17 @@ Token CXXTryStmt::try_token(void) const {
 }
 
 std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : handlers()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return CXXCatchStmt::from(Stmt(std::move(e)));
 }
 
 gap::generator<CXXCatchStmt> CXXTryStmt::handlers(void) const {
@@ -62687,13 +62779,17 @@ Token AsmStmt::assembly_token(void) const {
 }
 
 std::optional<Expr> AsmStmt::nth_input(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : inputs()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> AsmStmt::inputs(void) const {
@@ -62718,13 +62814,17 @@ bool AsmStmt::is_volatile(void) const {
 }
 
 std::optional<Expr> AsmStmt::nth_output(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : outputs()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal26();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> AsmStmt::outputs(void) const {
@@ -62740,16 +62840,6 @@ gap::generator<Expr> AsmStmt::outputs(void) const {
   co_return;
 }
 
-std::optional<std::string_view> AsmStmt::nth_output_constraint(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : output_constraints()) {
-    if (i++ == n) {
-      return ent;
-    }
-  }
-  return std::nullopt;
-}
-
 gap::generator<std::string_view> AsmStmt::output_constraints(void) const {
   auto list = impl->reader.getVal62();
   for (auto v : list) {
@@ -62759,13 +62849,17 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 std::optional<Expr> AsmStmt::nth_output_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : output_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal27();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> AsmStmt::output_expressions(void) const {
@@ -62781,16 +62875,6 @@ gap::generator<Expr> AsmStmt::output_expressions(void) const {
   co_return;
 }
 
-std::optional<std::string_view> AsmStmt::nth_input_constraint(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : input_constraints()) {
-    if (i++ == n) {
-      return ent;
-    }
-  }
-  return std::nullopt;
-}
-
 gap::generator<std::string_view> AsmStmt::input_constraints(void) const {
   auto list = impl->reader.getVal63();
   for (auto v : list) {
@@ -62800,13 +62884,17 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 std::optional<Expr> AsmStmt::nth_input_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : input_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal28();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> AsmStmt::input_expressions(void) const {
@@ -62820,16 +62908,6 @@ gap::generator<Expr> AsmStmt::input_expressions(void) const {
     }
   }
   co_return;
-}
-
-std::optional<std::string_view> AsmStmt::nth_clobber(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : clobbers()) {
-    if (i++ == n) {
-      return ent;
-    }
-  }
-  return std::nullopt;
 }
 
 gap::generator<std::string_view> AsmStmt::clobbers(void) const {
@@ -62964,16 +63042,6 @@ gap::generator<MSAsmStmt> MSAsmStmt::in(const File &file) {
   }
 }
 
-std::optional<std::string_view> MSAsmStmt::nth_all_constraint(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : all_constraints()) {
-    if (i++ == n) {
-      return ent;
-    }
-  }
-  return std::nullopt;
-}
-
 gap::generator<std::string_view> MSAsmStmt::all_constraints(void) const {
   auto list = impl->reader.getVal65();
   for (auto v : list) {
@@ -62983,13 +63051,17 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : all_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal29();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> MSAsmStmt::all_expressions(void) const {
@@ -63156,13 +63228,17 @@ bool GCCAsmStmt::is_assembly_goto(void) const {
 }
 
 std::optional<AddrLabelExpr> GCCAsmStmt::nth_label(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : labels()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal29();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return AddrLabelExpr::from(Stmt(std::move(e)));
 }
 
 gap::generator<AddrLabelExpr> GCCAsmStmt::labels(void) const {
@@ -63179,13 +63255,17 @@ gap::generator<AddrLabelExpr> GCCAsmStmt::labels(void) const {
 }
 
 std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : output_constraint_literals()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal53();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return StringLiteral::from(Stmt(std::move(e)));
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const {
@@ -63201,16 +63281,6 @@ gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const
   co_return;
 }
 
-std::optional<std::string_view> GCCAsmStmt::nth_output_name(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : output_names()) {
-    if (i++ == n) {
-      return ent;
-    }
-  }
-  return std::nullopt;
-}
-
 gap::generator<std::string_view> GCCAsmStmt::output_names(void) const {
   auto list = impl->reader.getVal65();
   for (auto v : list) {
@@ -63220,13 +63290,17 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : input_constraint_literals()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal54();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return StringLiteral::from(Stmt(std::move(e)));
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const {
@@ -63242,16 +63316,6 @@ gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const 
   co_return;
 }
 
-std::optional<std::string_view> GCCAsmStmt::nth_input_name(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : input_names()) {
-    if (i++ == n) {
-      return ent;
-    }
-  }
-  return std::nullopt;
-}
-
 gap::generator<std::string_view> GCCAsmStmt::input_names(void) const {
   auto list = impl->reader.getVal67();
   for (auto v : list) {
@@ -63261,13 +63325,17 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : clobber_string_literals()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal55();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return StringLiteral::from(Stmt(std::move(e)));
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const {
@@ -63284,13 +63352,17 @@ gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const {
 }
 
 std::optional<AddrLabelExpr> GCCAsmStmt::nth_label_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : label_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal68();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return AddrLabelExpr::from(Stmt(std::move(e)));
 }
 
 gap::generator<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const {
@@ -63304,16 +63376,6 @@ gap::generator<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const {
     }
   }
   co_return;
-}
-
-std::optional<std::string_view> GCCAsmStmt::nth_label_name(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : label_names()) {
-    if (i++ == n) {
-      return ent;
-    }
-  }
-  return std::nullopt;
 }
 
 gap::generator<std::string_view> GCCAsmStmt::label_names(void) const {
@@ -64894,13 +64956,17 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const File &file) {
 }
 
 std::optional<Designator> DesignatedInitExpr::nth_designator(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : designators()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DesignatorFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Designator(std::move(e));
 }
 
 gap::generator<Designator> DesignatedInitExpr::designators(void) const {
@@ -64937,13 +65003,17 @@ bool DesignatedInitExpr::uses_gnu_syntax(void) const {
 }
 
 std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : sub_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal26();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> DesignatedInitExpr::sub_expressions(void) const {
@@ -66089,13 +66159,17 @@ gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Fi
 }
 
 std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
 }
 
 gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const {
@@ -68446,13 +68520,17 @@ gap::generator<CallExpr> CallExpr::in(const File &file) {
 }
 
 std::optional<Expr> CallExpr::nth_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> CallExpr::arguments(void) const {
@@ -69392,13 +69470,17 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const 
 }
 
 std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const {
@@ -70946,13 +71028,17 @@ bool CXXNewExpr::pass_alignment(void) const {
 }
 
 std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : placement_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> CXXNewExpr::placement_arguments(void) const {
@@ -72056,13 +72142,17 @@ gap::generator<CXXConstructExpr> CXXConstructExpr::in(const File &file) {
 }
 
 std::optional<Expr> CXXConstructExpr::nth_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> CXXConstructExpr::arguments(void) const {
@@ -73212,13 +73302,17 @@ bool AtomicExpr::is_volatile(void) const {
 }
 
 std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : sub_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> AtomicExpr::sub_expressions(void) const {
@@ -75217,13 +75311,17 @@ std::optional<bool> TypeTraitExpr::value(void) const {
 }
 
 std::optional<Type> TypeTraitExpr::nth_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TypeFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Type(std::move(e));
 }
 
 gap::generator<Type> TypeTraitExpr::arguments(void) const {
@@ -76553,13 +76651,17 @@ RequiresExprBodyDecl RequiresExpr::body(void) const {
 }
 
 std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : local_parameters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ParmVarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const {
@@ -76712,13 +76814,17 @@ gap::generator<RecoveryExpr> RecoveryExpr::in(const File &file) {
 }
 
 std::optional<Expr> RecoveryExpr::nth_sub_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : sub_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> RecoveryExpr::sub_expressions(void) const {
@@ -76869,13 +76975,17 @@ Expr PseudoObjectExpr::syntactic_form(void) const {
 }
 
 std::optional<Expr> PseudoObjectExpr::nth_semantic(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : semantics()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> PseudoObjectExpr::semantics(void) const {
@@ -76892,13 +77002,17 @@ gap::generator<Expr> PseudoObjectExpr::semantics(void) const {
 }
 
 std::optional<Expr> PseudoObjectExpr::nth_semantic_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : semantic_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal26();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> PseudoObjectExpr::semantic_expressions(void) const {
@@ -77189,13 +77303,17 @@ Token ParenListExpr::r_paren_token(void) const {
 }
 
 std::optional<Expr> ParenListExpr::nth_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> ParenListExpr::expressions(void) const {
@@ -79081,13 +79199,17 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const File &file) {
 }
 
 std::optional<Expr> ObjCMessageExpr::nth_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> ObjCMessageExpr::arguments(void) const {
@@ -79189,13 +79311,17 @@ bool ObjCMessageExpr::is_instance_message(void) const {
 }
 
 std::optional<Token> ObjCMessageExpr::nth_selector_token(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : selector_tokens()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal26();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TokenFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Token(std::move(e));
 }
 
 gap::generator<Token> ObjCMessageExpr::selector_tokens(void) const {
@@ -80441,13 +80567,17 @@ ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
 }
 
 std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : elements()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> ObjCArrayLiteral::elements(void) const {
@@ -80729,13 +80859,17 @@ Expr OMPArrayShapingExpr::base(void) const {
 }
 
 std::optional<Expr> OMPArrayShapingExpr::nth_dimension(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : dimensions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPArrayShapingExpr::dimensions(void) const {
@@ -81980,13 +82114,17 @@ std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) co
 }
 
 std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : explicit_template_parameters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return NamedDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const {
@@ -82375,13 +82513,17 @@ bool InitListExpr::has_array_filler(void) const {
 }
 
 std::optional<Expr> InitListExpr::nth_initializer(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : initializers()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> InitListExpr::initializers(void) const {
@@ -82800,13 +82942,17 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const File &file) 
 }
 
 std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : association_expressions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const {
@@ -83110,13 +83256,17 @@ Token FunctionParmPackExpr::parameter_pack_token(void) const {
 }
 
 std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : expansions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return VarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<VarDecl> FunctionParmPackExpr::expansions(void) const {
@@ -84194,13 +84344,17 @@ Token AttributedStmt::attribute_token(void) const {
 }
 
 std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : attributes()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal15();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->AttrFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Attr(std::move(e));
 }
 
 gap::generator<Attr> AttributedStmt::attributes(void) const {
@@ -85035,13 +85189,17 @@ gap::generator<Decl> Decl::in(const File &file, std::span<DeclKind> kinds) {
 }
 
 std::optional<Attr> Decl::nth_attribute(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : attributes()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal3();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->AttrFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Attr(std::move(e));
 }
 
 gap::generator<Attr> Decl::attributes(void) const {
@@ -85552,13 +85710,17 @@ bool CapturedDecl::is_nothrow(void) const {
 }
 
 std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : parameters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ImplicitParamDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const {
@@ -85775,13 +85937,17 @@ bool BlockDecl::is_variadic(void) const {
 }
 
 std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : parameters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ParmVarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ParmVarDecl> BlockDecl::parameters(void) const {
@@ -85798,13 +85964,17 @@ gap::generator<ParmVarDecl> BlockDecl::parameters(void) const {
 }
 
 std::optional<ParmVarDecl> BlockDecl::nth_parameter_declaration(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : parameter_declarations()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal48();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ParmVarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
@@ -86250,13 +86420,17 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::in(const File &file) 
 }
 
 std::optional<Expr> OMPThreadPrivateDecl::nth_varlist(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : varlists()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPThreadPrivateDecl::varlists(void) const {
@@ -86545,13 +86719,17 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::in(const File &file) {
 }
 
 std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : varlists()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->StmtFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Expr::from(Stmt(std::move(e)));
 }
 
 gap::generator<Expr> OMPAllocateDecl::varlists(void) const {
@@ -88099,13 +88277,17 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::in(const File &file) {
 }
 
 std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : shadows()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return UsingShadowDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<UsingShadowDecl> BaseUsingDecl::shadows(void) const {
@@ -89878,13 +90060,17 @@ Token DeclaratorDecl::type_spec_start_token(void) const {
 }
 
 std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_parameter_lists()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateParameterListFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateParameterList(std::move(e));
 }
 
 gap::generator<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const {
@@ -90931,13 +91117,17 @@ gap::generator<DecompositionDecl> DecompositionDecl::in(const File &file) {
 }
 
 std::optional<BindingDecl> DecompositionDecl::nth_binding(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : bindings()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal48();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return BindingDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<BindingDecl> DecompositionDecl::bindings(void) const {
@@ -91105,13 +91295,17 @@ VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const 
 }
 
 std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal48();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
 }
 
 gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const {
@@ -91126,13 +91320,17 @@ gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_argumen
 }
 
 std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_instantiation_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal58();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
 }
 
 gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_instantiation_arguments(void) const {
@@ -91513,13 +91711,17 @@ bool NonTypeTemplateParmDecl::is_pack_expansion(void) const {
 }
 
 std::optional<Type> NonTypeTemplateParmDecl::nth_expansion_type(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : expansion_types()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal48();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TypeFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Type(std::move(e));
 }
 
 gap::generator<Type> NonTypeTemplateParmDecl::expansion_types(void) const {
@@ -92204,13 +92406,17 @@ bool FunctionDecl::is_virtual_as_written(void) const {
 }
 
 std::optional<ParmVarDecl> FunctionDecl::nth_parameter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : parameters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal48();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ParmVarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ParmVarDecl> FunctionDecl::parameters(void) const {
@@ -92461,13 +92667,17 @@ bool CXXMethodDecl::is_volatile(void) const {
 }
 
 std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : overridden_methods()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal169();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return CXXMethodDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const {
@@ -94537,13 +94747,17 @@ gap::generator<UsingPackDecl> UsingPackDecl::in(const File &file) {
 }
 
 std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : expansions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return NamedDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<NamedDecl> UsingPackDecl::expansions(void) const {
@@ -95445,13 +95659,17 @@ bool TagDecl::may_have_out_of_date_definition(void) const {
 }
 
 std::optional<TemplateParameterList> TagDecl::nth_template_parameter_list(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_parameter_lists()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateParameterListFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateParameterList(std::move(e));
 }
 
 gap::generator<TemplateParameterList> TagDecl::template_parameter_lists(void) const {
@@ -95621,13 +95839,17 @@ bool RecordDecl::can_pass_in_registers(void) const {
 }
 
 std::optional<FieldDecl> RecordDecl::nth_field(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : fields()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal58();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return FieldDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<FieldDecl> RecordDecl::fields(void) const {
@@ -95898,13 +96120,17 @@ std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(voi
 }
 
 std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : constructors()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal177();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return CXXConstructorDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
@@ -97151,13 +97377,17 @@ ClassTemplateDecl ClassTemplateSpecializationDecl::specialized_template(void) co
 }
 
 std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal341();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const {
@@ -97172,13 +97402,17 @@ gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_argum
 }
 
 std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_instantiation_arguments()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal342();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateArgumentFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateArgument(std::move(e));
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const {
@@ -97518,13 +97752,17 @@ gap::generator<EnumDecl> EnumDecl::in(const File &file) {
 }
 
 std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : enumerators()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal58();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return EnumConstantDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const {
@@ -100174,13 +100412,17 @@ bool ObjCMethodDecl::is_variadic(void) const {
 }
 
 std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : parameters()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ParmVarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const {
@@ -100197,13 +100439,17 @@ gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const {
 }
 
 std::optional<Token> ObjCMethodDecl::nth_selector_token(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : selector_tokens()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal48();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TokenFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Token(std::move(e));
 }
 
 gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const {
@@ -100377,13 +100623,17 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::in(const File &file) {
 }
 
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_class_method(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : class_methods()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCMethodDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const {
@@ -100400,13 +100650,17 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const {
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_class_propertie(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : class_properties()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal48();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCPropertyDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const {
@@ -100432,13 +100686,17 @@ Token ObjCContainerDecl::at_start_token(void) const {
 }
 
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_instance_method(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : instance_methods()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal58();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCMethodDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const {
@@ -100455,13 +100713,17 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const {
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_instance_propertie(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : instance_properties()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal169();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCPropertyDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const {
@@ -100478,13 +100740,17 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) co
 }
 
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_method(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : methods()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal177();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCMethodDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const {
@@ -100501,13 +100767,17 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const {
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_propertie(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : properties()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal178();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCPropertyDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
@@ -100700,13 +100970,17 @@ ObjCCategoryDecl ObjCCategoryDecl::next_class_category(void) const {
 }
 
 std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : instance_variables()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal313();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCIvarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
@@ -100723,13 +100997,17 @@ gap::generator<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
 }
 
 std::optional<Token> ObjCCategoryDecl::nth_protocol_token(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : protocol_tokens()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal339();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TokenFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Token(std::move(e));
 }
 
 gap::generator<Token> ObjCCategoryDecl::protocol_tokens(void) const {
@@ -100750,13 +101028,17 @@ gap::generator<Token> ObjCCategoryDecl::protocol_tokens(void) const {
 }
 
 std::optional<ObjCProtocolDecl> ObjCCategoryDecl::nth_protocol(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : protocols()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal341();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCProtocolDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const {
@@ -100926,13 +101208,17 @@ bool ObjCProtocolDecl::is_this_declaration_a_definition(void) const {
 }
 
 std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : protocol_tokens()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal313();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TokenFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Token(std::move(e));
 }
 
 gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const {
@@ -100953,13 +101239,17 @@ gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const {
 }
 
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : protocols()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal339();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCProtocolDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const {
@@ -101112,13 +101402,17 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::in(const File &file) {
 }
 
 std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_all_referenced_protocol(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : all_referenced_protocols()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal313();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCProtocolDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const {
@@ -101213,13 +101507,17 @@ bool ObjCInterfaceDecl::is_this_declaration_a_definition(void) const {
 }
 
 std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : instance_variables()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal339();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCIvarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
@@ -101236,13 +101534,17 @@ gap::generator<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
 }
 
 std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_categorie(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : known_categories()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal341();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCCategoryDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const {
@@ -101259,13 +101561,17 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const
 }
 
 std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_extension(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : known_extensions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal342();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCCategoryDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const {
@@ -101282,13 +101588,17 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const
 }
 
 std::optional<Token> ObjCInterfaceDecl::nth_protocol_token(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : protocol_tokens()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal347();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TokenFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Token(std::move(e));
 }
 
 gap::generator<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
@@ -101309,13 +101619,17 @@ gap::generator<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
 }
 
 std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_protocol(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : protocols()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal348();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCProtocolDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
@@ -101332,13 +101646,17 @@ gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
 }
 
 std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_categorie(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : visible_categories()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal349();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCCategoryDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const {
@@ -101355,13 +101673,17 @@ gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) con
 }
 
 std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_extension(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : visible_extensions()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal350();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCCategoryDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const {
@@ -101521,13 +101843,17 @@ ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
 }
 
 std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : property_implementations()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal313();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCPropertyImplDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const {
@@ -101855,13 +102181,17 @@ bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
 }
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : instance_variables()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal339();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->DeclFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return ObjCIvarDecl::from(Decl(std::move(e)));
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const {
@@ -102759,13 +103089,17 @@ gap::generator<ImportDecl> ImportDecl::in(const File &file) {
 }
 
 std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : identifier_tokens()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TokenFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Token(std::move(e));
 }
 
 gap::generator<Token> ImportDecl::identifier_tokens(void) const {
@@ -102936,13 +103270,17 @@ Type FriendTemplateDecl::friend_type(void) const {
 }
 
 std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_list(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : template_parameter_lists()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateParameterListFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateParameterList(std::move(e));
 }
 
 gap::generator<TemplateParameterList> FriendTemplateDecl::template_parameter_lists(void) const {
@@ -103127,13 +103465,17 @@ bool FriendDecl::is_unsupported_friend(void) const {
 }
 
 std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parameter_list(unsigned n) const {
-  unsigned i = 0u;
-  for (auto ent : friend_type_template_parameter_lists()) {
-    if (i++ == n) {
-      return ent;
-    }
+  auto list = impl->reader.getVal47();
+  if (n >= list.size()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->TemplateParameterListFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return TemplateParameterList(std::move(e));
 }
 
 gap::generator<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const {

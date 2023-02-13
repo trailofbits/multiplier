@@ -44,6 +44,7 @@ class ObjCObjectType;
 class RecordDecl;
 class RecordType;
 class Reference;
+class SourceIR;
 class TagDecl;
 class Type;
 class TypeImpl;
@@ -58,6 +59,7 @@ class Type {
   friend class Index;
   friend class Macro;
   friend class Reference;
+  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class TypeImpl;

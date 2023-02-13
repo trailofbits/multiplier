@@ -147,6 +147,28 @@ bool Reference::add(const ReferenceKind &kind, RawEntityId from_id,
   return ep->AddReference(ep, kind.impl->kind_id, from_id, to_id);
 }
 
+// Return this reference as a `VariantEntity`.
+VariantEntity Reference::as_variant(void) const noexcept {
+  switch (category_) {
+    case EntityCategory::NOT_AN_ENTITY: break;
+
+#define DEFINE_REF_GETTER(type_name, lower_name, enum_name, category) \
+    case EntityCategory::enum_name: \
+      if (auto ent_ ## lower_name = as_ ## lower_name()) { \
+        return std::move(ent_ ## lower_name.value()); \
+      } \
+      break;
+
+    MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
+                                DEFINE_REF_GETTER,
+                                DEFINE_REF_GETTER,
+                                DEFINE_REF_GETTER,
+                                DEFINE_REF_GETTER)
+#undef DEFINE_REF_GETTER
+  }
+  return NotAnEntity{};
+}
+
 std::optional<Token> Reference::as_token(void) const noexcept {
   if (category_ != EntityCategory::TOKEN) {
     return std::nullopt;

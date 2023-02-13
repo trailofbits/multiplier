@@ -29,6 +29,7 @@ namespace mx {
 class Attr;
 class AttrImpl;
 class Reference;
+class SourceIR;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Attr {
  protected:
@@ -39,6 +40,7 @@ class Attr {
   friend class Index;
   friend class Macro;
   friend class Reference;
+  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;

@@ -29,6 +29,7 @@ namespace mx {
 class Expr;
 class NamedDecl;
 class Reference;
+class SourceIR;
 class TemplateParameterList;
 class TemplateParameterListImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -42,6 +43,7 @@ class TemplateParameterList {
   friend class Index;
   friend class Macro;
   friend class Reference;
+  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;

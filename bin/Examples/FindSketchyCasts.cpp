@@ -96,27 +96,25 @@ static bool ShouldSkip(const mx::Expr expr) {
 // attempt to identify more instances of the vulnerable code pattern:
 // https://pwning.systems/posts/php_filter_var_shenanigans/
 static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
-  auto arg_index = 0u;
+  auto arg_num = 0u;
   for (mx::Expr argument : call_expr.arguments()) {
+    ++arg_num;
+
     if (std::optional<mx::CastExpr> cast_expr = mx::CastExpr::from(argument)) {
       if (cast_expr->cast_kind() != mx::CastKind::INTEGRAL_CAST) {
-        ++arg_index;
         continue;
       }
 
       if (auto implicit = mx::ImplicitCastExpr::from(argument)) {
         if (!FLAGS_show_implicit &&
             !(FLAGS_show_explicit && implicit->is_part_of_explicit_cast())) {
-          ++arg_index;
           continue;
         }
       } else if (mx::ExplicitCastExpr::from(argument)) {
         if (!FLAGS_show_explicit) {
-          ++arg_index;
           continue;
         }
       } else {
-        ++arg_index;
         continue;
       }
 
@@ -130,7 +128,6 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
       std::optional<mx::BuiltinType> dest_builtin =
           mx::BuiltinType::from(dest_type);
       if (!source_builtin || !dest_builtin) {
-        ++arg_index;
         continue;
       }
 
@@ -166,14 +163,12 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
       }
 
       // Didn't find.
-      ++arg_index;
       continue;
 
     found:
 
       if (std::optional<mx::Expr> expr = mx::Expr::from(cast_expr)) {
         if (ShouldSkip(expr->ignore_casts())) {
-          ++arg_index;
           continue;
         }
       }
@@ -203,12 +198,12 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
           << mx::EnumeratorName(source_type_kind)
           << " to "
           << mx::EnumeratorName(dest_type_kind)
-          << ")\nCall: " << call_expr.tokens().file_tokens().data()
-          << "\nArgument: " << cast_expr->tokens().data()
-          << '\n';
+          << ")\nCall:";
+
+      RenderTokens(std::cout, call_expr.tokens(), cast_expr->tokens(), "\t", true);
 
       if (FLAGS_highlight_use) {
-        std::cout << std::endl;
+        std::cout << "\n\n";
 
         // Print out a declaration of the function.
         if (std::optional<mx::FunctionDecl> callee = call_expr.direct_callee()) {
@@ -217,7 +212,7 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
           for (mx::FunctionDecl redecl : callee->redeclarations()) {
             if (!redecl.is_definition()) {
               mx::TokenRange param_toks;
-              if (auto param = redecl.nth_parameter(arg_index)) {
+              if (auto param = redecl.nth_parameter(arg_num - 1u)) {
                 param_toks = param->tokens();
               }
               RenderFragment(std::cout, mx::Fragment::containing(redecl),
@@ -229,7 +224,7 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
 
           if (!printed) {
             mx::TokenRange param_toks;
-            if (auto param = callee->nth_parameter(arg_index)) {
+            if (auto param = callee->nth_parameter(arg_num - 1u)) {
               param_toks = param->tokens();
             }
 
@@ -238,14 +233,13 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
                            param_toks, "\t", true);
             for (char c : ss.str()) {
               if (c == '{') {
-                std::cout << ";  // Stopped!\n";
                 break;
               } else {
                 std::cout << c;
               }
             }
           }
-          std::cout << "\nUse:";
+          std::cout << "\n\nUse:";
         }
 
         if (auto toks = call_expr.tokens()) {
