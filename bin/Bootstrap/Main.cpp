@@ -3390,6 +3390,16 @@ MethodListPtr CodeGenerator::RunOnClass(
       << "  gap::generator<CallExpr> callers(void) const;\n";
   }
 
+  // Allows CallExpr to convenientg get post-cast types if exists from
+  // a parent CastExpr
+  if (class_name == "CallExpr") {
+    forward_decls.insert("Type");
+    class_os
+      << "  bool has_implicit_cast(void) const;\n"
+      << "  bool has_explicit_cast(void) const;\n";
+      << "  std::optional<Type> call_return_casted_type(void) const;\n";
+  }
+
   class_os << "};\n\n";
 
   if (class_name == base_name) {
