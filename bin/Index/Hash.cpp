@@ -17,6 +17,13 @@
 #include <pasta/Util/FileManager.h>
 #include <sstream>
 
+//#define D(...) __VA_ARGS__
+#ifndef D
+# define D(...)
+#else
+# include <iostream>
+#endif
+
 namespace indexer {
 namespace {
 
@@ -51,6 +58,7 @@ class HashVisitor final : public pasta::DeclVisitor {
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
     if (auto hash = decl.ODRHash()) {
+      D( std::cerr << "\t4 odr=" << hash.value() << '\n'; )
       ss << hash.value() << ':';
     }
     VisitDeclContext(decl);
@@ -59,6 +67,7 @@ class HashVisitor final : public pasta::DeclVisitor {
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
     if (decl.HasDefinition()) {
       if (auto hash = decl.ODRHash()) {
+        D( std::cerr << "\t5 odr=" << hash.value() << '\n'; )
         ss << hash.value() << ':';
       }
       VisitDeclContext(decl);
@@ -67,6 +76,7 @@ class HashVisitor final : public pasta::DeclVisitor {
 
   void VisitEnumDecl(const pasta::EnumDecl &decl) final {
     if (auto hash = decl.ODRHash()) {
+      D( std::cerr << "\t6 odr=" << hash.value() << '\n'; )
       ss << hash.value() << ':';
     }
   }
@@ -114,6 +124,10 @@ std::string HashFragment(
     const std::vector<Entity> &entities, const pasta::TokenRange &toks,
     uint64_t begin_index, uint64_t end_index) {
 
+  D( std::cerr
+        << "begin_index=" << begin_index << " end_index=" << end_index
+        << " entities.size()=" << entities.size() << '\n'; )
+
   llvm::FoldingSetNodeID fs;
   if (begin_index > end_index || end_index > toks.size()) {
     return std::string();
@@ -123,19 +137,31 @@ std::string HashFragment(
 
   for (uint64_t i = begin_index; i < end_index; i++) {
     pasta::Token token = toks[i];
+    pasta::TokenKind kind = token.Kind();
+    llvm::StringRef data(token.Data());
+
+    if (kind == pasta::TokenKind::kRawIdentifier) {
+      kind = pasta::TokenKind::kIdentifier;
+    }
 
     // Mix in generic token/structure/context information.
     switch (token.Role()) {
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kInitialMacroUseToken:
-        fs.AddInteger(static_cast<uint16_t>(token.Kind()));
-        fs.AddString(llvm::StringRef(token.Data()));
+        D( std::cerr << "\t1 kind=" << int(kind) << " data="
+                     << token.Data() << '\n'; )
+        fs.AddInteger(static_cast<uint16_t>(kind));
+        fs.AddString(data);
         break;
 
       case pasta::TokenRole::kFileToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
+        D( std::cerr << "\t2 kind=" << int(kind) << " data="
+                     << token.Data() << '\n'; )
         for (auto context = token.Context(); context;
              context = context->Parent()) {
+          D( std::cerr << "\t\tcontext->kind=" << int(context->Kind()) << '\n'; )
+
           switch (context->Kind()) {
             case pasta::TokenContextKind::kDecl:
               fs.AddInteger(static_cast<uint16_t>(
@@ -159,8 +185,8 @@ std::string HashFragment(
           }
         }
 
-        fs.AddInteger(static_cast<uint16_t>(token.Kind()));
-        fs.AddString(llvm::StringRef(token.Data()));
+        fs.AddInteger(static_cast<uint16_t>(kind));
+        fs.AddString(data);
         break;
 
       default:
@@ -187,6 +213,8 @@ std::string HashFragment(
     //            proxy.
     } else if (std::holds_alternative<pasta::Macro>(entity)) {
       const pasta::Macro &macro = std::get<pasta::Macro>(entity);
+      D( std::cerr << "\t3 kind=" << int(macro.Kind()) << " num_children="
+                   << macro.Children().Size() << '\n'; )
       fs.AddInteger(static_cast<uint16_t>(macro.Kind()));
       fs.AddInteger(macro.Children().Size());
     }

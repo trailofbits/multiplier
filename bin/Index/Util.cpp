@@ -302,20 +302,22 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
       LOG(ERROR)
           << "Should not be serializing marker tokens";
       return mx::TokenKind::UNKNOWN;
-
-    // Try to get preprocessor kinds, if possible.
-    //
-    // NOTE(pag): File tokens show `IDENTIFIER` (due to `raw_identifier`) from
-    //            the raw lexer, whereas fragments do better.
-    case pasta::TokenRole::kFileToken:
-      if (auto ft = entity.FileLocation()) {
-        if (auto ret = TokenKindFromPasta(ft.value());
-            ret != mx::TokenKind::IDENTIFIER) {
-          return ret;
-        }
-      }
-      break;
   }
+
+  // Try to get preprocessor kinds, if possible.
+  //
+  // NOTE(pag): File tokens show `IDENTIFIER` (due to `raw_identifier`) from
+  //            the raw lexer, whereas fragments do better.
+  if (auto ft = entity.FileLocation()) {
+    if (ft->PreProcessorKeywordKind() != pasta::PPKeywordKind::kNotKeyword ||
+        ft->ObjectiveCAtKeywordKind() != pasta::ObjCKeywordKind::kNotKeyword) {
+      if (auto ret = TokenKindFromPasta(ft.value());
+          ret != mx::TokenKind::IDENTIFIER) {
+        return ret;
+      }
+    }
+  }
+
   auto kind = mx::FromPasta(entity.Kind());
   if (kind == mx::TokenKind::UNKNOWN) {
     auto data = entity.Data();
