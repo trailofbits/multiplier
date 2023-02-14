@@ -18,7 +18,6 @@ DEFINE_bool(show_locations, false, "Show the locations of users?");
 DEFINE_bool(highlight_use, false, "Highlight the use within its fragment?");
 DEFINE_bool(show_implicit, false, "Show implicit casts?");
 DEFINE_bool(show_explicit, false, "Show explicit casts?");
-DEFINE_bool(show_return_cast, true, "Include sketchy return casts as well?");
 DEFINE_bool(show_sign_changing, false, "Show sign-changing casts?");
 DEFINE_bool(show_sign_down_cast, false, "Show sign down-casts? E.g. int to short.");
 
@@ -30,6 +29,7 @@ static constexpr mx::BuiltinTypeKind kSketchyKinds[][2] = {
     {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::INT},
     {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::SHORT},
     {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::S_CHAR},
+    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::U_CHAR},
 
     {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::SHORT},
     {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::S_CHAR},
@@ -288,11 +288,12 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
 
 // Given a call expression and the parsed type of the parent assignment/declaration statement,
 // perform the same sketchy downcasting check.
-static void CheckCallRetForImplicitCast(const mx::CallExpr call_expr, const mx::Expr expr, mx::Type cmp_type) {
+static void CheckCallRetForImplicitCast(const mx::CallExpr call_expr, const mx::Expr cast_expr) {
   mx::Type call_type = call_expr.call_return_type().canonical_type();
+  mx::Type cast_type = cast_expr.type()->canonical_type();
 
   std::optional<mx::BuiltinType> call_builtin = mx::BuiltinType::from(call_type);
-  std::optional<mx::BuiltinType> return_builtin = mx::BuiltinType::from(cmp_type);
+  std::optional<mx::BuiltinType> return_builtin = mx::BuiltinType::from(cast_type);
   if (!call_builtin || !return_builtin) {
     return;
   }
@@ -305,133 +306,96 @@ static void CheckCallRetForImplicitCast(const mx::CallExpr call_expr, const mx::
     return;
   }
 
-  PrettifyCallResults(call_expr, expr, kind, source_type_kind, dest_type_kind);
+  PrettifyCallResults(call_expr, cast_expr, kind, source_type_kind, dest_type_kind);
 
   // TODO:
   if (FLAGS_highlight_use) {
-    //std::cout << "\n\n";
     //mx::Fragment fragment = mx::Fragment::containing(call_expr);
   }
 }
 
 
 static void FindSketchyUsesOfFragment(const mx::Fragment fragment) {
-  std::vector<mx::PackedStmtId> seen;
+  for (mx::CallExpr call : mx::CallExpr::in(fragment)) {
 
-  // We should make each CallExpr conveniently have the parent statement's assigned type
-  // stored as well. For now, we'll walk through each statement, and hopefully transfer this
-  // over to a public method to appropriately grab the type.
-  for (mx::Stmt stmt : mx::Stmt::in(fragment)) {
-    auto kind = stmt.kind();
+    // check parameters for a sketchy cast
+    CheckCallForImplicitCast(call);
 
-    // type var = call();
-    if (kind == mx::StmtKind::DECL_STMT) {
+    // Find implicit casts with the return value
+    for (mx::Stmt stmt : mx::Stmt::containing(call)) {
+      auto kind = stmt.kind();
 
-      // TODO(alan): what happens in the rare instance of multiple declarations?
-      auto decl_stmt = mx::DeclStmt::from(stmt);
-      if (!decl_stmt->is_single_declaration()) {
-        continue;
-      }
-      std::optional<mx::VarDecl> var_decl = mx::VarDecl::from(decl_stmt->single_declaration());
-      if (!var_decl) {
-        continue;
-      }
+      // type var = call();
+      if (kind == mx::StmtKind::DECL_STMT) {
 
-      // deal only with CallExprs as the initializer
-      std::optional<mx::Expr> ie = var_decl->initializer();
-      if (!ie) {
-        continue;
-      }
+        // TODO(alan): what happens in the rare instance of multiple declarations?
+        auto decl_stmt = mx::DeclStmt::from(stmt);
+        if (!decl_stmt->is_single_declaration()) {
+          continue;
+        }
+        std::optional<mx::VarDecl> var_decl = mx::VarDecl::from(decl_stmt->single_declaration());
+        if (!var_decl) {
+          continue;
+        }
 
-      std::optional<mx::CallExpr> ce = mx::CallExpr::from(ie);
-      if (!ce) {
-        continue;
-      }
-      
-      const mx::CallExpr &call_expr = *ce;
+        // deal only with declarations with initializers
+        if (!var_decl->has_initializer())
+          continue;
 
-      CheckCallForImplicitCast(call_expr);
-      if (FLAGS_show_return_cast) {
-        const mx::Expr &initializer = *ie;
-        CheckCallRetForImplicitCast(call_expr, initializer, var_decl->type().canonical_type());
-      }
+        std::optional<mx::CastExpr> ce = mx::CastExpr::from(var_decl->initializer());
+        if (!ce) {
+          continue;
+        }
 
-      seen.push_back(call_expr.id());
+        const mx::CastExpr &cast_expr = *ce;
+        CheckCallRetForImplicitCast(call, cast_expr);
 
-    // var = call(); or var += call();
-    } else if (kind == mx::StmtKind::BINARY_OPERATOR) {
-      auto binop = mx::BinaryOperator::from(stmt);
+      // var = call(); or var += call();
+      } else if (kind == mx::StmtKind::BINARY_OPERATOR) {
+        auto binop = mx::BinaryOperator::from(stmt);
 
-      // ensure we're only analyzing assignments to calls
-      std::optional<mx::CallExpr> ce = mx::CallExpr::from(binop->rhs());
-      if (!ce) {
-        continue;
-      }
-      const mx::CallExpr &call_expr = *ce;
+        std::optional<mx::CastExpr> ce = mx::CastExpr::from(binop->rhs());
+        if (!ce) {
+          continue;
+        }
+        const mx::CastExpr &cast_expr = *ce;
 
-      // grab return variable assignment's type
-      std::optional<mx::DeclRefExpr> re = mx::DeclRefExpr::from(binop->lhs());
-      if (!re) {
-        continue;
-      }
+        // TODO use this to highlight
+        /*
+        std::optional<mx::DeclRefExpr> re = mx::DeclRefExpr::from(binop->lhs());
+        if (!re) {
+          continue;
+        }
 
-      CheckCallForImplicitCast(call_expr);
-      if (FLAGS_show_return_cast) {
         const mx::Type type = re->declaration().type().canonical_type();
         const mx::Expr &expr = *re;
-        CheckCallRetForImplicitCast(call_expr, expr, type);
-      }
+        */
+        
+        CheckCallRetForImplicitCast(call, cast_expr);
 
-      seen.push_back(call_expr.id());
+      // var->val = call()
+      } else if (kind == mx::StmtKind::COMPOUND_ASSIGN_OPERATOR) {
+        auto compound_op = mx::CompoundAssignOperator::from(stmt);
 
-    // var->val = call()
-    } else if (kind == mx::StmtKind::COMPOUND_ASSIGN_OPERATOR) {
-      auto compound_op = mx::CompoundAssignOperator::from(stmt);
+        // ensure we're only analyzing assignments to calls
+        std::optional<mx::CastExpr> ce = mx::CastExpr::from(compound_op->rhs());
+        if (!ce) {
+          continue;
+        }
+        const mx::CastExpr &cast_expr = *ce;
 
-      // ensure we're only analyzing assignments to calls
-      std::optional<mx::CallExpr> ce = mx::CallExpr::from(compound_op->rhs());
-      if (!ce) {
-        continue;
-      }
-      const mx::CallExpr &call_expr = *ce;      
+        /* TODO use this to highlight
+        std::optional<mx::DeclRefExpr> re = mx::DeclRefExpr::from(compound_op->lhs());
+        if (!re) {
+          continue;
+        }
 
-      // grab return variable assignment's type
-      std::optional<mx::DeclRefExpr> re = mx::DeclRefExpr::from(compound_op->lhs());
-      if (!re) {
-        continue;
-      }
-
-      CheckCallForImplicitCast(call_expr);
-      if (FLAGS_show_return_cast) {
         const mx::Type type = re->declaration().type().canonical_type();
         const mx::Expr &expr = *re;
-        CheckCallRetForImplicitCast(call_expr, expr, type);
+        */
+
+        CheckCallRetForImplicitCast(call, cast_expr);
       }
-
-      seen.push_back(call_expr.id());
-
-    // call(); or foo(call());
-    } else if (kind == mx::StmtKind::CALL_EXPR) {
-      std::optional<mx::CallExpr> ce = mx::CallExpr::from(stmt);
-      if (!ce) {
-        continue;
-      }
-      const mx::CallExpr &call_expr = *ce;
-
-      // this will naturally also do a return assignment check
-      CheckCallForImplicitCast(call_expr);
-      seen.push_back(call_expr.id());
-    }
-
-    // We may have missed some statement kinds involving a call expression, make sure to walk through
-    // the fragment again and just do a parameter check on them.
-    // TODO(alan): distinguish the statement kind to later incorporate additional checks above
-    for (mx::CallExpr call_expr : mx::CallExpr::in(fragment)) {
-      auto id = call_expr.id();
-      if (std::find(seen.begin(), seen.end(), id) != seen.end())
-        continue;
-      
-      CheckCallForImplicitCast(call_expr);
     }
   }
 }
