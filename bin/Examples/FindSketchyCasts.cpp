@@ -18,6 +18,7 @@ DEFINE_bool(show_locations, false, "Show the locations of users?");
 DEFINE_bool(highlight_use, false, "Highlight the use within its fragment?");
 DEFINE_bool(show_implicit, false, "Show implicit casts?");
 DEFINE_bool(show_explicit, false, "Show explicit casts?");
+DEFINE_bool(show_return_cast, true, "Include sketchy return casts as well?");
 DEFINE_bool(show_sign_changing, false, "Show sign-changing casts?");
 DEFINE_bool(show_sign_down_cast, false, "Show sign down-casts? E.g. int to short.");
 
@@ -68,6 +69,26 @@ static constexpr mx::BuiltinTypeKind kSignChangingKinds[][2] = {
     {mx::BuiltinTypeKind::S_CHAR, mx::BuiltinTypeKind::U_CHAR},
 };
 
+enum DowncastBehavior {
+  None = 0,
+  Sketchy,
+  SignDowncast,
+  SignChange,
+};
+
+std::ostream& operator<<(std::ostream& out, const DowncastBehavior value){
+    static std::map<DowncastBehavior, std::string> outs;
+    if (outs.size() == 0) {
+#define INSERT_ELEMENT(p) outs[p] = #p
+        INSERT_ELEMENT(None);  
+        INSERT_ELEMENT(Sketchy);
+        INSERT_ELEMENT(SignDowncast);
+        INSERT_ELEMENT(SignChange);
+#undef INSERT_ELEMENT
+    }
+    return out << outs[value];
+}
+
 // Should we skip a result, e.g. froma `sizeof(blah)`.
 static bool ShouldSkip(const mx::Expr expr) {
   if (auto lit = mx::IntegerLiteral::from(expr)) {
@@ -80,6 +101,72 @@ static bool ShouldSkip(const mx::Expr expr) {
   } else {
     return false;
   }
+}
+
+
+// Helper to test for sketchy type downcasts
+static DowncastBehavior TestForDowncast(mx::BuiltinTypeKind source_type_kind, mx::BuiltinTypeKind dest_type_kind) {
+  for (auto [from_kind, to_kind] : kSketchyKinds) {
+    if (source_type_kind == from_kind && dest_type_kind == to_kind) {
+      return DowncastBehavior::Sketchy;
+    }
+  }
+
+  if (FLAGS_show_sign_down_cast) {
+    for (auto [from_kind, to_kind] : kSignDownCastKinds) {
+      if (source_type_kind == from_kind && dest_type_kind == to_kind) {
+        return DowncastBehavior::SignDowncast;
+      }
+    }
+  }
+
+  if (FLAGS_show_sign_changing) {
+    for (auto [from_kind, to_kind] : kSignChangingKinds) {
+      if (source_type_kind == from_kind && dest_type_kind == to_kind) {
+        return DowncastBehavior::SignChange;
+      }
+    }
+  }
+  return DowncastBehavior::None;
+}
+
+// Output prettified results for the offending call. Tokens for the originating expression should be
+// generated separately in the appropriate heuristic.
+static void PrettifyCallResults(
+  const mx::CallExpr call_expr,
+  const mx::Expr cast_expr,
+  const DowncastBehavior kind,
+  mx::BuiltinTypeKind source_type_kind, 
+  mx::BuiltinTypeKind dest_type_kind
+) {
+  mx::Fragment fragment = mx::Fragment::containing(call_expr);
+  auto file = mx::File::containing(fragment);
+
+  if (FLAGS_show_locations && file) {
+    std::cout << "Location: " << file_paths[file->id()].generic_string();
+    if (auto tok = call_expr.tokens()[0]) {
+      if (auto line_col = tok.location(location_cache)) {
+        std::cout << ':' << line_col->first << ':' << line_col->second;
+      }
+    }
+    std::cout << '\n';
+  }
+
+  if (file) {
+    std::cout
+        << "File ID: " << file->id() << '\n';
+  }
+
+  std::cout
+      << "Frag ID: " << fragment.id()
+      << "\nEntity ID: " << cast_expr.id()
+      << "\nKind: " << kind << " ("
+      << mx::EnumeratorName(source_type_kind)
+      << " to "
+      << mx::EnumeratorName(dest_type_kind)
+      << ")\nCall:";
+
+  RenderTokens(std::cout, call_expr.tokens(), cast_expr.tokens(), "\t", true);
 }
 
 // Checks whether any arguments passed the provided call expression are used
@@ -134,38 +221,10 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
       mx::BuiltinTypeKind source_type_kind = source_builtin->builtin_kind();
       mx::BuiltinTypeKind dest_type_kind = dest_builtin->builtin_kind();
 
-      const char *kind = "None";
-
-      // Check to see if we found a sketchy downcast.
-      for (auto [from_kind, to_kind] : kSketchyKinds) {
-        if (source_type_kind == from_kind && dest_type_kind == to_kind) {
-          kind = "Sketchy";
-          goto found;
-        }
+      const DowncastBehavior kind = TestForDowncast(source_type_kind, dest_type_kind);
+      if (kind == DowncastBehavior::None) {
+        continue;
       }
-
-      if (FLAGS_show_sign_down_cast) {
-        for (auto [from_kind, to_kind] : kSignDownCastKinds) {
-          if (source_type_kind == from_kind && dest_type_kind == to_kind) {
-            kind = "Sign down-cast";
-            goto found;
-          }
-        }
-      }
-
-      if (FLAGS_show_sign_changing) {
-        for (auto [from_kind, to_kind] : kSignChangingKinds) {
-          if (source_type_kind == from_kind && dest_type_kind == to_kind) {
-            kind = "Sign change";
-            goto found;
-          }
-        }
-      }
-
-      // Didn't find.
-      continue;
-
-    found:
 
       if (std::optional<mx::Expr> expr = mx::Expr::from(cast_expr)) {
         if (ShouldSkip(expr->ignore_casts())) {
@@ -173,37 +232,12 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
         }
       }
 
-      mx::Fragment fragment = mx::Fragment::containing(call_expr);
-      auto file = mx::File::containing(fragment);
-
-      if (FLAGS_show_locations && file) {
-        std::cout << "Location: " << file_paths[file->id()].generic_string();
-        if (auto tok = call_expr.tokens()[0]) {
-          if (auto line_col = tok.location(location_cache)) {
-            std::cout << ':' << line_col->first << ':' << line_col->second;
-          }
-        }
-        std::cout << '\n';
-      }
-
-      if (file) {
-        std::cout
-            << "File ID: " << file->id() << '\n';
-      }
-
-      std::cout
-          << "Frag ID: " << fragment.id()
-          << "\nEntity ID: " << cast_expr->id()
-          << "\nKind: " << kind << " ("
-          << mx::EnumeratorName(source_type_kind)
-          << " to "
-          << mx::EnumeratorName(dest_type_kind)
-          << ")\nCall:";
-
-      RenderTokens(std::cout, call_expr.tokens(), cast_expr->tokens(), "\t", true);
+      PrettifyCallResults(call_expr, *cast_expr, kind, source_type_kind, dest_type_kind);
 
       if (FLAGS_highlight_use) {
         std::cout << "\n\n";
+
+        mx::Fragment fragment = mx::Fragment::containing(call_expr);
 
         // Print out a declaration of the function.
         if (std::optional<mx::FunctionDecl> callee = call_expr.direct_callee()) {
@@ -252,54 +286,152 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
   }
 }
 
+// Given a call expression and the parsed type of the parent assignment/declaration statement,
+// perform the same sketchy downcasting check.
+static void CheckCallRetForImplicitCast(const mx::CallExpr call_expr, const mx::Expr expr, mx::Type cmp_type) {
+  mx::Type call_type = call_expr.call_return_type().canonical_type();
 
-static void CheckCallRetForImplicitCast(const mx::CallExpr call_expr, Expr return_value) {
-  // TODO
+  std::optional<mx::BuiltinType> call_builtin = mx::BuiltinType::from(call_type);
+  std::optional<mx::BuiltinType> return_builtin = mx::BuiltinType::from(cmp_type);
+  if (!call_builtin || !return_builtin) {
+    return;
+  }
+
+  mx::BuiltinTypeKind source_type_kind = call_builtin->builtin_kind();
+  mx::BuiltinTypeKind dest_type_kind = return_builtin->builtin_kind();
+
+  const DowncastBehavior kind = TestForDowncast(source_type_kind, dest_type_kind);
+  if (kind == DowncastBehavior::None) {
+    return;
+  }
+
+  PrettifyCallResults(call_expr, expr, kind, source_type_kind, dest_type_kind);
+
+  // TODO:
+  if (FLAGS_highlight_use) {
+    //std::cout << "\n\n";
+    //mx::Fragment fragment = mx::Fragment::containing(call_expr);
+  }
 }
 
 
 static void FindSketchyUsesOfFragment(const mx::Fragment fragment) {
+  std::vector<mx::PackedStmtId> seen;
+
+  // We should make each CallExpr conveniently have the parent statement's assigned type
+  // stored as well. For now, we'll walk through each statement, and hopefully transfer this
+  // over to a public method to appropriately grab the type.
   for (mx::Stmt stmt : mx::Stmt::in(fragment)) {
     auto kind = stmt.kind();
 
     // type var = call();
     if (kind == mx::StmtKind::DECL_STMT) {
+
+      // TODO(alan): what happens in the rare instance of multiple declarations?
       auto decl_stmt = mx::DeclStmt::from(stmt);
-
-      // in most cases there should only be one declaration
-      for (mx::Decl decl : decl_stmt->declarations()) {
-
-        std::optional<mx::VarDecl> var_decl = mx::VarDecl::from(decl);
-        if (!var_decl) {
-          continue;
-        }
-
-        std::optional<mx::Expr> initializer = var_decl->initializer();
-        if (!initializer) {
-          continue;
-        }
-
-        std::cout << initializer->tokens().data() << std::endl;
+      if (!decl_stmt->is_single_declaration()) {
+        continue;
       }
+      std::optional<mx::VarDecl> var_decl = mx::VarDecl::from(decl_stmt->single_declaration());
+      if (!var_decl) {
+        continue;
+      }
+
+      // deal only with CallExprs as the initializer
+      std::optional<mx::Expr> ie = var_decl->initializer();
+      if (!ie) {
+        continue;
+      }
+
+      std::optional<mx::CallExpr> ce = mx::CallExpr::from(ie);
+      if (!ce) {
+        continue;
+      }
+      
+      const mx::CallExpr &call_expr = *ce;
+
+      CheckCallForImplicitCast(call_expr);
+      if (FLAGS_show_return_cast) {
+        const mx::Expr &initializer = *ie;
+        CheckCallRetForImplicitCast(call_expr, initializer, var_decl->type().canonical_type());
+      }
+
+      seen.push_back(call_expr.id());
 
     // var = call(); or var += call();
     } else if (kind == mx::StmtKind::BINARY_OPERATOR) {
       auto binop = mx::BinaryOperator::from(stmt);
 
       // ensure we're only analyzing assignments to calls
-      std::optional<mx::CallExpr> call_expr = mx::CallExpr::from(binop->rhs());
-      if (!call_expr) {
+      std::optional<mx::CallExpr> ce = mx::CallExpr::from(binop->rhs());
+      if (!ce) {
+        continue;
+      }
+      const mx::CallExpr &call_expr = *ce;
+
+      // grab return variable assignment's type
+      std::optional<mx::DeclRefExpr> re = mx::DeclRefExpr::from(binop->lhs());
+      if (!re) {
         continue;
       }
 
-      // grab variable assignment
-      mx::Expr lhs = binop->lhs();
+      CheckCallForImplicitCast(call_expr);
+      if (FLAGS_show_return_cast) {
+        const mx::Type type = re->declaration().type().canonical_type();
+        const mx::Expr &expr = *re;
+        CheckCallRetForImplicitCast(call_expr, expr, type);
+      }
 
-      // check for implicit casts through parameters
-      //CheckCallForImplicitCast(call_expr);
+      seen.push_back(call_expr.id());
 
-      // check for implicit casts in return value
-      //CheckCallRetForImplicitCast(lhs, call_expr);
+    // var->val = call()
+    } else if (kind == mx::StmtKind::COMPOUND_ASSIGN_OPERATOR) {
+      auto compound_op = mx::CompoundAssignOperator::from(stmt);
+
+      // ensure we're only analyzing assignments to calls
+      std::optional<mx::CallExpr> ce = mx::CallExpr::from(compound_op->rhs());
+      if (!ce) {
+        continue;
+      }
+      const mx::CallExpr &call_expr = *ce;      
+
+      // grab return variable assignment's type
+      std::optional<mx::DeclRefExpr> re = mx::DeclRefExpr::from(compound_op->lhs());
+      if (!re) {
+        continue;
+      }
+
+      CheckCallForImplicitCast(call_expr);
+      if (FLAGS_show_return_cast) {
+        const mx::Type type = re->declaration().type().canonical_type();
+        const mx::Expr &expr = *re;
+        CheckCallRetForImplicitCast(call_expr, expr, type);
+      }
+
+      seen.push_back(call_expr.id());
+
+    // call(); or foo(call());
+    } else if (kind == mx::StmtKind::CALL_EXPR) {
+      std::optional<mx::CallExpr> ce = mx::CallExpr::from(stmt);
+      if (!ce) {
+        continue;
+      }
+      const mx::CallExpr &call_expr = *ce;
+
+      // this will naturally also do a return assignment check
+      CheckCallForImplicitCast(call_expr);
+      seen.push_back(call_expr.id());
+    }
+
+    // We may have missed some statement kinds involving a call expression, make sure to walk through
+    // the fragment again and just do a parameter check on them.
+    // TODO(alan): distinguish the statement kind to later incorporate additional checks above
+    for (mx::CallExpr call_expr : mx::CallExpr::in(fragment)) {
+      auto id = call_expr.id();
+      if (std::find(seen.begin(), seen.end(), id) != seen.end())
+        continue;
+      
+      CheckCallForImplicitCast(call_expr);
     }
   }
 }
