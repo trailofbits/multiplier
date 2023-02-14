@@ -69,25 +69,17 @@ static constexpr mx::BuiltinTypeKind kSignChangingKinds[][2] = {
     {mx::BuiltinTypeKind::S_CHAR, mx::BuiltinTypeKind::U_CHAR},
 };
 
-enum DowncastBehavior {
-  None = 0,
+enum class DowncastBehavior {
   Sketchy,
   SignDowncast,
   SignChange,
 };
 
-std::ostream& operator<<(std::ostream& out, const DowncastBehavior value){
-    static std::map<DowncastBehavior, std::string> outs;
-    if (outs.size() == 0) {
-#define INSERT_ELEMENT(p) outs[p] = #p
-        INSERT_ELEMENT(None);  
-        INSERT_ELEMENT(Sketchy);
-        INSERT_ELEMENT(SignDowncast);
-        INSERT_ELEMENT(SignChange);
-#undef INSERT_ELEMENT
-    }
-    return out << outs[value];
-}
+static const std::map<DowncastBehavior, std::string> kOuts {
+  {DowncastBehavior::Sketchy, "Sketchy"},
+  {DowncastBehavior::SignDowncast, "Sign downcast"},
+  {DowncastBehavior::SignChange, "Sign change"}
+};
 
 // Should we skip a result, e.g. froma `sizeof(blah)`.
 static bool ShouldSkip(const mx::Expr expr) {
@@ -105,7 +97,7 @@ static bool ShouldSkip(const mx::Expr expr) {
 
 
 // Helper to test for sketchy type downcasts
-static DowncastBehavior TestForDowncast(mx::BuiltinTypeKind source_type_kind, mx::BuiltinTypeKind dest_type_kind) {
+std::optional<DowncastBehavior> TestForDowncast(mx::BuiltinTypeKind source_type_kind, mx::BuiltinTypeKind dest_type_kind) {
   for (auto [from_kind, to_kind] : kSketchyKinds) {
     if (source_type_kind == from_kind && dest_type_kind == to_kind) {
       return DowncastBehavior::Sketchy;
@@ -127,18 +119,16 @@ static DowncastBehavior TestForDowncast(mx::BuiltinTypeKind source_type_kind, mx
       }
     }
   }
-  return DowncastBehavior::None;
+  return std::nullopt;
 }
 
 // Output prettified results for the offending call. Tokens for the originating expression should be
 // generated separately in the appropriate heuristic.
 static void PrettifyCallResults(
-  const mx::CallExpr call_expr,
-  const mx::Expr cast_expr,
-  const DowncastBehavior kind,
-  mx::BuiltinTypeKind source_type_kind, 
-  mx::BuiltinTypeKind dest_type_kind
-) {
+    const mx::CallExpr call_expr, const mx::Expr cast_expr,
+    DowncastBehavior kind, mx::BuiltinTypeKind source_type_kind,
+    mx::BuiltinTypeKind dest_type_kind) {
+
   mx::Fragment fragment = mx::Fragment::containing(call_expr);
   auto file = mx::File::containing(fragment);
 
@@ -160,7 +150,7 @@ static void PrettifyCallResults(
   std::cout
       << "Frag ID: " << fragment.id()
       << "\nEntity ID: " << cast_expr.id()
-      << "\nKind: " << kind << " ("
+      << "\nKind: " << kOuts.at(kind) << " ("
       << mx::EnumeratorName(source_type_kind)
       << " to "
       << mx::EnumeratorName(dest_type_kind)
@@ -221,10 +211,11 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
       mx::BuiltinTypeKind source_type_kind = source_builtin->builtin_kind();
       mx::BuiltinTypeKind dest_type_kind = dest_builtin->builtin_kind();
 
-      const DowncastBehavior kind = TestForDowncast(source_type_kind, dest_type_kind);
-      if (kind == DowncastBehavior::None) {
+      std::optional<DowncastBehavior> k = TestForDowncast(source_type_kind, dest_type_kind);
+      if (!k) {
         continue;
       }
+      DowncastBehavior &kind = *k;
 
       if (std::optional<mx::Expr> expr = mx::Expr::from(cast_expr)) {
         if (ShouldSkip(expr->ignore_casts())) {
@@ -301,10 +292,11 @@ static void CheckCallRetForImplicitCast(const mx::CallExpr call_expr, const mx::
   mx::BuiltinTypeKind source_type_kind = call_builtin->builtin_kind();
   mx::BuiltinTypeKind dest_type_kind = return_builtin->builtin_kind();
 
-  const DowncastBehavior kind = TestForDowncast(source_type_kind, dest_type_kind);
-  if (kind == DowncastBehavior::None) {
+  std::optional<DowncastBehavior> k = TestForDowncast(source_type_kind, dest_type_kind);
+  if (!k) {
     return;
   }
+  DowncastBehavior &kind = *k;
 
   PrettifyCallResults(call_expr, cast_expr, kind, source_type_kind, dest_type_kind);
 
