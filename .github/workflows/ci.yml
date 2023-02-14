@@ -432,7 +432,7 @@ jobs:
              gpg wget curl zip unzip tar git pkg-config \
              ninja-build clang-tidy cppcheck ccache build-essential \
              doctest-dev clang-15 libtool autoconf flex bison \
-             libncurses-dev libssl-dev libelf-dev
+             libncurses-dev libssl-dev libelf-dev lld
         mkdir src
         mkdir build
 
