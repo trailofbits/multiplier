@@ -252,9 +252,55 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
   }
 }
 
+
+static void CheckCallRetForImplicitCast(const mx::CallExpr call_expr, Expr return_value) {
+  // TODO
+}
+
+
 static void FindSketchyUsesOfFragment(const mx::Fragment fragment) {
-  for (mx::CallExpr call_expr : mx::CallExpr::in(fragment)) {
-    CheckCallForImplicitCast(call_expr);
+  for (mx::Stmt stmt : mx::Stmt::in(fragment)) {
+    auto kind = stmt.kind();
+
+    // type var = call();
+    if (kind == mx::StmtKind::DECL_STMT) {
+      auto decl_stmt = mx::DeclStmt::from(stmt);
+
+      // in most cases there should only be one declaration
+      for (mx::Decl decl : decl_stmt->declarations()) {
+
+        std::optional<mx::VarDecl> var_decl = mx::VarDecl::from(decl);
+        if (!var_decl) {
+          continue;
+        }
+
+        std::optional<mx::Expr> initializer = var_decl->initializer();
+        if (!initializer) {
+          continue;
+        }
+
+        std::cout << initializer->tokens().data() << std::endl;
+      }
+
+    // var = call(); or var += call();
+    } else if (kind == mx::StmtKind::BINARY_OPERATOR) {
+      auto binop = mx::BinaryOperator::from(stmt);
+
+      // ensure we're only analyzing assignments to calls
+      std::optional<mx::CallExpr> call_expr = mx::CallExpr::from(binop->rhs());
+      if (!call_expr) {
+        continue;
+      }
+
+      // grab variable assignment
+      mx::Expr lhs = binop->lhs();
+
+      // check for implicit casts through parameters
+      //CheckCallForImplicitCast(call_expr);
+
+      // check for implicit casts in return value
+      //CheckCallRetForImplicitCast(lhs, call_expr);
+    }
   }
 }
 
