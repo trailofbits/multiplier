@@ -7,7 +7,10 @@
 #pragma once
 
 #include <multiplier/AST.capnp.h>
+#include <multiplier/Entities/CastExpr.h>
+#include <multiplier/Entities/CallExpr.h>
 #include <multiplier/Entities/Stmt.h>
+#include <multiplier/Entities/Type.h>
 
 #include "Entity.h"
 
