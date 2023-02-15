@@ -110,9 +110,9 @@ mx::Decl LongestDefinition(mx::Decl decl) {
 std::unordered_set<mx::RawEntityId> Uses(mx::SourceIR &ir, const mlir::Operation *op) {
   std::unordered_set<mx::RawEntityId> uses_set;
   for (auto &uses : (const_cast<mlir::Operation*>(op))->getUses()) {
-    if (auto decl = ir.decl_for(const_cast<const mlir::Operation*>(uses.getOwner())); decl) {
+    if (auto decl = ir.declaration_for(const_cast<const mlir::Operation*>(uses.getOwner())); decl) {
       uses_set.emplace(decl->id().Pack());
-    } else if (auto stmt = ir.stmt_for(const_cast<const mlir::Operation*>(uses.getOwner())); stmt) {
+    } else if (auto stmt = ir.statement_for(const_cast<const mlir::Operation*>(uses.getOwner())); stmt) {
       uses_set.emplace(stmt->id().Pack());
     }
   }
@@ -172,26 +172,31 @@ extern "C" int main(int argc, char *argv[]) {
         // Add entity id to the json
         obj["entity_id"] = decl.id().Pack();
 
-        if (auto func_op = ir->for_decl(decl); func_op) {
-          auto name = const_cast<mlir::Operation*>(func_op.get())->getName();
+        auto range = ir->for_declaration(decl);
+        if (!range.has_value()) {
+          continue;
+        }
+
+        for (auto func_op = range.begin(); func_op != range.end(); func_op++) {
+          auto name = const_cast<mlir::Operation*>(*func_op)->getName();
           obj["operation"] = name.getIdentifier().str();
 
-          auto loc = const_cast<mlir::Operation*>(func_op.get())->getLoc();
+          auto loc = const_cast<mlir::Operation*>(*(func_op))->getLoc();
           obj["meta_id"] = MetaId(loc);
           obj["loc"] = LocationString(loc);
 
-          if (auto vast_symbol = mlir::dyn_cast<vast_symbol_interface>(func_op.get()); vast_symbol) {
+          if (auto vast_symbol = mlir::dyn_cast<vast_symbol_interface>(*(func_op)); vast_symbol) {
             obj["name"] = SymbolName(vast_symbol);
             auto type = vast_symbol->getAttr("function_type");
             obj["function_type"]= AttributeString(type);
 
-          } else if (auto mlir_symbol = mlir::dyn_cast<mlir_symbol_interface>(func_op.get()); mlir_symbol) {
+          } else if (auto mlir_symbol = mlir::dyn_cast<mlir_symbol_interface>(*func_op); mlir_symbol) {
             obj["name"] = SymbolName(mlir_symbol);
             auto type = mlir_symbol->getAttr("function_type");
             obj["function_type"]= AttributeString(type);
 
           }
-          auto uses_set = Uses(*ir, func_op.get());
+          auto uses_set = Uses(*ir, *func_op);
           if (!uses_set.empty()) {
             obj["uses"] = Stringify(uses_set);
           }
@@ -203,7 +208,6 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   llvm::outs() << "\n}";
-
 
   return EXIT_SUCCESS;
 }

@@ -38,7 +38,7 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   if (auto mlir = fragment->ir(); mlir) {
-    std::cout << *(*mlir);
+    mlir->print(std::cout);
   }
 
   return EXIT_SUCCESS;

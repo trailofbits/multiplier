@@ -6,6 +6,7 @@
 
 #include "Fragment.h"
 
+#include <iostream>
 #include <cassert>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Decl.h>
@@ -239,18 +240,14 @@ gap::generator<RegexQueryMatch> Fragment::query(const RegexQuery &query) const {
   }
 }
 
-#ifdef MX_ENABLE_SOURCEIR
+
 std::optional<SourceIR> Fragment::ir(void) const noexcept {
+#ifdef MX_ENABLE_SOURCEIR
   if (auto mlir = impl->SourceIR(); !mlir.empty()) {
-    auto handler = std::make_shared<SourceIRImpl>(impl, mlir);
-    return SourceIR(handler);
+    return SourceIR(std::make_shared<const SourceIRImpl>(impl, mlir));
   }
+#endif
   return std::nullopt;
 }
-#else
-std::optional<SourceIR> Fragment::ir(void) const noexcept {
-  return SourceIR({});
-}
-#endif
 
 }  // namespace mx

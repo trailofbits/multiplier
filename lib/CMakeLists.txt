@@ -192,6 +192,13 @@ else()
       "MX_DISABLE_WEGGLI")
 endif()
 
+if(MX_ENABLE_VAST)
+  target_compile_definitions("mx-api"
+    PRIVATE
+      "MX_ENABLE_SOURCEIR"
+  )
+endif()
+
 target_compile_options("mx-api"
   PRIVATE
     "-Wno-unknown-warning-option"
