@@ -139,7 +139,7 @@ class EntityProvider {
       return ep->type_name ## For(ep, id.Pack()); \
     } \
     virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &ep) = 0;
+        const Ptr &ep) & = 0;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -150,10 +150,10 @@ class EntityProvider {
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
     virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, type_name ## Kind kind) = 0; \
+        const Ptr &, type_name ## Kind kind) & = 0; \
     \
     virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, type_name ## Kind kind, PackedFragmentId id) = 0;
+        const Ptr &, type_name ## Kind kind, PackedFragmentId id) & = 0;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -164,7 +164,7 @@ class EntityProvider {
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
     virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, PackedFragmentId id) = 0;
+        const Ptr &, PackedFragmentId id) & = 0;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -179,16 +179,16 @@ class EntityProvider {
 
   // Return the redeclarations of a given declaration.
   virtual gap::generator<RawEntityId> Redeclarations(
-      const Ptr &, RawEntityId eid) = 0;
+      const Ptr &, RawEntityId eid) & = 0;
 
   // Fill out `redecl_ids_out` and `references_ids_out` with the set of things
   // to analyze when looking for references.
   virtual gap::generator<std::pair<RawEntityId, RawEntityId>>
-  References(const Ptr &, RawEntityId eid) = 0;
+  References(const Ptr &, RawEntityId eid) & = 0;
 
   // Find the entity ids matching the name
   virtual gap::generator<RawEntityId> FindSymbol(
-      const Ptr &, std::string name) = 0;
+      const Ptr &, std::string name) & = 0;
 };
 
 #define MX_DECLARE_ENTITY_VARIANT(type_name, lower_name, enum_name, category) \
@@ -320,12 +320,12 @@ class Index {
   }
 
   // Return all files in the index.
-  gap::generator<File> files(void) const;
+  gap::generator<File> files(void) const &;
 
   // Search for entities by their name and category.
   //
   // NOTE(pag): This might return redeclarations.
-  gap::generator<NamedEntity> query_entities(std::string name) const;
+  gap::generator<NamedEntity> query_entities(std::string name) const &;
 };
 
 template <typename T>

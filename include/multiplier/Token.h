@@ -80,7 +80,7 @@ class Token {
   }
 
   // References to this token.
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   // Return the context node that identifies how this token relates to the AST.
   //

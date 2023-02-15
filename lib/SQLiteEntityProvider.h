@@ -74,12 +74,12 @@ class SQLiteEntityProvider final : public EntityProvider {
   bool AddReference(const Ptr &ep, RawEntityId kind_id,
                               RawEntityId from_id, RawEntityId to_id) final;
 
-  gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+  gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) & final;
 
   gap::generator<std::pair<RawEntityId, RawEntityId>>
-  References(const Ptr &, RawEntityId eid) final;
+  References(const Ptr &, RawEntityId eid) & final;
 
-  gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) final;
+  gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) & final;
 
 #define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
     friend class type_name ## Impl; \
@@ -88,7 +88,7 @@ class SQLiteEntityProvider final : public EntityProvider {
         const Ptr &ep, RawEntityId id) final; \
     \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &ep) final;
+        const Ptr &ep) & final;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -99,10 +99,10 @@ class SQLiteEntityProvider final : public EntityProvider {
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, type_name ## Kind) final; \
+        const Ptr &, type_name ## Kind) & final; \
     \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, type_name ## Kind, PackedFragmentId) final;
+        const Ptr &, type_name ## Kind, PackedFragmentId) & final;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -113,7 +113,7 @@ class SQLiteEntityProvider final : public EntityProvider {
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, PackedFragmentId) final;
+        const Ptr &, PackedFragmentId) & final;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,

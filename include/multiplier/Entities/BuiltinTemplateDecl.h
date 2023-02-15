@@ -57,7 +57,7 @@ class BuiltinTemplateDecl : public TemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<BuiltinTemplateDecl> redeclarations(void) const;
+  gap::generator<BuiltinTemplateDecl> redeclarations(void) const &;
   static std::optional<BuiltinTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<BuiltinTemplateDecl> from(const std::optional<Decl> &parent) {

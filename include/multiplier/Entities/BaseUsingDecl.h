@@ -52,7 +52,7 @@ class BaseUsingDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<BaseUsingDecl> redeclarations(void) const;
+  gap::generator<BaseUsingDecl> redeclarations(void) const &;
   static std::optional<BaseUsingDecl> from(const Decl &parent);
 
   inline static std::optional<BaseUsingDecl> from(const std::optional<Decl> &parent) {
@@ -72,7 +72,7 @@ class BaseUsingDecl : public NamedDecl {
   }
 
   std::optional<UsingShadowDecl> nth_shadow(unsigned n) const;
-  gap::generator<UsingShadowDecl> shadows(void) const;
+  gap::generator<UsingShadowDecl> shadows(void) const &;
 };
 
 static_assert(sizeof(BaseUsingDecl) == sizeof(NamedDecl));

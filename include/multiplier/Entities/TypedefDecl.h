@@ -59,7 +59,7 @@ class TypedefDecl : public TypedefNameDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TypedefDecl> redeclarations(void) const;
+  gap::generator<TypedefDecl> redeclarations(void) const &;
   static std::optional<TypedefDecl> from(const Decl &parent);
 
   inline static std::optional<TypedefDecl> from(const std::optional<Decl> &parent) {

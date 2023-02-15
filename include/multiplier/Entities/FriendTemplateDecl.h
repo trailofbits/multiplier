@@ -56,7 +56,7 @@ class FriendTemplateDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<FriendTemplateDecl> redeclarations(void) const;
+  gap::generator<FriendTemplateDecl> redeclarations(void) const &;
   static std::optional<FriendTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<FriendTemplateDecl> from(const std::optional<Decl> &parent) {
@@ -79,7 +79,7 @@ class FriendTemplateDecl : public Decl {
   Token friend_token(void) const;
   Type friend_type(void) const;
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
-  gap::generator<TemplateParameterList> template_parameter_lists(void) const;
+  gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
 };
 
 static_assert(sizeof(FriendTemplateDecl) == sizeof(Decl));

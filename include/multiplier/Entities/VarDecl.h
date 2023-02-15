@@ -69,7 +69,7 @@ class VarDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<VarDecl> redeclarations(void) const;
+  gap::generator<VarDecl> redeclarations(void) const &;
   static std::optional<VarDecl> from(const Decl &parent);
 
   inline static std::optional<VarDecl> from(const std::optional<Decl> &parent) {

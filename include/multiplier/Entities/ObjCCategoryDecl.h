@@ -62,7 +62,7 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCCategoryDecl> redeclarations(void) const;
+  gap::generator<ObjCCategoryDecl> redeclarations(void) const &;
   static std::optional<ObjCCategoryDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCCategoryDecl> from(const std::optional<Decl> &parent) {
@@ -89,11 +89,11 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   Token instance_variable_r_brace_token(void) const;
   ObjCCategoryDecl next_class_category(void) const;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
-  gap::generator<ObjCIvarDecl> instance_variables(void) const;
+  gap::generator<ObjCIvarDecl> instance_variables(void) const &;
   std::optional<Token> nth_protocol_token(unsigned n) const;
-  gap::generator<Token> protocol_tokens(void) const;
+  gap::generator<Token> protocol_tokens(void) const &;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> protocols(void) const;
+  gap::generator<ObjCProtocolDecl> protocols(void) const &;
 };
 
 static_assert(sizeof(ObjCCategoryDecl) == sizeof(ObjCContainerDecl));

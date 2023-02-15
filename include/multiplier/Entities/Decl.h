@@ -55,9 +55,9 @@ class Decl {
   friend class Type;
   friend class DeclImpl;
   std::shared_ptr<const DeclImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Decl(Decl &&) noexcept = default;
   Decl(const Decl &) = default;
@@ -74,14 +74,14 @@ class Decl {
   }
 
   PackedDeclId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> definition(void) const;
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;
-  gap::generator<Decl> redeclarations(void) const;
+  gap::generator<Decl> redeclarations(void) const &;
  public:
   static gap::generator<Decl> in(const Fragment &frag, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const File &file, std::span<DeclKind> kinds);
@@ -119,7 +119,7 @@ class Decl {
   }
 
   std::optional<Attr> nth_attribute(unsigned n) const;
-  gap::generator<Attr> attributes(void) const;
+  gap::generator<Attr> attributes(void) const &;
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   std::optional<Attr> defining_attribute(void) const;

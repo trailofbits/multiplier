@@ -61,7 +61,7 @@ class OMPCapturedExprDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<OMPCapturedExprDecl> redeclarations(void) const;
+  gap::generator<OMPCapturedExprDecl> redeclarations(void) const &;
   static std::optional<OMPCapturedExprDecl> from(const Decl &parent);
 
   inline static std::optional<OMPCapturedExprDecl> from(const std::optional<Decl> &parent) {

@@ -58,7 +58,7 @@ class ConceptDecl : public TemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ConceptDecl> redeclarations(void) const;
+  gap::generator<ConceptDecl> redeclarations(void) const &;
   static std::optional<ConceptDecl> from(const Decl &parent);
 
   inline static std::optional<ConceptDecl> from(const std::optional<Decl> &parent) {

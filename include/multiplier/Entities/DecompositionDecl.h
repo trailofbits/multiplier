@@ -62,7 +62,7 @@ class DecompositionDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<DecompositionDecl> redeclarations(void) const;
+  gap::generator<DecompositionDecl> redeclarations(void) const &;
   static std::optional<DecompositionDecl> from(const Decl &parent);
 
   inline static std::optional<DecompositionDecl> from(const std::optional<Decl> &parent) {
@@ -82,7 +82,7 @@ class DecompositionDecl : public VarDecl {
   }
 
   std::optional<BindingDecl> nth_binding(unsigned n) const;
-  gap::generator<BindingDecl> bindings(void) const;
+  gap::generator<BindingDecl> bindings(void) const &;
 };
 
 static_assert(sizeof(DecompositionDecl) == sizeof(VarDecl));

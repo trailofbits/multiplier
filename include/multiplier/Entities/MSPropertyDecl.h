@@ -59,7 +59,7 @@ class MSPropertyDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<MSPropertyDecl> redeclarations(void) const;
+  gap::generator<MSPropertyDecl> redeclarations(void) const &;
   static std::optional<MSPropertyDecl> from(const Decl &parent);
 
   inline static std::optional<MSPropertyDecl> from(const std::optional<Decl> &parent) {

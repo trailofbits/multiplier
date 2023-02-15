@@ -63,7 +63,7 @@ class CXXMethodDecl : public FunctionDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<CXXMethodDecl> redeclarations(void) const;
+  gap::generator<CXXMethodDecl> redeclarations(void) const &;
   static std::optional<CXXMethodDecl> from(const Decl &parent);
 
   inline static std::optional<CXXMethodDecl> from(const std::optional<Decl> &parent) {
@@ -94,7 +94,7 @@ class CXXMethodDecl : public FunctionDecl {
   bool is_virtual(void) const;
   bool is_volatile(void) const;
   std::optional<CXXMethodDecl> nth_overridden_method(unsigned n) const;
-  gap::generator<CXXMethodDecl> overridden_methods(void) const;
+  gap::generator<CXXMethodDecl> overridden_methods(void) const &;
 };
 
 static_assert(sizeof(CXXMethodDecl) == sizeof(FunctionDecl));

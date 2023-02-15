@@ -54,7 +54,7 @@ class ImportDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ImportDecl> redeclarations(void) const;
+  gap::generator<ImportDecl> redeclarations(void) const &;
   static std::optional<ImportDecl> from(const Decl &parent);
 
   inline static std::optional<ImportDecl> from(const std::optional<Decl> &parent) {
@@ -74,7 +74,7 @@ class ImportDecl : public Decl {
   }
 
   std::optional<Token> nth_identifier_token(unsigned n) const;
-  gap::generator<Token> identifier_tokens(void) const;
+  gap::generator<Token> identifier_tokens(void) const &;
 };
 
 static_assert(sizeof(ImportDecl) == sizeof(Decl));

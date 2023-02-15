@@ -60,7 +60,7 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<OMPDeclareMapperDecl> redeclarations(void) const;
+  gap::generator<OMPDeclareMapperDecl> redeclarations(void) const &;
   static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
 
   inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<Decl> &parent) {
@@ -80,7 +80,7 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   }
 
   Expr mapper_variable_reference(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(OMPDeclareMapperDecl) == sizeof(OMPDeclarativeDirectiveValueDecl));

@@ -61,7 +61,7 @@ class RecordDecl : public TagDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<RecordDecl> redeclarations(void) const;
+  gap::generator<RecordDecl> redeclarations(void) const &;
   static std::optional<RecordDecl> from(const Decl &parent);
 
   inline static std::optional<RecordDecl> from(const std::optional<Decl> &parent) {
@@ -82,7 +82,7 @@ class RecordDecl : public TagDecl {
 
   bool can_pass_in_registers(void) const;
   std::optional<FieldDecl> nth_field(unsigned n) const;
-  gap::generator<FieldDecl> fields(void) const;
+  gap::generator<FieldDecl> fields(void) const &;
   RecordDeclArgPassingKind argument_passing_restrictions(void) const;
   bool has_flexible_array_member(void) const;
   bool has_loaded_fields_from_external_storage(void) const;

@@ -78,9 +78,9 @@ class PseudoObjectExpr : public Expr {
   Expr result_expression(void) const;
   Expr syntactic_form(void) const;
   std::optional<Expr> nth_semantic(unsigned n) const;
-  gap::generator<Expr> semantics(void) const;
+  gap::generator<Expr> semantics(void) const &;
   std::optional<Expr> nth_semantic_expression(unsigned n) const;
-  gap::generator<Expr> semantic_expressions(void) const;
+  gap::generator<Expr> semantic_expressions(void) const &;
 };
 
 static_assert(sizeof(PseudoObjectExpr) == sizeof(Expr));

@@ -1205,6 +1205,9 @@ static std::optional<pasta::AST> CompileJobToAST(
     const std::shared_ptr<GlobalIndexingState> &context,
     const pasta::CompileJob &job) {
 
+  DLOG(INFO)
+      << "Running compile job: " << job.Arguments().Join();
+
   ProgressBarWork parsing_progress_tracker(context->ast_progress);
   pasta::Result<pasta::AST, std::string> maybe_ast = job.Run();
   if (!maybe_ast.Succeeded()) {

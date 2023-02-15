@@ -57,7 +57,7 @@ class LifetimeExtendedTemporaryDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<LifetimeExtendedTemporaryDecl> redeclarations(void) const;
+  gap::generator<LifetimeExtendedTemporaryDecl> redeclarations(void) const &;
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
 
   inline static std::optional<LifetimeExtendedTemporaryDecl> from(const std::optional<Decl> &parent) {
@@ -76,7 +76,7 @@ class LifetimeExtendedTemporaryDecl : public Decl {
     return LifetimeExtendedTemporaryDecl::from(t.as_declaration());
   }
 
-  gap::generator<Stmt> children(void) const;
+  gap::generator<Stmt> children(void) const &;
   ValueDecl extending_declaration(void) const;
   StorageDuration storage_duration(void) const;
   Expr temporary_expression(void) const;

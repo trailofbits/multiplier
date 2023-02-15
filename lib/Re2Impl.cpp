@@ -268,7 +268,7 @@ std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   return ret;
 }
 
-gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) {
+gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) & {
   size_t index = 0;
   size_t num_matches = fragment_ids.size();
 
@@ -295,7 +295,7 @@ RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
 
 // Match this regular expression against a file.
 gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
-    const File &file) const {
+    const File &file) const & {
   const auto &reader = file.impl->reader;
   std::vector<EntityOffset> matched_offsets;
 
@@ -356,7 +356,7 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
 
 // Match this regular expression against a fragment.
 gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
-    const Fragment &frag) const {
+    const Fragment &frag) const & {
   RegexQueryResultImpl result_impl(*this, frag.impl);
   for (auto match : result_impl.Enumerate()) {
     co_yield match;
@@ -393,7 +393,7 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
     return std::nullopt;
 }
 
-gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) {
+gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) & {
   co_return;
 }
 
@@ -458,11 +458,13 @@ RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
 }
 
 // Match this regular expression against a file.
-gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const File &) const {
+gap::generator<RegexQueryMatch>
+RegexQuery::match_fragments(const File &) const & {
   co_return;
 }
 
-gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const Fragment &) const {
+gap::generator<RegexQueryMatch>
+RegexQuery::match_fragments(const Fragment &) const & {
   co_return;
 }
 

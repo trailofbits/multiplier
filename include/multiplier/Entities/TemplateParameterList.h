@@ -49,9 +49,9 @@ class TemplateParameterList {
   friend class Type;
   friend class TemplateParameterListImpl;
   std::shared_ptr<const TemplateParameterListImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   TemplateParameterList(TemplateParameterList &&) noexcept = default;
   TemplateParameterList(const TemplateParameterList &) = default;
@@ -68,7 +68,7 @@ class TemplateParameterList {
   }
 
   PackedTemplateParameterListId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<TemplateParameterList> from(const TemplateParameterList &self) {
     return self;
@@ -97,7 +97,7 @@ class TemplateParameterList {
   Token right_angle_token(void) const;
   TokenRange tokens(void) const;
   std::optional<NamedDecl> nth_parameter(unsigned n) const;
-  gap::generator<NamedDecl> parameters(void) const;
+  gap::generator<NamedDecl> parameters(void) const &;
 };
 
 #endif

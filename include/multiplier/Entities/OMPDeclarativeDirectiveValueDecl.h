@@ -53,7 +53,7 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<OMPDeclarativeDirectiveValueDecl> redeclarations(void) const;
+  gap::generator<OMPDeclarativeDirectiveValueDecl> redeclarations(void) const &;
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Decl &parent);
 
   inline static std::optional<OMPDeclarativeDirectiveValueDecl> from(const std::optional<Decl> &parent) {

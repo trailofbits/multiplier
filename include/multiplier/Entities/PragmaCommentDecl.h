@@ -54,7 +54,7 @@ class PragmaCommentDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<PragmaCommentDecl> redeclarations(void) const;
+  gap::generator<PragmaCommentDecl> redeclarations(void) const &;
   static std::optional<PragmaCommentDecl> from(const Decl &parent);
 
   inline static std::optional<PragmaCommentDecl> from(const std::optional<Decl> &parent) {

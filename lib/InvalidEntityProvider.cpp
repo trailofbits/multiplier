@@ -53,17 +53,17 @@ bool InvalidEntityProvider::AddReference(const Ptr &, RawEntityId,
 }
 
 gap::generator<RawEntityId> InvalidEntityProvider::Redeclarations(
-    const Ptr &, RawEntityId) {
+    const Ptr &, RawEntityId) & {
   co_return;
 }
 
 gap::generator<std::pair<RawEntityId, RawEntityId>>
-InvalidEntityProvider::References(const Ptr &, RawEntityId) {
+InvalidEntityProvider::References(const Ptr &, RawEntityId) & {
   co_return;
 }
 
 gap::generator<RawEntityId> InvalidEntityProvider::FindSymbol(
-    const Ptr &, std::string) {
+    const Ptr &, std::string) & {
   co_return;
 }
 
@@ -72,7 +72,7 @@ gap::generator<RawEntityId> InvalidEntityProvider::FindSymbol(
         const Ptr &, RawEntityId) { return {}; } \
     \
     gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
-        const Ptr &) { co_return; }
+        const Ptr &) & { co_return; }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
@@ -83,10 +83,10 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
-      const Ptr &, type_name ## Kind) { co_return; } \
+      const Ptr &, type_name ## Kind) & { co_return; } \
   \
   gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
-      const Ptr &, type_name ## Kind, PackedFragmentId) { co_return; }
+      const Ptr &, type_name ## Kind, PackedFragmentId) & { co_return; }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
@@ -97,7 +97,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
-      const Ptr &, PackedFragmentId) { co_return; }
+      const Ptr &, PackedFragmentId) & { co_return; }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,

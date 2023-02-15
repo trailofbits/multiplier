@@ -64,7 +64,7 @@ class ParmVarDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ParmVarDecl> redeclarations(void) const;
+  gap::generator<ParmVarDecl> redeclarations(void) const &;
   static std::optional<ParmVarDecl> from(const Decl &parent);
 
   inline static std::optional<ParmVarDecl> from(const std::optional<Decl> &parent) {

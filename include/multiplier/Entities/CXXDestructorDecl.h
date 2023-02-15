@@ -64,7 +64,7 @@ class CXXDestructorDecl : public CXXMethodDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<CXXDestructorDecl> redeclarations(void) const;
+  gap::generator<CXXDestructorDecl> redeclarations(void) const &;
   static std::optional<CXXDestructorDecl> from(const Decl &parent);
 
   inline static std::optional<CXXDestructorDecl> from(const std::optional<Decl> &parent) {

@@ -57,7 +57,7 @@ class TemplateTemplateParmDecl : public TemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TemplateTemplateParmDecl> redeclarations(void) const;
+  gap::generator<TemplateTemplateParmDecl> redeclarations(void) const &;
   static std::optional<TemplateTemplateParmDecl> from(const Decl &parent);
 
   inline static std::optional<TemplateTemplateParmDecl> from(const std::optional<Decl> &parent) {

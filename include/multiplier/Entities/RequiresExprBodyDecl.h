@@ -53,7 +53,7 @@ class RequiresExprBodyDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<RequiresExprBodyDecl> redeclarations(void) const;
+  gap::generator<RequiresExprBodyDecl> redeclarations(void) const &;
   static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
 
   inline static std::optional<RequiresExprBodyDecl> from(const std::optional<Decl> &parent) {
@@ -72,7 +72,7 @@ class RequiresExprBodyDecl : public Decl {
     return RequiresExprBodyDecl::from(t.as_declaration());
   }
 
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(RequiresExprBodyDecl) == sizeof(Decl));

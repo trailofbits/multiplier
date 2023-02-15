@@ -64,7 +64,7 @@ class ObjCMethodDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCMethodDecl> redeclarations(void) const;
+  gap::generator<ObjCMethodDecl> redeclarations(void) const &;
   static std::optional<ObjCMethodDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCMethodDecl> from(const std::optional<Decl> &parent) {
@@ -113,10 +113,10 @@ class ObjCMethodDecl : public NamedDecl {
   bool is_this_declaration_a_designated_initializer(void) const;
   bool is_variadic(void) const;
   std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
-  gap::generator<ParmVarDecl> parameters(void) const;
+  gap::generator<ParmVarDecl> parameters(void) const &;
   std::optional<Token> nth_selector_token(unsigned n) const;
-  gap::generator<Token> selector_tokens(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Token> selector_tokens(void) const &;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(ObjCMethodDecl) == sizeof(NamedDecl));

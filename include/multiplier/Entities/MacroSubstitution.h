@@ -67,7 +67,7 @@ class MacroSubstitution : public Macro {
     return MacroSubstitution::from(t.as_macro());
   }
 
-  gap::generator<MacroOrToken> replacement_children(void) const;
+  gap::generator<MacroOrToken> replacement_children(void) const &;
 };
 
 static_assert(sizeof(MacroSubstitution) == sizeof(Macro));

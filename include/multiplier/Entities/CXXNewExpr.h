@@ -95,7 +95,7 @@ class CXXNewExpr : public Expr {
   bool is_parenthesis_type_id(void) const;
   bool pass_alignment(void) const;
   std::optional<Expr> nth_placement_argument(unsigned n) const;
-  gap::generator<Expr> placement_arguments(void) const;
+  gap::generator<Expr> placement_arguments(void) const &;
   bool should_null_check_allocation(void) const;
 };
 

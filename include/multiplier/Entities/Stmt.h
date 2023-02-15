@@ -46,9 +46,9 @@ class Stmt {
   friend class Type;
   friend class StmtImpl;
   std::shared_ptr<const StmtImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Stmt(Stmt &&) noexcept = default;
   Stmt(const Stmt &) = default;
@@ -65,7 +65,7 @@ class Stmt {
   }
 
   PackedStmtId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
@@ -108,7 +108,7 @@ class Stmt {
   }
 
   Stmt ignore_containers(void) const;
-  gap::generator<Stmt> children(void) const;
+  gap::generator<Stmt> children(void) const &;
   TokenRange tokens(void) const;
   StmtKind kind(void) const;
   Stmt strip_label_like_statements(void) const;

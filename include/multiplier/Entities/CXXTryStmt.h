@@ -76,7 +76,7 @@ class CXXTryStmt : public Stmt {
   CompoundStmt try_block(void) const;
   Token try_token(void) const;
   std::optional<CXXCatchStmt> nth_handler(unsigned n) const;
-  gap::generator<CXXCatchStmt> handlers(void) const;
+  gap::generator<CXXCatchStmt> handlers(void) const &;
 };
 
 static_assert(sizeof(CXXTryStmt) == sizeof(Stmt));

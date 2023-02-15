@@ -59,7 +59,7 @@ class BindingDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<BindingDecl> redeclarations(void) const;
+  gap::generator<BindingDecl> redeclarations(void) const &;
   static std::optional<BindingDecl> from(const Decl &parent);
 
   inline static std::optional<BindingDecl> from(const std::optional<Decl> &parent) {

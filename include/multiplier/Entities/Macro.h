@@ -47,9 +47,9 @@ class Macro {
   friend class Type;
   friend class MacroImpl;
   std::shared_ptr<const MacroImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Macro(Macro &&) noexcept = default;
   Macro(const Macro &) = default;
@@ -66,7 +66,7 @@ class Macro {
   }
 
   PackedMacroId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
  protected:
   static gap::generator<Macro> containing_internal(const Token &token);
@@ -105,7 +105,7 @@ class Macro {
 
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;
-  gap::generator<MacroOrToken> children(void) const;
+  gap::generator<MacroOrToken> children(void) const &;
 };
 
 #endif

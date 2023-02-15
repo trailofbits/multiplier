@@ -55,7 +55,7 @@ class UsingPackDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<UsingPackDecl> redeclarations(void) const;
+  gap::generator<UsingPackDecl> redeclarations(void) const &;
   static std::optional<UsingPackDecl> from(const Decl &parent);
 
   inline static std::optional<UsingPackDecl> from(const std::optional<Decl> &parent) {
@@ -75,7 +75,7 @@ class UsingPackDecl : public NamedDecl {
   }
 
   std::optional<NamedDecl> nth_expansion(unsigned n) const;
-  gap::generator<NamedDecl> expansions(void) const;
+  gap::generator<NamedDecl> expansions(void) const &;
   NamedDecl instantiated_from_using_declaration(void) const;
 };
 

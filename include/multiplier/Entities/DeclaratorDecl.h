@@ -55,7 +55,7 @@ class DeclaratorDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<DeclaratorDecl> redeclarations(void) const;
+  gap::generator<DeclaratorDecl> redeclarations(void) const &;
   static std::optional<DeclaratorDecl> from(const Decl &parent);
 
   inline static std::optional<DeclaratorDecl> from(const std::optional<Decl> &parent) {
@@ -80,7 +80,7 @@ class DeclaratorDecl : public ValueDecl {
   Token type_spec_end_token(void) const;
   Token type_spec_start_token(void) const;
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
-  gap::generator<TemplateParameterList> template_parameter_lists(void) const;
+  gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
 };
 
 static_assert(sizeof(DeclaratorDecl) == sizeof(ValueDecl));

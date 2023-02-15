@@ -56,7 +56,7 @@ class TagDecl : public TypeDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TagDecl> redeclarations(void) const;
+  gap::generator<TagDecl> redeclarations(void) const &;
   static std::optional<TagDecl> from(const Decl &parent);
 
   inline static std::optional<TagDecl> from(const std::optional<Decl> &parent) {
@@ -96,8 +96,8 @@ class TagDecl : public TypeDecl {
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
-  gap::generator<TemplateParameterList> template_parameter_lists(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(TagDecl) == sizeof(TypeDecl));

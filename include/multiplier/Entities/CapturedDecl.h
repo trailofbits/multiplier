@@ -54,7 +54,7 @@ class CapturedDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<CapturedDecl> redeclarations(void) const;
+  gap::generator<CapturedDecl> redeclarations(void) const &;
   static std::optional<CapturedDecl> from(const Decl &parent);
 
   inline static std::optional<CapturedDecl> from(const std::optional<Decl> &parent) {
@@ -76,8 +76,8 @@ class CapturedDecl : public Decl {
   ImplicitParamDecl context_parameter(void) const;
   bool is_nothrow(void) const;
   std::optional<ImplicitParamDecl> nth_parameter(unsigned n) const;
-  gap::generator<ImplicitParamDecl> parameters(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<ImplicitParamDecl> parameters(void) const &;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(CapturedDecl) == sizeof(Decl));

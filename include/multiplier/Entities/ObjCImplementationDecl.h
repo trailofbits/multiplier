@@ -61,7 +61,7 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCImplementationDecl> redeclarations(void) const;
+  gap::generator<ObjCImplementationDecl> redeclarations(void) const &;
   static std::optional<ObjCImplementationDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCImplementationDecl> from(const std::optional<Decl> &parent) {
@@ -88,7 +88,7 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   bool has_destructors(void) const;
   bool has_non_zero_constructors(void) const;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
-  gap::generator<ObjCIvarDecl> instance_variables(void) const;
+  gap::generator<ObjCIvarDecl> instance_variables(void) const &;
 };
 
 static_assert(sizeof(ObjCImplementationDecl) == sizeof(ObjCImplDecl));

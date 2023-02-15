@@ -82,7 +82,7 @@ class ObjCMessageExpr : public Expr {
   }
 
   std::optional<Expr> nth_argument(unsigned n) const;
-  gap::generator<Expr> arguments(void) const;
+  gap::generator<Expr> arguments(void) const &;
   Type call_return_type(void) const;
   Type class_receiver(void) const;
   Type class_receiver_type(void) const;
@@ -103,7 +103,7 @@ class ObjCMessageExpr : public Expr {
   bool is_implicit(void) const;
   bool is_instance_message(void) const;
   std::optional<Token> nth_selector_token(unsigned n) const;
-  gap::generator<Token> selector_tokens(void) const;
+  gap::generator<Token> selector_tokens(void) const &;
 };
 
 static_assert(sizeof(ObjCMessageExpr) == sizeof(Expr));

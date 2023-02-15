@@ -78,7 +78,7 @@ class ObjCArrayLiteral : public Expr {
 
   ObjCMethodDecl array_with_objects_method(void) const;
   std::optional<Expr> nth_element(unsigned n) const;
-  gap::generator<Expr> elements(void) const;
+  gap::generator<Expr> elements(void) const &;
 };
 
 static_assert(sizeof(ObjCArrayLiteral) == sizeof(Expr));

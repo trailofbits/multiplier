@@ -48,9 +48,9 @@ class Designator {
   friend class Type;
   friend class DesignatorImpl;
   std::shared_ptr<const DesignatorImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Designator(Designator &&) noexcept = default;
   Designator(const Designator &) = default;
@@ -67,7 +67,7 @@ class Designator {
   }
 
   PackedDesignatorId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<Designator> from(const Designator &self) {
     return self;

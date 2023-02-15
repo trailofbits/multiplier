@@ -112,7 +112,7 @@ FilePathMap Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }
 
-gap::generator<File> Index::files(void) const {
+gap::generator<File> Index::files(void) const & {
   std::vector<SpecificEntityId<FileId>> file_ids;
   auto file_paths = impl->ListFiles(impl);
   file_ids.reserve(file_paths.size());
@@ -237,7 +237,7 @@ VariantEntity Index::entity(EntityId eid) const {
 // Search for entities by their name and category.
 //
 // NOTE(pag): This might return redeclarations.
-gap::generator<NamedEntity> Index::query_entities(std::string name) const {
+gap::generator<NamedEntity> Index::query_entities(std::string name) const & {
 
   for (RawEntityId eid : impl->FindSymbol(impl, std::move(name))) {
     VariantId vid = EntityId(eid).Unpack();

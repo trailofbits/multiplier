@@ -72,8 +72,8 @@ class ObjCObjectPointerType : public Type {
   ObjCObjectType object_type(void) const;
   Type super_class_type(void) const;
   std::optional<Type> nth_type_argument(unsigned n) const;
-  gap::generator<Type> type_arguments(void) const;
-  gap::generator<Type> type_arguments_as_written(void) const;
+  gap::generator<Type> type_arguments(void) const &;
+  gap::generator<Type> type_arguments_as_written(void) const &;
   bool is_kind_of_type(void) const;
   bool is_obj_c_id_or_class_type(void) const;
   bool is_specialized(void) const;
@@ -82,10 +82,10 @@ class ObjCObjectPointerType : public Type {
   bool is_unspecialized(void) const;
   bool is_unspecialized_as_written(void) const;
   std::optional<ObjCProtocolDecl> nth_qualifier(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> qualifiers(void) const;
+  gap::generator<ObjCProtocolDecl> qualifiers(void) const &;
   ObjCObjectPointerType strip_obj_c_kind_of_type_and_qualifiers(void) const;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> protocols(void) const;
+  gap::generator<ObjCProtocolDecl> protocols(void) const &;
 };
 
 static_assert(sizeof(ObjCObjectPointerType) == sizeof(Type));

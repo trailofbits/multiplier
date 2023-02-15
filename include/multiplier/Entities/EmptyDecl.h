@@ -53,7 +53,7 @@ class EmptyDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<EmptyDecl> redeclarations(void) const;
+  gap::generator<EmptyDecl> redeclarations(void) const &;
   static std::optional<EmptyDecl> from(const Decl &parent);
 
   inline static std::optional<EmptyDecl> from(const std::optional<Decl> &parent) {

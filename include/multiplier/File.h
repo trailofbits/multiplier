@@ -142,7 +142,7 @@ class File {
   SpecificEntityId<FileId> id(void) const noexcept;
 
   // Return a list of fragments in this file.
-  gap::generator<Fragment> fragments(void) const;
+  gap::generator<Fragment> fragments(void) const &;
 
   // Return the list of fragment ids in the file
   FragmentIdList fragment_ids(void) const;
@@ -154,7 +154,7 @@ class File {
   std::string_view data(void) const noexcept;
 
   // References of this file.
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();

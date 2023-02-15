@@ -90,7 +90,7 @@ Decl Decl::canonical_declaration(void) const {
   return *this;
 }
 
-gap::generator<Decl> Decl::redeclarations(void) const {
+gap::generator<Decl> Decl::redeclarations(void) const & {
   auto any = false;
   const EntityProvider::Ptr &ep = impl->ep;
   for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
@@ -106,7 +106,7 @@ gap::generator<Decl> Decl::redeclarations(void) const {
 }
 
 // Return references to this declaration.
-gap::generator<Reference> Decl::references(void) const {
+gap::generator<Reference> Decl::references(void) const & {
   const EntityProvider::Ptr &ep = impl->ep;
   for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
@@ -116,7 +116,7 @@ gap::generator<Reference> Decl::references(void) const {
 }
 
 // Grab all call expressions of this FunctionDecl
-gap::generator<CallExpr> FunctionDecl::callers() const {
+gap::generator<CallExpr> FunctionDecl::callers() const & {
   for (Reference ref : references()) {
     auto reference = ref.as_statement();
     for (CallExpr call : CallExpr::containing(reference)) {

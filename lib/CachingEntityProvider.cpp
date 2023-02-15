@@ -126,7 +126,7 @@ bool CachingEntityProvider::AddReference(const Ptr &ep, RawEntityId kind_id,
 }
 
 gap::generator<RawEntityId> CachingEntityProvider::Redeclarations(
-    const Ptr &self, RawEntityId raw_id) {
+    const Ptr &self, RawEntityId raw_id) & {
 
   EntityCategory category = CategoryFromEntityId(raw_id);
   if (EntityCategory::NOT_AN_ENTITY == category) {
@@ -169,12 +169,12 @@ gap::generator<RawEntityId> CachingEntityProvider::Redeclarations(
 }
 
 gap::generator<std::pair<RawEntityId, RawEntityId>>
-CachingEntityProvider::References(const Ptr &self, RawEntityId eid) {
+CachingEntityProvider::References(const Ptr &self, RawEntityId eid) & {
   return next->References(self, eid);
 }
 
 gap::generator<RawEntityId> CachingEntityProvider::FindSymbol(
-    const Ptr &self, std::string name) {
+    const Ptr &self, std::string name) & {
   return next->FindSymbol(self, std::move(name));
 }
 
@@ -250,7 +250,7 @@ EntityProvider::Ptr EntityProvider::in_memory_cache(
     } \
     \
     gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
-        const Ptr &self) { \
+        const Ptr &self) & { \
       return next->type_name ## sFor(self); \
     }
 
@@ -263,12 +263,12 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
-      const Ptr &self, type_name ## Kind kind) { \
+      const Ptr &self, type_name ## Kind kind) & { \
     return next->type_name ## sFor(self, kind); \
   } \
   \
   gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
-      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) { \
+      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) & { \
     return next->type_name ## sFor(self, kind, frag_id); \
   }
 
@@ -281,7 +281,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
-      const Ptr &self, PackedFragmentId frag_id) { \
+      const Ptr &self, PackedFragmentId frag_id) & { \
     return next->type_name ## sFor(self, frag_id); \
   }
 

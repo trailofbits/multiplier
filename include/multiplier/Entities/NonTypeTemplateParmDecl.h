@@ -61,7 +61,7 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<NonTypeTemplateParmDecl> redeclarations(void) const;
+  gap::generator<NonTypeTemplateParmDecl> redeclarations(void) const &;
   static std::optional<NonTypeTemplateParmDecl> from(const Decl &parent);
 
   inline static std::optional<NonTypeTemplateParmDecl> from(const std::optional<Decl> &parent) {
@@ -90,7 +90,7 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   bool is_expanded_parameter_pack(void) const;
   bool is_pack_expansion(void) const;
   std::optional<Type> nth_expansion_type(unsigned n) const;
-  gap::generator<Type> expansion_types(void) const;
+  gap::generator<Type> expansion_types(void) const &;
 };
 
 static_assert(sizeof(NonTypeTemplateParmDecl) == sizeof(DeclaratorDecl));

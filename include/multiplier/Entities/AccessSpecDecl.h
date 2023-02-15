@@ -53,7 +53,7 @@ class AccessSpecDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<AccessSpecDecl> redeclarations(void) const;
+  gap::generator<AccessSpecDecl> redeclarations(void) const &;
   static std::optional<AccessSpecDecl> from(const Decl &parent);
 
   inline static std::optional<AccessSpecDecl> from(const std::optional<Decl> &parent) {

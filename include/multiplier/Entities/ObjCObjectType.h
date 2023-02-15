@@ -68,8 +68,8 @@ class ObjCObjectType : public Type {
   ObjCInterfaceDecl interface(void) const;
   std::optional<Type> super_class_type(void) const;
   std::optional<Type> nth_type_argument(unsigned n) const;
-  gap::generator<Type> type_arguments(void) const;
-  gap::generator<Type> type_arguments_as_written(void) const;
+  gap::generator<Type> type_arguments(void) const &;
+  gap::generator<Type> type_arguments_as_written(void) const &;
   bool is_kind_of_type(void) const;
   bool is_kind_of_type_as_written(void) const;
   bool is_obj_c_class(void) const;

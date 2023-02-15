@@ -64,7 +64,7 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<VarTemplatePartialSpecializationDecl> redeclarations(void) const;
+  gap::generator<VarTemplatePartialSpecializationDecl> redeclarations(void) const &;
   static std::optional<VarTemplatePartialSpecializationDecl> from(const Decl &parent);
 
   inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<Decl> &parent) {

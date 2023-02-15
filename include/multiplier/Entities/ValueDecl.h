@@ -52,7 +52,7 @@ class ValueDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ValueDecl> redeclarations(void) const;
+  gap::generator<ValueDecl> redeclarations(void) const &;
   static std::optional<ValueDecl> from(const Decl &parent);
 
   inline static std::optional<ValueDecl> from(const std::optional<Decl> &parent) {

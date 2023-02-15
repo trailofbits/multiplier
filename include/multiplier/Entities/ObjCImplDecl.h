@@ -55,7 +55,7 @@ class ObjCImplDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCImplDecl> redeclarations(void) const;
+  gap::generator<ObjCImplDecl> redeclarations(void) const &;
   static std::optional<ObjCImplDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCImplDecl> from(const std::optional<Decl> &parent) {
@@ -76,7 +76,7 @@ class ObjCImplDecl : public ObjCContainerDecl {
 
   ObjCInterfaceDecl class_interface(void) const;
   std::optional<ObjCPropertyImplDecl> nth_property_implementation(unsigned n) const;
-  gap::generator<ObjCPropertyImplDecl> property_implementations(void) const;
+  gap::generator<ObjCPropertyImplDecl> property_implementations(void) const &;
 };
 
 static_assert(sizeof(ObjCImplDecl) == sizeof(ObjCContainerDecl));

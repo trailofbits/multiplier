@@ -51,9 +51,9 @@ class CXXBaseSpecifier {
   friend class Type;
   friend class CXXBaseSpecifierImpl;
   std::shared_ptr<const CXXBaseSpecifierImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier(const CXXBaseSpecifier &) = default;
@@ -70,7 +70,7 @@ class CXXBaseSpecifier {
   }
 
   PackedCXXBaseSpecifierId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<CXXBaseSpecifier> from(const CXXBaseSpecifier &self) {
     return self;

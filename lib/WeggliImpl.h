@@ -45,7 +45,7 @@ class WeggliQueryResultImpl final {
 
   bool InitForFragment(FragmentImplPtr frag_);
 
-  gap::generator<WeggliQueryMatch> Enumerate(void);
+  gap::generator<WeggliQueryMatch> Enumerate(void) &;
 };
 
 }  // namespace mx

@@ -64,9 +64,9 @@ class Type {
   friend class TokenContext;
   friend class TypeImpl;
   std::shared_ptr<const TypeImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Type(Type &&) noexcept = default;
   Type(const Type &) = default;
@@ -83,7 +83,7 @@ class Type {
   }
 
   PackedTypeId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
  public:
   static gap::generator<Type> in(const Fragment &frag, std::span<TypeKind> kinds);

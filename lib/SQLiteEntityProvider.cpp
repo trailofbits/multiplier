@@ -512,7 +512,7 @@ bool SQLiteEntityProvider::AddReference(const Ptr &, RawEntityId kind_id,
 }
 
 gap::generator<RawEntityId>
-SQLiteEntityProvider::Redeclarations(const Ptr &, RawEntityId raw_id) {
+SQLiteEntityProvider::Redeclarations(const Ptr &, RawEntityId raw_id) & {
   EntityCategory category = CategoryFromEntityId(raw_id);
   if (EntityCategory::NOT_AN_ENTITY == category) {
     assert(false);
@@ -583,7 +583,7 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
 // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
 //            with `eid` if `eid` resides in a fragment.
 gap::generator<std::pair<RawEntityId, RawEntityId>>
-SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
+SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
 
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = context->get_references;
@@ -678,7 +678,7 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
 }
 
 gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
-    const Ptr &self, std::string symbol) {
+    const Ptr &self, std::string symbol) & {
 
   ImplPtr context = impl.Lock();
   sqlite::Statement &list_ids = context->get_entities_by_name;
@@ -777,7 +777,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
     } \
     \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
-        const Ptr &self) { \
+        const Ptr &self) & { \
       ImplPtr context = impl.Lock(); \
       sqlite::Statement &list_ids = context->get_ ## lower_name ## _ids; \
       \
@@ -830,7 +830,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
-      const Ptr &self, type_name ## Kind kind) { \
+      const Ptr &self, type_name ## Kind kind) & { \
     ImplPtr context = impl.Lock(); \
     sqlite::Statement &list_ids = context->get_ ## lower_name ## _ids_by_kind; \
     \
@@ -875,7 +875,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
   } \
   \
   gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
-      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) { \
+      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) & { \
     ImplPtr context = impl.Lock(); \
     sqlite::Statement &list_ids = context->get_ ## lower_name ## _ids_by_kind_fragment; \
     \
@@ -928,7 +928,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
-      const Ptr &self, PackedFragmentId frag_id) { \
+      const Ptr &self, PackedFragmentId frag_id) & { \
     ImplPtr context = impl.Lock(); \
     sqlite::Statement &list_ids = context->get_ ## lower_name ## _ids_by_fragment; \
     \

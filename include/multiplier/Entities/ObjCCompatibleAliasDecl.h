@@ -56,7 +56,7 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCCompatibleAliasDecl> redeclarations(void) const;
+  gap::generator<ObjCCompatibleAliasDecl> redeclarations(void) const &;
   static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCCompatibleAliasDecl> from(const std::optional<Decl> &parent) {

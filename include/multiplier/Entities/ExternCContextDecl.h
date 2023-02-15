@@ -53,7 +53,7 @@ class ExternCContextDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ExternCContextDecl> redeclarations(void) const;
+  gap::generator<ExternCContextDecl> redeclarations(void) const &;
   static std::optional<ExternCContextDecl> from(const Decl &parent);
 
   inline static std::optional<ExternCContextDecl> from(const std::optional<Decl> &parent) {
@@ -72,7 +72,7 @@ class ExternCContextDecl : public Decl {
     return ExternCContextDecl::from(t.as_declaration());
   }
 
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(ExternCContextDecl) == sizeof(Decl));

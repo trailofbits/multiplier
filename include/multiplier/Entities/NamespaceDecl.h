@@ -55,7 +55,7 @@ class NamespaceDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<NamespaceDecl> redeclarations(void) const;
+  gap::generator<NamespaceDecl> redeclarations(void) const &;
   static std::optional<NamespaceDecl> from(const Decl &parent);
 
   inline static std::optional<NamespaceDecl> from(const std::optional<Decl> &parent) {
@@ -74,7 +74,7 @@ class NamespaceDecl : public NamedDecl {
     return NamespaceDecl::from(t.as_declaration());
   }
 
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(NamespaceDecl) == sizeof(NamedDecl));

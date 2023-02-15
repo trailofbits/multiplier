@@ -58,7 +58,7 @@ class ObjCPropertyImplDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCPropertyImplDecl> redeclarations(void) const;
+  gap::generator<ObjCPropertyImplDecl> redeclarations(void) const &;
   static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCPropertyImplDecl> from(const std::optional<Decl> &parent) {

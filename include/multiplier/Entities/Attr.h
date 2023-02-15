@@ -46,9 +46,9 @@ class Attr {
   friend class Type;
   friend class AttrImpl;
   std::shared_ptr<const AttrImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const File &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Attr(Attr &&) noexcept = default;
   Attr(const Attr &) = default;
@@ -65,7 +65,7 @@ class Attr {
   }
 
   PackedAttrId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
  public:
   static gap::generator<Attr> in(const Fragment &frag, std::span<AttrKind> kinds);

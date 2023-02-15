@@ -62,7 +62,7 @@ class EnumDecl : public TagDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<EnumDecl> redeclarations(void) const;
+  gap::generator<EnumDecl> redeclarations(void) const &;
   static std::optional<EnumDecl> from(const Decl &parent);
 
   inline static std::optional<EnumDecl> from(const std::optional<Decl> &parent) {
@@ -82,7 +82,7 @@ class EnumDecl : public TagDecl {
   }
 
   std::optional<EnumConstantDecl> nth_enumerator(unsigned n) const;
-  gap::generator<EnumConstantDecl> enumerators(void) const;
+  gap::generator<EnumConstantDecl> enumerators(void) const &;
   std::optional<EnumDecl> instantiated_from_member_enum(void) const;
   std::optional<Type> integer_type(void) const;
   TokenRange integer_type_range(void) const;

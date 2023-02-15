@@ -56,7 +56,7 @@ class FriendDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<FriendDecl> redeclarations(void) const;
+  gap::generator<FriendDecl> redeclarations(void) const &;
   static std::optional<FriendDecl> from(const Decl &parent);
 
   inline static std::optional<FriendDecl> from(const std::optional<Decl> &parent) {
@@ -80,7 +80,7 @@ class FriendDecl : public Decl {
   std::optional<Type> friend_type(void) const;
   bool is_unsupported_friend(void) const;
   std::optional<TemplateParameterList> nth_friend_type_template_parameter_list(unsigned n) const;
-  gap::generator<TemplateParameterList> friend_type_template_parameter_lists(void) const;
+  gap::generator<TemplateParameterList> friend_type_template_parameter_lists(void) const &;
 };
 
 static_assert(sizeof(FriendDecl) == sizeof(Decl));

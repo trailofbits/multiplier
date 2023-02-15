@@ -60,7 +60,7 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCTypeParamDecl> redeclarations(void) const;
+  gap::generator<ObjCTypeParamDecl> redeclarations(void) const &;
   static std::optional<ObjCTypeParamDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCTypeParamDecl> from(const std::optional<Decl> &parent) {

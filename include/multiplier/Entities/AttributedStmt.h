@@ -76,7 +76,7 @@ class AttributedStmt : public ValueStmt {
 
   Token attribute_token(void) const;
   std::optional<Attr> nth_attribute(unsigned n) const;
-  gap::generator<Attr> attributes(void) const;
+  gap::generator<Attr> attributes(void) const &;
   Stmt sub_statement(void) const;
 };
 

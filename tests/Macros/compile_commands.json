@@ -110,6 +110,11 @@
 "directory": ""
 },
 {
+"file": "PragmasAreRetained.c",
+"command": "clang PragmasAreRetained.c",
+"directory": ""
+},
+{
 "file": "TrailingConditionalVariadicMacro.c",
 "command": "clang TrailingConditionalVariadicMacro.c",
 "directory": ""

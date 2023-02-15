@@ -76,7 +76,7 @@ class GenericSelectionExpr : public Expr {
   }
 
   std::optional<Expr> nth_association_expression(unsigned n) const;
-  gap::generator<Expr> association_expressions(void) const;
+  gap::generator<Expr> association_expressions(void) const &;
   Expr controlling_expression(void) const;
   Token default_token(void) const;
   Token generic_token(void) const;

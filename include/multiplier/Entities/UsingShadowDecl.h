@@ -56,7 +56,7 @@ class UsingShadowDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<UsingShadowDecl> redeclarations(void) const;
+  gap::generator<UsingShadowDecl> redeclarations(void) const &;
   static std::optional<UsingShadowDecl> from(const Decl &parent);
 
   inline static std::optional<UsingShadowDecl> from(const std::optional<Decl> &parent) {

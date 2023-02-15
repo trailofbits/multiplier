@@ -72,7 +72,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<FunctionDecl> redeclarations(void) const;
+  gap::generator<FunctionDecl> redeclarations(void) const &;
   static std::optional<FunctionDecl> from(const Decl &parent);
 
   inline static std::optional<FunctionDecl> from(const std::optional<Decl> &parent) {
@@ -168,12 +168,12 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_variadic(void) const;
   bool is_virtual_as_written(void) const;
   std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
-  gap::generator<ParmVarDecl> parameters(void) const;
+  gap::generator<ParmVarDecl> parameters(void) const &;
   bool uses_seh_try(void) const;
   bool will_have_body(void) const;
   std::optional<Stmt> body(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
-  gap::generator<CallExpr> callers(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<CallExpr> callers(void) const &;
 };
 
 static_assert(sizeof(FunctionDecl) == sizeof(DeclaratorDecl));

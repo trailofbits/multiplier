@@ -60,7 +60,7 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCCategoryImplDecl> redeclarations(void) const;
+  gap::generator<ObjCCategoryImplDecl> redeclarations(void) const &;
   static std::optional<ObjCCategoryImplDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCCategoryImplDecl> from(const std::optional<Decl> &parent) {

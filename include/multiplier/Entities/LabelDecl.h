@@ -56,7 +56,7 @@ class LabelDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<LabelDecl> redeclarations(void) const;
+  gap::generator<LabelDecl> redeclarations(void) const &;
   static std::optional<LabelDecl> from(const Decl &parent);
 
   inline static std::optional<LabelDecl> from(const std::optional<Decl> &parent) {

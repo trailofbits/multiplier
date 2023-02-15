@@ -66,7 +66,7 @@ bool WeggliQueryResultImpl::InitForFragment(FragmentImplPtr frag_) {
   return true;
 }
 
-gap::generator<WeggliQueryMatch> WeggliQueryResultImpl::Enumerate(void) {
+gap::generator<WeggliQueryMatch> WeggliQueryResultImpl::Enumerate(void) & {
 
 #ifndef MX_DISABLE_WEGGLI
   unsigned index = 0u;
@@ -237,7 +237,7 @@ std::optional<size_t> WeggliQueryMatch::index_of_captured_variable(
 
 // Match this Weggli query against a file.
 gap::generator<WeggliQueryMatch>
-WeggliQuery::match_fragments(const File &file) const {
+WeggliQuery::match_fragments(const File &file) const & {
   std::vector<EntityOffset> matched_offsets;
   this->for_each_match(
       file.data(),
@@ -298,7 +298,7 @@ WeggliQuery::match_fragments(const File &file) const {
 
 // Match this Weggli query against a fragment.
 gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(
-    const Fragment &frag) const {
+    const Fragment &frag) const & {
   WeggliQueryResultImpl it(*this, frag.impl);
   for (auto match : it.Enumerate()) {
     co_yield match;
@@ -307,11 +307,13 @@ gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(
 
 #else
 
-gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(const File &) const {
+gap::generator<WeggliQueryMatch>
+WeggliQuery::match_fragments(const File &) const & {
   co_return;
 }
 
-gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(const Fragment &) const {
+gap::generator<WeggliQueryMatch>
+WeggliQuery::match_fragments(const Fragment &) const & {
   co_return;
 }
 

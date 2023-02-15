@@ -58,7 +58,7 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCProtocolDecl> redeclarations(void) const;
+  gap::generator<ObjCProtocolDecl> redeclarations(void) const &;
   static std::optional<ObjCProtocolDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCProtocolDecl> from(const std::optional<Decl> &parent) {
@@ -82,9 +82,9 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   bool is_non_runtime_protocol(void) const;
   bool is_this_declaration_a_definition(void) const;
   std::optional<Token> nth_protocol_token(unsigned n) const;
-  gap::generator<Token> protocol_tokens(void) const;
+  gap::generator<Token> protocol_tokens(void) const &;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> protocols(void) const;
+  gap::generator<ObjCProtocolDecl> protocols(void) const &;
 };
 
 static_assert(sizeof(ObjCProtocolDecl) == sizeof(ObjCContainerDecl));

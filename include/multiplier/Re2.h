@@ -59,10 +59,10 @@ class RegexQuery final {
   bool is_valid(void) const;
 
   // Match this regular expression against a file.
-  gap::generator<RegexQueryMatch> match_fragments(const File &) const;
+  gap::generator<RegexQueryMatch> match_fragments(const File &) const &;
 
   // Match this regular expression against a fragment.
-  gap::generator<RegexQueryMatch> match_fragments(const Fragment &) const;
+  gap::generator<RegexQueryMatch> match_fragments(const Fragment &) const &;
 };
 
 }  // namespace mx

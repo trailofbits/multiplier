@@ -35,7 +35,7 @@ SpecificEntityId<AttrId> Attr::id(void) const {
 }
 
 // Return references to this attribute.
-gap::generator<Reference> Attr::references(void) const {
+gap::generator<Reference> Attr::references(void) const & {
   const EntityProvider::Ptr &ep = impl->ep;
   for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {

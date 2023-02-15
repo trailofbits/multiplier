@@ -59,7 +59,7 @@ class OMPDeclareReductionDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<OMPDeclareReductionDecl> redeclarations(void) const;
+  gap::generator<OMPDeclareReductionDecl> redeclarations(void) const &;
   static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
 
   inline static std::optional<OMPDeclareReductionDecl> from(const std::optional<Decl> &parent) {
@@ -85,7 +85,7 @@ class OMPDeclareReductionDecl : public ValueDecl {
   Expr initializer_private(void) const;
   Expr initializer(void) const;
   OMPDeclareReductionDeclInitKind initializer_kind(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(OMPDeclareReductionDecl) == sizeof(ValueDecl));

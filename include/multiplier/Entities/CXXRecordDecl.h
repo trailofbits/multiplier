@@ -75,7 +75,7 @@ class CXXRecordDecl : public RecordDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<CXXRecordDecl> redeclarations(void) const;
+  gap::generator<CXXRecordDecl> redeclarations(void) const &;
   static std::optional<CXXRecordDecl> from(const Decl &parent);
 
   inline static std::optional<CXXRecordDecl> from(const std::optional<Decl> &parent) {
@@ -98,7 +98,7 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;
   std::optional<MSInheritanceModel> calculate_inheritance_model(void) const;
   std::optional<CXXConstructorDecl> nth_constructor(unsigned n) const;
-  gap::generator<CXXConstructorDecl> constructors(void) const;
+  gap::generator<CXXConstructorDecl> constructors(void) const &;
   std::optional<std::vector<FriendDecl>> friends(void) const;
   std::optional<FunctionTemplateDecl> dependent_lambda_call_operator(void) const;
   std::optional<ClassTemplateDecl> described_class_template(void) const;

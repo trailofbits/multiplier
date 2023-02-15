@@ -53,7 +53,7 @@ class TranslationUnitDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TranslationUnitDecl> redeclarations(void) const;
+  gap::generator<TranslationUnitDecl> redeclarations(void) const &;
   static std::optional<TranslationUnitDecl> from(const Decl &parent);
 
   inline static std::optional<TranslationUnitDecl> from(const std::optional<Decl> &parent) {
@@ -72,7 +72,7 @@ class TranslationUnitDecl : public Decl {
     return TranslationUnitDecl::from(t.as_declaration());
   }
 
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(TranslationUnitDecl) == sizeof(Decl));

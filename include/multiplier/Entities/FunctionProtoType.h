@@ -77,7 +77,7 @@ class FunctionProtoType : public FunctionType {
   ExceptionSpecificationType exception_spec_type(void) const;
   std::optional<Expr> noexcept_expression(void) const;
   std::optional<Type> nth_parameter_type(unsigned n) const;
-  gap::generator<Type> parameter_types(void) const;
+  gap::generator<Type> parameter_types(void) const &;
   RefQualifierKind reference_qualifier(void) const;
   bool has_dependent_exception_spec(void) const;
   bool has_dynamic_exception_spec(void) const;
@@ -91,7 +91,7 @@ class FunctionProtoType : public FunctionType {
   bool is_template_variadic(void) const;
   bool is_variadic(void) const;
   std::optional<Type> nth_exception_type(unsigned n) const;
-  gap::generator<Type> exception_types(void) const;
+  gap::generator<Type> exception_types(void) const &;
 };
 
 static_assert(sizeof(FunctionProtoType) == sizeof(FunctionType));

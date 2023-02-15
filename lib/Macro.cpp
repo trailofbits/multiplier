@@ -65,7 +65,7 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
 }
 
 // References to this macro definition.
-gap::generator<Reference> Macro::references(void) const {
+gap::generator<Reference> Macro::references(void) const & {
   const EntityProvider::Ptr &ep = impl->ep;
   for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {

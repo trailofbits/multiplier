@@ -56,7 +56,7 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<OMPAllocateDecl> redeclarations(void) const;
+  gap::generator<OMPAllocateDecl> redeclarations(void) const &;
   static std::optional<OMPAllocateDecl> from(const Decl &parent);
 
   inline static std::optional<OMPAllocateDecl> from(const std::optional<Decl> &parent) {
@@ -76,7 +76,7 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   }
 
   std::optional<Expr> nth_varlist(unsigned n) const;
-  gap::generator<Expr> varlists(void) const;
+  gap::generator<Expr> varlists(void) const &;
 };
 
 static_assert(sizeof(OMPAllocateDecl) == sizeof(OMPDeclarativeDirectiveDecl));

@@ -53,7 +53,7 @@ class ExportDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ExportDecl> redeclarations(void) const;
+  gap::generator<ExportDecl> redeclarations(void) const &;
   static std::optional<ExportDecl> from(const Decl &parent);
 
   inline static std::optional<ExportDecl> from(const std::optional<Decl> &parent) {
@@ -75,7 +75,7 @@ class ExportDecl : public Decl {
   Token export_token(void) const;
   Token r_brace_token(void) const;
   bool has_braces(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(ExportDecl) == sizeof(Decl));

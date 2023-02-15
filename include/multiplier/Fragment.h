@@ -107,13 +107,13 @@ class Fragment {
   TokenRange parsed_tokens(void) const;
 
   // Return references to this fragment.
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   // Return the list of top-level declarations in this fragment.
-  gap::generator<Decl> top_level_declarations(void) const;
+  gap::generator<Decl> top_level_declarations(void) const &;
 
   // Return the list of top-level macros or macro tokens in this code.
-  gap::generator<MacroOrToken> preprocessed_code(void) const;
+  gap::generator<MacroOrToken> preprocessed_code(void) const &;
 
   // Returns source IR for the fragment.
   std::optional<std::string_view> source_ir(void) const noexcept;
@@ -127,10 +127,10 @@ class Fragment {
   }
 
   // Run a Weggli search over this fragment.
-  gap::generator<WeggliQueryMatch> query(const WeggliQuery &query) const;
+  gap::generator<WeggliQueryMatch> query(const WeggliQuery &query) const &;
 
   // Run a regular expression search over this fragment.
-  gap::generator<RegexQueryMatch> query(const RegexQuery &query) const;
+  gap::generator<RegexQueryMatch> query(const RegexQuery &query) const &;
 };
 
 }  // namespace mx

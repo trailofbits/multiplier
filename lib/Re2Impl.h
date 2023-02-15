@@ -63,7 +63,7 @@ class RegexQueryResultImpl final {
 
   std::optional<RegexQueryMatch> GetNextMatchInFragment(void);
 
-  gap::generator<RegexQueryMatch> Enumerate(void);
+  gap::generator<RegexQueryMatch> Enumerate(void) &;
 };
 
 }  // namespace mx

@@ -822,7 +822,7 @@ EntityId Token::id(void) const {
 }
 
 // References to this token.
-gap::generator<Reference> Token::references(void) const {
+gap::generator<Reference> Token::references(void) const & {
   EntityProvider::Ptr ep;
   if (!impl) {
     co_return;

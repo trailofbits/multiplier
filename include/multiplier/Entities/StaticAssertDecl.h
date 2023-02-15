@@ -55,7 +55,7 @@ class StaticAssertDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<StaticAssertDecl> redeclarations(void) const;
+  gap::generator<StaticAssertDecl> redeclarations(void) const &;
   static std::optional<StaticAssertDecl> from(const Decl &parent);
 
   inline static std::optional<StaticAssertDecl> from(const std::optional<Decl> &parent) {

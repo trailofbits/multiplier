@@ -59,7 +59,7 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TypeAliasTemplateDecl> redeclarations(void) const;
+  gap::generator<TypeAliasTemplateDecl> redeclarations(void) const &;
   static std::optional<TypeAliasTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<TypeAliasTemplateDecl> from(const std::optional<Decl> &parent) {

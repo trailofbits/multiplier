@@ -59,7 +59,7 @@ class IndirectFieldDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<IndirectFieldDecl> redeclarations(void) const;
+  gap::generator<IndirectFieldDecl> redeclarations(void) const &;
   static std::optional<IndirectFieldDecl> from(const Decl &parent);
 
   inline static std::optional<IndirectFieldDecl> from(const std::optional<Decl> &parent) {
@@ -78,7 +78,7 @@ class IndirectFieldDecl : public ValueDecl {
     return IndirectFieldDecl::from(t.as_declaration());
   }
 
-  gap::generator<NamedDecl> chain(void) const;
+  gap::generator<NamedDecl> chain(void) const &;
   std::optional<FieldDecl> anonymous_field(void) const;
   std::optional<VarDecl> variable_declaration(void) const;
 };
