@@ -39,4 +39,24 @@ gap::generator<Reference> Stmt::references(void) const & {
   }
 }
 
+// Public methods for derived classes
+
+// Included to make sure to distinguish from `call_return_type`
+std::optional<Type> CallExpr::casted_return_type(void) const {
+  for (CastExpr cast_expr : CastExpr::containing(*this)) {
+    if (cast_expr.sub_expression().id() == id())
+      return cast_expr.type();
+  }
+  return std::nullopt;
+}
+
+// Grabs the actual parent CastExpr if needed for further inspection
+std::optional<CastExpr> CallExpr::casted_return_value(void) const {
+  for (CastExpr cast_expr : CastExpr::containing(*this)) {
+    if (cast_expr.sub_expression().id() == id())
+      return cast_expr;
+  }
+  return std::nullopt;
+}
+
 }  // namespace mx
