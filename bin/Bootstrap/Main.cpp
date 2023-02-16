@@ -3393,7 +3393,9 @@ MethodListPtr CodeGenerator::RunOnClass(
   // Allows CallExpr to conveniently get post-cast types if exists
   if (class_name == "CallExpr") {
     forward_decls.insert("Type");
+    forward_decls.insert("CastExpr");
     class_os
+      << "  std::optional<Type> call_casted_return_type(void) const;\n"
       << "  std::optional<CastExpr> casted_return_value(void) const;\n";
   }
 
