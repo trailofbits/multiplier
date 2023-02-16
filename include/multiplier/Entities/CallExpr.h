@@ -96,7 +96,7 @@ class CallExpr : public Expr {
   bool is_call_to_std_move(void) const;
   bool is_unevaluated_builtin_call(void) const;
   bool uses_adl(void) const;
-  std::optional<Type> call_casted_return_type(void) const;
+  std::optional<Type> casted_return_type(void) const;
   std::optional<CastExpr> casted_return_value(void) const;
 };
 
