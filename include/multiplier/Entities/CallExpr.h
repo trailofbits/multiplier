@@ -95,8 +95,7 @@ class CallExpr : public Expr {
   bool is_call_to_std_move(void) const;
   bool is_unevaluated_builtin_call(void) const;
   bool uses_adl(void) const;
-  std::optional<Type> call_return_casted_type(void) const;
-  std::optional<StmtKind> call_cast_kind(void) const;
+  std::optional<CastExpr> casted_return_value(void) const;
 };
 
 static_assert(sizeof(CallExpr) == sizeof(Expr));

@@ -3394,8 +3394,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (class_name == "CallExpr") {
     forward_decls.insert("Type");
     class_os
-      << "  std::optional<Type> call_return_casted_type(void) const;\n"
-      << "  std::optional<StmtKind> call_cast_kind(void) const;\n";
+      << "  std::optional<CastExpr> casted_return_value(void) const;\n";
   }
 
   class_os << "};\n\n";

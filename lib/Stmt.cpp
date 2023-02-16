@@ -41,21 +41,10 @@ gap::generator<Reference> Stmt::references(void) const {
 
 // Public methods for derived classes
 
-std::optional<Type> CallExpr::call_return_casted_type(void) const {
-  for (mx::Stmt stmt : mx::Stmt::containing(*this)) {
-    if (auto cast_expr = CastExpr::from(stmt); cast_expr) {
-      return cast_expr->type();
-    }
-  }
-  return std::nullopt;
-}
-
-// Get the implicit/explicit cast kind
-std::optional<StmtKind> CallExpr::call_cast_kind(void) const {
-  for (mx::Stmt stmt : mx::Stmt::containing(*this)) {
-    if (auto cast_expr = CastExpr::from(stmt); cast_expr) {
-      return stmt.kind();
-    }
+std::optional<CastExpr> CallExpr::casted_return_value(void) const {
+  auto cast_expr = CastExpr::containing(*this);
+  if (cast_expr && cast_expr->sub_expression() == *this) {
+    return cast_expr->value();
   }
   return std::nullopt;
 }
