@@ -15338,9 +15338,17 @@ LoopHintAttrLoopHintState LoopHintAttr::state(void) const {
   return static_cast<LoopHintAttrLoopHintState>(impl->reader.getVal15());
 }
 
-Expr LoopHintAttr::value(void) const {
-  RawEntityId eid = impl->reader.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+std::optional<Expr> LoopHintAttr::value(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal8();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr)));
+    }
+  }
+  return std::nullopt;
 }
 
 gap::generator<LoaderUninitializedAttr> LoaderUninitializedAttr::containing(const Token &tok) {

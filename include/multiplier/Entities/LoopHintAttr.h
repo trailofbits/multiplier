@@ -69,7 +69,7 @@ class LoopHintAttr : public Attr {
   LoopHintAttrOptionType option(void) const;
   LoopHintAttrSpelling semantic_spelling(void) const;
   LoopHintAttrLoopHintState state(void) const;
-  Expr value(void) const;
+  std::optional<Expr> value(void) const;
 };
 
 static_assert(sizeof(LoopHintAttr) == sizeof(Attr));

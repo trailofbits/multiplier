@@ -959,7 +959,13 @@ void SerializeLoopHintAttr(const EntityMapper &es, mx::ast::Attr::Builder b, con
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Option())));
   b.setVal14(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal15(static_cast<unsigned char>(mx::FromPasta(e.State())));
-  b.setVal8(es.EntityId(e.Value()));
+  auto v8 = e.Value();
+  if (v8) {
+    auto id8 = es.EntityId(v8.value());
+    b.setVal8(id8);
+  } else {
+    b.setVal8(mx::kInvalidEntityId);
+  }
 }
 
 void SerializeLoaderUninitializedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LoaderUninitializedAttr &e, const TokenTree *) {

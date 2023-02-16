@@ -7386,7 +7386,7 @@ MX_BEGIN_VISIT_ATTR(LoopHintAttr)
   MX_VISIT_ENUM(LoopHintAttr, option, 10, MX_APPLY_METHOD, Option, LoopHintAttrOptionType, NthAttr)
   MX_VISIT_ENUM(LoopHintAttr, semantic_spelling, 14, MX_APPLY_METHOD, SemanticSpelling, LoopHintAttrSpelling, NthAttr)
   MX_VISIT_ENUM(LoopHintAttr, state, 15, MX_APPLY_METHOD, State, LoopHintAttrLoopHintState, NthAttr)
-  MX_VISIT_ENTITY(LoopHintAttr, value, 8, MX_APPLY_METHOD, Value, Expr, NthAttr)
+  MX_VISIT_OPTIONAL_ENTITY(LoopHintAttr, value, 8, MX_APPLY_METHOD, Value, Expr, NthAttr)
   MX_EXIT_VISIT_LoopHintAttr
 MX_END_VISIT_ATTR(LoopHintAttr)
 
