@@ -769,11 +769,16 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
       query.Row().Columns(data); \
       query.Reset(); \
       \
-      return std::make_shared<type_name ## Impl>( \
-          self, \
-          Decompress(context->decompression_context, dict->dict[cat_index], \
-                     std::move(data)), \
-          raw_id); \
+      try { \
+        return std::make_shared<type_name ## Impl>( \
+            self, \
+            Decompress(context->decompression_context, dict->dict[cat_index], \
+                       std::move(data)), \
+            raw_id); \
+      } catch (...) { \
+        assert(false); \
+        return {}; \
+      } \
     } \
     \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
