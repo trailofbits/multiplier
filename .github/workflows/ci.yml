@@ -420,6 +420,8 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: true
     needs: [build-release]
+    # Indexing linux takes too long and eats up all our CI points, skip for now
+    if: false
     steps:
     - name: Install dependencies
       run: |
