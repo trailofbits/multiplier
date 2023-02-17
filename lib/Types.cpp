@@ -183,6 +183,14 @@ EntityId::EntityId(DeclId id) {
   }
 }
 
+std::optional<FragmentId> FragmentId::From(const EntityId &eid) {
+  if (auto frag_id = FragmentIdFromEntityId(eid.Pack())) {
+    return frag_id->Unpack();
+  } else {
+    return std::nullopt;
+  }
+}
+
 EntityId::EntityId(FileId id) {
   if (id.file_id) {
     PackedEntityId packed = {};

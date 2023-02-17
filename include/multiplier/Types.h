@@ -85,6 +85,8 @@ static constexpr uint64_t kNumTokensInBigFragment =
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;
 
+class EntityId;
+
 struct AttrId;
 struct DeclId;
 struct StmtId;
@@ -296,27 +298,29 @@ struct FragmentId {
       : fragment_id(fragment_id_) {}
 
   inline /* implicit */ FragmentId(const DeclId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const StmtId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const TypeId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const AttrId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const ParsedTokenId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const MacroTokenId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const MacroId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const TemplateArgumentId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const TemplateParameterListId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const CXXBaseSpecifierId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const DesignatorId &id_)
-    : fragment_id(id_.fragment_id) {}
+      : fragment_id(id_.fragment_id) {}
+
+  static std::optional<FragmentId> From(const EntityId &);
 };
 
 inline FileId::FileId(const FileTokenId &id_)

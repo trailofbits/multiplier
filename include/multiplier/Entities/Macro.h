@@ -30,6 +30,7 @@ class Macro;
 class MacroImpl;
 class Reference;
 class SourceIR;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
@@ -106,6 +107,7 @@ class Macro {
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;
   gap::generator<MacroOrToken> children(void) const &;
+  gap::generator<Token> tokens_covering_use(void) const &;
 };
 
 #endif

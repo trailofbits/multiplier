@@ -3396,7 +3396,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (class_name == "FunctionDecl") {
     forward_decls.insert("CallExpr");
     class_os
-      << "  gap::generator<CallExpr> callers(void) const &;\n";
+        << "  gap::generator<CallExpr> callers(void) const &;\n";
   }
 
   // Allows CallExpr to conveniently get post-cast types if exists
@@ -3404,8 +3404,17 @@ MethodListPtr CodeGenerator::RunOnClass(
     forward_decls.insert("Type");
     forward_decls.insert("CastExpr");
     class_os
-      << "  std::optional<Type> casted_return_type(void) const;\n"
-      << "  std::optional<CastExpr> casted_return_value(void) const;\n";
+        << "  std::optional<Type> casted_return_type(void) const;\n"
+        << "  std::optional<CastExpr> casted_return_value(void) const;\n";
+  }
+
+  // Allow macros to conveniently find the file tokens covering their uses, or
+  // their parent uses, etc. If this is a directive then this is just the file
+  // tokens.
+  if (class_name == "Macro") {
+    forward_decls.insert("Token");
+    class_os
+        << "  gap::generator<Token> tokens_covering_use(void) const &;\n";
   }
 
   class_os << "};\n\n";
@@ -3421,11 +3430,11 @@ MethodListPtr CodeGenerator::RunOnClass(
     os << "class " << fwd << ";\n";
   }
   os
-    << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
-    << class_os.str()
-    << late_class_os.str()
-    << "#endif\n"
-    << "} // namespace mx\n";
+      << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
+      << class_os.str()
+      << late_class_os.str()
+      << "#endif\n"
+      << "} // namespace mx\n";
 
   serialize_cpp_os << "}\n\n";
 

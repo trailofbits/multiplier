@@ -74,4 +74,28 @@ gap::generator<Reference> Macro::references(void) const & {
   }
 }
 
+namespace {
+
+static gap::generator<Token> GenerateTokens(const Macro &macro) {
+  for (mx::MacroOrToken use : macro.children()) {
+    if (std::holds_alternative<mx::Token>(use)) {
+      co_yield std::get<Token>(use);
+    } else if (std::holds_alternative<Macro>(use)) {
+      for (auto tok : GenerateTokens(std::get<Macro>(use))) {
+        co_yield tok;
+      }
+    }
+  }
+}
+
+}  // namespace
+
+gap::generator<Token> Macro::tokens_covering_use(void) const & {
+  if (auto p = parent()) {
+    return p->tokens_covering_use();
+  } else {
+    return GenerateTokens(*this);
+  }
+}
+
 }  // namespace mx

@@ -56,6 +56,11 @@ class TokenReader {
   // Returns `true` if `this` is logically equivalent to `that`.
   virtual bool Equals(const TokenReader *that) const = 0;
 
+  // Returns `true` if `this` is logically equivalent to `that`.
+  inline bool Equals(const std::shared_ptr<const TokenReader> &that) const {
+    return Equals(that.get());
+  }
+
   static Ptr ReaderForToken(const Ptr &self, const EntityProvider::Ptr &ep,
                             EntityId eid);
 

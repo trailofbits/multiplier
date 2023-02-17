@@ -115,6 +115,11 @@ class Reference {
     return !kind_id;
   }
 
+  // The ID of the referenced entity.
+  inline EntityId referenced_entity_id(void) const noexcept {
+    return eid;
+  }
+
   // Return the kind of this reference.
   ReferenceKind kind(void) const noexcept;
 

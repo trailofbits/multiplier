@@ -55,6 +55,9 @@ extern "C" int main(int argc, char *argv[]) {
     std::cout << "\n\n\nParsed data from token range:\n";
     std::cout << fragment->parsed_tokens().data();
 
+    std::cout << "\n\n\nFile data from parsed token range:\n";
+    std::cout << fragment->parsed_tokens().file_tokens().data();
+
     std::cout << "\n\nFile data from tokens:\n";
     for (mx::Token token : fragment->file_tokens()) {
       std::cout << token.data();

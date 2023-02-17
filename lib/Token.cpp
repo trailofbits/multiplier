@@ -13,6 +13,7 @@
 #include <multiplier/Entities/DeclKind.h>
 #include <multiplier/Entities/ImplicitParamDecl.h>
 #include <multiplier/Entities/MacroKind.h>
+#include <multiplier/Entities/MacroSubstitution.h>
 #include <multiplier/Entities/ObjCMethodDecl.h>
 #include <multiplier/Entities/TagDecl.h>
 #include <multiplier/Entities/TagTypeKind.h>
@@ -1040,6 +1041,74 @@ std::string_view TokenRange::data(void) const & {
   return std::string_view(data_begin.data(), size);
 }
 
+namespace {
+
+static Token LogicalFileLocation(Macro macro, RawEntityId prev_entity,
+                                 bool first) {
+
+  auto is_in_expansion = true;
+  while (is_in_expansion) {
+
+    // If `macro` is a substitution, then check that its replacement children
+    // contains `prev_entity`.
+    if (auto sub = MacroSubstitution::from(macro)) {
+      is_in_expansion = false;
+      for (MacroOrToken child : sub->replacement_children()) {
+        if (std::holds_alternative<Macro>(child)) {
+          if (std::get<Macro>(child).id().Pack() == prev_entity) {
+            is_in_expansion = true;
+            break;
+          }
+        } else if (std::holds_alternative<Token>(child)) {
+          if (std::get<Token>(child).id().Pack() == prev_entity) {
+            is_in_expansion = true;
+            break;
+          }
+        }
+      }
+    }
+
+    // Set the current macro to be the previous entity. This macro might be
+    // insdie of another expansion.
+    prev_entity = macro.id().Pack();
+
+    // Go to the parent.
+    if (std::optional<Macro> parent = macro.parent()) {
+      macro = std::move(parent.value());
+    } else {
+      break;
+    }
+  }
+
+  // If it's not in an expansion, then we can rely on the token reader to
+  // find the file location.
+  if (!is_in_expansion) {
+    return Token();
+  }
+
+  // If it was in an expansion, then go find the first file token in the range.
+  if (first) {
+    for (Token tok : macro.tokens_covering_use()) {
+      if (Token file_tok = tok.file_token()) {
+        return file_tok;
+      }
+    }
+
+    return Token();
+  }
+
+  // If it was in an expansion, then go find the last file token in the range.
+  Token last;
+  for (Token tok : macro.tokens_covering_use()) {
+    if (Token file_tok = tok.file_token()) {
+      last = std::move(file_tok);
+    }
+  }
+  return last;
+}
+
+}  // namespace
+
 // Convert this token range into a file token range.
 TokenRange TokenRange::file_tokens(void) const noexcept {
   TokenRange ret;
@@ -1052,64 +1121,68 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     return *this;
   }
 
-  RawEntityId file_id = kInvalidEntityId;
+  const FragmentImpl * const frag = impl->OwningFragment();
+  if (!frag) {
+    return TokenRange();
+  }
 
-  // Find the nearest file token for the first token.
-  for (auto i = 0u; i <= index; ++i) {
-    EntityId eid(impl->NthFileTokenId(index - i));
-    VariantId vid = eid.Unpack();
-    if (std::holds_alternative<FileTokenId>(vid)) {
-      FileTokenId fid = std::get<FileTokenId>(vid);
-      if (auto fr = impl->ReaderForToken(impl, eid.Pack())) {
-        ret.impl = std::move(fr);
-        ret.index = fid.offset;
-        file_id = fid.file_id;
-        break;
-      }
+  VariantId begin_vid = impl->NthTokenId(index).Unpack();
+  VariantId end_vid = impl->NthTokenId(num_tokens - 1u).Unpack();
+  assert(!std::holds_alternative<ParsedTokenId>(begin_vid) ==
+         !std::holds_alternative<ParsedTokenId>(end_vid));
+
+  // If we're dealing with a parsed token range, then when we convert it to
+  // a file token range, we need to account for the fact that some of the parsed
+  // tokens might be inside of a macro expansion, and so we need to find the
+  // use of the macro expansion.
+
+  Token first_tok;
+  Token last_tok;
+
+  if (std::holds_alternative<ParsedTokenId>(begin_vid)) {
+    auto macro_tok_id = impl->NthDerivedTokenId(index).Pack();
+    for (Macro macro : Macro::containing(front())) {
+      first_tok = LogicalFileLocation(std::move(macro), macro_tok_id, true);
+      goto have_first_tok;
     }
   }
 
-  if (file_id == kInvalidEntityId) {
-    return ret;
-  }
+  first_tok = front().file_token();
 
-  // Hope for an exact match with the last token in the range.
-  if (EntityId last_fid = impl->NthFileTokenId(num_tokens - 1u);
-      last_fid != EntityId{}) {
-    VariantId vid = last_fid.Unpack();
-    if (std::holds_alternative<FileTokenId>(vid)) {
-      FileTokenId fid = std::get<FileTokenId>(vid);
-      if (fid.file_id == file_id) {
-        ret.num_tokens = std::max(ret.index, fid.offset) + 1u;
-        ret.index = std::min(ret.index, fid.offset);
-        return ret;
-      }
+have_first_tok:
+  if (std::holds_alternative<ParsedTokenId>(end_vid)) {
+    auto macro_tok_id = impl->NthDerivedTokenId(num_tokens - 1u).Pack();
+    for (Macro macro : Macro::containing(back())) {
+      last_tok = LogicalFileLocation(std::move(macro), macro_tok_id, false);
+      goto have_last_tok;
     }
   }
 
-  // Try to find the file token for one-past-the-end of this token range, then
-  // we'll take the file token from before that. Failing that, we'll need to
-  // match up on the exact token, then mark the num tokens as that token's
-  // offset plus one.
-  auto offset_shift = 0u;
-  for (auto i = 0u; i <= num_tokens; ++i) {
-    VariantId vid = impl->NthFileTokenId(num_tokens - i).Unpack();
-    if (std::holds_alternative<FileTokenId>(vid)) {
-      FileTokenId fid = std::get<FileTokenId>(vid);
-      if (fid.file_id == file_id) {
-        if (fid.offset >= ret.index) {
-          ret.num_tokens = fid.offset + offset_shift;
-          return ret;
-        } else {
-          break;  // TODO(pag): Come up with a better thing.
-        }
-      }
-    }
-    offset_shift = 1u;
+  last_tok = back().file_token();
+
+have_last_tok:
+
+  const bool has_first = first_tok;
+  const bool has_last = last_tok;
+
+  if (has_first && !has_last) {
+    ret.impl = std::move(first_tok.impl);
+    ret.index = first_tok.offset;
+    ret.num_tokens = first_tok.offset + 1u;
+
+  } else if (!has_first && has_last) {
+    ret.impl = std::move(last_tok.impl);
+    ret.index = last_tok.offset;
+    ret.num_tokens = last_tok.offset + 1u;
+
+  } else if (has_first && has_last &&
+             first_tok.impl->Equals(last_tok.impl) &&
+             first_tok.offset <= last_tok.offset) {
+    ret.impl = std::move(first_tok.impl);
+    ret.index = first_tok.offset;
+    ret.num_tokens = last_tok.offset + 1u;
   }
 
-  // Worst case, the range of the only token :-/
-  ret.num_tokens = ret.index + 1u;
   return ret;
 }
 
