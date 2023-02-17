@@ -271,9 +271,13 @@ bool Parser::ParseCompileCommandsJSON(std::string_view file_name,
                                       const EnvVariableMap &envp) {
   auto ret = true;
   if (auto arr = json.getAsArray()) {
-    for (auto &val : *arr) {
-      if (auto obj = val.getAsObject()) {
-        ret = importer.ImportCMakeCompileCommand(*obj, envp) && ret;
+    for (llvm::json::Value &val : *arr) {
+      if (llvm::json::Object *obj = val.getAsObject()) {
+        if (obj->getString("wrapped_tool")) {
+          ret = importer.ImportBlightCompileCommand(*obj) && ret;
+        } else {
+          ret = importer.ImportCMakeCompileCommand(*obj, envp) && ret;
+        }
       } else {
         DLOG(ERROR)
             << "Entry in top-level array of JSON file is not an object";

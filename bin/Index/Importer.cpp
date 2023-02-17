@@ -504,20 +504,22 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   auto wrapped_tool = o.getString("wrapped_tool");
   auto cwd = o.getString("cwd");
   auto args = o.getArray("args");
-  auto hash = o.getString("hash");
   auto lang = o.getString("lang");  // `C`, `Cxx`, `Unknown`.
   auto env = o.getObject("env");
 
-  if (!wrapped_tool || !cwd || !args || args->empty() || !hash || !lang ||
-      !env) {
+  if (!wrapped_tool || !cwd || !args || args->empty() || !env) {
     return false;
   }
 
   std::vector<std::string> args_vec;
   args_vec.emplace_back(wrapped_tool->str());
 
-  for (auto arg : *args) {
+  auto bundle = false;
+  for (llvm::json::Value &arg : *args) {
     if (auto arg_str = arg.getAsString()) {
+      if (arg_str->equals("-bundle")) {
+        bundle = true;
+      }
       args_vec.emplace_back(arg_str->str());
     } else {
       return false;
@@ -540,13 +542,38 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
     cwd_str = d->cwd.generic_string();
   }
 
-  auto &command = d->commands[cwd_str].emplace_back(args_vec);
+  Command &command = d->commands[cwd_str].emplace_back(args_vec);
   command.working_dir = cwd_str;
-  command.compiler_hash = hash->str();
   command.env = std::move(envp);
+
+  if (bundle) {
+    LOG(WARNING)
+        << "Skipping bundle command: "
+        << command.vec.Join();
+    d->commands[cwd_str].pop_back();
+    return true;
+  }
+
+  if (!lang || lang->equals_insensitive("unknown")) {
+    LOG(WARNING)
+        << "Skipping command with unknown language: "
+        << command.vec.Join();
+    d->commands[cwd_str].pop_back();
+    return true;
+  }
+
   if (lang->equals_insensitive("c++") || lang->equals_insensitive("cxx")) {
     command.lang = pasta::TargetLanguage::kCXX;
   }
+
+  // Compiler hash.
+  if (auto hash = o.getString("hash")) {
+    command.compiler_hash = hash->str();
+
+  } else {
+    command.compiler_hash = command.vec.Join();
+  }
+
   return true;
 }
 
