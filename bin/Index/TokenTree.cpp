@@ -1098,6 +1098,9 @@ Substitution *TokenTreeImpl::MergeArguments(
   // If at least one of the original argument nodes is a substitution, then
   // create a before/after substitution.
   if (!orig_is_simple) {
+
+    D( std::cerr << indent << "  Argument isn't simple, using substitution.\n"; )
+
     Substitution::NodeList new_nodes;
     new_nodes.prev = sub->before.prev;
     new_nodes.next = sub->before.next;
@@ -1112,6 +1115,13 @@ Substitution *TokenTreeImpl::MergeArguments(
     new_nodes.emplace_back(new_arg_sub);
 
     sub->before = std::move(new_nodes);
+
+  // Use `pre_exp` because the original is simple, and so the pre-expansion
+  // is either simple or not, so whatever it is is more desirable.
+  } else {
+    sub->before.swap(pre_exp->before);
+    sub->after.swap(pre_exp->after);
+    FixupNodeParents(sub);
   }
 
   pre_exp->before.clear();
@@ -1332,6 +1342,8 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
   if (body) {
     return body;
   }
+
+  D( indent += "  "; )
 
   auto maybe_name = def.Name();
   if (!maybe_name) {
