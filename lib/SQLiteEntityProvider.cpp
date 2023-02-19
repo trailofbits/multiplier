@@ -247,9 +247,10 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
       get_references(db.Prepare(
           "SELECT DISTINCT(r.from_entity_id), r.kind_id "
           "FROM reference AS r "
-          "JOIN " + entity_id_list + " AS l "
-          "ON r.to_entity_id = l.entity_id "
           "WHERE r.from_entity_id > ?1 "
+          "  AND r.to_entity_id IN (SELECT l.entity_id "
+          "                         FROM " + entity_id_list + " AS l "
+          "                         ORDER BY l.entity_id ASC) "
           "ORDER BY r.from_entity_id ASC "
           "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
 

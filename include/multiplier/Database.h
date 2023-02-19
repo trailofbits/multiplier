@@ -254,7 +254,7 @@ struct ReferenceRecord {
             from_entity_id INTEGER NOT NULL,
             to_entity_id INTEGER NOT NULL,
             kind_id INTEGER NOT NULL,
-            PRIMARY KEY(from_entity_id, to_entity_id, kind_id)
+            PRIMARY KEY(to_entity_id ASC, from_entity_id ASC, kind_id)
           ) WITHOUT ROWID)",
 
        R"(CREATE TABLE IF NOT EXISTS reference_kind (
@@ -262,10 +262,7 @@ struct ReferenceRecord {
           ))",
 
        R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
-          VALUES (0, "Explicit code reference"))",
-
-       R"(CREATE INDEX IF NOT EXISTS references_by_target
-          ON reference(to_entity_id, from_entity_id))"};
+          VALUES (0, "Explicit code reference"))"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
