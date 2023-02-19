@@ -48,7 +48,7 @@ struct FilePathRecord {
       "INSERT OR IGNORE INTO file_path (file_id, path) VALUES (?1, ?2)";
 
   PackedFileId file_id;
-  std::filesystem::path path;
+  std::string path;
 };
 
 // Maps a file id to the file's serialized data.
@@ -375,7 +375,8 @@ class DatabaseWriter final {
 
   ~DatabaseWriter(void);
 
-  explicit DatabaseWriter(std::filesystem::path db_path);
+  explicit DatabaseWriter(std::filesystem::path db_path,
+                          size_t max_queue_size_in_bytes);
 
   // Schedule all outstanding asynchronous writes to be flushed. This operation
   // is itself asynchronous, and when it returns, there are no guarantees that

@@ -56,6 +56,8 @@ DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level decl
 
 DEFINE_bool(attach, false, "Print out the process ID for attaching gdb/lldb.");
 
+DEFINE_string(max_queue_size, "4G", "The maximum queue size. Use a K suffix for KiB, M suffix for MiB, or a G suffix for GiB.");
+
 namespace {
 
 std::unique_ptr<llvm::MemoryBuffer>
@@ -104,6 +106,40 @@ static void ClearEnvironmentVars(char *envp[]) {
   }
 }
 
+// Parse our queue size specifier.
+static std::optional<size_t> ParseQueueSize(void) {
+  if (FLAGS_max_queue_size.empty()) {
+    return std::nullopt;
+  }
+
+  size_t base = ~0ull;
+  char scale = '\0';
+  std::stringstream ss;
+  ss << FLAGS_max_queue_size;
+  ss >> base >> scale;
+
+  if (!base || base == ~0ull) {
+    return std::nullopt;
+  }
+
+  switch (scale) {
+    case 'b':
+    case 'B':
+      return base;
+    case 'k':
+    case 'K':
+      return base << 10u;
+    case 'm':
+    case 'M':
+      return base << 20u;
+    case 'g':
+    case 'G':
+      return base << 30u;
+    default:
+      return std::nullopt;
+  }
+}
+
 }  // namespace
 
 extern "C" int main(int argc, char *argv[], char *envp[]) {
@@ -142,6 +178,13 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     return EXIT_FAILURE;
   }
 
+  auto queue_size = ParseQueueSize();
+  if (!queue_size) {
+    std::cerr
+        << "Must specify a queue size with a suffix of B, K, M, or G.";
+    return EXIT_FAILURE;
+  }
+
   indexer::ExecutorOptions command_exe_options;
   indexer::ExecutorOptions indexer_exe_options;
 
@@ -156,7 +199,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   indexer_exe_options.num_workers = FLAGS_num_indexer_workers;
 
   indexer::Executor executor(indexer_exe_options);
-  mx::DatabaseWriter database(FLAGS_db);
+  mx::DatabaseWriter database(FLAGS_db, *queue_size);
   auto ic = std::make_shared<indexer::GlobalIndexingState>(database, executor);
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);

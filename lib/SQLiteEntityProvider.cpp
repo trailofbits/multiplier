@@ -706,7 +706,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
     do {
 
       // (Re)do the join to get the next page of entity references.
-      list_ids.BindValues(symbol, lower_bound);
+      list_ids.BindValuesWithoutCopying(symbol, lower_bound);
       while (list_ids.ExecuteStep()) {
         found = true;
         RawEntityId found_id = kInvalidEntityId;

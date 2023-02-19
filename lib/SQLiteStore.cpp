@@ -255,53 +255,47 @@ QueryResult Statement::Row(void) {
   return QueryResult(impl);
 }
 
-void Statement::bind(const size_t i, const int32_t &value) {
+void Statement::bind(size_t i, int32_t value) {
   sqlite3_bind_int(impl.get(), static_cast<int>(i + 1), value);
 }
 
-void Statement::bind(const size_t i, const uint32_t &value) {
+void Statement::bind(size_t i, uint32_t value) {
   sqlite3_bind_int(impl.get(), static_cast<int>(i + 1),
                    static_cast<int32_t>(value));
 }
 
-void Statement::bind(const size_t i, const int64_t &value) {
+void Statement::bind(size_t i, int64_t value) {
   sqlite3_bind_int64(impl.get(), static_cast<int>(i + 1), value);
 }
 
-void Statement::bind(const size_t i, const uint64_t &value) {
+void Statement::bind(size_t i, uint64_t value) {
   sqlite3_bind_int64(impl.get(), static_cast<int>(i + 1),
                      static_cast<int64_t>(value));
 }
 
-void Statement::bind(const size_t i, const double &value) {
+void Statement::bind(size_t i, double value) {
   sqlite3_bind_double(impl.get(), static_cast<int>(i + 1), value);
 }
 
-void Statement::bind(const size_t i, const std::nullptr_t &) {
+void Statement::bind(size_t i, std::nullptr_t) {
   sqlite3_bind_null(impl.get(), static_cast<int>(i + 1));
 }
 
-void Statement::bind(const size_t i, const std::nullopt_t &) {
+void Statement::bind(size_t i, std::nullopt_t) {
   sqlite3_bind_null(impl.get(), static_cast<int>(i + 1));
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 
-void Statement::bind(const size_t i, const char *&value) {
-  sqlite3_bind_text64(impl.get(), static_cast<int>(i + 1),
-                      value, strlen(value), SQLITE_TRANSIENT,
-                      SQLITE_UTF8);
-}
-
-void Statement::bind(const size_t i, const std::string &value) {
+void Statement::bind(size_t i, std::string_view value) {
   sqlite3_bind_blob64(impl.get(), static_cast<int>(i + 1),
                       value.data(), value.size(), SQLITE_TRANSIENT);
 }
 
-void Statement::bind(const size_t i, const std::string_view &value) {
+void Statement::bind_nocopy(size_t i, const std::string_view &value) {
   sqlite3_bind_blob64(impl.get(), static_cast<int>(i + 1),
-                      value.data(), value.size(), SQLITE_TRANSIENT);
+                      value.data(), value.size(), SQLITE_STATIC);
 }
 
 #pragma GCC diagnostic pop

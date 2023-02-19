@@ -201,9 +201,10 @@ void GlobalIndexingState::PersistFile(
   }
 
   // Add it to the database.
+  auto fp = file_path.lexically_normal().generic_string();
   database.AddAsync(
-      mx::FilePathRecord{file_id, file_path},
-      mx::NamedEntityRecord{file_id.Pack(), file_path.generic_string()},
+      mx::FilePathRecord{file_id, fp},
+      mx::NamedEntityRecord{file_id.Pack(), fp},
       mx::EntityRecord{file_id.Pack(), GetSerializedData(message)});
 }
 

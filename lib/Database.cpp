@@ -56,14 +56,20 @@ static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
 
 #define MX_RECORD_VARIANT_ENTRY(name) , name
 
+struct PushbackSignal {};
 struct ExitSignal {};
 struct FlushSignal {};
 using QueueItem = std::variant<
-    std::monostate, ExitSignal, FlushSignal, EntityRecord
+    std::monostate, ExitSignal, FlushSignal, PushbackSignal, EntityRecord
     MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_RECORD_VARIANT_ENTRY) >;
 #undef MX_RECORD_VARIANT_ENTRY
 
 using Queue = moodycamel::BlockingConcurrentQueue<QueueItem>;
+
+class Semaphore : public moodycamel::LightweightSemaphore {
+ public:
+  using moodycamel::LightweightSemaphore::LightweightSemaphore;
+};
 
 // Thread-local database connection.
 class WriterThreadState {
@@ -188,14 +194,16 @@ class BulkInserterState {
 
 #define MX_DECLARE_INSERT_STMT(record) \
     sqlite::Statement INSERT_INTO_ ## record; \
-    void DoInsertAsync(record r) { \
-      if (InsertAsync(std::move(r), INSERT_INTO_ ## record)) { \
+    void DoInsertAsync(const record &r) { \
+      if (InsertAsync(r, INSERT_INTO_ ## record)) { \
         INSERT_INTO_ ## record.Execute(); \
       } else { \
         INSERT_INTO_ ## record.Reset(); \
       } \
     } \
-    bool InsertAsync(record, sqlite::Statement &);
+    bool InsertAsync(const record &, sqlite::Statement &); \
+    static size_t SizeOfRecord(const record &r);
+
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
   MX_DECLARE_INSERT_STMT(EntityRecord)
 #undef MX_DECLARE_INSERT_STMT
@@ -276,6 +284,9 @@ void DictionaryContext::ReleaseContext(std::pair<ZSTD_CCtx *, size_t> c) {
   contexts[c.second].store(c.first, std::memory_order_release);
 }
 
+}  // namespace
+
+
 struct DictionaryCompressor {
 
   // The ZSTD dictionary to use to compress an entity record. If this contains
@@ -306,22 +317,107 @@ struct DictionaryCompressor {
 
   // Build the dictionary if it hasn't yet been built. This will enqueue any
   // pending records to `queue`.
-  void Build(Queue &queue, DictionaryContext &context,
+  void Build(DatabaseWriterImpl &impl, DictionaryContext &context,
              std::unique_lock<std::mutex> locker);
 
   // Add `record`, either as a pending item for training a dictionary, or passed
   // through to `CompressAndAdd`.
-  void Add(Queue &queue, DictionaryContext &context, EntityRecord record);
+  void Add(DatabaseWriterImpl &impl, DictionaryContext &context,
+           EntityRecord record);
 
-  void CompressAndAdd(Queue &queue, DictionaryContext &context,
+  void CompressAndAdd(DatabaseWriterImpl &impl, DictionaryContext &context,
                       EntityRecord record, ZSTD_CDict *d);
 
-  void CompressAndAdd(Queue &queue, DictionaryContext &context,
+  void CompressAndAdd(DatabaseWriterImpl &impl, DictionaryContext &context,
                       RawEntityId id, const void *data,
                       size_t data_size, ZSTD_CDict *d);
 
-  void CompressAndAdd(Queue &queue, RawEntityId id, const void *data,
+  void CompressAndAdd(DatabaseWriterImpl &impl, RawEntityId id,
+                      const void *data,
                       size_t data_size, ZSTD_CDict *d, ZSTD_CCtx *context);
+};
+
+class DatabaseWriterImpl {
+ public:
+  const std::filesystem::path db_path;
+
+  // Maximum size in bytes of the writer queue.
+  const size_t max_queue_size_in_bytes;
+
+  // Semaphore to wake up a blocked writer thread.
+  Semaphore pushback_signal;
+
+  // The connection used on construction.
+  sqlite::Connection db;
+
+  // Add some version info to the database. The number of records in the
+  // versions table tells us whether or not we're currently indexing.
+  sqlite::Statement add_version;
+
+  // Get the latest copies of file and fragment ids.
+  sqlite::Statement get_ids;
+
+  // Update the metadata.
+  sqlite::Statement update_meta_stmt;
+
+  // Per-thread connection state with the database.
+  ThreadLocal<WriterThreadState> thread_state;
+
+  // The next file ID that can be assigned. This represents an upper bound on
+  // the total number of file IDs.
+  std::atomic<RawEntityId> next_file_index;
+
+  // The next ID for a "small fragment." A small fragment has fewer than
+  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
+  // are more common, and require fewer bits to encode token offsets inside of
+  // the packed `mx::EntityId` for tokens.
+  std::atomic<RawEntityId> next_small_fragment_index;
+
+  // The next ID for a "big fragment." A big fragment has at least
+  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
+  // are less common, so we reserve space for fewer of them (typically there is
+  // a maximum of 2^16 big fragments allowed). Big fragments require more bits
+  // to represent token offsets inside of the packed `mx::EntityId` for tokens,
+  // but because we reserve the low ID space for big fragment IDs, we know that
+  // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
+  // bit for token offset bits.
+  std::atomic<RawEntityId> next_big_fragment_index;
+
+  // Entity-specific compression dictionaries.
+  DictionaryContext dictionary_context;
+  std::array<DictionaryCompressor, kNumEntityCategories> entity_dictionaries;
+
+  // Number of rows pending insertion.
+  std::atomic<size_t> num_total_rows;
+
+  // A thread and it's multiple-producer, single-consumer.
+  Queue insertion_queue;
+  std::thread bulk_insertion_thread;
+
+  // Number of bytes that in the queue, and number that are in-flight.
+  std::atomic<size_t> pending_bytes;
+
+  DatabaseWriterImpl(const std::filesystem::path &db_path_,
+                     size_t max_queue_size_in_bytes_);
+  ~DatabaseWriterImpl(void);
+
+  void BulkInserter(void);
+
+  void InitDictionaries(void);
+  void ExitDictionaries(void);
+
+  void InitMetadata(void);
+  void ExitMetadata(void);
+
+  void InitRecords(void);
+  void ExitRecords(void);
+
+#define MX_DECLARE_INSERT_STMT(record) \
+    void DoAddAsync(record r);
+
+  MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
+  MX_DECLARE_INSERT_STMT(EntityRecord)
+#undef MX_DECLARE_INSERT_STMT
 };
 
 DictionaryCompressor::DictionaryCompressor(void)
@@ -346,8 +442,8 @@ void DictionaryCompressor::InitWithoutDictionary(void) {
 }
 
 void DictionaryCompressor::CompressAndAdd(
-    Queue &queue, RawEntityId id, const void *data, size_t data_size,
-    ZSTD_CDict *d, ZSTD_CCtx *context) {
+    DatabaseWriterImpl &impl, RawEntityId id, const void *data,
+    size_t data_size, ZSTD_CDict *d, ZSTD_CCtx *context) {
 
   EntityRecord record;
   record.id = id;
@@ -366,32 +462,34 @@ void DictionaryCompressor::CompressAndAdd(
 
   // Swap the uncompressed data with the compressed data, and add it to the
   // bulk insertion queue.
-  queue.enqueue(std::move(record));
+  impl.DoAddAsync(std::move(record));
 }
 
 void DictionaryCompressor::CompressAndAdd(
-    Queue &queue, DictionaryContext &context, RawEntityId id,
+    DatabaseWriterImpl &impl, DictionaryContext &context, RawEntityId id,
     const void *data, size_t data_size, ZSTD_CDict *d) {
   auto context_and_index = context.AcquireContext();
-  CompressAndAdd(queue, id, data, data_size, d, context_and_index.first);
+  CompressAndAdd(impl, id, data, data_size, d, context_and_index.first);
   context.ReleaseContext(context_and_index);
 }
 
 // Compress the data from `record`, then add it to our insertion queue.
 void DictionaryCompressor::CompressAndAdd(
-    Queue &queue, DictionaryContext &context, EntityRecord record,
+    DatabaseWriterImpl &impl, DictionaryContext &context, EntityRecord record,
     ZSTD_CDict *d) {
-  CompressAndAdd(queue, context, record.id, record.data.data(), record.data.size(), d);
+  CompressAndAdd(impl, context, record.id, record.data.data(),
+                 record.data.size(), d);
 }
 
 // Add `record`, either as a pending item for training a dictionary, or passed
 // through to `CompressAndAdd`.
-void DictionaryCompressor::Add(Queue &queue, DictionaryContext &context,
+void DictionaryCompressor::Add(DatabaseWriterImpl &impl,
+                               DictionaryContext &context,
                                EntityRecord record) {
 
   // If we already have a dictionary, then use it.
   if (ZSTD_CDict *d = dict.load(std::memory_order_acquire)) {
-    CompressAndAdd(queue, context, std::move(record), d);
+    CompressAndAdd(impl, context, std::move(record), d);
     return;
   }
 
@@ -401,7 +499,7 @@ void DictionaryCompressor::Add(Queue &queue, DictionaryContext &context,
   // time that it took to acquire the lock, then use it to add the record.
   if (ZSTD_CDict *d = dict.load(std::memory_order_relaxed)) {
     locker.unlock();
-    CompressAndAdd(queue, context, std::move(record), d);
+    CompressAndAdd(impl, context, std::move(record), d);
     return;
   }
 
@@ -417,12 +515,13 @@ void DictionaryCompressor::Add(Queue &queue, DictionaryContext &context,
     return;
   }
 
-  Build(queue, context, std::move(locker));
+  Build(impl, context, std::move(locker));
 }
 
 // Build the dictionary if it hasn't yet been built. This will enqueue any
 // pending records to `queue`.
-void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context,
+void DictionaryCompressor::Build(DatabaseWriterImpl &impl,
+                                 DictionaryContext &context,
                                  std::unique_lock<std::mutex> locker) {
 
   if (dict.load(std::memory_order_relaxed)) {
@@ -483,11 +582,11 @@ void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context,
         ZSTD_maxCLevel());
   }
 
-  // Persist the dictionary.
-  queue.enqueue(std::move(dictionary));
-
   dict.store(compression_dict, std::memory_order_release);
   locker.unlock();
+
+  // Persist the dictionary.
+  impl.DoAddAsync(std::move(dictionary));
 
   // Now use it locally.
   auto context_and_index = context.AcquireContext();
@@ -496,7 +595,7 @@ void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context,
   for (auto i = 0u; i < num_records; ++i) {
     auto record_id = entity_ids[i];
     auto record_data_size = data_sizes[i];
-    CompressAndAdd(queue, record_id, record_data, record_data_size,
+    CompressAndAdd(impl, record_id, record_data, record_data_size,
                    compression_dict, context_and_index.first);
     record_data = &(record_data[record_data_size]);
   }
@@ -508,74 +607,6 @@ void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context,
   std::vector<size_t>().swap(data_sizes);
   std::string().swap(training_data);
 }
-
-}  // namespace
-
-class DatabaseWriterImpl {
- public:
-  const std::filesystem::path db_path;
-
-  // The connection used on construction.
-  sqlite::Connection db;
-
-  // Add some version info to the database. The number of records in the
-  // versions table tells us whether or not we're currently indexing.
-  sqlite::Statement add_version;
-
-  // Get the latest copies of file and fragment ids.
-  sqlite::Statement get_ids;
-
-  // Update the metadata.
-  sqlite::Statement update_meta_stmt;
-
-  // Per-thread connection state with the database.
-  ThreadLocal<WriterThreadState> thread_state;
-
-  // The next file ID that can be assigned. This represents an upper bound on
-  // the total number of file IDs.
-  std::atomic<RawEntityId> next_file_index;
-
-  // The next ID for a "small fragment." A small fragment has fewer than
-  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
-  // are more common, and require fewer bits to encode token offsets inside of
-  // the packed `mx::EntityId` for tokens.
-  std::atomic<RawEntityId> next_small_fragment_index;
-
-  // The next ID for a "big fragment." A big fragment has at least
-  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
-  // are less common, so we reserve space for fewer of them (typically there is
-  // a maximum of 2^16 big fragments allowed). Big fragments require more bits
-  // to represent token offsets inside of the packed `mx::EntityId` for tokens,
-  // but because we reserve the low ID space for big fragment IDs, we know that
-  // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
-  // bit for token offset bits.
-  std::atomic<RawEntityId> next_big_fragment_index;
-
-  // Entity-specific compression dictionaries.
-  DictionaryContext dictionary_context;
-  std::array<DictionaryCompressor, kNumEntityCategories> entity_dictionaries;
-
-  // Number of rows pending insertion.
-  std::atomic<size_t> num_pending_rows;
-
-  // A thread and it's multiple-producer, single-consumer.
-  Queue insertion_queue;
-  std::thread bulk_insertion_thread;
-
-  DatabaseWriterImpl(const std::filesystem::path &db_path);
-  ~DatabaseWriterImpl(void);
-
-  void BulkInserter(void);
-
-  void InitDictionaries(void);
-  void ExitDictionaries(void);
-
-  void InitMetadata(void);
-  void ExitMetadata(void);
-
-  void InitRecords(void);
-  void ExitRecords(void);
-};
 
 void DatabaseWriterImpl::ExitMetadata(void) {
   add_version.BindValues(0u);
@@ -621,7 +652,7 @@ void DatabaseWriterImpl::InitDictionaries(void) {
 void DatabaseWriterImpl::ExitDictionaries(void) {
   for (auto i = 1u; i < kNumEntityCategories; ++i) {
     DictionaryCompressor &dict = entity_dictionaries[i];
-    dict.Build(insertion_queue, dictionary_context,
+    dict.Build(*this, dictionary_context,
                std::unique_lock<std::mutex>(dict.lock));
   }
 }
@@ -680,21 +711,61 @@ void DatabaseWriterImpl::BulkInserter(void) {
   bool should_exit{false};
   bool should_flush{false};
   size_t num_added_rows = 0u;
+  size_t num_in_flight_bytes = 0u;
+  ssize_t num_pushbacks = 0;
 
-  for (; !should_exit || num_added_rows < num_pending_rows.load();
-      should_flush = false) {
+  std::vector<QueueItem> pending_items;
+  std::vector<Semaphore *> pushback_signals;
 
-    QueueItem item;
+  for (; !should_exit || num_added_rows < num_total_rows.load();
+       should_flush = false) {
+
+//    std::cerr
+//        << "should_exit=" << should_exit << " num_added_rows="
+//        << num_added_rows << " num_total_rows=" << num_total_rows.load()
+//        << " num_in_flight_bytes=" << num_in_flight_bytes
+//        << " num_pushbacks=" << num_pushbacks << '\n';
+
+    // Get rid of the last transaction's data.
+    pending_items.clear();
+    pending_bytes.fetch_sub(num_in_flight_bytes);
+    num_in_flight_bytes = 0u;
+
+    // Signal blocked threads that they can wake up now. They wait until a
+    // timeout is reached, or until the write queue is empty.
+    //
+    // TODO(pag): There is a race condition where the `signal` might execute
+    //            prior to the `wait`. The issue is that the writer adds a
+    //            `PushbackSignal` to our queue, then the writer `wait`s on
+    //            `pushback_signal`. The writer could be interrupted prior to
+    //            the `wait`, and the signal here could be sent out prior to
+    //            the writer resuming its execution. To try to mitigate this,
+    //            we have a 10s timed wait in the writer, and then the writer
+    //            wakes up. That might result in other problems, where there
+    //            are more signals than waits.. but I don't have a good solution
+    //            for this.
+    if (num_pushbacks &&
+        (num_added_rows + kMaxTransactionSize) >= num_total_rows.load()) {
+      pushback_signal.signal(num_pushbacks);
+      num_pushbacks = 0;
+    }
 
     // Go get the first thing.
-    insertion_queue.wait_dequeue(item);
+    QueueItem item;
+    if (!insertion_queue.wait_dequeue_timed(item, 10 * 1000)) {
+      continue;
+    }
 
     sqlite::Transaction transaction(async.db);
     size_t transaction_size = 0u;
 
     do {
+
+      // Keep the data alive as long as this transaction is alive.
+      const QueueItem &saved_item = pending_items.emplace_back(std::move(item));
+
       std::visit(
-          [&] (auto arg) {
+          [&] (const auto &arg) {
             using arg_t = std::decay_t<decltype(arg)>;
 
             // Shouldn't happen.
@@ -709,12 +780,17 @@ void DatabaseWriterImpl::BulkInserter(void) {
             } else if constexpr (std::is_same_v<FlushSignal, arg_t>) {
               should_flush = true;
 
+            // Signal a blocked inserter that they can retry.
+            } else if constexpr (std::is_same_v<PushbackSignal, arg_t>) {
+              num_pushbacks++;
+
             } else {
-              async.DoInsertAsync(std::move(arg));
+              num_in_flight_bytes += async.SizeOfRecord(arg);
+              async.DoInsertAsync(arg);
               ++transaction_size;
             }
           },
-          std::move(item));
+          saved_item);
 
       if (transaction_size >= kMaxTransactionSize) {
         should_flush = true;
@@ -729,6 +805,11 @@ void DatabaseWriterImpl::BulkInserter(void) {
              insertion_queue.wait_dequeue_timed(item, 10 * 1000));
 
     num_added_rows += transaction_size;
+  }
+
+  pending_bytes.fetch_sub(num_in_flight_bytes);
+  if (num_pushbacks) {
+    pushback_signal.signal(num_pushbacks);
   }
 }
 
@@ -789,9 +870,10 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
   db.Optimize();
 }
 
-DatabaseWriterImpl::DatabaseWriterImpl(
-    const std::filesystem::path &db_path_)
+DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
+                                       size_t max_queue_size_in_bytes_)
     : db_path(db_path_),
+      max_queue_size_in_bytes(max_queue_size_in_bytes_),
       db(CreateDatabase(db_path)),
       add_version(db.Prepare(
           R"(INSERT INTO version (action) VALUES (?1))")),
@@ -825,80 +907,120 @@ DatabaseWriterImpl::DatabaseWriterImpl(
   });
 }
 
-bool BulkInserterState::InsertAsync(
-    DictionaryRecord record, sqlite::Statement &insert) {
-  insert.BindValues(static_cast<unsigned>(record.category), record.data);
-  return true;
+size_t BulkInserterState::SizeOfRecord(const DictionaryRecord &record) {
+  return sizeof(record) + record.data.size();
 }
 
 bool BulkInserterState::InsertAsync(
-    FilePathRecord record, sqlite::Statement &insert) {
-  insert.BindValues(record.file_id.Pack(), record.path.lexically_normal());
+    const DictionaryRecord &record, sqlite::Statement &insert) {
+  insert.BindValuesWithoutCopying(static_cast<unsigned>(record.category),
+                                  record.data);
   return true;
 }
 
-bool BulkInserterState::InsertAsync(
-    FragmentFileRecord record, sqlite::Statement &insert) {
-  insert.BindValues(record.fragment_id.Pack(), record.file_id.Pack());
-  return true;
+size_t BulkInserterState::SizeOfRecord(const FilePathRecord &record) {
+  return sizeof(record) + record.path.size();
 }
 
 bool BulkInserterState::InsertAsync(
-    FragmentFileRangeRecord record, sqlite::Statement &insert) {
+    const FilePathRecord &record, sqlite::Statement &insert) {
+  insert.BindValuesWithoutCopying(record.file_id.Pack(), record.path);
+  return true;
+}
+
+size_t BulkInserterState::SizeOfRecord(const FragmentFileRecord &record) {
+  return sizeof(record);
+}
+
+bool BulkInserterState::InsertAsync(
+    const FragmentFileRecord &record, sqlite::Statement &insert) {
+  insert.BindValuesWithoutCopying(record.fragment_id.Pack(),
+                                  record.file_id.Pack());
+  return true;
+}
+
+size_t BulkInserterState::SizeOfRecord(const FragmentFileRangeRecord &record) {
+  return sizeof(record);
+}
+
+bool BulkInserterState::InsertAsync(
+    const FragmentFileRangeRecord &record, sqlite::Statement &insert) {
   FileTokenId begin = record.first_file_token.Unpack();
   FileTokenId end = record.last_file_token.Unpack();
   assert(begin.file_id == end.file_id);
   FileId fid(begin.file_id);
-  insert.BindValues(
+  insert.BindValuesWithoutCopying(
       record.fragment_id.Pack(), begin.offset, end.offset,
       EntityId(fid).Pack());
   return true;
 }
 
-bool BulkInserterState::InsertAsync(
-    RedeclarationRecord record, sqlite::Statement &insert) {
-  insert.BindValues(record.decl_id.Pack(), record.redecl_id.Pack());
-  return true;
+size_t BulkInserterState::SizeOfRecord(const RedeclarationRecord &record) {
+  return sizeof(record);
 }
 
 bool BulkInserterState::InsertAsync(
-    MangledNameRecord record, sqlite::Statement &insert) {
+    const RedeclarationRecord &record, sqlite::Statement &insert) {
+  insert.BindValuesWithoutCopying(
+      record.decl_id.Pack(), record.redecl_id.Pack());
+  return true;
+}
+
+size_t BulkInserterState::SizeOfRecord(const MangledNameRecord &record) {
+  return sizeof(record) + record.mangled_name.size();
+}
+
+bool BulkInserterState::InsertAsync(
+    const MangledNameRecord &record, sqlite::Statement &insert) {
   if (record.entity_id != mx::kInvalidEntityId &&
       !record.mangled_name.empty()) {
-    insert.BindValues(record.entity_id, record.mangled_name);
+    insert.BindValuesWithoutCopying(record.entity_id, record.mangled_name);
     return true;
   }
   return false;
 }
 
+size_t BulkInserterState::SizeOfRecord(const ReferenceRecord &record) {
+  return sizeof(record);
+}
+
 bool BulkInserterState::InsertAsync(
-    ReferenceRecord record, sqlite::Statement &insert) {
+    const ReferenceRecord &record, sqlite::Statement &insert) {
   if (record.from_entity_id != kInvalidEntityId &&
       record.to_entity_id != kInvalidEntityId) {
-    insert.BindValues(record.from_entity_id, record.to_entity_id);
+    insert.BindValuesWithoutCopying(record.from_entity_id, record.to_entity_id);
     return true;
   }
   return false;
+}
+
+size_t BulkInserterState::SizeOfRecord(const NamedEntityRecord &record) {
+  return sizeof(record) + record.name.size();
 }
 
 bool BulkInserterState::InsertAsync(
-    NamedEntityRecord record, sqlite::Statement &insert) {
+    const NamedEntityRecord &record, sqlite::Statement &insert) {
   if (!record.name.empty()) {
-    insert.BindValues(record.entity_id, record.name);
+    insert.BindValuesWithoutCopying(record.entity_id, record.name);
     return true;
   }
   return false;
 }
 
-bool BulkInserterState::InsertAsync(EntityRecord record,
+size_t BulkInserterState::SizeOfRecord(const EntityRecord &record) {
+  return sizeof(record) + record.data.size();
+}
+
+bool BulkInserterState::InsertAsync(const EntityRecord &record,
                                     sqlite::Statement &insert) {
-  insert.BindValues(record.id, record.data);
+  insert.BindValuesWithoutCopying(record.id, record.data);
   return true;
 }
 
-DatabaseWriter::DatabaseWriter(
-    std::filesystem::path db_path)
-    : impl(std::make_shared<DatabaseWriterImpl>(db_path)) {}
+DatabaseWriter::DatabaseWriter(std::filesystem::path db_path,
+                               size_t max_queue_size_in_bytes)
+    : impl(std::make_shared<DatabaseWriterImpl>(
+          db_path, max_queue_size_in_bytes)) {}
 
 DatabaseWriter::~DatabaseWriter(void) {}
 
@@ -1025,21 +1147,36 @@ void DatabaseWriterImpl::ExitRecords(void) {
 }
 
 #define MX_DEFINE_ADD_RECORD(name) \
+    void DatabaseWriterImpl::DoAddAsync(name record) { \
+      auto record_size = BulkInserterState::SizeOfRecord(record); \
+      auto queue_size = pending_bytes.fetch_add(record_size) + record_size; \
+      num_total_rows.fetch_add(1u); \
+      insertion_queue.enqueue(std::move(record)); \
+      if (queue_size > max_queue_size_in_bytes) { \
+        insertion_queue.enqueue(PushbackSignal{}); \
+        pushback_signal.wait(10000000 /* 10s */); \
+      } \
+    }
+
+  MX_DEFINE_ADD_RECORD(EntityRecord)
+  MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
+
+#undef MX_DEFINE_ADD_RECORD
+
+#define MX_DEFINE_ADD_RECORD(name) \
     void DatabaseWriter::AddAsync(name record) { \
-      impl->num_pending_rows.fetch_add(1u); \
-      impl->insertion_queue.enqueue(std::move(record)); \
+      impl->DoAddAsync(std::move(record)); \
     }
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 
-#undef MX_DECLARE_ADD_RECORD
+#undef MX_DEFINE_ADD_RECORD
 
 void DatabaseWriter::AddAsync(EntityRecord record) {
   EntityCategory category = CategoryFromEntityId(record.id);
   assert(category != EntityCategory::NOT_AN_ENTITY);
-  impl->num_pending_rows.fetch_add(1u);
   impl->entity_dictionaries[static_cast<unsigned>(category)].Add(
-      impl->insertion_queue, impl->dictionary_context, std::move(record));
+      *impl, impl->dictionary_context, std::move(record));
 }
 
 } // namespace mx

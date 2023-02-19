@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -108,10 +109,10 @@ class Statement {
  public:
   Statement(void) = delete;
 
-  // Bind values with a sqlite statement. It does not
-  // support binding to a blob yet
+  // Bind values with a sqlite statement. In the case of binding to a blob,
+  // a copy of the underlying data is made.
   template<typename... Args>
-  void BindValues(const Args&... args) {
+  void BindValues(Args... args) {
 #ifndef NDEBUG
     if (auto num_params = NumParams(); sizeof...(Args) > num_params) {
       std::string msg =
@@ -123,7 +124,26 @@ class Statement {
     size_t i = 0;
 //    Reset();
     assert(!needs_reset);
-    bind_many(i, args...);
+    bind_many(i, std::move(args)...);
+  }
+
+  // Bind values with a sqlite statement. In the case of binding to a blob,
+  // no copy of the underlying data is made. Instead, we assume that the passed-
+  // in data will live at least as long as the SQLite transaction.
+  template<typename... Args>
+  void BindValuesWithoutCopying(const Args&... args) {
+#ifndef NDEBUG
+    if (auto num_params = NumParams(); sizeof...(Args) > num_params) {
+      std::string msg =
+          "Too many arguments to bind() " + std::to_string(num_params) +
+          " expected " + std::to_string(sizeof...(Args)) + " specified";
+      throw Error(msg);
+    }
+#endif
+    size_t i = 0;
+//    Reset();
+    assert(!needs_reset);
+    bind_many_nocopy(i, args...);
   }
 
   void Execute(void);
@@ -141,43 +161,114 @@ class Statement {
   size_t NumParams(void) const noexcept;
 
   // Binding functions for the statements
-  void bind(const size_t i, const int32_t &value);
+  void bind(size_t i, int32_t value);
+  inline void bind_nocopy(const size_t i, const int32_t &value) {
+    bind(i, value);
+  }
 
-  void bind(const size_t i, const uint32_t &value);
+  void bind(size_t i, uint32_t value);
+  inline void bind_nocopy(const size_t i, const uint32_t &value) {
+    bind(i, value);
+  }
 
-  void bind(const size_t i, const int64_t &value);
+  void bind(size_t i, int64_t value);
+  inline void bind_nocopy(const size_t i, const int64_t &value) {
+    bind(i, value);
+  }
 
-  void bind(const size_t i, const uint64_t &value);
+  void bind(size_t i, uint64_t value);
+  inline void bind_nocopy(const size_t i, const uint64_t &value) {
+    bind(i, value);
+  }
 
-  void bind(const size_t i, const double &value);
+  void bind(size_t i, double value);
+  inline void bind_nocopy(const size_t i, const double &value) {
+    bind(i, value);
+  }
 
-  void bind(const size_t i, const std::nullptr_t &);
-  void bind(const size_t i, const std::nullopt_t &);
+  void bind(size_t i, std::nullptr_t);
+  inline void bind_nocopy(const size_t i, const std::nullptr_t &value) {
+    bind(i, value);
+  }
 
-  void bind(const size_t i, const char *&value);
+  void bind(size_t i, std::nullopt_t);
+  inline void bind_nocopy(const size_t i, const std::nullopt_t &value) {
+    bind(i, value);
+  }
 
-  void bind(const size_t i, const std::string &value);
+  inline void bind(size_t i, const char *value) {
+    if (!value) {
+      bind(i, std::string_view("", 0));
+    } else {
+      bind(i, std::string_view(value, strlen(value)));
+    }
+  }
 
-  void bind(const size_t i, const std::string_view &value);
+  inline void bind_nocopy(size_t i, const char *&value) {
+    if (!value) {
+      bind_nocopy(i, std::string_view("", 0));
+    } else {
+      bind_nocopy(i, std::string_view(value, strlen(value)));
+    }
+  }
 
-  inline void bind(const size_t i, const std::filesystem::path &value) {
+  inline void bind(size_t i, std::string value) {
+    if (value.empty()) {
+      bind(i, std::string_view("", 0));
+    } else {
+      bind(i, std::string_view(value.data(), value.size()));
+    }
+  }
+
+  inline void bind_nocopy(size_t i, const std::string &value) {
+    if (value.empty()) {
+      bind_nocopy(i, std::string_view("", 0));
+    } else {
+      bind_nocopy(i, std::string_view(value.data(), value.size()));
+    }
+  }
+
+  void bind(size_t i, std::string_view value);
+  void bind_nocopy(size_t i, const std::string_view &value);
+
+  inline void bind(size_t i, std::filesystem::path value) {
     bind(i, value.generic_string());
   }
 
-  inline void bind(const size_t i, const mx::EntityId &value) {
+  inline void bind_nocopy(size_t i, const std::filesystem::path &value) {
+    bind(i, value.generic_string());  // Actually copies.
+  }
+
+  inline void bind(size_t i, mx::EntityId value) {
     bind(i, value.Pack());
   }
 
+  inline void bind_nocopy(size_t i, const mx::EntityId &value) {
+    bind_nocopy(i, value.Pack());
+  }
+
   template<typename T>
-  void bind_many(size_t i, const T &value) {
-    bind(i, value);
+  void bind_many(size_t i, T value) {
+    bind(i, std::move(value));
   }
 
   template<typename T, typename... Args>
-  void bind_many(size_t i, const T &value, Args... args) {
-    bind(i, value);
+  void bind_many(size_t i, T value, Args... args) {
+    bind(i, std::move(value));
     i++;
-    bind_many(i, args...);
+    bind_many(i, std::move(args)...);
+  }
+
+  template<typename T>
+  void bind_many_nocopy(size_t i, const T &value) {
+    bind_nocopy(i, value);
+  }
+
+  template<typename T, typename... Args>
+  void bind_many_nocopy(size_t i, const T &value, const Args&... args) {
+    bind_nocopy(i, value);
+    i++;
+    bind_many_nocopy(i, args...);
   }
 
  public:
