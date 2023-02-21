@@ -945,6 +945,76 @@ static std::vector<EntityGroupRange> PartitionEntities(
   return entity_group_ranges;
 }
 
+static void FindTokenFileBounds(const pasta::FileToken &tok,
+                                std::optional<pasta::FileToken> &begin_tok,
+                                std::optional<pasta::FileToken> &end_tok) {
+  if (!begin_tok ||
+      (begin_tok->RawFile() == tok.RawFile() &&
+       begin_tok->Index() > tok.Index())) {
+    begin_tok = tok;
+  }
+  if (!end_tok ||
+      (end_tok->RawFile() == tok.RawFile() &&
+       end_tok->Index() < tok.Index())) {
+    end_tok = tok;
+  }
+}
+
+static void FindMacroFileBounds(const pasta::Macro &macro,
+                                std::optional<pasta::FileToken> &begin_tok,
+                                std::optional<pasta::FileToken> &end_tok) {
+
+  if (std::optional<pasta::MacroToken> mtok = pasta::MacroToken::From(macro)) {
+    if (std::optional<pasta::FileToken> ftok = mtok->FileLocation()) {
+      FindTokenFileBounds(*ftok, begin_tok, end_tok);
+    }
+  } else {
+    for (pasta::Macro child : macro.Children()) {
+      FindMacroFileBounds(child, begin_tok, end_tok);
+    }
+  }
+}
+static bool FindTokenFileBounds(const pasta::Token &ptok,
+                                std::optional<pasta::FileToken> &begin_tok,
+                                std::optional<pasta::FileToken> &end_tok) {
+  switch (ptok.Role()) {
+    default:
+      break;
+    case pasta::TokenRole::kFileToken:
+      if (std::optional<pasta::FileToken> ftok = ptok.FileLocation()) {
+        FindTokenFileBounds(*ftok, begin_tok, end_tok);
+        return true;
+      }
+      break;
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      if (std::optional<pasta::MacroToken> mtok = ptok.MacroLocation()) {
+        FindMacroFileBounds(RootMacroFrom(*mtok), begin_tok, end_tok);
+        return true;
+      }
+      break;
+  }
+  return false;
+}
+
+static void FindDeclFileBounds(const pasta::Decl &decl,
+                               std::optional<pasta::FileToken> &begin_tok,
+                               std::optional<pasta::FileToken> &end_tok) {
+  pasta::TokenRange toks = decl.Tokens();
+  if (auto num_toks = toks.Size()) {
+    for (auto i = 0u; i < num_toks; ++i) {
+      if (FindTokenFileBounds(toks[i], begin_tok, end_tok)) {
+        break;
+      }
+    }
+
+    for (auto i = 1u; i <= num_toks; ++i) {
+      if (FindTokenFileBounds(toks[num_toks - i], begin_tok, end_tok)) {
+        break;
+      }
+    }
+  }
+}
+
 // Try to find the first and last tokens in the range with a file location,
 // as a kind of anchor point of where this fragment is located in its main
 // source file. These begin/end locations also help with search.
@@ -956,77 +1026,43 @@ static std::vector<EntityGroupRange> PartitionEntities(
 //            hash, and so we'll do a better job of deduping top-level
 //            declarations in that case.
 static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
-    const EntityIdMap &entity_ids, const pasta::TokenRange &toks,
-    uint64_t begin_index, uint64_t end_index) {
+    const EntityIdMap &entity_ids, const EntityGroup &entities) {
 
-  mx::RawEntityId file_index = 0u;
   std::optional<pasta::FileToken> begin_tok;
   std::optional<pasta::FileToken> end_tok;
 
-  // Find the first one.
-  uint64_t i = begin_index;
-  for (; i <= end_index; ++i) {
-    begin_tok = AsTopLevelFileToken(toks[i]);
-    if (!begin_tok) {
-      continue;
-    }
+  for (const Entity &entity : entities) {
+    if (std::holds_alternative<pasta::Macro>(entity)) {
+      FindMacroFileBounds(std::get<pasta::Macro>(entity), begin_tok, end_tok);
 
-    auto id_it = entity_ids.find(begin_tok->RawFile());
-    if (id_it == entity_ids.end()) {
-      continue;
+    } else if (std::holds_alternative<pasta::Decl>(entity)) {
+      FindDeclFileBounds(std::get<pasta::Decl>(entity), begin_tok, end_tok);
     }
-
-    mx::VariantId vid = mx::EntityId(id_it->second).Unpack();
-    if (!std::holds_alternative<mx::FileId>(vid)) {
-      continue;
-    }
-
-    file_index = std::get<mx::FileId>(vid).file_id;
-    goto find_last_token;
   }
 
-  return std::nullopt;
-
-find_last_token:
-
-  // Find the last one.
-  for (uint64_t j = end_index; j >= i; --j) {
-    end_tok = AsTopLevelFileToken(toks[j]);
-    if (!end_tok) {
-      continue;
-    }
-
-    auto id_it = entity_ids.find(end_tok->RawFile());
-    if (id_it == entity_ids.end()) {
-      continue;
-    }
-
-    mx::VariantId vid = mx::EntityId(id_it->second).Unpack();
-    if (!std::holds_alternative<mx::FileId>(vid)) {
-      continue;
-    }
-
-    mx::FileId fid = std::get<mx::FileId>(vid);
-    if (fid.file_id != file_index) {
-      continue;
-    }
-
-    goto found_tokens;
+  if (!begin_tok || !end_tok) {
+    return std::nullopt;
   }
 
-  return std::nullopt;
+  auto id_it = entity_ids.find(begin_tok->RawFile());
+  if (id_it == entity_ids.end()) {
+    return std::nullopt;
+  }
 
-found_tokens:
+  mx::VariantId vid = mx::EntityId(id_it->second).Unpack();
+  if (!std::holds_alternative<mx::FileId>(vid)) {
+    return std::nullopt;
+  }
 
-  mx::FileId fid(file_index);
+  mx::FileId fid = std::get<mx::FileId>(vid);
 
   mx::FileTokenId btid;
-  btid.file_id = file_index;
+  btid.file_id = fid.file_id;
   btid.kind = TokenKindFromPasta(begin_tok.value());
   btid.offset = static_cast<mx::EntityOffset>(begin_tok->Index());
 
   mx::FileTokenId etid;
-  etid.file_id = file_index;
+  etid.file_id = fid.file_id;
   etid.kind = TokenKindFromPasta(end_tok.value());
   etid.offset = static_cast<mx::EntityOffset>(end_tok->Index());
 
@@ -1044,7 +1080,7 @@ static void CreatePendingFragment(
 
   // Locate where this fragment is in its file.
   std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
-      entity_ids, tok_range, begin_index, end_index);
+      entity_ids, entities);
 
   // Don't create token `decls_for_chunk` if the decl is already seen. This
   // means it's already been indexed.

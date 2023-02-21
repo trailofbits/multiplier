@@ -107,10 +107,12 @@ static void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
 static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
                      const mx::MacroSubstitution &macro) {
   auto id = macro.id().Pack();
+  auto rowspan = 1 + int(FLAGS_with_categories) + int(FLAGS_with_related_entity_ids);
   os
       << "m" << id
       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\" bgcolor=\"azure2\"><TR>"
-      << "<TD>" << mx::EnumeratorName(macro.kind()) << "</TD></TR></TABLE>>];"
+      << "<TD rowspan=\"" << rowspan << "\">" << mx::EnumeratorName(macro.kind())
+      << "</TD></TR></TABLE>>];"
       << "m" << id << " -> b" << id << " [label=\"before\"];\n"
       << "m" << id << " -> a" << id << " [label=\"after\"];\n"
       << "b" << id
@@ -235,10 +237,13 @@ void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
   }
 
   auto id = macro.id().Pack();
+  auto rowspan = 1 + int(FLAGS_with_categories) + int(FLAGS_with_related_entity_ids);
+
   os
       << "m" << id
       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>"
-      << "<TD bgcolor=\"darkseagreen2\">" << mx::EnumeratorName(macro.kind()) << "</TD>";
+      << "<TD bgcolor=\"darkseagreen2\" rowspan=\"" << rowspan << "\">"
+      << mx::EnumeratorName(macro.kind()) << "</TD>";
 
   auto empty = true;
   for (mx::MacroOrToken node : macro.children()) {
