@@ -636,8 +636,7 @@ static std::vector<OrderedMacro> FindTLMs(
   auto order = 0u;
   for (pasta::Macro mn : ast.Macros()) {
 
-    // Include all uses macros, and only those `#define`s for which the
-    // macro is used at least once.
+    // Include all defined macros, as well as the other non-`#define`s.
     if (auto md = pasta::DefineMacroDirective::From(mn)) {
 
       // If this macro definition doesn't have a name, then it's in a
@@ -658,11 +657,8 @@ static std::vector<OrderedMacro> FindTLMs(
         continue;
       }
 
-      for (pasta::Macro use : md->Uses()) {
-        tlms.emplace_back(std::move(mn), order++);
-        defs.push_back(std::move(md.value()));
-        break;
-      }
+      tlms.emplace_back(std::move(mn), order++);
+      defs.push_back(std::move(md.value()));
 
     // Include all `#include`s, `#pragma`s, `#if`s, etc.
     } else if (auto dir = pasta::MacroDirective::From(mn)) {
@@ -1151,6 +1147,24 @@ static void PersistParsedFragments(
       << " has " << pending_fragments.size() << " unique fragments";
 
   for (PendingFragment &pf : pending_fragments) {
+
+    // NOTE(pag): Left here for niftiness of debugging issues, e.g. where some
+    //            top-level decl doesn't have all of its tokens properly
+    //            identified. Usually this would be a bug in PASTA's
+    //            `lib/AST/Bounds.cpp` file, but having a restriction here also
+    //            helps the end-to-end debugging process.
+//    bool found = false;
+//    for (const pasta::Decl &decl : pf.top_level_decls) {
+//      if (auto nd = pasta::NamedDecl::From(decl)) {
+//        if (nd->Name() == "kvm_kick_many_cpus") {
+//          found = true;
+//        }
+//      }
+//    }
+//    if (!found) {
+//      continue;
+//    }
+
     ProgressBarWork fragment_progress_tracker(context.serialization_progress);
     context.PersistFragment(ast, tok_range, mangler, entity_ids, pf);
   }

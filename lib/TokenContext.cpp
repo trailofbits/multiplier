@@ -15,7 +15,6 @@
 
 namespace mx {
 
-
 std::optional<TokenContext> TokenContext::of(const Token &tok) {
   return tok.context();
 }
@@ -85,6 +84,7 @@ std::optional<TokenContext> Token::context(void) const {
         if (auto ptr = impl->ep->type_name ## For(impl->ep, entity_id)) { \
           return type_name(std::move(ptr)); \
         } \
+        assert(false); \
       } \
       return std::nullopt; \
     }

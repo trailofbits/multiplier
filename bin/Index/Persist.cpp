@@ -437,6 +437,91 @@ void VisitMacros(
   }
 }
 
+// Pre-fill the related entities associated with tokens.
+static RelatedEntityIds RelatedEntities(
+    const PendingFragment &pf, EntityMapper &em,
+    const std::vector<pasta::Token> &parsed_tokens) {
+
+  RelatedEntityIds rel_entities;
+
+  // First, we do a bottom-up pass. This is good at resolving referenced
+  // decls, macros, etc.
+  for (const pasta::Token &tok : parsed_tokens) {
+    RelatedEntityId(em, tok, rel_entities);
+  }
+
+  const size_t old_size = rel_entities.size();
+
+  // Then, collect the macros for two top-down passes. The first pass identifies
+  // tokens associated with macro names, and the second identifies tokens
+  // associated with file includes.
+  std::vector<std::pair<mx::RawEntityId, pasta::Macro>> include_wl;
+  std::vector<pasta::Macro> mwl;
+  for (pasta::Macro macro : pf.top_level_macros) {
+    if (auto inc = pasta::IncludeLikeMacroDirective::From(macro)) {
+      if (auto file = inc->IncludedFile()) {
+        include_wl.emplace_back(em.EntityId(file.value()), macro);
+      }
+    }
+    mwl.emplace_back(std::move(macro));
+  }
+
+  // Go through the macro work list first. If we can find tokens that are
+  // associated with macro names, and that haven't yet been linked up, then
+  // go link them.
+  while (!mwl.empty()) {
+    pasta::Macro parent = std::move(mwl.back());
+    mwl.pop_back();
+
+    if (auto mt = pasta::MacroToken::From(parent)) {
+      pasta::Token pl = mt->ParsedLocation();
+      if (auto def = pl.AssociatedMacro()) {
+        mx::RawEntityId def_eid = em.EntityId(def.value());
+        if (def_eid != mx::kInvalidEntityId) {
+          rel_entities.emplace(pl.RawToken(), def_eid);
+        }
+      }
+
+    } else {
+      for (pasta::Macro child : parent.Children()) {
+        mwl.emplace_back(std::move(child));
+      }
+      if (auto sub = pasta::MacroSubstitution::From(parent)) {
+        for (pasta::Macro child : sub->ReplacementChildren()) {
+          mwl.emplace_back(std::move(child));
+        }
+      }
+    }
+  }
+
+  // Now go through the include work list. We want to mark all remaining
+  // unmarked tokens in the usage steps as being associated with the file
+  // loations.
+  while (!include_wl.empty()) {
+    mx::RawEntityId file_eid = std::move(include_wl.back().first);
+    pasta::Macro parent = std::move(include_wl.back().second);
+    include_wl.pop_back();
+    if (auto mt = pasta::MacroToken::From(parent)) {
+      rel_entities.emplace(mt->ParsedLocation().RawToken(), file_eid);
+
+    } else {
+      for (pasta::Macro child : parent.Children()) {
+        include_wl.emplace_back(file_eid, std::move(child));
+      }
+    }
+  }
+
+  // If it looks like something changed, then try to re-run on the tokens
+  // with the bottom-up pass.
+  if (old_size < rel_entities.size()) {
+    for (const pasta::Token &tok : parsed_tokens) {
+      (void) RelatedEntityId(em, tok, rel_entities);
+    }
+  }
+
+  return rel_entities;
+}
+
 // Persist just the parsed tokens in the absence of a token tree.
 //
 // NOTE(pag): This is a *backup* approach when building a token tree fails.
@@ -445,7 +530,6 @@ static void PersistParsedTokens(
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
     const std::vector<pasta::Token> &parsed_tokens) {
 
-  RelatedEntityIds tok_related_entities;
   std::string utf8_fragment_data;
 
   // Find the set of macros to serialize.
@@ -453,6 +537,9 @@ static void PersistParsedTokens(
   for (const pasta::Macro &tlm : pf.top_level_macros) {
     VisitMacros(pf, em, tlm, macros_to_serialize);
   }
+
+  RelatedEntityIds tok_related_entities =
+      RelatedEntities(pf, em, parsed_tokens);
 
   unsigned num_macros = static_cast<unsigned>(macros_to_serialize.size());
   unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
@@ -540,7 +627,6 @@ static void PersistTokenTree(
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
     TokenTreeNodeRange nodes, const std::vector<pasta::Token> &parsed_tokens) {
 
-  RelatedEntityIds tok_related_entities;
   TokenTreeSerializationSchedule sched(pf, em);
   sched.Schedule(nodes);
 
@@ -556,9 +642,8 @@ static void PersistTokenTree(
   auto i = 0u;
 
   // Pre-fill the related entity IDs for the parsed tokens.
-  for (const pasta::Token &tok : parsed_tokens) {
-    (void) RelatedEntityId(em, tok, tok_related_entities);
-  }
+  RelatedEntityIds tok_related_entities =
+      RelatedEntities(pf, em, parsed_tokens);
 
   // Serialize the tokens.
   for (const TokenTreeNode &tok_node : sched.tokens) {

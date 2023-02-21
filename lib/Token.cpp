@@ -450,7 +450,8 @@ static TokenCategory ClassifyToken(const Token &tok) {
   }
 }
 
-static TokenCategory ClassifyMacro(const Token &tok, MacroId id) {
+static TokenCategory ClassifyMacro(const Token &tok, MacroId id,
+                                   TokenCategory baseline_category) {
   switch (tok.kind()) {
     case TokenKind::PP_IF:
     case TokenKind::PP_IFDEF:
@@ -479,8 +480,18 @@ static TokenCategory ClassifyMacro(const Token &tok, MacroId id) {
     case TokenKind::PP___PRIVATE_MACRO:
       return TokenCategory::MACRO_DIRECTIVE_NAME;
 
-    case TokenKind::IDENTIFIER:
-    case TokenKind::ELLIPSIS:  // For variadic parameters.
+    case TokenKind::ELLIPSIS:
+      goto try_param;
+    default:
+      break;
+  }
+  switch (baseline_category) {
+    case TokenCategory::IDENTIFIER:
+    case TokenCategory::KEYWORD:
+    case TokenCategory::OBJECTIVE_C_KEYWORD:
+    case TokenCategory::BUILTIN_TYPE_NAME:
+    case TokenCategory::THIS:
+    try_param:
       switch (id.kind) {
         case MacroKind::DEFINE_DIRECTIVE:
         case MacroKind::EXPANSION:
@@ -495,7 +506,8 @@ static TokenCategory ClassifyMacro(const Token &tok, MacroId id) {
     default:
       break;
   }
-  return ClassifyToken(tok);
+  assert(false);  // We had a macro ID, but didn't associate it with anything.
+  return baseline_category;
 }
 
 static inline TokenCategory Rebase(DeclCategory category) {
@@ -503,7 +515,8 @@ static inline TokenCategory Rebase(DeclCategory category) {
       int(category) + int(TokenCategory::COMMENT));
 }
 
-static TokenCategory ClassifyDecl(const Token &tok, DeclId id) {
+static TokenCategory ClassifyDecl(const Token &tok, DeclId id,
+                                  TokenCategory baseline_category) {
   switch (id.kind) {
     case DeclKind::NAMESPACE:
     case DeclKind::NAMESPACE_ALIAS:
@@ -645,19 +658,23 @@ static TokenCategory ClassifyDecl(const Token &tok, DeclId id) {
       break;
   }
 
-  return ClassifyToken(tok);
+  // We had a declaration ID, but didn't classify as anything better.
+  assert(false);
+
+  return baseline_category;
 }
 
 static TokenCategory ClassifyEntity(const Token &tok) {
   VariantId vid = tok.related_entity_id().Unpack();
+  TokenCategory baseline_category = ClassifyToken(tok);
   if (std::holds_alternative<MacroId>(vid)) {
-    return ClassifyMacro(tok, std::get<MacroId>(vid));
+    return ClassifyMacro(tok, std::get<MacroId>(vid), baseline_category);
 
   } else if (std::holds_alternative<DeclId>(vid)) {
-    return ClassifyDecl(tok, std::get<DeclId>(vid));
+    return ClassifyDecl(tok, std::get<DeclId>(vid), baseline_category);
 
   } else {
-    return ClassifyToken(tok);
+    return baseline_category;
   }
 }
 

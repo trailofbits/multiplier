@@ -507,11 +507,11 @@ static mx::RawEntityId RelatedEntityId(
 
 static mx::RawEntityId RelatedEntityIdToDerived(
     const EntityMapper &em, const pasta::Token &token, bool &found,
-    std::unordered_map<const void *, mx::RawEntityId> &related_ids) {
+    RelatedEntityIds &related_ids) {
 
   mx::RawEntityId eid = mx::kInvalidEntityId;
 
-  if (auto dtok = token.DerivedLocation()) {
+  if (std::optional<pasta::Token> dtok = token.DerivedLocation()) {
     eid = RelatedEntityId(em, dtok.value(), found, related_ids);
     if (found) {
       related_ids.emplace(token.RawToken(), eid);
@@ -595,8 +595,10 @@ mx::RawEntityId RelatedEntityId(
     const EntityMapper &em, const pasta::Token &token, bool &found,
     RelatedEntityIds &related_ids) {
 
-  if (auto it = related_ids.find(token.RawToken()); it != related_ids.end()) {
+  const void *self = token.RawToken();
+  if (auto it = related_ids.find(self); it != related_ids.end()) {
     found = true;
+    assert(it->second != mx::kInvalidEntityId);
     return it->second;
   }
 
@@ -681,7 +683,7 @@ mx::RawEntityId RelatedEntityId(
             related_decl = nd.value();
           }
           if (!related_decl &&
-              decl->Token().RawToken() == token.RawToken()) {
+              decl->Token().RawToken() == self) {
             related_decl = std::move(decl);
           }
         }
@@ -689,14 +691,14 @@ mx::RawEntityId RelatedEntityId(
       case pasta::TokenContextKind::kAttr:
         if (std::optional<pasta::Attr> attr =
                 pasta::Attr::From(context.value()).value();
-            attr && attr->Token().RawToken() == token.RawToken()) {
+            attr && attr->Token().RawToken() == self) {
           return mx::kInvalidEntityId;
         }
         break;
       case pasta::TokenContextKind::kDesignator:
         if (std::optional<pasta::Designator> d =
                 pasta::Designator::From(context.value())) {
-          if (d->FieldToken().RawToken() == token.RawToken()) {
+          if (d->FieldToken().RawToken() == self) {
             if (auto field = d->Field()) {
               related_decl = field.value();
               break;
@@ -711,21 +713,44 @@ mx::RawEntityId RelatedEntityId(
   }
 
   if (related_decl) {
-    auto eid = em.EntityId(related_decl.value());
-    related_ids.emplace(token.RawToken(), eid);
-    found = true;
-    return eid;
+    if (auto eid = em.EntityId(related_decl.value());
+        eid != mx::kInvalidEntityId) {
+      related_ids.emplace(self, eid);
+      found = true;
+      return eid;
+    }
   }
 
 fallback:
   if (auto mtok = token.MacroLocation()) {
     auto eid = RelatedEntityId(em, mtok.value(), found, related_ids);
     if (found) {
-      related_ids.emplace(token.RawToken(), eid);
+      assert(eid != mx::kInvalidEntityId);
+      related_ids.emplace(self, eid);
     }
     return eid;
   } else {
-    return RelatedEntityIdToDerived(em, token, found, related_ids);
+    auto eid = RelatedEntityIdToDerived(em, token, found, related_ids);
+    if (found) {
+      assert(eid != mx::kInvalidEntityId);
+      related_ids.emplace(self, eid);
+    }
+    return eid;
+  }
+}
+
+static bool IsDefinableToken(pasta::TokenKind kind) {
+  auto clang_kind = static_cast<clang::tok::TokenKind>(kind);
+  switch (clang_kind) {
+    default:
+      if (clang::tok::getKeywordSpelling(clang_kind)) {
+        return true;
+      } else {
+        return false;
+      }
+    case clang::tok::identifier:
+    case clang::tok::raw_identifier:
+      return true;
   }
 }
 
@@ -741,16 +766,54 @@ mx::RawEntityId RelatedEntityId(
     return it->second;
   }
 
-  if (auto parent = mtok.Parent()) {
+  pasta::TokenKind tk = mtok.TokenKind();
+  bool is_definable_name = IsDefinableToken(tk);
+
+  // In the good case, we have:
+  //
+  //     EXP_0
+  //     /   \
+  //   mtok  ...
+  //
+  // But in the harder cases, we have:
+  //
+  //         EXP_0
+  //         /   \        .
+  //      EXP_1  ...
+  //      /  \            .
+  //    ...  mtok
+  //
+  // Where `mtok` is the name of the macro expanded for `EXP_0`. Here, we only
+  // try to deal with the former case.
+  std::optional<unsigned> child_index;
+
+  auto self = mtok.RawMacro();
+  auto parent = mtok.Parent();
+  while (parent) {  // NOTE(pag): We don't ascend, we just want `break`ability.
+
+    // Figure out if we're inside of the expansion side.
+    auto index = 0u;
+    for (pasta::Macro child : parent->Children()) {
+      if (child.RawMacro() == self) {
+        child_index.emplace(index);
+        break;
+      }
+      ++index;
+    }
+
+    // Only let us find the first thing, i.e. the macro name.
+    if (!child_index.has_value() || index) {
+      break;
+    }
+
     if (auto exp = pasta::MacroExpansion::From(parent.value())) {
 
       // If the macro token is the name of the macro definition used, then
       // make the related entity be the defined macro itself.
-      if (auto def = exp->Definition()) {
-        if (auto name = def->Name()) {
-          if (name->Data() == mtok.Data()) {
-            auto eid = em.EntityId(def.value());
-            related_ids.emplace(tok.RawToken(), eid);
+      if (auto def = exp->Definition(); def && is_definable_name) {
+        if (auto name = def->Name(); name && name->Data() == mtok.Data()) {
+          if (mx::RawEntityId eid = em.EntityId(def.value());
+              eid != mx::kInvalidEntityId) {
             found = true;
             return eid;
           }
@@ -759,73 +822,76 @@ mx::RawEntityId RelatedEntityId(
 
       // If it's the first token in an expansion, then reference the expansion
       // instead. Sometimes we have macro expansions but no definitions.
-      if (mtok.TokenKind() == pasta::TokenKind::kIdentifier ||
-          mtok.TokenKind() == pasta::TokenKind::kRawIdentifier) {
-
-        for (auto child : exp->Children()) {
-          if (child.RawMacro() == mtok.RawMacro()) {
-            auto eid = em.EntityId(exp.value());
-            related_ids.emplace(tok.RawToken(), eid);
-            found = true;
-            return eid;
-          }
-        }
+      if (mx::RawEntityId eid = em.EntityId(exp.value());
+          eid != mx::kInvalidEntityId && is_definable_name) {
+        found = true;
+        return eid;
       }
 
     // If it's the first token in a substitution, and if the token is an
     // identifier name, then reference the substitution itself.
     } else if (auto sub = pasta::MacroSubstitution::From(parent.value())) {
-      if (mtok.TokenKind() == pasta::TokenKind::kIdentifier ||
-          mtok.TokenKind() == pasta::TokenKind::kRawIdentifier) {
-
-        auto children = sub->Children();
-        if (children.Size() == 1u &&
-            children[0u].RawMacro() == mtok.RawMacro()) {
-          auto eid = em.EntityId(exp.value());
-          related_ids.emplace(tok.RawToken(), eid);
-          found = true;
-          return eid;
-        }
+      if (mx::RawEntityId eid = em.EntityId(sub.value());
+          eid != mx::kInvalidEntityId && is_definable_name) {
+        found = true;
+        return eid;
       }
 
     // It's a macro parameter.
     } else if (auto param = pasta::MacroParameter::From(parent.value())) {
-      auto eid = em.EntityId(param.value());
-      related_ids.emplace(tok.RawToken(), eid);
-      found = true;
-      return eid;
-
+      if (mx::RawEntityId eid = em.EntityId(param.value());
+          eid != mx::kInvalidEntityId &&
+          (is_definable_name || tk == pasta::TokenKind::kEllipsis)) {
+        found = true;
+        return eid;
+      }
 
     // Point the defined macro name at the macro itself.
     } else if (auto def = pasta::DefineMacroDirective::From(parent.value())) {
-      if (auto name = def->Name()) {
-        if (name->RawMacro() == mtok.RawMacro()) {
-          auto eid = em.EntityId(def.value());
-          related_ids.emplace(tok.RawToken(), eid);
-          found = true;
-          return eid;
+      if (auto name = def->Name(); name && is_definable_name) {
+        if (name->RawMacro() == self) {
+          if (mx::RawEntityId eid = em.EntityId(def.value());
+              eid != mx::kInvalidEntityId) {
+            found = true;
+            return eid;
+          }
         }
       }
     }
 
     // Point the macro directive at the macro itself.
     if (auto dir = pasta::MacroDirective::From(parent.value())) {
-      if (auto dir_name = dir->DirectiveName()) {
-        if (dir_name->RawMacro() == mtok.RawMacro()) {
-          auto eid = em.EntityId(dir.value());
-          related_ids.emplace(tok.RawToken(), eid);
-          found = true;
-          return eid;
+      if (auto dir_name = dir->DirectiveName(); dir_name && is_definable_name) {
+        if (dir_name->RawMacro() == self) {
+          if (mx::RawEntityId eid = em.EntityId(dir.value());
+              eid != mx::kInvalidEntityId) {
+            found = true;
+            return eid;
+          }
+        }
+      }
+    }
+    break;
+  }
+
+  // If it's a header name then we're probably inside of the substitution of
+  // sequence of tokens for a header name, and that is inside of an inclusion
+  // directive, so we want to point at the included file.
+  if (tk == pasta::TokenKind::kHeaderName) {
+    for (; parent; parent = parent->Parent()) {
+      if (auto inc = pasta::IncludeLikeMacroDirective::From(parent.value())) {
+        if (auto file = inc->IncludedFile()) {
+          if (mx::RawEntityId eid = em.EntityId(file.value());
+              eid != mx::kInvalidEntityId) {
+            found = true;
+            return eid;
+          }
         }
       }
     }
   }
 
-  auto eid = RelatedEntityIdToDerived(em, tok, found, related_ids);
-  if (found) {
-    related_ids.emplace(tok.RawToken(), eid);
-  }
-  return eid;
+  return RelatedEntityIdToDerived(em, tok, found, related_ids);
 }
 
 class StringOutputStream final : public kj::OutputStream {
@@ -866,7 +932,9 @@ mx::RawEntityId RelatedEntityId(
       if (found) {
         prop_eid = eid_dloc;
       }
-      related_ids.emplace(dloc->RawToken(), prop_eid);
+      if (prop_eid != mx::kInvalidEntityId) {
+        related_ids.emplace(dloc->RawToken(), prop_eid);
+      }
       dloc = dloc->DerivedLocation();
     } while (dloc);
   }
