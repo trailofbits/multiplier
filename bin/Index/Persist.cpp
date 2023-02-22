@@ -365,14 +365,17 @@ static mx::RawEntityId DerivedTokenId(
     if (eid != mx::kInvalidEntityId) {
       return eid;
     }
-    CHECK(false);  // Weird.
-  }
 
-  if (std::optional<pasta::FileToken> file_tok = tok.FileLocation()) {
+    // Might be that we have a macro token in an argument-pre expansion that
+    // we discard. So we'll go one step back and hope to find something.
+    return DerivedTokenId(em, *derived_tok);
+
+  } else if (std::optional<pasta::FileToken> file_tok = tok.FileLocation()) {
     return DerivedTokenId(em, file_tok.value());
-  }
 
-  return mx::kInvalidEntityId;
+  } else {
+    return mx::kInvalidEntityId;
+  }
 }
 
 // Get the list of parsed tokens.
