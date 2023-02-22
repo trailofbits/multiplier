@@ -513,9 +513,6 @@ static mx::RawEntityId RelatedEntityIdToDerived(
 
   if (std::optional<pasta::Token> dtok = token.DerivedLocation()) {
     eid = RelatedEntityId(em, dtok.value(), found, related_ids);
-    if (found) {
-      related_ids.emplace(token.RawToken(), eid);
-    }
   }
   return eid;
 }

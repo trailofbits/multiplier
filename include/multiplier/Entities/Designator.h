@@ -57,7 +57,12 @@ class Designator {
   Designator &operator=(Designator &&) noexcept = default;
   Designator &operator=(const Designator &) = default;
 
-  inline std::strong_ordering operator<=>(const Designator &rhs) const { return id() <=> rhs.id(); }
+  friend inline std::strong_ordering operator<=>(const Designator &lhs, const Designator &rhs) noexcept {
+    return lhs.id().Pack() <=> rhs.id().Pack();
+  }
+
+  bool operator==(const Designator &) const noexcept = default;
+  bool operator!=(const Designator &) const noexcept = default;
 
   /* implicit */ inline Designator(std::shared_ptr<const DesignatorImpl> impl_)
       : impl(std::move(impl_)) {}

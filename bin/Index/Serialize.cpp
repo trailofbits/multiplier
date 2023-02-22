@@ -189,7 +189,18 @@ void SerializeMacro(const EntityMapper &es, mx::ast::Macro::Builder b, const pas
   } else {
     b.setVal0(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   }
-  auto v1 = e.Parent();
+  std::optional<const void *> v1 = nullptr;
+  if (tt) {
+    auto x1 = tt->Parent();
+    if (x1) {
+      v1 = x1->RawNode();
+    }
+  } else {
+    auto x1 = e.Parent();
+    if (x1) {
+      v1 = x1->RawMacro();
+    }
+  }
   if (v1) {
     auto id1 = es.EntityId(v1.value());
     b.setVal1(id1);

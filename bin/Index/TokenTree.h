@@ -138,6 +138,9 @@ class TokenTree {
   Create(const pasta::TokenRange &range, uint64_t begin_index,
          uint64_t end_index, std::ostream &err);
 
+  // Dump.
+  void Dump(std::ostream &os) const;
+
   mx::MacroKind Kind(void) const noexcept;
 
   std::optional<pasta::Macro> Macro(void) const noexcept;
@@ -148,6 +151,7 @@ class TokenTree {
   std::optional<pasta::MacroExpansion> MacroExpansion(void) const noexcept;
   std::optional<pasta::MacroArgument> MacroArgument(void) const noexcept;
 
+  std::optional<TokenTree> Parent(void) const noexcept;
   TokenTreeNodeRange Children(void) const noexcept;
   TokenTreeNodeRange ReplacementChildren(void) const noexcept;
 

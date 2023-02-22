@@ -10,6 +10,7 @@
 #include <deque>
 
 #include <multiplier/AST.capnp.h>
+#include <multiplier/Entities/MacroKind.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Database.h>
 
@@ -121,30 +122,34 @@ void DispatchSerializeMacro(const EntityMapper &em,
                             const pasta::Macro &entity,
                             const TokenTree *tt) {
 
+  // NOTE(pag): If we have `tt`, then trust it, and not `entity`. Due to evil
+  //            sketchiness, `entity`, might be an invalid pointer.
+  mx::MacroKind kind = mx::MacroKind::SUBSTITUTION;
+  if (tt) {
+    kind = tt->Kind();
+  } else {
+    kind = mx::FromPasta(entity.Kind());
+  }
+
   // Second pass actually does the real serialization.
-  switch (entity.Kind()) {
+  if (false) {
 #define MX_VISIT_MACRO(type) \
-  case pasta::MacroKind::k ## type: \
+  } else if (kind == mx::FromPasta(pasta::MacroKind::k ## type)) { \
     SerializeMacro ## type ( \
         em, builder, reinterpret_cast<const pasta::Macro ## type &>(entity), \
         tt); \
-    break;
 
 #define MX_VISIT_DIRECTIVE(type) \
-  case pasta::MacroKind::k ## type ## Directive: \
+  } else if (kind == mx::FromPasta(pasta::MacroKind::k ## type ## Directive)) { \
     Serialize ## type ## MacroDirective( \
         em, builder, \
         reinterpret_cast<const pasta::type ## MacroDirective &>(entity), tt); \
-    break;
 
     PASTA_FOR_EACH_MACRO_IMPL(MX_VISIT_MACRO, PASTA_IGNORE_ABSTRACT,
                               MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
                               MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
                               PASTA_IGNORE_ABSTRACT)
 #undef MX_VISIT_DIRECTIVE
-    default:
-      assert(false);
-      break;
   }
 }
 

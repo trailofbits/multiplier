@@ -542,17 +542,12 @@ bool Substitution::HasExpansion(void) const noexcept {
     case mx::MacroKind::PRAGMA_DIRECTIVE:
       return true;  // Empty expansion.
 
-    // Empty if we're dealing with a top-level directive, but non-empty
-    // if we're dealing with a directive nested inside of a decl / larger
-    // fragment.
-    //
-    // NOTE(pag): Have to handle the empty file case with `.prev` being non-
-    //            nullptr.
     case mx::MacroKind::INCLUDE_DIRECTIVE:
     case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
     case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
     case mx::MacroKind::IMPORT_DIRECTIVE:
-      return !after.empty() || after.prev != nullptr;
+      assert(after.empty());
+      return false;
 
     case mx::MacroKind::EXPANSION:
     case mx::MacroKind::SUBSTITUTION:
@@ -684,7 +679,9 @@ void Substitution::Print(std::ostream &os) const {
           continue;
       }
     } else {
-      std::get<Substitution *>(ent)->Print(os);
+      Substitution *child = std::get<Substitution *>(ent);
+      assert(child->parent == this);
+      child->Print(os);
     }
   }
 }
@@ -2005,6 +2002,7 @@ Substitution *TokenTreeImpl::BuildFileSubstitutions(
     case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
     case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
     case mx::MacroKind::IMPORT_DIRECTIVE:
+      assert(include_sub->after.empty());
       break;
     default:
       err << "The last thing in the current substitution "
@@ -2012,8 +2010,18 @@ Substitution *TokenTreeImpl::BuildFileSubstitutions(
       return nullptr;
   }
 
-  include_sub->after = std::move(file_sub->before);
-  FixupNodeParents(include_sub);
+  nodes.pop_back();
+  nodes.emplace_back(file_sub);
+  file_sub->parent = include_sub->parent;
+  file_sub->kind = mx::MacroKind::SUBSTITUTION;
+  file_sub->after = std::move(file_sub->before);
+
+  file_sub->before.emplace_back(include_sub);
+  file_sub->before.prev = include_sub->before.prev;
+  file_sub->before.next = include_sub->before.next;
+
+  include_sub->parent = file_sub;
+  FixupNodeParents(file_sub);
 
   // Make sure that we're at the end of a file.
   if (!curr || curr->category != TokenInfo::kMarkerToken) {
@@ -2032,10 +2040,10 @@ Substitution *TokenTreeImpl::BuildFileSubstitutions(
     return nullptr;
   }
 
-  include_sub->after.prev = TryGetBeforeToken(first_tok);
-  include_sub->after.next = TryGetAfterToken(prev);
+  file_sub->after.prev = TryGetBeforeToken(first_tok);
+  file_sub->after.next = TryGetAfterToken(prev);
 
-  AddOrClearInsaneBounds(include_sub);
+  AddOrClearInsaneBounds(file_sub);
 
   // Skip the marker.
   prev = curr;
@@ -2615,6 +2623,11 @@ unsigned TokenTreeNodeRange::Size(void) const noexcept {
   return static_cast<unsigned>(begin_.node.impl->size());
 }
 
+// Dump.
+void TokenTree::Dump(std::ostream &os) const {
+  impl->PrintDOT(os, true);
+}
+
 mx::MacroKind TokenTree::Kind(void) const noexcept {
   return impl->kind;
 }
@@ -2653,6 +2666,20 @@ TokenTree::MacroArgument(void) const noexcept {
     return std::nullopt;
   }
   return pasta::MacroArgument::From(impl->macro.value());
+}
+
+std::optional<TokenTree> TokenTree::Parent(void) const noexcept {
+  if (!impl->parent) {
+    assert(false);  // Should never call expose the root.
+    return std::nullopt;
+  }
+
+  if (!impl->parent->parent) {
+    return std::nullopt; // This is the root node.
+  }
+
+  std::shared_ptr<const Substitution> ptr(impl, impl->parent);
+  return TokenTree(std::move(ptr));
 }
 
 TokenTreeNodeRange TokenTree::Children(void) const noexcept {

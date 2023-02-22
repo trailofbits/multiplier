@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <compare>
 #include <memory>
 #include <optional>
 #include <string_view>
@@ -74,10 +75,13 @@ class Token {
   // Return the ID of this token.
   EntityId id(void) const;
 
-  inline auto operator<=>(const Token &that) const noexcept
-      -> decltype(mx::RawEntityId() <=> mx::RawEntityId()) {
-    return id().Pack() <=> that.id().Pack();
+  friend inline std::strong_ordering operator<=>(
+      const Token &self, const Token &that) noexcept {
+    return self.id().Pack() <=> that.id().Pack();
   }
+
+  bool operator==(const Token &) const noexcept = default;
+  bool operator!=(const Token &) const noexcept = default;
 
   // References to this token.
   gap::generator<Reference> references(void) const &;

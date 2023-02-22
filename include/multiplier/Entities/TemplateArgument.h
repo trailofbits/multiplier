@@ -59,7 +59,12 @@ class TemplateArgument {
   TemplateArgument &operator=(TemplateArgument &&) noexcept = default;
   TemplateArgument &operator=(const TemplateArgument &) = default;
 
-  inline std::strong_ordering operator<=>(const TemplateArgument &rhs) const { return id() <=> rhs.id(); }
+  friend inline std::strong_ordering operator<=>(const TemplateArgument &lhs, const TemplateArgument &rhs) noexcept {
+    return lhs.id().Pack() <=> rhs.id().Pack();
+  }
+
+  bool operator==(const TemplateArgument &) const noexcept = default;
+  bool operator!=(const TemplateArgument &) const noexcept = default;
 
   /* implicit */ inline TemplateArgument(std::shared_ptr<const TemplateArgumentImpl> impl_)
       : impl(std::move(impl_)) {}

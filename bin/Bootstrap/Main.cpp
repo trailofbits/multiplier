@@ -1150,8 +1150,26 @@ void CodeGenerator::RunOnOptional(
         << "  if (true) {\n";
   }
 
-  serialize_cpp_os
-      << "  auto v" << i << " = e." << method_name << "();\n";
+  // Take the parent from the `TokenTree` if we have it.
+  if (base_name == "Macro" && method_name == "Parent") {
+    serialize_cpp_os
+        << "  std::optional<const void *> v" << i << " = nullptr;\n"
+        << "  if (tt) {\n"
+        << "    auto x" << i << " = tt->" << method_name << "();\n"
+        << "    if (x" << i << ") {\n"
+        << "      v" << i << " = x" << i << "->RawNode();\n"
+        << "    }\n"
+        << "  } else {\n"
+        << "    auto x" << i << " = e." << method_name << "();\n"
+        << "    if (x" << i << ") {\n"
+        << "      v" << i << " = x" << i << "->RawMacro();\n"
+        << "    }\n"
+        << "  }\n";
+
+  } else {
+    serialize_cpp_os
+        << "  auto v" << i << " = e." << method_name << "();\n";
+  }
 
   const char *serializer = nullptr;
 
@@ -2161,21 +2179,26 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  " << class_name << "(const " << class_name << " &) = default;\n"
         << "  " << class_name << " &operator=(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << " &operator=(const " << class_name << " &) = default;\n\n"
-        << "  inline std::strong_ordering operator<=>(const " << class_name << " &rhs) const {";
+        << "  friend inline std::strong_ordering operator<=>(const "
+        << class_name << " &lhs, const " << class_name << " &rhs) noexcept {\n";
 
       // Equality on Decls need to be tested in its canonicalized form
       if (class_name == "Decl") {
         class_os
-          << " return canonical_declaration().id() <=> rhs.canonical_declaration().id(); }\n\n";
+            << "    return lhs.canonical_declaration().id().Pack() <=>\n"
+            << "           rhs.canonical_declaration().id().Pack();\n";
       } else {
         class_os
-          << " return id() <=> rhs.id(); }\n\n";
+            << "    return lhs.id().Pack() <=> rhs.id().Pack();\n";
       }
 
       class_os
-        << "  /* implicit */ inline " << class_name
-        << "(std::shared_ptr<const " << class_name << "Impl> impl_)\n"
-        << "      : impl(std::move(impl_)) {}\n\n";
+          << "  }\n\n"
+          << "  bool operator==(const " << class_name << " &) const noexcept = default;\n"
+          << "  bool operator!=(const " << class_name << " &) const noexcept = default;\n\n"
+          << "  /* implicit */ inline " << class_name
+          << "(std::shared_ptr<const " << class_name << "Impl> impl_)\n"
+          << "      : impl(std::move(impl_)) {}\n\n";
 
     if (base_name == class_name) {
       lib_cpp_os

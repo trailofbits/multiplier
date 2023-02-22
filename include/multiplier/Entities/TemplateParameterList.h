@@ -58,7 +58,12 @@ class TemplateParameterList {
   TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
   TemplateParameterList &operator=(const TemplateParameterList &) = default;
 
-  inline std::strong_ordering operator<=>(const TemplateParameterList &rhs) const { return id() <=> rhs.id(); }
+  friend inline std::strong_ordering operator<=>(const TemplateParameterList &lhs, const TemplateParameterList &rhs) noexcept {
+    return lhs.id().Pack() <=> rhs.id().Pack();
+  }
+
+  bool operator==(const TemplateParameterList &) const noexcept = default;
+  bool operator!=(const TemplateParameterList &) const noexcept = default;
 
   /* implicit */ inline TemplateParameterList(std::shared_ptr<const TemplateParameterListImpl> impl_)
       : impl(std::move(impl_)) {}

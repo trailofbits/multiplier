@@ -360,7 +360,12 @@ static mx::RawEntityId DerivedTokenId(
 static mx::RawEntityId DerivedTokenId(
     EntityMapper &em, const pasta::Token &tok) {
   if (std::optional<pasta::Token> derived_tok = tok.DerivedLocation()) {
-    return em.EntityId(derived_tok.value());
+    DCHECK_NE(tok.RawToken(), derived_tok->RawToken());
+    mx::RawEntityId eid = em.EntityId(derived_tok.value());
+    if (eid != mx::kInvalidEntityId) {
+      return eid;
+    }
+    CHECK(false);  // Weird.
   }
 
   if (std::optional<pasta::FileToken> file_tok = tok.FileLocation()) {
@@ -728,6 +733,7 @@ static void PersistTokenTree(
     // Introduce a mapping of macro tokens back to parsed tokens.
     for (auto dloc = parsed_tok.DerivedLocation(); dloc;
          dloc = dloc->DerivedLocation()) {
+
       mx::VariantId vid = mx::EntityId(em.EntityId(dloc.value())).Unpack();
       if (!std::holds_alternative<mx::MacroTokenId>(vid)) {
         CHECK(!std::holds_alternative<mx::ParsedTokenId>(vid));
@@ -744,6 +750,8 @@ static void PersistTokenTree(
           mti2po.set(mtid.offset, i);
 
         // This macro token ended up being related to multiple parsed tokens.
+        // Make it relate to an out-of-bounds offset, so that from the API's
+        // perspective, it's not related to anything.
         } else {
           mti2po.set(mtid.offset, num_parsed_tokens + 1u);
         }
@@ -760,21 +768,42 @@ static void PersistTokenTree(
     mx::RawEntityId eid = em.EntityId(raw_tt);
     mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(eid).Unpack());
 
+
+    EntityBuilder<mx::ast::Macro> storage;
     CHECK_LT(id.offset, num_macros);
     if (std::optional<pasta::Macro> macro = tt->Macro()) {
-      EntityBuilder<mx::ast::Macro> storage;
       DispatchSerializeMacro(em, storage.builder, macro.value(), &(tt.value()));
 
-      database.AddAsync(
-          mx::EntityRecord{eid, GetSerializedData(storage.message)});
+    // NOTE(pag): This is only reasonable on a case-by-case basis!! Right now,
+    //            we only expect `SUBSITUTION`s to be invented by the
+    //            `TokenTree` code, for connecting `#include` directives to
+    //            included file contents for X-macros.
+    } else {
+      CHECK(tt->Kind() == mx::MacroKind::SUBSTITUTION);
+      const pasta::Macro &invalid_macro =
+          *reinterpret_cast<const pasta::Macro *>(0xdeadbeefull);
+      DispatchSerializeMacro(em, storage.builder, invalid_macro, &(tt.value()));
     }
+
+    database.AddAsync(
+        mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
   // Serialize the top-level list.
   auto tlms = fb.initTopLevelMacros(nodes.Size());
   i = 0u;
   for (TokenTreeNode node : nodes) {
-    tlms.set(i++, em.EntityId(node.RawNode()));
+    mx::RawEntityId eid = em.EntityId(node.RawNode());
+#ifndef NDEBUG
+    mx::VariantId vid = mx::EntityId(eid).Unpack();
+    if (std::holds_alternative<mx::MacroId>(vid)) {
+      mx::MacroId mid = std::get<mx::MacroId>(vid);
+      CHECK_EQ(mid.fragment_id, pf.fragment_index);
+      CHECK_LT(mid.offset, pf.macros_to_serialize.size());
+      CHECK(pf.macros_to_serialize[mid.offset].has_value());
+    }
+#endif
+    tlms.set(i++, eid);
   }
 }
 

@@ -55,7 +55,12 @@ class Stmt {
   Stmt &operator=(Stmt &&) noexcept = default;
   Stmt &operator=(const Stmt &) = default;
 
-  inline std::strong_ordering operator<=>(const Stmt &rhs) const { return id() <=> rhs.id(); }
+  friend inline std::strong_ordering operator<=>(const Stmt &lhs, const Stmt &rhs) noexcept {
+    return lhs.id().Pack() <=> rhs.id().Pack();
+  }
+
+  bool operator==(const Stmt &) const noexcept = default;
+  bool operator!=(const Stmt &) const noexcept = default;
 
   /* implicit */ inline Stmt(std::shared_ptr<const StmtImpl> impl_)
       : impl(std::move(impl_)) {}
