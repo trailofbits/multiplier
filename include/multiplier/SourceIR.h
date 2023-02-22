@@ -21,40 +21,38 @@ class SourceIRImpl;
 
 class OperationRangeIterator {
  public:
-  using Set = std::unordered_set<const mlir::Operation*>;
+  using Set = std::vector<const mlir::Operation*>;
   using Ptr = std::shared_ptr<const Set>;
 
  private:
-  std::shared_ptr<const Set> ops;
+  unsigned offset;
+  unsigned num_elements;
+
   Set::const_iterator iter;
 
   bool operator==(const OperationRangeIterator &) = delete;
   bool operator!=(const OperationRangeIterator &) = delete;
 
-  inline OperationRangeIterator(std::shared_ptr<const Set> ops_,
-                                const Set::const_iterator iter_)
-      : ops(ops_), iter(iter_) {}
+  inline OperationRangeIterator(Set::const_iterator iter_,
+                                unsigned offset_, unsigned num_elem)
+      : offset(offset_), num_elements(num_elem), iter(iter_) {}
 
  public:
   using EndIteratorType = IteratorEnd;
 
-  inline OperationRangeIterator(std::shared_ptr<const Set> ops_)
-      : ops(ops_) {
-    if (ops) {
-      iter = ops->begin();
-    }
-  }
+  inline OperationRangeIterator(Set::const_iterator iter_, unsigned num_elem)
+      : offset(0), num_elements(num_elem), iter(iter_) {}
 
   inline bool operator==(EndIteratorType) const noexcept {
-    return ops.get() && iter == ops->end();
+    return offset >= num_elements;
   }
 
   inline bool operator!=(EndIteratorType) const noexcept {
-    return ops.get() && iter != ops->end();
+    return offset < num_elements;
   }
 
   inline operator bool(void) const {
-    return ops.get() && iter != ops->end();
+    return offset < num_elements;
   }
 
   inline const mlir::Operation* operator*(void) && noexcept {
@@ -66,12 +64,13 @@ class OperationRangeIterator {
   }
 
   inline OperationRangeIterator &operator++(void) & noexcept {
+    ++offset;
     ++iter;
     return *this;
   }
 
   inline OperationRangeIterator operator++(int) noexcept {
-    return OperationRangeIterator(ops, iter++);
+    return OperationRangeIterator(iter++, offset++, num_elements);
   }
 };
 
@@ -89,7 +88,7 @@ class OperationRange {
       : iter(std::move(iter_)) {}
 
   inline OperationRange(void)
-      : iter(OperationRangeIterator({})) {}
+      : iter(OperationRangeIterator({}, 0)) {}
 
   inline Iter begin(void) && {
     return std::move(iter);

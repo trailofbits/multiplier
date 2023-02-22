@@ -15,7 +15,7 @@
 
 #ifdef MX_ENABLE_SOURCEIR
 #include <unordered_map>
-#include <unordered_set>
+#include <vector>
 
 #include <mlir/IR/OwningOpRef.h>
 #include <mlir/InitAllDialects.h>
@@ -37,7 +37,7 @@ class FragmentImpl;
 using MLIRContext     = mlir::MLIRContext;
 using Module          = mlir::ModuleOp;
 using OwningModuleRef = mlir::OwningOpRef<Module>;
-using OperationMap = std::unordered_map<uint64_t, std::unordered_set<const mlir::Operation*>>;
+using OperationMap = std::unordered_map<uint64_t, std::vector<const mlir::Operation*>>;
 
 class SourceIRImpl {
  private:

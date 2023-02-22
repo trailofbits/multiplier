@@ -51,7 +51,7 @@ static OperationMap Deserialize(mlir::Operation *scope) {
   auto result = scope->walk<mlir::WalkOrder::PreOrder>([&] (mlir::Operation *child) {
     auto loc = child->getLoc();
     auto id = MetaIdFromLocation(loc);
-    entities[id].emplace(const_cast<const mlir::Operation*>(child));
+    entities[id].emplace_back(const_cast<const mlir::Operation*>(child));
     return mlir::WalkResult::advance();
   });
 
@@ -67,7 +67,7 @@ static OperationMap Deserialize(mlir::Operation *scope) {
 #define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
   OperationRange SourceIR::for_##lower_name(const mx::type_name &lower_name) const { \
     auto ops = impl->For##type_name(lower_name); \
-    return OperationRange(std::shared_ptr<const OperationRange::Set>(impl, ops)); \
+    return OperationRange({ops->begin(), static_cast<unsigned>(ops->size())}); \
   }
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
