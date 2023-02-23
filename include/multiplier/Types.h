@@ -320,7 +320,7 @@ struct FragmentId {
   inline /* implicit */ FragmentId(const DesignatorId &id_)
       : fragment_id(id_.fragment_id) {}
 
-  static std::optional<FragmentId> From(const EntityId &);
+  static std::optional<FragmentId> from(const EntityId &);
 };
 
 inline FileId::FileId(const FileTokenId &id_)

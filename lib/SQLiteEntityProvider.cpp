@@ -569,11 +569,13 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
   auto it = std::unique(ret.begin(), ret.end());
   ret.erase(it, ret.end());
 
-  std::partition(
-      ret.begin(), ret.end(),
-      [] (RawEntityId eid) {
-        return std::get<DeclId>(EntityId(eid).Unpack()).is_definition;
-      });
+  if (EntityCategory::DECLARATION == category) {
+    std::partition(
+        ret.begin(), ret.end(),
+        [] (RawEntityId eid) {
+          return std::get<DeclId>(EntityId(eid).Unpack()).is_definition;
+        });
+  }
 
   return ret;
 }
