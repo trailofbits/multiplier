@@ -19,7 +19,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: [self-hosted, linux, x64]
     steps:
     - name: Install dependencies
       run: |
@@ -136,7 +136,7 @@ jobs:
         path: '${{ env.INSTALL_DIR }}'
 
   build-release:
-    runs-on: ubuntu-22.04
+    runs-on: [self-hosted, linux, x64]
     steps:
     - name: Install dependencies
       run: |
@@ -253,7 +253,7 @@ jobs:
         path: '${{ env.INSTALL_DIR }}'
 
   index-lua:
-    runs-on: ubuntu-22.04
+    runs-on: [self-hosted, linux, x64]
     needs: [build]
     steps:
     - name: Install dependencies
@@ -306,7 +306,7 @@ jobs:
         path: /tmp/lua-5.4.4.mx
 
   index-pcre2:
-    runs-on: ubuntu-22.04
+    runs-on: [self-hosted, linux, x64]
     needs: [build]
     steps:
     - name: Install dependencies
@@ -361,7 +361,7 @@ jobs:
         path: /tmp/pcre2-10.42.mx
 
   index-sqlite:
-    runs-on: ubuntu-22.04
+    runs-on: [self-hosted, linux, x64]
     continue-on-error: true
     needs: [build]
     steps:
@@ -417,7 +417,7 @@ jobs:
         path: /tmp/sqlite-autoconf-3400000.mx
 
   index-linux:
-    runs-on: ubuntu-22.04
+    runs-on: [self-hosted, linux, x64]
     continue-on-error: true
     needs: [build-release]
     # Indexing linux takes too long and eats up all our CI points, skip for now
