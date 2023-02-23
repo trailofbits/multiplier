@@ -17,6 +17,10 @@ env:
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
   INSTALL_DIR: ${{ github.workspace }}/install
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: [self-hosted, linux, x64]
