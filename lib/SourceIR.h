@@ -64,7 +64,7 @@ class SourceIRImpl {
   VariantEntity EntityFor(EntityId id) const;
 
 #define MX_DECLARE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
-	const OperationRange::Set* For##type_name(const type_name &lower_name) const; \
+	const OperationRange::OpVec *For##type_name(const type_name &lower_name) const; \
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,

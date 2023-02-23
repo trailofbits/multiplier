@@ -19,29 +19,33 @@ namespace mx {
 
 class SourceIRImpl;
 
+// Forward-only iterator that traverses through the vector of operations
 class OperationRangeIterator {
  public:
-  using Set = std::vector<const mlir::Operation*>;
-  using Ptr = std::shared_ptr<const Set>;
+  using OpVec     = std::vector<const mlir::Operation *>;
+  using OpVecPtr  = std::shared_ptr<const OpVec>;
+  using OpPtr     = std::shared_ptr<const mlir::Operation>;
+
+  using EndIteratorType = IteratorEnd;
 
  private:
+  OpVecPtr ops;
   unsigned offset;
   unsigned num_elements;
-
-  Set::const_iterator iter;
 
   bool operator==(const OperationRangeIterator &) = delete;
   bool operator!=(const OperationRangeIterator &) = delete;
 
-  inline OperationRangeIterator(Set::const_iterator iter_,
-                                unsigned offset_, unsigned num_elem)
-      : offset(offset_), num_elements(num_elem), iter(iter_) {}
+  inline OperationRangeIterator(OpVecPtr ops_, unsigned offset_, unsigned num_elem)
+      : ops(ops_), offset(offset_), num_elements(num_elem) {}
 
  public:
-  using EndIteratorType = IteratorEnd;
+  inline OperationRangeIterator(OpVecPtr ops_)
+      : ops(ops_), offset(0),
+        num_elements(ops_ ? static_cast<unsigned>(ops_->size()) : 0){}
 
-  inline OperationRangeIterator(Set::const_iterator iter_, unsigned num_elem)
-      : offset(0), num_elements(num_elem), iter(iter_) {}
+  inline OperationRangeIterator(void)
+      : ops(nullptr), offset(0), num_elements(0) {}
 
   inline bool operator==(EndIteratorType) const noexcept {
     return offset >= num_elements;
@@ -55,30 +59,35 @@ class OperationRangeIterator {
     return offset < num_elements;
   }
 
-  inline const mlir::Operation* operator*(void) && noexcept {
-    return std::move(*iter);
+  inline OpPtr operator*(void) && noexcept {
+    const mlir::Operation *op = (*ops)[offset];
+    return OpPtr(std::move(ops), op);
   }
 
-  inline const mlir::Operation* const &operator*(void) const & noexcept {
-    return *iter;
+  inline OpPtr operator*(void) const & noexcept {
+    return OpPtr(ops, (*ops)[offset]);
   }
 
+  // Pre-increment
   inline OperationRangeIterator &operator++(void) & noexcept {
     ++offset;
-    ++iter;
     return *this;
   }
 
+  // Post increment
   inline OperationRangeIterator operator++(int) noexcept {
-    return OperationRangeIterator(iter++, offset++, num_elements);
+    return OperationRangeIterator(ops, offset++, num_elements);
   }
 };
 
 class OperationRange {
  public:
-  using Iter = OperationRangeIterator;
-  using EndIteratorType = typename Iter::EndIteratorType;
-  using Set = typename Iter::Set;
+  using Iter            = OperationRangeIterator;
+  using EndIteratorType = Iter::EndIteratorType;
+
+  using OpVec           = Iter::OpVec;
+  using OpVecPtr        = Iter::OpVecPtr;
+  using OpPtr           = Iter::OpPtr;
 
  private:
   OperationRangeIterator iter;
@@ -88,7 +97,7 @@ class OperationRange {
       : iter(std::move(iter_)) {}
 
   inline OperationRange(void)
-      : iter(OperationRangeIterator({}, 0)) {}
+      : iter(OperationRangeIterator()) {}
 
   inline Iter begin(void) && {
     return std::move(iter);
@@ -106,25 +115,12 @@ class OperationRange {
     return !!iter;
   }
 
-  inline const mlir::Operation* value(void) && noexcept {
-    return std::move(*iter);
-  }
-
-
-  inline const mlir::Operation* const &value(void) const & noexcept {
+  inline OpPtr value(void) const & noexcept {
     return *iter;
   }
 
-  inline const mlir::Operation* operator*(void) && noexcept {
-    return std::move(*iter);
-  }
-
-  inline const mlir::Operation* const &operator*(void) const & noexcept {
+  inline OpPtr operator*(void) const & noexcept {
     return *iter;
-  }
-
-  inline const mlir::Operation* const *operator->(void) const & noexcept {
-    return std::addressof(*iter);
   }
 
   inline EndIteratorType end(void) const noexcept {

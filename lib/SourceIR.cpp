@@ -66,8 +66,10 @@ static OperationMap Deserialize(mlir::Operation *scope) {
 
 #define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
   OperationRange SourceIR::for_##lower_name(const mx::type_name &lower_name) const { \
-    auto ops = impl->For##type_name(lower_name); \
-    return OperationRange({ops->begin(), static_cast<unsigned>(ops->size())}); \
+    if (auto ops = impl->For##type_name(lower_name); ops) { \
+      return OperationRange(OperationRange::OpVecPtr(impl, ops)); \
+    } \
+    return {}; \
   }
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
@@ -147,7 +149,7 @@ mlir::Operation* SourceIRImpl::scope(void) const {
   return mod.get();
 }
 
-const OperationRange::Set*
+const OperationRange::OpVec *
 SourceIRImpl::ForDecl(const Decl &decl) const {
   auto id = decl.id().Pack();
   // Note: A decl can have multiple redeclaration. If the
@@ -169,7 +171,7 @@ SourceIRImpl::ForDecl(const Decl &decl) const {
   return {};
 }
 
-const OperationRange::Set*
+const OperationRange::OpVec *
 SourceIRImpl::ForStmt(const Stmt &stmt) const {
   auto id = stmt.id().Pack();
   auto found_item = deserialized_ops.find(id);
@@ -179,23 +181,23 @@ SourceIRImpl::ForStmt(const Stmt &stmt) const {
   return {};
 }
 
-const OperationRange::Set*
+const OperationRange::OpVec *
 SourceIRImpl::ForType(const Type &) const {
   return {};
 }
 
-const OperationRange::Set*
+const OperationRange::OpVec *
 SourceIRImpl::ForAttr(const Attr &) const {
   return {};
 }
 
-const OperationRange::Set*
+const OperationRange::OpVec *
 SourceIRImpl::ForMacro(const Macro &) const {
   return {};
 }
 
 #define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
-	const OperationRange::Set* \
+	const OperationRange::OpVec * \
 	SourceIRImpl::For##type_name(const type_name &lower_name) const { \
     return {}; \
   }

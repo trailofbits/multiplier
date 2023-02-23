@@ -43,15 +43,15 @@ using WorkList = std::vector<mx::Decl>;
 
 namespace {
 
-std::string SymbolName(vast_symbol_interface &value) {
+static std::string SymbolName(vast_symbol_interface &value) {
   return value.getSymbolName().str();
 }
 
-std::string SymbolName(mlir_symbol_interface &value) {
+static std::string SymbolName(mlir_symbol_interface &value) {
   return value.getName().str();
 }
 
-std::string AttributeString(mlir::Attribute &attr) {
+static std::string AttributeString(mlir::Attribute &attr) {
   std::string attr_string;
   llvm::raw_string_ostream os(attr_string);
   attr.print(os);
@@ -157,15 +157,17 @@ extern "C" int main(int argc, char *argv[]) {
   auto sep = "";
 
   while (!wl.empty()) {
+    std::string str;
+    llvm::raw_string_ostream os(str);
     mx::Decl decl = std::move(wl.back());
     wl.pop_back();
 
     if (seen.emplace(decl.id()).second) {
-      llvm::outs() << sep;
+      os << sep;
       sep = ",\n";
 
       mx::Fragment frag = mx::Fragment::containing(decl);
-      llvm::outs() << '"' << frag.id().Pack() << "\": ";
+      os << '"' << frag.id().Pack() << "\": ";
 
       llvm::json::Object obj;
       if (auto ir = frag.ir(); ir) {
@@ -177,34 +179,37 @@ extern "C" int main(int argc, char *argv[]) {
           continue;
         }
 
-        for (auto func_op = range.begin(); func_op != range.end(); func_op++) {
-          auto name = const_cast<mlir::Operation*>(*func_op)->getName();
+        for (auto iter = range.begin(); iter != range.end(); iter++) {
+          auto func_op = *iter;
+          auto name = const_cast<mlir::Operation*>(func_op.get())->getName();
+          (void)name;
           obj["operation"] = name.getIdentifier().str();
 
-          auto loc = const_cast<mlir::Operation*>(*(func_op))->getLoc();
+          auto loc = const_cast<mlir::Operation*>(func_op.get())->getLoc();
           obj["meta_id"] = MetaId(loc);
           obj["loc"] = LocationString(loc);
 
-          if (auto vast_symbol = mlir::dyn_cast<vast_symbol_interface>(*(func_op)); vast_symbol) {
+          if (auto vast_symbol = mlir::dyn_cast<vast_symbol_interface>(func_op.get()); vast_symbol) {
             obj["name"] = SymbolName(vast_symbol);
             auto type = vast_symbol->getAttr("function_type");
             obj["function_type"]= AttributeString(type);
 
-          } else if (auto mlir_symbol = mlir::dyn_cast<mlir_symbol_interface>(*func_op); mlir_symbol) {
+          } else if (auto mlir_symbol = mlir::dyn_cast<mlir_symbol_interface>(func_op.get()); mlir_symbol) {
             obj["name"] = SymbolName(mlir_symbol);
             auto type = mlir_symbol->getAttr("function_type");
             obj["function_type"]= AttributeString(type);
 
           }
-          auto uses_set = Uses(*ir, *func_op);
+          auto uses_set = Uses(*ir, func_op.get());
           if (!uses_set.empty()) {
             obj["uses"] = Stringify(uses_set);
           }
         }
       }
       llvm::json::Value val(std::move(obj));
-      llvm::outs() << std::move(val);
+      os << std::move(val);
     }
+    std::cout << str;
   }
 
   llvm::outs() << "\n}";
