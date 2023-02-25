@@ -1105,7 +1105,7 @@ static Token LogicalFileLocation(Macro macro, RawEntityId prev_entity,
 
   // If it was in an expansion, then go find the first file token in the range.
   if (first) {
-    for (Token tok : macro.tokens_covering_use()) {
+    for (Token tok : macro.use_tokens()) {
       if (Token file_tok = tok.file_token()) {
         return file_tok;
       }
@@ -1116,7 +1116,7 @@ static Token LogicalFileLocation(Macro macro, RawEntityId prev_entity,
 
   // If it was in an expansion, then go find the last file token in the range.
   Token last;
-  for (Token tok : macro.tokens_covering_use()) {
+  for (Token tok : macro.use_tokens()) {
     if (Token file_tok = tok.file_token()) {
       last = std::move(file_tok);
     }

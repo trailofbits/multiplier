@@ -112,7 +112,8 @@ class Macro {
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;
   gap::generator<MacroOrToken> children(void) const &;
-  gap::generator<Token> tokens_covering_use(void) const &;
+  gap::generator<Token> use_tokens(void) const &;
+  gap::generator<Token> expansion_tokens(void) const &;
 };
 
 #endif

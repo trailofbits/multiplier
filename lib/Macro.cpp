@@ -6,6 +6,7 @@
 
 #include "Macro.h"
 
+#include <multiplier/Entities/MacroSubstitution.h>
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -76,25 +77,59 @@ gap::generator<Reference> Macro::references(void) const & {
 
 namespace {
 
-static gap::generator<Token> GenerateTokens(const Macro &macro) {
+static gap::generator<Token> GenerateUseTokens(const Macro &macro) {
   for (mx::MacroOrToken use : macro.children()) {
     if (std::holds_alternative<mx::Token>(use)) {
       co_yield std::get<Token>(use);
     } else if (std::holds_alternative<Macro>(use)) {
-      for (auto tok : GenerateTokens(std::get<Macro>(use))) {
+      for (auto tok : GenerateUseTokens(std::get<Macro>(use))) {
         co_yield tok;
       }
     }
   }
 }
 
+static gap::generator<Token> GenerateExpansionTokens(const Macro &macro);
+
+static gap::generator<Token> GenerateExpansionTokens(
+    gap::generator<MacroOrToken> gen) {
+  for (mx::MacroOrToken use : gen) {
+    if (std::holds_alternative<mx::Token>(use)) {
+      if (auto pt = std::get<Token>(use).parsed_token()) {
+        co_yield pt;
+      }
+    } else if (std::holds_alternative<Macro>(use)) {
+      for (Token pt : GenerateExpansionTokens(std::get<Macro>(use))) {
+        co_yield pt;
+      }
+    }
+  }
+}
+
+gap::generator<Token> GenerateExpansionTokens(const Macro &macro) {
+  if (auto sub = MacroSubstitution::from(macro)) {
+    return GenerateExpansionTokens(sub->replacement_children());
+  } else {
+    return GenerateExpansionTokens(macro.children());
+  }
+}
+
 }  // namespace
 
-gap::generator<Token> Macro::tokens_covering_use(void) const & {
+gap::generator<Token> Macro::use_tokens(void) const & {
   if (auto p = parent()) {
-    return p->tokens_covering_use();
+    return p->use_tokens();
   } else {
-    return GenerateTokens(*this);
+    return GenerateUseTokens(*this);
+  }
+}
+
+// Find the tokens the expansion tokens that are actually parsed.
+gap::generator<Token> Macro::expansion_tokens(void) const & {
+  if (auto p = parent()) {
+    return p->expansion_tokens();
+  } else {
+    return GenerateExpansionTokens(*this);
   }
 }
 

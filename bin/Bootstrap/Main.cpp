@@ -2322,10 +2322,20 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("uses");  // Manual.
 
     } else if (class_name == "Macro") {
+      forward_decls.insert("Token");
       class_os
           << " protected:\n"
           << "  static gap::generator<Macro> containing_internal(const Token &token);\n\n"
-          << " public:\n";
+          << " public:\n"
+
+      // Allow macros to conveniently find the file tokens covering their uses,
+      // or their parent uses, etc. If this is a directive then this is just the
+      // file tokens.
+          << "  gap::generator<Token> use_tokens(void) const &;\n"
+
+      // Allow macros to conveniently find the final parsed expansion tokens
+      // that they cover.
+          << "  gap::generator<Token> expansion_tokens(void) const &;\n\n";
 
       // Serialization of these tokens is manually performed in
       // `bin/Index/Persist.cpp`.
@@ -3429,15 +3439,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     class_os
         << "  std::optional<Type> casted_return_type(void) const;\n"
         << "  std::optional<CastExpr> casted_return_value(void) const;\n";
-  }
-
-  // Allow macros to conveniently find the file tokens covering their uses, or
-  // their parent uses, etc. If this is a directive then this is just the file
-  // tokens.
-  if (class_name == "Macro") {
-    forward_decls.insert("Token");
-    class_os
-        << "  gap::generator<Token> tokens_covering_use(void) const &;\n";
   }
 
   class_os << "};\n\n";
