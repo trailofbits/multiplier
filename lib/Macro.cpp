@@ -89,7 +89,7 @@ static gap::generator<Token> GenerateUseTokens(const Macro &macro) {
   }
 }
 
-static gap::generator<Token> GenerateExpansionTokens(const Macro &macro);
+static gap::generator<Token> GenerateExpansionTokens(Macro macro);
 
 static gap::generator<Token> GenerateExpansionTokens(
     gap::generator<MacroOrToken> gen) {
@@ -99,14 +99,15 @@ static gap::generator<Token> GenerateExpansionTokens(
         co_yield pt;
       }
     } else if (std::holds_alternative<Macro>(use)) {
-      for (Token pt : GenerateExpansionTokens(std::get<Macro>(use))) {
+      for (Token pt : GenerateExpansionTokens(
+                          std::move(std::get<Macro>(use)))) {
         co_yield pt;
       }
     }
   }
 }
 
-gap::generator<Token> GenerateExpansionTokens(const Macro &macro) {
+gap::generator<Token> GenerateExpansionTokens(Macro macro) {
   if (auto sub = MacroSubstitution::from(macro)) {
     return GenerateExpansionTokens(sub->replacement_children());
   } else {

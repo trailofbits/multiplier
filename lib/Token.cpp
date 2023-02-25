@@ -868,11 +868,12 @@ Token Token::parsed_token(void) const {
   EntityId eid = impl->NthParsedTokenId(offset);
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<ParsedTokenId>(vid)) {
-    assert(std::get<ParsedTokenId>(vid) == id());
-    return *this;
+    return TokenReader::TokenFor(impl, eid.Pack());
 
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
-    return TokenReader::TokenFor(impl, eid.Pack());
+    assert(std::get<MacroTokenId>(vid) == id());
+    assert(false);  // Really, this is unreasonable.
+    return Token();
 
   } else {
     return Token();
