@@ -77,12 +77,12 @@ gap::generator<Reference> Macro::references(void) const & {
 
 namespace {
 
-static gap::generator<Token> GenerateUseTokens(const Macro &macro) {
+static gap::generator<Token> GenerateUseTokens(Macro macro) {
   for (mx::MacroOrToken use : macro.children()) {
     if (std::holds_alternative<mx::Token>(use)) {
       co_yield std::get<Token>(use);
     } else if (std::holds_alternative<Macro>(use)) {
-      for (auto tok : GenerateUseTokens(std::get<Macro>(use))) {
+      for (auto tok : GenerateUseTokens(std::move(std::get<Macro>(use)))) {
         co_yield tok;
       }
     }
