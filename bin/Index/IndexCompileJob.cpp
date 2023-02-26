@@ -996,25 +996,6 @@ static bool FindTokenFileBounds(const pasta::Token &ptok,
   return false;
 }
 
-static void FindDeclFileBounds(const pasta::Decl &decl,
-                               std::optional<pasta::FileToken> &begin_tok,
-                               std::optional<pasta::FileToken> &end_tok) {
-  pasta::TokenRange toks = decl.Tokens();
-  if (auto num_toks = toks.Size()) {
-    for (auto i = 0u; i < num_toks; ++i) {
-      if (FindTokenFileBounds(toks[i], begin_tok, end_tok)) {
-        break;
-      }
-    }
-
-    for (auto i = 1u; i <= num_toks; ++i) {
-      if (FindTokenFileBounds(toks[num_toks - i], begin_tok, end_tok)) {
-        break;
-      }
-    }
-  }
-}
-
 // Try to find the first and last tokens in the range with a file location,
 // as a kind of anchor point of where this fragment is located in its main
 // source file. These begin/end locations also help with search.
@@ -1026,17 +1007,35 @@ static void FindDeclFileBounds(const pasta::Decl &decl,
 //            hash, and so we'll do a better job of deduping top-level
 //            declarations in that case.
 static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
-    const EntityIdMap &entity_ids, const EntityGroup &entities) {
+    const EntityIdMap &entity_ids, const EntityGroup &entities,
+    const pasta::TokenRange &tokens, uint64_t begin_index, uint64_t end_index) {
 
   std::optional<pasta::FileToken> begin_tok;
   std::optional<pasta::FileToken> end_tok;
 
+  auto range_size = end_index - begin_index;
+
+  // Find a good begin index candidate.
+  for (auto i = 0u; i <= range_size; ++i) {
+    if (FindTokenFileBounds(tokens[begin_index + i], begin_tok, end_tok)) {
+      break;
+    }
+  }
+
+  // Find a good end index candidate.
+  //
+  // NOTE(pag): `end_index` is inclusive.
+  for (auto i = 0u; i <= range_size; ++i) {
+    if (FindTokenFileBounds(tokens[end_index - i], begin_tok, end_tok)) {
+      break;
+    }
+  }
+
+  // We might have only directives with no parsed tokens in the expansion, so
+  // we need to go looking more.
   for (const Entity &entity : entities) {
     if (std::holds_alternative<pasta::Macro>(entity)) {
       FindMacroFileBounds(std::get<pasta::Macro>(entity), begin_tok, end_tok);
-
-    } else if (std::holds_alternative<pasta::Decl>(entity)) {
-      FindDeclFileBounds(std::get<pasta::Decl>(entity), begin_tok, end_tok);
     }
   }
 
@@ -1080,7 +1079,7 @@ static void CreatePendingFragment(
 
   // Locate where this fragment is in its file.
   std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
-      entity_ids, entities);
+      entity_ids, entities, tok_range, begin_index, end_index);
 
   // Don't create token `decls_for_chunk` if the decl is already seen. This
   // means it's already been indexed.
@@ -1192,7 +1191,7 @@ static void PersistParsedFragments(
 //    bool found = false;
 //    for (const pasta::Decl &decl : pf.top_level_decls) {
 //      if (auto nd = pasta::NamedDecl::From(decl)) {
-//        if (nd->Name() == "kvm_kick_many_cpus") {
+//        if (nd->Name() == "script_security_level") {
 //          found = true;
 //        }
 //      }
