@@ -78,7 +78,7 @@ gap::generator<Reference> Macro::references(void) const & {
 namespace {
 
 static gap::generator<Token> GenerateUseTokens(Macro macro) {
-  for (mx::MacroOrToken use : macro.children()) {
+  for (MacroOrToken use : macro.children()) {
     if (std::holds_alternative<mx::Token>(use)) {
       co_yield std::get<Token>(use);
     } else if (std::holds_alternative<Macro>(use)) {
@@ -89,29 +89,35 @@ static gap::generator<Token> GenerateUseTokens(Macro macro) {
   }
 }
 
-static gap::generator<Token> GenerateExpansionTokens(Macro macro);
+static gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro);
 
-static gap::generator<Token> GenerateExpansionTokens(
-    gap::generator<MacroOrToken> gen) {
-  for (mx::MacroOrToken use : gen) {
-    if (std::holds_alternative<mx::Token>(use)) {
-      if (auto pt = std::get<Token>(use).parsed_token()) {
-        co_yield pt;
-      }
-    } else if (std::holds_alternative<Macro>(use)) {
-      for (Token pt : GenerateExpansionTokens(
-                          std::move(std::get<Macro>(use)))) {
-        co_yield pt;
-      }
+static gap::generator<Token> GenerateExpansionTokensFromUse(
+    MacroOrToken use) {
+  if (std::holds_alternative<mx::Token>(use)) {
+    if (auto pt = std::get<Token>(use).parsed_token()) {
+      co_yield pt;
+    }
+  } else if (std::holds_alternative<Macro>(use)) {
+    for (Token pt : GenerateExpansionTokensFromMacro(
+                        std::move(std::get<Macro>(use)))) {
+      co_yield pt;
     }
   }
 }
 
-gap::generator<Token> GenerateExpansionTokens(Macro macro) {
+gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro) {
   if (auto sub = MacroSubstitution::from(macro)) {
-    return GenerateExpansionTokens(sub->replacement_children());
+    for (MacroOrToken use : sub->replacement_children()) {
+      for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
+        co_yield tok;
+      }
+    }
   } else {
-    return GenerateExpansionTokens(macro.children());
+    for (MacroOrToken use : sub->children()) {
+      for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
+        co_yield tok;
+      }
+    }
   }
 }
 
@@ -130,7 +136,7 @@ gap::generator<Token> Macro::expansion_tokens(void) const & {
   if (auto p = parent()) {
     return p->expansion_tokens();
   } else {
-    return GenerateExpansionTokens(*this);
+    return GenerateExpansionTokensFromMacro(*this);
   }
 }
 
