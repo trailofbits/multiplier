@@ -83,7 +83,5 @@ if(MX_ENABLE_VAST)
   target_link_libraries("mx-dump-sourceir"
     PRIVATE
       "mx-mlir"
-      LLVMCore
-      LLVMSupport
   )
 endif(MX_ENABLE_VAST)

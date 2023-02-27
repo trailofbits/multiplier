@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <unordered_set>
-
 #include "Index.h"
 #include "Fragment.h"
 

@@ -22,26 +22,31 @@
 
 namespace llvm {
 class SourceMgr;
-}
+} // namespace llvm
 
 namespace mlir {
 class MLIRContext;
 class Operation;
-}
+} // namespace mlir
 
 namespace mx {
 
 class Fragment;
 class FragmentImpl;
 
+namespace {
+class RegistryInitializer;
+} // namespace
+
 using MLIRContext     = mlir::MLIRContext;
 using Module          = mlir::ModuleOp;
 using OwningModuleRef = mlir::OwningOpRef<Module>;
-using OperationMap = std::unordered_map<uint64_t, std::vector<const mlir::Operation*>>;
+using OperationMap    = std::unordered_map<uint64_t, std::vector<const mlir::Operation *>>;
 
 class SourceIRImpl {
  private:
   friend class Fragment;
+  friend class RegistryInitializer;
 
   MLIRContext mctx;
   OwningModuleRef mod;
@@ -50,16 +55,14 @@ class SourceIRImpl {
 
   std::shared_ptr<const FragmentImpl> frag;
 
-  static mlir::DialectRegistry registry;
-
-  static const mlir::DialectRegistry& Registry(void);
+  static mlir::DialectRegistry gRegistry;
 
  public:
   virtual ~SourceIRImpl(void);
 
-  explicit SourceIRImpl(std::shared_ptr<const FragmentImpl> frag_, std::string_view &mlir);
+  explicit SourceIRImpl(std::shared_ptr<const FragmentImpl> frag_, std::string_view mlir);
 
-  mlir::Operation *scope(void) const;
+  const mlir::Operation *scope(void) const;
 
   VariantEntity EntityFor(EntityId id) const;
 
@@ -88,7 +91,7 @@ class SourceIRImpl {
   virtual ~SourceIRImpl(void);
 
   explicit SourceIRImpl(
-      std::shared_ptr<const FragmentImpl>, std::string_view &) {}
+      std::shared_ptr<const FragmentImpl>, std::string_view) {}
 };
 
 } // namespace mx

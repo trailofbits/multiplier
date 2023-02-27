@@ -13,14 +13,12 @@
 #include <unordered_set>
 
 #include <llvm/Support/JSON.h>
-#include <llvm/Support/raw_ostream.h>
-
 #include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/SourceMgr.h>
 
 #include <mlir/IR/Dialect.h>
 #include <mlir/IR/MLIRContext.h>
-#include <mlir/InitAllDialects.h>
 #include <mlir/Parser/Parser.h>
 
 #include <vast/Dialect/Dialects.hpp>
@@ -62,10 +60,13 @@ static std::string AttributeString(mlir::Attribute &attr) {
 mx::RawEntityId MetaId(mlir::Location &loc) {
   if(loc.isa<mlir::FusedLoc>()) {
     auto fused = loc.cast<mlir::FusedLoc>();
-    auto meta = fused.getMetadata().cast<vast::meta::IdentifierAttr>();
-    return meta.getValue();
+    auto meta = fused.getMetadata();
+    if (meta.isa<vast::meta::IdentifierAttr>()) {
+      auto identifier = meta.cast<const vast::meta::IdentifierAttr>();
+      return identifier.getValue();
+    }
   }
-  return -1;
+  return mx::kInvalidEntityId;
 }
 
 std::string LocationString(mlir::Location &loc) {
@@ -153,7 +154,7 @@ extern "C" int main(int argc, char *argv[]) {
     }
   }
 
-  llvm::outs() << "{\n";
+  std::cout << "{\n";
   auto sep = "";
 
   while (!wl.empty()) {
@@ -212,7 +213,7 @@ extern "C" int main(int argc, char *argv[]) {
     std::cout << str;
   }
 
-  llvm::outs() << "\n}";
+  std::cout << "\n}";
 
   return EXIT_SUCCESS;
 }
