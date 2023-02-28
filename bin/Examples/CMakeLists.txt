@@ -13,7 +13,7 @@ add_library("mx-example-index" STATIC
 
 target_link_libraries("mx-example-index"
   PUBLIC
-    "mx-api"
+    "mx-analysis"
     glog::glog
     gflags::gflags
 )
@@ -65,6 +65,7 @@ define_example("mx-weggli-query" "WeggliQuery.cpp")
 define_example("mx-regex-query" "RegexQuery.cpp")
 define_example("mx-find-sketchy-casts" "FindSketchyCasts.cpp")
 define_example("mx-find-divergent-candidates" "FindDivergentCandidates.cpp")
+define_example("mx-find-other-uses-of-max" "FindOtherUsesOfMax.cpp")
 define_example("mx-find-sketchy-strchr" "FindSketchyStrchr.cpp")
 define_example("mx-find-symbol" "FindSymbol.cpp")
 define_example("mx-taint-entity" "TaintEntity.cpp")

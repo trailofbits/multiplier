@@ -267,7 +267,8 @@ if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "mx-entities"
-    EXPORT "${PROJECT_NAME}Targets"
+    EXPORT
+      "${PROJECT_NAME}Targets"
     PUBLIC_HEADER
       DESTINATION
         "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}/Entities"
@@ -276,7 +277,8 @@ if(MX_ENABLE_INSTALL)
     TARGETS
       "mx-api"
       "mx-mlir"
-    EXPORT "${PROJECT_NAME}Targets"
+    EXPORT
+      "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
         "${CMAKE_INSTALL_BINDIR}"
@@ -291,3 +293,5 @@ if(MX_ENABLE_INSTALL)
         "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}"
   )
 endif(MX_ENABLE_INSTALL)
+
+add_subdirectory("Analysis")

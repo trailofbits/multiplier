@@ -113,7 +113,7 @@ gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro) {
       }
     }
   } else {
-    for (MacroOrToken use : sub->children()) {
+    for (MacroOrToken use : macro.children()) {
       for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
         co_yield tok;
       }
