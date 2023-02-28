@@ -26,7 +26,7 @@
 #include <multiplier/Entities/UnaryOperator.h>
 #include <multiplier/Entities/UnaryOperatorKind.h>
 #include <multiplier/Entities/VarDecl.h>
-#include <multiplier/Token.h>
+#include <multiplier/Index.h>
 #include <ostream>
 #include <sstream>
 #include <unordered_set>
