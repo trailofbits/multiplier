@@ -28,6 +28,33 @@
 DEFINE_bool(exact, false, "Whether or not the name must match exactly.");
 DEFINE_string(name, "MAX", "Name of the macro or part of the macro to find.");
 
+static void RenderEdge(const mx::TraintTrackingEdge &edge) {
+  if (std::optional<mx::Stmt> stmt = edge.as_statement()) {
+    std::cout << mx::EnumeratorName(stmt->kind()) << ' ' << stmt->id()
+              << ": ";
+    for (mx::Token tok : stmt->tokens().file_tokens()) {
+      for (char ch : tok.data()) {
+        if (ch == '\n') {
+          std::cout << ' ';
+        } else {
+          std::cout << ch;
+        }
+      }
+    }
+
+  } else if (std::optional<mx::Decl> decl = edge.as_declaration()) {
+    std::cout << mx::EnumeratorName(decl->kind()) << ' ' << decl->id();
+    if (auto nd = mx::NamedDecl::from(decl)) {
+      std::cout << ' ';
+      for (mx::FunctionDecl func : mx::FunctionDecl::containing(decl)) {
+        std::cout << func.name() << "::";
+        break;
+      }
+      std::cout << nd->name();
+    }
+  }
+}
+
 static void PrintNext(mx::TaintTracker &tracker,
                       mx::TaintTrackingResult res,
                       int depth) {
@@ -35,32 +62,8 @@ static void PrintNext(mx::TaintTracker &tracker,
     std::cout << "  ";
   }
   if (std::holds_alternative<mx::TaintTrackingStep>(res)) {
-    const mx::TaintTrackingStep &step = std::get<mx::TaintTrackingStep>(res);
-
-    if (std::optional<mx::Stmt> stmt = step.as_statement()) {
-      std::cout << mx::EnumeratorName(stmt->kind()) << ' ' << stmt->id()
-                << ": ";
-      for (mx::Token tok : stmt->tokens().file_tokens()) {
-        for (char ch : tok.data()) {
-          if (ch == '\n') {
-            std::cout << ' ';
-          } else {
-            std::cout << ch;
-          }
-        }
-      }
-
-    } else if (std::optional<mx::Decl> decl = step.as_declaration()) {
-      std::cout << mx::EnumeratorName(decl->kind()) << ' ' << decl->id();
-      if (auto nd = mx::NamedDecl::from(decl)) {
-        std::cout << ' ';
-        for (mx::FunctionDecl func : mx::FunctionDecl::containing(decl)) {
-          std::cout << func.name() << "::";
-          break;
-        }
-        std::cout << nd->name();
-      }
-    }
+    const auto &step = std::get<mx::TaintTrackingStep>(res);
+    RenderEdge(step);
 
     if (!step.is_new()) {
       std::cout << " <repeat>\n";
@@ -71,6 +74,11 @@ static void PrintNext(mx::TaintTracker &tracker,
         PrintNext(tracker, std::move(next_res), depth + 1);
       }
     }
+
+  } else if (std::holds_alternative<mx::TaintTrackingCondition>(res)) {
+    const auto &cond = std::get<mx::TaintTrackingCondition>(res);
+    RenderEdge(cond);
+    std::cout << " <condition>\n";
 
   } else if (std::holds_alternative<mx::TaintTrackingSink>(res)) {
     std::cout << std::get<mx::TaintTrackingSink>(res).message() << '\n';

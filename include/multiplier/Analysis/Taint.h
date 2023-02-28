@@ -30,11 +30,12 @@ class DefineMacroDirective;
 class Index;
 class TaintTracker;
 class TaintTrackerImpl;
-class TaintTrackResult;
+class TaintTrackingCondition;
 class TaintTrackingSink;
 class TaintTrackingStep;
 
-using TaintTrackingResult = std::variant<TaintTrackingStep, TaintTrackingSink>;
+using TaintTrackingResult = std::variant<TaintTrackingStep, TaintTrackingSink,
+                                         TaintTrackingCondition>;
 using TaintTrackingResults = gap::generator<TaintTrackingResult>;
 
 // An edge in a taint tracking graph.
@@ -137,7 +138,19 @@ class TaintTrackingSink final : public TraintTrackingEdge {
   }
 };
 
-class TaintTrackingStep final : public TraintTrackingEdge {
+// The stopping point for the taint tracker. This happens when a tainted value
+// reaches the condition of something like a `if`, `for`, etc.
+class TaintTrackingCondition final : public TraintTrackingEdge {
+ private:
+  friend class TaintTracker;
+  friend class TaintTrackerImpl;
+
+  using TraintTrackingEdge::TraintTrackingEdge;
+};
+
+// A taint propagation step that was taken from source node to destination
+// node.
+class TaintTrackingStep : public TraintTrackingEdge {
  private:
   friend class TaintTracker;
   friend class TaintTrackerImpl;

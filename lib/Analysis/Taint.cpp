@@ -51,6 +51,8 @@ class TaintTrackerImpl final
   TaintTrackingResults AcceptReturn(Stmt stmt);
   TaintTrackingResults AcceptStmt(Stmt stmt);
 
+  TaintTrackingResults TaintConditionalOperator(
+      Stmt child, ConditionalOperator parent);
   TaintTrackingResults TaintBinaryOperator(
       Stmt child, BinaryOperator parent);
   TaintTrackingResults TaintUnaryOperator(
@@ -222,7 +224,7 @@ TaintTrackingResults TaintTrackerImpl::NoTaints(void) {
 
 TaintTrackingResults TaintTrackerImpl::TaintStmt(Stmt stmt) {
   // If it looks like this array subscript is used, then go and yield this
-    // node to taint the parent.
+  // node to taint the parent.
   if (ParentLooksUsed(stmt)) {
     bool is_new = TestAndSet(stmt);
     co_yield TaintTrackingStep(std::move(stmt), is_new);
@@ -273,6 +275,17 @@ static bool IsAssignment(const Stmt &stmt) {
     return IsAssignment(bin->opcode());
   } else {
     return false;
+  }
+}
+
+TaintTrackingResults TaintTrackerImpl::TaintConditionalOperator(
+    Stmt child, ConditionalOperator parent) {
+  if (parent.condition() == child) {
+    co_yield TaintTrackingCondition(std::move(parent));
+
+  } else if (ParentLooksUsed(parent)) {
+    bool is_new = TestAndSet(parent);
+    co_yield TaintTrackingStep(std::move(parent), is_new);
   }
 }
 
@@ -567,10 +580,9 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
       break;
 
     case StmtKind::CONDITIONAL_OPERATOR: {
-      auto cond = ConditionalOperator::from(parent).value();
-      if (cond.condition() != stmt) {
-        return TaintStmt(std::move(parent.value()));
-      }
+      return TaintConditionalOperator(
+          std::move(stmt),
+          ConditionalOperator::from(parent).value());
       break;
     }
 
