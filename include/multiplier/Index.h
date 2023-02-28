@@ -283,26 +283,6 @@ class Index {
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
 
-  template <typename T>
-  inline std::optional<EntityType<T>> entity(T eid) const {
-    VariantEntity vent = entity(eid.Pack());
-    if (std::holds_alternative<EntityType<T>>(vent)) {
-      return std::move(std::get<EntityType<T>>(vent));
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  template <typename T>
-  inline std::optional<EntityType<T>> entity(SpecificEntityId<T> eid) const {
-    VariantEntity vent = entity(eid.Pack());
-    if (std::holds_alternative<EntityType<T>>(vent)) {
-      return std::move(std::get<EntityType<T>>(vent));
-    } else {
-      return std::nullopt;
-    }
-  }
-
   // Return an entity given its ID.
   VariantEntity entity(EntityId eid) const;
 
