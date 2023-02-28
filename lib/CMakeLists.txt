@@ -85,6 +85,7 @@ set(api_headers
   "${source_include_dir}/Reference.h"
   "${source_include_dir}/Token.h"
   "${source_include_dir}/Types.h"
+  "${source_include_dir}/SourceIR.h"
   "${source_include_dir}/Weggli.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
@@ -130,6 +131,8 @@ add_library("mx-api" STATIC
   "SQLiteStore.h"
   "Stmt.h"
   "Stmt.cpp"
+  "SourceIR.cpp"
+  "SourceIR.h"
   "ThreadLocal.cpp"
   "ThreadLocal.h"
   "TokenContext.cpp"
@@ -190,6 +193,13 @@ else()
       "MX_DISABLE_WEGGLI")
 endif()
 
+if(MX_ENABLE_VAST)
+  target_compile_definitions("mx-api"
+    PRIVATE
+      "MX_ENABLE_SOURCEIR"
+  )
+endif()
+
 target_compile_options("mx-api"
   PRIVATE
     "-Wno-unknown-warning-option"
@@ -237,6 +247,7 @@ set_target_properties("mx-mlir"
       YES
 )
 
+if(MX_ENABLE_VAST)
 target_link_libraries("mx-mlir"
   INTERFACE
     vast::vast
@@ -262,6 +273,9 @@ target_link_libraries("mx-mlir"
     MLIRSPIRVDialect
     MLIRTensorInferTypeOpInterfaceImpl
 )
+else(MX_ENABLE_VAST)
+target_link_libraries("mx-mlir" INTERFACE)
+endif(MX_ENABLE_VAST)
 
 if(MX_ENABLE_INSTALL)
   install(

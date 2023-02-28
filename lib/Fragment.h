@@ -11,6 +11,7 @@
 namespace mx {
 
 class FileImpl;
+class SourceIRImpl;
 
 using FragmentIdList = std::vector<PackedFragmentId>;
 
@@ -148,8 +149,6 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   std::shared_ptr<const class TokenReader>
   ParsedTokenReader(const FragmentImplPtr &) const;
 
-  std::string_view SourceIR(void) const & noexcept;
-
   std::string_view Data(void) const & noexcept;
 
   // Return the token associated with a specific entity ID.
@@ -159,6 +158,9 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   // Return the inclusive token range associated with two entity IDs.
   TokenRange TokenRangeFor(const FragmentImplPtr &, EntityId begin_id,
                            EntityId end_id) const;
+
+  // Return the source ir for the fragment.
+  std::string_view SourceIR(void) const & noexcept;
 };
 
 }  // namespace mx

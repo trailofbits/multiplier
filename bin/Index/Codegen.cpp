@@ -113,7 +113,12 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   }
 
   auto flags = mlir::OpPrintingFlags();
-  flags.enableDebugInfo(true);
+
+  // Set the flag to enable printing of debug information. The prettyForm
+  // flag passed to the function is set to false to avoid printing them in
+  // `pretty` form. This is because the IR generated in pretty form is not
+  // parsable.
+  flags.enableDebugInfo(false);
 
   mlir::MLIRContext context(impl->registry);
   CodeGeneratorVisitor codegen(ast, &context, em);
