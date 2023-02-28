@@ -14,6 +14,7 @@ add_library("mx-example-index" STATIC
 target_link_libraries("mx-example-index"
   PUBLIC
     "mx-api"
+    "mx-mlir"
     glog::glog
     gflags::gflags
 )
@@ -60,7 +61,7 @@ define_example("mx-list-redeclarations" "ListRedeclarations.cpp")
 define_example("mx-list-structures" "ListStructures.cpp")
 # define_example("mx-list-uses" "ListUses.cpp")  # TODO(pag): Make this list-references.
 define_example("mx-dump-json" "DumpJSON.cpp")
-define_example("mx-print-sourceir" "PrintSourceIR.cpp")
+
 define_example("mx-weggli-query" "WeggliQuery.cpp")
 define_example("mx-regex-query" "RegexQuery.cpp")
 define_example("mx-find-sketchy-casts" "FindSketchyCasts.cpp")
@@ -74,3 +75,13 @@ target_link_libraries("mx-dump-json"
   PRIVATE
     LLVMCore LLVMSupport
 )
+
+if(MX_ENABLE_VAST)
+  define_example("mx-print-sourceir" "PrintSourceIR.cpp")
+  define_example("mx-dump-sourceir" "DumpSourceIR.cpp")
+
+  target_link_libraries("mx-dump-sourceir"
+    PRIVATE
+      "mx-mlir"
+  )
+endif(MX_ENABLE_VAST)

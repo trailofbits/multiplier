@@ -37,8 +37,8 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  if (auto mlir = fragment->source_ir(); mlir) {
-    std::cout << *mlir;
+  if (auto mlir = fragment->ir(); mlir) {
+    mlir->print(std::cout);
   }
 
   return EXIT_SUCCESS;

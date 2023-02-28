@@ -244,10 +244,8 @@ struct FallBackStmtVisitor
   }
 
   vast::Operation* VisitGCCAsmStmt(const clang::GCCAsmStmt *expr){
-    auto loc = meta_location(expr);
-    auto label = expr->getLabelExpr(0);
-    auto [region, type] = make_value_yield_region(label);
-    return make<vast::hl::UnsupportedExprOp>(loc, expr->getStmtClassName(), type, std::move(region));
+    THROW("Unable to handle GCCASMStmt : {0}", expr->getStmtClassName());
+    return nullptr;
   }
 
   vast::Operation* VisitImplicitValueInitExpr(const clang::ImplicitValueInitExpr *expr) {
