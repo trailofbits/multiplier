@@ -272,10 +272,8 @@ class Index {
 #define MX_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
   std::optional<type_name> lower_name(RawEntityId id) const; \
   \
-  inline std::optional<type_name> lower_name( \
-      Packed ## type_name ## Id id) const { \
-    return lower_name(id.Pack()); \
-  }
+  std::optional<type_name> lower_name( \
+      Packed ## type_name ## Id id) const;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,

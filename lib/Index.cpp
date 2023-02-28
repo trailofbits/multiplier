@@ -139,6 +139,15 @@ gap::generator<File> Index::files(void) const & {
     } else { \
       return std::nullopt; \
     } \
+  } \
+  \
+  std::optional<type_name> Index::lower_name( \
+      Packed ## type_name ## Id id) const { \
+    if (type_name ## ImplPtr ptr = impl->type_name ## For(impl, id.Pack())) { \
+      return type_name(std::move(ptr)); \
+    } else { \
+      return std::nullopt; \
+    } \
   }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,

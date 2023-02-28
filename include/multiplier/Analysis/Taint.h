@@ -12,12 +12,14 @@
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/DefineMacroDirective.h>
 #include <multiplier/Entities/Designator.h>
+#include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/TemplateArgument.h>
 #include <multiplier/Entities/TemplateParameterList.h>
 #include <multiplier/Entities/Type.h>
 #include <multiplier/File.h>
 #include <multiplier/Fragment.h>
+#include <multiplier/Token.h>
 #include <string>
 
 #include "../Entity.h"

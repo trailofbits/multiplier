@@ -13,6 +13,7 @@ add_library("mx-example-index" STATIC
 
 target_link_libraries("mx-example-index"
   PUBLIC
+    "mx-api"
     "mx-analysis"
     "mx-mlir"
     glog::glog

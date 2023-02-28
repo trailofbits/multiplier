@@ -5,7 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/Analysis/Taint.h>
-#include <iostream>
+
 #include <cassert>
 #include <multiplier/Entities/ArraySubscriptExpr.h>
 #include <multiplier/Entities/BinaryOperator.h>
@@ -30,12 +30,6 @@
 #include <ostream>
 #include <sstream>
 #include <unordered_set>
-
-#include "../Decl.h"
-#include "../Macro.h"
-#include "../Reference.h"
-#include "../Stmt.h"
-#include "../Types.h"
 
 namespace mx {
 
