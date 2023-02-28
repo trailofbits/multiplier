@@ -15,7 +15,6 @@
 
 #include "File.h"
 #include "Types.h"
-#include "SourceIR.h"
 
 namespace mx {
 
