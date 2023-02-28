@@ -6,12 +6,10 @@
 
 #pragma once
 
+#include <multiplier/SourceIR.h>
+
 #include <memory>
 #include <string>
-
-#include <multiplier/Index.h>
-#include <multiplier/Fragment.h>
-#include <multiplier/Types.h>
 
 #ifdef MX_ENABLE_SOURCEIR
 #include <unordered_map>
