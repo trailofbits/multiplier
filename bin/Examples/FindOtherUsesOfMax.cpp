@@ -117,6 +117,21 @@ static std::optional<mx::Decl> FindReferencedDecl(mx::Stmt stmt) {
   }
 }
 
+static bool IsComparison(mx::BinaryOperatorKind kind) {
+  switch (kind) {
+    case mx::BinaryOperatorKind::CMP:
+    case mx::BinaryOperatorKind::LT:
+    case mx::BinaryOperatorKind::GT:
+    case mx::BinaryOperatorKind::LE:
+    case mx::BinaryOperatorKind::GE:
+    case mx::BinaryOperatorKind::EQ:
+    case mx::BinaryOperatorKind::NE:
+      return true;
+    default:
+      return false;
+  }
+}
+
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
@@ -153,18 +168,27 @@ extern "C" int main(int argc, char *argv[]) {
 
       for (mx::Token tok : exp->expansion_tokens()) {
         for (mx::BinaryOperator op : mx::BinaryOperator::containing(tok)) {
-          std::cout << "=== " << op.tokens().file_tokens().data() << " ===\n";
-          if (auto decl = FindReferencedDecl(op.lhs())) {
-            std::cout << "=== " << mx::EnumeratorName(decl->kind()) << ' '
-                      << decl->id() << " ===\n";
-            for (mx::TaintTrackingResult res : tracker.add_source(decl.value())) {
-              PrintNext(tracker, std::move(res), 0);
-            }
-            std::cout << "\n\n";
+          if (!IsComparison(op.opcode())) {
+            continue;
           }
-          break;
+
+          auto decl = FindReferencedDecl(op.lhs());
+          if (!decl) {
+            continue;
+          }
+
+          std::cout << "=== " << op.tokens().file_tokens().data() << " ===\n"
+                    << "=== " << mx::EnumeratorName(decl->kind()) << ' '
+                    << decl->id() << " ===\n";
+          for (mx::TaintTrackingResult res : tracker.add_source(decl.value())) {
+            PrintNext(tracker, std::move(res), 0);
+          }
+          std::cout << "\n\n";
+          goto skip;;
         }
       }
+    skip:
+      continue;
     }
   }
 
