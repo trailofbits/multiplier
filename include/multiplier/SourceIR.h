@@ -7,7 +7,6 @@
 #pragma once
 
 #include "Index.h"
-#include "Fragment.h"
 
 namespace mlir {
 class Operation;
