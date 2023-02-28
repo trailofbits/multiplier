@@ -12,7 +12,6 @@
 #include <multiplier/Entities/Type.h>
 
 #include "File.h"
-#include "SourceIR.h"
 
 namespace mx {
 

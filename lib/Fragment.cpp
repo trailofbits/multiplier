@@ -26,7 +26,6 @@
 #include "SourceIR.h"
 #include "WeggliImpl.h"
 
-
 namespace mx {
 
 // Return the fragment containing a query match.
@@ -241,7 +240,6 @@ gap::generator<RegexQueryMatch> Fragment::query(
     co_yield match;
   }
 }
-
 
 std::optional<SourceIR> Fragment::ir(void) const noexcept {
 #ifdef MX_ENABLE_SOURCEIR
