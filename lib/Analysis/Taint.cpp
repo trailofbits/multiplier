@@ -17,15 +17,20 @@
 #include <multiplier/Entities/DeclKind.h>
 #include <multiplier/Entities/DeclRefExpr.h>
 #include <multiplier/Entities/Designator.h>
+#include <multiplier/Entities/DoStmt.h>
+#include <multiplier/Entities/ForStmt.h>
 #include <multiplier/Entities/FunctionDecl.h>
+#include <multiplier/Entities/IfStmt.h>
 #include <multiplier/Entities/MacroExpansion.h>
 #include <multiplier/Entities/MemberExpr.h>
 #include <multiplier/Entities/ParenExpr.h>
 #include <multiplier/Entities/ParmVarDecl.h>
 #include <multiplier/Entities/StmtKind.h>
+#include <multiplier/Entities/SwitchStmt.h>
 #include <multiplier/Entities/UnaryOperator.h>
 #include <multiplier/Entities/UnaryOperatorKind.h>
 #include <multiplier/Entities/VarDecl.h>
+#include <multiplier/Entities/WhileStmt.h>
 #include <multiplier/Index.h>
 #include <ostream>
 #include <sstream>
@@ -64,6 +69,7 @@ class TaintTrackerImpl final
   TaintTrackingResults TaintCallArgument(
       Stmt child, CallExpr parent);
   TaintTrackingResults TaintStmt(Stmt stmt);
+  TaintTrackingResults TaintCondition(Stmt stmt);
   TaintTrackingResults NoTaints(void);
 
   TaintTrackingResults TaintAssignedValue(Stmt lhs, Stmt rhs);
@@ -231,6 +237,10 @@ TaintTrackingResults TaintTrackerImpl::TaintStmt(Stmt stmt) {
     bool is_new = TestAndSet(stmt);
     co_yield TaintTrackingStep(std::move(stmt), is_new);
   }
+}
+
+TaintTrackingResults TaintTrackerImpl::TaintCondition(Stmt stmt) {
+  co_yield TaintTrackingCondition(std::move(stmt));
 }
 
 TaintTrackingResults TaintTrackerImpl::TaintArraySubscript(
@@ -594,6 +604,42 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
         return TaintCallArgument(std::move(stmt), std::move(call));
       }
       [[clang::fallthrough]];
+    }
+
+    case StmtKind::SWITCH_STMT: {
+      auto switch_ = SwitchStmt::from(parent).value();
+      if (switch_.condition() == stmt) {
+        return TaintCondition(std::move(parent.value()));
+      }
+      break;
+    }
+    case StmtKind::DO_STMT: {
+      auto do_ = DoStmt::from(parent).value();
+      if (do_.condition() == stmt) {
+        return TaintCondition(std::move(parent.value()));
+      }
+      break;
+    }
+    case StmtKind::WHILE_STMT: {
+      auto while_ = WhileStmt::from(parent).value();
+      if (while_.condition() == stmt) {
+        return TaintCondition(std::move(parent.value()));
+      }
+      break;
+    }
+    case StmtKind::FOR_STMT: {
+      auto for_ = ForStmt::from(parent).value();
+      if (for_.condition() == stmt) {
+        return TaintCondition(std::move(parent.value()));
+      }
+      break;
+    }
+    case StmtKind::IF_STMT: {
+      auto if_ = IfStmt::from(parent).value();
+      if (if_.condition() == stmt) {
+        return TaintCondition(std::move(parent.value()));
+      }
+      break;
     }
 
     // Not sure.
