@@ -31,6 +31,8 @@
 #include <sstream>
 #include <unordered_set>
 
+#include "../Types.h"
+
 namespace mx {
 
 class TaintTrackerImpl final
