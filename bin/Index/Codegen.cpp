@@ -22,20 +22,19 @@ VAST_RELAX_WARNINGS
 VAST_UNRELAX_WARNINGS
 
 #include <glog/logging.h>
-#include <pasta/AST/Decl.h>
-#include <map>
 
 #include <vast/Util/Common.hpp>
 #include <vast/Translation/CodeGenContext.hpp>
 #include <vast/Translation/CodeGenVisitor.hpp>
-#include "CodegenVisitor.hpp"
-
 #include <vast/Dialect/Dialects.hpp>
 #include <vast/Translation/CodeGen.hpp>
 
 #include "CodegenMetaGenerator.h"
+#include "CodegenVisitor.hpp"
 
 #endif  // MX_ENABLE_SOURCEIR
+
+#include <pasta/AST/Decl.h>
 
 #include "Context.h"
 #include "EntityMapper.h"
@@ -47,10 +46,10 @@ class CodeGeneratorVisitor {
  public:
 
   template<typename Derived>
-  using VisitorConfig =  vast::hl::CodeGenFallBackVisitorMixin<
-      Derived, vast::hl::DefaultCodeGenVisitorMixin, FallBackVisitor >;
+  using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
+      Derived, vast::cg::DefaultCodeGenVisitorMixin, FallBackVisitor >;
 
-  using Visitor = vast::hl::CodeGenVisitor<VisitorConfig, MetaGenerator>;
+  using Visitor = vast::cg::CodeGenVisitor<VisitorConfig, MetaGenerator>;
 
   CodeGeneratorVisitor(const pasta::AST &ast, mlir::MLIRContext *mctx, const EntityMapper &em)
     : meta(ast, mctx, em), codegen(mctx, meta) {}
@@ -59,12 +58,12 @@ class CodeGeneratorVisitor {
     codegen.append_to_module(decl);
   }
 
-  vast::OwningModuleRef freeze() {
+  vast::owning_module_ref freeze() {
     return codegen.freeze();
   }
 
   MetaGenerator meta;
-  vast::hl::CodeGenBase<Visitor> codegen;
+  vast::cg::CodeGenBase<Visitor> codegen;
 };
 
 #endif
@@ -79,7 +78,8 @@ class CodeGeneratorImpl {
 
   CodeGeneratorImpl(void) {
     registry.insert<vast::hl::HighLevelDialect,
-                    vast::meta::MetaDialect>();
+                    vast::meta::MetaDialect,
+                    vast::core::CoreDialect>();
   }
 #endif  // MX_ENABLE_SOURCEIR
 };

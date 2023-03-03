@@ -4,11 +4,14 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <multiplier/SourceIR.h>
+#include <multiplier/AST.h>
+
 #include <cstdlib>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/Index.h>
+
 #include <sstream>
 #include <unordered_set>
 
@@ -25,8 +28,6 @@
 #include <vast/Translation/CodeGenContext.hpp>
 #include <vast/Translation/CodeGenBuilder.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
-
-#include <multiplier/AST.h>
 
 #include "Index.h"
 

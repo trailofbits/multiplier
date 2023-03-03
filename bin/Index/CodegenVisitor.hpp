@@ -55,10 +55,10 @@ class ExceptionThrower {
 template< typename Derived >
 struct FallBackDeclVisitor
     : clang::ConstDeclVisitor< FallBackDeclVisitor< Derived >, vast::Operation* >,
-      vast::hl::CodeGenVisitorLens< FallBackDeclVisitor< Derived >, Derived >,
-      vast::hl::CodeGenBuilderMixin< FallBackDeclVisitor< Derived >, Derived >
+      vast::cg::CodeGenVisitorLens< FallBackDeclVisitor< Derived >, Derived >,
+      vast::cg::CodeGenBuilderMixin< FallBackDeclVisitor< Derived >, Derived >
 {
-  using LensType = vast::hl::CodeGenVisitorLens< FallBackDeclVisitor< Derived >, Derived >;
+  using LensType = vast::cg::CodeGenVisitorLens< FallBackDeclVisitor< Derived >, Derived >;
 
   using LensType::derived;
   using LensType::context;
@@ -119,9 +119,9 @@ struct FallBackDeclVisitor
 template< typename Derived >
 struct FallBackStmtVisitor
     : clang::ConstStmtVisitor< FallBackStmtVisitor< Derived >, vast::Operation* >,
-      vast::hl::CodeGenVisitorLens< FallBackStmtVisitor< Derived >, Derived >,
-      vast::hl::CodeGenBuilderMixin< FallBackStmtVisitor< Derived >, Derived > {
-  using LensType = vast::hl::CodeGenVisitorLens< FallBackStmtVisitor< Derived >, Derived >;
+      vast::cg::CodeGenVisitorLens< FallBackStmtVisitor< Derived >, Derived >,
+      vast::cg::CodeGenBuilderMixin< FallBackStmtVisitor< Derived >, Derived > {
+  using LensType = vast::cg::CodeGenVisitorLens< FallBackStmtVisitor< Derived >, Derived >;
 
   using LensType::derived;
   using LensType::context;
@@ -131,7 +131,7 @@ struct FallBackStmtVisitor
   using LensType::meta_location;
   using LensType::visit;
 
-  using Builder = vast::hl::CodeGenBuilderMixin< FallBackStmtVisitor< Derived >, Derived >;
+  using Builder = vast::cg::CodeGenBuilderMixin< FallBackStmtVisitor< Derived >, Derived >;
 
   using Builder::make_stmt_region;
   using Builder::make_region_builder;
@@ -292,10 +292,10 @@ struct FallBackStmtVisitor
 template< typename Derived >
 struct FallBackTypeVisitor
     : clang::TypeVisitor< FallBackTypeVisitor< Derived >, vast::hl::Type >,
-      vast::hl::CodeGenVisitorLens< FallBackTypeVisitor< Derived >, Derived >,
-      vast::hl::CodeGenBuilderMixin< FallBackTypeVisitor< Derived >, Derived > {
+      vast::cg::CodeGenVisitorLens< FallBackTypeVisitor< Derived >, Derived >,
+      vast::cg::CodeGenBuilderMixin< FallBackTypeVisitor< Derived >, Derived > {
 
-  using LensType = vast::hl::CodeGenVisitorLens< FallBackTypeVisitor< Derived >, Derived >;
+  using LensType = vast::cg::CodeGenVisitorLens< FallBackTypeVisitor< Derived >, Derived >;
   using base_type = clang::TypeVisitor< FallBackTypeVisitor< Derived >, Derived >;
 
   using LensType::derived;
@@ -322,7 +322,7 @@ struct FallBackVisitor
     : FallBackDeclVisitor< Derived >,
       FallBackStmtVisitor< Derived >,
       FallBackTypeVisitor< Derived >,
-      vast::hl::DefaultFallBackVisitorMixin< Derived >
+      vast::cg::DefaultFallBackVisitorMixin< Derived >
 {
   using DeclVisitor = FallBackDeclVisitor< Derived >;
   using StmtVisitor = FallBackStmtVisitor< Derived >;
@@ -332,7 +332,7 @@ struct FallBackVisitor
   using StmtVisitor::Visit;
   using TypeVisitor::Visit;
 
-  using DefaultFallbackVisitor =  vast::hl::DefaultFallBackVisitorMixin< Derived >;
+  using DefaultFallbackVisitor =  vast::cg::DefaultFallBackVisitorMixin< Derived >;
 
   vast::Operation *Visit(const clang::Stmt *stmt) {
     if (auto result = StmtVisitor::Visit(stmt)) {
