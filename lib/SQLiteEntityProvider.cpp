@@ -385,7 +385,9 @@ FilePathMap SQLiteEntityProvider::ListFiles(const Ptr &) {
 
     VariantId vid = EntityId(id).Unpack();
     if (std::holds_alternative<FileId>(vid)) {
-      res.emplace(std::move(path), std::get<FileId>(vid));
+      auto added = res.emplace(std::move(path), std::get<FileId>(vid)).second;
+      assert(added);
+      (void) added;
     } else {
       assert(false);
     }

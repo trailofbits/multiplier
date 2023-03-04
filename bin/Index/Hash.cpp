@@ -17,6 +17,8 @@
 #include <pasta/Util/FileManager.h>
 #include <sstream>
 
+#include "Util.h"
+
 //#define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
@@ -57,15 +59,20 @@ class HashVisitor final : public pasta::DeclVisitor {
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-    if (auto hash = decl.ODRHash()) {
-      D( std::cerr << "\t4 odr=" << hash.value() << '\n'; )
-      ss << hash.value() << ':';
+
+    // XREF(pag): Issue #318. Only integrate the ODR hash when we have a
+    //            definition.
+    if (IsDefinition(decl)) {
+      if (auto hash = decl.ODRHash()) {
+        D( std::cerr << "\t4 odr=" << hash.value() << '\n'; )
+        ss << hash.value() << ':';
+      }
     }
     VisitDeclContext(decl);
   }
 
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
-    if (decl.HasDefinition()) {
+    if (IsDefinition(decl)) {
       if (auto hash = decl.ODRHash()) {
         D( std::cerr << "\t5 odr=" << hash.value() << '\n'; )
         ss << hash.value() << ':';
@@ -75,9 +82,11 @@ class HashVisitor final : public pasta::DeclVisitor {
   }
 
   void VisitEnumDecl(const pasta::EnumDecl &decl) final {
-    if (auto hash = decl.ODRHash()) {
-      D( std::cerr << "\t6 odr=" << hash.value() << '\n'; )
-      ss << hash.value() << ':';
+    if (IsDefinition(decl)) {
+      if (auto hash = decl.ODRHash()) {
+        D( std::cerr << "\t6 odr=" << hash.value() << '\n'; )
+        ss << hash.value() << ':';
+      }
     }
   }
 
@@ -135,7 +144,7 @@ std::string HashFragment(
 
   std::stringstream ss;
 
-  for (uint64_t i = begin_index; i < end_index; i++) {
+  for (uint64_t i = begin_index; i <= end_index; i++) {
     pasta::Token token = toks[i];
     pasta::TokenKind kind = token.Kind();
     llvm::StringRef data(token.Data());
@@ -222,6 +231,8 @@ std::string HashFragment(
 
   // Mix in summarized generic info.
   ss << fs.ComputeHash();
+
+  D( std::cerr << "hash=" << ss.str() << "\n\n"; )
   return ss.str();
 }
 
