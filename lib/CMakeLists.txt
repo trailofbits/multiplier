@@ -255,6 +255,7 @@ if(MX_ENABLE_VAST)
 target_link_libraries("mx-mlir"
   INTERFACE
     vast::vast
+    vast::MLIRCore
     vast::MLIRMeta
     MLIRDialect
     MLIRMLProgramDialect
