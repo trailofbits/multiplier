@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
 class BTFTagAttributedType;
 class BTFTypeTagAttr;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BTFTagAttributedType : public Type {

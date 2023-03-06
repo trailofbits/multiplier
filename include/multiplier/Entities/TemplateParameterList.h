@@ -32,6 +32,7 @@ class Reference;
 class SourceIR;
 class TemplateParameterList;
 class TemplateParameterListImpl;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
  protected:
@@ -49,9 +50,9 @@ class TemplateParameterList {
   friend class Type;
   friend class TemplateParameterListImpl;
   std::shared_ptr<const TemplateParameterListImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   TemplateParameterList(TemplateParameterList &&) noexcept = default;
   TemplateParameterList(const TemplateParameterList &) = default;

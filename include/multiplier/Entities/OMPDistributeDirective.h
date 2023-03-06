@@ -22,14 +22,15 @@
 #include "../Token.h"
 
 #include "OMPLoopDirective.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class OMPDistributeDirective;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopDirective;
 class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDistributeDirective : public OMPLoopDirective {
  private:

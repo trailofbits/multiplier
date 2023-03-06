@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "CXXConstructExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXConstructExpr;
 class CXXTemporaryObjectExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXTemporaryObjectExpr : public CXXConstructExpr {

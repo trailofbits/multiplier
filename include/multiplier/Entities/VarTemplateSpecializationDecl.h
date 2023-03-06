@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "TemplateSpecializationKind.h"
 #include "VarDecl.h"
 
@@ -29,11 +28,14 @@ namespace mx {
 class Decl;
 class DeclaratorDecl;
 class NamedDecl;
+class Stmt;
 class TemplateArgument;
+class Token;
 class Type;
 class ValueDecl;
 class VarDecl;
 class VarTemplateDecl;
+class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarTemplateSpecializationDecl : public VarDecl {

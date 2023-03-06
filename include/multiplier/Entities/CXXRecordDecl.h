@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "LambdaCaptureDefault.h"
 #include "MSInheritanceModel.h"
 #include "MSVtorDispMode.h"
@@ -35,14 +34,18 @@ class CXXDestructorDecl;
 class CXXMethodDecl;
 class CXXRecordDecl;
 class ClassTemplateDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
 class Decl;
 class FriendDecl;
 class FunctionDecl;
 class FunctionTemplateDecl;
 class NamedDecl;
 class RecordDecl;
+class Stmt;
 class TagDecl;
 class TemplateParameterList;
+class Token;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

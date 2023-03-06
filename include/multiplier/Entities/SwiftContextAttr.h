@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "ParameterABIAttr.h"
 
 namespace mx {
@@ -30,6 +29,7 @@ class InheritableAttr;
 class InheritableParamAttr;
 class ParameterABIAttr;
 class SwiftContextAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SwiftContextAttr : public ParameterABIAttr {
  private:

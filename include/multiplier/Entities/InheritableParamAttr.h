@@ -21,13 +21,26 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class AnnotateAttr;
 class Attr;
+class CFConsumedAttr;
+class CarriesDependencyAttr;
 class InheritableAttr;
 class InheritableParamAttr;
+class NSConsumedAttr;
+class NonNullAttr;
+class OSConsumedAttr;
+class PassObjectSizeAttr;
+class ReleaseHandleAttr;
+class SwiftAsyncContextAttr;
+class SwiftContextAttr;
+class SwiftErrorResultAttr;
+class SwiftIndirectResultAttr;
+class Token;
+class UseHandleAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InheritableParamAttr : public InheritableAttr {
  private:

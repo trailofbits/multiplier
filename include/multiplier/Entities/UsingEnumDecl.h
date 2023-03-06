@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "BaseUsingDecl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class BaseUsingDecl;
 class Decl;
 class EnumDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class UsingEnumDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UsingEnumDecl : public BaseUsingDecl {

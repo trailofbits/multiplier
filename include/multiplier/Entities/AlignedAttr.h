@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "AlignedAttrSpelling.h"
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
@@ -30,6 +29,7 @@ class AlignedAttr;
 class Attr;
 class Expr;
 class InheritableAttr;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AlignedAttr : public InheritableAttr {

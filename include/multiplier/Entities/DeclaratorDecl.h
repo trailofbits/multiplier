@@ -21,16 +21,35 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "ValueDecl.h"
 
 namespace mx {
+class CXXConstructorDecl;
+class CXXConversionDecl;
+class CXXDeductionGuideDecl;
+class CXXDestructorDecl;
+class CXXMethodDecl;
 class Decl;
 class DeclaratorDecl;
+class DecompositionDecl;
 class Expr;
+class FieldDecl;
+class FunctionDecl;
+class ImplicitParamDecl;
+class MSPropertyDecl;
 class NamedDecl;
+class NonTypeTemplateParmDecl;
+class OMPCapturedExprDecl;
+class ObjCAtDefsFieldDecl;
+class ObjCIvarDecl;
+class ParmVarDecl;
+class Stmt;
 class TemplateParameterList;
+class Token;
 class ValueDecl;
+class VarDecl;
+class VarTemplatePartialSpecializationDecl;
+class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DeclaratorDecl : public ValueDecl {
  private:

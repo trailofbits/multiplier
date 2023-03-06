@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "VarDecl.h"
 
 namespace mx {
@@ -29,6 +28,8 @@ class Decl;
 class DeclaratorDecl;
 class NamedDecl;
 class OMPCapturedExprDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

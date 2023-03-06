@@ -22,14 +22,15 @@
 #include "../Token.h"
 
 #include "AbstractConditionalOperator.h"
-#include "StmtKind.h"
 
 namespace mx {
 class AbstractConditionalOperator;
 class BinaryConditionalOperator;
+class Decl;
 class Expr;
 class OpaqueValueExpr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BinaryConditionalOperator : public AbstractConditionalOperator {

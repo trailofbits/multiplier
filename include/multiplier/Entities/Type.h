@@ -39,6 +39,9 @@ class BuiltinType;
 class CXXRecordDecl;
 class ComplexType;
 class DeducedType;
+class File;
+class Fragment;
+class Index;
 class ObjCObjectPointerType;
 class ObjCObjectType;
 class RecordDecl;
@@ -46,6 +49,7 @@ class RecordType;
 class Reference;
 class SourceIR;
 class TagDecl;
+class Token;
 class Type;
 class TypeImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -64,9 +68,9 @@ class Type {
   friend class TokenContext;
   friend class TypeImpl;
   std::shared_ptr<const TypeImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Type(Type &&) noexcept = default;
   Type(const Type &) = default;

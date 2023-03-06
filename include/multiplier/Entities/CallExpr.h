@@ -23,17 +23,21 @@
 
 #include "CallExprADLCallKind.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class Attr;
+class CUDAKernelCallExpr;
+class CXXMemberCallExpr;
+class CXXOperatorCallExpr;
 class CallExpr;
 class CastExpr;
 class Decl;
 class Expr;
 class FunctionDecl;
 class Stmt;
+class Token;
 class Type;
+class UserDefinedLiteral;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CallExpr : public Expr {

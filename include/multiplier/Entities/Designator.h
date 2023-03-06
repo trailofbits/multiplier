@@ -31,6 +31,7 @@ class DesignatorImpl;
 class FieldDecl;
 class Reference;
 class SourceIR;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Designator {
  protected:
@@ -48,9 +49,9 @@ class Designator {
   friend class Type;
   friend class DesignatorImpl;
   std::shared_ptr<const DesignatorImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Designator(Designator &&) noexcept = default;
   Designator(const Designator &) = default;

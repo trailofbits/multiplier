@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class ObjCAtCatchStmt;
 class ObjCAtFinallyStmt;
 class ObjCAtTryStmt;
 class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCAtTryStmt : public Stmt {
  private:

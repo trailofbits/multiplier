@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "ImplicitParamDeclImplicitParamKind.h"
 #include "VarDecl.h"
 
@@ -30,6 +29,8 @@ class Decl;
 class DeclaratorDecl;
 class ImplicitParamDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

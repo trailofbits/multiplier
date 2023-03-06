@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "DeclaratorDecl.h"
 #include "LanguageLinkage.h"
 #include "QualTypeDestructionKind.h"
@@ -35,11 +34,19 @@
 namespace mx {
 class Decl;
 class DeclaratorDecl;
+class DecompositionDecl;
 class Expr;
+class ImplicitParamDecl;
 class NamedDecl;
+class OMPCapturedExprDecl;
+class ParmVarDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VarDecl;
 class VarTemplateDecl;
+class VarTemplatePartialSpecializationDecl;
+class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarDecl : public DeclaratorDecl {
  private:

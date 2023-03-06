@@ -21,11 +21,11 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "TypeKind.h"
 #include "TypeWithKeyword.h"
 
 namespace mx {
 class DependentNameType;
+class Token;
 class Type;
 class TypeWithKeyword;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

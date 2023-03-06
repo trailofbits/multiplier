@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "AlwaysInlineAttrSpelling.h"
-#include "AttrKind.h"
 #include "DeclOrStmtAttr.h"
 
 namespace mx {
@@ -30,6 +29,7 @@ class AlwaysInlineAttr;
 class Attr;
 class DeclOrStmtAttr;
 class InheritableAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AlwaysInlineAttr : public DeclOrStmtAttr {
  private:

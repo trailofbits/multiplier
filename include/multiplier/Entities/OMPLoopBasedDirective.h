@@ -22,12 +22,50 @@
 #include "../Token.h"
 
 #include "OMPExecutableDirective.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
+class OMPDistributeDirective;
+class OMPDistributeParallelForDirective;
+class OMPDistributeParallelForSimdDirective;
+class OMPDistributeSimdDirective;
 class OMPExecutableDirective;
+class OMPForDirective;
+class OMPForSimdDirective;
+class OMPGenericLoopDirective;
 class OMPLoopBasedDirective;
+class OMPMaskedTaskLoopDirective;
+class OMPMaskedTaskLoopSimdDirective;
+class OMPMasterTaskLoopDirective;
+class OMPMasterTaskLoopSimdDirective;
+class OMPParallelForDirective;
+class OMPParallelForSimdDirective;
+class OMPParallelGenericLoopDirective;
+class OMPParallelMaskedTaskLoopDirective;
+class OMPParallelMaskedTaskLoopSimdDirective;
+class OMPParallelMasterTaskLoopDirective;
+class OMPParallelMasterTaskLoopSimdDirective;
+class OMPSimdDirective;
+class OMPTargetParallelForDirective;
+class OMPTargetParallelForSimdDirective;
+class OMPTargetParallelGenericLoopDirective;
+class OMPTargetSimdDirective;
+class OMPTargetTeamsDistributeDirective;
+class OMPTargetTeamsDistributeParallelForDirective;
+class OMPTargetTeamsDistributeParallelForSimdDirective;
+class OMPTargetTeamsDistributeSimdDirective;
+class OMPTargetTeamsGenericLoopDirective;
+class OMPTaskLoopDirective;
+class OMPTaskLoopSimdDirective;
+class OMPTeamsDistributeDirective;
+class OMPTeamsDistributeParallelForDirective;
+class OMPTeamsDistributeParallelForSimdDirective;
+class OMPTeamsDistributeSimdDirective;
+class OMPTeamsGenericLoopDirective;
+class OMPTileDirective;
+class OMPUnrollDirective;
 class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPLoopBasedDirective : public OMPExecutableDirective {
  private:

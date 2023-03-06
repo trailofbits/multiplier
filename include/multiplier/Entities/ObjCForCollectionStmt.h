@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class ObjCForCollectionStmt;
 class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCForCollectionStmt : public Stmt {
  private:

@@ -21,15 +21,22 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
 class Decl;
 class NamedDecl;
+class ObjCCategoryDecl;
+class ObjCCategoryImplDecl;
 class ObjCContainerDecl;
+class ObjCImplementationDecl;
+class ObjCInterfaceDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
+class ObjCProtocolDecl;
+class Stmt;
+class Token;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCContainerDecl : public NamedDecl {
  private:

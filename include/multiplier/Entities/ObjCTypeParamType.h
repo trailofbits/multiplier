@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
 class ObjCTypeParamDecl;
 class ObjCTypeParamType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCTypeParamType : public Type {

@@ -23,13 +23,16 @@
 
 #include "CXXConstructExprConstructionKind.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXConstructExpr;
 class CXXConstructorDecl;
+class CXXTemporaryObjectExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
+class TokenRange;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXConstructExpr : public Expr {

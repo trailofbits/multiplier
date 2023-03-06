@@ -21,13 +21,13 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "StmtAttr.h"
 
 namespace mx {
 class Attr;
 class MustTailAttr;
 class StmtAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MustTailAttr : public StmtAttr {
  private:

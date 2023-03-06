@@ -22,11 +22,12 @@
 #include "../Token.h"
 
 #include "ArrayType.h"
-#include "TypeKind.h"
 
 namespace mx {
 class ArrayType;
 class Expr;
+class Token;
+class TokenRange;
 class Type;
 class VariableArrayType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

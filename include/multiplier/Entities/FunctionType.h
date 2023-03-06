@@ -23,10 +23,12 @@
 
 #include "CallingConv.h"
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class FunctionNoProtoType;
+class FunctionProtoType;
 class FunctionType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FunctionType : public Type {

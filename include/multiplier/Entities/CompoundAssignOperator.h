@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "BinaryOperator.h"
-#include "StmtKind.h"
 
 namespace mx {
 class BinaryOperator;
 class CompoundAssignOperator;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

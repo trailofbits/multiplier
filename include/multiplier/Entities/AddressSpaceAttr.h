@@ -21,12 +21,12 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "TypeAttr.h"
 
 namespace mx {
 class AddressSpaceAttr;
 class Attr;
+class Token;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AddressSpaceAttr : public TypeAttr {

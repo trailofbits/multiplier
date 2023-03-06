@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class Decl;
 class FriendDecl;
 class NamedDecl;
+class Stmt;
 class TemplateParameterList;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FriendDecl : public Decl {

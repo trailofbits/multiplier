@@ -939,6 +939,9 @@ static std::optional<pasta::Decl> VisitStmt(const pasta::Stmt &stmt,
   } else if (auto di = pasta::DesignatedInitExpr::From(stmt)) {
     // TODO(pag): need support in pasta.
 
+  } else if (auto ili = pasta::InitListExpr::From(stmt)) {
+    // TODO(pag): Issue #192.
+
   } else if (auto ls = pasta::LabelStmt::From(stmt)) {
     if (ls->IdentifierToken().RawToken() == token.RawToken()) {
       return ls->Declaration();

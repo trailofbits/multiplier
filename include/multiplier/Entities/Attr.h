@@ -28,8 +28,13 @@
 namespace mx {
 class Attr;
 class AttrImpl;
+class File;
+class Fragment;
+class Index;
 class Reference;
 class SourceIR;
+class Token;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Attr {
  protected:
@@ -46,9 +51,9 @@ class Attr {
   friend class Type;
   friend class AttrImpl;
   std::shared_ptr<const AttrImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Attr(Attr &&) noexcept = default;
   Attr(const Attr &) = default;

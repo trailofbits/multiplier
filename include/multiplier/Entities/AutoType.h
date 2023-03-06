@@ -23,13 +23,13 @@
 
 #include "AutoTypeKeyword.h"
 #include "DeducedType.h"
-#include "TypeKind.h"
 
 namespace mx {
 class AutoType;
 class ConceptDecl;
 class DeducedType;
 class TemplateArgument;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AutoType : public DeducedType {

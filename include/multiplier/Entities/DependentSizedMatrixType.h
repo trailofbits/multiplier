@@ -22,12 +22,12 @@
 #include "../Token.h"
 
 #include "MatrixType.h"
-#include "TypeKind.h"
 
 namespace mx {
 class DependentSizedMatrixType;
 class Expr;
 class MatrixType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DependentSizedMatrixType : public MatrixType {

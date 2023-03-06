@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "ConstexprSpecKind.h"
-#include "DeclKind.h"
 #include "DeclaratorDecl.h"
 #include "ExceptionSpecificationType.h"
 #include "FunctionDeclTemplatedKind.h"
@@ -33,6 +32,11 @@
 #include "TemplateSpecializationKind.h"
 
 namespace mx {
+class CXXConstructorDecl;
+class CXXConversionDecl;
+class CXXDeductionGuideDecl;
+class CXXDestructorDecl;
+class CXXMethodDecl;
 class CallExpr;
 class Decl;
 class DeclaratorDecl;
@@ -41,6 +45,8 @@ class FunctionTemplateDecl;
 class NamedDecl;
 class ParmVarDecl;
 class Stmt;
+class Token;
+class TokenRange;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

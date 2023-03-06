@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 #include "ObjCPropertyImplDeclKind.h"
 
 namespace mx {
@@ -32,6 +31,8 @@ class ObjCIvarDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
 class ObjCPropertyImplDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCPropertyImplDecl : public Decl {
  private:

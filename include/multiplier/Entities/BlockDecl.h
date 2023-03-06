@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class BlockDecl;
 class CompoundStmt;
 class Decl;
 class ParmVarDecl;
+class Stmt;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BlockDecl : public Decl {

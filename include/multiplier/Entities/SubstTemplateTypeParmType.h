@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
 class SubstTemplateTypeParmType;
 class TemplateTypeParmType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SubstTemplateTypeParmType : public Type {

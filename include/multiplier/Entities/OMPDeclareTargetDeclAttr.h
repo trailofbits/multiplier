@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "OMPDeclareTargetDeclAttrDevTypeTy.h"
 #include "OMPDeclareTargetDeclAttrMapTypeTy.h"
@@ -31,6 +30,7 @@ class Attr;
 class Expr;
 class InheritableAttr;
 class OMPDeclareTargetDeclAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDeclareTargetDeclAttr : public InheritableAttr {
  private:

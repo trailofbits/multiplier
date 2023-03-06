@@ -22,14 +22,15 @@
 #include "../Token.h"
 
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class DeclStmt;
 class Expr;
 class Stmt;
 class SwitchCase;
 class SwitchStmt;
+class Token;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SwitchStmt : public Stmt {

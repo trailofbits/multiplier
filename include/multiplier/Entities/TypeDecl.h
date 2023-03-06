@@ -21,14 +21,25 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
+class CXXRecordDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
 class Decl;
+class EnumDecl;
 class NamedDecl;
+class ObjCTypeParamDecl;
+class RecordDecl;
+class Stmt;
+class TemplateTypeParmDecl;
+class Token;
 class Type;
+class TypeAliasDecl;
 class TypeDecl;
+class TypedefDecl;
+class UnresolvedUsingTypenameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeDecl : public NamedDecl {
  private:

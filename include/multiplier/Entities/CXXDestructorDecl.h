@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "CXXMethodDecl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class CXXDestructorDecl;
@@ -32,6 +31,8 @@ class DeclaratorDecl;
 class Expr;
 class FunctionDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXDestructorDecl : public CXXMethodDecl {

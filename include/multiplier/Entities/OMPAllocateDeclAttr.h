@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "OMPAllocateDeclAttrAllocatorTypeTy.h"
 
@@ -30,6 +29,7 @@ class Attr;
 class Expr;
 class InheritableAttr;
 class OMPAllocateDeclAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPAllocateDeclAttr : public InheritableAttr {
  private:

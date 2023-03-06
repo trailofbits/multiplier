@@ -22,13 +22,13 @@
 #include "../Token.h"
 
 #include "ARMInterruptAttrInterruptType.h"
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
 class ARMInterruptAttr;
 class Attr;
 class InheritableAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ARMInterruptAttr : public InheritableAttr {
  private:

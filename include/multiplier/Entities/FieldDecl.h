@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "DeclaratorDecl.h"
 #include "InClassInitStyle.h"
 
@@ -31,6 +30,10 @@ class DeclaratorDecl;
 class Expr;
 class FieldDecl;
 class NamedDecl;
+class ObjCAtDefsFieldDecl;
+class ObjCIvarDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VariableArrayType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class Decl;
 class ImportDecl;
+class Stmt;
 class Token;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ImportDecl : public Decl {
  private:

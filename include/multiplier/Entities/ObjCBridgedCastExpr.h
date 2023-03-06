@@ -23,14 +23,15 @@
 
 #include "ExplicitCastExpr.h"
 #include "ObjCBridgeCastKind.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CastExpr;
+class Decl;
 class ExplicitCastExpr;
 class Expr;
 class ObjCBridgedCastExpr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCBridgedCastExpr : public ExplicitCastExpr {

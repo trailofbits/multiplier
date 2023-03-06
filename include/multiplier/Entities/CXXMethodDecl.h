@@ -21,16 +21,20 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "FunctionDecl.h"
 #include "RefQualifierKind.h"
 
 namespace mx {
+class CXXConstructorDecl;
+class CXXConversionDecl;
+class CXXDestructorDecl;
 class CXXMethodDecl;
 class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

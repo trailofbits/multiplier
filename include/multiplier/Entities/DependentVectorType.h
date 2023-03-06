@@ -22,12 +22,12 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 #include "VectorTypeVectorKind.h"
 
 namespace mx {
 class DependentVectorType;
 class Expr;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DependentVectorType : public Type {

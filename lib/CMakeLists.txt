@@ -15,7 +15,8 @@ set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 capnp_generate_cpp(MX_RPC_SOURCES MX_RPC_HEADERS RPC.capnp)
 capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file.
 
-file(GLOB entity_headers CONFIGURE_DEPENDS "${source_include_dir}/Entities/*.h")
+file(GLOB entity_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}/*.h")
+file(GLOB entity_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}/*.cpp")
 
 add_library("mx-entities" INTERFACE)
 set_target_properties("mx-entities"
@@ -92,9 +93,8 @@ set(api_headers
 
 add_library("mx-api" STATIC
   ${api_headers}
-  ${entity_headers}
-
-  "${MX_BOOTSTRAP_LIB_AST_CPP}"  # Auto-generated
+  ${entity_headers}  # Auto-generated
+  ${entity_sources}  # Auto-generated
   
   "API.cpp"
   "API.h"
@@ -102,9 +102,11 @@ add_library("mx-api" STATIC
   "Attr.cpp"
   "CachingEntityProvider.cpp"
   "CachingEntityProvider.h"
+  "CXXBaseSpecifier.h"
   "Database.cpp"
   "Decl.h"
   "Decl.cpp"
+  "Designator.h"
   "Entity.h"
   "File.cpp"
   "FileImpl.cpp"
@@ -133,6 +135,8 @@ add_library("mx-api" STATIC
   "Stmt.cpp"
   "SourceIR.cpp"
   "SourceIR.h"
+  "TemplateArgument.h"
+  "TemplateParameterList.h"
   "ThreadLocal.cpp"
   "ThreadLocal.h"
   "TokenContext.cpp"

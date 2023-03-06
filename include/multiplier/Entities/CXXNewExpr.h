@@ -23,14 +23,16 @@
 
 #include "CXXNewExprInitializationStyle.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXConstructExpr;
 class CXXNewExpr;
+class Decl;
 class Expr;
 class FunctionDecl;
 class Stmt;
+class Token;
+class TokenRange;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

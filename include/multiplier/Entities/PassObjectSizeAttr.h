@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableParamAttr.h"
 #include "PassObjectSizeAttrSpelling.h"
 
@@ -30,6 +29,7 @@ class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
 class PassObjectSizeAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PassObjectSizeAttr : public InheritableParamAttr {
  private:

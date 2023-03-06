@@ -21,12 +21,13 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "TypedefNameDecl.h"
 
 namespace mx {
 class Decl;
 class NamedDecl;
+class Stmt;
+class Token;
 class TypeAliasDecl;
 class TypeAliasTemplateDecl;
 class TypeDecl;

@@ -24,15 +24,16 @@
 #include "Expr.h"
 #include "ObjCMessageExprReceiverKind.h"
 #include "ObjCMethodFamily.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class ObjCInterfaceDecl;
 class ObjCMessageExpr;
 class ObjCMethodDecl;
 class Stmt;
 class Token;
+class TokenRange;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

@@ -26,10 +26,16 @@
 #include "StmtKind.h"
 
 namespace mx {
+class Decl;
+class File;
+class Fragment;
+class Index;
 class Reference;
 class SourceIR;
 class Stmt;
 class StmtImpl;
+class Token;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Stmt {
  protected:
@@ -46,9 +52,9 @@ class Stmt {
   friend class Type;
   friend class StmtImpl;
   std::shared_ptr<const StmtImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Stmt(Stmt &&) noexcept = default;
   Stmt(const Stmt &) = default;

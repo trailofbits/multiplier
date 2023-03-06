@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 
 namespace mx {
 class Attr;
 class NoEscapeAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NoEscapeAttr : public Attr {
  private:

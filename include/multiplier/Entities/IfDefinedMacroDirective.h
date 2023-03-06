@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "ConditionalMacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
 class ConditionalMacroDirective;

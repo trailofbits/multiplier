@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CapturedStmt;
+class Decl;
 class DeclRefExpr;
 class OMPCanonicalLoop;
 class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPCanonicalLoop : public Stmt {
  private:

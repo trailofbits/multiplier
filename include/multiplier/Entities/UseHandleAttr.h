@@ -21,13 +21,13 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableParamAttr.h"
 
 namespace mx {
 class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
+class Token;
 class UseHandleAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UseHandleAttr : public InheritableParamAttr {

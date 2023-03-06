@@ -21,13 +21,13 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "OpenCLGenericAddressSpaceAttrSpelling.h"
 #include "TypeAttr.h"
 
 namespace mx {
 class Attr;
 class OpenCLGenericAddressSpaceAttr;
+class Token;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OpenCLGenericAddressSpaceAttr : public TypeAttr {

@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "DeclObjCDeclQualifier.h"
 #include "VarDecl.h"
 
@@ -31,6 +30,9 @@ class DeclaratorDecl;
 class Expr;
 class NamedDecl;
 class ParmVarDecl;
+class Stmt;
+class Token;
+class TokenRange;
 class Type;
 class ValueDecl;
 class VarDecl;

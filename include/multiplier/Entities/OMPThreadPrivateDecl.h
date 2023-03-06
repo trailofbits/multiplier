@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "OMPDeclarativeDirectiveDecl.h"
 
 namespace mx {
@@ -29,6 +28,8 @@ class Decl;
 class Expr;
 class OMPDeclarativeDirectiveDecl;
 class OMPThreadPrivateDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
  private:

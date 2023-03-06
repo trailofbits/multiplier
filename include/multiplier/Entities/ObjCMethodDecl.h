@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "DeclObjCDeclQualifier.h"
 #include "NamedDecl.h"
 #include "ObjCMethodDeclImplementationControl.h"
@@ -35,7 +34,9 @@ class ObjCInterfaceDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
 class ParmVarDecl;
+class Stmt;
 class Token;
+class TokenRange;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCMethodDecl : public NamedDecl {

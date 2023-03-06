@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "MSVtorDispMode.h"
 
@@ -29,6 +28,7 @@ namespace mx {
 class Attr;
 class InheritableAttr;
 class MSVtorDispAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MSVtorDispAttr : public InheritableAttr {
  private:

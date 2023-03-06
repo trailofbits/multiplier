@@ -23,13 +23,14 @@
 
 #include "IfStatementKind.h"
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class DeclStmt;
 class Expr;
 class IfStmt;
 class Stmt;
+class Token;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class IfStmt : public Stmt {

@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 #include "PragmaMSCommentKind.h"
 
 namespace mx {
 class Decl;
 class PragmaCommentDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PragmaCommentDecl : public Decl {
  private:

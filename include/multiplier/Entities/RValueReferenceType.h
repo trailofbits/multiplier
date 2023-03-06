@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "ReferenceType.h"
-#include "TypeKind.h"
 
 namespace mx {
 class RValueReferenceType;
 class ReferenceType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RValueReferenceType : public ReferenceType {

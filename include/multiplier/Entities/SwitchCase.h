@@ -22,11 +22,14 @@
 #include "../Token.h"
 
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class CaseStmt;
+class Decl;
+class DefaultStmt;
 class Stmt;
 class SwitchCase;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SwitchCase : public Stmt {
  private:

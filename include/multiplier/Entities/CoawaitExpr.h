@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "CoroutineSuspendExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CoawaitExpr;
 class CoroutineSuspendExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CoawaitExpr : public CoroutineSuspendExpr {

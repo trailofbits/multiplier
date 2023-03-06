@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "ObjCTypeParamVariance.h"
 #include "TypedefNameDecl.h"
 
@@ -29,6 +28,8 @@ namespace mx {
 class Decl;
 class NamedDecl;
 class ObjCTypeParamDecl;
+class Stmt;
+class Token;
 class TypeDecl;
 class TypedefNameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

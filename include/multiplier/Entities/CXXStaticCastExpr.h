@@ -22,15 +22,16 @@
 #include "../Token.h"
 
 #include "CXXNamedCastExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXNamedCastExpr;
 class CXXStaticCastExpr;
 class CastExpr;
+class Decl;
 class ExplicitCastExpr;
 class Expr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXStaticCastExpr : public CXXNamedCastExpr {

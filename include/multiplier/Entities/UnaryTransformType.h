@@ -22,10 +22,10 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 #include "UnaryTransformTypeUTTKind.h"
 
 namespace mx {
+class Token;
 class Type;
 class UnaryTransformType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

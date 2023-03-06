@@ -23,18 +23,20 @@
 
 #include "Expr.h"
 #include "LambdaCaptureDefault.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXMethodDecl;
 class CXXRecordDecl;
 class CompoundStmt;
+class Decl;
 class Expr;
 class FunctionTemplateDecl;
 class LambdaExpr;
 class NamedDecl;
 class Stmt;
 class TemplateParameterList;
+class Token;
+class TokenRange;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LambdaExpr : public Expr {

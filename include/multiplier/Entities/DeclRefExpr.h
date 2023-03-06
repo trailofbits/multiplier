@@ -23,13 +23,14 @@
 
 #include "Expr.h"
 #include "NonOdrUseReason.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class DeclRefExpr;
 class Expr;
 class NamedDecl;
 class Stmt;
+class Token;
 class ValueDecl;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

@@ -22,13 +22,23 @@
 #include "../Token.h"
 
 #include "CastExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class BuiltinBitCastExpr;
+class CStyleCastExpr;
+class CXXAddrspaceCastExpr;
+class CXXConstCastExpr;
+class CXXDynamicCastExpr;
+class CXXFunctionalCastExpr;
+class CXXReinterpretCastExpr;
+class CXXStaticCastExpr;
 class CastExpr;
+class Decl;
 class ExplicitCastExpr;
 class Expr;
+class ObjCBridgedCastExpr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

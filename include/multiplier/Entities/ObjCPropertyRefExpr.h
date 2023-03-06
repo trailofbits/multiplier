@@ -22,15 +22,16 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class ObjCInterfaceDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
 class ObjCPropertyRefExpr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

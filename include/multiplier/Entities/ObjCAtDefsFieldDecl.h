@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "FieldDecl.h"
 
 namespace mx {
@@ -30,6 +29,8 @@ class DeclaratorDecl;
 class FieldDecl;
 class NamedDecl;
 class ObjCAtDefsFieldDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCAtDefsFieldDecl : public FieldDecl {

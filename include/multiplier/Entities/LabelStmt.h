@@ -21,13 +21,14 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "StmtKind.h"
 #include "ValueStmt.h"
 
 namespace mx {
+class Decl;
 class LabelDecl;
 class LabelStmt;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LabelStmt : public ValueStmt {

@@ -25,13 +25,13 @@
 #include "ExceptionSpecificationType.h"
 #include "FunctionType.h"
 #include "RefQualifierKind.h"
-#include "TypeKind.h"
 
 namespace mx {
 class Expr;
 class FunctionDecl;
 class FunctionProtoType;
 class FunctionType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FunctionProtoType : public FunctionType {

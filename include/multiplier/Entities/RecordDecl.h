@@ -21,16 +21,20 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "RecordDeclArgPassingKind.h"
 #include "TagDecl.h"
 
 namespace mx {
+class CXXRecordDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
 class Decl;
 class FieldDecl;
 class NamedDecl;
 class RecordDecl;
+class Stmt;
 class TagDecl;
+class Token;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RecordDecl : public TagDecl {

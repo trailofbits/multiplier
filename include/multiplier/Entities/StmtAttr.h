@@ -22,11 +22,17 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 
 namespace mx {
 class Attr;
+class FallThroughAttr;
+class LikelyAttr;
+class MustTailAttr;
+class OpenCLUnrollHintAttr;
 class StmtAttr;
+class SuppressAttr;
+class Token;
+class UnlikelyAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class StmtAttr : public Attr {
  private:

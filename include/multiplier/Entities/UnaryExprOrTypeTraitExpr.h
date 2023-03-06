@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 #include "UnaryExprOrTypeTrait.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class UnaryExprOrTypeTraitExpr;
 class ValueStmt;

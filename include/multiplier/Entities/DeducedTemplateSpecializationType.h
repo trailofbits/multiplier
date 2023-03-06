@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "DeducedType.h"
-#include "TypeKind.h"
 
 namespace mx {
 class DeducedTemplateSpecializationType;
 class DeducedType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DeducedTemplateSpecializationType : public DeducedType {
