@@ -158,6 +158,10 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::in(const File &file) {
   }
 }
 
+unsigned OMPAllocateDecl::num_varlists(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

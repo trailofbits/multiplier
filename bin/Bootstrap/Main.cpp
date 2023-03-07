@@ -778,14 +778,15 @@ class CodeGenerator {
       const std::optional<pasta::RecordDecl> &record,
       const std::string &class_name, const std::string &api_name,
       const std::string &method_name, const std::string &nth_entity_reader,
-      const std::string &base_name);
+      const std::string &base_name, const MethodListPtr &seen_methods);
 
   void RunOnVector(
       std::ostream &os, SpecificEntityStorage &storage,
       const std::optional<pasta::RecordDecl> &record,
       const std::string &class_name, const std::string &api_name,
       const std::string &method_name, const std::string &nth_entity_reader,
-      bool optional, const std::string &base_name);
+      bool optional, const std::string &base_name,
+      const MethodListPtr &seen_methods);
 
  public:
   CodeGenerator(char *argv[]);
@@ -1067,11 +1068,12 @@ NamesFor(unsigned meth_id) {
 }
 
 void CodeGenerator::RunOnOptional(
-    std::ostream& os, ClassHierarchy *cls, SpecificEntityStorage &storage,
+    std::ostream &os, ClassHierarchy *cls, SpecificEntityStorage &storage,
     const std::optional<pasta::RecordDecl> &record,
     const std::string &class_name, const std::string &api_name,
     const std::string &method_name,
-    const std::string &nth_entity_reader, const std::string &base_name) {
+    const std::string &nth_entity_reader, const std::string &base_name,
+    const MethodListPtr &seen_methods) {
 
   std::optional<std::string> element_name =
       GetFirstTemplateParameterType(record);
@@ -1112,7 +1114,7 @@ void CodeGenerator::RunOnOptional(
   } else if (*element_name == "vector") {
     if (auto sub_record = GetTemplateParameterRecord(record)) {
       RunOnVector(os, storage, sub_record, class_name, api_name, method_name,
-                  nth_entity_reader, true, base_name);
+                  nth_entity_reader, true, base_name, seen_methods);
       return;
     }
 
@@ -1428,7 +1430,8 @@ void CodeGenerator::RunOnVector(
     const std::optional<pasta::RecordDecl> &record,
     const std::string &class_name, const std::string &api_name,
     const std::string &method_name, const std::string &nth_entity_reader,
-    bool optional, const std::string &base_name) {
+    bool optional, const std::string &base_name,
+    const MethodListPtr &seen_methods) {
 
   std::optional<std::string> element_name =
       GetFirstTemplateParameterType(record);
@@ -1504,9 +1507,16 @@ void CodeGenerator::RunOnVector(
       singular_api.pop_back();
       os
           << "  std::optional<" << cxx_element_name << "> nth_"
-          << singular_api << "(unsigned n) const;\n";
+          << singular_api << "(unsigned n) const;\n"
+          << "  unsigned num_" << api_name << "(void) const;\n";
+
+      (void) seen_methods->emplace("num_" + api_name);
 
       lib_cpp_os
+          << "unsigned " << class_name
+          << "::num_" << api_name << "(void) const {\n"
+          << "  return impl->reader." << getter_name << "().size();\n"
+          << "}\n\n"
           << "std::optional<" << cxx_element_name << "> " << class_name
           << "::nth_" << singular_api << "(unsigned n) const {\n"
           << "  auto list = impl->reader." << getter_name << "();\n"
@@ -3031,7 +3041,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     std::string api_name = SnakeCaseToAPICase(snake_name);
-    if (!seen_methods->emplace(api_name).second) {
+
+    // Assume we have a vector of this thing, which will make us a `num_*`.
+    if (api_name.starts_with("num_") && api_name.ends_with('s')) {
       continue;
     }
 
@@ -3041,7 +3053,12 @@ MethodListPtr CodeGenerator::RunOnClass(
       continue;
     }
 
+    if (!seen_methods->emplace(api_name).second) {
+      continue;
+    }
+
     std::string camel_name = SnakeCaseToCamelCase(snake_name);
+
     auto return_type = method.ReturnType().UnqualifiedType();
     if (auto return_type_ref = pasta::ReferenceType::From(return_type)) {
       return_type = return_type_ref->PointeeType().UnqualifiedType();
@@ -3299,12 +3316,14 @@ MethodListPtr CodeGenerator::RunOnClass(
       // member, so the extra `bool` just means 1 bit of overhead.
       } else if (record_name == "optional") {
         RunOnOptional(class_os, cls, storage, record, class_name, api_name,
-                      method_name, nth_entity_reader, base_name);
+                      method_name, nth_entity_reader, base_name,
+                      seen_methods);
 
       // List of things; figure out what.
       } else if (record_name == "vector") {
         RunOnVector(class_os, storage, record, class_name, api_name,
-                    method_name, nth_entity_reader, false, base_name);
+                    method_name, nth_entity_reader, false, base_name,
+                    seen_methods);
 
       // E.g. something that returns a `Decl`, `Stmt`, etc.
       } else if (gEntityClassNames.count(record_name)) {
@@ -3414,6 +3433,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     // Handle integral return types.
     } else if (auto int_type = SchemaIntType(return_type)) {
+
       std::string cxx_int_type = CxxIntType(return_type);
       const auto i = storage.AddMethod(int_type);
       auto [getter_name, setter_name, init_name] = NamesFor(i);

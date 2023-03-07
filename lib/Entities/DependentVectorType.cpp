@@ -111,7 +111,7 @@ Type DependentVectorType::element_type(void) const {
 }
 
 Expr DependentVectorType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal263();
+  RawEntityId eid = impl->reader.getVal262();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

@@ -181,6 +181,10 @@ Stmt CoroutineBodyStmt::initializer_suspend_statement(void) const {
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
+unsigned CoroutineBodyStmt::num_parameter_moves(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

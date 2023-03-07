@@ -146,6 +146,10 @@ gap::generator<RecoveryExpr> RecoveryExpr::in(const File &file) {
   }
 }
 
+unsigned RecoveryExpr::num_sub_expressions(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> RecoveryExpr::nth_sub_expression(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

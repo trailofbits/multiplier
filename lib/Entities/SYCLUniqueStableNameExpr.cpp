@@ -147,7 +147,7 @@ gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::in(const File
 }
 
 std::string_view SYCLUniqueStableNameExpr::compute_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 

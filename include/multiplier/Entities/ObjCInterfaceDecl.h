@@ -84,6 +84,7 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   }
 
   std::optional<ObjCProtocolDecl> nth_all_referenced_protocol(unsigned n) const;
+  unsigned num_all_referenced_protocols(void) const;
   gap::generator<ObjCProtocolDecl> all_referenced_protocols(void) const &;
   bool declares_or_inherits_designated_initializers(void) const;
   Token end_of_definition_token(void) const;
@@ -100,18 +101,25 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
   bool is_this_declaration_a_definition(void) const;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
+  unsigned num_instance_variables(void) const;
   gap::generator<ObjCIvarDecl> instance_variables(void) const &;
   std::optional<ObjCCategoryDecl> nth_known_categorie(unsigned n) const;
+  unsigned num_known_categories(void) const;
   gap::generator<ObjCCategoryDecl> known_categories(void) const &;
   std::optional<ObjCCategoryDecl> nth_known_extension(unsigned n) const;
+  unsigned num_known_extensions(void) const;
   gap::generator<ObjCCategoryDecl> known_extensions(void) const &;
   std::optional<Token> nth_protocol_token(unsigned n) const;
+  unsigned num_protocol_tokens(void) const;
   gap::generator<Token> protocol_tokens(void) const &;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
+  unsigned num_protocols(void) const;
   gap::generator<ObjCProtocolDecl> protocols(void) const &;
   std::optional<ObjCCategoryDecl> nth_visible_categorie(unsigned n) const;
+  unsigned num_visible_categories(void) const;
   gap::generator<ObjCCategoryDecl> visible_categories(void) const &;
   std::optional<ObjCCategoryDecl> nth_visible_extension(unsigned n) const;
+  unsigned num_visible_extensions(void) const;
   gap::generator<ObjCCategoryDecl> visible_extensions(void) const &;
 };
 

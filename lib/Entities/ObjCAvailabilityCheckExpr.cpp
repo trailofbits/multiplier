@@ -147,7 +147,7 @@ gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::in(const Fi
 }
 
 bool ObjCAvailabilityCheckExpr::has_version(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

@@ -150,12 +150,16 @@ gap::generator<AsmStmt> AsmStmt::in(const File &file) {
 }
 
 std::string_view AsmStmt::generate_assembly_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token AsmStmt::assembly_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+}
+
+unsigned AsmStmt::num_inputs(void) const {
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Expr> AsmStmt::nth_input(unsigned n) const {
@@ -194,6 +198,10 @@ bool AsmStmt::is_volatile(void) const {
   return impl->reader.getVal16();
 }
 
+unsigned AsmStmt::num_outputs(void) const {
+  return impl->reader.getVal26().size();
+}
+
 std::optional<Expr> AsmStmt::nth_output(unsigned n) const {
   auto list = impl->reader.getVal26();
   if (n >= list.size()) {
@@ -223,12 +231,16 @@ gap::generator<Expr> AsmStmt::outputs(void) const & {
 }
 
 gap::generator<std::string_view> AsmStmt::output_constraints(void) const & {
-  auto list = impl->reader.getVal62();
+  auto list = impl->reader.getVal61();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
   co_return;
+}
+
+unsigned AsmStmt::num_output_expressions(void) const {
+  return impl->reader.getVal27().size();
 }
 
 std::optional<Expr> AsmStmt::nth_output_expression(unsigned n) const {
@@ -260,12 +272,16 @@ gap::generator<Expr> AsmStmt::output_expressions(void) const & {
 }
 
 gap::generator<std::string_view> AsmStmt::input_constraints(void) const & {
-  auto list = impl->reader.getVal63();
+  auto list = impl->reader.getVal62();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
   co_return;
+}
+
+unsigned AsmStmt::num_input_expressions(void) const {
+  return impl->reader.getVal28().size();
 }
 
 std::optional<Expr> AsmStmt::nth_input_expression(unsigned n) const {
@@ -297,7 +313,7 @@ gap::generator<Expr> AsmStmt::input_expressions(void) const & {
 }
 
 gap::generator<std::string_view> AsmStmt::clobbers(void) const & {
-  auto list = impl->reader.getVal64();
+  auto list = impl->reader.getVal63();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());

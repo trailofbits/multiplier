@@ -214,6 +214,10 @@ bool BlockDecl::is_variadic(void) const {
   return impl->reader.getVal57();
 }
 
+unsigned BlockDecl::num_parameters(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {
@@ -240,6 +244,10 @@ gap::generator<ParmVarDecl> BlockDecl::parameters(void) const & {
     }
   }
   co_return;
+}
+
+unsigned BlockDecl::num_parameter_declarations(void) const {
+  return impl->reader.getVal48().size();
 }
 
 std::optional<ParmVarDecl> BlockDecl::nth_parameter_declaration(unsigned n) const {

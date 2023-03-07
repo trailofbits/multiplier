@@ -147,7 +147,7 @@ gap::generator<CharacterLiteral> CharacterLiteral::in(const File &file) {
 }
 
 CharacterLiteralCharacterKind CharacterLiteral::character_kind(void) const {
-  return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal94());
+  return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal93());
 }
 
 Token CharacterLiteral::token(void) const {

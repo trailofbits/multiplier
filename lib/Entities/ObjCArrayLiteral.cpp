@@ -152,6 +152,10 @@ ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
+unsigned ObjCArrayLiteral::num_elements(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

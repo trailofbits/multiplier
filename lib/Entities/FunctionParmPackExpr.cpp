@@ -156,6 +156,10 @@ Token FunctionParmPackExpr::parameter_pack_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
+unsigned FunctionParmPackExpr::num_expansions(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

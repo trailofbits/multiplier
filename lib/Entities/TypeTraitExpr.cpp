@@ -148,16 +148,20 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::in(const File &file) {
 }
 
 TypeTrait TypeTraitExpr::trait(void) const {
-  return static_cast<TypeTrait>(impl->reader.getVal94());
+  return static_cast<TypeTrait>(impl->reader.getVal93());
 }
 
 std::optional<bool> TypeTraitExpr::value(void) const {
-  if (!impl->reader.getVal90()) {
+  if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal89());
+    return static_cast<bool>(impl->reader.getVal88());
   }
   return std::nullopt;
+}
+
+unsigned TypeTraitExpr::num_arguments(void) const {
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Type> TypeTraitExpr::nth_argument(unsigned n) const {

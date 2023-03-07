@@ -150,6 +150,10 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const File &file) {
   }
 }
 
+unsigned ObjCMessageExpr::num_arguments(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> ObjCMessageExpr::nth_argument(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {
@@ -208,7 +212,7 @@ ObjCMethodDecl ObjCMessageExpr::method_declaration(void) const {
 }
 
 ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
-  return static_cast<ObjCMethodFamily>(impl->reader.getVal94());
+  return static_cast<ObjCMethodFamily>(impl->reader.getVal93());
 }
 
 ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
@@ -217,7 +221,7 @@ ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
 }
 
 ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {
-  return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal96());
+  return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal95());
 }
 
 TokenRange ObjCMessageExpr::receiver_range(void) const {
@@ -249,19 +253,23 @@ Type ObjCMessageExpr::super_type(void) const {
 }
 
 bool ObjCMessageExpr::is_class_message(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 bool ObjCMessageExpr::is_delegate_initializer_call(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool ObjCMessageExpr::is_implicit(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool ObjCMessageExpr::is_instance_message(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
+}
+
+unsigned ObjCMessageExpr::num_selector_tokens(void) const {
+  return impl->reader.getVal26().size();
 }
 
 std::optional<Token> ObjCMessageExpr::nth_selector_token(unsigned n) const {

@@ -126,6 +126,10 @@ bool TemplateSpecializationType::is_type_alias(void) const {
   return impl->reader.getVal232();
 }
 
+unsigned TemplateSpecializationType::num_template_arguments(void) const {
+  return impl->reader.getVal233().size();
+}
+
 std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argument(unsigned n) const {
   auto list = impl->reader.getVal233();
   if (n >= list.size()) {

@@ -72,6 +72,7 @@ class MacroExpansion : public MacroSubstitution {
 
   std::optional<DefineMacroDirective> definition(void) const;
   std::optional<MacroArgument> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<MacroArgument> arguments(void) const &;
 };
 

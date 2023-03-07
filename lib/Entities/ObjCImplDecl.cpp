@@ -169,8 +169,12 @@ ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
+unsigned ObjCImplDecl::num_property_implementations(void) const {
+  return impl->reader.getVal309().size();
+}
+
 std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
-  auto list = impl->reader.getVal313();
+  auto list = impl->reader.getVal309();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -184,12 +188,12 @@ std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(un
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const & {
-  auto list = impl->reader.getVal313();
+  auto list = impl->reader.getVal309();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d313 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyImplDecl::from(Decl(std::move(d313)))) {
+    if (auto d309 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCPropertyImplDecl::from(Decl(std::move(d309)))) {
         co_yield std::move(*e);
       }
     }

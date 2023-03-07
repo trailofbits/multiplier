@@ -81,6 +81,7 @@ class FriendDecl : public Decl {
   std::optional<Type> friend_type(void) const;
   bool is_unsupported_friend(void) const;
   std::optional<TemplateParameterList> nth_friend_type_template_parameter_list(unsigned n) const;
+  unsigned num_friend_type_template_parameter_lists(void) const;
   gap::generator<TemplateParameterList> friend_type_template_parameter_lists(void) const &;
 };
 

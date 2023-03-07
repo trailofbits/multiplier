@@ -34,29 +34,21 @@ std::shared_ptr<EntityProvider> TemplateParameterList::entity_provider_of(const 
   return file_.impl->ep;
 }
 
-unsigned TemplateParameterList::num_parameters(void) const {
+unsigned TemplateParameterList::depth(void) const {
   return impl->reader.getVal0();
 }
 
-unsigned TemplateParameterList::num_required_parameters(void) const {
+bool TemplateParameterList::has_unexpanded_parameter_pack(void) const {
   return impl->reader.getVal1();
 }
 
-unsigned TemplateParameterList::depth(void) const {
-  return impl->reader.getVal2();
-}
-
-bool TemplateParameterList::has_unexpanded_parameter_pack(void) const {
-  return impl->reader.getVal3();
-}
-
 bool TemplateParameterList::has_parameter_pack(void) const {
-  return impl->reader.getVal4();
+  return impl->reader.getVal2();
 }
 
 std::optional<Expr> TemplateParameterList::requires_clause(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal5();
+    RawEntityId eid = impl->reader.getVal3();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -68,25 +60,29 @@ std::optional<Expr> TemplateParameterList::requires_clause(void) const {
 }
 
 Token TemplateParameterList::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal6());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal4());
 }
 
 Token TemplateParameterList::left_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal7());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal5());
 }
 
 Token TemplateParameterList::right_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal8());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal6());
 }
 
 TokenRange TemplateParameterList::tokens(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal9(), impl->reader.getVal10());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal7(), impl->reader.getVal8());
+}
+
+unsigned TemplateParameterList::num_parameters(void) const {
+  return impl->reader.getVal9().size();
 }
 
 std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const {
-  auto list = impl->reader.getVal11();
+  auto list = impl->reader.getVal9();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -100,12 +96,12 @@ std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const 
 }
 
 gap::generator<NamedDecl> TemplateParameterList::parameters(void) const & {
-  auto list = impl->reader.getVal11();
+  auto list = impl->reader.getVal9();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d11 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d11)))) {
+    if (auto d9 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from(Decl(std::move(d9)))) {
         co_yield std::move(*e);
       }
     }

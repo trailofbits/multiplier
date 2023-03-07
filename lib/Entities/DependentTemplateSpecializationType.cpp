@@ -106,6 +106,10 @@ bool DependentTemplateSpecializationType::is_sugared(void) const {
   return impl->reader.getVal230();
 }
 
+unsigned DependentTemplateSpecializationType::num_template_arguments(void) const {
+  return impl->reader.getVal233().size();
+}
+
 std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_template_argument(unsigned n) const {
   auto list = impl->reader.getVal233();
   if (n >= list.size()) {

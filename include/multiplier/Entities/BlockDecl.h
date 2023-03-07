@@ -88,8 +88,10 @@ class BlockDecl : public Decl {
   bool is_conversion_from_lambda(void) const;
   bool is_variadic(void) const;
   std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
+  unsigned num_parameters(void) const;
   gap::generator<ParmVarDecl> parameters(void) const &;
   std::optional<ParmVarDecl> nth_parameter_declaration(unsigned n) const;
+  unsigned num_parameter_declarations(void) const;
   gap::generator<ParmVarDecl> parameter_declarations(void) const &;
   gap::generator<Decl> declarations_in_context(void) const &;
 };

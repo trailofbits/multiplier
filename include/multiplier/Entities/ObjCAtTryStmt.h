@@ -78,6 +78,7 @@ class ObjCAtTryStmt : public Stmt {
   ObjCAtFinallyStmt finally_statement(void) const;
   Stmt try_body(void) const;
   std::optional<ObjCAtCatchStmt> nth_catch_statement(unsigned n) const;
+  unsigned num_catch_statements(void) const;
   gap::generator<ObjCAtCatchStmt> catch_statements(void) const &;
 };
 

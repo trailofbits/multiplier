@@ -147,12 +147,16 @@ gap::generator<MSAsmStmt> MSAsmStmt::in(const File &file) {
 }
 
 gap::generator<std::string_view> MSAsmStmt::all_constraints(void) const & {
-  auto list = impl->reader.getVal65();
+  auto list = impl->reader.getVal64();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
   co_return;
+}
+
+unsigned MSAsmStmt::num_all_expressions(void) const {
+  return impl->reader.getVal29().size();
 }
 
 std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
@@ -184,7 +188,7 @@ gap::generator<Expr> MSAsmStmt::all_expressions(void) const & {
 }
 
 std::string_view MSAsmStmt::assembly_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal66();
+  capnp::Text::Reader data = impl->reader.getVal65();
   return std::string_view(data.cStr(), data.size());
 }
 

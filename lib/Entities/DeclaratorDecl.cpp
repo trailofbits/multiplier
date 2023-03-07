@@ -241,6 +241,10 @@ Token DeclaratorDecl::type_spec_start_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
 }
 
+unsigned DeclaratorDecl::num_template_parameter_lists(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

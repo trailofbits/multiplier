@@ -84,6 +84,7 @@ class EnumDecl : public TagDecl {
   }
 
   std::optional<EnumConstantDecl> nth_enumerator(unsigned n) const;
+  unsigned num_enumerators(void) const;
   gap::generator<EnumConstantDecl> enumerators(void) const &;
   std::optional<EnumDecl> instantiated_from_member_enum(void) const;
   std::optional<Type> integer_type(void) const;

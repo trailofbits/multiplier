@@ -89,6 +89,7 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   bool has_destructors(void) const;
   bool has_non_zero_constructors(void) const;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
+  unsigned num_instance_variables(void) const;
   gap::generator<ObjCIvarDecl> instance_variables(void) const &;
 };
 

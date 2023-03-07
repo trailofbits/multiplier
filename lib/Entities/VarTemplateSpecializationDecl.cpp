@@ -179,6 +179,10 @@ VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const 
   return VarTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
+unsigned VarTemplateSpecializationDecl::num_template_arguments(void) const {
+  return impl->reader.getVal48().size();
+}
+
 std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
   auto list = impl->reader.getVal48();
   if (n >= list.size()) {
@@ -203,6 +207,10 @@ gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_argumen
     }
   }
   co_return;
+}
+
+unsigned VarTemplateSpecializationDecl::num_template_instantiation_arguments(void) const {
+  return impl->reader.getVal58().size();
 }
 
 std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {

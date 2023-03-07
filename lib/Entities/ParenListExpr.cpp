@@ -154,6 +154,10 @@ Token ParenListExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
+unsigned ParenListExpr::num_expressions(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> ParenListExpr::nth_expression(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

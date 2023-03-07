@@ -609,7 +609,7 @@ std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
 }
 
 ExprObjectKind Expr::object_kind(void) const {
-  return static_cast<ExprObjectKind>(impl->reader.getVal57());
+  return static_cast<ExprObjectKind>(impl->reader.getVal56());
 }
 
 std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
@@ -652,7 +652,7 @@ std::optional<Type> Expr::type(void) const {
 }
 
 ExprValueKind Expr::value_kind(void) const {
-  return static_cast<ExprValueKind>(impl->reader.getVal70());
+  return static_cast<ExprValueKind>(impl->reader.getVal69());
 }
 
 bool Expr::has_non_trivial_call(void) const {
@@ -660,7 +660,7 @@ bool Expr::has_non_trivial_call(void) const {
 }
 
 std::optional<bool> Expr::is_cxx98_integral_constant_expression(void) const {
-  if (!impl->reader.getVal58()) {
+  if (!impl->reader.getVal57()) {
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal25());
@@ -669,84 +669,84 @@ std::optional<bool> Expr::is_cxx98_integral_constant_expression(void) const {
 }
 
 bool Expr::is_default_argument(void) const {
-  return impl->reader.getVal59();
+  return impl->reader.getVal58();
 }
 
 bool Expr::is_gl_value(void) const {
-  return impl->reader.getVal60();
+  return impl->reader.getVal59();
 }
 
 bool Expr::is_implicit_cxx_this(void) const {
-  return impl->reader.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool Expr::is_instantiation_dependent(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal71();
 }
 
 std::optional<bool> Expr::is_integer_constant_expression(void) const {
-  if (!impl->reader.getVal74()) {
+  if (!impl->reader.getVal73()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal73());
+    return static_cast<bool>(impl->reader.getVal72());
   }
   return std::nullopt;
 }
 
 bool Expr::is_known_to_have_boolean_value(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal74();
 }
 
 bool Expr::is_l_value(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal75();
 }
 
 bool Expr::is_objcgc_candidate(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal76();
 }
 
 bool Expr::is_obj_c_self_expression(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal77();
 }
 
 bool Expr::is_ordinary_or_bit_field_object(void) const {
-  return impl->reader.getVal79();
+  return impl->reader.getVal78();
 }
 
 bool Expr::is_pr_value(void) const {
-  return impl->reader.getVal80();
+  return impl->reader.getVal79();
 }
 
 bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
-  return impl->reader.getVal81();
+  return impl->reader.getVal80();
 }
 
 bool Expr::is_type_dependent(void) const {
-  return impl->reader.getVal82();
+  return impl->reader.getVal81();
 }
 
 bool Expr::is_value_dependent(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal82();
 }
 
 bool Expr::is_x_value(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal83();
 }
 
 bool Expr::refers_to_bit_field(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal84();
 }
 
 bool Expr::refers_to_global_register_variable(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal85();
 }
 
 bool Expr::refers_to_matrix_element(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal86();
 }
 
 bool Expr::refers_to_vector_element(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal87();
 }
 
 #pragma GCC diagnostic pop

@@ -75,6 +75,7 @@ class ImportDecl : public Decl {
   }
 
   std::optional<Token> nth_identifier_token(unsigned n) const;
+  unsigned num_identifier_tokens(void) const;
   gap::generator<Token> identifier_tokens(void) const &;
 };
 

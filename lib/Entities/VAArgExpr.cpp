@@ -166,7 +166,7 @@ Type VAArgExpr::written_type(void) const {
 }
 
 bool VAArgExpr::is_microsoft_abi(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

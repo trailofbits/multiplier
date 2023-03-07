@@ -286,6 +286,10 @@ bool ObjCMethodDecl::is_variadic(void) const {
   return impl->reader.getVal102();
 }
 
+unsigned ObjCMethodDecl::num_parameters(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {
@@ -312,6 +316,10 @@ gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const & {
     }
   }
   co_return;
+}
+
+unsigned ObjCMethodDecl::num_selector_tokens(void) const {
+  return impl->reader.getVal48().size();
 }
 
 std::optional<Token> ObjCMethodDecl::nth_selector_token(unsigned n) const {

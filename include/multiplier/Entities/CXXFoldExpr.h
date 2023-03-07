@@ -83,7 +83,6 @@ class CXXFoldExpr : public Expr {
   Expr initializer(void) const;
   Expr lhs(void) const;
   Token l_paren_token(void) const;
-  std::optional<unsigned> num_expansions(void) const;
   BinaryOperatorKind operator_(void) const;
   Expr pattern(void) const;
   Expr rhs(void) const;

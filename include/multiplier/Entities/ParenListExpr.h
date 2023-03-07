@@ -79,6 +79,7 @@ class ParenListExpr : public Expr {
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   std::optional<Expr> nth_expression(unsigned n) const;
+  unsigned num_expressions(void) const;
   gap::generator<Expr> expressions(void) const &;
 };
 

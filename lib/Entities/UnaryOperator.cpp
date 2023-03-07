@@ -147,11 +147,11 @@ gap::generator<UnaryOperator> UnaryOperator::in(const File &file) {
 }
 
 bool UnaryOperator::can_overflow(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 UnaryOperatorKind UnaryOperator::opcode(void) const {
-  return static_cast<UnaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<UnaryOperatorKind>(impl->reader.getVal93());
 }
 
 Token UnaryOperator::operator_token(void) const {
@@ -164,31 +164,31 @@ Expr UnaryOperator::sub_expression(void) const {
 }
 
 bool UnaryOperator::has_stored_fp_features(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool UnaryOperator::is_arithmetic_operation(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool UnaryOperator::is_decrement_operation(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool UnaryOperator::is_increment_decrement_operation(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool UnaryOperator::is_increment_operation(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool UnaryOperator::is_postfix(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool UnaryOperator::is_prefix(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal97();
 }
 
 #pragma GCC diagnostic pop

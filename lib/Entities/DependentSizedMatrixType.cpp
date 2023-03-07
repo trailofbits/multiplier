@@ -102,12 +102,12 @@ Token DependentSizedMatrixType::attribute_token(void) const {
 }
 
 Expr DependentSizedMatrixType::column_expression(void) const {
-  RawEntityId eid = impl->reader.getVal263();
+  RawEntityId eid = impl->reader.getVal262();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr DependentSizedMatrixType::row_expression(void) const {
-  RawEntityId eid = impl->reader.getVal265();
+  RawEntityId eid = impl->reader.getVal264();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

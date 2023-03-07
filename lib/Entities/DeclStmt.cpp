@@ -144,6 +144,10 @@ gap::generator<DeclStmt> DeclStmt::in(const File &file) {
   }
 }
 
+unsigned DeclStmt::num_declarations(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Decl> DeclStmt::nth_declaration(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

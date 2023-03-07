@@ -148,7 +148,7 @@ gap::generator<ExprWithCleanups> ExprWithCleanups::in(const File &file) {
 }
 
 bool ExprWithCleanups::cleanups_have_side_effects(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

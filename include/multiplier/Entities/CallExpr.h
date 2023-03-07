@@ -86,6 +86,7 @@ class CallExpr : public Expr {
   }
 
   std::optional<Expr> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<Expr> arguments(void) const &;
   CallExprADLCallKind adl_call_kind(void) const;
   Type call_return_type(void) const;

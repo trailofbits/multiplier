@@ -174,6 +174,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_variadic(void) const;
   bool is_virtual_as_written(void) const;
   std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
+  unsigned num_parameters(void) const;
   gap::generator<ParmVarDecl> parameters(void) const &;
   bool uses_seh_try(void) const;
   bool will_have_body(void) const;

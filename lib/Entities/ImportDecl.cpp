@@ -157,6 +157,10 @@ gap::generator<ImportDecl> ImportDecl::in(const File &file) {
   }
 }
 
+unsigned ImportDecl::num_identifier_tokens(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

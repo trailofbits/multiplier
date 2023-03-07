@@ -162,6 +162,10 @@ gap::generator<EnumDecl> EnumDecl::in(const File &file) {
   }
 }
 
+unsigned EnumDecl::num_enumerators(void) const {
+  return impl->reader.getVal58().size();
+}
+
 std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
   auto list = impl->reader.getVal58();
   if (n >= list.size()) {

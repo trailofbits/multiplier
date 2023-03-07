@@ -250,6 +250,10 @@ gap::generator<OMPLoopDirective> OMPLoopDirective::in(const File &file) {
   }
 }
 
+unsigned OMPLoopDirective::num_counters(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> OMPLoopDirective::nth_counter(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {
@@ -276,6 +280,10 @@ gap::generator<Expr> OMPLoopDirective::counters(void) const & {
     }
   }
   co_return;
+}
+
+unsigned OMPLoopDirective::num_dependent_counters(void) const {
+  return impl->reader.getVal26().size();
 }
 
 std::optional<Expr> OMPLoopDirective::nth_dependent_counter(unsigned n) const {
@@ -306,6 +314,10 @@ gap::generator<Expr> OMPLoopDirective::dependent_counters(void) const & {
   co_return;
 }
 
+unsigned OMPLoopDirective::num_dependent_initializers(void) const {
+  return impl->reader.getVal27().size();
+}
+
 std::optional<Expr> OMPLoopDirective::nth_dependent_initializer(unsigned n) const {
   auto list = impl->reader.getVal27();
   if (n >= list.size()) {
@@ -334,6 +346,10 @@ gap::generator<Expr> OMPLoopDirective::dependent_initializers(void) const & {
   co_return;
 }
 
+unsigned OMPLoopDirective::num_finals(void) const {
+  return impl->reader.getVal28().size();
+}
+
 std::optional<Expr> OMPLoopDirective::nth_final(unsigned n) const {
   auto list = impl->reader.getVal28();
   if (n >= list.size()) {
@@ -360,6 +376,10 @@ gap::generator<Expr> OMPLoopDirective::finals(void) const & {
     }
   }
   co_return;
+}
+
+unsigned OMPLoopDirective::num_finals_conditions(void) const {
+  return impl->reader.getVal29().size();
 }
 
 std::optional<Expr> OMPLoopDirective::nth_finals_condition(unsigned n) const {
@@ -500,48 +520,47 @@ Expr OMPLoopDirective::next_upper_bound(void) const {
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr OMPLoopDirective::num_iterations(void) const {
+Expr OMPLoopDirective::pre_condition(void) const {
   RawEntityId eid = impl->reader.getVal45();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr OMPLoopDirective::pre_condition(void) const {
-  RawEntityId eid = impl->reader.getVal46();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
 Stmt OMPLoopDirective::pre_initializers(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal46();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr OMPLoopDirective::prev_ensure_upper_bound(void) const {
-  RawEntityId eid = impl->reader.getVal48();
+  RawEntityId eid = impl->reader.getVal47();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::prev_lower_bound_variable(void) const {
-  RawEntityId eid = impl->reader.getVal49();
+  RawEntityId eid = impl->reader.getVal48();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::prev_upper_bound_variable(void) const {
-  RawEntityId eid = impl->reader.getVal50();
+  RawEntityId eid = impl->reader.getVal49();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::stride_variable(void) const {
-  RawEntityId eid = impl->reader.getVal51();
+  RawEntityId eid = impl->reader.getVal50();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::upper_bound_variable(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal51();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+unsigned OMPLoopDirective::num_initializers(void) const {
+  return impl->reader.getVal52().size();
+}
+
 std::optional<Expr> OMPLoopDirective::nth_initializer(unsigned n) const {
-  auto list = impl->reader.getVal53();
+  auto list = impl->reader.getVal52();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -555,12 +574,12 @@ std::optional<Expr> OMPLoopDirective::nth_initializer(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::initializers(void) const & {
-  auto list = impl->reader.getVal53();
+  auto list = impl->reader.getVal52();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d53 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d53)))) {
+    if (auto d52 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d52)))) {
         co_yield std::move(*e);
       }
     }
@@ -568,8 +587,12 @@ gap::generator<Expr> OMPLoopDirective::initializers(void) const & {
   co_return;
 }
 
+unsigned OMPLoopDirective::num_private_counters(void) const {
+  return impl->reader.getVal53().size();
+}
+
 std::optional<Expr> OMPLoopDirective::nth_private_counter(unsigned n) const {
-  auto list = impl->reader.getVal54();
+  auto list = impl->reader.getVal53();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -583,12 +606,12 @@ std::optional<Expr> OMPLoopDirective::nth_private_counter(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::private_counters(void) const & {
-  auto list = impl->reader.getVal54();
+  auto list = impl->reader.getVal53();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d54 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d54)))) {
+    if (auto d53 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d53)))) {
         co_yield std::move(*e);
       }
     }
@@ -596,8 +619,12 @@ gap::generator<Expr> OMPLoopDirective::private_counters(void) const & {
   co_return;
 }
 
+unsigned OMPLoopDirective::num_updates(void) const {
+  return impl->reader.getVal54().size();
+}
+
 std::optional<Expr> OMPLoopDirective::nth_update(unsigned n) const {
-  auto list = impl->reader.getVal55();
+  auto list = impl->reader.getVal54();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -611,12 +638,12 @@ std::optional<Expr> OMPLoopDirective::nth_update(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::updates(void) const & {
-  auto list = impl->reader.getVal55();
+  auto list = impl->reader.getVal54();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d55 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d55)))) {
+    if (auto d54 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d54)))) {
         co_yield std::move(*e);
       }
     }

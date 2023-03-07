@@ -169,7 +169,7 @@ TokenRange CXXNamedCastExpr::angle_brackets(void) const {
 }
 
 std::string_view CXXNamedCastExpr::cast_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal66();
+  capnp::Text::Reader data = impl->reader.getVal65();
   return std::string_view(data.cStr(), data.size());
 }
 

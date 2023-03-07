@@ -100,22 +100,13 @@ Type PackExpansionType::desugar(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-std::optional<unsigned> PackExpansionType::num_expansions(void) const {
-  if (!impl->reader.getVal230()) {
-    return std::nullopt;
-  } else {
-    return static_cast<unsigned>(impl->reader.getVal262());
-  }
-  return std::nullopt;
-}
-
 Type PackExpansionType::pattern(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool PackExpansionType::is_sugared(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

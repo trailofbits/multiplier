@@ -79,6 +79,7 @@ class ObjCImplDecl : public ObjCContainerDecl {
 
   ObjCInterfaceDecl class_interface(void) const;
   std::optional<ObjCPropertyImplDecl> nth_property_implementation(unsigned n) const;
+  unsigned num_property_implementations(void) const;
   gap::generator<ObjCPropertyImplDecl> property_implementations(void) const &;
 };
 

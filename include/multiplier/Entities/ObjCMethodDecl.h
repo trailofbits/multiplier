@@ -114,8 +114,10 @@ class ObjCMethodDecl : public NamedDecl {
   bool is_this_declaration_a_designated_initializer(void) const;
   bool is_variadic(void) const;
   std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
+  unsigned num_parameters(void) const;
   gap::generator<ParmVarDecl> parameters(void) const &;
   std::optional<Token> nth_selector_token(unsigned n) const;
+  unsigned num_selector_tokens(void) const;
   gap::generator<Token> selector_tokens(void) const &;
   gap::generator<Decl> declarations_in_context(void) const &;
 };

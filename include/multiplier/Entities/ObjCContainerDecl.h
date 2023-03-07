@@ -80,18 +80,24 @@ class ObjCContainerDecl : public NamedDecl {
   }
 
   std::optional<ObjCMethodDecl> nth_class_method(unsigned n) const;
+  unsigned num_class_methods(void) const;
   gap::generator<ObjCMethodDecl> class_methods(void) const &;
   std::optional<ObjCPropertyDecl> nth_class_propertie(unsigned n) const;
+  unsigned num_class_properties(void) const;
   gap::generator<ObjCPropertyDecl> class_properties(void) const &;
   TokenRange at_end_range(void) const;
   Token at_start_token(void) const;
   std::optional<ObjCMethodDecl> nth_instance_method(unsigned n) const;
+  unsigned num_instance_methods(void) const;
   gap::generator<ObjCMethodDecl> instance_methods(void) const &;
   std::optional<ObjCPropertyDecl> nth_instance_propertie(unsigned n) const;
+  unsigned num_instance_properties(void) const;
   gap::generator<ObjCPropertyDecl> instance_properties(void) const &;
   std::optional<ObjCMethodDecl> nth_method(unsigned n) const;
+  unsigned num_methods(void) const;
   gap::generator<ObjCMethodDecl> methods(void) const &;
   std::optional<ObjCPropertyDecl> nth_propertie(unsigned n) const;
+  unsigned num_properties(void) const;
   gap::generator<ObjCPropertyDecl> properties(void) const &;
   gap::generator<Decl> declarations_in_context(void) const &;
 };

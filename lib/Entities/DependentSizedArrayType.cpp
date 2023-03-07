@@ -106,19 +106,19 @@ Type DependentSizedArrayType::desugar(void) const {
 TokenRange DependentSizedArrayType::brackets_range(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal234(), impl->reader.getVal263());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal234(), impl->reader.getVal262());
 }
 
 Token DependentSizedArrayType::l_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal265());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal264());
 }
 
 Token DependentSizedArrayType::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal266());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal265());
 }
 
 Expr DependentSizedArrayType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal271();
+  RawEntityId eid = impl->reader.getVal270();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

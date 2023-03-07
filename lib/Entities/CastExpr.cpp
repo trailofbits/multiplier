@@ -177,11 +177,11 @@ gap::generator<CastExpr> CastExpr::in(const File &file) {
 }
 
 CastKind CastExpr::cast_kind(void) const {
-  return static_cast<CastKind>(impl->reader.getVal94());
+  return static_cast<CastKind>(impl->reader.getVal93());
 }
 
 std::string_view CastExpr::cast_kind_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -222,7 +222,7 @@ std::optional<FieldDecl> CastExpr::target_union_field(void) const {
 }
 
 bool CastExpr::has_stored_fp_features(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

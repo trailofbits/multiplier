@@ -562,6 +562,10 @@ bool FunctionDecl::is_virtual_as_written(void) const {
   return impl->reader.getVal154();
 }
 
+unsigned FunctionDecl::num_parameters(void) const {
+  return impl->reader.getVal48().size();
+}
+
 std::optional<ParmVarDecl> FunctionDecl::nth_parameter(unsigned n) const {
   auto list = impl->reader.getVal48();
   if (n >= list.size()) {

@@ -81,6 +81,7 @@ class TypeTraitExpr : public Expr {
   TypeTrait trait(void) const;
   std::optional<bool> value(void) const;
   std::optional<Type> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<Type> arguments(void) const &;
 };
 

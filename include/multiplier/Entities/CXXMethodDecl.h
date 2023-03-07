@@ -98,6 +98,7 @@ class CXXMethodDecl : public FunctionDecl {
   bool is_virtual(void) const;
   bool is_volatile(void) const;
   std::optional<CXXMethodDecl> nth_overridden_method(unsigned n) const;
+  unsigned num_overridden_methods(void) const;
   gap::generator<CXXMethodDecl> overridden_methods(void) const &;
 };
 

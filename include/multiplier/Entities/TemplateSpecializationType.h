@@ -69,6 +69,7 @@ class TemplateSpecializationType : public Type {
   bool is_sugared(void) const;
   bool is_type_alias(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  unsigned num_template_arguments(void) const;
   gap::generator<TemplateArgument> template_arguments(void) const &;
 };
 

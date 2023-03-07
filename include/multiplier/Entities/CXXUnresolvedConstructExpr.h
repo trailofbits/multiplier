@@ -78,6 +78,7 @@ class CXXUnresolvedConstructExpr : public Expr {
   }
 
   std::optional<Expr> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<Expr> arguments(void) const &;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;

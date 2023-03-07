@@ -80,6 +80,7 @@ class FriendTemplateDecl : public Decl {
   Token friend_token(void) const;
   Type friend_type(void) const;
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
+  unsigned num_template_parameter_lists(void) const;
   gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
 };
 

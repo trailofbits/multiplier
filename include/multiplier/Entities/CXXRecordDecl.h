@@ -101,6 +101,7 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;
   std::optional<MSInheritanceModel> calculate_inheritance_model(void) const;
   std::optional<CXXConstructorDecl> nth_constructor(unsigned n) const;
+  unsigned num_constructors(void) const;
   gap::generator<CXXConstructorDecl> constructors(void) const &;
   std::optional<std::vector<FriendDecl>> friends(void) const;
   std::optional<FunctionTemplateDecl> dependent_lambda_call_operator(void) const;
@@ -116,8 +117,6 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<Type> lambda_type(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
-  std::optional<unsigned> num_bases(void) const;
-  std::optional<unsigned> num_virtual_bases(void) const;
   std::optional<unsigned> odr_hash(void) const;
   std::optional<CXXRecordDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;

@@ -148,7 +148,7 @@ gap::generator<ImplicitCastExpr> ImplicitCastExpr::in(const File &file) {
 }
 
 bool ImplicitCastExpr::is_part_of_explicit_cast(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

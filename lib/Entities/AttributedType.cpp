@@ -101,7 +101,7 @@ Type AttributedType::desugar(void) const {
 }
 
 AttrKind AttributedType::attribute_kind(void) const {
-  return static_cast<AttrKind>(impl->reader.getVal273());
+  return static_cast<AttrKind>(impl->reader.getVal272());
 }
 
 Type AttributedType::equivalent_type(void) const {

@@ -200,6 +200,10 @@ gap::generator<Decl> Decl::in(const File &file, std::span<DeclKind> kinds) {
   }
 }
 
+unsigned Decl::num_attributes(void) const {
+  return impl->reader.getVal3().size();
+}
+
 std::optional<Attr> Decl::nth_attribute(unsigned n) const {
   auto list = impl->reader.getVal3();
   if (n >= list.size()) {

@@ -83,6 +83,7 @@ class DecompositionDecl : public VarDecl {
   }
 
   std::optional<BindingDecl> nth_binding(unsigned n) const;
+  unsigned num_bindings(void) const;
   gap::generator<BindingDecl> bindings(void) const &;
 };
 

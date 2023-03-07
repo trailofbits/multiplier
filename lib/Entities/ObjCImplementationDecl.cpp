@@ -191,8 +191,12 @@ bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
   return impl->reader.getVal71();
 }
 
+unsigned ObjCImplementationDecl::num_instance_variables(void) const {
+  return impl->reader.getVal335().size();
+}
+
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal339();
+  auto list = impl->reader.getVal335();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -206,12 +210,12 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
-  auto list = impl->reader.getVal339();
+  auto list = impl->reader.getVal335();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d339 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(std::move(d339)))) {
+    if (auto d335 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from(Decl(std::move(d335)))) {
         co_yield std::move(*e);
       }
     }

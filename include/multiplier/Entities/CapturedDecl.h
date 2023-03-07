@@ -77,6 +77,7 @@ class CapturedDecl : public Decl {
   ImplicitParamDecl context_parameter(void) const;
   bool is_nothrow(void) const;
   std::optional<ImplicitParamDecl> nth_parameter(unsigned n) const;
+  unsigned num_parameters(void) const;
   gap::generator<ImplicitParamDecl> parameters(void) const &;
   gap::generator<Decl> declarations_in_context(void) const &;
 };

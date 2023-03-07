@@ -157,6 +157,10 @@ gap::generator<UsingPackDecl> UsingPackDecl::in(const File &file) {
   }
 }
 
+unsigned UsingPackDecl::num_expansions(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

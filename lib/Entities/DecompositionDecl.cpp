@@ -161,6 +161,10 @@ gap::generator<DecompositionDecl> DecompositionDecl::in(const File &file) {
   }
 }
 
+unsigned DecompositionDecl::num_bindings(void) const {
+  return impl->reader.getVal48().size();
+}
+
 std::optional<BindingDecl> DecompositionDecl::nth_binding(unsigned n) const {
   auto list = impl->reader.getVal48();
   if (n >= list.size()) {

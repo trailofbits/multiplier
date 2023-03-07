@@ -149,7 +149,7 @@ gap::generator<CXXDeleteExpr> CXXDeleteExpr::in(const File &file) {
 }
 
 bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 Expr CXXDeleteExpr::argument(void) const {
@@ -168,15 +168,15 @@ FunctionDecl CXXDeleteExpr::operator_delete(void) const {
 }
 
 bool CXXDeleteExpr::is_array_form(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool CXXDeleteExpr::is_array_form_as_written(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXDeleteExpr::is_global_delete(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

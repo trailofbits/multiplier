@@ -166,6 +166,10 @@ bool CapturedDecl::is_nothrow(void) const {
   return impl->reader.getVal46();
 }
 
+unsigned CapturedDecl::num_parameters(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

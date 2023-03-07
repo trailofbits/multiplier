@@ -148,6 +148,10 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const File &file) {
   }
 }
 
+unsigned DesignatedInitExpr::num_designators(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Designator> DesignatedInitExpr::nth_designator(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {
@@ -190,11 +194,15 @@ Expr DesignatedInitExpr::initializer(void) const {
 }
 
 bool DesignatedInitExpr::is_direct_initializer(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 bool DesignatedInitExpr::uses_gnu_syntax(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
+}
+
+unsigned DesignatedInitExpr::num_sub_expressions(void) const {
+  return impl->reader.getVal26().size();
 }
 
 std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {

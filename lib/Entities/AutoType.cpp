@@ -102,6 +102,10 @@ AutoTypeKeyword AutoType::keyword(void) const {
   return static_cast<AutoTypeKeyword>(impl->reader.getVal235());
 }
 
+unsigned AutoType::num_type_constraint_arguments(void) const {
+  return impl->reader.getVal233().size();
+}
+
 std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned n) const {
   auto list = impl->reader.getVal233();
   if (n >= list.size()) {

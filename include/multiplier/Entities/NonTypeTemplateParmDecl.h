@@ -84,13 +84,13 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   bool default_argument_was_inherited(void) const;
   std::optional<Expr> default_argument(void) const;
   Token default_argument_token(void) const;
-  std::optional<unsigned> num_expansion_types(void) const;
   std::optional<Expr> placeholder_type_constraint(void) const;
   bool has_default_argument(void) const;
   bool has_placeholder_type_constraint(void) const;
   bool is_expanded_parameter_pack(void) const;
   bool is_pack_expansion(void) const;
   std::optional<Type> nth_expansion_type(unsigned n) const;
+  unsigned num_expansion_types(void) const;
   gap::generator<Type> expansion_types(void) const &;
 };
 

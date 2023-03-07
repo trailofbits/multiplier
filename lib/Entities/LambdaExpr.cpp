@@ -164,7 +164,7 @@ CXXMethodDecl LambdaExpr::call_operator(void) const {
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const {
-  return static_cast<LambdaCaptureDefault>(impl->reader.getVal94());
+  return static_cast<LambdaCaptureDefault>(impl->reader.getVal93());
 }
 
 Token LambdaExpr::capture_default_token(void) const {
@@ -187,6 +187,10 @@ std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) co
     }
   }
   return std::nullopt;
+}
+
+unsigned LambdaExpr::num_explicit_template_parameters(void) const {
+  return impl->reader.getVal15().size();
 }
 
 std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n) const {
@@ -255,19 +259,19 @@ std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
 }
 
 bool LambdaExpr::has_explicit_parameters(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 bool LambdaExpr::has_explicit_result_type(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool LambdaExpr::is_generic_lambda(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool LambdaExpr::is_mutable(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

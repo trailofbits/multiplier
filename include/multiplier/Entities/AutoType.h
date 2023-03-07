@@ -69,6 +69,7 @@ class AutoType : public DeducedType {
 
   AutoTypeKeyword keyword(void) const;
   std::optional<TemplateArgument> nth_type_constraint_argument(unsigned n) const;
+  unsigned num_type_constraint_arguments(void) const;
   gap::generator<TemplateArgument> type_constraint_arguments(void) const &;
   std::optional<ConceptDecl> type_constraint_concept(void) const;
   bool is_constrained(void) const;

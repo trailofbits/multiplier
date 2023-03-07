@@ -147,6 +147,10 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const 
   }
 }
 
+unsigned CXXUnresolvedConstructExpr::num_arguments(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {
@@ -189,7 +193,7 @@ Type CXXUnresolvedConstructExpr::type_as_written(void) const {
 }
 
 bool CXXUnresolvedConstructExpr::is_list_initialization(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

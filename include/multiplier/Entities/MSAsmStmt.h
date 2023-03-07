@@ -77,6 +77,7 @@ class MSAsmStmt : public AsmStmt {
 
   gap::generator<std::string_view> all_constraints(void) const &;
   std::optional<Expr> nth_all_expression(unsigned n) const;
+  unsigned num_all_expressions(void) const;
   gap::generator<Expr> all_expressions(void) const &;
   std::string_view assembly_string(void) const;
   Token l_brace_token(void) const;

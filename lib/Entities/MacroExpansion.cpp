@@ -126,6 +126,10 @@ std::optional<DefineMacroDirective> MacroExpansion::definition(void) const {
   return std::nullopt;
 }
 
+unsigned MacroExpansion::num_arguments(void) const {
+  return impl->reader.getVal5().size();
+}
+
 std::optional<MacroArgument> MacroExpansion::nth_argument(unsigned n) const {
   auto list = impl->reader.getVal5();
   if (n >= list.size()) {

@@ -150,6 +150,10 @@ Token AttributedStmt::attribute_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
+unsigned AttributedStmt::num_attributes(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

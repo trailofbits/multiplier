@@ -75,6 +75,7 @@ class BaseUsingDecl : public NamedDecl {
   }
 
   std::optional<UsingShadowDecl> nth_shadow(unsigned n) const;
+  unsigned num_shadows(void) const;
   gap::generator<UsingShadowDecl> shadows(void) const &;
 };
 

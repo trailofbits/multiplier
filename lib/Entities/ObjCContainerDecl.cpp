@@ -173,6 +173,10 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::in(const File &file) {
   }
 }
 
+unsigned ObjCContainerDecl::num_class_methods(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_class_method(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {
@@ -199,6 +203,10 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const & {
     }
   }
   co_return;
+}
+
+unsigned ObjCContainerDecl::num_class_properties(void) const {
+  return impl->reader.getVal48().size();
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_class_propertie(unsigned n) const {
@@ -239,6 +247,10 @@ Token ObjCContainerDecl::at_start_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
 }
 
+unsigned ObjCContainerDecl::num_instance_methods(void) const {
+  return impl->reader.getVal58().size();
+}
+
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_instance_method(unsigned n) const {
   auto list = impl->reader.getVal58();
   if (n >= list.size()) {
@@ -265,6 +277,10 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const &
     }
   }
   co_return;
+}
+
+unsigned ObjCContainerDecl::num_instance_properties(void) const {
+  return impl->reader.getVal169().size();
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_instance_propertie(unsigned n) const {
@@ -295,6 +311,10 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) co
   co_return;
 }
 
+unsigned ObjCContainerDecl::num_methods(void) const {
+  return impl->reader.getVal177().size();
+}
+
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_method(unsigned n) const {
   auto list = impl->reader.getVal177();
   if (n >= list.size()) {
@@ -321,6 +341,10 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const & {
     }
   }
   co_return;
+}
+
+unsigned ObjCContainerDecl::num_properties(void) const {
+  return impl->reader.getVal178().size();
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_propertie(unsigned n) const {

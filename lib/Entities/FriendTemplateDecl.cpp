@@ -173,6 +173,10 @@ Type FriendTemplateDecl::friend_type(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+unsigned FriendTemplateDecl::num_template_parameter_lists(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_list(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

@@ -162,6 +162,10 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::in(const File &file) {
   }
 }
 
+unsigned BaseUsingDecl::num_shadows(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

@@ -22,6 +22,7 @@
 #include <multiplier/Token.h>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "Index.h"
 
@@ -57,7 +58,8 @@ static void RenderEdge(const mx::TraintTrackingEdge &edge) {
 
 static void PrintNext(mx::TaintTracker &tracker,
                       mx::TaintTrackingResult res,
-                      int depth) {
+                      int depth,
+                      std::unordered_set<mx::RawEntityId> &seen) {
   for (auto i = 0; i < depth; ++i) {
     std::cout << "  ";
   }
@@ -65,20 +67,15 @@ static void PrintNext(mx::TaintTracker &tracker,
     const auto &step = std::get<mx::TaintTrackingStep>(res);
     RenderEdge(step);
 
-    if (!step.is_new()) {
+    if (!seen.emplace(step.id().Pack()).second) {
       std::cout << " <repeat>\n";
     } else {
       std::cout << '\n';
 
       for (mx::TaintTrackingResult next_res : tracker.add_source(step)) {
-        PrintNext(tracker, std::move(next_res), depth + 1);
+        PrintNext(tracker, std::move(next_res), depth + 1, seen);
       }
     }
-
-  } else if (std::holds_alternative<mx::TaintTrackingCondition>(res)) {
-    const auto &cond = std::get<mx::TaintTrackingCondition>(res);
-    RenderEdge(cond);
-    std::cout << " <condition>\n";
 
   } else if (std::holds_alternative<mx::TaintTrackingSink>(res)) {
     std::cout << std::get<mx::TaintTrackingSink>(res).message() << '\n';
@@ -153,6 +150,8 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index = InitExample();
   mx::TaintTracker tracker(index);
 
+  std::unordered_set<mx::RawEntityId> seen;
+
   for (mx::NamedEntity named : index.query_entities(FLAGS_name)) {
     if (!std::holds_alternative<mx::DefineMacroDirective>(named)) {
       continue;
@@ -189,7 +188,7 @@ extern "C" int main(int argc, char *argv[]) {
                     << "=== " << mx::EnumeratorName(decl->kind()) << ' '
                     << decl->id() << " ===\n";
           for (mx::TaintTrackingResult res : tracker.add_source(decl.value())) {
-            PrintNext(tracker, std::move(res), 0);
+            PrintNext(tracker, std::move(res), 0, seen);
           }
           std::cout << "\n\n";
           goto skip;;

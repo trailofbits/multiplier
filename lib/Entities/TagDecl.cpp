@@ -265,6 +265,10 @@ bool TagDecl::may_have_out_of_date_definition(void) const {
   return impl->reader.getVal99();
 }
 
+unsigned TagDecl::num_template_parameter_lists(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<TemplateParameterList> TagDecl::nth_template_parameter_list(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

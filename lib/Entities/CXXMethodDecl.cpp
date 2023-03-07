@@ -232,6 +232,10 @@ bool CXXMethodDecl::is_volatile(void) const {
   return impl->reader.getVal168();
 }
 
+unsigned CXXMethodDecl::num_overridden_methods(void) const {
+  return impl->reader.getVal169().size();
+}
+
 std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) const {
   auto list = impl->reader.getVal169();
   if (n >= list.size()) {

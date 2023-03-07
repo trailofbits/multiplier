@@ -166,11 +166,11 @@ Token ObjCIvarRefExpr::operation_token(void) const {
 }
 
 bool ObjCIvarRefExpr::is_arrow(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 bool ObjCIvarRefExpr::is_free_instance_variable(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

@@ -113,7 +113,7 @@ Type InjectedClassNameType::injected_specialization_type(void) const {
 }
 
 TemplateSpecializationType InjectedClassNameType::injected_tst(void) const {
-  RawEntityId eid = impl->reader.getVal263();
+  RawEntityId eid = impl->reader.getVal262();
   return TemplateSpecializationType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 

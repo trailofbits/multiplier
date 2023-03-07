@@ -147,12 +147,12 @@ gap::generator<SourceLocExpr> SourceLocExpr::in(const File &file) {
 }
 
 std::string_view SourceLocExpr::builtin_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 
 SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const {
-  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal94());
+  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal93());
 }
 
 Token SourceLocExpr::token(void) const {
@@ -160,7 +160,7 @@ Token SourceLocExpr::token(void) const {
 }
 
 bool SourceLocExpr::is_int_type(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

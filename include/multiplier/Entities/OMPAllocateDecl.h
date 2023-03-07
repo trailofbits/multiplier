@@ -77,6 +77,7 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   }
 
   std::optional<Expr> nth_varlist(unsigned n) const;
+  unsigned num_varlists(void) const;
   gap::generator<Expr> varlists(void) const &;
 };
 

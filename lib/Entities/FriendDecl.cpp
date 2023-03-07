@@ -193,6 +193,10 @@ bool FriendDecl::is_unsupported_friend(void) const {
   return impl->reader.getVal46();
 }
 
+unsigned FriendDecl::num_friend_type_template_parameter_lists(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parameter_list(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

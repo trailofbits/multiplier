@@ -99,6 +99,7 @@ class DeclaratorDecl : public ValueDecl {
   Token type_spec_end_token(void) const;
   Token type_spec_start_token(void) const;
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
+  unsigned num_template_parameter_lists(void) const;
   gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
 };
 

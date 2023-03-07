@@ -44,7 +44,7 @@ static constexpr size_t kNumFragmentShards = 256u;
 static const std::hash<std::string> kHasher;
 
 // Number of INSERT statements to try to add in a single transaction.
-static constexpr size_t kMaxTransactionSize = 10000u;
+static constexpr size_t kMaxTransactionSize = 10000000u;
 
 // Upper bound on the size of a trained entity dictionary.
 static constexpr size_t kMaxDictionarySize = 112640;  // 110 KiB.

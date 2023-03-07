@@ -150,15 +150,6 @@ Token PackExpansionExpr::ellipsis_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
-std::optional<unsigned> PackExpansionExpr::num_expansions(void) const {
-  if (!impl->reader.getVal89()) {
-    return std::nullopt;
-  } else {
-    return static_cast<unsigned>(impl->reader.getVal100());
-  }
-  return std::nullopt;
-}
-
 Expr PackExpansionExpr::pattern(void) const {
   RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

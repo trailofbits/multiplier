@@ -150,7 +150,7 @@ gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::in(const File &file) {
 }
 
 bool CXXDynamicCastExpr::is_always_null(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

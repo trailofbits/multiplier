@@ -8,11 +8,14 @@
 #include <optional>
 #include <memory>
 #include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/CallExpr.h>
 #include <multiplier/Entities/CXXBaseSpecifier.h>
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/DefineMacroDirective.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Macro.h>
+#include <multiplier/Entities/ParmVarDecl.h>
+#include <multiplier/Entities/ReturnStmt.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/TemplateArgument.h>
 #include <multiplier/Entities/TemplateParameterList.h>
@@ -30,12 +33,11 @@ class DefineMacroDirective;
 class Index;
 class TaintTracker;
 class TaintTrackerImpl;
-class TaintTrackingCondition;
 class TaintTrackingSink;
 class TaintTrackingStep;
 
-using TaintTrackingResult = std::variant<TaintTrackingStep, TaintTrackingSink,
-                                         TaintTrackingCondition>;
+using TaintTrackingResult = std::variant<TaintTrackingStep,
+                                         TaintTrackingSink>;
 using TaintTrackingResults = gap::generator<TaintTrackingResult>;
 
 // An edge in a taint tracking graph.
@@ -108,6 +110,20 @@ class TaintTracker {
   TaintTrackingResults add_source(Stmt stmt) &;
 };
 
+enum class TaintTrackingSinkKind {
+  UNHANDLED_ADDRESS_OF,
+  UNHANDLED_REFERENCE,
+  UNHANDLED_ASSIGNMENT,
+  UNCONTROLLED_ARRAY_INDEX,
+  UNCONTROLLED_INDIRECT_MEMBER,
+  UNCONTROLLED_POINTER,
+  RETURN_TO_NOWHERE,
+  UNMATCHED_ARGUMENT,
+  VARIADIC_ARGUMENT,
+  CONDITIONAL_EXPRESSION,
+  CONDITIONAL_BRANCH
+};
+
 // The stopping point for the taint tracker, where it isn't able to evaluate
 // its condition further, or where the sink condition is accepted.
 class TaintTrackingSink final : public TraintTrackingEdge {
@@ -116,16 +132,21 @@ class TaintTrackingSink final : public TraintTrackingEdge {
   friend class TaintTrackerImpl;
 
   std::string message_;
+  TaintTrackingSinkKind kind_;
 
   TaintTrackingSink(void) = delete;
 
-  inline TaintTrackingSink(Decl entity_, std::string message__)
+  inline TaintTrackingSink(Decl entity_, std::string message__,
+                           TaintTrackingSinkKind kind__)
       : TraintTrackingEdge(std::move(entity_)),
-        message_(std::move(message__)) {}
+        message_(std::move(message__)),
+        kind_(kind__) {}
 
-  inline TaintTrackingSink(Stmt entity_, std::string message__)
+  inline TaintTrackingSink(Stmt entity_, std::string message__,
+                           TaintTrackingSinkKind kind__)
       : TraintTrackingEdge(std::move(entity_)),
-        message_(std::move(message__)) {}
+        message_(std::move(message__)),
+        kind_(kind__) {}
 
  public:
 
@@ -136,41 +157,47 @@ class TaintTrackingSink final : public TraintTrackingEdge {
   inline std::string message(void) const && noexcept {
     return std::move(message_);
   }
+
+  inline TaintTrackingSinkKind kind(void) const noexcept {
+    return kind_;
+  }
 };
 
-// The stopping point for the taint tracker. This happens when a tainted value
-// reaches the condition of something like a `if`, `for`, etc.
-class TaintTrackingCondition final : public TraintTrackingEdge {
- private:
-  friend class TaintTracker;
-  friend class TaintTrackerImpl;
-
-  using TraintTrackingEdge::TraintTrackingEdge;
+enum class TaintTrackingStepKind {
+  NORMAL,
+  ARGUMENT_TO_PARAMETER,
+  RETURN_TO_FUNCTION,
+  FUNCTION_TO_CALL,
+  ASSIGNMENT_TO_DECLARATION,
+  STATEMENT_IN_MACRO_EXPANSION,
+  DECLARATION_IN_MACRO_EXPANSION
 };
 
 // A taint propagation step that was taken from source node to destination
 // node.
-class TaintTrackingStep : public TraintTrackingEdge {
- private:
+class TaintTrackingStep final : public TraintTrackingEdge {
+ protected:
   friend class TaintTracker;
   friend class TaintTrackerImpl;
 
-  bool is_new_;
+  TaintTrackingStepKind kind_;
 
-  inline TaintTrackingStep(Decl entity_, bool is_new__)
+  inline TaintTrackingStep(
+      Decl entity_,
+      TaintTrackingStepKind kind__=TaintTrackingStepKind::NORMAL)
       : TraintTrackingEdge(std::move(entity_)),
-        is_new_(is_new__) {}
+        kind_(kind__) {}
 
-  inline TaintTrackingStep(Stmt entity_, bool is_new__)
+  inline TaintTrackingStep(
+      Stmt entity_,
+      TaintTrackingStepKind kind__=TaintTrackingStepKind::NORMAL)
       : TraintTrackingEdge(std::move(entity_)),
-        is_new_(is_new__) {}
+        kind_(kind__) {}
 
  public:
 
-  // Whether or not this is the first time we've tainted the entity associated
-  // with this step.
-  inline bool is_new(void) const noexcept {
-    return is_new_;
+  inline TaintTrackingStepKind kind(void) const noexcept {
+    return kind_;
   }
 };
 

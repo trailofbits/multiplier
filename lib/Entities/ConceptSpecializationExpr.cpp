@@ -147,6 +147,10 @@ gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Fi
   }
 }
 
+unsigned ConceptSpecializationExpr::num_template_arguments(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {
@@ -174,7 +178,7 @@ gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(v
 }
 
 bool ConceptSpecializationExpr::is_satisfied(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

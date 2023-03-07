@@ -160,6 +160,10 @@ Stmt ObjCAtTryStmt::try_body(void) const {
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
+unsigned ObjCAtTryStmt::num_catch_statements(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

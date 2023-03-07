@@ -148,15 +148,15 @@ gap::generator<ConstantExpr> ConstantExpr::in(const File &file) {
 }
 
 ConstantExprResultStorageKind ConstantExpr::result_storage_kind(void) const {
-  return static_cast<ConstantExprResultStorageKind>(impl->reader.getVal94());
+  return static_cast<ConstantExprResultStorageKind>(impl->reader.getVal93());
 }
 
 bool ConstantExpr::has_ap_value_result(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 bool ConstantExpr::is_immediate_invocation(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

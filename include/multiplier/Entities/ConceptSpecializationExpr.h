@@ -78,6 +78,7 @@ class ConceptSpecializationExpr : public Expr {
   }
 
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  unsigned num_template_arguments(void) const;
   gap::generator<TemplateArgument> template_arguments(void) const &;
   bool is_satisfied(void) const;
 };

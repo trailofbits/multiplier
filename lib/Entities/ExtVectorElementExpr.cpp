@@ -147,7 +147,7 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const File &file) 
 }
 
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 Token ExtVectorElementExpr::accessor_token(void) const {
@@ -160,7 +160,7 @@ Expr ExtVectorElementExpr::base(void) const {
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

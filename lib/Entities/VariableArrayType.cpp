@@ -106,19 +106,19 @@ Type VariableArrayType::desugar(void) const {
 TokenRange VariableArrayType::brackets_range(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal234(), impl->reader.getVal263());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal234(), impl->reader.getVal262());
 }
 
 Token VariableArrayType::l_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal265());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal264());
 }
 
 Token VariableArrayType::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal266());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal265());
 }
 
 Expr VariableArrayType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal271();
+  RawEntityId eid = impl->reader.getVal270();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

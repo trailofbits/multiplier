@@ -45,13 +45,9 @@ class TaintTrackerImpl final
  public:
 
   Index index;
-  std::unordered_set<RawEntityId> seen;
 
   inline TaintTrackerImpl(const Index &index_)
       : index(index_) {}
-
-  bool TestAndSet(const Decl &decl);
-  bool TestAndSet(const Stmt &stmt);
 
   TaintTrackingResults AcceptDecl(Decl decl);
 
@@ -128,8 +124,9 @@ TaintTrackingResults TaintTracker::add_source(
     auto added = false;
     for (Token tok : exp->expansion_tokens()) {
       for (Stmt stmt : Stmt::containing(tok)) {
-        bool is_new = impl->TestAndSet(stmt);
-        co_yield TaintTrackingStep(std::move(stmt), is_new);
+        co_yield TaintTrackingStep(
+            std::move(stmt),
+            TaintTrackingStepKind::STATEMENT_IN_MACRO_EXPANSION);
         added = true;
         break;
       }
@@ -139,8 +136,9 @@ TaintTrackingResults TaintTracker::add_source(
       }
 
       for (Decl decl : Decl::containing(tok)) {
-        bool is_new = impl->TestAndSet(decl);
-        co_yield TaintTrackingStep(std::move(decl), is_new);
+        co_yield TaintTrackingStep(
+            std::move(decl),
+            TaintTrackingStepKind::DECLARATION_IN_MACRO_EXPANSION);
         added = true;
         break;
       }
@@ -162,14 +160,6 @@ TaintTrackingResults TaintTracker::add_source(Decl decl) & {
 // next step of tainting.
 TaintTrackingResults TaintTracker::add_source(Stmt stmt) & {
   return impl->AcceptStmt(std::move(stmt));
-}
-
-bool TaintTrackerImpl::TestAndSet(const Decl &decl) {
-  return seen.emplace(decl.id().Pack()).second;
-}
-
-bool TaintTrackerImpl::TestAndSet(const Stmt &stmt) {
-  return seen.emplace(stmt.id().Pack()).second;
 }
 
 // Given that `decl` is tainted, go and taint all references to it.
@@ -234,13 +224,15 @@ TaintTrackingResults TaintTrackerImpl::TaintStmt(Stmt stmt) {
   // If it looks like this array subscript is used, then go and yield this
   // node to taint the parent.
   if (ParentLooksUsed(stmt)) {
-    bool is_new = TestAndSet(stmt);
-    co_yield TaintTrackingStep(std::move(stmt), is_new);
+    co_yield TaintTrackingStep(std::move(stmt));
   }
 }
 
 TaintTrackingResults TaintTrackerImpl::TaintCondition(Stmt stmt) {
-  co_yield TaintTrackingCondition(std::move(stmt));
+  std::stringstream ss;
+  ss << "Tainted conditional branch.";
+  co_yield TaintTrackingSink(
+      std::move(stmt), ss.str(), TaintTrackingSinkKind::CONDITIONAL_BRANCH);
 }
 
 TaintTrackingResults TaintTrackerImpl::TaintArraySubscript(
@@ -250,7 +242,8 @@ TaintTrackingResults TaintTrackerImpl::TaintArraySubscript(
     std::stringstream ss;
     ss << "Memory access through tainted array index: "
        << StatementToString(ss, child) << '.';
-    co_yield TaintTrackingSink(parent, ss.str());
+    co_yield TaintTrackingSink(parent, ss.str(),
+                               TaintTrackingSinkKind::UNCONTROLLED_ARRAY_INDEX);
   }
 
   for (TaintTrackingResult res : TaintStmt(std::move(parent))) {
@@ -293,11 +286,15 @@ static bool IsAssignment(const Stmt &stmt) {
 TaintTrackingResults TaintTrackerImpl::TaintConditionalOperator(
     Stmt child, ConditionalOperator parent) {
   if (parent.condition() == child) {
-    co_yield TaintTrackingCondition(std::move(parent));
+    std::stringstream ss;
+    ss << "Tainted conditional select: "
+       << StatementToString(ss, child) << '.';
+    co_yield TaintTrackingSink(
+        std::move(parent), ss.str(),
+        TaintTrackingSinkKind::CONDITIONAL_EXPRESSION);
 
   } else if (ParentLooksUsed(parent)) {
-    bool is_new = TestAndSet(parent);
-    co_yield TaintTrackingStep(std::move(parent), is_new);
+    co_yield TaintTrackingStep(std::move(parent));
   }
 }
 
@@ -313,7 +310,9 @@ TaintTrackingResults TaintTrackerImpl::TaintBinaryOperator(
         std::stringstream ss;
         ss << "Memory access through tainted member: "
            << StatementToString(ss, child) << '.';
-        co_yield TaintTrackingSink(std::move(parent), ss.str());
+        co_yield TaintTrackingSink(
+            std::move(parent), ss.str(),
+            TaintTrackingSinkKind::UNCONTROLLED_INDIRECT_MEMBER);
       }
       break;
 
@@ -337,8 +336,7 @@ TaintTrackingResults TaintTrackerImpl::TaintBinaryOperator(
 
   // Something like `foo + taint_source`. Here we want to propagate upwards.
   if (ParentLooksUsed(parent)) {
-    bool is_new = TestAndSet(parent);
-    co_yield TaintTrackingStep(std::move(parent), is_new);
+    co_yield TaintTrackingStep(std::move(parent));
   }
 }
 
@@ -349,7 +347,8 @@ TaintTrackingResults TaintTrackerImpl::TaintUnaryOperator(
       std::stringstream ss;
       ss << "Memory access through tainted pointer: "
          << StatementToString(ss, child) << '.';
-      co_yield TaintTrackingSink(parent, ss.str());
+      co_yield TaintTrackingSink(parent, ss.str(),
+                                 TaintTrackingSinkKind::UNCONTROLLED_POINTER);
       break;
     }
 
@@ -357,7 +356,8 @@ TaintTrackingResults TaintTrackerImpl::TaintUnaryOperator(
       std::stringstream ss;
       ss << "Unhandled address of on tainted value: "
          << StatementToString(ss, child) << '.';
-      co_yield TaintTrackingSink(parent, ss.str());
+      co_yield TaintTrackingSink(parent, ss.str(),
+                                 TaintTrackingSinkKind::UNHANDLED_ADDRESS_OF);
       co_return;
     }
 
@@ -368,8 +368,7 @@ TaintTrackingResults TaintTrackerImpl::TaintUnaryOperator(
   }
 
   if (ParentLooksUsed(parent)) {
-    bool is_new = TestAndSet(parent);
-    co_yield TaintTrackingStep(std::move(parent), is_new);
+    co_yield TaintTrackingStep(std::move(parent));
   }
 }
 
@@ -377,13 +376,15 @@ TaintTrackingResults TaintTrackerImpl::TaintUnaryOperator(
 // the return.
 TaintTrackingResults TaintTrackerImpl::AcceptReturn(Stmt stmt) {
   for (FunctionDecl func : FunctionDecl::containing(stmt)) {
-    bool is_new = TestAndSet(func);
-    co_yield TaintTrackingStep(std::move(func), is_new);
+    co_yield TaintTrackingStep(
+        std::move(func),
+        TaintTrackingStepKind::RETURN_TO_FUNCTION);
     co_return;
   }
 
   co_yield TaintTrackingSink(
-      std::move(stmt), "Could not find function containing return statement");
+      std::move(stmt), "Could not find function containing return statement",
+      TaintTrackingSinkKind::RETURN_TO_NOWHERE);
 }
 
 static std::optional<unsigned> MatchArgumentToParameter(
@@ -513,18 +514,23 @@ TaintTrackingResults TaintTrackerImpl::TaintCallArgument(
 
     matched = true;
     if (param) {
-      bool is_new = TestAndSet(param.value());
-      co_yield TaintTrackingStep(param->canonical_declaration(), is_new);
+      co_yield TaintTrackingStep(
+          param->canonical_declaration(),
+          TaintTrackingStepKind::ARGUMENT_TO_PARAMETER);
 
     } else {
+      TaintTrackingSinkKind kind = TaintTrackingSinkKind::UNMATCHED_ARGUMENT;
       std::stringstream ss;
       ss << "Can't match statement to function call parameter: "
          << StatementToString(ss, child);
       if (func.is_variadic()) {
-        ss << "; function '" << func.name() << "' is variadic";
+        if (arg_num.value() >= func.num_parameters()) {
+          kind = TaintTrackingSinkKind::VARIADIC_ARGUMENT;
+          ss << "; function '" << func.name() << "' is variadic";
+        }
       }
       ss << '.';
-      co_yield TaintTrackingSink(child, ss.str());
+      co_yield TaintTrackingSink(child, ss.str(), kind);
     }
   }
 
@@ -532,7 +538,8 @@ TaintTrackingResults TaintTrackerImpl::TaintCallArgument(
     std::stringstream ss;
     ss << "Can't find callee(s) tainted argument of call: "
        << StatementToString(ss, child) << '.';
-    co_yield TaintTrackingSink(child, ss.str());
+    co_yield TaintTrackingSink(child, ss.str(),
+                               TaintTrackingSinkKind::UNMATCHED_ARGUMENT);
   }
 }
 
@@ -653,14 +660,24 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
 // Given that the value `val` is tainted, go and find all of its uses, then
 // taint those.
 TaintTrackingResults TaintTrackerImpl::TaintValue(ValueDecl val) {
+  auto is_func = FunctionDecl::from(val).has_value();
   for (Reference ref : val.references()) {
     if (std::optional<Stmt> stmt = ref.as_statement()) {
-      bool is_new = TestAndSet(stmt.value());
-      co_yield TaintTrackingStep(std::move(stmt.value()), is_new);
+      TaintTrackingStepKind kind = TaintTrackingStepKind::NORMAL;
+      if (is_func) {
+        for (CallExpr call : CallExpr::containing(stmt.value())) {
+          if (call.direct_callee() == val) {
+            kind = TaintTrackingStepKind::FUNCTION_TO_CALL;
+          }
+          break;
+        }
+      }
+      co_yield TaintTrackingStep(std::move(stmt.value()), kind);
     } else {
       std::stringstream ss;
       ss << "Ignoring other reference to declaration " << val.id().Pack();
-      co_yield TaintTrackingSink(val, ss.str());
+      co_yield TaintTrackingSink(
+          val, ss.str(), TaintTrackingSinkKind::UNHANDLED_REFERENCE);
     }
   }
 }
@@ -707,14 +724,16 @@ TaintTrackerImpl::TaintAssignedValue(Stmt lhs, Stmt rhs) {
 
   std::optional<Decl> decl = FindAssignedDecl(lhs);
   if (decl) {
-    bool is_new = TestAndSet(decl.value());
-    co_yield TaintTrackingStep(std::move(decl.value()), is_new);
+    co_yield TaintTrackingStep(
+        std::move(decl.value()),
+        TaintTrackingStepKind::ASSIGNMENT_TO_DECLARATION);
     co_return;
   }
 
   ss << "Can't propagate taint through unhandled assignment: "
      << StatementToString(ss, rhs) << '.';
-  co_yield TaintTrackingSink(std::move(rhs), ss.str());
+  co_yield TaintTrackingSink(std::move(rhs), ss.str(),
+                             TaintTrackingSinkKind::UNHANDLED_ASSIGNMENT);
 }
 
 }  // namespace mx

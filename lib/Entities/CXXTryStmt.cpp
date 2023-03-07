@@ -155,6 +155,10 @@ Token CXXTryStmt::try_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
+unsigned CXXTryStmt::num_handlers(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

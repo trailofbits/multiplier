@@ -138,10 +138,6 @@ gap::generator<MacroOrToken> DefineMacroDirective::body(void) const & {
   }
 }
 
-unsigned DefineMacroDirective::num_explicit_parameters(void) const {
-  return impl->reader.getVal7();
-}
-
 bool DefineMacroDirective::is_variadic(void) const {
   return impl->reader.getVal6();
 }

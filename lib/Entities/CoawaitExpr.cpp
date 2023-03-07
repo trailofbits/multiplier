@@ -148,7 +148,7 @@ gap::generator<CoawaitExpr> CoawaitExpr::in(const File &file) {
 }
 
 bool CoawaitExpr::is_implicit(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

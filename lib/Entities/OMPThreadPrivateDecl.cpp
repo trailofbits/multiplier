@@ -158,6 +158,10 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::in(const File &file) 
   }
 }
 
+unsigned OMPThreadPrivateDecl::num_varlists(void) const {
+  return impl->reader.getVal47().size();
+}
+
 std::optional<Expr> OMPThreadPrivateDecl::nth_varlist(unsigned n) const {
   auto list = impl->reader.getVal47();
   if (n >= list.size()) {

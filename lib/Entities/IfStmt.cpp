@@ -221,7 +221,7 @@ Token IfStmt::r_paren_token(void) const {
 }
 
 IfStatementKind IfStmt::statement_kind(void) const {
-  return static_cast<IfStatementKind>(impl->reader.getVal57());
+  return static_cast<IfStatementKind>(impl->reader.getVal56());
 }
 
 Stmt IfStmt::then(void) const {
@@ -250,15 +250,15 @@ bool IfStmt::is_constexpr(void) const {
 }
 
 bool IfStmt::is_negated_consteval(void) const {
-  return impl->reader.getVal58();
+  return impl->reader.getVal57();
 }
 
 bool IfStmt::is_non_negated_consteval(void) const {
-  return impl->reader.getVal59();
+  return impl->reader.getVal58();
 }
 
 bool IfStmt::is_obj_c_availability_check(void) const {
-  return impl->reader.getVal60();
+  return impl->reader.getVal59();
 }
 
 #pragma GCC diagnostic pop

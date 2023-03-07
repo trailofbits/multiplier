@@ -90,10 +90,13 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   Token instance_variable_r_brace_token(void) const;
   ObjCCategoryDecl next_class_category(void) const;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
+  unsigned num_instance_variables(void) const;
   gap::generator<ObjCIvarDecl> instance_variables(void) const &;
   std::optional<Token> nth_protocol_token(unsigned n) const;
+  unsigned num_protocol_tokens(void) const;
   gap::generator<Token> protocol_tokens(void) const &;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
+  unsigned num_protocols(void) const;
   gap::generator<ObjCProtocolDecl> protocols(void) const &;
 };
 

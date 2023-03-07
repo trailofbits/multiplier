@@ -156,6 +156,10 @@ Expr PseudoObjectExpr::syntactic_form(void) const {
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+unsigned PseudoObjectExpr::num_semantics(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> PseudoObjectExpr::nth_semantic(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {
@@ -182,6 +186,10 @@ gap::generator<Expr> PseudoObjectExpr::semantics(void) const & {
     }
   }
   co_return;
+}
+
+unsigned PseudoObjectExpr::num_semantic_expressions(void) const {
+  return impl->reader.getVal26().size();
 }
 
 std::optional<Expr> PseudoObjectExpr::nth_semantic_expression(unsigned n) const {

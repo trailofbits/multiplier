@@ -151,6 +151,10 @@ Expr OMPArrayShapingExpr::base(void) const {
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+unsigned OMPArrayShapingExpr::num_dimensions(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> OMPArrayShapingExpr::nth_dimension(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {

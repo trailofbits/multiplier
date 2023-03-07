@@ -77,7 +77,6 @@ class PackExpansionExpr : public Expr {
   }
 
   Token ellipsis_token(void) const;
-  std::optional<unsigned> num_expansions(void) const;
   Expr pattern(void) const;
 };
 

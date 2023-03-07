@@ -146,6 +146,10 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const File &file) 
   }
 }
 
+unsigned GenericSelectionExpr::num_association_expressions(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {
@@ -197,7 +201,7 @@ Expr GenericSelectionExpr::result_expression(void) const {
 }
 
 bool GenericSelectionExpr::is_result_dependent(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

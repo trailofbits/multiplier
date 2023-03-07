@@ -173,6 +173,10 @@ bool RecordDecl::can_pass_in_registers(void) const {
   return impl->reader.getVal100();
 }
 
+unsigned RecordDecl::num_fields(void) const {
+  return impl->reader.getVal58().size();
+}
+
 std::optional<FieldDecl> RecordDecl::nth_field(unsigned n) const {
   auto list = impl->reader.getVal58();
   if (n >= list.size()) {

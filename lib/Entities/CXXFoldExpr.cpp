@@ -170,17 +170,8 @@ Token CXXFoldExpr::l_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
-std::optional<unsigned> CXXFoldExpr::num_expansions(void) const {
-  if (!impl->reader.getVal89()) {
-    return std::nullopt;
-  } else {
-    return static_cast<unsigned>(impl->reader.getVal100());
-  }
-  return std::nullopt;
-}
-
 BinaryOperatorKind CXXFoldExpr::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal93());
 }
 
 Expr CXXFoldExpr::pattern(void) const {
@@ -198,11 +189,11 @@ Token CXXFoldExpr::r_paren_token(void) const {
 }
 
 bool CXXFoldExpr::is_left_fold(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool CXXFoldExpr::is_right_fold(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

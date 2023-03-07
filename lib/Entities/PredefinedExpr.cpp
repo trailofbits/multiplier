@@ -153,11 +153,11 @@ StringLiteral PredefinedExpr::function_name(void) const {
 }
 
 PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const {
-  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal94());
+  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal93());
 }
 
 std::string_view PredefinedExpr::identifier_kind_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 

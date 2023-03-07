@@ -153,11 +153,11 @@ Token ObjCBridgedCastExpr::bridge_keyword_token(void) const {
 }
 
 ObjCBridgeCastKind ObjCBridgedCastExpr::bridge_kind(void) const {
-  return static_cast<ObjCBridgeCastKind>(impl->reader.getVal96());
+  return static_cast<ObjCBridgeCastKind>(impl->reader.getVal95());
 }
 
 std::string_view ObjCBridgedCastExpr::bridge_kind_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal66();
+  capnp::Text::Reader data = impl->reader.getVal65();
   return std::string_view(data.cStr(), data.size());
 }
 

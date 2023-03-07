@@ -153,6 +153,10 @@ RequiresExprBodyDecl RequiresExpr::body(void) const {
   return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
+unsigned RequiresExpr::num_local_parameters(void) const {
+  return impl->reader.getVal15().size();
+}
+
 std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
   auto list = impl->reader.getVal15();
   if (n >= list.size()) {
@@ -190,7 +194,7 @@ Token RequiresExpr::requires_keyword_token(void) const {
 }
 
 bool RequiresExpr::is_satisfied(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop
