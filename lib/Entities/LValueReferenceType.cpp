@@ -97,12 +97,12 @@ gap::generator<LValueReferenceType> LValueReferenceType::in(const File &file) {
 }
 
 Type LValueReferenceType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool LValueReferenceType::is_sugared(void) const {
-  return impl->reader.getVal295();
+  return impl->reader.getVal232();
 }
 
 #pragma GCC diagnostic pop

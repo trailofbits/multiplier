@@ -226,7 +226,7 @@ std::optional<unsigned> EnumDecl::odr_hash(void) const {
   if (!impl->reader.getVal100()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal138());
+    return static_cast<unsigned>(impl->reader.getVal137());
   }
   return std::nullopt;
 }

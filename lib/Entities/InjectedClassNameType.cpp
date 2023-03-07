@@ -98,27 +98,27 @@ gap::generator<InjectedClassNameType> InjectedClassNameType::in(const File &file
 }
 
 Type InjectedClassNameType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 CXXRecordDecl InjectedClassNameType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type InjectedClassNameType::injected_specialization_type(void) const {
-  RawEntityId eid = impl->reader.getVal297();
+  RawEntityId eid = impl->reader.getVal234();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TemplateSpecializationType InjectedClassNameType::injected_tst(void) const {
-  RawEntityId eid = impl->reader.getVal299();
+  RawEntityId eid = impl->reader.getVal263();
   return TemplateSpecializationType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 bool InjectedClassNameType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

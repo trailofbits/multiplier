@@ -23,32 +23,19 @@
 
 #include <compare>
 
-#include "LangAS.h"
 #include "Linkage.h"
 #include "NullabilityKind.h"
-#include "QualTypeDestructionKind.h"
-#include "QualTypePrimitiveCopyKind.h"
-#include "QualTypePrimitiveDefaultInitializeKind.h"
 #include "TypeKind.h"
 #include "TypeScalarTypeKind.h"
 #include "Visibility.h"
 
 namespace mx {
-class AutoType;
-class BuiltinType;
 class CXXRecordDecl;
-class ComplexType;
-class DeducedType;
 class File;
 class Fragment;
 class Index;
-class ObjCObjectPointerType;
-class ObjCObjectType;
-class RecordDecl;
-class RecordType;
 class Reference;
 class SourceIR;
-class TagDecl;
 class Token;
 class Type;
 class TypeImpl;
@@ -121,6 +108,8 @@ class Type {
     return t.as_type();
   }
 
+  Type desugared_type(void) const;
+  Type canonical_type(void) const;
   bool is_qualified(void) const;
   Type unqualified_type(void) const;
   bool accepts_obj_c_type_parameters(void) const;
@@ -129,22 +118,7 @@ class Type {
   bool contains_errors(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
   std::optional<Type> array_element_type_no_type_qualified(void) const;
-  std::optional<CXXRecordDecl> as_cxx_record_declaration(void) const;
-  std::optional<ComplexType> as_complex_integer_type(void) const;
-  std::optional<ObjCObjectPointerType> as_obj_c_interface_pointer_type(void) const;
-  std::optional<ObjCObjectType> as_obj_c_interface_type(void) const;
-  std::optional<ObjCObjectPointerType> as_obj_c_qualified_class_type(void) const;
-  std::optional<ObjCObjectPointerType> as_obj_c_qualified_id_type(void) const;
-  std::optional<ObjCObjectType> as_obj_c_qualified_interface_type(void) const;
-  std::optional<BuiltinType> as_placeholder_type(void) const;
-  std::optional<RecordDecl> as_record_declaration(void) const;
-  std::optional<RecordType> as_structure_type(void) const;
-  std::optional<TagDecl> as_tag_declaration(void) const;
-  std::optional<RecordType> as_union_type(void) const;
-  std::optional<AutoType> contained_auto_type(void) const;
-  std::optional<DeducedType> contained_deduced_type(void) const;
   Linkage linkage(void) const;
-  Type locally_unqualified_single_step_desugared_type(void) const;
   std::optional<NullabilityKind> nullability(void) const;
   std::optional<CXXRecordDecl> pointee_cxx_record_declaration(void) const;
   std::optional<Type> pointee_or_array_element_type(void) const;
@@ -354,56 +328,6 @@ class Type {
   bool is_void_pointer_type(void) const;
   bool is_void_type(void) const;
   bool is_wide_character_type(void) const;
-  Type ignore_parentheses(void) const;
-  LangAS address_space(void) const;
-  Type atomic_unqualified_type(void) const;
-  Type canonical_type(void) const;
-  Type desugared_type(void) const;
-  Type local_unqualified_type(void) const;
-  Type non_l_value_expression_type(void) const;
-  Type non_pack_expansion_type(void) const;
-  Type non_reference_type(void) const;
-  Type single_step_desugared_type(void) const;
-  bool has_address_space(void) const;
-  bool has_local_non_fast_qualifiers(void) const;
-  bool has_local_qualifiers(void) const;
-  bool has_non_trivial_obj_c_lifetime(void) const;
-  bool has_non_trivial_to_primitive_copy_c_union(void) const;
-  bool has_non_trivial_to_primitive_default_initialize_c_union(void) const;
-  bool has_non_trivial_to_primitive_destruct_c_union(void) const;
-  bool has_qualifiers(void) const;
-  bool has_strong_or_weak_obj_c_lifetime(void) const;
-  bool is_c_forbidden_l_value_type(void) const;
-  bool is_cxx11_pod_type(void) const;
-  bool is_cxx98_pod_type(void) const;
-  bool is_canonical(void) const;
-  bool is_canonical_as_parameter(void) const;
-  bool is_const_qualified(void) const;
-  bool is_constant(void) const;
-  QualTypeDestructionKind is_destructed_type(void) const;
-  bool is_local_const_qualified(void) const;
-  bool is_local_restrict_qualified(void) const;
-  bool is_local_volatile_qualified(void) const;
-  QualTypePrimitiveCopyKind is_non_trivial_to_primitive_copy(void) const;
-  QualTypePrimitiveDefaultInitializeKind is_non_trivial_to_primitive_default_initialize(void) const;
-  QualTypePrimitiveCopyKind is_non_trivial_to_primitive_destructive_move(void) const;
-  bool is_non_weak_in_mrr_with_obj_c_weak(void) const;
-  bool is_null(void) const;
-  bool is_obj_cgc_strong(void) const;
-  bool is_obj_cgc_weak(void) const;
-  bool is_pod_type(void) const;
-  bool is_restrict_qualified(void) const;
-  bool is_trivial_type(void) const;
-  bool is_trivially_copyable_type(void) const;
-  bool is_trivially_relocatable_type(void) const;
-  bool is_volatile_qualified(void) const;
-  bool may_be_dynamic_class(void) const;
-  bool may_be_not_dynamic_class(void) const;
-  Type strip_obj_c_kind_of_type(void) const;
-  Type with_const(void) const;
-  Type with_restrict(void) const;
-  Type with_volatile(void) const;
-  Type without_local_fast_qualifiers(void) const;
 };
 
 #endif

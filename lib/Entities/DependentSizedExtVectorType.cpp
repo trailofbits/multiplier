@@ -97,26 +97,26 @@ gap::generator<DependentSizedExtVectorType> DependentSizedExtVectorType::in(cons
 }
 
 Type DependentSizedExtVectorType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token DependentSizedExtVectorType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal292());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal229());
 }
 
 Type DependentSizedExtVectorType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal297();
+  RawEntityId eid = impl->reader.getVal234();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentSizedExtVectorType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal299();
+  RawEntityId eid = impl->reader.getVal263();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentSizedExtVectorType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

@@ -88,19 +88,24 @@ static void DumpElaboratedTypeToJSON(llvm::json::Object &obj,
   DumpTypeToJSON(obj, type.named_type(), wl);
 }
 
-void DumpTypeToJSON(llvm::json::Object &obj, mx::Type type,
-                    WorkList &wl) {
-
+static void DumpQualifiedTypeToJSON(llvm::json::Object &obj,
+                                    mx::QualifiedType type, WorkList &wl) {
   llvm::json::Array qualifiers_a;
 
   if (type.is_const_qualified()) {
     qualifiers_a.push_back("const");
   }
+
   if (type.is_volatile_qualified()) {
     qualifiers_a.push_back("volatile");
   }
+
   if (type.is_restrict_qualified()) {
     qualifiers_a.push_back("restrict");
+  }
+
+  if (type.is_atomic_type()) {
+    qualifiers_a.push_back("_Atomic");
   }
 
   if (!qualifiers_a.empty()) {
@@ -108,9 +113,18 @@ void DumpTypeToJSON(llvm::json::Object &obj, mx::Type type,
     obj["qualifiers"] = std::move(qualifiers_v);
   }
 
+  DumpTypeToJSON(obj, type.unqualified_type(), wl);
+}
+
+void DumpTypeToJSON(llvm::json::Object &obj, mx::Type type,
+                    WorkList &wl) {
+
   obj["kind"] = mx::EnumeratorName(type.kind());
 
-  if (auto builtin = mx::BuiltinType::from(type)) {
+  if (auto qual = mx::QualifiedType::from(type)) {
+    DumpQualifiedTypeToJSON(obj, std::move(qual.value()), wl);
+
+  } else if (auto builtin = mx::BuiltinType::from(type)) {
     DumpBuiltinTypeToJSON(obj, std::move(builtin.value()), wl);
 
   } else if (auto ptr = mx::PointerType::from(type)) {

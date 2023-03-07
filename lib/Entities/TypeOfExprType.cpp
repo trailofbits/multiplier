@@ -97,17 +97,17 @@ gap::generator<TypeOfExprType> TypeOfExprType::in(const File &file) {
 }
 
 Type TypeOfExprType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr TypeOfExprType::underlying_expression(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool TypeOfExprType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

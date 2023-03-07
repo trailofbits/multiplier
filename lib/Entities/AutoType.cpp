@@ -99,11 +99,11 @@ gap::generator<AutoType> AutoType::in(const File &file) {
 }
 
 AutoTypeKeyword AutoType::keyword(void) const {
-  return static_cast<AutoTypeKeyword>(impl->reader.getVal316());
+  return static_cast<AutoTypeKeyword>(impl->reader.getVal235());
 }
 
 std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned n) const {
-  auto list = impl->reader.getVal296();
+  auto list = impl->reader.getVal233();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -117,12 +117,12 @@ std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned 
 }
 
 gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const & {
-  auto list = impl->reader.getVal296();
+  auto list = impl->reader.getVal233();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d296 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d296));
+    if (auto d233 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d233));
     }
   }
   co_return;
@@ -130,7 +130,7 @@ gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const
 
 std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal297();
+    RawEntityId eid = impl->reader.getVal234();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -142,15 +142,15 @@ std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
 }
 
 bool AutoType::is_constrained(void) const {
-  return impl->reader.getVal295();
+  return impl->reader.getVal232();
 }
 
 bool AutoType::is_decltype_auto(void) const {
-  return impl->reader.getVal301();
+  return impl->reader.getVal236();
 }
 
 bool AutoType::is_gnu_auto_type(void) const {
-  return impl->reader.getVal302();
+  return impl->reader.getVal237();
 }
 
 #pragma GCC diagnostic pop

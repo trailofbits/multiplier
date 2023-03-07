@@ -96,36 +96,36 @@ gap::generator<BuiltinType> BuiltinType::in(const File &file) {
 }
 
 Type BuiltinType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 BuiltinTypeKind BuiltinType::builtin_kind(void) const {
-  return static_cast<BuiltinTypeKind>(impl->reader.getVal316());
+  return static_cast<BuiltinTypeKind>(impl->reader.getVal235());
 }
 
 bool BuiltinType::is_floating_point(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 bool BuiltinType::is_integer(void) const {
-  return impl->reader.getVal294();
+  return impl->reader.getVal231();
 }
 
 bool BuiltinType::is_sve_bool(void) const {
-  return impl->reader.getVal295();
+  return impl->reader.getVal232();
 }
 
 bool BuiltinType::is_signed_integer(void) const {
-  return impl->reader.getVal301();
+  return impl->reader.getVal236();
 }
 
 bool BuiltinType::is_sugared(void) const {
-  return impl->reader.getVal302();
+  return impl->reader.getVal237();
 }
 
 bool BuiltinType::is_unsigned_integer(void) const {
-  return impl->reader.getVal303();
+  return impl->reader.getVal238();
 }
 
 #pragma GCC diagnostic pop

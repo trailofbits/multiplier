@@ -96,47 +96,47 @@ gap::generator<AttributedType> AttributedType::in(const File &file) {
 }
 
 Type AttributedType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 AttrKind AttributedType::attribute_kind(void) const {
-  return static_cast<AttrKind>(impl->reader.getVal326());
+  return static_cast<AttrKind>(impl->reader.getVal273());
 }
 
 Type AttributedType::equivalent_type(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<NullabilityKind> AttributedType::immediate_nullability(void) const {
-  if (!impl->reader.getVal293()) {
+  if (!impl->reader.getVal230()) {
     return std::nullopt;
   } else {
-    return static_cast<NullabilityKind>(impl->reader.getVal316());
+    return static_cast<NullabilityKind>(impl->reader.getVal235());
   }
   return std::nullopt;
 }
 
 Type AttributedType::modified_type(void) const {
-  RawEntityId eid = impl->reader.getVal297();
+  RawEntityId eid = impl->reader.getVal234();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool AttributedType::is_calling_conv(void) const {
-  return impl->reader.getVal294();
+  return impl->reader.getVal231();
 }
 
 bool AttributedType::is_ms_type_spec(void) const {
-  return impl->reader.getVal295();
+  return impl->reader.getVal232();
 }
 
 bool AttributedType::is_qualifier(void) const {
-  return impl->reader.getVal301();
+  return impl->reader.getVal236();
 }
 
 bool AttributedType::is_sugared(void) const {
-  return impl->reader.getVal302();
+  return impl->reader.getVal237();
 }
 
 #pragma GCC diagnostic pop

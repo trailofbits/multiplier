@@ -99,31 +99,31 @@ gap::generator<DependentSizedArrayType> DependentSizedArrayType::in(const File &
 }
 
 Type DependentSizedArrayType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange DependentSizedArrayType::brackets_range(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal297(), impl->reader.getVal299());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal234(), impl->reader.getVal263());
 }
 
 Token DependentSizedArrayType::l_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal312());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal265());
 }
 
 Token DependentSizedArrayType::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal313());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal266());
 }
 
 Expr DependentSizedArrayType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal319();
+  RawEntityId eid = impl->reader.getVal271();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentSizedArrayType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

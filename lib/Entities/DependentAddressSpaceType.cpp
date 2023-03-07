@@ -97,21 +97,21 @@ gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::in(const Fi
 }
 
 Type DependentAddressSpaceType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentAddressSpaceType::address_space_expression(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token DependentAddressSpaceType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal297());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal234());
 }
 
 bool DependentAddressSpaceType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

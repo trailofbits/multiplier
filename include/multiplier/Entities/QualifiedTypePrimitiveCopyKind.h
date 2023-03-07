@@ -11,21 +11,22 @@
 #include <cstdint>
 
 namespace mx {
-enum class QualTypePrimitiveDefaultInitializeKind : unsigned char {
+enum class QualifiedTypePrimitiveCopyKind : unsigned char {
   TRIVIAL,
+  VOLATILE_TRIVIAL,
   ARC_STRONG,
   ARC_WEAK,
   STRUCT,
 };
 
-inline static const char *EnumerationName(QualTypePrimitiveDefaultInitializeKind) {
-  return "QualTypePrimitiveDefaultInitializeKind";
+inline static const char *EnumerationName(QualifiedTypePrimitiveCopyKind) {
+  return "QualifiedTypePrimitiveCopyKind";
 }
 
-inline static constexpr unsigned NumEnumerators(QualTypePrimitiveDefaultInitializeKind) {
-  return 4;
+inline static constexpr unsigned NumEnumerators(QualifiedTypePrimitiveCopyKind) {
+  return 5;
 }
 
-const char *EnumeratorName(QualTypePrimitiveDefaultInitializeKind);
+const char *EnumeratorName(QualifiedTypePrimitiveCopyKind);
 
 } // namespace mx

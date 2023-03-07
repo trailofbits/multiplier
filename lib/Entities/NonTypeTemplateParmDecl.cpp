@@ -186,7 +186,7 @@ std::optional<unsigned> NonTypeTemplateParmDecl::num_expansion_types(void) const
   if (!impl->reader.getVal72()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal138());
+    return static_cast<unsigned>(impl->reader.getVal137());
   }
   return std::nullopt;
 }

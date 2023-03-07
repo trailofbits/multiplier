@@ -443,10 +443,6 @@ bool VarDecl::might_be_usable_in_constant_expressions(void) const {
   return impl->reader.getVal122();
 }
 
-QualTypeDestructionKind VarDecl::needs_destruction(void) const {
-  return static_cast<QualTypeDestructionKind>(impl->reader.getVal123());
-}
-
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

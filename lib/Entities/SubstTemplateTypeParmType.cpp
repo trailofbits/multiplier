@@ -97,22 +97,22 @@ gap::generator<SubstTemplateTypeParmType> SubstTemplateTypeParmType::in(const Fi
 }
 
 Type SubstTemplateTypeParmType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TemplateTypeParmType SubstTemplateTypeParmType::replaced_parameter(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 Type SubstTemplateTypeParmType::replacement_type(void) const {
-  RawEntityId eid = impl->reader.getVal297();
+  RawEntityId eid = impl->reader.getVal234();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool SubstTemplateTypeParmType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

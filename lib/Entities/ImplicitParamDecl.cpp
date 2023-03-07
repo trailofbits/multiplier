@@ -161,7 +161,7 @@ gap::generator<ImplicitParamDecl> ImplicitParamDecl::in(const File &file) {
 }
 
 ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const {
-  return static_cast<ImplicitParamDeclImplicitParamKind>(impl->reader.getVal127());
+  return static_cast<ImplicitParamDeclImplicitParamKind>(impl->reader.getVal126());
 }
 
 #pragma GCC diagnostic pop

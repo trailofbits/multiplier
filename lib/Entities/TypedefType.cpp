@@ -97,17 +97,17 @@ gap::generator<TypedefType> TypedefType::in(const File &file) {
 }
 
 Type TypedefType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TypedefNameDecl TypedefType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return TypedefNameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool TypedefType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

@@ -252,7 +252,7 @@ std::optional<FunctionDecl> FunctionDecl::instantiated_from_declaration(void) co
 
 std::optional<FunctionDecl> FunctionDecl::instantiated_from_member_function(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal124();
+    RawEntityId eid = impl->reader.getVal123();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -275,7 +275,7 @@ std::optional<unsigned> FunctionDecl::odr_hash(void) const {
   if (!impl->reader.getVal90()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal138());
+    return static_cast<unsigned>(impl->reader.getVal137());
   }
   return std::nullopt;
 }
@@ -287,16 +287,16 @@ OverloadedOperatorKind FunctionDecl::overloaded_operator(void) const {
 TokenRange FunctionDecl::parameters_source_range(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal125(), impl->reader.getVal126());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal124(), impl->reader.getVal125());
 }
 
 Token FunctionDecl::point_of_instantiation(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal128());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal127());
 }
 
 std::optional<FunctionTemplateDecl> FunctionDecl::primary_template(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal129();
+    RawEntityId eid = impl->reader.getVal128();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -308,14 +308,14 @@ std::optional<FunctionTemplateDecl> FunctionDecl::primary_template(void) const {
 }
 
 Type FunctionDecl::return_type(void) const {
-  RawEntityId eid = impl->reader.getVal137();
+  RawEntityId eid = impl->reader.getVal136();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange FunctionDecl::return_type_source_range(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal139(), impl->reader.getVal140());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal138(), impl->reader.getVal139());
 }
 
 StorageClass FunctionDecl::storage_class(void) const {
@@ -324,7 +324,7 @@ StorageClass FunctionDecl::storage_class(void) const {
 
 std::optional<FunctionDecl> FunctionDecl::template_instantiation_pattern(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal141();
+    RawEntityId eid = impl->reader.getVal140();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -344,7 +344,7 @@ TemplateSpecializationKind FunctionDecl::template_specialization_kind_for_instan
 }
 
 FunctionDeclTemplatedKind FunctionDecl::templated_kind(void) const {
-  return static_cast<FunctionDeclTemplatedKind>(impl->reader.getVal123());
+  return static_cast<FunctionDeclTemplatedKind>(impl->reader.getVal126());
 }
 
 bool FunctionDecl::has_implicit_return_zero(void) const {
@@ -473,7 +473,7 @@ bool FunctionDecl::is_late_template_parsed(void) const {
 }
 
 std::optional<bool> FunctionDecl::is_ms_extern_inline(void) const {
-  if (!impl->reader.getVal130()) {
+  if (!impl->reader.getVal129()) {
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal122());
@@ -482,84 +482,84 @@ std::optional<bool> FunctionDecl::is_ms_extern_inline(void) const {
 }
 
 bool FunctionDecl::is_msvcrt_entry_point(void) const {
-  return impl->reader.getVal131();
+  return impl->reader.getVal130();
 }
 
 bool FunctionDecl::is_main(void) const {
-  return impl->reader.getVal132();
+  return impl->reader.getVal131();
 }
 
 bool FunctionDecl::is_multi_version(void) const {
-  return impl->reader.getVal133();
+  return impl->reader.getVal132();
 }
 
 bool FunctionDecl::is_no_return(void) const {
-  return impl->reader.getVal134();
+  return impl->reader.getVal133();
 }
 
 bool FunctionDecl::is_overloaded_operator(void) const {
-  return impl->reader.getVal135();
+  return impl->reader.getVal134();
 }
 
 bool FunctionDecl::is_pure(void) const {
-  return impl->reader.getVal136();
+  return impl->reader.getVal135();
 }
 
 bool FunctionDecl::is_replaceable_global_allocation_function(void) const {
-  return impl->reader.getVal142();
+  return impl->reader.getVal141();
 }
 
 std::optional<bool> FunctionDecl::is_reserved_global_placement_operator(void) const {
-  if (!impl->reader.getVal144()) {
+  if (!impl->reader.getVal143()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal143());
+    return static_cast<bool>(impl->reader.getVal142());
   }
   return std::nullopt;
 }
 
 bool FunctionDecl::is_static(void) const {
-  return impl->reader.getVal145();
+  return impl->reader.getVal144();
 }
 
 bool FunctionDecl::is_target_clones_multi_version(void) const {
-  return impl->reader.getVal146();
+  return impl->reader.getVal145();
 }
 
 bool FunctionDecl::is_target_multi_version(void) const {
-  return impl->reader.getVal147();
+  return impl->reader.getVal146();
 }
 
 bool FunctionDecl::is_template_instantiation(void) const {
-  return impl->reader.getVal148();
+  return impl->reader.getVal147();
 }
 
 bool FunctionDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal149();
+  return impl->reader.getVal148();
 }
 
 bool FunctionDecl::is_this_declaration_instantiated_from_a_friend_definition(void) const {
-  return impl->reader.getVal150();
+  return impl->reader.getVal149();
 }
 
 bool FunctionDecl::is_trivial(void) const {
-  return impl->reader.getVal151();
+  return impl->reader.getVal150();
 }
 
 bool FunctionDecl::is_trivial_for_call(void) const {
-  return impl->reader.getVal152();
+  return impl->reader.getVal151();
 }
 
 bool FunctionDecl::is_user_provided(void) const {
-  return impl->reader.getVal153();
+  return impl->reader.getVal152();
 }
 
 bool FunctionDecl::is_variadic(void) const {
-  return impl->reader.getVal154();
+  return impl->reader.getVal153();
 }
 
 bool FunctionDecl::is_virtual_as_written(void) const {
-  return impl->reader.getVal155();
+  return impl->reader.getVal154();
 }
 
 std::optional<ParmVarDecl> FunctionDecl::nth_parameter(unsigned n) const {
@@ -591,16 +591,16 @@ gap::generator<ParmVarDecl> FunctionDecl::parameters(void) const & {
 }
 
 bool FunctionDecl::uses_seh_try(void) const {
-  return impl->reader.getVal156();
+  return impl->reader.getVal155();
 }
 
 bool FunctionDecl::will_have_body(void) const {
-  return impl->reader.getVal157();
+  return impl->reader.getVal156();
 }
 
 std::optional<Stmt> FunctionDecl::body(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal158();
+    RawEntityId eid = impl->reader.getVal157();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

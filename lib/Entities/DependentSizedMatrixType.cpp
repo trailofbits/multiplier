@@ -98,16 +98,16 @@ gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const File
 }
 
 Token DependentSizedMatrixType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal297());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal234());
 }
 
 Expr DependentSizedMatrixType::column_expression(void) const {
-  RawEntityId eid = impl->reader.getVal299();
+  RawEntityId eid = impl->reader.getVal263();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr DependentSizedMatrixType::row_expression(void) const {
-  RawEntityId eid = impl->reader.getVal312();
+  RawEntityId eid = impl->reader.getVal265();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

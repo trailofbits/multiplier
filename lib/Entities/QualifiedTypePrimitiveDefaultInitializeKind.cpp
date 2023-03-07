@@ -6,7 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#include <multiplier/Entities/QualTypeDestructionKind.h>
+#include <multiplier/Entities/QualifiedTypePrimitiveDefaultInitializeKind.h>
 
 
 #include "../API.h"
@@ -15,13 +15,12 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
-const char *EnumeratorName(QualTypeDestructionKind e) {
+const char *EnumeratorName(QualifiedTypePrimitiveDefaultInitializeKind e) {
   switch (e) {
-    case QualTypeDestructionKind::NONE: return "NONE";
-    case QualTypeDestructionKind::CXX_DESTRUCTOR: return "CXX_DESTRUCTOR";
-    case QualTypeDestructionKind::OBJC_STRONG_LIFETIME: return "OBJC_STRONG_LIFETIME";
-    case QualTypeDestructionKind::OBJC_WEAK_LIFETIME: return "OBJC_WEAK_LIFETIME";
-    case QualTypeDestructionKind::NONTRIVIAL_C_STRUCT: return "NONTRIVIAL_C_STRUCT";
+    case QualifiedTypePrimitiveDefaultInitializeKind::TRIVIAL: return "TRIVIAL";
+    case QualifiedTypePrimitiveDefaultInitializeKind::ARC_STRONG: return "ARC_STRONG";
+    case QualifiedTypePrimitiveDefaultInitializeKind::ARC_WEAK: return "ARC_WEAK";
+    case QualifiedTypePrimitiveDefaultInitializeKind::STRUCT: return "STRUCT";
     default: return "<invalid>";
   }
 }

@@ -414,7 +414,10 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type_) {
   auto type = type_;
   for (const void *prev_raw = nullptr; prev_raw != type.RawType();
        prev_raw = type.RawType()) {
-    type = type.IgnoreParentheses().LocalUnqualifiedType();
+    type = type.UnqualifiedType();
+    if (auto paren = pasta::ParenType::From(type)) {
+      type = paren->InnerType().UnqualifiedType();
+    }
     if (auto nt = type.PointeeOrArrayElementType()) {
       type = std::move(nt.value());
     }
@@ -825,6 +828,11 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
     case pasta::TypeKind::kExtVector: {
       auto &tt = reinterpret_cast<const pasta::ExtVectorType &>(type);
       GEN(tt.ElementType());
+      break;
+    }
+    case pasta::TypeKind::kQualified: {
+      auto &tt = reinterpret_cast<const pasta::QualifiedType &>(type);
+      GEN(tt.UnqualifiedType());
       break;
     }
   }

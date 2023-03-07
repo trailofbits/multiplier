@@ -23,7 +23,6 @@
 
 #include "DeclaratorDecl.h"
 #include "LanguageLinkage.h"
-#include "QualTypeDestructionKind.h"
 #include "StorageClass.h"
 #include "StorageDuration.h"
 #include "TemplateSpecializationKind.h"
@@ -145,7 +144,6 @@ class VarDecl : public DeclaratorDecl {
   bool is_this_declaration_a_demoted_definition(void) const;
   bool is_usable_in_constant_expressions(void) const;
   bool might_be_usable_in_constant_expressions(void) const;
-  QualTypeDestructionKind needs_destruction(void) const;
 };
 
 static_assert(sizeof(VarDecl) == sizeof(DeclaratorDecl));

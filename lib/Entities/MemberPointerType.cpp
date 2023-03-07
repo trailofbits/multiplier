@@ -97,30 +97,30 @@ gap::generator<MemberPointerType> MemberPointerType::in(const File &file) {
 }
 
 Type MemberPointerType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type MemberPointerType::class_(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 CXXRecordDecl MemberPointerType::most_recent_cxx_record_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal297();
+  RawEntityId eid = impl->reader.getVal234();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool MemberPointerType::is_member_data_pointer(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 bool MemberPointerType::is_member_function_pointer(void) const {
-  return impl->reader.getVal294();
+  return impl->reader.getVal231();
 }
 
 bool MemberPointerType::is_sugared(void) const {
-  return impl->reader.getVal295();
+  return impl->reader.getVal232();
 }
 
 #pragma GCC diagnostic pop

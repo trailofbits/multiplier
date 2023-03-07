@@ -97,22 +97,22 @@ gap::generator<UsingType> UsingType::in(const File &file) {
 }
 
 Type UsingType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 UsingShadowDecl UsingType::found_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return UsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type UsingType::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal297();
+  RawEntityId eid = impl->reader.getVal234();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UsingType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

@@ -163,17 +163,17 @@ gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializ
 }
 
 VarTemplatePartialSpecializationDecl VarTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
-  RawEntityId eid = impl->reader.getVal129();
+  RawEntityId eid = impl->reader.getVal128();
   return VarTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateParameterList VarTemplatePartialSpecializationDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal137();
+  RawEntityId eid = impl->reader.getVal136();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool VarTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal133();
+  return impl->reader.getVal132();
 }
 
 #pragma GCC diagnostic pop

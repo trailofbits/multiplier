@@ -97,12 +97,12 @@ gap::generator<FunctionNoProtoType> FunctionNoProtoType::in(const File &file) {
 }
 
 Type FunctionNoProtoType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal297();
+  RawEntityId eid = impl->reader.getVal234();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionNoProtoType::is_sugared(void) const {
-  return impl->reader.getVal304();
+  return impl->reader.getVal239();
 }
 
 #pragma GCC diagnostic pop

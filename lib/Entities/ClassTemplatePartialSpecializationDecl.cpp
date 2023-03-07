@@ -165,12 +165,12 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
 }
 
 Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
-  RawEntityId eid = impl->reader.getVal141();
+  RawEntityId eid = impl->reader.getVal140();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
-  RawEntityId eid = impl->reader.getVal158();
+  RawEntityId eid = impl->reader.getVal157();
   return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

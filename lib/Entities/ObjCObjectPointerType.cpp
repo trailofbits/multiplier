@@ -100,32 +100,32 @@ gap::generator<ObjCObjectPointerType> ObjCObjectPointerType::in(const File &file
 }
 
 Type ObjCObjectPointerType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ObjCInterfaceDecl ObjCObjectPointerType::interface_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCInterfaceType ObjCObjectPointerType::interface_type(void) const {
-  RawEntityId eid = impl->reader.getVal297();
+  RawEntityId eid = impl->reader.getVal234();
   return ObjCInterfaceType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 ObjCObjectType ObjCObjectPointerType::object_type(void) const {
-  RawEntityId eid = impl->reader.getVal299();
+  RawEntityId eid = impl->reader.getVal263();
   return ObjCObjectType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 Type ObjCObjectPointerType::super_class_type(void) const {
-  RawEntityId eid = impl->reader.getVal312();
+  RawEntityId eid = impl->reader.getVal265();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Type> ObjCObjectPointerType::nth_type_argument(unsigned n) const {
-  auto list = impl->reader.getVal296();
+  auto list = impl->reader.getVal233();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -139,59 +139,59 @@ std::optional<Type> ObjCObjectPointerType::nth_type_argument(unsigned n) const {
 }
 
 gap::generator<Type> ObjCObjectPointerType::type_arguments(void) const & {
-  auto list = impl->reader.getVal296();
+  auto list = impl->reader.getVal233();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d296 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d296));
+    if (auto d233 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d233));
     }
   }
   co_return;
 }
 
 gap::generator<Type> ObjCObjectPointerType::type_arguments_as_written(void) const & {
-  auto list = impl->reader.getVal300();
+  auto list = impl->reader.getVal264();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d300 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d300));
+    if (auto d264 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d264));
     }
   }
   co_return;
 }
 
 bool ObjCObjectPointerType::is_kind_of_type(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 bool ObjCObjectPointerType::is_obj_c_id_or_class_type(void) const {
-  return impl->reader.getVal294();
+  return impl->reader.getVal231();
 }
 
 bool ObjCObjectPointerType::is_specialized(void) const {
-  return impl->reader.getVal295();
+  return impl->reader.getVal232();
 }
 
 bool ObjCObjectPointerType::is_specialized_as_written(void) const {
-  return impl->reader.getVal301();
+  return impl->reader.getVal236();
 }
 
 bool ObjCObjectPointerType::is_sugared(void) const {
-  return impl->reader.getVal302();
+  return impl->reader.getVal237();
 }
 
 bool ObjCObjectPointerType::is_unspecialized(void) const {
-  return impl->reader.getVal303();
+  return impl->reader.getVal238();
 }
 
 bool ObjCObjectPointerType::is_unspecialized_as_written(void) const {
-  return impl->reader.getVal304();
+  return impl->reader.getVal239();
 }
 
 std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_qualifier(unsigned n) const {
-  auto list = impl->reader.getVal314();
+  auto list = impl->reader.getVal267();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -205,12 +205,12 @@ std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_qualifier(unsigned n)
 }
 
 gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const & {
-  auto list = impl->reader.getVal314();
+  auto list = impl->reader.getVal267();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d314 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d314)))) {
+    if (auto d267 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d267)))) {
         co_yield std::move(*e);
       }
     }
@@ -219,12 +219,12 @@ gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const &
 }
 
 ObjCObjectPointerType ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
-  RawEntityId eid = impl->reader.getVal313();
+  RawEntityId eid = impl->reader.getVal266();
   return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_protocol(unsigned n) const {
-  auto list = impl->reader.getVal315();
+  auto list = impl->reader.getVal268();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -238,12 +238,12 @@ std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_protocol(unsigned n) 
 }
 
 gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::protocols(void) const & {
-  auto list = impl->reader.getVal315();
+  auto list = impl->reader.getVal268();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d315 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d315)))) {
+    if (auto d268 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d268)))) {
         co_yield std::move(*e);
       }
     }

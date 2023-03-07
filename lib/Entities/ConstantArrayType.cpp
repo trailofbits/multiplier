@@ -98,13 +98,13 @@ gap::generator<ConstantArrayType> ConstantArrayType::in(const File &file) {
 }
 
 Type ConstantArrayType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> ConstantArrayType::size_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal297();
+    RawEntityId eid = impl->reader.getVal234();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -116,7 +116,7 @@ std::optional<Expr> ConstantArrayType::size_expression(void) const {
 }
 
 bool ConstantArrayType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

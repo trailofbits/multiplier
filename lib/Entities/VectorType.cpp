@@ -99,21 +99,21 @@ gap::generator<VectorType> VectorType::in(const File &file) {
 }
 
 Type VectorType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type VectorType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal292();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 VectorTypeVectorKind VectorType::vector_kind(void) const {
-  return static_cast<VectorTypeVectorKind>(impl->reader.getVal316());
+  return static_cast<VectorTypeVectorKind>(impl->reader.getVal235());
 }
 
 bool VectorType::is_sugared(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

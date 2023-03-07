@@ -103,7 +103,7 @@ gap::generator<TypeWithKeyword> TypeWithKeyword::in(const File &file) {
 }
 
 ElaboratedTypeKeyword TypeWithKeyword::keyword(void) const {
-  return static_cast<ElaboratedTypeKeyword>(impl->reader.getVal316());
+  return static_cast<ElaboratedTypeKeyword>(impl->reader.getVal235());
 }
 
 #pragma GCC diagnostic pop

@@ -171,7 +171,7 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::in(const File &file) {
 }
 
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
-  return static_cast<RefQualifierKind>(impl->reader.getVal127());
+  return static_cast<RefQualifierKind>(impl->reader.getVal158());
 }
 
 std::optional<Type> CXXMethodDecl::this_object_type(void) const {

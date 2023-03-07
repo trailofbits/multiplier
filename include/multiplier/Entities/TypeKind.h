@@ -66,6 +66,7 @@ enum class TypeKind : unsigned char {
   USING,
   VECTOR,
   EXT_VECTOR,
+  QUALIFIED,
 };
 
 inline static const char *EnumerationName(TypeKind) {
@@ -73,7 +74,7 @@ inline static const char *EnumerationName(TypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeKind) {
-  return 54;
+  return 55;
 }
 
 const char *EnumeratorName(TypeKind);

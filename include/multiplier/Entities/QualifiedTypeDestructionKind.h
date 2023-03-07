@@ -11,7 +11,7 @@
 #include <cstdint>
 
 namespace mx {
-enum class QualTypeDestructionKind : unsigned char {
+enum class QualifiedTypeDestructionKind : unsigned char {
   NONE,
   CXX_DESTRUCTOR,
   OBJC_STRONG_LIFETIME,
@@ -19,14 +19,14 @@ enum class QualTypeDestructionKind : unsigned char {
   NONTRIVIAL_C_STRUCT,
 };
 
-inline static const char *EnumerationName(QualTypeDestructionKind) {
-  return "QualTypeDestructionKind";
+inline static const char *EnumerationName(QualifiedTypeDestructionKind) {
+  return "QualifiedTypeDestructionKind";
 }
 
-inline static constexpr unsigned NumEnumerators(QualTypeDestructionKind) {
+inline static constexpr unsigned NumEnumerators(QualifiedTypeDestructionKind) {
   return 5;
 }
 
-const char *EnumeratorName(QualTypeDestructionKind);
+const char *EnumeratorName(QualifiedTypeDestructionKind);
 
 } // namespace mx

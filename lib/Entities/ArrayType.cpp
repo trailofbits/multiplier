@@ -106,12 +106,12 @@ gap::generator<ArrayType> ArrayType::in(const File &file) {
 }
 
 Type ArrayType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ArrayTypeArraySizeModifier ArrayType::size_modifier(void) const {
-  return static_cast<ArrayTypeArraySizeModifier>(impl->reader.getVal316());
+  return static_cast<ArrayTypeArraySizeModifier>(impl->reader.getVal235());
 }
 
 #pragma GCC diagnostic pop

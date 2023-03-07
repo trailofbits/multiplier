@@ -6,7 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#include <multiplier/Entities/QualTypePrimitiveCopyKind.h>
+#include <multiplier/Entities/QualifiedTypeDestructionKind.h>
 
 
 #include "../API.h"
@@ -15,13 +15,13 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
-const char *EnumeratorName(QualTypePrimitiveCopyKind e) {
+const char *EnumeratorName(QualifiedTypeDestructionKind e) {
   switch (e) {
-    case QualTypePrimitiveCopyKind::TRIVIAL: return "TRIVIAL";
-    case QualTypePrimitiveCopyKind::VOLATILE_TRIVIAL: return "VOLATILE_TRIVIAL";
-    case QualTypePrimitiveCopyKind::ARC_STRONG: return "ARC_STRONG";
-    case QualTypePrimitiveCopyKind::ARC_WEAK: return "ARC_WEAK";
-    case QualTypePrimitiveCopyKind::STRUCT: return "STRUCT";
+    case QualifiedTypeDestructionKind::NONE: return "NONE";
+    case QualifiedTypeDestructionKind::CXX_DESTRUCTOR: return "CXX_DESTRUCTOR";
+    case QualifiedTypeDestructionKind::OBJC_STRONG_LIFETIME: return "OBJC_STRONG_LIFETIME";
+    case QualifiedTypeDestructionKind::OBJC_WEAK_LIFETIME: return "OBJC_WEAK_LIFETIME";
+    case QualifiedTypeDestructionKind::NONTRIVIAL_C_STRUCT: return "NONTRIVIAL_C_STRUCT";
     default: return "<invalid>";
   }
 }

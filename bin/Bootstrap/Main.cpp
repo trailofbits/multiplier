@@ -354,6 +354,51 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"VarTemplateDecl", "Specializations"},
   {"FunctionTemplateDecl", "Specializations"},
 
+  // We just don't want these. We want types to be subtractive, not additive.
+  // When we have these, it pollutes our database with all sorts of stuff that
+  // isn't necessarily in the code.
+  //
+  // NOTE(pag): `AtomicUnqualifiedType` is special.
+  {"QualifiedType", "IgnoreParentheses"},
+  {"QualifiedType", "LocalUnqualifiedType"},
+  {"QualifiedType", "NonLValueExpressionType"},
+  {"QualifiedType", "NonPackExpansionType"},
+  {"QualifiedType", "NonPackExpansionType"},
+  {"QualifiedType", "NonReferenceType"},
+  {"QualifiedType", "SingleStepDesugaredType"},
+  {"QualifiedType", "HasLocalNonFastQualifiers"},
+  {"QualifiedType", "HasLocalQualifiers"},
+  {"QualifiedType", "StripObjCKindOfType"},
+  {"QualifiedType", "WithConst"},
+  {"QualifiedType", "WithRestrict"},
+  {"QualifiedType", "WithVolatile"},
+  {"QualifiedType", "WithoutLocalFastQualifiers"},
+
+  // End up being a bit spammy in serialization, and we support `::from`.
+  {"Type", "AsCXXRecordDeclaration"},
+  {"Type", "AsComplexIntegerType"},
+  {"Type", "AsObjCInterfacePointerType"},
+  {"Type", "AsObjCInterfaceType"},
+  {"Type", "AsObjCQualifiedClassType"},
+  {"Type", "AsObjCQualifiedIdType"},
+  {"Type", "AsObjCQualifiedInterfaceType"},
+  {"Type", "AsPlaceholderType"},
+  {"Type", "AsRecordDeclaration"},
+  {"Type", "AsStructureType"},
+  {"Type", "AsTagDeclaration"},
+  {"Type", "AsUnionType"},
+  {"Type", "LocallyUnqualifiedSingleStepDesugaredType"},
+
+  {"Type", "CanonicalTypeInternal"},
+  {"Type", "ContainedAutoType"},
+  {"Type", "ContainedDeducedType"},
+
+  // The bit packing in here are not well described, so we should just omit
+  // them.
+  {"QualifiedType", "CVRQualifiers"},
+  {"QualifiedType", "LocalCVRQualifiers"},
+  {"QualifiedType", "LocalFastQualifiers"},
+
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 };

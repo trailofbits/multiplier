@@ -71,6 +71,7 @@ const char *EnumeratorName(TypeKind e) {
     case TypeKind::USING: return "USING";
     case TypeKind::VECTOR: return "VECTOR";
     case TypeKind::EXT_VECTOR: return "EXT_VECTOR";
+    case TypeKind::QUALIFIED: return "QUALIFIED";
     default: return "<invalid>";
   }
 }

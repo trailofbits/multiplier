@@ -98,7 +98,7 @@ gap::generator<ObjCInterfaceType> ObjCInterfaceType::in(const File &file) {
 }
 
 ObjCInterfaceDecl ObjCInterfaceType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal313();
+  RawEntityId eid = impl->reader.getVal266();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

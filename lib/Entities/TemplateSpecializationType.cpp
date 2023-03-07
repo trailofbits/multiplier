@@ -97,13 +97,13 @@ gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const 
 }
 
 Type TemplateSpecializationType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal291();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Type> TemplateSpecializationType::aliased_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal292();
+    RawEntityId eid = impl->reader.getVal229();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -115,19 +115,19 @@ std::optional<Type> TemplateSpecializationType::aliased_type(void) const {
 }
 
 bool TemplateSpecializationType::is_current_instantiation(void) const {
-  return impl->reader.getVal293();
+  return impl->reader.getVal230();
 }
 
 bool TemplateSpecializationType::is_sugared(void) const {
-  return impl->reader.getVal294();
+  return impl->reader.getVal231();
 }
 
 bool TemplateSpecializationType::is_type_alias(void) const {
-  return impl->reader.getVal295();
+  return impl->reader.getVal232();
 }
 
 std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal296();
+  auto list = impl->reader.getVal233();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -141,12 +141,12 @@ std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argumen
 }
 
 gap::generator<TemplateArgument> TemplateSpecializationType::template_arguments(void) const & {
-  auto list = impl->reader.getVal296();
+  auto list = impl->reader.getVal233();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d296 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d296));
+    if (auto d233 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d233));
     }
   }
   co_return;
