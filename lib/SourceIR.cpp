@@ -62,6 +62,7 @@ static OperationMap Deserialize(mlir::Operation *scope) {
 
   // Add assert to check if it gets hit at anytime?
   assert(result != mlir::WalkResult::interrupt());
+  (void) result;
   return entities;
 }
 
@@ -137,7 +138,8 @@ static RegistryInitializer init_guard;
 
 SourceIRImpl::SourceIRImpl(std::shared_ptr<const FragmentImpl> frag_,
                            std::string_view mlir)
-    : mctx(gRegistry), frag(frag_) {
+    : mctx(gRegistry),
+      frag(std::move(frag_)) {
   llvm::SourceMgr sm;
   auto buffer = llvm::MemoryBuffer::getMemBuffer(mlir);
   sm.AddNewSourceBuffer(std::move(buffer), llvm::SMLoc());

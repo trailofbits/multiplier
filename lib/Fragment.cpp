@@ -244,7 +244,11 @@ gap::generator<RegexQueryMatch> Fragment::query(
 std::optional<SourceIR> Fragment::ir(void) const noexcept {
 #ifdef MX_ENABLE_SOURCEIR
   if (auto mlir = impl->SourceIR(); !mlir.empty()) {
-    return SourceIR(std::make_shared<const SourceIRImpl>(impl, mlir));
+    auto ir_obj = std::make_shared<const SourceIRImpl>(impl, mlir);
+    if (!ir_obj->mod.get()) {
+      return std::nullopt;
+    }
+    return SourceIR(std::move(ir_obj));
   }
 #endif
   return std::nullopt;
