@@ -471,6 +471,10 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Decl decl) {
         co_yield ref;
       }
     }
+  } else if (auto td_ = pasta::TypedefNameDecl::From(decl)) {
+    for (auto ref : DeclReferencesFrom(td_->UnderlyingType())) {
+      co_yield ref;
+    }
   }
 }
 
