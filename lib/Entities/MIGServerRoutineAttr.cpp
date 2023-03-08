@@ -96,6 +96,14 @@ gap::generator<MIGServerRoutineAttr> MIGServerRoutineAttr::in(const File &file) 
   }
 }
 
+std::optional<MIGServerRoutineAttr> MIGServerRoutineAttr::from(const Reference &r) {
+  return MIGServerRoutineAttr::from(r.as_attribute());
+}
+
+std::optional<MIGServerRoutineAttr> MIGServerRoutineAttr::from(const TokenContext &t) {
+  return MIGServerRoutineAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

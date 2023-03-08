@@ -96,6 +96,14 @@ gap::generator<AssertExclusiveLockAttr> AssertExclusiveLockAttr::in(const File &
   }
 }
 
+std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const Reference &r) {
+  return AssertExclusiveLockAttr::from(r.as_attribute());
+}
+
+std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const TokenContext &t) {
+  return AssertExclusiveLockAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

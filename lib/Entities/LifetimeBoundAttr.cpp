@@ -96,6 +96,14 @@ gap::generator<LifetimeBoundAttr> LifetimeBoundAttr::in(const File &file) {
   }
 }
 
+std::optional<LifetimeBoundAttr> LifetimeBoundAttr::from(const Reference &r) {
+  return LifetimeBoundAttr::from(r.as_attribute());
+}
+
+std::optional<LifetimeBoundAttr> LifetimeBoundAttr::from(const TokenContext &t) {
+  return LifetimeBoundAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

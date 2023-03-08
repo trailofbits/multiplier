@@ -98,6 +98,14 @@ gap::generator<SwiftContextAttr> SwiftContextAttr::in(const File &file) {
   }
 }
 
+std::optional<SwiftContextAttr> SwiftContextAttr::from(const Reference &r) {
+  return SwiftContextAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftContextAttr> SwiftContextAttr::from(const TokenContext &t) {
+  return SwiftContextAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

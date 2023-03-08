@@ -96,6 +96,14 @@ gap::generator<CPUDispatchAttr> CPUDispatchAttr::in(const File &file) {
   }
 }
 
+std::optional<CPUDispatchAttr> CPUDispatchAttr::from(const Reference &r) {
+  return CPUDispatchAttr::from(r.as_attribute());
+}
+
+std::optional<CPUDispatchAttr> CPUDispatchAttr::from(const TokenContext &t) {
+  return CPUDispatchAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

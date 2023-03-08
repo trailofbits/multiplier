@@ -96,6 +96,14 @@ gap::generator<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::in(const File &file
   }
 }
 
+std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const Reference &r) {
+  return MaxFieldAlignmentAttr::from(r.as_attribute());
+}
+
+std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const TokenContext &t) {
+  return MaxFieldAlignmentAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

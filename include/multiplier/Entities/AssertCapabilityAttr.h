@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AssertCapabilityAttrSpelling.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AssertCapabilityAttr;
 class Attr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class AssertCapabilityAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<AssertCapabilityAttr> from(const Reference &r) {
-    return AssertCapabilityAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<AssertCapabilityAttr> from(const TokenContext &t) {
-    return AssertCapabilityAttr::from(t.as_attribute());
-  }
+  static std::optional<AssertCapabilityAttr> from(const Reference &r);
+  static std::optional<AssertCapabilityAttr> from(const TokenContext &t);
 
   AssertCapabilityAttrSpelling semantic_spelling(void) const;
   bool is_shared(void) const;

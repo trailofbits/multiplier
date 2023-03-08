@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CXXMethodDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConstructorDecl;
 class CXXMethodDecl;
 class Decl;
@@ -75,13 +64,8 @@ class CXXConstructorDecl : public CXXMethodDecl {
     }
   }
 
-  inline static std::optional<CXXConstructorDecl> from(const Reference &r) {
-    return CXXConstructorDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXConstructorDecl> from(const TokenContext &t) {
-    return CXXConstructorDecl::from(t.as_declaration());
-  }
+  static std::optional<CXXConstructorDecl> from(const Reference &r);
+  static std::optional<CXXConstructorDecl> from(const TokenContext &t);
 
   std::optional<CXXConstructorDecl> target_constructor(void) const;
   bool is_default_constructor(void) const;

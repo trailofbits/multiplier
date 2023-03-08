@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class ExtVectorElementExpr;
@@ -68,13 +57,8 @@ class ExtVectorElementExpr : public Expr {
     }
   }
 
-  inline static std::optional<ExtVectorElementExpr> from(const Reference &r) {
-    return ExtVectorElementExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ExtVectorElementExpr> from(const TokenContext &t) {
-    return ExtVectorElementExpr::from(t.as_statement());
-  }
+  static std::optional<ExtVectorElementExpr> from(const Reference &r);
+  static std::optional<ExtVectorElementExpr> from(const TokenContext &t);
 
   bool contains_duplicate_elements(void) const;
   Token accessor_token(void) const;

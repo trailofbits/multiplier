@@ -147,6 +147,14 @@ gap::generator<OMPForSimdDirective> OMPForSimdDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const Reference &r) {
+  return OMPForSimdDirective::from(r.as_statement());
+}
+
+std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const TokenContext &t) {
+  return OMPForSimdDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

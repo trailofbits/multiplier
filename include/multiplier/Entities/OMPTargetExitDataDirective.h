@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPExecutableDirective.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class OMPExecutableDirective;
 class OMPTargetExitDataDirective;
@@ -66,13 +55,8 @@ class OMPTargetExitDataDirective : public OMPExecutableDirective {
     }
   }
 
-  inline static std::optional<OMPTargetExitDataDirective> from(const Reference &r) {
-    return OMPTargetExitDataDirective::from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTargetExitDataDirective> from(const TokenContext &t) {
-    return OMPTargetExitDataDirective::from(t.as_statement());
-  }
+  static std::optional<OMPTargetExitDataDirective> from(const Reference &r);
+  static std::optional<OMPTargetExitDataDirective> from(const TokenContext &t);
 
 };
 

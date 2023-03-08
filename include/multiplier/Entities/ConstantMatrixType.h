@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "MatrixType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConstantMatrixType;
 class MatrixType;
 class Token;
@@ -56,13 +45,8 @@ class ConstantMatrixType : public MatrixType {
     }
   }
 
-  inline static std::optional<ConstantMatrixType> from(const Reference &r) {
-    return ConstantMatrixType::from(r.as_type());
-  }
-
-  inline static std::optional<ConstantMatrixType> from(const TokenContext &t) {
-    return ConstantMatrixType::from(t.as_type());
-  }
+  static std::optional<ConstantMatrixType> from(const Reference &r);
+  static std::optional<ConstantMatrixType> from(const TokenContext &t);
 
 };
 

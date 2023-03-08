@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "IfStatementKind.h"
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclStmt;
 class Expr;
@@ -68,13 +57,8 @@ class IfStmt : public Stmt {
     }
   }
 
-  inline static std::optional<IfStmt> from(const Reference &r) {
-    return IfStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<IfStmt> from(const TokenContext &t) {
-    return IfStmt::from(t.as_statement());
-  }
+  static std::optional<IfStmt> from(const Reference &r);
+  static std::optional<IfStmt> from(const TokenContext &t);
 
   Expr condition(void) const;
   std::optional<VarDecl> condition_variable(void) const;

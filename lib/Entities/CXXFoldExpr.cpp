@@ -147,6 +147,14 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXFoldExpr> CXXFoldExpr::from(const Reference &r) {
+  return CXXFoldExpr::from(r.as_statement());
+}
+
+std::optional<CXXFoldExpr> CXXFoldExpr::from(const TokenContext &t) {
+  return CXXFoldExpr::from(t.as_statement());
+}
+
 UnresolvedLookupExpr CXXFoldExpr::callee(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

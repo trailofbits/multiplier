@@ -145,6 +145,14 @@ gap::generator<OMPTargetExitDataDirective> OMPTargetExitDataDirective::in(const 
   }
 }
 
+std::optional<OMPTargetExitDataDirective> OMPTargetExitDataDirective::from(const Reference &r) {
+  return OMPTargetExitDataDirective::from(r.as_statement());
+}
+
+std::optional<OMPTargetExitDataDirective> OMPTargetExitDataDirective::from(const TokenContext &t) {
+  return OMPTargetExitDataDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

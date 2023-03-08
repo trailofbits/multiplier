@@ -990,6 +990,14 @@ gap::generator<InheritableAttr> InheritableAttr::in(const File &file) {
   }
 }
 
+std::optional<InheritableAttr> InheritableAttr::from(const Reference &r) {
+  return InheritableAttr::from(r.as_attribute());
+}
+
+std::optional<InheritableAttr> InheritableAttr::from(const TokenContext &t) {
+  return InheritableAttr::from(t.as_attribute());
+}
+
 bool InheritableAttr::should_inherit_even_if_already_present(void) const {
   return impl->reader.getVal11();
 }

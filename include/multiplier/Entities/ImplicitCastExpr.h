@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CastExpr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CastExpr;
 class Decl;
 class Expr;
@@ -70,13 +59,8 @@ class ImplicitCastExpr : public CastExpr {
     }
   }
 
-  inline static std::optional<ImplicitCastExpr> from(const Reference &r) {
-    return ImplicitCastExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ImplicitCastExpr> from(const TokenContext &t) {
-    return ImplicitCastExpr::from(t.as_statement());
-  }
+  static std::optional<ImplicitCastExpr> from(const Reference &r);
+  static std::optional<ImplicitCastExpr> from(const TokenContext &t);
 
   bool is_part_of_explicit_cast(void) const;
 };

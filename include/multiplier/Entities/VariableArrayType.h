@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ArrayType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ArrayType;
 class Expr;
 class Token;
@@ -58,13 +47,8 @@ class VariableArrayType : public ArrayType {
     }
   }
 
-  inline static std::optional<VariableArrayType> from(const Reference &r) {
-    return VariableArrayType::from(r.as_type());
-  }
-
-  inline static std::optional<VariableArrayType> from(const TokenContext &t) {
-    return VariableArrayType::from(t.as_type());
-  }
+  static std::optional<VariableArrayType> from(const Reference &r);
+  static std::optional<VariableArrayType> from(const TokenContext &t);
 
   Type desugar(void) const;
   TokenRange brackets_range(void) const;

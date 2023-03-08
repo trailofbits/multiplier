@@ -96,6 +96,14 @@ gap::generator<ErrorAttr> ErrorAttr::in(const File &file) {
   }
 }
 
+std::optional<ErrorAttr> ErrorAttr::from(const Reference &r) {
+  return ErrorAttr::from(r.as_attribute());
+}
+
+std::optional<ErrorAttr> ErrorAttr::from(const TokenContext &t) {
+  return ErrorAttr::from(t.as_attribute());
+}
+
 ErrorAttrSpelling ErrorAttr::semantic_spelling(void) const {
   return static_cast<ErrorAttrSpelling>(impl->reader.getVal10());
 }

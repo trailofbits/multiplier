@@ -96,6 +96,14 @@ gap::generator<TypeNullableAttr> TypeNullableAttr::in(const File &file) {
   }
 }
 
+std::optional<TypeNullableAttr> TypeNullableAttr::from(const Reference &r) {
+  return TypeNullableAttr::from(r.as_attribute());
+}
+
+std::optional<TypeNullableAttr> TypeNullableAttr::from(const TokenContext &t) {
+  return TypeNullableAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

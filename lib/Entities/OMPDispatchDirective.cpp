@@ -145,6 +145,14 @@ gap::generator<OMPDispatchDirective> OMPDispatchDirective::in(const File &file) 
   }
 }
 
+std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const Reference &r) {
+  return OMPDispatchDirective::from(r.as_statement());
+}
+
+std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const TokenContext &t) {
+  return OMPDispatchDirective::from(t.as_statement());
+}
+
 Token OMPDispatchDirective::target_call_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }

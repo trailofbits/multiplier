@@ -96,6 +96,14 @@ gap::generator<XRayInstrumentAttr> XRayInstrumentAttr::in(const File &file) {
   }
 }
 
+std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const Reference &r) {
+  return XRayInstrumentAttr::from(r.as_attribute());
+}
+
+std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const TokenContext &t) {
+  return XRayInstrumentAttr::from(t.as_attribute());
+}
+
 bool XRayInstrumentAttr::always_x_ray_instrument(void) const {
   return impl->reader.getVal12();
 }

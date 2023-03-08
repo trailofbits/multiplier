@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ClassTemplateSpecializationDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXRecordDecl;
 class ClassTemplatePartialSpecializationDecl;
 class ClassTemplateSpecializationDecl;
@@ -79,13 +68,8 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
     }
   }
 
-  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const Reference &r) {
-    return ClassTemplatePartialSpecializationDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const TokenContext &t) {
-    return ClassTemplatePartialSpecializationDecl::from(t.as_declaration());
-  }
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const Reference &r);
+  static std::optional<ClassTemplatePartialSpecializationDecl> from(const TokenContext &t);
 
   Type injected_specialization_type(void) const;
   ClassTemplatePartialSpecializationDecl instantiated_from_member(void) const;

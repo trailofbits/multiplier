@@ -146,6 +146,14 @@ gap::generator<MSAsmStmt> MSAsmStmt::in(const File &file) {
   }
 }
 
+std::optional<MSAsmStmt> MSAsmStmt::from(const Reference &r) {
+  return MSAsmStmt::from(r.as_statement());
+}
+
+std::optional<MSAsmStmt> MSAsmStmt::from(const TokenContext &t) {
+  return MSAsmStmt::from(t.as_statement());
+}
+
 gap::generator<std::string_view> MSAsmStmt::all_constraints(void) const & {
   auto list = impl->reader.getVal64();
   EntityProvider::Ptr ep = impl->ep;

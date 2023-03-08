@@ -215,6 +215,14 @@ gap::generator<Stmt> Stmt::in(const File &file, std::span<StmtKind> kinds) {
   }
 }
 
+std::optional<Stmt> Stmt::from(const Reference &r) {
+  return r.as_statement();
+}
+
+std::optional<Stmt> Stmt::from(const TokenContext &t) {
+  return t.as_statement();
+}
+
 Stmt Stmt::ignore_containers(void) const {
   RawEntityId eid = impl->reader.getVal3();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

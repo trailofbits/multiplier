@@ -96,6 +96,14 @@ gap::generator<CommonAttr> CommonAttr::in(const File &file) {
   }
 }
 
+std::optional<CommonAttr> CommonAttr::from(const Reference &r) {
+  return CommonAttr::from(r.as_attribute());
+}
+
+std::optional<CommonAttr> CommonAttr::from(const TokenContext &t) {
+  return CommonAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -147,6 +147,14 @@ gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Reference &r) {
+  return CXXTypeidExpr::from(r.as_statement());
+}
+
+std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const TokenContext &t) {
+  return CXXTypeidExpr::from(t.as_statement());
+}
+
 std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal38();

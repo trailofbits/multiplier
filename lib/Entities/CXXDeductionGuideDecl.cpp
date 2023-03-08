@@ -162,6 +162,14 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::in(const File &file
   }
 }
 
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Reference &r) {
+  return CXXDeductionGuideDecl::from(r.as_declaration());
+}
+
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const TokenContext &t) {
+  return CXXDeductionGuideDecl::from(t.as_declaration());
+}
+
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
   RawEntityId eid = impl->reader.getVal159();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

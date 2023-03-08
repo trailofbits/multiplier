@@ -96,6 +96,14 @@ gap::generator<EnumExtensibilityAttr> EnumExtensibilityAttr::in(const File &file
   }
 }
 
+std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const Reference &r) {
+  return EnumExtensibilityAttr::from(r.as_attribute());
+}
+
+std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const TokenContext &t) {
+  return EnumExtensibilityAttr::from(t.as_attribute());
+}
+
 EnumExtensibilityAttrKind EnumExtensibilityAttr::extensibility(void) const {
   return static_cast<EnumExtensibilityAttrKind>(impl->reader.getVal10());
 }

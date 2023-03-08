@@ -96,6 +96,14 @@ gap::generator<AsmLabelAttr> AsmLabelAttr::in(const File &file) {
   }
 }
 
+std::optional<AsmLabelAttr> AsmLabelAttr::from(const Reference &r) {
+  return AsmLabelAttr::from(r.as_attribute());
+}
+
+std::optional<AsmLabelAttr> AsmLabelAttr::from(const TokenContext &t) {
+  return AsmLabelAttr::from(t.as_attribute());
+}
+
 bool AsmLabelAttr::is_literal_label(void) const {
   return impl->reader.getVal12();
 }

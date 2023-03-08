@@ -96,6 +96,14 @@ gap::generator<RegCallAttr> RegCallAttr::in(const File &file) {
   }
 }
 
+std::optional<RegCallAttr> RegCallAttr::from(const Reference &r) {
+  return RegCallAttr::from(r.as_attribute());
+}
+
+std::optional<RegCallAttr> RegCallAttr::from(const TokenContext &t) {
+  return RegCallAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

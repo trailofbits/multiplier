@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "MacroSubstitution.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Macro;
 class MacroSubstitution;
 class MacroVAOpt;
@@ -60,13 +49,8 @@ class MacroVAOpt : public MacroSubstitution {
     }
   }
 
-  inline static std::optional<MacroVAOpt> from(const Reference &r) {
-    return MacroVAOpt::from(r.as_macro());
-  }
-
-  inline static std::optional<MacroVAOpt> from(const TokenContext &t) {
-    return MacroVAOpt::from(t.as_macro());
-  }
+  static std::optional<MacroVAOpt> from(const Reference &r);
+  static std::optional<MacroVAOpt> from(const TokenContext &t);
 
 };
 

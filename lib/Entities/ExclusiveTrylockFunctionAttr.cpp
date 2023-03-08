@@ -97,6 +97,14 @@ gap::generator<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::in(co
   }
 }
 
+std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::from(const Reference &r) {
+  return ExclusiveTrylockFunctionAttr::from(r.as_attribute());
+}
+
+std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::from(const TokenContext &t) {
+  return ExclusiveTrylockFunctionAttr::from(t.as_attribute());
+}
+
 Expr ExclusiveTrylockFunctionAttr::success_value(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

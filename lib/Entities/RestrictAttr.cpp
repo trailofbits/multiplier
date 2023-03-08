@@ -96,6 +96,14 @@ gap::generator<RestrictAttr> RestrictAttr::in(const File &file) {
   }
 }
 
+std::optional<RestrictAttr> RestrictAttr::from(const Reference &r) {
+  return RestrictAttr::from(r.as_attribute());
+}
+
+std::optional<RestrictAttr> RestrictAttr::from(const TokenContext &t) {
+  return RestrictAttr::from(t.as_attribute());
+}
+
 RestrictAttrSpelling RestrictAttr::semantic_spelling(void) const {
   return static_cast<RestrictAttrSpelling>(impl->reader.getVal10());
 }

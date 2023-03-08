@@ -96,6 +96,14 @@ gap::generator<CodeSegAttr> CodeSegAttr::in(const File &file) {
   }
 }
 
+std::optional<CodeSegAttr> CodeSegAttr::from(const Reference &r) {
+  return CodeSegAttr::from(r.as_attribute());
+}
+
+std::optional<CodeSegAttr> CodeSegAttr::from(const TokenContext &t) {
+  return CodeSegAttr::from(t.as_attribute());
+}
+
 std::string_view CodeSegAttr::name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

@@ -96,6 +96,14 @@ gap::generator<TLSModelAttr> TLSModelAttr::in(const File &file) {
   }
 }
 
+std::optional<TLSModelAttr> TLSModelAttr::from(const Reference &r) {
+  return TLSModelAttr::from(r.as_attribute());
+}
+
+std::optional<TLSModelAttr> TLSModelAttr::from(const TokenContext &t) {
+  return TLSModelAttr::from(t.as_attribute());
+}
+
 std::string_view TLSModelAttr::model(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

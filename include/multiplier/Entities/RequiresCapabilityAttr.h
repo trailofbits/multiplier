@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "RequiresCapabilityAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class RequiresCapabilityAttr;
@@ -57,13 +46,8 @@ class RequiresCapabilityAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<RequiresCapabilityAttr> from(const Reference &r) {
-    return RequiresCapabilityAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<RequiresCapabilityAttr> from(const TokenContext &t) {
-    return RequiresCapabilityAttr::from(t.as_attribute());
-  }
+  static std::optional<RequiresCapabilityAttr> from(const Reference &r);
+  static std::optional<RequiresCapabilityAttr> from(const TokenContext &t);
 
   RequiresCapabilityAttrSpelling semantic_spelling(void) const;
   bool is_shared(void) const;

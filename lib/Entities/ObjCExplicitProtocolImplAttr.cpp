@@ -96,6 +96,14 @@ gap::generator<ObjCExplicitProtocolImplAttr> ObjCExplicitProtocolImplAttr::in(co
   }
 }
 
+std::optional<ObjCExplicitProtocolImplAttr> ObjCExplicitProtocolImplAttr::from(const Reference &r) {
+  return ObjCExplicitProtocolImplAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCExplicitProtocolImplAttr> ObjCExplicitProtocolImplAttr::from(const TokenContext &t) {
+  return ObjCExplicitProtocolImplAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

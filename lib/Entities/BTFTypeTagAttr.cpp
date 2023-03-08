@@ -96,6 +96,14 @@ gap::generator<BTFTypeTagAttr> BTFTypeTagAttr::in(const File &file) {
   }
 }
 
+std::optional<BTFTypeTagAttr> BTFTypeTagAttr::from(const Reference &r) {
+  return BTFTypeTagAttr::from(r.as_attribute());
+}
+
+std::optional<BTFTypeTagAttr> BTFTypeTagAttr::from(const TokenContext &t) {
+  return BTFTypeTagAttr::from(t.as_attribute());
+}
+
 std::string_view BTFTypeTagAttr::btf_type_tag(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

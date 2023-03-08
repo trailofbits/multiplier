@@ -96,6 +96,14 @@ gap::generator<M68kInterruptAttr> M68kInterruptAttr::in(const File &file) {
   }
 }
 
+std::optional<M68kInterruptAttr> M68kInterruptAttr::from(const Reference &r) {
+  return M68kInterruptAttr::from(r.as_attribute());
+}
+
+std::optional<M68kInterruptAttr> M68kInterruptAttr::from(const TokenContext &t) {
+  return M68kInterruptAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

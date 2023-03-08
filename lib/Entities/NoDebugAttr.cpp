@@ -96,6 +96,14 @@ gap::generator<NoDebugAttr> NoDebugAttr::in(const File &file) {
   }
 }
 
+std::optional<NoDebugAttr> NoDebugAttr::from(const Reference &r) {
+  return NoDebugAttr::from(r.as_attribute());
+}
+
+std::optional<NoDebugAttr> NoDebugAttr::from(const TokenContext &t) {
+  return NoDebugAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

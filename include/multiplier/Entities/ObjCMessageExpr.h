@@ -8,24 +8,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "ObjCMessageExprReceiverKind.h"
 #include "ObjCMethodFamily.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class ObjCInterfaceDecl;
@@ -74,13 +63,8 @@ class ObjCMessageExpr : public Expr {
     }
   }
 
-  inline static std::optional<ObjCMessageExpr> from(const Reference &r) {
-    return ObjCMessageExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCMessageExpr> from(const TokenContext &t) {
-    return ObjCMessageExpr::from(t.as_statement());
-  }
+  static std::optional<ObjCMessageExpr> from(const Reference &r);
+  static std::optional<ObjCMessageExpr> from(const TokenContext &t);
 
   std::optional<Expr> nth_argument(unsigned n) const;
   unsigned num_arguments(void) const;

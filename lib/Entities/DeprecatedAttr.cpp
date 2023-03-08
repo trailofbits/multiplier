@@ -96,6 +96,14 @@ gap::generator<DeprecatedAttr> DeprecatedAttr::in(const File &file) {
   }
 }
 
+std::optional<DeprecatedAttr> DeprecatedAttr::from(const Reference &r) {
+  return DeprecatedAttr::from(r.as_attribute());
+}
+
+std::optional<DeprecatedAttr> DeprecatedAttr::from(const TokenContext &t) {
+  return DeprecatedAttr::from(t.as_attribute());
+}
+
 std::string_view DeprecatedAttr::message(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

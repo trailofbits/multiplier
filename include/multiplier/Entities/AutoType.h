@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AutoTypeKeyword.h"
 #include "DeducedType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AutoType;
 class ConceptDecl;
 class DeducedType;
@@ -59,13 +48,8 @@ class AutoType : public DeducedType {
     }
   }
 
-  inline static std::optional<AutoType> from(const Reference &r) {
-    return AutoType::from(r.as_type());
-  }
-
-  inline static std::optional<AutoType> from(const TokenContext &t) {
-    return AutoType::from(t.as_type());
-  }
+  static std::optional<AutoType> from(const Reference &r);
+  static std::optional<AutoType> from(const TokenContext &t);
 
   AutoTypeKeyword keyword(void) const;
   std::optional<TemplateArgument> nth_type_constraint_argument(unsigned n) const;

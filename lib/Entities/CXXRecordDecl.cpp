@@ -176,6 +176,14 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::in(const File &file) {
   }
 }
 
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const Reference &r) {
+  return CXXRecordDecl::from(r.as_declaration());
+}
+
+std::optional<CXXRecordDecl> CXXRecordDecl::from(const TokenContext &t) {
+  return CXXRecordDecl::from(t.as_declaration());
+}
+
 std::optional<bool> CXXRecordDecl::allow_const_default_initializer(void) const {
   if (!impl->reader.getVal121()) {
     return std::nullopt;

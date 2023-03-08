@@ -146,6 +146,14 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::in(const File &fi
   }
 }
 
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Reference &r) {
+  return CXXScalarValueInitExpr::from(r.as_statement());
+}
+
+std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const TokenContext &t) {
+  return CXXScalarValueInitExpr::from(t.as_statement());
+}
+
 Token CXXScalarValueInitExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

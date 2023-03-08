@@ -9,8 +9,11 @@
 #include <multiplier/Entities/TemplateParameterList.h>
 
 #include <multiplier/Entities/Expr.h>
+#include <multiplier/Entities/File.h>
+#include <multiplier/Entities/Fragment.h>
 #include <multiplier/Entities/NamedDecl.h>
 #include <multiplier/Entities/Reference.h>
+#include <multiplier/Entities/Token.h>
 
 #include "../API.h"
 #include "../File.h"
@@ -32,6 +35,14 @@ std::shared_ptr<EntityProvider> TemplateParameterList::entity_provider_of(const 
 
 std::shared_ptr<EntityProvider> TemplateParameterList::entity_provider_of(const File &file_) {
   return file_.impl->ep;
+}
+
+std::optional<TemplateParameterList> TemplateParameterList::from(const Reference &r) {
+  return r.as_template_parameter_list();
+}
+
+std::optional<TemplateParameterList> TemplateParameterList::from(const TokenContext &t) {
+  return t.as_template_parameter_list();
 }
 
 unsigned TemplateParameterList::depth(void) const {

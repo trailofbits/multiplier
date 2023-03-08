@@ -96,6 +96,14 @@ gap::generator<MSABIAttr> MSABIAttr::in(const File &file) {
   }
 }
 
+std::optional<MSABIAttr> MSABIAttr::from(const Reference &r) {
+  return MSABIAttr::from(r.as_attribute());
+}
+
+std::optional<MSABIAttr> MSABIAttr::from(const TokenContext &t) {
+  return MSABIAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

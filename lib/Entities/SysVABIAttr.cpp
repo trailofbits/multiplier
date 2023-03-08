@@ -96,6 +96,14 @@ gap::generator<SysVABIAttr> SysVABIAttr::in(const File &file) {
   }
 }
 
+std::optional<SysVABIAttr> SysVABIAttr::from(const Reference &r) {
+  return SysVABIAttr::from(r.as_attribute());
+}
+
+std::optional<SysVABIAttr> SysVABIAttr::from(const TokenContext &t) {
+  return SysVABIAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

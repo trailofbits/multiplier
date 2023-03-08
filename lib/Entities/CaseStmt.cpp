@@ -146,6 +146,14 @@ gap::generator<CaseStmt> CaseStmt::in(const File &file) {
   }
 }
 
+std::optional<CaseStmt> CaseStmt::from(const Reference &r) {
+  return CaseStmt::from(r.as_statement());
+}
+
+std::optional<CaseStmt> CaseStmt::from(const TokenContext &t) {
+  return CaseStmt::from(t.as_statement());
+}
+
 bool CaseStmt::case_statement_is_gnu_range(void) const {
   return impl->reader.getVal12();
 }

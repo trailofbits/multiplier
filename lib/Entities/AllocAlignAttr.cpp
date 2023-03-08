@@ -96,6 +96,14 @@ gap::generator<AllocAlignAttr> AllocAlignAttr::in(const File &file) {
   }
 }
 
+std::optional<AllocAlignAttr> AllocAlignAttr::from(const Reference &r) {
+  return AllocAlignAttr::from(r.as_attribute());
+}
+
+std::optional<AllocAlignAttr> AllocAlignAttr::from(const TokenContext &t) {
+  return AllocAlignAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

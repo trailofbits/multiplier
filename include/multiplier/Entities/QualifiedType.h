@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "LangAS.h"
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class QualifiedType;
 class Token;
 class Type;
@@ -55,13 +44,8 @@ class QualifiedType : public Type {
     }
   }
 
-  inline static std::optional<QualifiedType> from(const Reference &r) {
-    return QualifiedType::from(r.as_type());
-  }
-
-  inline static std::optional<QualifiedType> from(const TokenContext &t) {
-    return QualifiedType::from(t.as_type());
-  }
+  static std::optional<QualifiedType> from(const Reference &r);
+  static std::optional<QualifiedType> from(const TokenContext &t);
 
   LangAS address_space(void) const;
   Type atomic_unqualified_type(void) const;

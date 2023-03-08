@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TypeDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class ObjCTypeParamDecl;
@@ -70,13 +59,8 @@ class TypedefNameDecl : public TypeDecl {
     }
   }
 
-  inline static std::optional<TypedefNameDecl> from(const Reference &r) {
-    return TypedefNameDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<TypedefNameDecl> from(const TokenContext &t) {
-    return TypedefNameDecl::from(t.as_declaration());
-  }
+  static std::optional<TypedefNameDecl> from(const Reference &r);
+  static std::optional<TypedefNameDecl> from(const TokenContext &t);
 
   std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const;
   Type underlying_type(void) const;

@@ -148,6 +148,14 @@ gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const File &file) 
   }
 }
 
+std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const Reference &r) {
+  return UnresolvedMemberExpr::from(r.as_statement());
+}
+
+std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const TokenContext &t) {
+  return UnresolvedMemberExpr::from(t.as_statement());
+}
+
 Expr UnresolvedMemberExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal43();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

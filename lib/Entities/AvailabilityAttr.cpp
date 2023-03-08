@@ -96,6 +96,14 @@ gap::generator<AvailabilityAttr> AvailabilityAttr::in(const File &file) {
   }
 }
 
+std::optional<AvailabilityAttr> AvailabilityAttr::from(const Reference &r) {
+  return AvailabilityAttr::from(r.as_attribute());
+}
+
+std::optional<AvailabilityAttr> AvailabilityAttr::from(const TokenContext &t) {
+  return AvailabilityAttr::from(t.as_attribute());
+}
+
 std::string_view AvailabilityAttr::message(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

@@ -8,24 +8,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "OMPDeclareTargetDeclAttrDevTypeTy.h"
 #include "OMPDeclareTargetDeclAttrMapTypeTy.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class Expr;
 class InheritableAttr;
@@ -59,13 +48,8 @@ class OMPDeclareTargetDeclAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<OMPDeclareTargetDeclAttr> from(const Reference &r) {
-    return OMPDeclareTargetDeclAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<OMPDeclareTargetDeclAttr> from(const TokenContext &t) {
-    return OMPDeclareTargetDeclAttr::from(t.as_attribute());
-  }
+  static std::optional<OMPDeclareTargetDeclAttr> from(const Reference &r);
+  static std::optional<OMPDeclareTargetDeclAttr> from(const TokenContext &t);
 
   OMPDeclareTargetDeclAttrDevTypeTy dev_type(void) const;
   bool indirect(void) const;

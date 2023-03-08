@@ -96,6 +96,14 @@ gap::generator<MSVtorDispAttr> MSVtorDispAttr::in(const File &file) {
   }
 }
 
+std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const Reference &r) {
+  return MSVtorDispAttr::from(r.as_attribute());
+}
+
+std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const TokenContext &t) {
+  return MSVtorDispAttr::from(t.as_attribute());
+}
+
 MSVtorDispMode MSVtorDispAttr::vtor_disp_mode(void) const {
   return static_cast<MSVtorDispMode>(impl->reader.getVal10());
 }

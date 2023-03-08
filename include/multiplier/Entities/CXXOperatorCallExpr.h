@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CallExpr.h"
 #include "OverloadedOperatorKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXOperatorCallExpr;
 class CallExpr;
 class Decl;
@@ -71,13 +60,8 @@ class CXXOperatorCallExpr : public CallExpr {
     }
   }
 
-  inline static std::optional<CXXOperatorCallExpr> from(const Reference &r) {
-    return CXXOperatorCallExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXOperatorCallExpr> from(const TokenContext &t) {
-    return CXXOperatorCallExpr::from(t.as_statement());
-  }
+  static std::optional<CXXOperatorCallExpr> from(const Reference &r);
+  static std::optional<CXXOperatorCallExpr> from(const TokenContext &t);
 
   OverloadedOperatorKind operator_(void) const;
   Token operator_token(void) const;

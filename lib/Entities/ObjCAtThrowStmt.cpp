@@ -145,6 +145,14 @@ gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::in(const File &file) {
   }
 }
 
+std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const Reference &r) {
+  return ObjCAtThrowStmt::from(r.as_statement());
+}
+
+std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const TokenContext &t) {
+  return ObjCAtThrowStmt::from(t.as_statement());
+}
+
 Expr ObjCAtThrowStmt::throw_expression(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

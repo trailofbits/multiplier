@@ -147,6 +147,14 @@ gap::generator<VAArgExpr> VAArgExpr::in(const File &file) {
   }
 }
 
+std::optional<VAArgExpr> VAArgExpr::from(const Reference &r) {
+  return VAArgExpr::from(r.as_statement());
+}
+
+std::optional<VAArgExpr> VAArgExpr::from(const TokenContext &t) {
+  return VAArgExpr::from(t.as_statement());
+}
+
 Token VAArgExpr::builtin_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

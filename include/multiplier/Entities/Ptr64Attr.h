@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TypeAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class Ptr64Attr;
 class Token;
@@ -56,13 +45,8 @@ class Ptr64Attr : public TypeAttr {
     }
   }
 
-  inline static std::optional<Ptr64Attr> from(const Reference &r) {
-    return Ptr64Attr::from(r.as_attribute());
-  }
-
-  inline static std::optional<Ptr64Attr> from(const TokenContext &t) {
-    return Ptr64Attr::from(t.as_attribute());
-  }
+  static std::optional<Ptr64Attr> from(const Reference &r);
+  static std::optional<Ptr64Attr> from(const TokenContext &t);
 
 };
 

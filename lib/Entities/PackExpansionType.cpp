@@ -95,6 +95,14 @@ gap::generator<PackExpansionType> PackExpansionType::in(const File &file) {
   }
 }
 
+std::optional<PackExpansionType> PackExpansionType::from(const Reference &r) {
+  return PackExpansionType::from(r.as_type());
+}
+
+std::optional<PackExpansionType> PackExpansionType::from(const TokenContext &t) {
+  return PackExpansionType::from(t.as_type());
+}
+
 Type PackExpansionType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

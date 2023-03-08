@@ -145,6 +145,14 @@ gap::generator<GotoStmt> GotoStmt::in(const File &file) {
   }
 }
 
+std::optional<GotoStmt> GotoStmt::from(const Reference &r) {
+  return GotoStmt::from(r.as_statement());
+}
+
+std::optional<GotoStmt> GotoStmt::from(const TokenContext &t) {
+  return GotoStmt::from(t.as_statement());
+}
+
 Token GotoStmt::goto_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

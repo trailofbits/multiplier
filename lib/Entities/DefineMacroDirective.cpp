@@ -112,6 +112,14 @@ gap::generator<DefineMacroDirective> DefineMacroDirective::in(const File &file) 
   }
 }
 
+std::optional<DefineMacroDirective> DefineMacroDirective::from(const Reference &r) {
+  return DefineMacroDirective::from(r.as_macro());
+}
+
+std::optional<DefineMacroDirective> DefineMacroDirective::from(const TokenContext &t) {
+  return DefineMacroDirective::from(t.as_macro());
+}
+
 Token DefineMacroDirective::name(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal9();

@@ -96,6 +96,14 @@ gap::generator<ObjCRequiresPropertyDefsAttr> ObjCRequiresPropertyDefsAttr::in(co
   }
 }
 
+std::optional<ObjCRequiresPropertyDefsAttr> ObjCRequiresPropertyDefsAttr::from(const Reference &r) {
+  return ObjCRequiresPropertyDefsAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCRequiresPropertyDefsAttr> ObjCRequiresPropertyDefsAttr::from(const TokenContext &t) {
+  return ObjCRequiresPropertyDefsAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

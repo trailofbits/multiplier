@@ -147,6 +147,14 @@ gap::generator<CoawaitExpr> CoawaitExpr::in(const File &file) {
   }
 }
 
+std::optional<CoawaitExpr> CoawaitExpr::from(const Reference &r) {
+  return CoawaitExpr::from(r.as_statement());
+}
+
+std::optional<CoawaitExpr> CoawaitExpr::from(const TokenContext &t) {
+  return CoawaitExpr::from(t.as_statement());
+}
+
 bool CoawaitExpr::is_implicit(void) const {
   return impl->reader.getVal88();
 }

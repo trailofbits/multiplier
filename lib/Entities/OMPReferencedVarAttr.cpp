@@ -96,6 +96,14 @@ gap::generator<OMPReferencedVarAttr> OMPReferencedVarAttr::in(const File &file) 
   }
 }
 
+std::optional<OMPReferencedVarAttr> OMPReferencedVarAttr::from(const Reference &r) {
+  return OMPReferencedVarAttr::from(r.as_attribute());
+}
+
+std::optional<OMPReferencedVarAttr> OMPReferencedVarAttr::from(const TokenContext &t) {
+  return OMPReferencedVarAttr::from(t.as_attribute());
+}
+
 Expr OMPReferencedVarAttr::reference(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

@@ -156,6 +156,14 @@ gap::generator<LinkageSpecDecl> LinkageSpecDecl::in(const File &file) {
   }
 }
 
+std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const Reference &r) {
+  return LinkageSpecDecl::from(r.as_declaration());
+}
+
+std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const TokenContext &t) {
+  return LinkageSpecDecl::from(t.as_declaration());
+}
+
 gap::generator<Decl> LinkageSpecDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
   auto list = impl->reader.getVal47();

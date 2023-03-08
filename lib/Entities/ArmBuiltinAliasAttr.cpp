@@ -96,6 +96,14 @@ gap::generator<ArmBuiltinAliasAttr> ArmBuiltinAliasAttr::in(const File &file) {
   }
 }
 
+std::optional<ArmBuiltinAliasAttr> ArmBuiltinAliasAttr::from(const Reference &r) {
+  return ArmBuiltinAliasAttr::from(r.as_attribute());
+}
+
+std::optional<ArmBuiltinAliasAttr> ArmBuiltinAliasAttr::from(const TokenContext &t) {
+  return ArmBuiltinAliasAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

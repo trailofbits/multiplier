@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TagDecl.h"
 #include "TemplateSpecializationKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class EnumConstantDecl;
 class EnumDecl;
@@ -75,13 +64,8 @@ class EnumDecl : public TagDecl {
     }
   }
 
-  inline static std::optional<EnumDecl> from(const Reference &r) {
-    return EnumDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<EnumDecl> from(const TokenContext &t) {
-    return EnumDecl::from(t.as_declaration());
-  }
+  static std::optional<EnumDecl> from(const Reference &r);
+  static std::optional<EnumDecl> from(const TokenContext &t);
 
   std::optional<EnumConstantDecl> nth_enumerator(unsigned n) const;
   unsigned num_enumerators(void) const;

@@ -107,6 +107,14 @@ gap::generator<ParameterABIAttr> ParameterABIAttr::in(const File &file) {
   }
 }
 
+std::optional<ParameterABIAttr> ParameterABIAttr::from(const Reference &r) {
+  return ParameterABIAttr::from(r.as_attribute());
+}
+
+std::optional<ParameterABIAttr> ParameterABIAttr::from(const TokenContext &t) {
+  return ParameterABIAttr::from(t.as_attribute());
+}
+
 ParameterABI ParameterABIAttr::abi(void) const {
   return static_cast<ParameterABI>(impl->reader.getVal10());
 }

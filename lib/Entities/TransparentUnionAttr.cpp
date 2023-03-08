@@ -96,6 +96,14 @@ gap::generator<TransparentUnionAttr> TransparentUnionAttr::in(const File &file) 
   }
 }
 
+std::optional<TransparentUnionAttr> TransparentUnionAttr::from(const Reference &r) {
+  return TransparentUnionAttr::from(r.as_attribute());
+}
+
+std::optional<TransparentUnionAttr> TransparentUnionAttr::from(const TokenContext &t) {
+  return TransparentUnionAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

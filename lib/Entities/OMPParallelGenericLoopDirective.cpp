@@ -147,6 +147,14 @@ gap::generator<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective:
   }
 }
 
+std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::from(const Reference &r) {
+  return OMPParallelGenericLoopDirective::from(r.as_statement());
+}
+
+std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::from(const TokenContext &t) {
+  return OMPParallelGenericLoopDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

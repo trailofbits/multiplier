@@ -96,6 +96,14 @@ gap::generator<NoStackProtectorAttr> NoStackProtectorAttr::in(const File &file) 
   }
 }
 
+std::optional<NoStackProtectorAttr> NoStackProtectorAttr::from(const Reference &r) {
+  return NoStackProtectorAttr::from(r.as_attribute());
+}
+
+std::optional<NoStackProtectorAttr> NoStackProtectorAttr::from(const TokenContext &t) {
+  return NoStackProtectorAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

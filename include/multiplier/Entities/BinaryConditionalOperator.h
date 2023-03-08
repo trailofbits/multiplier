@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AbstractConditionalOperator.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AbstractConditionalOperator;
 class BinaryConditionalOperator;
 class Decl;
@@ -71,13 +60,8 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
     }
   }
 
-  inline static std::optional<BinaryConditionalOperator> from(const Reference &r) {
-    return BinaryConditionalOperator::from(r.as_statement());
-  }
-
-  inline static std::optional<BinaryConditionalOperator> from(const TokenContext &t) {
-    return BinaryConditionalOperator::from(t.as_statement());
-  }
+  static std::optional<BinaryConditionalOperator> from(const Reference &r);
+  static std::optional<BinaryConditionalOperator> from(const TokenContext &t);
 
   Expr common(void) const;
   OpaqueValueExpr opaque_value(void) const;

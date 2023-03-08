@@ -96,6 +96,14 @@ gap::generator<TrivialABIAttr> TrivialABIAttr::in(const File &file) {
   }
 }
 
+std::optional<TrivialABIAttr> TrivialABIAttr::from(const Reference &r) {
+  return TrivialABIAttr::from(r.as_attribute());
+}
+
+std::optional<TrivialABIAttr> TrivialABIAttr::from(const TokenContext &t) {
+  return TrivialABIAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

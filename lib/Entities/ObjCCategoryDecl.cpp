@@ -163,6 +163,14 @@ gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const Reference &r) {
+  return ObjCCategoryDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const TokenContext &t) {
+  return ObjCCategoryDecl::from(t.as_declaration());
+}
+
 bool ObjCCategoryDecl::is_class_extension(void) const {
   return impl->reader.getVal70();
 }

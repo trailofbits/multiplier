@@ -96,6 +96,14 @@ gap::generator<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::in(const Fi
   }
 }
 
+std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::from(const Reference &r) {
+  return ArcWeakrefUnavailableAttr::from(r.as_attribute());
+}
+
+std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::from(const TokenContext &t) {
+  return ArcWeakrefUnavailableAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

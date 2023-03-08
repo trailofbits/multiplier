@@ -156,6 +156,14 @@ gap::generator<ExternCContextDecl> ExternCContextDecl::in(const File &file) {
   }
 }
 
+std::optional<ExternCContextDecl> ExternCContextDecl::from(const Reference &r) {
+  return ExternCContextDecl::from(r.as_declaration());
+}
+
+std::optional<ExternCContextDecl> ExternCContextDecl::from(const TokenContext &t) {
+  return ExternCContextDecl::from(t.as_declaration());
+}
+
 gap::generator<Decl> ExternCContextDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
   auto list = impl->reader.getVal47();

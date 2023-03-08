@@ -97,6 +97,14 @@ gap::generator<PreferredNameAttr> PreferredNameAttr::in(const File &file) {
   }
 }
 
+std::optional<PreferredNameAttr> PreferredNameAttr::from(const Reference &r) {
+  return PreferredNameAttr::from(r.as_attribute());
+}
+
+std::optional<PreferredNameAttr> PreferredNameAttr::from(const TokenContext &t) {
+  return PreferredNameAttr::from(t.as_attribute());
+}
+
 Type PreferredNameAttr::typedef_type(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -96,6 +96,14 @@ gap::generator<ObjCGCAttr> ObjCGCAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCGCAttr> ObjCGCAttr::from(const Reference &r) {
+  return ObjCGCAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCGCAttr> ObjCGCAttr::from(const TokenContext &t) {
+  return ObjCGCAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

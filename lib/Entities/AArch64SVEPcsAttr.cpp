@@ -96,6 +96,14 @@ gap::generator<AArch64SVEPcsAttr> AArch64SVEPcsAttr::in(const File &file) {
   }
 }
 
+std::optional<AArch64SVEPcsAttr> AArch64SVEPcsAttr::from(const Reference &r) {
+  return AArch64SVEPcsAttr::from(r.as_attribute());
+}
+
+std::optional<AArch64SVEPcsAttr> AArch64SVEPcsAttr::from(const TokenContext &t) {
+  return AArch64SVEPcsAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

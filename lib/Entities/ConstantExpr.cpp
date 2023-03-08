@@ -147,6 +147,14 @@ gap::generator<ConstantExpr> ConstantExpr::in(const File &file) {
   }
 }
 
+std::optional<ConstantExpr> ConstantExpr::from(const Reference &r) {
+  return ConstantExpr::from(r.as_statement());
+}
+
+std::optional<ConstantExpr> ConstantExpr::from(const TokenContext &t) {
+  return ConstantExpr::from(t.as_statement());
+}
+
 ConstantExprResultStorageKind ConstantExpr::result_storage_kind(void) const {
   return static_cast<ConstantExprResultStorageKind>(impl->reader.getVal93());
 }

@@ -148,6 +148,14 @@ gap::generator<DeclRefExpr> DeclRefExpr::in(const File &file) {
   }
 }
 
+std::optional<DeclRefExpr> DeclRefExpr::from(const Reference &r) {
+  return DeclRefExpr::from(r.as_statement());
+}
+
+std::optional<DeclRefExpr> DeclRefExpr::from(const TokenContext &t) {
+  return DeclRefExpr::from(t.as_statement());
+}
+
 ValueDecl DeclRefExpr::declaration(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

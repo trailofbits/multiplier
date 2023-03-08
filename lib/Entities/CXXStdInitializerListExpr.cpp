@@ -146,6 +146,14 @@ gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::in(const Fi
   }
 }
 
+std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const Reference &r) {
+  return CXXStdInitializerListExpr::from(r.as_statement());
+}
+
+std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const TokenContext &t) {
+  return CXXStdInitializerListExpr::from(t.as_statement());
+}
+
 Expr CXXStdInitializerListExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

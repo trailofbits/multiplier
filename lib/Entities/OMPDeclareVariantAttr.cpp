@@ -97,6 +97,14 @@ gap::generator<OMPDeclareVariantAttr> OMPDeclareVariantAttr::in(const File &file
   }
 }
 
+std::optional<OMPDeclareVariantAttr> OMPDeclareVariantAttr::from(const Reference &r) {
+  return OMPDeclareVariantAttr::from(r.as_attribute());
+}
+
+std::optional<OMPDeclareVariantAttr> OMPDeclareVariantAttr::from(const TokenContext &t) {
+  return OMPDeclareVariantAttr::from(t.as_attribute());
+}
+
 Expr OMPDeclareVariantAttr::variant_func_reference(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

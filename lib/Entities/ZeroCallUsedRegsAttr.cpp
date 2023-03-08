@@ -96,6 +96,14 @@ gap::generator<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::in(const File &file) 
   }
 }
 
+std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from(const Reference &r) {
+  return ZeroCallUsedRegsAttr::from(r.as_attribute());
+}
+
+std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from(const TokenContext &t) {
+  return ZeroCallUsedRegsAttr::from(t.as_attribute());
+}
+
 ZeroCallUsedRegsAttrZeroCallUsedRegsKind ZeroCallUsedRegsAttr::zero_call_used_regs(void) const {
   return static_cast<ZeroCallUsedRegsAttrZeroCallUsedRegsKind>(impl->reader.getVal10());
 }

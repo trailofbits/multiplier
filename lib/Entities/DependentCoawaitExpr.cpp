@@ -147,6 +147,14 @@ gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::in(const File &file) 
   }
 }
 
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Reference &r) {
+  return DependentCoawaitExpr::from(r.as_statement());
+}
+
+std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const TokenContext &t) {
+  return DependentCoawaitExpr::from(t.as_statement());
+}
+
 Token DependentCoawaitExpr::keyword_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

@@ -99,6 +99,14 @@ gap::generator<FunctionType> FunctionType::in(const File &file) {
   }
 }
 
+std::optional<FunctionType> FunctionType::from(const Reference &r) {
+  return FunctionType::from(r.as_type());
+}
+
+std::optional<FunctionType> FunctionType::from(const TokenContext &t) {
+  return FunctionType::from(t.as_type());
+}
+
 CallingConv FunctionType::call_conv(void) const {
   return static_cast<CallingConv>(impl->reader.getVal235());
 }

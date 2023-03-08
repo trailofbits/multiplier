@@ -145,6 +145,14 @@ gap::generator<OMPScanDirective> OMPScanDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPScanDirective> OMPScanDirective::from(const Reference &r) {
+  return OMPScanDirective::from(r.as_statement());
+}
+
+std::optional<OMPScanDirective> OMPScanDirective::from(const TokenContext &t) {
+  return OMPScanDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

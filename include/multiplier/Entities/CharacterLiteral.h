@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CharacterLiteralCharacterKind.h"
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CharacterLiteral;
 class Decl;
 class Expr;
@@ -69,13 +58,8 @@ class CharacterLiteral : public Expr {
     }
   }
 
-  inline static std::optional<CharacterLiteral> from(const Reference &r) {
-    return CharacterLiteral::from(r.as_statement());
-  }
-
-  inline static std::optional<CharacterLiteral> from(const TokenContext &t) {
-    return CharacterLiteral::from(t.as_statement());
-  }
+  static std::optional<CharacterLiteral> from(const Reference &r);
+  static std::optional<CharacterLiteral> from(const TokenContext &t);
 
   CharacterLiteralCharacterKind character_kind(void) const;
   Token token(void) const;

@@ -122,6 +122,14 @@ gap::generator<MacroSubstitution> MacroSubstitution::in(const File &file) {
   }
 }
 
+std::optional<MacroSubstitution> MacroSubstitution::from(const Reference &r) {
+  return MacroSubstitution::from(r.as_macro());
+}
+
+std::optional<MacroSubstitution> MacroSubstitution::from(const TokenContext &t) {
+  return MacroSubstitution::from(t.as_macro());
+}
+
 gap::generator<MacroOrToken> MacroSubstitution::replacement_children(void) const & {
   Index index(impl->ep);
   auto list = impl->reader.getVal3();

@@ -159,6 +159,14 @@ gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::in(const File &
   }
 }
 
+std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Reference &r) {
+  return OMPDeclareReductionDecl::from(r.as_declaration());
+}
+
+std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const TokenContext &t) {
+  return OMPDeclareReductionDecl::from(t.as_declaration());
+}
+
 Expr OMPDeclareReductionDecl::combiner(void) const {
   RawEntityId eid = impl->reader.getVal53();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

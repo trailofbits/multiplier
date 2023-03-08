@@ -146,6 +146,14 @@ gap::generator<CXXCatchStmt> CXXCatchStmt::in(const File &file) {
   }
 }
 
+std::optional<CXXCatchStmt> CXXCatchStmt::from(const Reference &r) {
+  return CXXCatchStmt::from(r.as_statement());
+}
+
+std::optional<CXXCatchStmt> CXXCatchStmt::from(const TokenContext &t) {
+  return CXXCatchStmt::from(t.as_statement());
+}
+
 Token CXXCatchStmt::catch_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

@@ -158,6 +158,14 @@ gap::generator<LabelDecl> LabelDecl::in(const File &file) {
   }
 }
 
+std::optional<LabelDecl> LabelDecl::from(const Reference &r) {
+  return LabelDecl::from(r.as_declaration());
+}
+
+std::optional<LabelDecl> LabelDecl::from(const TokenContext &t) {
+  return LabelDecl::from(t.as_declaration());
+}
+
 std::string_view LabelDecl::ms_assembly_label(void) const {
   capnp::Text::Reader data = impl->reader.getVal69();
   return std::string_view(data.cStr(), data.size());

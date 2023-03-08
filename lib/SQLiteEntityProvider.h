@@ -59,6 +59,10 @@ class SQLiteEntityProvider final : public EntityProvider {
 
   FilePathMap ListFiles(const Ptr &) final;
 
+  // Get the list of paths associated with a given file id.
+  gap::generator<std::filesystem::path> ListPathsForFile(
+      const Ptr &, PackedFileId) final;
+
   FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id);
 
   // Return the list of fragments covering / overlapping some tokens in a file.

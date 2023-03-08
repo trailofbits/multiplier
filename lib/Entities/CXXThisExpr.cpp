@@ -146,6 +146,14 @@ gap::generator<CXXThisExpr> CXXThisExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXThisExpr> CXXThisExpr::from(const Reference &r) {
+  return CXXThisExpr::from(r.as_statement());
+}
+
+std::optional<CXXThisExpr> CXXThisExpr::from(const TokenContext &t) {
+  return CXXThisExpr::from(t.as_statement());
+}
+
 Token CXXThisExpr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

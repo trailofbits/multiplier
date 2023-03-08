@@ -146,6 +146,14 @@ gap::generator<IndirectGotoStmt> IndirectGotoStmt::in(const File &file) {
   }
 }
 
+std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Reference &r) {
+  return IndirectGotoStmt::from(r.as_statement());
+}
+
+std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const TokenContext &t) {
+  return IndirectGotoStmt::from(t.as_statement());
+}
+
 std::optional<LabelDecl> IndirectGotoStmt::constant_target(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal9();

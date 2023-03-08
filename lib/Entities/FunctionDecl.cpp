@@ -179,6 +179,14 @@ gap::generator<FunctionDecl> FunctionDecl::in(const File &file) {
   }
 }
 
+std::optional<FunctionDecl> FunctionDecl::from(const Reference &r) {
+  return FunctionDecl::from(r.as_declaration());
+}
+
+std::optional<FunctionDecl> FunctionDecl::from(const TokenContext &t) {
+  return FunctionDecl::from(t.as_declaration());
+}
+
 bool FunctionDecl::uses_fp_intrin(void) const {
   return impl->reader.getVal71();
 }

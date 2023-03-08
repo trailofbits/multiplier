@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "FunctionReturnThunksAttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class FunctionReturnThunksAttr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class FunctionReturnThunksAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<FunctionReturnThunksAttr> from(const Reference &r) {
-    return FunctionReturnThunksAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<FunctionReturnThunksAttr> from(const TokenContext &t) {
-    return FunctionReturnThunksAttr::from(t.as_attribute());
-  }
+  static std::optional<FunctionReturnThunksAttr> from(const Reference &r);
+  static std::optional<FunctionReturnThunksAttr> from(const TokenContext &t);
 
   FunctionReturnThunksAttrKind thunk_type(void) const;
 };

@@ -96,6 +96,14 @@ gap::generator<ObjCBridgeRelatedAttr> ObjCBridgeRelatedAttr::in(const File &file
   }
 }
 
+std::optional<ObjCBridgeRelatedAttr> ObjCBridgeRelatedAttr::from(const Reference &r) {
+  return ObjCBridgeRelatedAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCBridgeRelatedAttr> ObjCBridgeRelatedAttr::from(const TokenContext &t) {
+  return ObjCBridgeRelatedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

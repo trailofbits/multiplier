@@ -95,6 +95,14 @@ gap::generator<ComplexType> ComplexType::in(const File &file) {
   }
 }
 
+std::optional<ComplexType> ComplexType::from(const Reference &r) {
+  return ComplexType::from(r.as_type());
+}
+
+std::optional<ComplexType> ComplexType::from(const TokenContext &t) {
+  return ComplexType::from(t.as_type());
+}
+
 Type ComplexType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

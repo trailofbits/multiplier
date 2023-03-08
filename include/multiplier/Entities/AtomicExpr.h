@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AtomicExprAtomicOp.h"
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AtomicExpr;
 class Decl;
 class Expr;
@@ -70,13 +59,8 @@ class AtomicExpr : public Expr {
     }
   }
 
-  inline static std::optional<AtomicExpr> from(const Reference &r) {
-    return AtomicExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<AtomicExpr> from(const TokenContext &t) {
-    return AtomicExpr::from(t.as_statement());
-  }
+  static std::optional<AtomicExpr> from(const Reference &r);
+  static std::optional<AtomicExpr> from(const TokenContext &t);
 
   Token builtin_token(void) const;
   AtomicExprAtomicOp operation(void) const;

@@ -97,6 +97,14 @@ gap::generator<EnableIfAttr> EnableIfAttr::in(const File &file) {
   }
 }
 
+std::optional<EnableIfAttr> EnableIfAttr::from(const Reference &r) {
+  return EnableIfAttr::from(r.as_attribute());
+}
+
+std::optional<EnableIfAttr> EnableIfAttr::from(const TokenContext &t) {
+  return EnableIfAttr::from(t.as_attribute());
+}
+
 Expr EnableIfAttr::condition(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

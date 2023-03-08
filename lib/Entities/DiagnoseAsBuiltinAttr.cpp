@@ -97,6 +97,14 @@ gap::generator<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::in(const File &file
   }
 }
 
+std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const Reference &r) {
+  return DiagnoseAsBuiltinAttr::from(r.as_attribute());
+}
+
+std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const TokenContext &t) {
+  return DiagnoseAsBuiltinAttr::from(t.as_attribute());
+}
+
 FunctionDecl DiagnoseAsBuiltinAttr::function(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

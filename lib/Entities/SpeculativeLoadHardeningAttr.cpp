@@ -96,6 +96,14 @@ gap::generator<SpeculativeLoadHardeningAttr> SpeculativeLoadHardeningAttr::in(co
   }
 }
 
+std::optional<SpeculativeLoadHardeningAttr> SpeculativeLoadHardeningAttr::from(const Reference &r) {
+  return SpeculativeLoadHardeningAttr::from(r.as_attribute());
+}
+
+std::optional<SpeculativeLoadHardeningAttr> SpeculativeLoadHardeningAttr::from(const TokenContext &t) {
+  return SpeculativeLoadHardeningAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

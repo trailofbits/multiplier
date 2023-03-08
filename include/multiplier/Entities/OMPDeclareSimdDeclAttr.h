@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Attr.h"
 #include "OMPDeclareSimdDeclAttrBranchStateTy.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class Expr;
 class OMPDeclareSimdDeclAttr;
@@ -56,13 +45,8 @@ class OMPDeclareSimdDeclAttr : public Attr {
     }
   }
 
-  inline static std::optional<OMPDeclareSimdDeclAttr> from(const Reference &r) {
-    return OMPDeclareSimdDeclAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<OMPDeclareSimdDeclAttr> from(const TokenContext &t) {
-    return OMPDeclareSimdDeclAttr::from(t.as_attribute());
-  }
+  static std::optional<OMPDeclareSimdDeclAttr> from(const Reference &r);
+  static std::optional<OMPDeclareSimdDeclAttr> from(const TokenContext &t);
 
   OMPDeclareSimdDeclAttrBranchStateTy branch_state(void) const;
   Expr simdlen(void) const;

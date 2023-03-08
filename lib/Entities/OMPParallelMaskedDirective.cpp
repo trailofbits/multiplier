@@ -146,6 +146,14 @@ gap::generator<OMPParallelMaskedDirective> OMPParallelMaskedDirective::in(const 
   }
 }
 
+std::optional<OMPParallelMaskedDirective> OMPParallelMaskedDirective::from(const Reference &r) {
+  return OMPParallelMaskedDirective::from(r.as_statement());
+}
+
+std::optional<OMPParallelMaskedDirective> OMPParallelMaskedDirective::from(const TokenContext &t) {
+  return OMPParallelMaskedDirective::from(t.as_statement());
+}
+
 Expr OMPParallelMaskedDirective::task_reduction_reference_expression(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

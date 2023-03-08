@@ -95,6 +95,14 @@ gap::generator<ModeAttr> ModeAttr::in(const File &file) {
   }
 }
 
+std::optional<ModeAttr> ModeAttr::from(const Reference &r) {
+  return ModeAttr::from(r.as_attribute());
+}
+
+std::optional<ModeAttr> ModeAttr::from(const TokenContext &t) {
+  return ModeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -96,6 +96,14 @@ gap::generator<CmseNSEntryAttr> CmseNSEntryAttr::in(const File &file) {
   }
 }
 
+std::optional<CmseNSEntryAttr> CmseNSEntryAttr::from(const Reference &r) {
+  return CmseNSEntryAttr::from(r.as_attribute());
+}
+
+std::optional<CmseNSEntryAttr> CmseNSEntryAttr::from(const TokenContext &t) {
+  return CmseNSEntryAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

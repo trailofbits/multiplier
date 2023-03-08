@@ -157,6 +157,14 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::in(const File &file) {
   }
 }
 
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Reference &r) {
+  return FileScopeAsmDecl::from(r.as_declaration());
+}
+
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const TokenContext &t) {
+  return FileScopeAsmDecl::from(t.as_declaration());
+}
+
 Token FileScopeAsmDecl::assembly_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }

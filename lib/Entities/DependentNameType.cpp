@@ -96,6 +96,14 @@ gap::generator<DependentNameType> DependentNameType::in(const File &file) {
   }
 }
 
+std::optional<DependentNameType> DependentNameType::from(const Reference &r) {
+  return DependentNameType::from(r.as_type());
+}
+
+std::optional<DependentNameType> DependentNameType::from(const TokenContext &t) {
+  return DependentNameType::from(t.as_type());
+}
+
 Type DependentNameType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

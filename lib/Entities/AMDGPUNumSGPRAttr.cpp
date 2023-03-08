@@ -96,6 +96,14 @@ gap::generator<AMDGPUNumSGPRAttr> AMDGPUNumSGPRAttr::in(const File &file) {
   }
 }
 
+std::optional<AMDGPUNumSGPRAttr> AMDGPUNumSGPRAttr::from(const Reference &r) {
+  return AMDGPUNumSGPRAttr::from(r.as_attribute());
+}
+
+std::optional<AMDGPUNumSGPRAttr> AMDGPUNumSGPRAttr::from(const TokenContext &t) {
+  return AMDGPUNumSGPRAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

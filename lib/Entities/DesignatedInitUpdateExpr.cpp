@@ -147,6 +147,14 @@ gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::in(const File
   }
 }
 
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Reference &r) {
+  return DesignatedInitUpdateExpr::from(r.as_statement());
+}
+
+std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const TokenContext &t) {
+  return DesignatedInitUpdateExpr::from(t.as_statement());
+}
+
 Expr DesignatedInitUpdateExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

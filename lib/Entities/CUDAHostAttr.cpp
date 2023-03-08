@@ -96,6 +96,14 @@ gap::generator<CUDAHostAttr> CUDAHostAttr::in(const File &file) {
   }
 }
 
+std::optional<CUDAHostAttr> CUDAHostAttr::from(const Reference &r) {
+  return CUDAHostAttr::from(r.as_attribute());
+}
+
+std::optional<CUDAHostAttr> CUDAHostAttr::from(const TokenContext &t) {
+  return CUDAHostAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

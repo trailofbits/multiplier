@@ -96,6 +96,14 @@ gap::generator<PreserveMostAttr> PreserveMostAttr::in(const File &file) {
   }
 }
 
+std::optional<PreserveMostAttr> PreserveMostAttr::from(const Reference &r) {
+  return PreserveMostAttr::from(r.as_attribute());
+}
+
+std::optional<PreserveMostAttr> PreserveMostAttr::from(const TokenContext &t) {
+  return PreserveMostAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

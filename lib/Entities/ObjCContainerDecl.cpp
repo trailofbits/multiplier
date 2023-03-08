@@ -173,6 +173,14 @@ gap::generator<ObjCContainerDecl> ObjCContainerDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const Reference &r) {
+  return ObjCContainerDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const TokenContext &t) {
+  return ObjCContainerDecl::from(t.as_declaration());
+}
+
 unsigned ObjCContainerDecl::num_class_methods(void) const {
   return impl->reader.getVal47().size();
 }

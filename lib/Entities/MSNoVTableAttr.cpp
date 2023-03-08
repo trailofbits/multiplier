@@ -96,6 +96,14 @@ gap::generator<MSNoVTableAttr> MSNoVTableAttr::in(const File &file) {
   }
 }
 
+std::optional<MSNoVTableAttr> MSNoVTableAttr::from(const Reference &r) {
+  return MSNoVTableAttr::from(r.as_attribute());
+}
+
+std::optional<MSNoVTableAttr> MSNoVTableAttr::from(const TokenContext &t) {
+  return MSNoVTableAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

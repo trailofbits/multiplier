@@ -96,6 +96,14 @@ gap::generator<AssertCapabilityAttr> AssertCapabilityAttr::in(const File &file) 
   }
 }
 
+std::optional<AssertCapabilityAttr> AssertCapabilityAttr::from(const Reference &r) {
+  return AssertCapabilityAttr::from(r.as_attribute());
+}
+
+std::optional<AssertCapabilityAttr> AssertCapabilityAttr::from(const TokenContext &t) {
+  return AssertCapabilityAttr::from(t.as_attribute());
+}
+
 AssertCapabilityAttrSpelling AssertCapabilityAttr::semantic_spelling(void) const {
   return static_cast<AssertCapabilityAttrSpelling>(impl->reader.getVal10());
 }

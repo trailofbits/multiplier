@@ -147,6 +147,14 @@ gap::generator<ObjCStringLiteral> ObjCStringLiteral::in(const File &file) {
   }
 }
 
+std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const Reference &r) {
+  return ObjCStringLiteral::from(r.as_statement());
+}
+
+std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const TokenContext &t) {
+  return ObjCStringLiteral::from(t.as_statement());
+}
+
 Token ObjCStringLiteral::at_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

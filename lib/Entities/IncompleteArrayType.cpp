@@ -96,6 +96,14 @@ gap::generator<IncompleteArrayType> IncompleteArrayType::in(const File &file) {
   }
 }
 
+std::optional<IncompleteArrayType> IncompleteArrayType::from(const Reference &r) {
+  return IncompleteArrayType::from(r.as_type());
+}
+
+std::optional<IncompleteArrayType> IncompleteArrayType::from(const TokenContext &t) {
+  return IncompleteArrayType::from(t.as_type());
+}
+
 Type IncompleteArrayType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));

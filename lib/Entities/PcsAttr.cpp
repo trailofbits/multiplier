@@ -96,6 +96,14 @@ gap::generator<PcsAttr> PcsAttr::in(const File &file) {
   }
 }
 
+std::optional<PcsAttr> PcsAttr::from(const Reference &r) {
+  return PcsAttr::from(r.as_attribute());
+}
+
+std::optional<PcsAttr> PcsAttr::from(const TokenContext &t) {
+  return PcsAttr::from(t.as_attribute());
+}
+
 PcsAttrPCSType PcsAttr::pcs(void) const {
   return static_cast<PcsAttrPCSType>(impl->reader.getVal10());
 }

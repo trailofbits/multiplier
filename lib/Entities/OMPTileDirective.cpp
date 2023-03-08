@@ -147,6 +147,14 @@ gap::generator<OMPTileDirective> OMPTileDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPTileDirective> OMPTileDirective::from(const Reference &r) {
+  return OMPTileDirective::from(r.as_statement());
+}
+
+std::optional<OMPTileDirective> OMPTileDirective::from(const TokenContext &t) {
+  return OMPTileDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

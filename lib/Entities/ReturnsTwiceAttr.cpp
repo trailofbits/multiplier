@@ -96,6 +96,14 @@ gap::generator<ReturnsTwiceAttr> ReturnsTwiceAttr::in(const File &file) {
   }
 }
 
+std::optional<ReturnsTwiceAttr> ReturnsTwiceAttr::from(const Reference &r) {
+  return ReturnsTwiceAttr::from(r.as_attribute());
+}
+
+std::optional<ReturnsTwiceAttr> ReturnsTwiceAttr::from(const TokenContext &t) {
+  return ReturnsTwiceAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

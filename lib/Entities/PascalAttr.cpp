@@ -96,6 +96,14 @@ gap::generator<PascalAttr> PascalAttr::in(const File &file) {
   }
 }
 
+std::optional<PascalAttr> PascalAttr::from(const Reference &r) {
+  return PascalAttr::from(r.as_attribute());
+}
+
+std::optional<PascalAttr> PascalAttr::from(const TokenContext &t) {
+  return PascalAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

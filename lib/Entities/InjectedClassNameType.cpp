@@ -97,6 +97,14 @@ gap::generator<InjectedClassNameType> InjectedClassNameType::in(const File &file
   }
 }
 
+std::optional<InjectedClassNameType> InjectedClassNameType::from(const Reference &r) {
+  return InjectedClassNameType::from(r.as_type());
+}
+
+std::optional<InjectedClassNameType> InjectedClassNameType::from(const TokenContext &t) {
+  return InjectedClassNameType::from(t.as_type());
+}
+
 Type InjectedClassNameType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "NamedDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BaseUsingDecl;
 class Decl;
 class NamedDecl;
@@ -66,13 +55,8 @@ class BaseUsingDecl : public NamedDecl {
     }
   }
 
-  inline static std::optional<BaseUsingDecl> from(const Reference &r) {
-    return BaseUsingDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<BaseUsingDecl> from(const TokenContext &t) {
-    return BaseUsingDecl::from(t.as_declaration());
-  }
+  static std::optional<BaseUsingDecl> from(const Reference &r);
+  static std::optional<BaseUsingDecl> from(const TokenContext &t);
 
   std::optional<UsingShadowDecl> nth_shadow(unsigned n) const;
   unsigned num_shadows(void) const;

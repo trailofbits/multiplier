@@ -97,6 +97,14 @@ gap::generator<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::in(const File &file) 
   }
 }
 
+std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from(const Reference &r) {
+  return AMDGPUWavesPerEUAttr::from(r.as_attribute());
+}
+
+std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from(const TokenContext &t) {
+  return AMDGPUWavesPerEUAttr::from(t.as_attribute());
+}
+
 Expr AMDGPUWavesPerEUAttr::max(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

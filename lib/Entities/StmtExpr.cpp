@@ -147,6 +147,14 @@ gap::generator<StmtExpr> StmtExpr::in(const File &file) {
   }
 }
 
+std::optional<StmtExpr> StmtExpr::from(const Reference &r) {
+  return StmtExpr::from(r.as_statement());
+}
+
+std::optional<StmtExpr> StmtExpr::from(const TokenContext &t) {
+  return StmtExpr::from(t.as_statement());
+}
+
 Token StmtExpr::l_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

@@ -147,6 +147,14 @@ gap::generator<AddrLabelExpr> AddrLabelExpr::in(const File &file) {
   }
 }
 
+std::optional<AddrLabelExpr> AddrLabelExpr::from(const Reference &r) {
+  return AddrLabelExpr::from(r.as_statement());
+}
+
+std::optional<AddrLabelExpr> AddrLabelExpr::from(const TokenContext &t) {
+  return AddrLabelExpr::from(t.as_statement());
+}
+
 Token AddrLabelExpr::amp_amp_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

@@ -96,6 +96,14 @@ gap::generator<MustTailAttr> MustTailAttr::in(const File &file) {
   }
 }
 
+std::optional<MustTailAttr> MustTailAttr::from(const Reference &r) {
+  return MustTailAttr::from(r.as_attribute());
+}
+
+std::optional<MustTailAttr> MustTailAttr::from(const TokenContext &t) {
+  return MustTailAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -96,6 +96,14 @@ gap::generator<InternalLinkageAttr> InternalLinkageAttr::in(const File &file) {
   }
 }
 
+std::optional<InternalLinkageAttr> InternalLinkageAttr::from(const Reference &r) {
+  return InternalLinkageAttr::from(r.as_attribute());
+}
+
+std::optional<InternalLinkageAttr> InternalLinkageAttr::from(const TokenContext &t) {
+  return InternalLinkageAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

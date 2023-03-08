@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ArrayType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ArrayType;
 class ConstantArrayType;
 class Expr;
@@ -57,13 +46,8 @@ class ConstantArrayType : public ArrayType {
     }
   }
 
-  inline static std::optional<ConstantArrayType> from(const Reference &r) {
-    return ConstantArrayType::from(r.as_type());
-  }
-
-  inline static std::optional<ConstantArrayType> from(const TokenContext &t) {
-    return ConstantArrayType::from(t.as_type());
-  }
+  static std::optional<ConstantArrayType> from(const Reference &r);
+  static std::optional<ConstantArrayType> from(const TokenContext &t);
 
   Type desugar(void) const;
   std::optional<Expr> size_expression(void) const;

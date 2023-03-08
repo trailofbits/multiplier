@@ -96,6 +96,14 @@ gap::generator<UnusedAttr> UnusedAttr::in(const File &file) {
   }
 }
 
+std::optional<UnusedAttr> UnusedAttr::from(const Reference &r) {
+  return UnusedAttr::from(r.as_attribute());
+}
+
+std::optional<UnusedAttr> UnusedAttr::from(const TokenContext &t) {
+  return UnusedAttr::from(t.as_attribute());
+}
+
 UnusedAttrSpelling UnusedAttr::semantic_spelling(void) const {
   return static_cast<UnusedAttrSpelling>(impl->reader.getVal10());
 }

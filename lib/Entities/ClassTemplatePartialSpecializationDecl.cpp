@@ -164,6 +164,14 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
   }
 }
 
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const Reference &r) {
+  return ClassTemplatePartialSpecializationDecl::from(r.as_declaration());
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::from(const TokenContext &t) {
+  return ClassTemplatePartialSpecializationDecl::from(t.as_declaration());
+}
+
 Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
   RawEntityId eid = impl->reader.getVal140();
   return Type(impl->ep->TypeFor(impl->ep, eid));

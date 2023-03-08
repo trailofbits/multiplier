@@ -97,6 +97,14 @@ gap::generator<GuardedByAttr> GuardedByAttr::in(const File &file) {
   }
 }
 
+std::optional<GuardedByAttr> GuardedByAttr::from(const Reference &r) {
+  return GuardedByAttr::from(r.as_attribute());
+}
+
+std::optional<GuardedByAttr> GuardedByAttr::from(const TokenContext &t) {
+  return GuardedByAttr::from(t.as_attribute());
+}
+
 Expr GuardedByAttr::argument(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

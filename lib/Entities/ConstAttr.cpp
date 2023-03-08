@@ -96,6 +96,14 @@ gap::generator<ConstAttr> ConstAttr::in(const File &file) {
   }
 }
 
+std::optional<ConstAttr> ConstAttr::from(const Reference &r) {
+  return ConstAttr::from(r.as_attribute());
+}
+
+std::optional<ConstAttr> ConstAttr::from(const TokenContext &t) {
+  return ConstAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -96,6 +96,14 @@ gap::generator<AnyX86NoCallerSavedRegistersAttr> AnyX86NoCallerSavedRegistersAtt
   }
 }
 
+std::optional<AnyX86NoCallerSavedRegistersAttr> AnyX86NoCallerSavedRegistersAttr::from(const Reference &r) {
+  return AnyX86NoCallerSavedRegistersAttr::from(r.as_attribute());
+}
+
+std::optional<AnyX86NoCallerSavedRegistersAttr> AnyX86NoCallerSavedRegistersAttr::from(const TokenContext &t) {
+  return AnyX86NoCallerSavedRegistersAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

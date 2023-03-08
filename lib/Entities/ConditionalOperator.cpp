@@ -147,6 +147,14 @@ gap::generator<ConditionalOperator> ConditionalOperator::in(const File &file) {
   }
 }
 
+std::optional<ConditionalOperator> ConditionalOperator::from(const Reference &r) {
+  return ConditionalOperator::from(r.as_statement());
+}
+
+std::optional<ConditionalOperator> ConditionalOperator::from(const TokenContext &t) {
+  return ConditionalOperator::from(t.as_statement());
+}
+
 Expr ConditionalOperator::lhs(void) const {
   RawEntityId eid = impl->reader.getVal43();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

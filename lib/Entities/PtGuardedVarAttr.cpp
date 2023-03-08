@@ -96,6 +96,14 @@ gap::generator<PtGuardedVarAttr> PtGuardedVarAttr::in(const File &file) {
   }
 }
 
+std::optional<PtGuardedVarAttr> PtGuardedVarAttr::from(const Reference &r) {
+  return PtGuardedVarAttr::from(r.as_attribute());
+}
+
+std::optional<PtGuardedVarAttr> PtGuardedVarAttr::from(const TokenContext &t) {
+  return PtGuardedVarAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

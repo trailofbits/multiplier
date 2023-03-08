@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class NoInstrumentFunctionAttr;
@@ -56,13 +45,8 @@ class NoInstrumentFunctionAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<NoInstrumentFunctionAttr> from(const Reference &r) {
-    return NoInstrumentFunctionAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<NoInstrumentFunctionAttr> from(const TokenContext &t) {
-    return NoInstrumentFunctionAttr::from(t.as_attribute());
-  }
+  static std::optional<NoInstrumentFunctionAttr> from(const Reference &r);
+  static std::optional<NoInstrumentFunctionAttr> from(const TokenContext &t);
 
 };
 

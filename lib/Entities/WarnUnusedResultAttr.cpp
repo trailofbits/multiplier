@@ -96,6 +96,14 @@ gap::generator<WarnUnusedResultAttr> WarnUnusedResultAttr::in(const File &file) 
   }
 }
 
+std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const Reference &r) {
+  return WarnUnusedResultAttr::from(r.as_attribute());
+}
+
+std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const TokenContext &t) {
+  return WarnUnusedResultAttr::from(t.as_attribute());
+}
+
 bool WarnUnusedResultAttr::is_cxx11_no_discard(void) const {
   return impl->reader.getVal12();
 }

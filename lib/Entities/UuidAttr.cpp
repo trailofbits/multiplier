@@ -97,6 +97,14 @@ gap::generator<UuidAttr> UuidAttr::in(const File &file) {
   }
 }
 
+std::optional<UuidAttr> UuidAttr::from(const Reference &r) {
+  return UuidAttr::from(r.as_attribute());
+}
+
+std::optional<UuidAttr> UuidAttr::from(const TokenContext &t) {
+  return UuidAttr::from(t.as_attribute());
+}
+
 std::string_view UuidAttr::guid(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

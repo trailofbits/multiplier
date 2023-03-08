@@ -96,6 +96,14 @@ gap::generator<SetTypestateAttr> SetTypestateAttr::in(const File &file) {
   }
 }
 
+std::optional<SetTypestateAttr> SetTypestateAttr::from(const Reference &r) {
+  return SetTypestateAttr::from(r.as_attribute());
+}
+
+std::optional<SetTypestateAttr> SetTypestateAttr::from(const TokenContext &t) {
+  return SetTypestateAttr::from(t.as_attribute());
+}
+
 SetTypestateAttrConsumedState SetTypestateAttr::new_state(void) const {
   return static_cast<SetTypestateAttrConsumedState>(impl->reader.getVal10());
 }

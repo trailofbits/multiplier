@@ -147,6 +147,14 @@ gap::generator<ObjCEncodeExpr> ObjCEncodeExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const Reference &r) {
+  return ObjCEncodeExpr::from(r.as_statement());
+}
+
+std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const TokenContext &t) {
+  return ObjCEncodeExpr::from(t.as_statement());
+}
+
 Token ObjCEncodeExpr::at_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

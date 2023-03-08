@@ -340,6 +340,14 @@ gap::generator<NamedDecl> NamedDecl::in(const File &file) {
   }
 }
 
+std::optional<NamedDecl> NamedDecl::from(const Reference &r) {
+  return NamedDecl::from(r.as_declaration());
+}
+
+std::optional<NamedDecl> NamedDecl::from(const TokenContext &t) {
+  return NamedDecl::from(t.as_declaration());
+}
+
 Linkage NamedDecl::formal_linkage(void) const {
   return static_cast<Linkage>(impl->reader.getVal61());
 }

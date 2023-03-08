@@ -96,6 +96,14 @@ gap::generator<CUDADeviceAttr> CUDADeviceAttr::in(const File &file) {
   }
 }
 
+std::optional<CUDADeviceAttr> CUDADeviceAttr::from(const Reference &r) {
+  return CUDADeviceAttr::from(r.as_attribute());
+}
+
+std::optional<CUDADeviceAttr> CUDADeviceAttr::from(const TokenContext &t) {
+  return CUDADeviceAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

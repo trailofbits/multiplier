@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NullStmt;
 class Stmt;
@@ -64,13 +53,8 @@ class NullStmt : public Stmt {
     }
   }
 
-  inline static std::optional<NullStmt> from(const Reference &r) {
-    return NullStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<NullStmt> from(const TokenContext &t) {
-    return NullStmt::from(t.as_statement());
-  }
+  static std::optional<NullStmt> from(const Reference &r);
+  static std::optional<NullStmt> from(const TokenContext &t);
 
   Token semi_token(void) const;
   bool has_leading_empty_macro(void) const;

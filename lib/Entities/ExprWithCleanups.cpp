@@ -147,6 +147,14 @@ gap::generator<ExprWithCleanups> ExprWithCleanups::in(const File &file) {
   }
 }
 
+std::optional<ExprWithCleanups> ExprWithCleanups::from(const Reference &r) {
+  return ExprWithCleanups::from(r.as_statement());
+}
+
+std::optional<ExprWithCleanups> ExprWithCleanups::from(const TokenContext &t) {
+  return ExprWithCleanups::from(t.as_statement());
+}
+
 bool ExprWithCleanups::cleanups_have_side_effects(void) const {
   return impl->reader.getVal88();
 }

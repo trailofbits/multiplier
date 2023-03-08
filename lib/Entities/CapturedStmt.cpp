@@ -146,6 +146,14 @@ gap::generator<CapturedStmt> CapturedStmt::in(const File &file) {
   }
 }
 
+std::optional<CapturedStmt> CapturedStmt::from(const Reference &r) {
+  return CapturedStmt::from(r.as_statement());
+}
+
+std::optional<CapturedStmt> CapturedStmt::from(const TokenContext &t) {
+  return CapturedStmt::from(t.as_statement());
+}
+
 CapturedDecl CapturedStmt::captured_declaration(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return CapturedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "VarDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BindingDecl;
 class Decl;
 class DeclaratorDecl;
@@ -74,13 +63,8 @@ class DecompositionDecl : public VarDecl {
     }
   }
 
-  inline static std::optional<DecompositionDecl> from(const Reference &r) {
-    return DecompositionDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<DecompositionDecl> from(const TokenContext &t) {
-    return DecompositionDecl::from(t.as_declaration());
-  }
+  static std::optional<DecompositionDecl> from(const Reference &r);
+  static std::optional<DecompositionDecl> from(const TokenContext &t);
 
   std::optional<BindingDecl> nth_binding(unsigned n) const;
   unsigned num_bindings(void) const;

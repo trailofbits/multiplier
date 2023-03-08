@@ -147,6 +147,14 @@ gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Reference &r) {
+  return ObjCProtocolExpr::from(r.as_statement());
+}
+
+std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const TokenContext &t) {
+  return ObjCProtocolExpr::from(t.as_statement());
+}
+
 Token ObjCProtocolExpr::at_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

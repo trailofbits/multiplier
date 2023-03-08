@@ -96,6 +96,14 @@ gap::generator<SwiftNewTypeAttr> SwiftNewTypeAttr::in(const File &file) {
   }
 }
 
+std::optional<SwiftNewTypeAttr> SwiftNewTypeAttr::from(const Reference &r) {
+  return SwiftNewTypeAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftNewTypeAttr> SwiftNewTypeAttr::from(const TokenContext &t) {
+  return SwiftNewTypeAttr::from(t.as_attribute());
+}
+
 SwiftNewTypeAttrNewtypeKind SwiftNewTypeAttr::newtype_kind(void) const {
   return static_cast<SwiftNewTypeAttrNewtypeKind>(impl->reader.getVal10());
 }

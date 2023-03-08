@@ -96,6 +96,14 @@ gap::generator<NoDuplicateAttr> NoDuplicateAttr::in(const File &file) {
   }
 }
 
+std::optional<NoDuplicateAttr> NoDuplicateAttr::from(const Reference &r) {
+  return NoDuplicateAttr::from(r.as_attribute());
+}
+
+std::optional<NoDuplicateAttr> NoDuplicateAttr::from(const TokenContext &t) {
+  return NoDuplicateAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

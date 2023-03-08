@@ -96,6 +96,14 @@ gap::generator<NoSplitStackAttr> NoSplitStackAttr::in(const File &file) {
   }
 }
 
+std::optional<NoSplitStackAttr> NoSplitStackAttr::from(const Reference &r) {
+  return NoSplitStackAttr::from(r.as_attribute());
+}
+
+std::optional<NoSplitStackAttr> NoSplitStackAttr::from(const TokenContext &t) {
+  return NoSplitStackAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

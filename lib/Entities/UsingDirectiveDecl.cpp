@@ -157,6 +157,14 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::in(const File &file) {
   }
 }
 
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const Reference &r) {
+  return UsingDirectiveDecl::from(r.as_declaration());
+}
+
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const TokenContext &t) {
+  return UsingDirectiveDecl::from(t.as_declaration());
+}
+
 Token UsingDirectiveDecl::identifier_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }

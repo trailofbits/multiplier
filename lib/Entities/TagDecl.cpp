@@ -174,6 +174,14 @@ gap::generator<TagDecl> TagDecl::in(const File &file) {
   }
 }
 
+std::optional<TagDecl> TagDecl::from(const Reference &r) {
+  return TagDecl::from(r.as_declaration());
+}
+
+std::optional<TagDecl> TagDecl::from(const TokenContext &t) {
+  return TagDecl::from(t.as_declaration());
+}
+
 TokenRange TagDecl::brace_range(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);

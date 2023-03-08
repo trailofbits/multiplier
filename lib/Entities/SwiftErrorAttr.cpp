@@ -96,6 +96,14 @@ gap::generator<SwiftErrorAttr> SwiftErrorAttr::in(const File &file) {
   }
 }
 
+std::optional<SwiftErrorAttr> SwiftErrorAttr::from(const Reference &r) {
+  return SwiftErrorAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftErrorAttr> SwiftErrorAttr::from(const TokenContext &t) {
+  return SwiftErrorAttr::from(t.as_attribute());
+}
+
 SwiftErrorAttrConventionKind SwiftErrorAttr::convention(void) const {
   return static_cast<SwiftErrorAttrConventionKind>(impl->reader.getVal10());
 }

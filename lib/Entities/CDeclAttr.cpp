@@ -96,6 +96,14 @@ gap::generator<CDeclAttr> CDeclAttr::in(const File &file) {
   }
 }
 
+std::optional<CDeclAttr> CDeclAttr::from(const Reference &r) {
+  return CDeclAttr::from(r.as_attribute());
+}
+
+std::optional<CDeclAttr> CDeclAttr::from(const TokenContext &t) {
+  return CDeclAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

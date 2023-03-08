@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXForRangeStmt;
 class Decl;
 class DeclStmt;
@@ -67,13 +56,8 @@ class CXXForRangeStmt : public Stmt {
     }
   }
 
-  inline static std::optional<CXXForRangeStmt> from(const Reference &r) {
-    return CXXForRangeStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXForRangeStmt> from(const TokenContext &t) {
-    return CXXForRangeStmt::from(t.as_statement());
-  }
+  static std::optional<CXXForRangeStmt> from(const Reference &r);
+  static std::optional<CXXForRangeStmt> from(const TokenContext &t);
 
   DeclStmt begin_statement(void) const;
   Stmt body(void) const;

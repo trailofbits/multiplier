@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TypeWithKeyword.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ElaboratedType;
 class TagDecl;
 class Token;
@@ -57,13 +46,8 @@ class ElaboratedType : public TypeWithKeyword {
     }
   }
 
-  inline static std::optional<ElaboratedType> from(const Reference &r) {
-    return ElaboratedType::from(r.as_type());
-  }
-
-  inline static std::optional<ElaboratedType> from(const TokenContext &t) {
-    return ElaboratedType::from(t.as_type());
-  }
+  static std::optional<ElaboratedType> from(const Reference &r);
+  static std::optional<ElaboratedType> from(const TokenContext &t);
 
   Type desugar(void) const;
   Type named_type(void) const;

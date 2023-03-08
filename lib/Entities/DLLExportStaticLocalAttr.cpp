@@ -96,6 +96,14 @@ gap::generator<DLLExportStaticLocalAttr> DLLExportStaticLocalAttr::in(const File
   }
 }
 
+std::optional<DLLExportStaticLocalAttr> DLLExportStaticLocalAttr::from(const Reference &r) {
+  return DLLExportStaticLocalAttr::from(r.as_attribute());
+}
+
+std::optional<DLLExportStaticLocalAttr> DLLExportStaticLocalAttr::from(const TokenContext &t) {
+  return DLLExportStaticLocalAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

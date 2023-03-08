@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CXXConstructExprConstructionKind.h"
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConstructExpr;
 class CXXConstructorDecl;
 class CXXTemporaryObjectExpr;
@@ -72,13 +61,8 @@ class CXXConstructExpr : public Expr {
     }
   }
 
-  inline static std::optional<CXXConstructExpr> from(const Reference &r) {
-    return CXXConstructExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXConstructExpr> from(const TokenContext &t) {
-    return CXXConstructExpr::from(t.as_statement());
-  }
+  static std::optional<CXXConstructExpr> from(const Reference &r);
+  static std::optional<CXXConstructExpr> from(const TokenContext &t);
 
   std::optional<Expr> nth_argument(unsigned n) const;
   unsigned num_arguments(void) const;

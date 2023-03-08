@@ -96,6 +96,14 @@ gap::generator<LayoutVersionAttr> LayoutVersionAttr::in(const File &file) {
   }
 }
 
+std::optional<LayoutVersionAttr> LayoutVersionAttr::from(const Reference &r) {
+  return LayoutVersionAttr::from(r.as_attribute());
+}
+
+std::optional<LayoutVersionAttr> LayoutVersionAttr::from(const TokenContext &t) {
+  return LayoutVersionAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

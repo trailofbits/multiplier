@@ -144,6 +144,14 @@ gap::generator<DeclStmt> DeclStmt::in(const File &file) {
   }
 }
 
+std::optional<DeclStmt> DeclStmt::from(const Reference &r) {
+  return DeclStmt::from(r.as_statement());
+}
+
+std::optional<DeclStmt> DeclStmt::from(const TokenContext &t) {
+  return DeclStmt::from(t.as_statement());
+}
+
 unsigned DeclStmt::num_declarations(void) const {
   return impl->reader.getVal15().size();
 }

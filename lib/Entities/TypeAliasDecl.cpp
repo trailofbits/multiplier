@@ -160,6 +160,14 @@ gap::generator<TypeAliasDecl> TypeAliasDecl::in(const File &file) {
   }
 }
 
+std::optional<TypeAliasDecl> TypeAliasDecl::from(const Reference &r) {
+  return TypeAliasDecl::from(r.as_declaration());
+}
+
+std::optional<TypeAliasDecl> TypeAliasDecl::from(const TokenContext &t) {
+  return TypeAliasDecl::from(t.as_declaration());
+}
+
 std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal62();

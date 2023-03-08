@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class ObjCEncodeExpr;
@@ -69,13 +58,8 @@ class ObjCEncodeExpr : public Expr {
     }
   }
 
-  inline static std::optional<ObjCEncodeExpr> from(const Reference &r) {
-    return ObjCEncodeExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCEncodeExpr> from(const TokenContext &t) {
-    return ObjCEncodeExpr::from(t.as_statement());
-  }
+  static std::optional<ObjCEncodeExpr> from(const Reference &r);
+  static std::optional<ObjCEncodeExpr> from(const TokenContext &t);
 
   Token at_token(void) const;
   Type encoded_type(void) const;

@@ -96,6 +96,14 @@ gap::generator<PragmaClangDataSectionAttr> PragmaClangDataSectionAttr::in(const 
   }
 }
 
+std::optional<PragmaClangDataSectionAttr> PragmaClangDataSectionAttr::from(const Reference &r) {
+  return PragmaClangDataSectionAttr::from(r.as_attribute());
+}
+
+std::optional<PragmaClangDataSectionAttr> PragmaClangDataSectionAttr::from(const TokenContext &t) {
+  return PragmaClangDataSectionAttr::from(t.as_attribute());
+}
+
 std::string_view PragmaClangDataSectionAttr::name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

@@ -97,6 +97,14 @@ gap::generator<NSConsumedAttr> NSConsumedAttr::in(const File &file) {
   }
 }
 
+std::optional<NSConsumedAttr> NSConsumedAttr::from(const Reference &r) {
+  return NSConsumedAttr::from(r.as_attribute());
+}
+
+std::optional<NSConsumedAttr> NSConsumedAttr::from(const TokenContext &t) {
+  return NSConsumedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

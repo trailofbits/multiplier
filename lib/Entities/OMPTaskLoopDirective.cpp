@@ -147,6 +147,14 @@ gap::generator<OMPTaskLoopDirective> OMPTaskLoopDirective::in(const File &file) 
   }
 }
 
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const Reference &r) {
+  return OMPTaskLoopDirective::from(r.as_statement());
+}
+
+std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const TokenContext &t) {
+  return OMPTaskLoopDirective::from(t.as_statement());
+}
+
 bool OMPTaskLoopDirective::has_cancel(void) const {
   return impl->reader.getVal23();
 }

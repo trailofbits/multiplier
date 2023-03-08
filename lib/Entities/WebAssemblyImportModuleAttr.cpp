@@ -96,6 +96,14 @@ gap::generator<WebAssemblyImportModuleAttr> WebAssemblyImportModuleAttr::in(cons
   }
 }
 
+std::optional<WebAssemblyImportModuleAttr> WebAssemblyImportModuleAttr::from(const Reference &r) {
+  return WebAssemblyImportModuleAttr::from(r.as_attribute());
+}
+
+std::optional<WebAssemblyImportModuleAttr> WebAssemblyImportModuleAttr::from(const TokenContext &t) {
+  return WebAssemblyImportModuleAttr::from(t.as_attribute());
+}
+
 std::string_view WebAssemblyImportModuleAttr::import_module(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

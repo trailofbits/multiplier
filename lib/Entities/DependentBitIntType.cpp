@@ -96,6 +96,14 @@ gap::generator<DependentBitIntType> DependentBitIntType::in(const File &file) {
   }
 }
 
+std::optional<DependentBitIntType> DependentBitIntType::from(const Reference &r) {
+  return DependentBitIntType::from(r.as_type());
+}
+
+std::optional<DependentBitIntType> DependentBitIntType::from(const TokenContext &t) {
+  return DependentBitIntType::from(t.as_type());
+}
+
 Type DependentBitIntType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

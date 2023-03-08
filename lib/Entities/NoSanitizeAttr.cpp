@@ -96,6 +96,14 @@ gap::generator<NoSanitizeAttr> NoSanitizeAttr::in(const File &file) {
   }
 }
 
+std::optional<NoSanitizeAttr> NoSanitizeAttr::from(const Reference &r) {
+  return NoSanitizeAttr::from(r.as_attribute());
+}
+
+std::optional<NoSanitizeAttr> NoSanitizeAttr::from(const TokenContext &t) {
+  return NoSanitizeAttr::from(t.as_attribute());
+}
+
 bool NoSanitizeAttr::has_coverage(void) const {
   return impl->reader.getVal12();
 }

@@ -96,6 +96,14 @@ gap::generator<XRayLogArgsAttr> XRayLogArgsAttr::in(const File &file) {
   }
 }
 
+std::optional<XRayLogArgsAttr> XRayLogArgsAttr::from(const Reference &r) {
+  return XRayLogArgsAttr::from(r.as_attribute());
+}
+
+std::optional<XRayLogArgsAttr> XRayLogArgsAttr::from(const TokenContext &t) {
+  return XRayLogArgsAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

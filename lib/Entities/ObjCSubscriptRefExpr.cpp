@@ -147,6 +147,14 @@ gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::in(const File &file) 
   }
 }
 
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Reference &r) {
+  return ObjCSubscriptRefExpr::from(r.as_statement());
+}
+
+std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const TokenContext &t) {
+  return ObjCSubscriptRefExpr::from(t.as_statement());
+}
+
 ObjCMethodDecl ObjCSubscriptRefExpr::at_index_method_declaration(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

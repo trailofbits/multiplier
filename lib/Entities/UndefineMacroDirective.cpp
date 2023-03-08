@@ -111,6 +111,14 @@ gap::generator<UndefineMacroDirective> UndefineMacroDirective::in(const File &fi
   }
 }
 
+std::optional<UndefineMacroDirective> UndefineMacroDirective::from(const Reference &r) {
+  return UndefineMacroDirective::from(r.as_macro());
+}
+
+std::optional<UndefineMacroDirective> UndefineMacroDirective::from(const TokenContext &t) {
+  return UndefineMacroDirective::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

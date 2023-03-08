@@ -96,6 +96,14 @@ gap::generator<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::in(const File &file) 
   }
 }
 
+std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from(const Reference &r) {
+  return ObjCMethodFamilyAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from(const TokenContext &t) {
+  return ObjCMethodFamilyAttr::from(t.as_attribute());
+}
+
 ObjCMethodFamilyAttrFamilyKind ObjCMethodFamilyAttr::family(void) const {
   return static_cast<ObjCMethodFamilyAttrFamilyKind>(impl->reader.getVal10());
 }

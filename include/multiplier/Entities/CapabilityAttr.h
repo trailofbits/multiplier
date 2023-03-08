@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CapabilityAttrSpelling.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class CapabilityAttr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class CapabilityAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<CapabilityAttr> from(const Reference &r) {
-    return CapabilityAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<CapabilityAttr> from(const TokenContext &t) {
-    return CapabilityAttr::from(t.as_attribute());
-  }
+  static std::optional<CapabilityAttr> from(const Reference &r);
+  static std::optional<CapabilityAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;
   CapabilityAttrSpelling semantic_spelling(void) const;

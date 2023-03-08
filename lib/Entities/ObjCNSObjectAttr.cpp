@@ -96,6 +96,14 @@ gap::generator<ObjCNSObjectAttr> ObjCNSObjectAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCNSObjectAttr> ObjCNSObjectAttr::from(const Reference &r) {
+  return ObjCNSObjectAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCNSObjectAttr> ObjCNSObjectAttr::from(const TokenContext &t) {
+  return ObjCNSObjectAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

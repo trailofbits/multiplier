@@ -96,6 +96,14 @@ gap::generator<UsingIfExistsAttr> UsingIfExistsAttr::in(const File &file) {
   }
 }
 
+std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from(const Reference &r) {
+  return UsingIfExistsAttr::from(r.as_attribute());
+}
+
+std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from(const TokenContext &t) {
+  return UsingIfExistsAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

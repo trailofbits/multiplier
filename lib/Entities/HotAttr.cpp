@@ -96,6 +96,14 @@ gap::generator<HotAttr> HotAttr::in(const File &file) {
   }
 }
 
+std::optional<HotAttr> HotAttr::from(const Reference &r) {
+  return HotAttr::from(r.as_attribute());
+}
+
+std::optional<HotAttr> HotAttr::from(const TokenContext &t) {
+  return HotAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -156,6 +156,14 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::in(const File &file) {
   }
 }
 
+std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Reference &r) {
+  return PragmaCommentDecl::from(r.as_declaration());
+}
+
+std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const TokenContext &t) {
+  return PragmaCommentDecl::from(t.as_declaration());
+}
+
 std::string_view PragmaCommentDecl::argument(void) const {
   capnp::Text::Reader data = impl->reader.getVal59();
   return std::string_view(data.cStr(), data.size());

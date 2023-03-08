@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "LambdaCaptureDefault.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXMethodDecl;
 class CXXRecordDecl;
 class CompoundStmt;
@@ -76,13 +65,8 @@ class LambdaExpr : public Expr {
     }
   }
 
-  inline static std::optional<LambdaExpr> from(const Reference &r) {
-    return LambdaExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<LambdaExpr> from(const TokenContext &t) {
-    return LambdaExpr::from(t.as_statement());
-  }
+  static std::optional<LambdaExpr> from(const Reference &r);
+  static std::optional<LambdaExpr> from(const TokenContext &t);
 
   Stmt body(void) const;
   CXXMethodDecl call_operator(void) const;

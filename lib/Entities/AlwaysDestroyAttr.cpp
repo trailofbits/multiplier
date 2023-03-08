@@ -96,6 +96,14 @@ gap::generator<AlwaysDestroyAttr> AlwaysDestroyAttr::in(const File &file) {
   }
 }
 
+std::optional<AlwaysDestroyAttr> AlwaysDestroyAttr::from(const Reference &r) {
+  return AlwaysDestroyAttr::from(r.as_attribute());
+}
+
+std::optional<AlwaysDestroyAttr> AlwaysDestroyAttr::from(const TokenContext &t) {
+  return AlwaysDestroyAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

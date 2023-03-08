@@ -98,6 +98,14 @@ gap::generator<DependentSizedArrayType> DependentSizedArrayType::in(const File &
   }
 }
 
+std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const Reference &r) {
+  return DependentSizedArrayType::from(r.as_type());
+}
+
+std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const TokenContext &t) {
+  return DependentSizedArrayType::from(t.as_type());
+}
+
 Type DependentSizedArrayType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -96,6 +96,14 @@ gap::generator<NSReturnsRetainedAttr> NSReturnsRetainedAttr::in(const File &file
   }
 }
 
+std::optional<NSReturnsRetainedAttr> NSReturnsRetainedAttr::from(const Reference &r) {
+  return NSReturnsRetainedAttr::from(r.as_attribute());
+}
+
+std::optional<NSReturnsRetainedAttr> NSReturnsRetainedAttr::from(const TokenContext &t) {
+  return NSReturnsRetainedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

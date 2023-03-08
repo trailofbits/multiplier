@@ -95,6 +95,14 @@ gap::generator<ParenType> ParenType::in(const File &file) {
   }
 }
 
+std::optional<ParenType> ParenType::from(const Reference &r) {
+  return ParenType::from(r.as_type());
+}
+
+std::optional<ParenType> ParenType::from(const TokenContext &t) {
+  return ParenType::from(t.as_type());
+}
+
 Type ParenType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -96,6 +96,14 @@ gap::generator<AssumptionAttr> AssumptionAttr::in(const File &file) {
   }
 }
 
+std::optional<AssumptionAttr> AssumptionAttr::from(const Reference &r) {
+  return AssumptionAttr::from(r.as_attribute());
+}
+
+std::optional<AssumptionAttr> AssumptionAttr::from(const TokenContext &t) {
+  return AssumptionAttr::from(t.as_attribute());
+}
+
 std::string_view AssumptionAttr::assumption(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

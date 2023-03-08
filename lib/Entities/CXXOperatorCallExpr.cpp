@@ -147,6 +147,14 @@ gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const Reference &r) {
+  return CXXOperatorCallExpr::from(r.as_statement());
+}
+
+std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const TokenContext &t) {
+  return CXXOperatorCallExpr::from(t.as_statement());
+}
+
 OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const {
   return static_cast<OverloadedOperatorKind>(impl->reader.getVal95());
 }

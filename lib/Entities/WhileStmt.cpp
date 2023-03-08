@@ -147,6 +147,14 @@ gap::generator<WhileStmt> WhileStmt::in(const File &file) {
   }
 }
 
+std::optional<WhileStmt> WhileStmt::from(const Reference &r) {
+  return WhileStmt::from(r.as_statement());
+}
+
+std::optional<WhileStmt> WhileStmt::from(const TokenContext &t) {
+  return WhileStmt::from(t.as_statement());
+}
+
 Stmt WhileStmt::body(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

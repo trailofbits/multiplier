@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CXXMethodDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXDestructorDecl;
 class CXXMethodDecl;
 class Decl;
@@ -76,13 +65,8 @@ class CXXDestructorDecl : public CXXMethodDecl {
     }
   }
 
-  inline static std::optional<CXXDestructorDecl> from(const Reference &r) {
-    return CXXDestructorDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXDestructorDecl> from(const TokenContext &t) {
-    return CXXDestructorDecl::from(t.as_declaration());
-  }
+  static std::optional<CXXDestructorDecl> from(const Reference &r);
+  static std::optional<CXXDestructorDecl> from(const TokenContext &t);
 
   std::optional<FunctionDecl> operator_delete(void) const;
   std::optional<Expr> operator_delete_this_argument(void) const;

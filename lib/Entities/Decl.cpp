@@ -200,6 +200,14 @@ gap::generator<Decl> Decl::in(const File &file, std::span<DeclKind> kinds) {
   }
 }
 
+std::optional<Decl> Decl::from(const Reference &r) {
+  return r.as_declaration();
+}
+
+std::optional<Decl> Decl::from(const TokenContext &t) {
+  return t.as_declaration();
+}
+
 unsigned Decl::num_attributes(void) const {
   return impl->reader.getVal3().size();
 }

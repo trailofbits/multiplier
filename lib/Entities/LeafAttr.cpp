@@ -96,6 +96,14 @@ gap::generator<LeafAttr> LeafAttr::in(const File &file) {
   }
 }
 
+std::optional<LeafAttr> LeafAttr::from(const Reference &r) {
+  return LeafAttr::from(r.as_attribute());
+}
+
+std::optional<LeafAttr> LeafAttr::from(const TokenContext &t) {
+  return LeafAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

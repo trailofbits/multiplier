@@ -146,6 +146,14 @@ gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::in(const File &file) {
   }
 }
 
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Reference &r) {
+  return ArraySubscriptExpr::from(r.as_statement());
+}
+
+std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const TokenContext &t) {
+  return ArraySubscriptExpr::from(t.as_statement());
+}
+
 Expr ArraySubscriptExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

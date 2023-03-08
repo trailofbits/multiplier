@@ -96,6 +96,14 @@ gap::generator<StrictFPAttr> StrictFPAttr::in(const File &file) {
   }
 }
 
+std::optional<StrictFPAttr> StrictFPAttr::from(const Reference &r) {
+  return StrictFPAttr::from(r.as_attribute());
+}
+
+std::optional<StrictFPAttr> StrictFPAttr::from(const TokenContext &t) {
+  return StrictFPAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -158,6 +158,14 @@ gap::generator<MSGuidDecl> MSGuidDecl::in(const File &file) {
   }
 }
 
+std::optional<MSGuidDecl> MSGuidDecl::from(const Reference &r) {
+  return MSGuidDecl::from(r.as_declaration());
+}
+
+std::optional<MSGuidDecl> MSGuidDecl::from(const TokenContext &t) {
+  return MSGuidDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

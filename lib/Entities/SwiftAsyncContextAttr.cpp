@@ -98,6 +98,14 @@ gap::generator<SwiftAsyncContextAttr> SwiftAsyncContextAttr::in(const File &file
   }
 }
 
+std::optional<SwiftAsyncContextAttr> SwiftAsyncContextAttr::from(const Reference &r) {
+  return SwiftAsyncContextAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftAsyncContextAttr> SwiftAsyncContextAttr::from(const TokenContext &t) {
+  return SwiftAsyncContextAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

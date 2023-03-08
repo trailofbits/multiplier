@@ -96,6 +96,14 @@ gap::generator<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::in(const File
   }
 }
 
+std::optional<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::from(const Reference &r) {
+  return NoInstrumentFunctionAttr::from(r.as_attribute());
+}
+
+std::optional<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::from(const TokenContext &t) {
+  return NoInstrumentFunctionAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -96,6 +96,14 @@ gap::generator<EnumType> EnumType::in(const File &file) {
   }
 }
 
+std::optional<EnumType> EnumType::from(const Reference &r) {
+  return EnumType::from(r.as_type());
+}
+
+std::optional<EnumType> EnumType::from(const TokenContext &t) {
+  return EnumType::from(t.as_type());
+}
+
 Type EnumType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));

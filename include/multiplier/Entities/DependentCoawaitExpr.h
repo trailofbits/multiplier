@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DependentCoawaitExpr;
 class Expr;
@@ -69,13 +58,8 @@ class DependentCoawaitExpr : public Expr {
     }
   }
 
-  inline static std::optional<DependentCoawaitExpr> from(const Reference &r) {
-    return DependentCoawaitExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<DependentCoawaitExpr> from(const TokenContext &t) {
-    return DependentCoawaitExpr::from(t.as_statement());
-  }
+  static std::optional<DependentCoawaitExpr> from(const Reference &r);
+  static std::optional<DependentCoawaitExpr> from(const TokenContext &t);
 
   Token keyword_token(void) const;
   Expr operand(void) const;

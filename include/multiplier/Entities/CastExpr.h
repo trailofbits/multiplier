@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CastKind.h"
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BuiltinBitCastExpr;
 class CStyleCastExpr;
 class CXXAddrspaceCastExpr;
@@ -77,13 +66,8 @@ class CastExpr : public Expr {
     }
   }
 
-  inline static std::optional<CastExpr> from(const Reference &r) {
-    return CastExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CastExpr> from(const TokenContext &t) {
-    return CastExpr::from(t.as_statement());
-  }
+  static std::optional<CastExpr> from(const Reference &r);
+  static std::optional<CastExpr> from(const TokenContext &t);
 
   CastKind cast_kind(void) const;
   std::string_view cast_kind_name(void) const;

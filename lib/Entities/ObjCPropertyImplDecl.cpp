@@ -160,6 +160,14 @@ gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::in(const File &file) 
   }
 }
 
+std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Reference &r) {
+  return ObjCPropertyImplDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const TokenContext &t) {
+  return ObjCPropertyImplDecl::from(t.as_declaration());
+}
+
 Expr ObjCPropertyImplDecl::getter_cxx_constructor(void) const {
   RawEntityId eid = impl->reader.getVal45();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

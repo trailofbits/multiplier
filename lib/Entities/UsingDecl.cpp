@@ -158,6 +158,14 @@ gap::generator<UsingDecl> UsingDecl::in(const File &file) {
   }
 }
 
+std::optional<UsingDecl> UsingDecl::from(const Reference &r) {
+  return UsingDecl::from(r.as_declaration());
+}
+
+std::optional<UsingDecl> UsingDecl::from(const TokenContext &t) {
+  return UsingDecl::from(t.as_declaration());
+}
+
 Token UsingDecl::using_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }

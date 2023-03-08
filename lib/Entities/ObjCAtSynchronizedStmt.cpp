@@ -146,6 +146,14 @@ gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::in(const File &fi
   }
 }
 
+std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const Reference &r) {
+  return ObjCAtSynchronizedStmt::from(r.as_statement());
+}
+
+std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const TokenContext &t) {
+  return ObjCAtSynchronizedStmt::from(t.as_statement());
+}
+
 Token ObjCAtSynchronizedStmt::at_synchronized_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

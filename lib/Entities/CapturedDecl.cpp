@@ -157,6 +157,14 @@ gap::generator<CapturedDecl> CapturedDecl::in(const File &file) {
   }
 }
 
+std::optional<CapturedDecl> CapturedDecl::from(const Reference &r) {
+  return CapturedDecl::from(r.as_declaration());
+}
+
+std::optional<CapturedDecl> CapturedDecl::from(const TokenContext &t) {
+  return CapturedDecl::from(t.as_declaration());
+}
+
 ImplicitParamDecl CapturedDecl::context_parameter(void) const {
   RawEntityId eid = impl->reader.getVal45();
   return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

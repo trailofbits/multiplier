@@ -96,6 +96,14 @@ gap::generator<WeakRefAttr> WeakRefAttr::in(const File &file) {
   }
 }
 
+std::optional<WeakRefAttr> WeakRefAttr::from(const Reference &r) {
+  return WeakRefAttr::from(r.as_attribute());
+}
+
+std::optional<WeakRefAttr> WeakRefAttr::from(const TokenContext &t) {
+  return WeakRefAttr::from(t.as_attribute());
+}
+
 std::string_view WeakRefAttr::aliasee(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

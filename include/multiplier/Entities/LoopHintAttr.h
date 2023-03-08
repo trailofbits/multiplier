@@ -8,25 +8,14 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Attr.h"
 #include "LoopHintAttrLoopHintState.h"
 #include "LoopHintAttrOptionType.h"
 #include "LoopHintAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class Expr;
 class LoopHintAttr;
@@ -58,13 +47,8 @@ class LoopHintAttr : public Attr {
     }
   }
 
-  inline static std::optional<LoopHintAttr> from(const Reference &r) {
-    return LoopHintAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<LoopHintAttr> from(const TokenContext &t) {
-    return LoopHintAttr::from(t.as_attribute());
-  }
+  static std::optional<LoopHintAttr> from(const Reference &r);
+  static std::optional<LoopHintAttr> from(const TokenContext &t);
 
   LoopHintAttrOptionType option(void) const;
   LoopHintAttrSpelling semantic_spelling(void) const;

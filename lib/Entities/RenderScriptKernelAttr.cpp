@@ -95,6 +95,14 @@ gap::generator<RenderScriptKernelAttr> RenderScriptKernelAttr::in(const File &fi
   }
 }
 
+std::optional<RenderScriptKernelAttr> RenderScriptKernelAttr::from(const Reference &r) {
+  return RenderScriptKernelAttr::from(r.as_attribute());
+}
+
+std::optional<RenderScriptKernelAttr> RenderScriptKernelAttr::from(const TokenContext &t) {
+  return RenderScriptKernelAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

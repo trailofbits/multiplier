@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "VarTemplateSpecializationDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class NamedDecl;
@@ -76,13 +65,8 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     }
   }
 
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const Reference &r) {
-    return VarTemplatePartialSpecializationDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &t) {
-    return VarTemplatePartialSpecializationDecl::from(t.as_declaration());
-  }
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const Reference &r);
+  static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &t);
 
   VarTemplatePartialSpecializationDecl instantiated_from_member(void) const;
   TemplateParameterList template_parameters(void) const;

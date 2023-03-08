@@ -147,6 +147,14 @@ gap::generator<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDire
   }
 }
 
+std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::from(const Reference &r) {
+  return OMPTargetTeamsGenericLoopDirective::from(r.as_statement());
+}
+
+std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::from(const TokenContext &t) {
+  return OMPTargetTeamsGenericLoopDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

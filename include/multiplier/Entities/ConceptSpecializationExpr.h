@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConceptSpecializationExpr;
 class Decl;
 class Expr;
@@ -69,13 +58,8 @@ class ConceptSpecializationExpr : public Expr {
     }
   }
 
-  inline static std::optional<ConceptSpecializationExpr> from(const Reference &r) {
-    return ConceptSpecializationExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ConceptSpecializationExpr> from(const TokenContext &t) {
-    return ConceptSpecializationExpr::from(t.as_statement());
-  }
+  static std::optional<ConceptSpecializationExpr> from(const Reference &r);
+  static std::optional<ConceptSpecializationExpr> from(const TokenContext &t);
 
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
   unsigned num_template_arguments(void) const;

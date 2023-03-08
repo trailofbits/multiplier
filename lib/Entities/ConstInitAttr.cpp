@@ -96,6 +96,14 @@ gap::generator<ConstInitAttr> ConstInitAttr::in(const File &file) {
   }
 }
 
+std::optional<ConstInitAttr> ConstInitAttr::from(const Reference &r) {
+  return ConstInitAttr::from(r.as_attribute());
+}
+
+std::optional<ConstInitAttr> ConstInitAttr::from(const TokenContext &t) {
+  return ConstInitAttr::from(t.as_attribute());
+}
+
 ConstInitAttrSpelling ConstInitAttr::semantic_spelling(void) const {
   return static_cast<ConstInitAttrSpelling>(impl->reader.getVal10());
 }

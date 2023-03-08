@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXPseudoDestructorExpr;
 class Decl;
 class Expr;
@@ -69,13 +58,8 @@ class CXXPseudoDestructorExpr : public Expr {
     }
   }
 
-  inline static std::optional<CXXPseudoDestructorExpr> from(const Reference &r) {
-    return CXXPseudoDestructorExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXPseudoDestructorExpr> from(const TokenContext &t) {
-    return CXXPseudoDestructorExpr::from(t.as_statement());
-  }
+  static std::optional<CXXPseudoDestructorExpr> from(const Reference &r);
+  static std::optional<CXXPseudoDestructorExpr> from(const TokenContext &t);
 
   Expr base(void) const;
   Token colon_colon_token(void) const;

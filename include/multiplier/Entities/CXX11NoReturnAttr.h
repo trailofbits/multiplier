@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CXX11NoReturnAttrSpelling.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class CXX11NoReturnAttr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class CXX11NoReturnAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<CXX11NoReturnAttr> from(const Reference &r) {
-    return CXX11NoReturnAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<CXX11NoReturnAttr> from(const TokenContext &t) {
-    return CXX11NoReturnAttr::from(t.as_attribute());
-  }
+  static std::optional<CXX11NoReturnAttr> from(const Reference &r);
+  static std::optional<CXX11NoReturnAttr> from(const TokenContext &t);
 
   CXX11NoReturnAttrSpelling semantic_spelling(void) const;
 };

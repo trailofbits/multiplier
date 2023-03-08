@@ -96,6 +96,14 @@ gap::generator<NoThreadSafetyAnalysisAttr> NoThreadSafetyAnalysisAttr::in(const 
   }
 }
 
+std::optional<NoThreadSafetyAnalysisAttr> NoThreadSafetyAnalysisAttr::from(const Reference &r) {
+  return NoThreadSafetyAnalysisAttr::from(r.as_attribute());
+}
+
+std::optional<NoThreadSafetyAnalysisAttr> NoThreadSafetyAnalysisAttr::from(const TokenContext &t) {
+  return NoThreadSafetyAnalysisAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

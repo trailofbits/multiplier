@@ -96,6 +96,14 @@ gap::generator<AssertSharedLockAttr> AssertSharedLockAttr::in(const File &file) 
   }
 }
 
+std::optional<AssertSharedLockAttr> AssertSharedLockAttr::from(const Reference &r) {
+  return AssertSharedLockAttr::from(r.as_attribute());
+}
+
+std::optional<AssertSharedLockAttr> AssertSharedLockAttr::from(const TokenContext &t) {
+  return AssertSharedLockAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -156,6 +156,14 @@ gap::generator<EmptyDecl> EmptyDecl::in(const File &file) {
   }
 }
 
+std::optional<EmptyDecl> EmptyDecl::from(const Reference &r) {
+  return EmptyDecl::from(r.as_declaration());
+}
+
+std::optional<EmptyDecl> EmptyDecl::from(const TokenContext &t) {
+  return EmptyDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

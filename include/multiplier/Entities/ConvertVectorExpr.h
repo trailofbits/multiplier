@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConvertVectorExpr;
 class Decl;
 class Expr;
@@ -68,13 +57,8 @@ class ConvertVectorExpr : public Expr {
     }
   }
 
-  inline static std::optional<ConvertVectorExpr> from(const Reference &r) {
-    return ConvertVectorExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ConvertVectorExpr> from(const TokenContext &t) {
-    return ConvertVectorExpr::from(t.as_statement());
-  }
+  static std::optional<ConvertVectorExpr> from(const Reference &r);
+  static std::optional<ConvertVectorExpr> from(const TokenContext &t);
 
   Token builtin_token(void) const;
   Token r_paren_token(void) const;

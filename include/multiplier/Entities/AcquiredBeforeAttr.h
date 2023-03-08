@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AcquiredBeforeAttr;
 class Attr;
 class InheritableAttr;
@@ -56,13 +45,8 @@ class AcquiredBeforeAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<AcquiredBeforeAttr> from(const Reference &r) {
-    return AcquiredBeforeAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<AcquiredBeforeAttr> from(const TokenContext &t) {
-    return AcquiredBeforeAttr::from(t.as_attribute());
-  }
+  static std::optional<AcquiredBeforeAttr> from(const Reference &r);
+  static std::optional<AcquiredBeforeAttr> from(const TokenContext &t);
 
 };
 

@@ -145,6 +145,14 @@ gap::generator<OMPCancellationPointDirective> OMPCancellationPointDirective::in(
   }
 }
 
+std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::from(const Reference &r) {
+  return OMPCancellationPointDirective::from(r.as_statement());
+}
+
+std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::from(const TokenContext &t) {
+  return OMPCancellationPointDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

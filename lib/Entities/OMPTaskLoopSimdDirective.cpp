@@ -147,6 +147,14 @@ gap::generator<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::in(const File
   }
 }
 
+std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const Reference &r) {
+  return OMPTaskLoopSimdDirective::from(r.as_statement());
+}
+
+std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const TokenContext &t) {
+  return OMPTaskLoopSimdDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

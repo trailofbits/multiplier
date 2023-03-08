@@ -96,6 +96,14 @@ gap::generator<HLSLNumThreadsAttr> HLSLNumThreadsAttr::in(const File &file) {
   }
 }
 
+std::optional<HLSLNumThreadsAttr> HLSLNumThreadsAttr::from(const Reference &r) {
+  return HLSLNumThreadsAttr::from(r.as_attribute());
+}
+
+std::optional<HLSLNumThreadsAttr> HLSLNumThreadsAttr::from(const TokenContext &t) {
+  return HLSLNumThreadsAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

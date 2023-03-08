@@ -145,6 +145,14 @@ gap::generator<OMPSectionDirective> OMPSectionDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPSectionDirective> OMPSectionDirective::from(const Reference &r) {
+  return OMPSectionDirective::from(r.as_statement());
+}
+
+std::optional<OMPSectionDirective> OMPSectionDirective::from(const TokenContext &t) {
+  return OMPSectionDirective::from(t.as_statement());
+}
+
 bool OMPSectionDirective::has_cancel(void) const {
   return impl->reader.getVal23();
 }

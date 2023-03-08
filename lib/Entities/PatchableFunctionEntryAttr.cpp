@@ -96,6 +96,14 @@ gap::generator<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::in(const 
   }
 }
 
+std::optional<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::from(const Reference &r) {
+  return PatchableFunctionEntryAttr::from(r.as_attribute());
+}
+
+std::optional<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::from(const TokenContext &t) {
+  return PatchableFunctionEntryAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

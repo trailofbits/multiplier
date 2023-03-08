@@ -96,6 +96,14 @@ gap::generator<RISCVInterruptAttr> RISCVInterruptAttr::in(const File &file) {
   }
 }
 
+std::optional<RISCVInterruptAttr> RISCVInterruptAttr::from(const Reference &r) {
+  return RISCVInterruptAttr::from(r.as_attribute());
+}
+
+std::optional<RISCVInterruptAttr> RISCVInterruptAttr::from(const TokenContext &t) {
+  return RISCVInterruptAttr::from(t.as_attribute());
+}
+
 RISCVInterruptAttrInterruptType RISCVInterruptAttr::interrupt(void) const {
   return static_cast<RISCVInterruptAttrInterruptType>(impl->reader.getVal10());
 }

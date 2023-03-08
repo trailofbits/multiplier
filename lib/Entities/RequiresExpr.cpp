@@ -148,6 +148,14 @@ gap::generator<RequiresExpr> RequiresExpr::in(const File &file) {
   }
 }
 
+std::optional<RequiresExpr> RequiresExpr::from(const Reference &r) {
+  return RequiresExpr::from(r.as_statement());
+}
+
+std::optional<RequiresExpr> RequiresExpr::from(const TokenContext &t) {
+  return RequiresExpr::from(t.as_statement());
+}
+
 RequiresExprBodyDecl RequiresExpr::body(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

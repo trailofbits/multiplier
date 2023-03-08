@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class EnumConstantDecl;
 class Expr;
@@ -70,13 +59,8 @@ class EnumConstantDecl : public ValueDecl {
     }
   }
 
-  inline static std::optional<EnumConstantDecl> from(const Reference &r) {
-    return EnumConstantDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<EnumConstantDecl> from(const TokenContext &t) {
-    return EnumConstantDecl::from(t.as_declaration());
-  }
+  static std::optional<EnumConstantDecl> from(const Reference &r);
+  static std::optional<EnumConstantDecl> from(const TokenContext &t);
 
   std::optional<Expr> initializer_expression(void) const;
 };

@@ -148,6 +148,14 @@ gap::generator<DesignatedInitExpr> DesignatedInitExpr::in(const File &file) {
   }
 }
 
+std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Reference &r) {
+  return DesignatedInitExpr::from(r.as_statement());
+}
+
+std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const TokenContext &t) {
+  return DesignatedInitExpr::from(t.as_statement());
+}
+
 unsigned DesignatedInitExpr::num_designators(void) const {
   return impl->reader.getVal15().size();
 }

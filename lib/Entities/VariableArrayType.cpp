@@ -98,6 +98,14 @@ gap::generator<VariableArrayType> VariableArrayType::in(const File &file) {
   }
 }
 
+std::optional<VariableArrayType> VariableArrayType::from(const Reference &r) {
+  return VariableArrayType::from(r.as_type());
+}
+
+std::optional<VariableArrayType> VariableArrayType::from(const TokenContext &t) {
+  return VariableArrayType::from(t.as_type());
+}
+
 Type VariableArrayType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));

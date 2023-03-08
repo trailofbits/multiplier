@@ -353,6 +353,14 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const File &fi
   }
 }
 
+std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Reference &r) {
+  return OMPExecutableDirective::from(r.as_statement());
+}
+
+std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const TokenContext &t) {
+  return OMPExecutableDirective::from(t.as_statement());
+}
+
 Stmt OMPExecutableDirective::associated_statement(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

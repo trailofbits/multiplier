@@ -96,6 +96,14 @@ gap::generator<BTFTagAttributedType> BTFTagAttributedType::in(const File &file) 
   }
 }
 
+std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const Reference &r) {
+  return BTFTagAttributedType::from(r.as_type());
+}
+
+std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const TokenContext &t) {
+  return BTFTagAttributedType::from(t.as_type());
+}
+
 Type BTFTagAttributedType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

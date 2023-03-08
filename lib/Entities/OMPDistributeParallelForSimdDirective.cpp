@@ -147,6 +147,14 @@ gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSi
   }
 }
 
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const Reference &r) {
+  return OMPDistributeParallelForSimdDirective::from(r.as_statement());
+}
+
+std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::from(const TokenContext &t) {
+  return OMPDistributeParallelForSimdDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

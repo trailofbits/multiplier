@@ -161,6 +161,14 @@ gap::generator<CXXConstructorDecl> CXXConstructorDecl::in(const File &file) {
   }
 }
 
+std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const Reference &r) {
+  return CXXConstructorDecl::from(r.as_declaration());
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const TokenContext &t) {
+  return CXXConstructorDecl::from(t.as_declaration());
+}
+
 std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal170();

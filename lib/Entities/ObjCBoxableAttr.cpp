@@ -95,6 +95,14 @@ gap::generator<ObjCBoxableAttr> ObjCBoxableAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCBoxableAttr> ObjCBoxableAttr::from(const Reference &r) {
+  return ObjCBoxableAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCBoxableAttr> ObjCBoxableAttr::from(const TokenContext &t) {
+  return ObjCBoxableAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

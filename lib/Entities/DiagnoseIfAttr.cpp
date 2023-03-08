@@ -98,6 +98,14 @@ gap::generator<DiagnoseIfAttr> DiagnoseIfAttr::in(const File &file) {
   }
 }
 
+std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from(const Reference &r) {
+  return DiagnoseIfAttr::from(r.as_attribute());
+}
+
+std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from(const TokenContext &t) {
+  return DiagnoseIfAttr::from(t.as_attribute());
+}
+
 bool DiagnoseIfAttr::argument_dependent(void) const {
   return impl->reader.getVal12();
 }

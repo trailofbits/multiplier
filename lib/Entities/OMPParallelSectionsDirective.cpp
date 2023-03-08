@@ -146,6 +146,14 @@ gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::in(co
   }
 }
 
+std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const Reference &r) {
+  return OMPParallelSectionsDirective::from(r.as_statement());
+}
+
+std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(const TokenContext &t) {
+  return OMPParallelSectionsDirective::from(t.as_statement());
+}
+
 Expr OMPParallelSectionsDirective::task_reduction_reference_expression(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

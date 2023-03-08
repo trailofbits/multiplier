@@ -146,6 +146,14 @@ gap::generator<UnaryOperator> UnaryOperator::in(const File &file) {
   }
 }
 
+std::optional<UnaryOperator> UnaryOperator::from(const Reference &r) {
+  return UnaryOperator::from(r.as_statement());
+}
+
+std::optional<UnaryOperator> UnaryOperator::from(const TokenContext &t) {
+  return UnaryOperator::from(t.as_statement());
+}
+
 bool UnaryOperator::can_overflow(void) const {
   return impl->reader.getVal88();
 }

@@ -96,6 +96,14 @@ gap::generator<ReturnTypestateAttr> ReturnTypestateAttr::in(const File &file) {
   }
 }
 
+std::optional<ReturnTypestateAttr> ReturnTypestateAttr::from(const Reference &r) {
+  return ReturnTypestateAttr::from(r.as_attribute());
+}
+
+std::optional<ReturnTypestateAttr> ReturnTypestateAttr::from(const TokenContext &t) {
+  return ReturnTypestateAttr::from(t.as_attribute());
+}
+
 ReturnTypestateAttrConsumedState ReturnTypestateAttr::state(void) const {
   return static_cast<ReturnTypestateAttrConsumedState>(impl->reader.getVal10());
 }

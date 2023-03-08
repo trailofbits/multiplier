@@ -146,6 +146,14 @@ gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const File &file
   }
 }
 
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Reference &r) {
+  return CXXNullPtrLiteralExpr::from(r.as_statement());
+}
+
+std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const TokenContext &t) {
+  return CXXNullPtrLiteralExpr::from(t.as_statement());
+}
+
 Token CXXNullPtrLiteralExpr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

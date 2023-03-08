@@ -149,6 +149,14 @@ gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const Reference &r) {
+  return CXXDynamicCastExpr::from(r.as_statement());
+}
+
+std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const TokenContext &t) {
+  return CXXDynamicCastExpr::from(t.as_statement());
+}
+
 bool CXXDynamicCastExpr::is_always_null(void) const {
   return impl->reader.getVal89();
 }

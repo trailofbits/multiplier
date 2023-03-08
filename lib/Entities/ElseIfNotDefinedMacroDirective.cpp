@@ -112,6 +112,14 @@ gap::generator<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::i
   }
 }
 
+std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const Reference &r) {
+  return ElseIfNotDefinedMacroDirective::from(r.as_macro());
+}
+
+std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const TokenContext &t) {
+  return ElseIfNotDefinedMacroDirective::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

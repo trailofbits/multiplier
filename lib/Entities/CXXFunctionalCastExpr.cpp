@@ -148,6 +148,14 @@ gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::in(const File &file
   }
 }
 
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const Reference &r) {
+  return CXXFunctionalCastExpr::from(r.as_statement());
+}
+
+std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const TokenContext &t) {
+  return CXXFunctionalCastExpr::from(t.as_statement());
+}
+
 Token CXXFunctionalCastExpr::l_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }

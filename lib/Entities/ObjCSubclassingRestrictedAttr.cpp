@@ -96,6 +96,14 @@ gap::generator<ObjCSubclassingRestrictedAttr> ObjCSubclassingRestrictedAttr::in(
   }
 }
 
+std::optional<ObjCSubclassingRestrictedAttr> ObjCSubclassingRestrictedAttr::from(const Reference &r) {
+  return ObjCSubclassingRestrictedAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCSubclassingRestrictedAttr> ObjCSubclassingRestrictedAttr::from(const TokenContext &t) {
+  return ObjCSubclassingRestrictedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

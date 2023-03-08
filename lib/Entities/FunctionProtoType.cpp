@@ -98,6 +98,14 @@ gap::generator<FunctionProtoType> FunctionProtoType::in(const File &file) {
   }
 }
 
+std::optional<FunctionProtoType> FunctionProtoType::from(const Reference &r) {
+  return FunctionProtoType::from(r.as_type());
+}
+
+std::optional<FunctionProtoType> FunctionProtoType::from(const TokenContext &t) {
+  return FunctionProtoType::from(t.as_type());
+}
+
 std::optional<CanThrowResult> FunctionProtoType::can_throw(void) const {
   if (!impl->reader.getVal239()) {
     return std::nullopt;

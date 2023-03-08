@@ -95,6 +95,14 @@ gap::generator<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::in(const 
   }
 }
 
+std::optional<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::from(const Reference &r) {
+  return ObjCNonRuntimeProtocolAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::from(const TokenContext &t) {
+  return ObjCNonRuntimeProtocolAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

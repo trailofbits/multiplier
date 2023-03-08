@@ -97,6 +97,14 @@ gap::generator<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::in(const File &file) 
   }
 }
 
+std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const Reference &r) {
+  return CUDALaunchBoundsAttr::from(r.as_attribute());
+}
+
+std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const TokenContext &t) {
+  return CUDALaunchBoundsAttr::from(t.as_attribute());
+}
+
 Expr CUDALaunchBoundsAttr::max_threads(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

@@ -95,6 +95,14 @@ gap::generator<ObjCClassStubAttr> ObjCClassStubAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCClassStubAttr> ObjCClassStubAttr::from(const Reference &r) {
+  return ObjCClassStubAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCClassStubAttr> ObjCClassStubAttr::from(const TokenContext &t) {
+  return ObjCClassStubAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

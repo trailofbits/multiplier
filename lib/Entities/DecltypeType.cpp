@@ -96,6 +96,14 @@ gap::generator<DecltypeType> DecltypeType::in(const File &file) {
   }
 }
 
+std::optional<DecltypeType> DecltypeType::from(const Reference &r) {
+  return DecltypeType::from(r.as_type());
+}
+
+std::optional<DecltypeType> DecltypeType::from(const TokenContext &t) {
+  return DecltypeType::from(t.as_type());
+}
+
 Type DecltypeType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

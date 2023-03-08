@@ -147,6 +147,14 @@ gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::in(const 
   }
 }
 
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const Reference &r) {
+  return CXXUnresolvedConstructExpr::from(r.as_statement());
+}
+
+std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const TokenContext &t) {
+  return CXXUnresolvedConstructExpr::from(t.as_statement());
+}
+
 unsigned CXXUnresolvedConstructExpr::num_arguments(void) const {
   return impl->reader.getVal15().size();
 }

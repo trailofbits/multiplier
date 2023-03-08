@@ -158,6 +158,14 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::in(const File &file) {
   }
 }
 
+std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const Reference &r) {
+  return OMPAllocateDecl::from(r.as_declaration());
+}
+
+std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const TokenContext &t) {
+  return OMPAllocateDecl::from(t.as_declaration());
+}
+
 unsigned OMPAllocateDecl::num_varlists(void) const {
   return impl->reader.getVal47().size();
 }

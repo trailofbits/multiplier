@@ -96,6 +96,14 @@ gap::generator<OSReturnsRetainedOnZeroAttr> OSReturnsRetainedOnZeroAttr::in(cons
   }
 }
 
+std::optional<OSReturnsRetainedOnZeroAttr> OSReturnsRetainedOnZeroAttr::from(const Reference &r) {
+  return OSReturnsRetainedOnZeroAttr::from(r.as_attribute());
+}
+
+std::optional<OSReturnsRetainedOnZeroAttr> OSReturnsRetainedOnZeroAttr::from(const TokenContext &t) {
+  return OSReturnsRetainedOnZeroAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

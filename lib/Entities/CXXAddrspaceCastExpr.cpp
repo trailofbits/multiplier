@@ -149,6 +149,14 @@ gap::generator<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::in(const File &file) 
   }
 }
 
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const Reference &r) {
+  return CXXAddrspaceCastExpr::from(r.as_statement());
+}
+
+std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const TokenContext &t) {
+  return CXXAddrspaceCastExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

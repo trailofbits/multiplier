@@ -97,6 +97,14 @@ gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const File
   }
 }
 
+std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Reference &r) {
+  return DependentSizedMatrixType::from(r.as_type());
+}
+
+std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const TokenContext &t) {
+  return DependentSizedMatrixType::from(t.as_type());
+}
+
 Token DependentSizedMatrixType::attribute_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal234());
 }

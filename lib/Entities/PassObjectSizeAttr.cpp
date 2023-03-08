@@ -97,6 +97,14 @@ gap::generator<PassObjectSizeAttr> PassObjectSizeAttr::in(const File &file) {
   }
 }
 
+std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const Reference &r) {
+  return PassObjectSizeAttr::from(r.as_attribute());
+}
+
+std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const TokenContext &t) {
+  return PassObjectSizeAttr::from(t.as_attribute());
+}
+
 PassObjectSizeAttrSpelling PassObjectSizeAttr::semantic_spelling(void) const {
   return static_cast<PassObjectSizeAttrSpelling>(impl->reader.getVal10());
 }

@@ -145,6 +145,14 @@ gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::in(const File &file) {
   }
 }
 
+std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const Reference &r) {
+  return ObjCAtCatchStmt::from(r.as_statement());
+}
+
+std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const TokenContext &t) {
+  return ObjCAtCatchStmt::from(t.as_statement());
+}
+
 Token ObjCAtCatchStmt::at_catch_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

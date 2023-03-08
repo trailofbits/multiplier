@@ -177,6 +177,14 @@ gap::generator<TemplateDecl> TemplateDecl::in(const File &file) {
   }
 }
 
+std::optional<TemplateDecl> TemplateDecl::from(const Reference &r) {
+  return TemplateDecl::from(r.as_declaration());
+}
+
+std::optional<TemplateDecl> TemplateDecl::from(const TokenContext &t) {
+  return TemplateDecl::from(t.as_declaration());
+}
+
 TemplateParameterList TemplateDecl::template_parameters(void) const {
   RawEntityId eid = impl->reader.getVal52();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));

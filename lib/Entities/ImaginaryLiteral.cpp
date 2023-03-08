@@ -146,6 +146,14 @@ gap::generator<ImaginaryLiteral> ImaginaryLiteral::in(const File &file) {
   }
 }
 
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const Reference &r) {
+  return ImaginaryLiteral::from(r.as_statement());
+}
+
+std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const TokenContext &t) {
+  return ImaginaryLiteral::from(t.as_statement());
+}
+
 Expr ImaginaryLiteral::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

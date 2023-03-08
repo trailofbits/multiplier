@@ -159,6 +159,14 @@ gap::generator<FriendDecl> FriendDecl::in(const File &file) {
   }
 }
 
+std::optional<FriendDecl> FriendDecl::from(const Reference &r) {
+  return FriendDecl::from(r.as_declaration());
+}
+
+std::optional<FriendDecl> FriendDecl::from(const TokenContext &t) {
+  return FriendDecl::from(t.as_declaration());
+}
+
 std::optional<NamedDecl> FriendDecl::friend_declaration(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal45();

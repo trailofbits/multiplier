@@ -147,6 +147,14 @@ gap::generator<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::in(const 
   }
 }
 
+std::optional<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::from(const Reference &r) {
+  return OMPMaskedTaskLoopDirective::from(r.as_statement());
+}
+
+std::optional<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::from(const TokenContext &t) {
+  return OMPMaskedTaskLoopDirective::from(t.as_statement());
+}
+
 bool OMPMaskedTaskLoopDirective::has_cancel(void) const {
   return impl->reader.getVal23();
 }

@@ -95,6 +95,14 @@ gap::generator<UnaryTransformType> UnaryTransformType::in(const File &file) {
   }
 }
 
+std::optional<UnaryTransformType> UnaryTransformType::from(const Reference &r) {
+  return UnaryTransformType::from(r.as_type());
+}
+
+std::optional<UnaryTransformType> UnaryTransformType::from(const TokenContext &t) {
+  return UnaryTransformType::from(t.as_type());
+}
+
 Type UnaryTransformType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

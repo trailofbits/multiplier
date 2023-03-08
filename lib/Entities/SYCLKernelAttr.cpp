@@ -96,6 +96,14 @@ gap::generator<SYCLKernelAttr> SYCLKernelAttr::in(const File &file) {
   }
 }
 
+std::optional<SYCLKernelAttr> SYCLKernelAttr::from(const Reference &r) {
+  return SYCLKernelAttr::from(r.as_attribute());
+}
+
+std::optional<SYCLKernelAttr> SYCLKernelAttr::from(const TokenContext &t) {
+  return SYCLKernelAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

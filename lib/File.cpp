@@ -275,6 +275,11 @@ gap::generator<Fragment> File::fragments(void) const & {
   }
 }
 
+// Return all file paths associated with this file.
+gap::generator<std::filesystem::path> File::paths(void) const & {
+  return impl->ep->ListPathsForFile(impl->ep, FileId(impl->file_id));
+}
+
 FragmentIdList File::fragment_ids(void) const {
   FileId fid(impl->file_id);
   return impl->ep->ListFragmentsInFile(impl->ep, fid);

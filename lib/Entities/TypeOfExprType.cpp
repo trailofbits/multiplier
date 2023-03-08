@@ -96,6 +96,14 @@ gap::generator<TypeOfExprType> TypeOfExprType::in(const File &file) {
   }
 }
 
+std::optional<TypeOfExprType> TypeOfExprType::from(const Reference &r) {
+  return TypeOfExprType::from(r.as_type());
+}
+
+std::optional<TypeOfExprType> TypeOfExprType::from(const TokenContext &t) {
+  return TypeOfExprType::from(t.as_type());
+}
+
 Type TypeOfExprType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

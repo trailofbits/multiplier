@@ -147,6 +147,14 @@ gap::generator<CXXForRangeStmt> CXXForRangeStmt::in(const File &file) {
   }
 }
 
+std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const Reference &r) {
+  return CXXForRangeStmt::from(r.as_statement());
+}
+
+std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const TokenContext &t) {
+  return CXXForRangeStmt::from(t.as_statement());
+}
+
 DeclStmt CXXForRangeStmt::begin_statement(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

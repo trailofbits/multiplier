@@ -146,6 +146,14 @@ gap::generator<ArrayInitIndexExpr> ArrayInitIndexExpr::in(const File &file) {
   }
 }
 
+std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::from(const Reference &r) {
+  return ArrayInitIndexExpr::from(r.as_statement());
+}
+
+std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::from(const TokenContext &t) {
+  return ArrayInitIndexExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

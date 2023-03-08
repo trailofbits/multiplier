@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DependentScopeDeclRefExpr;
 class Expr;
@@ -68,13 +57,8 @@ class DependentScopeDeclRefExpr : public Expr {
     }
   }
 
-  inline static std::optional<DependentScopeDeclRefExpr> from(const Reference &r) {
-    return DependentScopeDeclRefExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<DependentScopeDeclRefExpr> from(const TokenContext &t) {
-    return DependentScopeDeclRefExpr::from(t.as_statement());
-  }
+  static std::optional<DependentScopeDeclRefExpr> from(const Reference &r);
+  static std::optional<DependentScopeDeclRefExpr> from(const TokenContext &t);
 
   Token l_angle_token(void) const;
   Token r_angle_token(void) const;

@@ -96,6 +96,14 @@ gap::generator<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::in(
   }
 }
 
+std::optional<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::from(const Reference &r) {
+  return OpenCLGenericAddressSpaceAttr::from(r.as_attribute());
+}
+
+std::optional<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::from(const TokenContext &t) {
+  return OpenCLGenericAddressSpaceAttr::from(t.as_attribute());
+}
+
 OpenCLGenericAddressSpaceAttrSpelling OpenCLGenericAddressSpaceAttr::semantic_spelling(void) const {
   return static_cast<OpenCLGenericAddressSpaceAttrSpelling>(impl->reader.getVal10());
 }

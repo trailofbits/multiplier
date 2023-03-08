@@ -96,6 +96,14 @@ gap::generator<ArmMveStrictPolymorphismAttr> ArmMveStrictPolymorphismAttr::in(co
   }
 }
 
+std::optional<ArmMveStrictPolymorphismAttr> ArmMveStrictPolymorphismAttr::from(const Reference &r) {
+  return ArmMveStrictPolymorphismAttr::from(r.as_attribute());
+}
+
+std::optional<ArmMveStrictPolymorphismAttr> ArmMveStrictPolymorphismAttr::from(const TokenContext &t) {
+  return ArmMveStrictPolymorphismAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

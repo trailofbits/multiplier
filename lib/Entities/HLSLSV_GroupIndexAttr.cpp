@@ -96,6 +96,14 @@ gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const File &file
   }
 }
 
+std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const Reference &r) {
+  return HLSLSV_GroupIndexAttr::from(r.as_attribute());
+}
+
+std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const TokenContext &t) {
+  return HLSLSV_GroupIndexAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

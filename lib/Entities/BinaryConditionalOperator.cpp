@@ -148,6 +148,14 @@ gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const Fi
   }
 }
 
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const Reference &r) {
+  return BinaryConditionalOperator::from(r.as_statement());
+}
+
+std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const TokenContext &t) {
+  return BinaryConditionalOperator::from(t.as_statement());
+}
+
 Expr BinaryConditionalOperator::common(void) const {
   RawEntityId eid = impl->reader.getVal43();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

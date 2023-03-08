@@ -111,6 +111,14 @@ gap::generator<MacroStringify> MacroStringify::in(const File &file) {
   }
 }
 
+std::optional<MacroStringify> MacroStringify::from(const Reference &r) {
+  return MacroStringify::from(r.as_macro());
+}
+
+std::optional<MacroStringify> MacroStringify::from(const TokenContext &t) {
+  return MacroStringify::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

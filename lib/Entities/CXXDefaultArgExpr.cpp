@@ -147,6 +147,14 @@ gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Reference &r) {
+  return CXXDefaultArgExpr::from(r.as_statement());
+}
+
+std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const TokenContext &t) {
+  return CXXDefaultArgExpr::from(t.as_statement());
+}
+
 Expr CXXDefaultArgExpr::expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

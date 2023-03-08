@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class GNUNullExpr;
@@ -68,13 +57,8 @@ class GNUNullExpr : public Expr {
     }
   }
 
-  inline static std::optional<GNUNullExpr> from(const Reference &r) {
-    return GNUNullExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<GNUNullExpr> from(const TokenContext &t) {
-    return GNUNullExpr::from(t.as_statement());
-  }
+  static std::optional<GNUNullExpr> from(const Reference &r);
+  static std::optional<GNUNullExpr> from(const TokenContext &t);
 
   Token token_token(void) const;
 };

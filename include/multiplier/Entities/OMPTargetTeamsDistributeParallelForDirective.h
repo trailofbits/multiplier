@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPLoopDirective.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class OMPExecutableDirective;
@@ -71,13 +60,8 @@ class OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
     }
   }
 
-  inline static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const Reference &r) {
-    return OMPTargetTeamsDistributeParallelForDirective::from(r.as_statement());
-  }
-
-  inline static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const TokenContext &t) {
-    return OMPTargetTeamsDistributeParallelForDirective::from(t.as_statement());
-  }
+  static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const Reference &r);
+  static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const TokenContext &t);
 
   Expr task_reduction_reference_expression(void) const;
   bool has_cancel(void) const;

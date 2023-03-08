@@ -95,6 +95,14 @@ gap::generator<OMPCaptureKindAttr> OMPCaptureKindAttr::in(const File &file) {
   }
 }
 
+std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from(const Reference &r) {
+  return OMPCaptureKindAttr::from(r.as_attribute());
+}
+
+std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from(const TokenContext &t) {
+  return OMPCaptureKindAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

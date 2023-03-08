@@ -140,6 +140,14 @@ gap::generator<Macro> Macro::in(const File &file, std::span<MacroKind> kinds) {
   }
 }
 
+std::optional<Macro> Macro::from(const Reference &r) {
+  return r.as_macro();
+}
+
+std::optional<Macro> Macro::from(const TokenContext &t) {
+  return t.as_macro();
+}
+
 MacroKind Macro::kind(void) const {
   return static_cast<MacroKind>(impl->reader.getVal0());
 }

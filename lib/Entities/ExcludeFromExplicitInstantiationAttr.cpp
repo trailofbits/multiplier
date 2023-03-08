@@ -96,6 +96,14 @@ gap::generator<ExcludeFromExplicitInstantiationAttr> ExcludeFromExplicitInstanti
   }
 }
 
+std::optional<ExcludeFromExplicitInstantiationAttr> ExcludeFromExplicitInstantiationAttr::from(const Reference &r) {
+  return ExcludeFromExplicitInstantiationAttr::from(r.as_attribute());
+}
+
+std::optional<ExcludeFromExplicitInstantiationAttr> ExcludeFromExplicitInstantiationAttr::from(const TokenContext &t) {
+  return ExcludeFromExplicitInstantiationAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

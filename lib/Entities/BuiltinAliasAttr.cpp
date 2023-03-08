@@ -95,6 +95,14 @@ gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const File &file) {
   }
 }
 
+std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const Reference &r) {
+  return BuiltinAliasAttr::from(r.as_attribute());
+}
+
+std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const TokenContext &t) {
+  return BuiltinAliasAttr::from(t.as_attribute());
+}
+
 BuiltinAliasAttrSpelling BuiltinAliasAttr::semantic_spelling(void) const {
   return static_cast<BuiltinAliasAttrSpelling>(impl->reader.getVal10());
 }

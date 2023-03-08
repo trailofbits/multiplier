@@ -147,6 +147,14 @@ gap::generator<UserDefinedLiteral> UserDefinedLiteral::in(const File &file) {
   }
 }
 
+std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const Reference &r) {
+  return UserDefinedLiteral::from(r.as_statement());
+}
+
+std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const TokenContext &t) {
+  return UserDefinedLiteral::from(t.as_statement());
+}
+
 Expr UserDefinedLiteral::cooked_literal(void) const {
   RawEntityId eid = impl->reader.getVal44();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

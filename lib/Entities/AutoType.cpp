@@ -98,6 +98,14 @@ gap::generator<AutoType> AutoType::in(const File &file) {
   }
 }
 
+std::optional<AutoType> AutoType::from(const Reference &r) {
+  return AutoType::from(r.as_type());
+}
+
+std::optional<AutoType> AutoType::from(const TokenContext &t) {
+  return AutoType::from(t.as_type());
+}
+
 AutoTypeKeyword AutoType::keyword(void) const {
   return static_cast<AutoTypeKeyword>(impl->reader.getVal235());
 }

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class ObjCAtCatchStmt;
 class ObjCAtFinallyStmt;
@@ -66,13 +55,8 @@ class ObjCAtTryStmt : public Stmt {
     }
   }
 
-  inline static std::optional<ObjCAtTryStmt> from(const Reference &r) {
-    return ObjCAtTryStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCAtTryStmt> from(const TokenContext &t) {
-    return ObjCAtTryStmt::from(t.as_statement());
-  }
+  static std::optional<ObjCAtTryStmt> from(const Reference &r);
+  static std::optional<ObjCAtTryStmt> from(const TokenContext &t);
 
   Token at_try_token(void) const;
   ObjCAtFinallyStmt finally_statement(void) const;

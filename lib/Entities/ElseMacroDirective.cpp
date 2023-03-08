@@ -112,6 +112,14 @@ gap::generator<ElseMacroDirective> ElseMacroDirective::in(const File &file) {
   }
 }
 
+std::optional<ElseMacroDirective> ElseMacroDirective::from(const Reference &r) {
+  return ElseMacroDirective::from(r.as_macro());
+}
+
+std::optional<ElseMacroDirective> ElseMacroDirective::from(const TokenContext &t) {
+  return ElseMacroDirective::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

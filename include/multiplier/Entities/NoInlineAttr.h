@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "DeclOrStmtAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class DeclOrStmtAttr;
 class InheritableAttr;
@@ -58,13 +47,8 @@ class NoInlineAttr : public DeclOrStmtAttr {
     }
   }
 
-  inline static std::optional<NoInlineAttr> from(const Reference &r) {
-    return NoInlineAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<NoInlineAttr> from(const TokenContext &t) {
-    return NoInlineAttr::from(t.as_attribute());
-  }
+  static std::optional<NoInlineAttr> from(const Reference &r);
+  static std::optional<NoInlineAttr> from(const TokenContext &t);
 
   bool is_clang_no_inline(void) const;
 };

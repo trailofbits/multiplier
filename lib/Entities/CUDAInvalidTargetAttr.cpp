@@ -96,6 +96,14 @@ gap::generator<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::in(const File &file
   }
 }
 
+std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from(const Reference &r) {
+  return CUDAInvalidTargetAttr::from(r.as_attribute());
+}
+
+std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from(const TokenContext &t) {
+  return CUDAInvalidTargetAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

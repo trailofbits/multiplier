@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "UnusedAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class Token;
@@ -57,13 +46,8 @@ class UnusedAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<UnusedAttr> from(const Reference &r) {
-    return UnusedAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<UnusedAttr> from(const TokenContext &t) {
-    return UnusedAttr::from(t.as_attribute());
-  }
+  static std::optional<UnusedAttr> from(const Reference &r);
+  static std::optional<UnusedAttr> from(const TokenContext &t);
 
   UnusedAttrSpelling semantic_spelling(void) const;
 };

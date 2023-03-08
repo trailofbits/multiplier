@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "HLSLShaderAttrShaderType.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class HLSLShaderAttr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class HLSLShaderAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<HLSLShaderAttr> from(const Reference &r) {
-    return HLSLShaderAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<HLSLShaderAttr> from(const TokenContext &t) {
-    return HLSLShaderAttr::from(t.as_attribute());
-  }
+  static std::optional<HLSLShaderAttr> from(const Reference &r);
+  static std::optional<HLSLShaderAttr> from(const TokenContext &t);
 
   HLSLShaderAttrShaderType type(void) const;
 };

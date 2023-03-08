@@ -96,6 +96,14 @@ gap::generator<UnavailableAttr> UnavailableAttr::in(const File &file) {
   }
 }
 
+std::optional<UnavailableAttr> UnavailableAttr::from(const Reference &r) {
+  return UnavailableAttr::from(r.as_attribute());
+}
+
+std::optional<UnavailableAttr> UnavailableAttr::from(const TokenContext &t) {
+  return UnavailableAttr::from(t.as_attribute());
+}
+
 UnavailableAttrImplicitReason UnavailableAttr::implicit_reason(void) const {
   return static_cast<UnavailableAttrImplicitReason>(impl->reader.getVal10());
 }

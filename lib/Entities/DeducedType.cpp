@@ -99,6 +99,14 @@ gap::generator<DeducedType> DeducedType::in(const File &file) {
   }
 }
 
+std::optional<DeducedType> DeducedType::from(const Reference &r) {
+  return DeducedType::from(r.as_type());
+}
+
+std::optional<DeducedType> DeducedType::from(const TokenContext &t) {
+  return DeducedType::from(t.as_type());
+}
+
 Type DeducedType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

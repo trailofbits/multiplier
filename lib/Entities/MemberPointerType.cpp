@@ -96,6 +96,14 @@ gap::generator<MemberPointerType> MemberPointerType::in(const File &file) {
   }
 }
 
+std::optional<MemberPointerType> MemberPointerType::from(const Reference &r) {
+  return MemberPointerType::from(r.as_type());
+}
+
+std::optional<MemberPointerType> MemberPointerType::from(const TokenContext &t) {
+  return MemberPointerType::from(t.as_type());
+}
+
 Type MemberPointerType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

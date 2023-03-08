@@ -96,6 +96,14 @@ gap::generator<AVRInterruptAttr> AVRInterruptAttr::in(const File &file) {
   }
 }
 
+std::optional<AVRInterruptAttr> AVRInterruptAttr::from(const Reference &r) {
+  return AVRInterruptAttr::from(r.as_attribute());
+}
+
+std::optional<AVRInterruptAttr> AVRInterruptAttr::from(const TokenContext &t) {
+  return AVRInterruptAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

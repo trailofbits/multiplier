@@ -161,6 +161,14 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const File &
   }
 }
 
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Reference &r) {
+  return NonTypeTemplateParmDecl::from(r.as_declaration());
+}
+
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const TokenContext &t) {
+  return NonTypeTemplateParmDecl::from(t.as_declaration());
+}
+
 bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const {
   return impl->reader.getVal71();
 }

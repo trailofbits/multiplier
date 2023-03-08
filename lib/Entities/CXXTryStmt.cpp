@@ -146,6 +146,14 @@ gap::generator<CXXTryStmt> CXXTryStmt::in(const File &file) {
   }
 }
 
+std::optional<CXXTryStmt> CXXTryStmt::from(const Reference &r) {
+  return CXXTryStmt::from(r.as_statement());
+}
+
+std::optional<CXXTryStmt> CXXTryStmt::from(const TokenContext &t) {
+  return CXXTryStmt::from(t.as_statement());
+}
+
 CompoundStmt CXXTryStmt::try_block(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

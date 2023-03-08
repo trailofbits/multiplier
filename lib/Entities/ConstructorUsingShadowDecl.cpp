@@ -159,6 +159,14 @@ gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::in(const 
   }
 }
 
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const Reference &r) {
+  return ConstructorUsingShadowDecl::from(r.as_declaration());
+}
+
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const TokenContext &t) {
+  return ConstructorUsingShadowDecl::from(t.as_declaration());
+}
+
 bool ConstructorUsingShadowDecl::constructs_virtual_base(void) const {
   return impl->reader.getVal70();
 }

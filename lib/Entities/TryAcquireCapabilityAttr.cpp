@@ -97,6 +97,14 @@ gap::generator<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::in(const File
   }
 }
 
+std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const Reference &r) {
+  return TryAcquireCapabilityAttr::from(r.as_attribute());
+}
+
+std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const TokenContext &t) {
+  return TryAcquireCapabilityAttr::from(t.as_attribute());
+}
+
 TryAcquireCapabilityAttrSpelling TryAcquireCapabilityAttr::semantic_spelling(void) const {
   return static_cast<TryAcquireCapabilityAttrSpelling>(impl->reader.getVal10());
 }

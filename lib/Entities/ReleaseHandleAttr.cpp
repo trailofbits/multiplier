@@ -97,6 +97,14 @@ gap::generator<ReleaseHandleAttr> ReleaseHandleAttr::in(const File &file) {
   }
 }
 
+std::optional<ReleaseHandleAttr> ReleaseHandleAttr::from(const Reference &r) {
+  return ReleaseHandleAttr::from(r.as_attribute());
+}
+
+std::optional<ReleaseHandleAttr> ReleaseHandleAttr::from(const TokenContext &t) {
+  return ReleaseHandleAttr::from(t.as_attribute());
+}
+
 std::string_view ReleaseHandleAttr::handle_type(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

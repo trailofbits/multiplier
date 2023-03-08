@@ -167,6 +167,14 @@ gap::generator<TypedefNameDecl> TypedefNameDecl::in(const File &file) {
   }
 }
 
+std::optional<TypedefNameDecl> TypedefNameDecl::from(const Reference &r) {
+  return TypedefNameDecl::from(r.as_declaration());
+}
+
+std::optional<TypedefNameDecl> TypedefNameDecl::from(const TokenContext &t) {
+  return TypedefNameDecl::from(t.as_declaration());
+}
+
 std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal53();

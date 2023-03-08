@@ -96,6 +96,14 @@ gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const File &file) {
   }
 }
 
+std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const Reference &r) {
+  return MipsShortCallAttr::from(r.as_attribute());
+}
+
+std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const TokenContext &t) {
+  return MipsShortCallAttr::from(t.as_attribute());
+}
+
 MipsShortCallAttrSpelling MipsShortCallAttr::semantic_spelling(void) const {
   return static_cast<MipsShortCallAttrSpelling>(impl->reader.getVal10());
 }

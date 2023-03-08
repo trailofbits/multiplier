@@ -96,6 +96,14 @@ gap::generator<DisableSanitizerInstrumentationAttr> DisableSanitizerInstrumentat
   }
 }
 
+std::optional<DisableSanitizerInstrumentationAttr> DisableSanitizerInstrumentationAttr::from(const Reference &r) {
+  return DisableSanitizerInstrumentationAttr::from(r.as_attribute());
+}
+
+std::optional<DisableSanitizerInstrumentationAttr> DisableSanitizerInstrumentationAttr::from(const TokenContext &t) {
+  return DisableSanitizerInstrumentationAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

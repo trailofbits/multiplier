@@ -59,6 +59,7 @@ class SQLiteEntityProviderImpl {
   sqlite::Connection db;
   sqlite::Statement get_version_number;
   sqlite::Statement get_file_paths;
+  sqlite::Statement get_file_paths_by_id;
   sqlite::Statement get_file_fragments;
   sqlite::Statement clear_entity_id_list;
   sqlite::Statement add_entity_id_to_list;
@@ -195,6 +196,8 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "SELECT COUNT(rowid) FROM version WHERE action = ?1")),
       get_file_paths(db.Prepare(
           "SELECT file_id, path FROM file_path")),
+      get_file_paths_by_id(db.Prepare(
+          "SELECT path FROM file_path WHERE file_id = ?1")),
       get_file_fragments(db.Prepare(
           "SELECT DISTINCT(fragment_id) "
           "FROM fragment_file "
@@ -397,8 +400,29 @@ FilePathMap SQLiteEntityProvider::ListFiles(const Ptr &) {
   return res;
 }
 
+// Get the list of paths associated with a given file id.
+gap::generator<std::filesystem::path> SQLiteEntityProvider::ListPathsForFile(
+    const Ptr &, PackedFileId file_id) {
+  
+  std::vector<std::filesystem::path> paths;
+  paths.reserve(2u);
+  
+  ImplPtr context = impl.Lock();
+  sqlite::Statement &query = context->get_file_paths_by_id;
+  query.BindValues(file_id.Pack());
+
+  while (query.ExecuteStep()) {
+    query.Row().Columns(paths.emplace_back());
+  }
+  query.Reset();
+
+  for (auto &path : paths) {
+    co_yield std::move(path);
+  }
+}
+
 FragmentIdList SQLiteEntityProvider::ListFragmentsInFile(
-    const Ptr &, SpecificEntityId<FileId> file_id) {
+    const Ptr &, PackedFileId file_id) {
 
   FragmentIdList res;
   res.reserve(128u);

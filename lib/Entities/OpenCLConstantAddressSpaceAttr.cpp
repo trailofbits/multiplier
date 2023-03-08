@@ -96,6 +96,14 @@ gap::generator<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::i
   }
 }
 
+std::optional<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::from(const Reference &r) {
+  return OpenCLConstantAddressSpaceAttr::from(r.as_attribute());
+}
+
+std::optional<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::from(const TokenContext &t) {
+  return OpenCLConstantAddressSpaceAttr::from(t.as_attribute());
+}
+
 OpenCLConstantAddressSpaceAttrSpelling OpenCLConstantAddressSpaceAttr::semantic_spelling(void) const {
   return static_cast<OpenCLConstantAddressSpaceAttrSpelling>(impl->reader.getVal10());
 }

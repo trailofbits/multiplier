@@ -97,6 +97,14 @@ gap::generator<AlwaysInlineAttr> AlwaysInlineAttr::in(const File &file) {
   }
 }
 
+std::optional<AlwaysInlineAttr> AlwaysInlineAttr::from(const Reference &r) {
+  return AlwaysInlineAttr::from(r.as_attribute());
+}
+
+std::optional<AlwaysInlineAttr> AlwaysInlineAttr::from(const TokenContext &t) {
+  return AlwaysInlineAttr::from(t.as_attribute());
+}
+
 AlwaysInlineAttrSpelling AlwaysInlineAttr::semantic_spelling(void) const {
   return static_cast<AlwaysInlineAttrSpelling>(impl->reader.getVal10());
 }

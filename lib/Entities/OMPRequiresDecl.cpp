@@ -157,6 +157,14 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::in(const File &file) {
   }
 }
 
+std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const Reference &r) {
+  return OMPRequiresDecl::from(r.as_declaration());
+}
+
+std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const TokenContext &t) {
+  return OMPRequiresDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -96,6 +96,14 @@ gap::generator<OverrideAttr> OverrideAttr::in(const File &file) {
   }
 }
 
+std::optional<OverrideAttr> OverrideAttr::from(const Reference &r) {
+  return OverrideAttr::from(r.as_attribute());
+}
+
+std::optional<OverrideAttr> OverrideAttr::from(const TokenContext &t) {
+  return OverrideAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

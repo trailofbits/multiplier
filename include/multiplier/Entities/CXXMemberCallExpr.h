@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CallExpr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXMemberCallExpr;
 class CXXMethodDecl;
 class CXXRecordDecl;
@@ -73,13 +62,8 @@ class CXXMemberCallExpr : public CallExpr {
     }
   }
 
-  inline static std::optional<CXXMemberCallExpr> from(const Reference &r) {
-    return CXXMemberCallExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXMemberCallExpr> from(const TokenContext &t) {
-    return CXXMemberCallExpr::from(t.as_statement());
-  }
+  static std::optional<CXXMemberCallExpr> from(const Reference &r);
+  static std::optional<CXXMemberCallExpr> from(const TokenContext &t);
 
   Expr implicit_object_argument(void) const;
   std::optional<CXXMethodDecl> method_declaration(void) const;

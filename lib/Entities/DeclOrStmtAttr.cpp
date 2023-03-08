@@ -103,6 +103,14 @@ gap::generator<DeclOrStmtAttr> DeclOrStmtAttr::in(const File &file) {
   }
 }
 
+std::optional<DeclOrStmtAttr> DeclOrStmtAttr::from(const Reference &r) {
+  return DeclOrStmtAttr::from(r.as_attribute());
+}
+
+std::optional<DeclOrStmtAttr> DeclOrStmtAttr::from(const TokenContext &t) {
+  return DeclOrStmtAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

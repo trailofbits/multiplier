@@ -110,6 +110,14 @@ gap::generator<MacroArgument> MacroArgument::in(const File &file) {
   }
 }
 
+std::optional<MacroArgument> MacroArgument::from(const Reference &r) {
+  return MacroArgument::from(r.as_macro());
+}
+
+std::optional<MacroArgument> MacroArgument::from(const TokenContext &t) {
+  return MacroArgument::from(t.as_macro());
+}
+
 bool MacroArgument::is_variadic(void) const {
   return impl->reader.getVal6();
 }

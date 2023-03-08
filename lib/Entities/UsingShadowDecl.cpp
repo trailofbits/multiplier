@@ -161,6 +161,14 @@ gap::generator<UsingShadowDecl> UsingShadowDecl::in(const File &file) {
   }
 }
 
+std::optional<UsingShadowDecl> UsingShadowDecl::from(const Reference &r) {
+  return UsingShadowDecl::from(r.as_declaration());
+}
+
+std::optional<UsingShadowDecl> UsingShadowDecl::from(const TokenContext &t) {
+  return UsingShadowDecl::from(t.as_declaration());
+}
+
 BaseUsingDecl UsingShadowDecl::introducer(void) const {
   RawEntityId eid = impl->reader.getVal52();
   return BaseUsingDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

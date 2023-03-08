@@ -96,6 +96,14 @@ gap::generator<SwiftCallAttr> SwiftCallAttr::in(const File &file) {
   }
 }
 
+std::optional<SwiftCallAttr> SwiftCallAttr::from(const Reference &r) {
+  return SwiftCallAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftCallAttr> SwiftCallAttr::from(const TokenContext &t) {
+  return SwiftCallAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

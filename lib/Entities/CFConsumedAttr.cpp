@@ -97,6 +97,14 @@ gap::generator<CFConsumedAttr> CFConsumedAttr::in(const File &file) {
   }
 }
 
+std::optional<CFConsumedAttr> CFConsumedAttr::from(const Reference &r) {
+  return CFConsumedAttr::from(r.as_attribute());
+}
+
+std::optional<CFConsumedAttr> CFConsumedAttr::from(const TokenContext &t) {
+  return CFConsumedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

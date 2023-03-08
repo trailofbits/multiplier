@@ -97,6 +97,14 @@ gap::generator<AnnotateAttr> AnnotateAttr::in(const File &file) {
   }
 }
 
+std::optional<AnnotateAttr> AnnotateAttr::from(const Reference &r) {
+  return AnnotateAttr::from(r.as_attribute());
+}
+
+std::optional<AnnotateAttr> AnnotateAttr::from(const TokenContext &t) {
+  return AnnotateAttr::from(t.as_attribute());
+}
+
 std::string_view AnnotateAttr::annotation(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

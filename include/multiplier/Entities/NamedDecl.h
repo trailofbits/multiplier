@@ -8,25 +8,14 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
 #include "Linkage.h"
 #include "ObjCStringFormatFamily.h"
 #include "Visibility.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BindingDecl;
 class BuiltinTemplateDecl;
 class CXXConstructorDecl;
@@ -126,13 +115,8 @@ class NamedDecl : public Decl {
     }
   }
 
-  inline static std::optional<NamedDecl> from(const Reference &r) {
-    return NamedDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<NamedDecl> from(const TokenContext &t) {
-    return NamedDecl::from(t.as_declaration());
-  }
+  static std::optional<NamedDecl> from(const Reference &r);
+  static std::optional<NamedDecl> from(const TokenContext &t);
 
   Linkage formal_linkage(void) const;
   std::string_view name(void) const;

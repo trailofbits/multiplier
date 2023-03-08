@@ -147,6 +147,14 @@ gap::generator<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirect
   }
 }
 
+std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const Reference &r) {
+  return OMPTargetTeamsDistributeDirective::from(r.as_statement());
+}
+
+std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::from(const TokenContext &t) {
+  return OMPTargetTeamsDistributeDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

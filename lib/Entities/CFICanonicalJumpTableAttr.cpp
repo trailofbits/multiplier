@@ -96,6 +96,14 @@ gap::generator<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::in(const Fi
   }
 }
 
+std::optional<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::from(const Reference &r) {
+  return CFICanonicalJumpTableAttr::from(r.as_attribute());
+}
+
+std::optional<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::from(const TokenContext &t) {
+  return CFICanonicalJumpTableAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

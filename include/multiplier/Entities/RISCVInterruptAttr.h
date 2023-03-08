@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "RISCVInterruptAttrInterruptType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class RISCVInterruptAttr;
@@ -57,13 +46,8 @@ class RISCVInterruptAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<RISCVInterruptAttr> from(const Reference &r) {
-    return RISCVInterruptAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<RISCVInterruptAttr> from(const TokenContext &t) {
-    return RISCVInterruptAttr::from(t.as_attribute());
-  }
+  static std::optional<RISCVInterruptAttr> from(const Reference &r);
+  static std::optional<RISCVInterruptAttr> from(const TokenContext &t);
 
   RISCVInterruptAttrInterruptType interrupt(void) const;
 };

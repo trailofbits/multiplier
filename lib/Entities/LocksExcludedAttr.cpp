@@ -96,6 +96,14 @@ gap::generator<LocksExcludedAttr> LocksExcludedAttr::in(const File &file) {
   }
 }
 
+std::optional<LocksExcludedAttr> LocksExcludedAttr::from(const Reference &r) {
+  return LocksExcludedAttr::from(r.as_attribute());
+}
+
+std::optional<LocksExcludedAttr> LocksExcludedAttr::from(const TokenContext &t) {
+  return LocksExcludedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

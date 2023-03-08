@@ -96,6 +96,14 @@ gap::generator<BTFDeclTagAttr> BTFDeclTagAttr::in(const File &file) {
   }
 }
 
+std::optional<BTFDeclTagAttr> BTFDeclTagAttr::from(const Reference &r) {
+  return BTFDeclTagAttr::from(r.as_attribute());
+}
+
+std::optional<BTFDeclTagAttr> BTFDeclTagAttr::from(const TokenContext &t) {
+  return BTFDeclTagAttr::from(t.as_attribute());
+}
+
 std::string_view BTFDeclTagAttr::btf_decl_tag(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

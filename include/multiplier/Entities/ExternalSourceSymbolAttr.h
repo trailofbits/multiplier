@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class ExternalSourceSymbolAttr;
 class InheritableAttr;
@@ -56,13 +45,8 @@ class ExternalSourceSymbolAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<ExternalSourceSymbolAttr> from(const Reference &r) {
-    return ExternalSourceSymbolAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<ExternalSourceSymbolAttr> from(const TokenContext &t) {
-    return ExternalSourceSymbolAttr::from(t.as_attribute());
-  }
+  static std::optional<ExternalSourceSymbolAttr> from(const Reference &r);
+  static std::optional<ExternalSourceSymbolAttr> from(const TokenContext &t);
 
   std::string_view defined_in(void) const;
   bool generated_declaration(void) const;

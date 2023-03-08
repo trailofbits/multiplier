@@ -148,6 +148,14 @@ gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::in(co
   }
 }
 
+std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const Reference &r) {
+  return SubstNonTypeTemplateParmExpr::from(r.as_statement());
+}
+
+std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const TokenContext &t) {
+  return SubstNonTypeTemplateParmExpr::from(t.as_statement());
+}
+
 Token SubstNonTypeTemplateParmExpr::name_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

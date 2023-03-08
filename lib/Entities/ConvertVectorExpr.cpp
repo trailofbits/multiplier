@@ -146,6 +146,14 @@ gap::generator<ConvertVectorExpr> ConvertVectorExpr::in(const File &file) {
   }
 }
 
+std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const Reference &r) {
+  return ConvertVectorExpr::from(r.as_statement());
+}
+
+std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const TokenContext &t) {
+  return ConvertVectorExpr::from(t.as_statement());
+}
+
 Token ConvertVectorExpr::builtin_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

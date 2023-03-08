@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TypeAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AnnotateTypeAttr;
 class Attr;
 class Token;
@@ -56,13 +45,8 @@ class AnnotateTypeAttr : public TypeAttr {
     }
   }
 
-  inline static std::optional<AnnotateTypeAttr> from(const Reference &r) {
-    return AnnotateTypeAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<AnnotateTypeAttr> from(const TokenContext &t) {
-    return AnnotateTypeAttr::from(t.as_attribute());
-  }
+  static std::optional<AnnotateTypeAttr> from(const Reference &r);
+  static std::optional<AnnotateTypeAttr> from(const TokenContext &t);
 
   std::string_view annotation(void) const;
 };

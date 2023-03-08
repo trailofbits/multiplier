@@ -145,6 +145,14 @@ gap::generator<CoreturnStmt> CoreturnStmt::in(const File &file) {
   }
 }
 
+std::optional<CoreturnStmt> CoreturnStmt::from(const Reference &r) {
+  return CoreturnStmt::from(r.as_statement());
+}
+
+std::optional<CoreturnStmt> CoreturnStmt::from(const TokenContext &t) {
+  return CoreturnStmt::from(t.as_statement());
+}
+
 Token CoreturnStmt::keyword_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

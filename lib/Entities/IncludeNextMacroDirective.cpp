@@ -112,6 +112,14 @@ gap::generator<IncludeNextMacroDirective> IncludeNextMacroDirective::in(const Fi
   }
 }
 
+std::optional<IncludeNextMacroDirective> IncludeNextMacroDirective::from(const Reference &r) {
+  return IncludeNextMacroDirective::from(r.as_macro());
+}
+
+std::optional<IncludeNextMacroDirective> IncludeNextMacroDirective::from(const TokenContext &t) {
+  return IncludeNextMacroDirective::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

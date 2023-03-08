@@ -96,6 +96,14 @@ gap::generator<CallableWhenAttr> CallableWhenAttr::in(const File &file) {
   }
 }
 
+std::optional<CallableWhenAttr> CallableWhenAttr::from(const Reference &r) {
+  return CallableWhenAttr::from(r.as_attribute());
+}
+
+std::optional<CallableWhenAttr> CallableWhenAttr::from(const TokenContext &t) {
+  return CallableWhenAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

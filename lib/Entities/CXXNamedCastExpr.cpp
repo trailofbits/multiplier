@@ -162,6 +162,14 @@ gap::generator<CXXNamedCastExpr> CXXNamedCastExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const Reference &r) {
+  return CXXNamedCastExpr::from(r.as_statement());
+}
+
+std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const TokenContext &t) {
+  return CXXNamedCastExpr::from(t.as_statement());
+}
+
 TokenRange CXXNamedCastExpr::angle_brackets(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);

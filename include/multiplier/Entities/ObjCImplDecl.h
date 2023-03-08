@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ObjCContainerDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class ObjCCategoryImplDecl;
@@ -69,13 +58,8 @@ class ObjCImplDecl : public ObjCContainerDecl {
     }
   }
 
-  inline static std::optional<ObjCImplDecl> from(const Reference &r) {
-    return ObjCImplDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCImplDecl> from(const TokenContext &t) {
-    return ObjCImplDecl::from(t.as_declaration());
-  }
+  static std::optional<ObjCImplDecl> from(const Reference &r);
+  static std::optional<ObjCImplDecl> from(const TokenContext &t);
 
   ObjCInterfaceDecl class_interface(void) const;
   std::optional<ObjCPropertyImplDecl> nth_property_implementation(unsigned n) const;

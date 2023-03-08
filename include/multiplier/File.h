@@ -6,9 +6,10 @@
 
 #pragma once
 
+#include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <string_view>
-#include <gap/core/generator.hpp>
 
 #include "Token.h"
 
@@ -143,6 +144,9 @@ class File {
 
   // Return a list of fragments in this file.
   gap::generator<Fragment> fragments(void) const &;
+
+  // Return all file paths associated with this file.
+  gap::generator<std::filesystem::path> paths(void) const &;
 
   // Return the list of fragment ids in the file
   FragmentIdList fragment_ids(void) const;

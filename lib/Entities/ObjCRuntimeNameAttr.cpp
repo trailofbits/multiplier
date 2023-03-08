@@ -95,6 +95,14 @@ gap::generator<ObjCRuntimeNameAttr> ObjCRuntimeNameAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCRuntimeNameAttr> ObjCRuntimeNameAttr::from(const Reference &r) {
+  return ObjCRuntimeNameAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCRuntimeNameAttr> ObjCRuntimeNameAttr::from(const TokenContext &t) {
+  return ObjCRuntimeNameAttr::from(t.as_attribute());
+}
+
 std::string_view ObjCRuntimeNameAttr::metadata_name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

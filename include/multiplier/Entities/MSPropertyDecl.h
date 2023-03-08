@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "DeclaratorDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class MSPropertyDecl;
@@ -71,13 +60,8 @@ class MSPropertyDecl : public DeclaratorDecl {
     }
   }
 
-  inline static std::optional<MSPropertyDecl> from(const Reference &r) {
-    return MSPropertyDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<MSPropertyDecl> from(const TokenContext &t) {
-    return MSPropertyDecl::from(t.as_declaration());
-  }
+  static std::optional<MSPropertyDecl> from(const Reference &r);
+  static std::optional<MSPropertyDecl> from(const TokenContext &t);
 
   bool has_getter(void) const;
   bool has_setter(void) const;

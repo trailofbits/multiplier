@@ -112,6 +112,14 @@ gap::generator<ImportMacroDirective> ImportMacroDirective::in(const File &file) 
   }
 }
 
+std::optional<ImportMacroDirective> ImportMacroDirective::from(const Reference &r) {
+  return ImportMacroDirective::from(r.as_macro());
+}
+
+std::optional<ImportMacroDirective> ImportMacroDirective::from(const TokenContext &t) {
+  return ImportMacroDirective::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -96,6 +96,14 @@ gap::generator<MinVectorWidthAttr> MinVectorWidthAttr::in(const File &file) {
   }
 }
 
+std::optional<MinVectorWidthAttr> MinVectorWidthAttr::from(const Reference &r) {
+  return MinVectorWidthAttr::from(r.as_attribute());
+}
+
+std::optional<MinVectorWidthAttr> MinVectorWidthAttr::from(const TokenContext &t) {
+  return MinVectorWidthAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -146,6 +146,14 @@ gap::generator<PackExpansionExpr> PackExpansionExpr::in(const File &file) {
   }
 }
 
+std::optional<PackExpansionExpr> PackExpansionExpr::from(const Reference &r) {
+  return PackExpansionExpr::from(r.as_statement());
+}
+
+std::optional<PackExpansionExpr> PackExpansionExpr::from(const TokenContext &t) {
+  return PackExpansionExpr::from(t.as_statement());
+}
+
 Token PackExpansionExpr::ellipsis_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

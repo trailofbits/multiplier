@@ -146,6 +146,14 @@ gap::generator<NoInitExpr> NoInitExpr::in(const File &file) {
   }
 }
 
+std::optional<NoInitExpr> NoInitExpr::from(const Reference &r) {
+  return NoInitExpr::from(r.as_statement());
+}
+
+std::optional<NoInitExpr> NoInitExpr::from(const TokenContext &t) {
+  return NoInitExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

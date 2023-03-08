@@ -159,6 +159,14 @@ gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const Reference &r) {
+  return ObjCTypeParamDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const TokenContext &t) {
+  return ObjCTypeParamDecl::from(t.as_declaration());
+}
+
 Token ObjCTypeParamDecl::colon_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
 }

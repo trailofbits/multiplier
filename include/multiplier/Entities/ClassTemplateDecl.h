@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "RedeclarableTemplateDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ClassTemplateDecl;
 class Decl;
 class NamedDecl;
@@ -71,13 +60,8 @@ class ClassTemplateDecl : public RedeclarableTemplateDecl {
     }
   }
 
-  inline static std::optional<ClassTemplateDecl> from(const Reference &r) {
-    return ClassTemplateDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ClassTemplateDecl> from(const TokenContext &t) {
-    return ClassTemplateDecl::from(t.as_declaration());
-  }
+  static std::optional<ClassTemplateDecl> from(const Reference &r);
+  static std::optional<ClassTemplateDecl> from(const TokenContext &t);
 
   bool is_this_declaration_a_definition(void) const;
 };

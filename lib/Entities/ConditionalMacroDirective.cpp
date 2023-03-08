@@ -133,6 +133,14 @@ gap::generator<ConditionalMacroDirective> ConditionalMacroDirective::in(const Fi
   }
 }
 
+std::optional<ConditionalMacroDirective> ConditionalMacroDirective::from(const Reference &r) {
+  return ConditionalMacroDirective::from(r.as_macro());
+}
+
+std::optional<ConditionalMacroDirective> ConditionalMacroDirective::from(const TokenContext &t) {
+  return ConditionalMacroDirective::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

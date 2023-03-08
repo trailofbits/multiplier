@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "FunctionDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConstructorDecl;
 class CXXDeductionGuideDecl;
 class Decl;
@@ -75,13 +64,8 @@ class CXXDeductionGuideDecl : public FunctionDecl {
     }
   }
 
-  inline static std::optional<CXXDeductionGuideDecl> from(const Reference &r) {
-    return CXXDeductionGuideDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const TokenContext &t) {
-    return CXXDeductionGuideDecl::from(t.as_declaration());
-  }
+  static std::optional<CXXDeductionGuideDecl> from(const Reference &r);
+  static std::optional<CXXDeductionGuideDecl> from(const TokenContext &t);
 
   CXXConstructorDecl corresponding_constructor(void) const;
   TemplateDecl deduced_template(void) const;

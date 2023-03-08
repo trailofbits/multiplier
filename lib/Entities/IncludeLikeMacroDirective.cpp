@@ -122,6 +122,14 @@ gap::generator<IncludeLikeMacroDirective> IncludeLikeMacroDirective::in(const Fi
   }
 }
 
+std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const Reference &r) {
+  return IncludeLikeMacroDirective::from(r.as_macro());
+}
+
+std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const TokenContext &t) {
+  return IncludeLikeMacroDirective::from(t.as_macro());
+}
+
 std::optional<File> IncludeLikeMacroDirective::included_file(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal9();

@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CXXRecordDecl.h"
 #include "TemplateSpecializationKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXRecordDecl;
 class ClassTemplateDecl;
 class ClassTemplatePartialSpecializationDecl;
@@ -80,13 +69,8 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
     }
   }
 
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const Reference &r) {
-    return ClassTemplateSpecializationDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &t) {
-    return ClassTemplateSpecializationDecl::from(t.as_declaration());
-  }
+  static std::optional<ClassTemplateSpecializationDecl> from(const Reference &r);
+  static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &t);
 
   Token extern_token(void) const;
   Token point_of_instantiation(void) const;

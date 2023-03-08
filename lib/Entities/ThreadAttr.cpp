@@ -95,6 +95,14 @@ gap::generator<ThreadAttr> ThreadAttr::in(const File &file) {
   }
 }
 
+std::optional<ThreadAttr> ThreadAttr::from(const Reference &r) {
+  return ThreadAttr::from(r.as_attribute());
+}
+
+std::optional<ThreadAttr> ThreadAttr::from(const TokenContext &t) {
+  return ThreadAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

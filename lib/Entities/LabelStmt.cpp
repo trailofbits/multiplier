@@ -146,6 +146,14 @@ gap::generator<LabelStmt> LabelStmt::in(const File &file) {
   }
 }
 
+std::optional<LabelStmt> LabelStmt::from(const Reference &r) {
+  return LabelStmt::from(r.as_statement());
+}
+
+std::optional<LabelStmt> LabelStmt::from(const TokenContext &t) {
+  return LabelStmt::from(t.as_statement());
+}
+
 LabelDecl LabelStmt::declaration(void) const {
   RawEntityId eid = impl->reader.getVal10();
   return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

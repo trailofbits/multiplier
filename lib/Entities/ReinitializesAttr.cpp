@@ -96,6 +96,14 @@ gap::generator<ReinitializesAttr> ReinitializesAttr::in(const File &file) {
   }
 }
 
+std::optional<ReinitializesAttr> ReinitializesAttr::from(const Reference &r) {
+  return ReinitializesAttr::from(r.as_attribute());
+}
+
+std::optional<ReinitializesAttr> ReinitializesAttr::from(const TokenContext &t) {
+  return ReinitializesAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

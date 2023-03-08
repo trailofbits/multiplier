@@ -96,6 +96,14 @@ gap::generator<Mips16Attr> Mips16Attr::in(const File &file) {
   }
 }
 
+std::optional<Mips16Attr> Mips16Attr::from(const Reference &r) {
+  return Mips16Attr::from(r.as_attribute());
+}
+
+std::optional<Mips16Attr> Mips16Attr::from(const TokenContext &t) {
+  return Mips16Attr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

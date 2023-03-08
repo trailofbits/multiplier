@@ -97,6 +97,14 @@ gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const File
   }
 }
 
+std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const Reference &r) {
+  return OMPDeclareTargetDeclAttr::from(r.as_attribute());
+}
+
+std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const TokenContext &t) {
+  return OMPDeclareTargetDeclAttr::from(t.as_attribute());
+}
+
 OMPDeclareTargetDeclAttrDevTypeTy OMPDeclareTargetDeclAttr::dev_type(void) const {
   return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(impl->reader.getVal10());
 }

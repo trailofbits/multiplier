@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class DLLImportAttr;
 class InheritableAttr;
@@ -56,13 +45,8 @@ class DLLImportAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<DLLImportAttr> from(const Reference &r) {
-    return DLLImportAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<DLLImportAttr> from(const TokenContext &t) {
-    return DLLImportAttr::from(t.as_attribute());
-  }
+  static std::optional<DLLImportAttr> from(const Reference &r);
+  static std::optional<DLLImportAttr> from(const TokenContext &t);
 
 };
 

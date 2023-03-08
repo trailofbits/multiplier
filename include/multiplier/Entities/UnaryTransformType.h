@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
 #include "UnaryTransformTypeUTTKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Token;
 class Type;
 class UnaryTransformType;
@@ -55,13 +44,8 @@ class UnaryTransformType : public Type {
     }
   }
 
-  inline static std::optional<UnaryTransformType> from(const Reference &r) {
-    return UnaryTransformType::from(r.as_type());
-  }
-
-  inline static std::optional<UnaryTransformType> from(const TokenContext &t) {
-    return UnaryTransformType::from(t.as_type());
-  }
+  static std::optional<UnaryTransformType> from(const Reference &r);
+  static std::optional<UnaryTransformType> from(const TokenContext &t);
 
   Type desugar(void) const;
   Type base_type(void) const;

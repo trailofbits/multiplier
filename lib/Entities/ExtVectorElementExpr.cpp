@@ -146,6 +146,14 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const File &file) 
   }
 }
 
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Reference &r) {
+  return ExtVectorElementExpr::from(r.as_statement());
+}
+
+std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const TokenContext &t) {
+  return ExtVectorElementExpr::from(t.as_statement());
+}
+
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
   return impl->reader.getVal88();
 }

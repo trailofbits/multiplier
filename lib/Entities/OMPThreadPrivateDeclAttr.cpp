@@ -96,6 +96,14 @@ gap::generator<OMPThreadPrivateDeclAttr> OMPThreadPrivateDeclAttr::in(const File
   }
 }
 
+std::optional<OMPThreadPrivateDeclAttr> OMPThreadPrivateDeclAttr::from(const Reference &r) {
+  return OMPThreadPrivateDeclAttr::from(r.as_attribute());
+}
+
+std::optional<OMPThreadPrivateDeclAttr> OMPThreadPrivateDeclAttr::from(const TokenContext &t) {
+  return OMPThreadPrivateDeclAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

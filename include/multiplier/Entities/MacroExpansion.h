@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "MacroSubstitution.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DefineMacroDirective;
 class Macro;
 class MacroArgument;
@@ -62,13 +51,8 @@ class MacroExpansion : public MacroSubstitution {
     }
   }
 
-  inline static std::optional<MacroExpansion> from(const Reference &r) {
-    return MacroExpansion::from(r.as_macro());
-  }
-
-  inline static std::optional<MacroExpansion> from(const TokenContext &t) {
-    return MacroExpansion::from(t.as_macro());
-  }
+  static std::optional<MacroExpansion> from(const Reference &r);
+  static std::optional<MacroExpansion> from(const TokenContext &t);
 
   std::optional<DefineMacroDirective> definition(void) const;
   std::optional<MacroArgument> nth_argument(unsigned n) const;

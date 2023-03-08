@@ -146,6 +146,14 @@ gap::generator<OMPTaskgroupDirective> OMPTaskgroupDirective::in(const File &file
   }
 }
 
+std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const Reference &r) {
+  return OMPTaskgroupDirective::from(r.as_statement());
+}
+
+std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const TokenContext &t) {
+  return OMPTaskgroupDirective::from(t.as_statement());
+}
+
 Expr OMPTaskgroupDirective::reduction_reference(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

@@ -158,6 +158,14 @@ gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::in(const File &
   }
 }
 
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Reference &r) {
+  return ObjCCompatibleAliasDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const TokenContext &t) {
+  return ObjCCompatibleAliasDecl::from(t.as_declaration());
+}
+
 ObjCInterfaceDecl ObjCCompatibleAliasDecl::class_interface(void) const {
   RawEntityId eid = impl->reader.getVal52();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

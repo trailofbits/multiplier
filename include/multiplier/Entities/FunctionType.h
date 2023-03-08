@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CallingConv.h"
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class FunctionNoProtoType;
 class FunctionProtoType;
 class FunctionType;
@@ -53,13 +42,8 @@ class FunctionType : public Type {
     }
   }
 
-  inline static std::optional<FunctionType> from(const Reference &r) {
-    return FunctionType::from(r.as_type());
-  }
-
-  inline static std::optional<FunctionType> from(const TokenContext &t) {
-    return FunctionType::from(t.as_type());
-  }
+  static std::optional<FunctionType> from(const Reference &r);
+  static std::optional<FunctionType> from(const TokenContext &t);
 
   CallingConv call_conv(void) const;
   Type call_result_type(void) const;

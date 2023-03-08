@@ -147,6 +147,14 @@ gap::generator<UnresolvedLookupExpr> UnresolvedLookupExpr::in(const File &file) 
   }
 }
 
+std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const Reference &r) {
+  return UnresolvedLookupExpr::from(r.as_statement());
+}
+
+std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const TokenContext &t) {
+  return UnresolvedLookupExpr::from(t.as_statement());
+}
+
 bool UnresolvedLookupExpr::is_overloaded(void) const {
   return impl->reader.getVal90();
 }

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DesignatedInitUpdateExpr;
 class Expr;
@@ -69,13 +58,8 @@ class DesignatedInitUpdateExpr : public Expr {
     }
   }
 
-  inline static std::optional<DesignatedInitUpdateExpr> from(const Reference &r) {
-    return DesignatedInitUpdateExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<DesignatedInitUpdateExpr> from(const TokenContext &t) {
-    return DesignatedInitUpdateExpr::from(t.as_statement());
-  }
+  static std::optional<DesignatedInitUpdateExpr> from(const Reference &r);
+  static std::optional<DesignatedInitUpdateExpr> from(const TokenContext &t);
 
   Expr base(void) const;
   InitListExpr updater(void) const;

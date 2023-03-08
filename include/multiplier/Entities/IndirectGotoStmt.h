@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class IndirectGotoStmt;
@@ -66,13 +55,8 @@ class IndirectGotoStmt : public Stmt {
     }
   }
 
-  inline static std::optional<IndirectGotoStmt> from(const Reference &r) {
-    return IndirectGotoStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<IndirectGotoStmt> from(const TokenContext &t) {
-    return IndirectGotoStmt::from(t.as_statement());
-  }
+  static std::optional<IndirectGotoStmt> from(const Reference &r);
+  static std::optional<IndirectGotoStmt> from(const TokenContext &t);
 
   std::optional<LabelDecl> constant_target(void) const;
   Token goto_token(void) const;

@@ -158,6 +158,14 @@ gap::generator<TemplateTemplateParmDecl> TemplateTemplateParmDecl::in(const File
   }
 }
 
+std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const Reference &r) {
+  return TemplateTemplateParmDecl::from(r.as_declaration());
+}
+
+std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const TokenContext &t) {
+  return TemplateTemplateParmDecl::from(t.as_declaration());
+}
+
 bool TemplateTemplateParmDecl::default_argument_was_inherited(void) const {
   return impl->reader.getVal71();
 }

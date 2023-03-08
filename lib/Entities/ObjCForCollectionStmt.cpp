@@ -145,6 +145,14 @@ gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const File &file
   }
 }
 
+std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Reference &r) {
+  return ObjCForCollectionStmt::from(r.as_statement());
+}
+
+std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const TokenContext &t) {
+  return ObjCForCollectionStmt::from(t.as_statement());
+}
+
 Stmt ObjCForCollectionStmt::body(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

@@ -146,6 +146,14 @@ gap::generator<FloatingLiteral> FloatingLiteral::in(const File &file) {
   }
 }
 
+std::optional<FloatingLiteral> FloatingLiteral::from(const Reference &r) {
+  return FloatingLiteral::from(r.as_statement());
+}
+
+std::optional<FloatingLiteral> FloatingLiteral::from(const TokenContext &t) {
+  return FloatingLiteral::from(t.as_statement());
+}
+
 Token FloatingLiteral::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

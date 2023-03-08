@@ -147,6 +147,14 @@ gap::generator<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::in(const File &fi
   }
 }
 
+std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const Reference &r) {
+  return CXXTemporaryObjectExpr::from(r.as_statement());
+}
+
+std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const TokenContext &t) {
+  return CXXTemporaryObjectExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

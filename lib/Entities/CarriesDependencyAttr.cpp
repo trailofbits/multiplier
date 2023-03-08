@@ -97,6 +97,14 @@ gap::generator<CarriesDependencyAttr> CarriesDependencyAttr::in(const File &file
   }
 }
 
+std::optional<CarriesDependencyAttr> CarriesDependencyAttr::from(const Reference &r) {
+  return CarriesDependencyAttr::from(r.as_attribute());
+}
+
+std::optional<CarriesDependencyAttr> CarriesDependencyAttr::from(const TokenContext &t) {
+  return CarriesDependencyAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

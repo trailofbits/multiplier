@@ -96,6 +96,14 @@ gap::generator<NSReturnsAutoreleasedAttr> NSReturnsAutoreleasedAttr::in(const Fi
   }
 }
 
+std::optional<NSReturnsAutoreleasedAttr> NSReturnsAutoreleasedAttr::from(const Reference &r) {
+  return NSReturnsAutoreleasedAttr::from(r.as_attribute());
+}
+
+std::optional<NSReturnsAutoreleasedAttr> NSReturnsAutoreleasedAttr::from(const TokenContext &t) {
+  return NSReturnsAutoreleasedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

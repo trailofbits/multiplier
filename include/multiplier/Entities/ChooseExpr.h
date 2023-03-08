@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ChooseExpr;
 class Decl;
 class Expr;
@@ -68,13 +57,8 @@ class ChooseExpr : public Expr {
     }
   }
 
-  inline static std::optional<ChooseExpr> from(const Reference &r) {
-    return ChooseExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ChooseExpr> from(const TokenContext &t) {
-    return ChooseExpr::from(t.as_statement());
-  }
+  static std::optional<ChooseExpr> from(const Reference &r);
+  static std::optional<ChooseExpr> from(const TokenContext &t);
 
   Token builtin_token(void) const;
   Expr chosen_sub_expression(void) const;

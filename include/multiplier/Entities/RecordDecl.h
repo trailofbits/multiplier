@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "RecordDeclArgPassingKind.h"
 #include "TagDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXRecordDecl;
 class ClassTemplatePartialSpecializationDecl;
 class ClassTemplateSpecializationDecl;
@@ -76,13 +65,8 @@ class RecordDecl : public TagDecl {
     }
   }
 
-  inline static std::optional<RecordDecl> from(const Reference &r) {
-    return RecordDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<RecordDecl> from(const TokenContext &t) {
-    return RecordDecl::from(t.as_declaration());
-  }
+  static std::optional<RecordDecl> from(const Reference &r);
+  static std::optional<RecordDecl> from(const TokenContext &t);
 
   bool can_pass_in_registers(void) const;
   std::optional<FieldDecl> nth_field(unsigned n) const;

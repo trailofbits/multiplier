@@ -96,6 +96,14 @@ gap::generator<ARMInterruptAttr> ARMInterruptAttr::in(const File &file) {
   }
 }
 
+std::optional<ARMInterruptAttr> ARMInterruptAttr::from(const Reference &r) {
+  return ARMInterruptAttr::from(r.as_attribute());
+}
+
+std::optional<ARMInterruptAttr> ARMInterruptAttr::from(const TokenContext &t) {
+  return ARMInterruptAttr::from(t.as_attribute());
+}
+
 ARMInterruptAttrInterruptType ARMInterruptAttr::interrupt(void) const {
   return static_cast<ARMInterruptAttrInterruptType>(impl->reader.getVal10());
 }

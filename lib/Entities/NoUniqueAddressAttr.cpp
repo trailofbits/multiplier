@@ -96,6 +96,14 @@ gap::generator<NoUniqueAddressAttr> NoUniqueAddressAttr::in(const File &file) {
   }
 }
 
+std::optional<NoUniqueAddressAttr> NoUniqueAddressAttr::from(const Reference &r) {
+  return NoUniqueAddressAttr::from(r.as_attribute());
+}
+
+std::optional<NoUniqueAddressAttr> NoUniqueAddressAttr::from(const TokenContext &t) {
+  return NoUniqueAddressAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

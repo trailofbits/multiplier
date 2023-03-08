@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "FieldDecl.h"
 #include "ObjCIvarDeclAccessControl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class FieldDecl;
@@ -75,13 +64,8 @@ class ObjCIvarDecl : public FieldDecl {
     }
   }
 
-  inline static std::optional<ObjCIvarDecl> from(const Reference &r) {
-    return ObjCIvarDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCIvarDecl> from(const TokenContext &t) {
-    return ObjCIvarDecl::from(t.as_declaration());
-  }
+  static std::optional<ObjCIvarDecl> from(const Reference &r);
+  static std::optional<ObjCIvarDecl> from(const TokenContext &t);
 
   ObjCIvarDeclAccessControl access_control(void) const;
   ObjCIvarDeclAccessControl canonical_access_control(void) const;

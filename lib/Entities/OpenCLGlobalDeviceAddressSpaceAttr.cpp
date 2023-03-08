@@ -96,6 +96,14 @@ gap::generator<OpenCLGlobalDeviceAddressSpaceAttr> OpenCLGlobalDeviceAddressSpac
   }
 }
 
+std::optional<OpenCLGlobalDeviceAddressSpaceAttr> OpenCLGlobalDeviceAddressSpaceAttr::from(const Reference &r) {
+  return OpenCLGlobalDeviceAddressSpaceAttr::from(r.as_attribute());
+}
+
+std::optional<OpenCLGlobalDeviceAddressSpaceAttr> OpenCLGlobalDeviceAddressSpaceAttr::from(const TokenContext &t) {
+  return OpenCLGlobalDeviceAddressSpaceAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

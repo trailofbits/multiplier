@@ -96,6 +96,14 @@ gap::generator<BuiltinAttr> BuiltinAttr::in(const File &file) {
   }
 }
 
+std::optional<BuiltinAttr> BuiltinAttr::from(const Reference &r) {
+  return BuiltinAttr::from(r.as_attribute());
+}
+
+std::optional<BuiltinAttr> BuiltinAttr::from(const TokenContext &t) {
+  return BuiltinAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

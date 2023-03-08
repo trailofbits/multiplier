@@ -111,6 +111,14 @@ gap::generator<PragmaMacroDirective> PragmaMacroDirective::in(const File &file) 
   }
 }
 
+std::optional<PragmaMacroDirective> PragmaMacroDirective::from(const Reference &r) {
+  return PragmaMacroDirective::from(r.as_macro());
+}
+
+std::optional<PragmaMacroDirective> PragmaMacroDirective::from(const TokenContext &t) {
+  return PragmaMacroDirective::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

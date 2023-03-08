@@ -146,6 +146,14 @@ gap::generator<CharacterLiteral> CharacterLiteral::in(const File &file) {
   }
 }
 
+std::optional<CharacterLiteral> CharacterLiteral::from(const Reference &r) {
+  return CharacterLiteral::from(r.as_statement());
+}
+
+std::optional<CharacterLiteral> CharacterLiteral::from(const TokenContext &t) {
+  return CharacterLiteral::from(t.as_statement());
+}
+
 CharacterLiteralCharacterKind CharacterLiteral::character_kind(void) const {
   return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal93());
 }

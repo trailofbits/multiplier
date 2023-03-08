@@ -95,6 +95,14 @@ gap::generator<SwiftObjCMembersAttr> SwiftObjCMembersAttr::in(const File &file) 
   }
 }
 
+std::optional<SwiftObjCMembersAttr> SwiftObjCMembersAttr::from(const Reference &r) {
+  return SwiftObjCMembersAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftObjCMembersAttr> SwiftObjCMembersAttr::from(const TokenContext &t) {
+  return SwiftObjCMembersAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

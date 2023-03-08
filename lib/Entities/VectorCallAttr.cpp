@@ -96,6 +96,14 @@ gap::generator<VectorCallAttr> VectorCallAttr::in(const File &file) {
   }
 }
 
+std::optional<VectorCallAttr> VectorCallAttr::from(const Reference &r) {
+  return VectorCallAttr::from(r.as_attribute());
+}
+
+std::optional<VectorCallAttr> VectorCallAttr::from(const TokenContext &t) {
+  return VectorCallAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

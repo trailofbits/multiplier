@@ -96,6 +96,14 @@ gap::generator<NakedAttr> NakedAttr::in(const File &file) {
   }
 }
 
+std::optional<NakedAttr> NakedAttr::from(const Reference &r) {
+  return NakedAttr::from(r.as_attribute());
+}
+
+std::optional<NakedAttr> NakedAttr::from(const TokenContext &t) {
+  return NakedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

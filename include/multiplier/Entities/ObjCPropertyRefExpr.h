@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class ObjCInterfaceDecl;
@@ -72,13 +61,8 @@ class ObjCPropertyRefExpr : public Expr {
     }
   }
 
-  inline static std::optional<ObjCPropertyRefExpr> from(const Reference &r) {
-    return ObjCPropertyRefExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCPropertyRefExpr> from(const TokenContext &t) {
-    return ObjCPropertyRefExpr::from(t.as_statement());
-  }
+  static std::optional<ObjCPropertyRefExpr> from(const Reference &r);
+  static std::optional<ObjCPropertyRefExpr> from(const TokenContext &t);
 
   Expr base(void) const;
   ObjCInterfaceDecl class_receiver(void) const;

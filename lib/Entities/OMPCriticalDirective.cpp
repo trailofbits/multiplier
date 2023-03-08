@@ -145,6 +145,14 @@ gap::generator<OMPCriticalDirective> OMPCriticalDirective::in(const File &file) 
   }
 }
 
+std::optional<OMPCriticalDirective> OMPCriticalDirective::from(const Reference &r) {
+  return OMPCriticalDirective::from(r.as_statement());
+}
+
+std::optional<OMPCriticalDirective> OMPCriticalDirective::from(const TokenContext &t) {
+  return OMPCriticalDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

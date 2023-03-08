@@ -96,6 +96,14 @@ gap::generator<InitPriorityAttr> InitPriorityAttr::in(const File &file) {
   }
 }
 
+std::optional<InitPriorityAttr> InitPriorityAttr::from(const Reference &r) {
+  return InitPriorityAttr::from(r.as_attribute());
+}
+
+std::optional<InitPriorityAttr> InitPriorityAttr::from(const TokenContext &t) {
+  return InitPriorityAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

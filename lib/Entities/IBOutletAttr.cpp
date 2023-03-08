@@ -96,6 +96,14 @@ gap::generator<IBOutletAttr> IBOutletAttr::in(const File &file) {
   }
 }
 
+std::optional<IBOutletAttr> IBOutletAttr::from(const Reference &r) {
+  return IBOutletAttr::from(r.as_attribute());
+}
+
+std::optional<IBOutletAttr> IBOutletAttr::from(const TokenContext &t) {
+  return IBOutletAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

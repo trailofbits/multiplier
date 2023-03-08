@@ -254,6 +254,14 @@ gap::generator<OMPLoopBasedDirective> OMPLoopBasedDirective::in(const File &file
   }
 }
 
+std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const Reference &r) {
+  return OMPLoopBasedDirective::from(r.as_statement());
+}
+
+std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const TokenContext &t) {
+  return OMPLoopBasedDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -147,6 +147,14 @@ gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::in(const File
   }
 }
 
+std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Reference &r) {
+  return CXXInheritedCtorInitExpr::from(r.as_statement());
+}
+
+std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const TokenContext &t) {
+  return CXXInheritedCtorInitExpr::from(t.as_statement());
+}
+
 bool CXXInheritedCtorInitExpr::constructs_virtual_base(void) const {
   return impl->reader.getVal88();
 }

@@ -111,6 +111,14 @@ gap::generator<MacroVAOpt> MacroVAOpt::in(const File &file) {
   }
 }
 
+std::optional<MacroVAOpt> MacroVAOpt::from(const Reference &r) {
+  return MacroVAOpt::from(r.as_macro());
+}
+
+std::optional<MacroVAOpt> MacroVAOpt::from(const TokenContext &t) {
+  return MacroVAOpt::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

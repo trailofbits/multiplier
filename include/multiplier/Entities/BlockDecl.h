@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BlockDecl;
 class CompoundStmt;
 class Decl;
@@ -68,13 +57,8 @@ class BlockDecl : public Decl {
     }
   }
 
-  inline static std::optional<BlockDecl> from(const Reference &r) {
-    return BlockDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<BlockDecl> from(const TokenContext &t) {
-    return BlockDecl::from(t.as_declaration());
-  }
+  static std::optional<BlockDecl> from(const Reference &r);
+  static std::optional<BlockDecl> from(const TokenContext &t);
 
   bool block_missing_return_type(void) const;
   bool can_avoid_copy_to_heap(void) const;

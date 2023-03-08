@@ -164,6 +164,14 @@ gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const Reference &r) {
+  return ObjCInterfaceDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const TokenContext &t) {
+  return ObjCInterfaceDecl::from(t.as_declaration());
+}
+
 unsigned ObjCInterfaceDecl::num_all_referenced_protocols(void) const {
   return impl->reader.getVal309().size();
 }

@@ -96,6 +96,14 @@ gap::generator<WebAssemblyExportNameAttr> WebAssemblyExportNameAttr::in(const Fi
   }
 }
 
+std::optional<WebAssemblyExportNameAttr> WebAssemblyExportNameAttr::from(const Reference &r) {
+  return WebAssemblyExportNameAttr::from(r.as_attribute());
+}
+
+std::optional<WebAssemblyExportNameAttr> WebAssemblyExportNameAttr::from(const TokenContext &t) {
+  return WebAssemblyExportNameAttr::from(t.as_attribute());
+}
+
 std::string_view WebAssemblyExportNameAttr::export_name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

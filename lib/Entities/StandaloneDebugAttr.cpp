@@ -96,6 +96,14 @@ gap::generator<StandaloneDebugAttr> StandaloneDebugAttr::in(const File &file) {
   }
 }
 
+std::optional<StandaloneDebugAttr> StandaloneDebugAttr::from(const Reference &r) {
+  return StandaloneDebugAttr::from(r.as_attribute());
+}
+
+std::optional<StandaloneDebugAttr> StandaloneDebugAttr::from(const TokenContext &t) {
+  return StandaloneDebugAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

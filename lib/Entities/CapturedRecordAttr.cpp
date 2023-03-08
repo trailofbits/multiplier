@@ -96,6 +96,14 @@ gap::generator<CapturedRecordAttr> CapturedRecordAttr::in(const File &file) {
   }
 }
 
+std::optional<CapturedRecordAttr> CapturedRecordAttr::from(const Reference &r) {
+  return CapturedRecordAttr::from(r.as_attribute());
+}
+
+std::optional<CapturedRecordAttr> CapturedRecordAttr::from(const TokenContext &t) {
+  return CapturedRecordAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

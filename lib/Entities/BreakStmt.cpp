@@ -144,6 +144,14 @@ gap::generator<BreakStmt> BreakStmt::in(const File &file) {
   }
 }
 
+std::optional<BreakStmt> BreakStmt::from(const Reference &r) {
+  return BreakStmt::from(r.as_statement());
+}
+
+std::optional<BreakStmt> BreakStmt::from(const TokenContext &t) {
+  return BreakStmt::from(t.as_statement());
+}
+
 Token BreakStmt::break_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

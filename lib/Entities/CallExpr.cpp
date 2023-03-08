@@ -162,6 +162,14 @@ gap::generator<CallExpr> CallExpr::in(const File &file) {
   }
 }
 
+std::optional<CallExpr> CallExpr::from(const Reference &r) {
+  return CallExpr::from(r.as_statement());
+}
+
+std::optional<CallExpr> CallExpr::from(const TokenContext &t) {
+  return CallExpr::from(t.as_statement());
+}
+
 unsigned CallExpr::num_arguments(void) const {
   return impl->reader.getVal15().size();
 }

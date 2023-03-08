@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "MacroDirective.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DefineMacroDirective;
 class Macro;
 class MacroDirective;
@@ -61,13 +50,8 @@ class DefineMacroDirective : public MacroDirective {
     }
   }
 
-  inline static std::optional<DefineMacroDirective> from(const Reference &r) {
-    return DefineMacroDirective::from(r.as_macro());
-  }
-
-  inline static std::optional<DefineMacroDirective> from(const TokenContext &t) {
-    return DefineMacroDirective::from(t.as_macro());
-  }
+  static std::optional<DefineMacroDirective> from(const Reference &r);
+  static std::optional<DefineMacroDirective> from(const TokenContext &t);
 
   Token name(void) const;
   gap::generator<MacroOrToken> body(void) const &;

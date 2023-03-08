@@ -96,6 +96,14 @@ gap::generator<SubstTemplateTypeParmType> SubstTemplateTypeParmType::in(const Fi
   }
 }
 
+std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const Reference &r) {
+  return SubstTemplateTypeParmType::from(r.as_type());
+}
+
+std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const TokenContext &t) {
+  return SubstTemplateTypeParmType::from(t.as_type());
+}
+
 Type SubstTemplateTypeParmType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

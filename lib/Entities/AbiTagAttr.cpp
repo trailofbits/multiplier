@@ -95,6 +95,14 @@ gap::generator<AbiTagAttr> AbiTagAttr::in(const File &file) {
   }
 }
 
+std::optional<AbiTagAttr> AbiTagAttr::from(const Reference &r) {
+  return AbiTagAttr::from(r.as_attribute());
+}
+
+std::optional<AbiTagAttr> AbiTagAttr::from(const TokenContext &t) {
+  return AbiTagAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

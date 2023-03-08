@@ -147,6 +147,14 @@ gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::in(const File &file) {
   }
 }
 
+std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const Reference &r) {
+  return CUDAKernelCallExpr::from(r.as_statement());
+}
+
+std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const TokenContext &t) {
+  return CUDAKernelCallExpr::from(t.as_statement());
+}
+
 CallExpr CUDAKernelCallExpr::config(void) const {
   RawEntityId eid = impl->reader.getVal44();
   return CallExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

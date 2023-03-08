@@ -150,6 +150,14 @@ gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::i
   }
 }
 
+std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const Reference &r) {
+  return OMPLoopTransformationDirective::from(r.as_statement());
+}
+
+std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::from(const TokenContext &t) {
+  return OMPLoopTransformationDirective::from(t.as_statement());
+}
+
 Stmt OMPLoopTransformationDirective::pre_initializers(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

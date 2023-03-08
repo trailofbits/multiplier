@@ -96,6 +96,14 @@ gap::generator<SentinelAttr> SentinelAttr::in(const File &file) {
   }
 }
 
+std::optional<SentinelAttr> SentinelAttr::from(const Reference &r) {
+  return SentinelAttr::from(r.as_attribute());
+}
+
+std::optional<SentinelAttr> SentinelAttr::from(const TokenContext &t) {
+  return SentinelAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -97,6 +97,14 @@ gap::generator<LockReturnedAttr> LockReturnedAttr::in(const File &file) {
   }
 }
 
+std::optional<LockReturnedAttr> LockReturnedAttr::from(const Reference &r) {
+  return LockReturnedAttr::from(r.as_attribute());
+}
+
+std::optional<LockReturnedAttr> LockReturnedAttr::from(const TokenContext &t) {
+  return LockReturnedAttr::from(t.as_attribute());
+}
+
 Expr LockReturnedAttr::argument(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

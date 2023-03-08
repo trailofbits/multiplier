@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class PragmaDetectMismatchDecl;
 class Stmt;
@@ -65,13 +54,8 @@ class PragmaDetectMismatchDecl : public Decl {
     }
   }
 
-  inline static std::optional<PragmaDetectMismatchDecl> from(const Reference &r) {
-    return PragmaDetectMismatchDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<PragmaDetectMismatchDecl> from(const TokenContext &t) {
-    return PragmaDetectMismatchDecl::from(t.as_declaration());
-  }
+  static std::optional<PragmaDetectMismatchDecl> from(const Reference &r);
+  static std::optional<PragmaDetectMismatchDecl> from(const TokenContext &t);
 
   std::string_view name(void) const;
   std::string_view value(void) const;

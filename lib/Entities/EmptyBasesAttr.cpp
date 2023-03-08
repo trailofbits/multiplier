@@ -96,6 +96,14 @@ gap::generator<EmptyBasesAttr> EmptyBasesAttr::in(const File &file) {
   }
 }
 
+std::optional<EmptyBasesAttr> EmptyBasesAttr::from(const Reference &r) {
+  return EmptyBasesAttr::from(r.as_attribute());
+}
+
+std::optional<EmptyBasesAttr> EmptyBasesAttr::from(const TokenContext &t) {
+  return EmptyBasesAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

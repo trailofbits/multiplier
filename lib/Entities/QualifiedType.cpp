@@ -95,6 +95,14 @@ gap::generator<QualifiedType> QualifiedType::in(const File &file) {
   }
 }
 
+std::optional<QualifiedType> QualifiedType::from(const Reference &r) {
+  return QualifiedType::from(r.as_type());
+}
+
+std::optional<QualifiedType> QualifiedType::from(const TokenContext &t) {
+  return QualifiedType::from(t.as_type());
+}
+
 LangAS QualifiedType::address_space(void) const {
   return static_cast<LangAS>(impl->reader.getVal235());
 }

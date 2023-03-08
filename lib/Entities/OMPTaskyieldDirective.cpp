@@ -145,6 +145,14 @@ gap::generator<OMPTaskyieldDirective> OMPTaskyieldDirective::in(const File &file
   }
 }
 
+std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const Reference &r) {
+  return OMPTaskyieldDirective::from(r.as_statement());
+}
+
+std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const TokenContext &t) {
+  return OMPTaskyieldDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

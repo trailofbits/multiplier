@@ -147,6 +147,14 @@ gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const File &
   }
 }
 
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Reference &r) {
+  return CXXPseudoDestructorExpr::from(r.as_statement());
+}
+
+std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const TokenContext &t) {
+  return CXXPseudoDestructorExpr::from(t.as_statement());
+}
+
 Expr CXXPseudoDestructorExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

@@ -96,6 +96,14 @@ gap::generator<FunctionReturnThunksAttr> FunctionReturnThunksAttr::in(const File
   }
 }
 
+std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from(const Reference &r) {
+  return FunctionReturnThunksAttr::from(r.as_attribute());
+}
+
+std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from(const TokenContext &t) {
+  return FunctionReturnThunksAttr::from(t.as_attribute());
+}
+
 FunctionReturnThunksAttrKind FunctionReturnThunksAttr::thunk_type(void) const {
   return static_cast<FunctionReturnThunksAttrKind>(impl->reader.getVal10());
 }

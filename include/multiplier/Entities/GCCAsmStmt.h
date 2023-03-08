@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AsmStmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AddrLabelExpr;
 class AsmStmt;
 class Decl;
@@ -68,13 +57,8 @@ class GCCAsmStmt : public AsmStmt {
     }
   }
 
-  inline static std::optional<GCCAsmStmt> from(const Reference &r) {
-    return GCCAsmStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<GCCAsmStmt> from(const TokenContext &t) {
-    return GCCAsmStmt::from(t.as_statement());
-  }
+  static std::optional<GCCAsmStmt> from(const Reference &r);
+  static std::optional<GCCAsmStmt> from(const TokenContext &t);
 
   StringLiteral assembly_string(void) const;
   Token r_paren_token(void) const;

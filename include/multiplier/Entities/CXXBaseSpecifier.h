@@ -8,28 +8,29 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
-
-#include <compare>
 
 #include "AccessSpecifier.h"
 #include "PseudoKind.h"
 #include "TagTypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXBaseSpecifier;
 class CXXBaseSpecifierImpl;
+class File;
+class Fragment;
 class Reference;
 class SourceIR;
 class Token;
@@ -86,13 +87,9 @@ class CXXBaseSpecifier {
     return self;
   }
 
-  inline static std::optional<CXXBaseSpecifier> from(const Reference &r) {
-    return r.as_cxx_base_specifier();
-  }
+  static std::optional<CXXBaseSpecifier> from(const Reference &r);
 
-  inline static std::optional<CXXBaseSpecifier> from(const TokenContext &t) {
-    return t.as_cxx_base_specifier();
-  }
+  static std::optional<CXXBaseSpecifier> from(const TokenContext &t);
 
   TokenRange tokens(void) const;
   Token base_type_token(void) const;

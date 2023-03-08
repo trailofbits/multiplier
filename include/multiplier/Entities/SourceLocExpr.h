@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "SourceLocExprIdentKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class SourceLocExpr;
@@ -69,13 +58,8 @@ class SourceLocExpr : public Expr {
     }
   }
 
-  inline static std::optional<SourceLocExpr> from(const Reference &r) {
-    return SourceLocExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<SourceLocExpr> from(const TokenContext &t) {
-    return SourceLocExpr::from(t.as_statement());
-  }
+  static std::optional<SourceLocExpr> from(const Reference &r);
+  static std::optional<SourceLocExpr> from(const TokenContext &t);
 
   std::string_view builtin_string(void) const;
   SourceLocExprIdentKind identifier_kind(void) const;

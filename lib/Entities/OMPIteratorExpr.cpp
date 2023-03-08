@@ -146,6 +146,14 @@ gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const File &file) {
   }
 }
 
+std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Reference &r) {
+  return OMPIteratorExpr::from(r.as_statement());
+}
+
+std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const TokenContext &t) {
+  return OMPIteratorExpr::from(t.as_statement());
+}
+
 Token OMPIteratorExpr::iterator_kw_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

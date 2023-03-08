@@ -95,6 +95,14 @@ gap::generator<ObjCRuntimeVisibleAttr> ObjCRuntimeVisibleAttr::in(const File &fi
   }
 }
 
+std::optional<ObjCRuntimeVisibleAttr> ObjCRuntimeVisibleAttr::from(const Reference &r) {
+  return ObjCRuntimeVisibleAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCRuntimeVisibleAttr> ObjCRuntimeVisibleAttr::from(const TokenContext &t) {
+  return ObjCRuntimeVisibleAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

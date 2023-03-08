@@ -145,6 +145,14 @@ gap::generator<DoStmt> DoStmt::in(const File &file) {
   }
 }
 
+std::optional<DoStmt> DoStmt::from(const Reference &r) {
+  return DoStmt::from(r.as_statement());
+}
+
+std::optional<DoStmt> DoStmt::from(const TokenContext &t) {
+  return DoStmt::from(t.as_statement());
+}
+
 Stmt DoStmt::body(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

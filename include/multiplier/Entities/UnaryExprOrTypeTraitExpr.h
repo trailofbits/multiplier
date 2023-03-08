@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "UnaryExprOrTypeTrait.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class Stmt;
@@ -70,13 +59,8 @@ class UnaryExprOrTypeTraitExpr : public Expr {
     }
   }
 
-  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const Reference &r) {
-    return UnaryExprOrTypeTraitExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const TokenContext &t) {
-    return UnaryExprOrTypeTraitExpr::from(t.as_statement());
-  }
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const Reference &r);
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const TokenContext &t);
 
   std::optional<Expr> argument_expression(void) const;
   std::optional<Type> argument_type(void) const;

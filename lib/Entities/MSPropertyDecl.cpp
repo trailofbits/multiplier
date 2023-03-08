@@ -159,6 +159,14 @@ gap::generator<MSPropertyDecl> MSPropertyDecl::in(const File &file) {
   }
 }
 
+std::optional<MSPropertyDecl> MSPropertyDecl::from(const Reference &r) {
+  return MSPropertyDecl::from(r.as_declaration());
+}
+
+std::optional<MSPropertyDecl> MSPropertyDecl::from(const TokenContext &t) {
+  return MSPropertyDecl::from(t.as_declaration());
+}
+
 bool MSPropertyDecl::has_getter(void) const {
   return impl->reader.getVal71();
 }

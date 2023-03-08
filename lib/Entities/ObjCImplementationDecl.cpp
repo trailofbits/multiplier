@@ -161,6 +161,14 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::in(const File &fi
   }
 }
 
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const Reference &r) {
+  return ObjCImplementationDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const TokenContext &t) {
+  return ObjCImplementationDecl::from(t.as_declaration());
+}
+
 Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal63());
 }

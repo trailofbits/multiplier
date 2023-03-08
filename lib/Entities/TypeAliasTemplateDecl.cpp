@@ -159,6 +159,14 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::in(const File &file
   }
 }
 
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const Reference &r) {
+  return TypeAliasTemplateDecl::from(r.as_declaration());
+}
+
+std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const TokenContext &t) {
+  return TypeAliasTemplateDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

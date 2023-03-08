@@ -96,6 +96,14 @@ gap::generator<BlocksAttr> BlocksAttr::in(const File &file) {
   }
 }
 
+std::optional<BlocksAttr> BlocksAttr::from(const Reference &r) {
+  return BlocksAttr::from(r.as_attribute());
+}
+
+std::optional<BlocksAttr> BlocksAttr::from(const TokenContext &t) {
+  return BlocksAttr::from(t.as_attribute());
+}
+
 BlocksAttrBlockType BlocksAttr::type(void) const {
   return static_cast<BlocksAttrBlockType>(impl->reader.getVal10());
 }

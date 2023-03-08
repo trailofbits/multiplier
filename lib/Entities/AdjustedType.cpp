@@ -98,6 +98,14 @@ gap::generator<AdjustedType> AdjustedType::in(const File &file) {
   }
 }
 
+std::optional<AdjustedType> AdjustedType::from(const Reference &r) {
+  return AdjustedType::from(r.as_type());
+}
+
+std::optional<AdjustedType> AdjustedType::from(const TokenContext &t) {
+  return AdjustedType::from(t.as_type());
+}
+
 Type AdjustedType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

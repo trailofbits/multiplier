@@ -95,6 +95,14 @@ gap::generator<OpenCLAccessAttr> OpenCLAccessAttr::in(const File &file) {
   }
 }
 
+std::optional<OpenCLAccessAttr> OpenCLAccessAttr::from(const Reference &r) {
+  return OpenCLAccessAttr::from(r.as_attribute());
+}
+
+std::optional<OpenCLAccessAttr> OpenCLAccessAttr::from(const TokenContext &t) {
+  return OpenCLAccessAttr::from(t.as_attribute());
+}
+
 OpenCLAccessAttrSpelling OpenCLAccessAttr::semantic_spelling(void) const {
   return static_cast<OpenCLAccessAttrSpelling>(impl->reader.getVal10());
 }

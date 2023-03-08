@@ -96,6 +96,14 @@ gap::generator<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::in(const File &file
   }
 }
 
+std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const Reference &r) {
+  return ObjCBridgeMutableAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const TokenContext &t) {
+  return ObjCBridgeMutableAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

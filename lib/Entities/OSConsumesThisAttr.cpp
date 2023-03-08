@@ -96,6 +96,14 @@ gap::generator<OSConsumesThisAttr> OSConsumesThisAttr::in(const File &file) {
   }
 }
 
+std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const Reference &r) {
+  return OSConsumesThisAttr::from(r.as_attribute());
+}
+
+std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const TokenContext &t) {
+  return OSConsumesThisAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

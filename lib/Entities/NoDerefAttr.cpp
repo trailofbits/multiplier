@@ -96,6 +96,14 @@ gap::generator<NoDerefAttr> NoDerefAttr::in(const File &file) {
   }
 }
 
+std::optional<NoDerefAttr> NoDerefAttr::from(const Reference &r) {
+  return NoDerefAttr::from(r.as_attribute());
+}
+
+std::optional<NoDerefAttr> NoDerefAttr::from(const TokenContext &t) {
+  return NoDerefAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

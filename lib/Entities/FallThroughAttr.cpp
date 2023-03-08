@@ -96,6 +96,14 @@ gap::generator<FallThroughAttr> FallThroughAttr::in(const File &file) {
   }
 }
 
+std::optional<FallThroughAttr> FallThroughAttr::from(const Reference &r) {
+  return FallThroughAttr::from(r.as_attribute());
+}
+
+std::optional<FallThroughAttr> FallThroughAttr::from(const TokenContext &t) {
+  return FallThroughAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

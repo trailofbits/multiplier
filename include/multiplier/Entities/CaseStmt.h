@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "SwitchCase.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CaseStmt;
 class Decl;
 class Expr;
@@ -67,13 +56,8 @@ class CaseStmt : public SwitchCase {
     }
   }
 
-  inline static std::optional<CaseStmt> from(const Reference &r) {
-    return CaseStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<CaseStmt> from(const TokenContext &t) {
-    return CaseStmt::from(t.as_statement());
-  }
+  static std::optional<CaseStmt> from(const Reference &r);
+  static std::optional<CaseStmt> from(const TokenContext &t);
 
   bool case_statement_is_gnu_range(void) const;
   Token case_token(void) const;

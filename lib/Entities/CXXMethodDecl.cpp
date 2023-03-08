@@ -170,6 +170,14 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::in(const File &file) {
   }
 }
 
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const Reference &r) {
+  return CXXMethodDecl::from(r.as_declaration());
+}
+
+std::optional<CXXMethodDecl> CXXMethodDecl::from(const TokenContext &t) {
+  return CXXMethodDecl::from(t.as_declaration());
+}
+
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
   return static_cast<RefQualifierKind>(impl->reader.getVal158());
 }

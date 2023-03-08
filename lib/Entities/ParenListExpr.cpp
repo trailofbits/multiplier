@@ -146,6 +146,14 @@ gap::generator<ParenListExpr> ParenListExpr::in(const File &file) {
   }
 }
 
+std::optional<ParenListExpr> ParenListExpr::from(const Reference &r) {
+  return ParenListExpr::from(r.as_statement());
+}
+
+std::optional<ParenListExpr> ParenListExpr::from(const TokenContext &t) {
+  return ParenListExpr::from(t.as_statement());
+}
+
 Token ParenListExpr::l_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

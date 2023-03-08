@@ -158,6 +158,14 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::in(const File &file) 
   }
 }
 
+std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const Reference &r) {
+  return OMPThreadPrivateDecl::from(r.as_declaration());
+}
+
+std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const TokenContext &t) {
+  return OMPThreadPrivateDecl::from(t.as_declaration());
+}
+
 unsigned OMPThreadPrivateDecl::num_varlists(void) const {
   return impl->reader.getVal47().size();
 }

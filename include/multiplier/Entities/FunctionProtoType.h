@@ -8,25 +8,14 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CanThrowResult.h"
 #include "ExceptionSpecificationType.h"
 #include "FunctionType.h"
 #include "RefQualifierKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Expr;
 class FunctionDecl;
 class FunctionProtoType;
@@ -61,13 +50,8 @@ class FunctionProtoType : public FunctionType {
     }
   }
 
-  inline static std::optional<FunctionProtoType> from(const Reference &r) {
-    return FunctionProtoType::from(r.as_type());
-  }
-
-  inline static std::optional<FunctionProtoType> from(const TokenContext &t) {
-    return FunctionProtoType::from(t.as_type());
-  }
+  static std::optional<FunctionProtoType> from(const Reference &r);
+  static std::optional<FunctionProtoType> from(const TokenContext &t);
 
   std::optional<CanThrowResult> can_throw(void) const;
   Type desugar(void) const;

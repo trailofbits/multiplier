@@ -96,6 +96,14 @@ gap::generator<TypeNonNullAttr> TypeNonNullAttr::in(const File &file) {
   }
 }
 
+std::optional<TypeNonNullAttr> TypeNonNullAttr::from(const Reference &r) {
+  return TypeNonNullAttr::from(r.as_attribute());
+}
+
+std::optional<TypeNonNullAttr> TypeNonNullAttr::from(const TokenContext &t) {
+  return TypeNonNullAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

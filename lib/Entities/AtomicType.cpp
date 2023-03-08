@@ -95,6 +95,14 @@ gap::generator<AtomicType> AtomicType::in(const File &file) {
   }
 }
 
+std::optional<AtomicType> AtomicType::from(const Reference &r) {
+  return AtomicType::from(r.as_type());
+}
+
+std::optional<AtomicType> AtomicType::from(const TokenContext &t) {
+  return AtomicType::from(t.as_type());
+}
+
 Type AtomicType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

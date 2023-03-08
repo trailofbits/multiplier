@@ -160,6 +160,14 @@ gap::generator<BindingDecl> BindingDecl::in(const File &file) {
   }
 }
 
+std::optional<BindingDecl> BindingDecl::from(const Reference &r) {
+  return BindingDecl::from(r.as_declaration());
+}
+
+std::optional<BindingDecl> BindingDecl::from(const TokenContext &t) {
+  return BindingDecl::from(t.as_declaration());
+}
+
 Expr BindingDecl::binding(void) const {
   RawEntityId eid = impl->reader.getVal53();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

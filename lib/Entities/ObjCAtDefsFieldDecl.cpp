@@ -160,6 +160,14 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const Reference &r) {
+  return ObjCAtDefsFieldDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const TokenContext &t) {
+  return ObjCAtDefsFieldDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

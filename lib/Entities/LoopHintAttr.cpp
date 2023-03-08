@@ -96,6 +96,14 @@ gap::generator<LoopHintAttr> LoopHintAttr::in(const File &file) {
   }
 }
 
+std::optional<LoopHintAttr> LoopHintAttr::from(const Reference &r) {
+  return LoopHintAttr::from(r.as_attribute());
+}
+
+std::optional<LoopHintAttr> LoopHintAttr::from(const TokenContext &t) {
+  return LoopHintAttr::from(t.as_attribute());
+}
+
 LoopHintAttrOptionType LoopHintAttr::option(void) const {
   return static_cast<LoopHintAttrOptionType>(impl->reader.getVal10());
 }

@@ -96,6 +96,14 @@ gap::generator<FormatAttr> FormatAttr::in(const File &file) {
   }
 }
 
+std::optional<FormatAttr> FormatAttr::from(const Reference &r) {
+  return FormatAttr::from(r.as_attribute());
+}
+
+std::optional<FormatAttr> FormatAttr::from(const TokenContext &t) {
+  return FormatAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

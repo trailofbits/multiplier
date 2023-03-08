@@ -146,6 +146,14 @@ gap::generator<ReturnStmt> ReturnStmt::in(const File &file) {
   }
 }
 
+std::optional<ReturnStmt> ReturnStmt::from(const Reference &r) {
+  return ReturnStmt::from(r.as_statement());
+}
+
+std::optional<ReturnStmt> ReturnStmt::from(const TokenContext &t) {
+  return ReturnStmt::from(t.as_statement());
+}
+
 std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal9();

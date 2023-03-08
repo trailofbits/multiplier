@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TemplateDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConceptDecl;
 class Decl;
 class Expr;
@@ -70,13 +59,8 @@ class ConceptDecl : public TemplateDecl {
     }
   }
 
-  inline static std::optional<ConceptDecl> from(const Reference &r) {
-    return ConceptDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ConceptDecl> from(const TokenContext &t) {
-    return ConceptDecl::from(t.as_declaration());
-  }
+  static std::optional<ConceptDecl> from(const Reference &r);
+  static std::optional<ConceptDecl> from(const TokenContext &t);
 
   Expr constraint_expression(void) const;
   bool is_type_concept(void) const;

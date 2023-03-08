@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "BinaryOperatorKind.h"
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXFoldExpr;
 class Decl;
 class Expr;
@@ -70,13 +59,8 @@ class CXXFoldExpr : public Expr {
     }
   }
 
-  inline static std::optional<CXXFoldExpr> from(const Reference &r) {
-    return CXXFoldExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXFoldExpr> from(const TokenContext &t) {
-    return CXXFoldExpr::from(t.as_statement());
-  }
+  static std::optional<CXXFoldExpr> from(const Reference &r);
+  static std::optional<CXXFoldExpr> from(const TokenContext &t);
 
   UnresolvedLookupExpr callee(void) const;
   Token ellipsis_token(void) const;

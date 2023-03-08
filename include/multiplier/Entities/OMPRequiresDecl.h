@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPDeclarativeDirectiveDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class OMPDeclarativeDirectiveDecl;
 class OMPRequiresDecl;
@@ -67,13 +56,8 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
     }
   }
 
-  inline static std::optional<OMPRequiresDecl> from(const Reference &r) {
-    return OMPRequiresDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPRequiresDecl> from(const TokenContext &t) {
-    return OMPRequiresDecl::from(t.as_declaration());
-  }
+  static std::optional<OMPRequiresDecl> from(const Reference &r);
+  static std::optional<OMPRequiresDecl> from(const TokenContext &t);
 
 };
 

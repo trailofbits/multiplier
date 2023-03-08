@@ -96,6 +96,14 @@ gap::generator<Ptr32Attr> Ptr32Attr::in(const File &file) {
   }
 }
 
+std::optional<Ptr32Attr> Ptr32Attr::from(const Reference &r) {
+  return Ptr32Attr::from(r.as_attribute());
+}
+
+std::optional<Ptr32Attr> Ptr32Attr::from(const TokenContext &t) {
+  return Ptr32Attr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

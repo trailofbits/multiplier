@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Macro.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Macro;
 class MacroVAOptArgument;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -58,13 +47,8 @@ class MacroVAOptArgument : public Macro {
     }
   }
 
-  inline static std::optional<MacroVAOptArgument> from(const Reference &r) {
-    return MacroVAOptArgument::from(r.as_macro());
-  }
-
-  inline static std::optional<MacroVAOptArgument> from(const TokenContext &t) {
-    return MacroVAOptArgument::from(t.as_macro());
-  }
+  static std::optional<MacroVAOptArgument> from(const Reference &r);
+  static std::optional<MacroVAOptArgument> from(const TokenContext &t);
 
 };
 

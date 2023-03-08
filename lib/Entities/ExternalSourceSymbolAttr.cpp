@@ -96,6 +96,14 @@ gap::generator<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::in(const File
   }
 }
 
+std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const Reference &r) {
+  return ExternalSourceSymbolAttr::from(r.as_attribute());
+}
+
+std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const TokenContext &t) {
+  return ExternalSourceSymbolAttr::from(t.as_attribute());
+}
+
 std::string_view ExternalSourceSymbolAttr::defined_in(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

@@ -96,6 +96,14 @@ gap::generator<ObjCRequiresSuperAttr> ObjCRequiresSuperAttr::in(const File &file
   }
 }
 
+std::optional<ObjCRequiresSuperAttr> ObjCRequiresSuperAttr::from(const Reference &r) {
+  return ObjCRequiresSuperAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCRequiresSuperAttr> ObjCRequiresSuperAttr::from(const TokenContext &t) {
+  return ObjCRequiresSuperAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

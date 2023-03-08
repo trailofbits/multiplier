@@ -96,6 +96,14 @@ gap::generator<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::in(const 
   }
 }
 
+std::optional<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::from(const Reference &r) {
+  return BPFPreserveAccessIndexAttr::from(r.as_attribute());
+}
+
+std::optional<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::from(const TokenContext &t) {
+  return BPFPreserveAccessIndexAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

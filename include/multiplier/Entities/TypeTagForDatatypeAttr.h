@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class Token;
@@ -57,13 +46,8 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<TypeTagForDatatypeAttr> from(const Reference &r) {
-    return TypeTagForDatatypeAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<TypeTagForDatatypeAttr> from(const TokenContext &t) {
-    return TypeTagForDatatypeAttr::from(t.as_attribute());
-  }
+  static std::optional<TypeTagForDatatypeAttr> from(const Reference &r);
+  static std::optional<TypeTagForDatatypeAttr> from(const TokenContext &t);
 
   bool layout_compatible(void) const;
   Type matching_c_type(void) const;

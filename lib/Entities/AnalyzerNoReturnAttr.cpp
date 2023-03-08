@@ -96,6 +96,14 @@ gap::generator<AnalyzerNoReturnAttr> AnalyzerNoReturnAttr::in(const File &file) 
   }
 }
 
+std::optional<AnalyzerNoReturnAttr> AnalyzerNoReturnAttr::from(const Reference &r) {
+  return AnalyzerNoReturnAttr::from(r.as_attribute());
+}
+
+std::optional<AnalyzerNoReturnAttr> AnalyzerNoReturnAttr::from(const TokenContext &t) {
+  return AnalyzerNoReturnAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

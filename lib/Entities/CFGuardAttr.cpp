@@ -96,6 +96,14 @@ gap::generator<CFGuardAttr> CFGuardAttr::in(const File &file) {
   }
 }
 
+std::optional<CFGuardAttr> CFGuardAttr::from(const Reference &r) {
+  return CFGuardAttr::from(r.as_attribute());
+}
+
+std::optional<CFGuardAttr> CFGuardAttr::from(const TokenContext &t) {
+  return CFGuardAttr::from(t.as_attribute());
+}
+
 CFGuardAttrGuardArg CFGuardAttr::guard(void) const {
   return static_cast<CFGuardAttrGuardArg>(impl->reader.getVal10());
 }
