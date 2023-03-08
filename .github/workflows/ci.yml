@@ -5,9 +5,9 @@ on:
     branches:
       - "main"
 
-  pull_request:
-    branches:
-      - "*"
+  # pull_request:
+  #   branches:
+  #     - "*"
 
 env:
   CXX_COMMON_URL: https://github.com/lifting-bits/cxx-common/releases/download/v0.2.23/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz
@@ -22,90 +22,8 @@ concurrency:
 jobs:
   build-release:
     runs-on: ubuntu-22.04
+    container: 
     steps:
-      - name: Install dependencies
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install -y \
-               gpg wget curl zip unzip tar git pkg-config \
-               ninja-build clang-tidy cppcheck ccache build-essential \
-               doctest-dev clang-15 bear
-          mkdir src
-          mkdir build
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Download cxx-common
-        run: |
-          curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-      - name: Download gap
-        uses: actions/checkout@v3
-        with:
-          repository: "lifting-bits/gap"
-          path: "${{ github.workspace }}/src/gap"
-
-      - name: Build and install gap
-        run: |
-          cmake \
-            -S '${{ github.workspace }}/src/gap' \
-            -B '${{ github.workspace }}/build/gap' \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DUSE_SYSTEM_DEPENDENCIES=ON \
-            -DGAP_ENABLE_WARNINGS=OFF \
-            -DGAP_ENABLE_TESTING=OFF \
-            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-          cmake --build '${{ github.workspace }}/build/gap' --target install
-
-      - name: Download weggli-native
-        uses: actions/checkout@v3
-        with:
-          repository: "trailofbits/weggli-native"
-          path: "${{ github.workspace }}/src/weggli-native"
-
-      - name: Build and install weggli-native
-        run: |
-          cmake \
-            -S '${{ github.workspace }}/src/weggli-native' \
-            -B '${{ github.workspace }}/build/weggli-native' \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-          cmake --build '${{ github.workspace }}/build/weggli-native' --target install
-
-      - name: Download pasta
-        uses: actions/checkout@v3
-        with:
-          repository: "trailofbits/pasta"
-          path: "${{ github.workspace }}/src/pasta"
-
-      - name: Build and install pasta
-        run: |
-          cmake \
-            --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-            -S '${{ github.workspace }}/src/pasta' \
-            -B '${{ github.workspace }}/build/pasta' \
-            -G Ninja \
-            -DVCPKG_ROOT="$VCPKG_ROOT" \
-            -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang" \
-            -DCMAKE_CXX_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang++" \
-            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-            -DPASTA_BOOTSTRAP_MACROS=OFF \
-            -DPASTA_BOOTSTRAP_TYPES=OFF \
-            -DPASTA_ENABLE_TESTING=OFF \
-            -DPASTA_ENABLE_INSTALL=ON
-          cmake --build '${{ github.workspace }}/build/pasta' --target install
-
       - name: Download multiplier
         uses: actions/checkout@v3
         with:
