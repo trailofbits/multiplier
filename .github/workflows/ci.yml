@@ -10,9 +10,9 @@ on:
       - "*"
 
 env:
-  CXX_COMMON_URL: https://github.com/lifting-bits/cxx-common/releases/download/v0.2.23/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
   INSTALL_DIR: ${{ github.workspace }}/install
+  DOCKER_RUN: docker run -v ${PWD}:/build -w /build -e VCPKG_ROOT -e INSTALL_DIR ghcr.io/trailofbits/multiplier
 
 # Cancel in progress runs for PRs but not main
 concurrency:
@@ -21,8 +21,7 @@ concurrency:
 
 jobs:
   build-release:
-    runs-on: multiplier 
-    container: ghcr.io/trailofbits/multiplier
+    runs-on: multiplier
     steps:
       - name: Download multiplier
         uses: actions/checkout@v3
@@ -32,7 +31,7 @@ jobs:
 
       - name: Build and install multiplier
         run: |
-          cmake \
+          ${DOCKER_RUN} cmake \
             --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
             -S '${{ github.workspace }}/src/multiplier' \
             -B '${{ github.workspace }}/build/multiplier' \
@@ -47,7 +46,7 @@ jobs:
             -DMX_ENABLE_BOOTSTRAP=OFF \
             -DMX_ENABLE_VAST=OFF \
             -DMX_ENABLE_WEGGLI=ON
-          cmake --build '${{ github.workspace }}/build/multiplier' --target install
+          ${DOCKER_RUN} cmake --build '${{ github.workspace }}/build/multiplier' --target install
 
       - name: Upload build artifacts on merge to main
         if: ${{ github.ref == 'refs/heads/main' }}
