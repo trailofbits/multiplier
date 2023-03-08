@@ -3,479 +3,137 @@ name: Build and Test
 on:
   push:
     branches:
-      - 'main'
-
-    tags:
-      - '*'
+      - "main"
 
   pull_request:
     branches:
-      - '*'
+      - "*"
 
 env:
   CXX_COMMON_URL: https://github.com/lifting-bits/cxx-common/releases/download/v0.2.23/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
   INSTALL_DIR: ${{ github.workspace }}/install
 
+# Cancel in progress runs for PRs but not main
 concurrency:
-  group: ${{ github.workflow }}-${{ github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: [self-hosted, linux, x64]
-    steps:
-    - name: Install dependencies
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y \
-             gpg wget curl zip unzip tar git pkg-config \
-             ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear
-        mkdir src
-        mkdir build
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-          toolchain: stable
-
-    - name: Download cxx-common
-      run: |
-        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-    - name: Download gap
-      uses: actions/checkout@v3
-      with:
-          repository: 'lifting-bits/gap'
-          path: '${{ github.workspace }}/src/gap'
-
-    - name: Build and install gap
-      run: |
-        cmake \
-          -S '${{ github.workspace }}/src/gap' \
-          -B '${{ github.workspace }}/build/gap' \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DUSE_SYSTEM_DEPENDENCIES=ON \
-          -DGAP_ENABLE_WARNINGS=OFF \
-          -DGAP_ENABLE_TESTING=OFF \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-        cmake --build '${{ github.workspace }}/build/gap' --target install
-
-    - name: Download weggli-native
-      uses: actions/checkout@v3
-      with:
-          repository: 'trailofbits/weggli-native'
-          path: '${{ github.workspace }}/src/weggli-native'
-
-    - name: Build and install weggli-native
-      run: |
-        cmake \
-          -S '${{ github.workspace }}/src/weggli-native' \
-          -B '${{ github.workspace }}/build/weggli-native' \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-        cmake --build '${{ github.workspace }}/build/weggli-native' --target install
-
-    - name: Download pasta
-      uses: actions/checkout@v3
-      with:
-          repository: 'trailofbits/pasta'
-          path: '${{ github.workspace }}/src/pasta'
-
-    - name: Build and install pasta
-      run: |
-        cmake \
-          --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -S '${{ github.workspace }}/src/pasta' \
-          -B '${{ github.workspace }}/build/pasta' \
-          -G Ninja \
-          -DVCPKG_ROOT="$VCPKG_ROOT" \
-          -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_C_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang" \
-          -DCMAKE_CXX_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang++" \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-          -DPASTA_BOOTSTRAP_MACROS=OFF \
-          -DPASTA_BOOTSTRAP_TYPES=OFF \
-          -DPASTA_ENABLE_TESTING=OFF \
-          -DPASTA_ENABLE_INSTALL=ON
-        cmake --build '${{ github.workspace }}/build/pasta' --target install
-
-    - name: Download multiplier
-      uses: actions/checkout@v3
-      with:
-          path: '${{ github.workspace }}/src/multiplier'
-          submodules: 'recursive'
-
-    - name: Build and install multiplier
-      run: |
-        cmake \
-          --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -S '${{ github.workspace }}/src/multiplier' \
-          -B '${{ github.workspace }}/build/multiplier' \
-          -G Ninja \
-          -DVCPKG_ROOT="$VCPKG_ROOT" \
-          -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_C_COMPILER="$(which clang-15)" \
-          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-          -DMX_ENABLE_INSTALL=ON \
-          -DMX_ENABLE_BOOTSTRAP=OFF \
-          -DMX_ENABLE_VAST=OFF \
-          -DMX_ENABLE_WEGGLI=ON
-        cmake --build '${{ github.workspace }}/build/multiplier' --target install
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: multiplier
-        path: '${{ env.INSTALL_DIR }}'
-
   build-release:
     runs-on: [self-hosted, linux, x64]
     steps:
-    - name: Install dependencies
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y \
-             gpg wget curl zip unzip tar git pkg-config \
-             ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear
-        mkdir src
-        mkdir build
+      - name: Install dependencies
+        run: |
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
+          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install -y \
+               gpg wget curl zip unzip tar git pkg-config \
+               ninja-build clang-tidy cppcheck ccache build-essential \
+               doctest-dev clang-15 bear
+          mkdir src
+          mkdir build
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
           toolchain: stable
 
-    - name: Download cxx-common
-      run: |
-        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
+      - name: Download cxx-common
+        run: |
+          curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
 
-    - name: Download gap
-      uses: actions/checkout@v3
-      with:
-          repository: 'lifting-bits/gap'
-          path: '${{ github.workspace }}/src/gap'
+      - name: Download gap
+        uses: actions/checkout@v3
+        with:
+          repository: "lifting-bits/gap"
+          path: "${{ github.workspace }}/src/gap"
 
-    - name: Build and install gap
-      run: |
-        cmake \
-          -S '${{ github.workspace }}/src/gap' \
-          -B '${{ github.workspace }}/build/gap' \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DUSE_SYSTEM_DEPENDENCIES=ON \
-          -DGAP_ENABLE_WARNINGS=OFF \
-          -DGAP_ENABLE_TESTING=OFF \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-        cmake --build '${{ github.workspace }}/build/gap' --target install
+      - name: Build and install gap
+        run: |
+          cmake \
+            -S '${{ github.workspace }}/src/gap' \
+            -B '${{ github.workspace }}/build/gap' \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DUSE_SYSTEM_DEPENDENCIES=ON \
+            -DGAP_ENABLE_WARNINGS=OFF \
+            -DGAP_ENABLE_TESTING=OFF \
+            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
+          cmake --build '${{ github.workspace }}/build/gap' --target install
 
-    - name: Download weggli-native
-      uses: actions/checkout@v3
-      with:
-          repository: 'trailofbits/weggli-native'
-          path: '${{ github.workspace }}/src/weggli-native'
+      - name: Download weggli-native
+        uses: actions/checkout@v3
+        with:
+          repository: "trailofbits/weggli-native"
+          path: "${{ github.workspace }}/src/weggli-native"
 
-    - name: Build and install weggli-native
-      run: |
-        cmake \
-          -S '${{ github.workspace }}/src/weggli-native' \
-          -B '${{ github.workspace }}/build/weggli-native' \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-        cmake --build '${{ github.workspace }}/build/weggli-native' --target install
+      - name: Build and install weggli-native
+        run: |
+          cmake \
+            -S '${{ github.workspace }}/src/weggli-native' \
+            -B '${{ github.workspace }}/build/weggli-native' \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
+          cmake --build '${{ github.workspace }}/build/weggli-native' --target install
 
-    - name: Download pasta
-      uses: actions/checkout@v3
-      with:
-          repository: 'trailofbits/pasta'
-          path: '${{ github.workspace }}/src/pasta'
+      - name: Download pasta
+        uses: actions/checkout@v3
+        with:
+          repository: "trailofbits/pasta"
+          path: "${{ github.workspace }}/src/pasta"
 
-    - name: Build and install pasta
-      run: |
-        cmake \
-          --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -S '${{ github.workspace }}/src/pasta' \
-          -B '${{ github.workspace }}/build/pasta' \
-          -G Ninja \
-          -DVCPKG_ROOT="$VCPKG_ROOT" \
-          -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang" \
-          -DCMAKE_CXX_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang++" \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-          -DPASTA_BOOTSTRAP_MACROS=OFF \
-          -DPASTA_BOOTSTRAP_TYPES=OFF \
-          -DPASTA_ENABLE_TESTING=OFF \
-          -DPASTA_ENABLE_INSTALL=ON
-        cmake --build '${{ github.workspace }}/build/pasta' --target install
+      - name: Build and install pasta
+        run: |
+          cmake \
+            --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -S '${{ github.workspace }}/src/pasta' \
+            -B '${{ github.workspace }}/build/pasta' \
+            -G Ninja \
+            -DVCPKG_ROOT="$VCPKG_ROOT" \
+            -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang" \
+            -DCMAKE_CXX_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang++" \
+            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+            -DPASTA_BOOTSTRAP_MACROS=OFF \
+            -DPASTA_BOOTSTRAP_TYPES=OFF \
+            -DPASTA_ENABLE_TESTING=OFF \
+            -DPASTA_ENABLE_INSTALL=ON
+          cmake --build '${{ github.workspace }}/build/pasta' --target install
 
-    - name: Download multiplier
-      uses: actions/checkout@v3
-      with:
-          path: '${{ github.workspace }}/src/multiplier'
-          submodules: 'recursive'
+      - name: Download multiplier
+        uses: actions/checkout@v3
+        with:
+          path: "${{ github.workspace }}/src/multiplier"
+          submodules: "recursive"
 
-    - name: Build and install multiplier
-      run: |
-        cmake \
-          --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -S '${{ github.workspace }}/src/multiplier' \
-          -B '${{ github.workspace }}/build/multiplier' \
-          -G Ninja \
-          -DVCPKG_ROOT="$VCPKG_ROOT" \
-          -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_COMPILER="$(which clang-15)" \
-          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-          -DMX_ENABLE_INSTALL=ON \
-          -DMX_ENABLE_BOOTSTRAP=OFF \
-          -DMX_ENABLE_VAST=OFF \
-          -DMX_ENABLE_WEGGLI=ON
-        cmake --build '${{ github.workspace }}/build/multiplier' --target install
+      - name: Build and install multiplier
+        run: |
+          cmake \
+            --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -S '${{ github.workspace }}/src/multiplier' \
+            -B '${{ github.workspace }}/build/multiplier' \
+            -G Ninja \
+            -DVCPKG_ROOT="$VCPKG_ROOT" \
+            -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER="$(which clang-15)" \
+            -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
+            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+            -DMX_ENABLE_INSTALL=ON \
+            -DMX_ENABLE_BOOTSTRAP=OFF \
+            -DMX_ENABLE_VAST=OFF \
+            -DMX_ENABLE_WEGGLI=ON
+          cmake --build '${{ github.workspace }}/build/multiplier' --target install
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: multiplier-rel
-        path: '${{ env.INSTALL_DIR }}'
-
-  index-lua:
-    runs-on: [self-hosted, linux, x64]
-    needs: [build]
-    steps:
-    - name: Install dependencies
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y \
-             gpg wget curl zip unzip tar git pkg-config \
-             ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear
-        mkdir src
-        mkdir build
-
-    - name: Download cxx-common
-      run: |
-        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-    - name: Download multiplier
-      uses: actions/download-artifact@v3
-      with:
-        name: multiplier
-        path: install
-
-    - name: Download and build Lua
-      run: |
-        curl --silent --location \
-          https://www.lua.org/ftp/lua-5.4.4.tar.gz | tar xz -C '${{ github.workspace }}/src'
-        cd '${{ github.workspace }}/src/lua-5.4.4'
-        bear -- make
-
-    - name: Index Lua
-      run: |
-        chmod +x install/bin/*
-        $INSTALL_DIR/bin/mx-index \
-          --db /tmp/lua-5.4.4.mx \
-          --target '${{ github.workspace }}/src/lua-5.4.4/compile_commands.json'
-
-    - name: List functions
-      run: |
-        $INSTALL_DIR/bin/mx-list-functions \
-          --db /tmp/lua-5.4.4.mx
-
-    - name: Upload Lua index
-      uses: actions/upload-artifact@v3
-      with:
-        name: lua-5.4.4
-        path: /tmp/lua-5.4.4.mx
-
-  index-pcre2:
-    runs-on: [self-hosted, linux, x64]
-    needs: [build]
-    steps:
-    - name: Install dependencies
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y \
-             gpg wget curl zip unzip tar git pkg-config \
-             ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear
-        mkdir src
-        mkdir build
-
-    - name: Download cxx-common
-      run: |
-        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-    - name: Download multiplier
-      uses: actions/download-artifact@v3
-      with:
-        name: multiplier
-        path: install
-
-    - name: Download, configure and build PCRE2
-      run: |
-        curl --silent --location \
-          https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.bz2 | tar xj -C '${{ github.workspace }}/src'
-        mkdir '${{ github.workspace }}/build/pcre2-10.42'
-        cd '${{ github.workspace }}/build/pcre2-10.42'
-        ${{ github.workspace }}/src/pcre2-10.42/configure
-        bear -- make
-
-    - name: Index PCRE2
-      run: |
-        chmod +x install/bin/*
-        $INSTALL_DIR/bin/mx-index \
-          --db /tmp/pcre2-10.42.mx \
-          --target '${{ github.workspace }}/build/pcre2-10.42/compile_commands.json'
-
-    - name: List functions
-      run: |
-        $INSTALL_DIR/bin/mx-list-functions \
-          --db /tmp/pcre2-10.42.mx
-
-    - name: Upload PCRE2 index
-      uses: actions/upload-artifact@v3
-      with:
-        name: pcre2-10.42
-        path: /tmp/pcre2-10.42.mx
-
-  index-sqlite:
-    runs-on: [self-hosted, linux, x64]
-    continue-on-error: true
-    needs: [build]
-    steps:
-    - name: Install dependencies
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y \
-             gpg wget curl zip unzip tar git pkg-config \
-             ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear
-        mkdir src
-        mkdir build
-
-    - name: Download cxx-common
-      run: |
-        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-    - name: Download multiplier
-      uses: actions/download-artifact@v3
-      with:
-        name: multiplier
-        path: install
-
-    - name: Download, configure and build SQLite
-      run: |
-        curl --silent --location \
-          https://www.sqlite.org/2022/sqlite-autoconf-3400000.tar.gz | tar xz -C '${{ github.workspace }}/src'
-        mkdir '${{ github.workspace }}/build/sqlite-autoconf-3400000'
-        cd '${{ github.workspace }}/build/sqlite-autoconf-3400000'
-        ${{ github.workspace }}/src/sqlite-autoconf-3400000/configure
-        bear -- make
-
-    - name: Index SQLite
-      run: |
-        chmod +x install/bin/*
-        $INSTALL_DIR/bin/mx-index \
-          --db /tmp/sqlite-autoconf-3400000.mx \
-          --target '${{ github.workspace }}/build/sqlite-autoconf-3400000/compile_commands.json'
-
-    - name: List functions
-      run: |
-        $INSTALL_DIR/bin/mx-list-functions \
-          --db /tmp/sqlite-autoconf-3400000.mx
-
-    - name: Upload SQLite index
-      uses: actions/upload-artifact@v3
-      with:
-        name: sqlite-autoconf-3400000
-        path: /tmp/sqlite-autoconf-3400000.mx
-
-  index-linux:
-    runs-on: [self-hosted, linux, x64]
-    continue-on-error: true
-    needs: [build-release]
-    # Indexing linux takes too long and eats up all our CI points, skip for now
-    if: false
-    steps:
-    - name: Install dependencies
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y \
-             gpg wget curl zip unzip tar git pkg-config \
-             ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 libtool autoconf flex bison \
-             libncurses-dev libssl-dev libelf-dev lld
-        mkdir src
-        mkdir build
-
-    - name: Download cxx-common
-      run: |
-        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-    - name: Download multiplier
-      uses: actions/download-artifact@v3
-      with:
-        name: multiplier-rel
-        path: install
-
-    - name: Download, configure and build Linux
-      run: |
-        curl --silent --location \
-          https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.6.tar.xz | tar xJ -C '${{ github.workspace }}/src'
-        cd '${{ github.workspace }}/src/linux-6.1.6'
-        PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" make LLVM=1 defconfig
-        PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" make LLVM=1 compile_commands.json
-        PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" env > env_vars.txt
-
-    - name: Index Linux
-      run: |
-        chmod +x install/bin/*
-        $INSTALL_DIR/bin/mx-index \
-          --env '${{ github.workspace }}/src/linux-6.1.6/env_vars.txt' \
-          --db /tmp/linux-6.1.6.mx \
-          --target '${{ github.workspace }}/src/linux-6.1.6/compile_commands.json'
-
-    - name: List functions
-      run: |
-        $INSTALL_DIR/bin/mx-list-functions \
-          --db /tmp/linux-6.1.6.mx
-
-    - name: Upload Linux index
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-6.1.6
-        path: /tmp/linux-6.1.6.mx
+      - name: Upload build artifacts on merge to main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: multiplier
+          path: "${{ env.INSTALL_DIR }}"
