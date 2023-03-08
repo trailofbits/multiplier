@@ -22,13 +22,15 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class DesignatedInitExpr;
 class Designator;
 class Expr;
 class Stmt;
+class Token;
+class TokenRange;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DesignatedInitExpr : public Expr {
@@ -77,6 +79,7 @@ class DesignatedInitExpr : public Expr {
   }
 
   std::optional<Designator> nth_designator(unsigned n) const;
+  unsigned num_designators(void) const;
   gap::generator<Designator> designators(void) const &;
   TokenRange designators_source_range(void) const;
   Token equal_or_colon_token(void) const;
@@ -84,6 +87,7 @@ class DesignatedInitExpr : public Expr {
   bool is_direct_initializer(void) const;
   bool uses_gnu_syntax(void) const;
   std::optional<Expr> nth_sub_expression(unsigned n) const;
+  unsigned num_sub_expressions(void) const;
   gap::generator<Expr> sub_expressions(void) const &;
 };
 

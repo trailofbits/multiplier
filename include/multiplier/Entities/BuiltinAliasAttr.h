@@ -22,12 +22,12 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 #include "BuiltinAliasAttrSpelling.h"
 
 namespace mx {
 class Attr;
 class BuiltinAliasAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BuiltinAliasAttr : public Attr {
  private:

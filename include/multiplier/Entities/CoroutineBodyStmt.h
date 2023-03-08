@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CoroutineBodyStmt;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CoroutineBodyStmt : public Stmt {
@@ -81,6 +82,7 @@ class CoroutineBodyStmt : public Stmt {
   Stmt final_suspend_statement(void) const;
   Stmt initializer_suspend_statement(void) const;
   std::optional<Stmt> nth_parameter_move(unsigned n) const;
+  unsigned num_parameter_moves(void) const;
   gap::generator<Stmt> parameter_moves(void) const &;
   VarDecl promise_declaration(void) const;
   Stmt promise_declaration_statement(void) const;

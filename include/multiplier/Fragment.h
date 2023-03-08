@@ -26,6 +26,7 @@ class ReferenceIteratorImpl;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
+class SourceIR;
 class WeggliQuery;
 class WeggliQueryMatch;
 class WeggliQueryResult;
@@ -57,6 +58,7 @@ class Fragment {
   friend class RemoteEntityProvider;
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
+  friend class SourceIRImpl;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
 
@@ -116,7 +118,7 @@ class Fragment {
   gap::generator<MacroOrToken> preprocessed_code(void) const &;
 
   // Returns source IR for the fragment.
-  std::optional<std::string_view> source_ir(void) const noexcept;
+  std::optional<SourceIR> ir(void) const noexcept;
 
   inline bool operator==(const Fragment &that) const noexcept {
     return id() == that.id();

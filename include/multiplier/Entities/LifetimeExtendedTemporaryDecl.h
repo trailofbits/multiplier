@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 #include "StorageDuration.h"
 
 namespace mx {
@@ -30,6 +29,7 @@ class Decl;
 class Expr;
 class LifetimeExtendedTemporaryDecl;
 class Stmt;
+class Token;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LifetimeExtendedTemporaryDecl : public Decl {

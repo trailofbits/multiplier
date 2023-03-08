@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXForRangeStmt;
+class Decl;
 class DeclStmt;
 class Expr;
 class Stmt;
+class Token;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXForRangeStmt : public Stmt {

@@ -22,11 +22,14 @@
 #include "../Token.h"
 
 #include "Macro.h"
-#include "MacroKind.h"
 
 namespace mx {
 class Macro;
+class MacroConcatenate;
+class MacroExpansion;
+class MacroStringify;
 class MacroSubstitution;
+class MacroVAOpt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroSubstitution : public Macro {
  private:

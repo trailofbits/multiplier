@@ -22,12 +22,12 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 #include "OpenCLAccessAttrSpelling.h"
 
 namespace mx {
 class Attr;
 class OpenCLAccessAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OpenCLAccessAttr : public Attr {
  private:

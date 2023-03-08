@@ -22,10 +22,10 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
 class PackExpansionType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PackExpansionType : public Type {
@@ -63,7 +63,6 @@ class PackExpansionType : public Type {
   }
 
   Type desugar(void) const;
-  std::optional<unsigned> num_expansions(void) const;
   Type pattern(void) const;
   bool is_sugared(void) const;
 };

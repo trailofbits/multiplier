@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "OMPDeclarativeDirectiveDecl.h"
 
 namespace mx {
@@ -29,6 +28,8 @@ class Decl;
 class Expr;
 class OMPAllocateDecl;
 class OMPDeclarativeDirectiveDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -76,6 +77,7 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   }
 
   std::optional<Expr> nth_varlist(unsigned n) const;
+  unsigned num_varlists(void) const;
   gap::generator<Expr> varlists(void) const &;
 };
 

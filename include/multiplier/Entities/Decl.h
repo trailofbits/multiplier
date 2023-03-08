@@ -35,10 +35,16 @@ class Attr;
 class Decl;
 class DeclImpl;
 class ExternalSourceSymbolAttr;
+class File;
+class Fragment;
+class Index;
 class Reference;
 class SourceIR;
+class Stmt;
 class TemplateDecl;
 class TemplateParameterList;
+class Token;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Decl {
  protected:
@@ -55,9 +61,9 @@ class Decl {
   friend class Type;
   friend class DeclImpl;
   std::shared_ptr<const DeclImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Decl(Decl &&) noexcept = default;
   Decl(const Decl &) = default;
@@ -125,6 +131,7 @@ class Decl {
   }
 
   std::optional<Attr> nth_attribute(unsigned n) const;
+  unsigned num_attributes(void) const;
   gap::generator<Attr> attributes(void) const &;
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;

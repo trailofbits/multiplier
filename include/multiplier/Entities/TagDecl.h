@@ -21,15 +21,22 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "TagTypeKind.h"
 #include "TypeDecl.h"
 
 namespace mx {
+class CXXRecordDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
 class Decl;
+class EnumDecl;
 class NamedDecl;
+class RecordDecl;
+class Stmt;
 class TagDecl;
 class TemplateParameterList;
+class Token;
+class TokenRange;
 class TypeDecl;
 class TypedefNameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -96,6 +103,7 @@ class TagDecl : public TypeDecl {
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
+  unsigned num_template_parameter_lists(void) const;
   gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
   gap::generator<Decl> declarations_in_context(void) const &;
 };

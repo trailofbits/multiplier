@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class RecoveryExpr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RecoveryExpr : public Expr {
@@ -76,6 +77,7 @@ class RecoveryExpr : public Expr {
   }
 
   std::optional<Expr> nth_sub_expression(unsigned n) const;
+  unsigned num_sub_expressions(void) const;
   gap::generator<Expr> sub_expressions(void) const &;
 };
 

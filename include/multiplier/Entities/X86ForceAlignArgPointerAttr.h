@@ -21,12 +21,12 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
 class Attr;
 class InheritableAttr;
+class Token;
 class X86ForceAlignArgPointerAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class X86ForceAlignArgPointerAttr : public InheritableAttr {

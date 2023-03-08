@@ -6,6 +6,7 @@
 
 #include "Macro.h"
 
+#include <multiplier/Entities/MacroSubstitution.h>
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -76,12 +77,44 @@ gap::generator<Reference> Macro::references(void) const & {
 
 namespace {
 
-static gap::generator<Token> GenerateTokens(const Macro &macro) {
-  for (mx::MacroOrToken use : macro.children()) {
+static gap::generator<Token> GenerateUseTokens(Macro macro) {
+  for (MacroOrToken use : macro.children()) {
     if (std::holds_alternative<mx::Token>(use)) {
       co_yield std::get<Token>(use);
     } else if (std::holds_alternative<Macro>(use)) {
-      for (auto tok : GenerateTokens(std::get<Macro>(use))) {
+      for (auto tok : GenerateUseTokens(std::move(std::get<Macro>(use)))) {
+        co_yield tok;
+      }
+    }
+  }
+}
+
+static gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro);
+
+static gap::generator<Token> GenerateExpansionTokensFromUse(
+    MacroOrToken use) {
+  if (std::holds_alternative<mx::Token>(use)) {
+    if (auto pt = std::get<Token>(use).parsed_token()) {
+      co_yield pt;
+    }
+  } else if (std::holds_alternative<Macro>(use)) {
+    for (Token pt : GenerateExpansionTokensFromMacro(
+                        std::move(std::get<Macro>(use)))) {
+      co_yield pt;
+    }
+  }
+}
+
+gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro) {
+  if (auto sub = MacroSubstitution::from(macro)) {
+    for (MacroOrToken use : sub->replacement_children()) {
+      for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
+        co_yield tok;
+      }
+    }
+  } else {
+    for (MacroOrToken use : macro.children()) {
+      for (Token tok : GenerateExpansionTokensFromUse(std::move(use))) {
         co_yield tok;
       }
     }
@@ -90,11 +123,20 @@ static gap::generator<Token> GenerateTokens(const Macro &macro) {
 
 }  // namespace
 
-gap::generator<Token> Macro::tokens_covering_use(void) const & {
+gap::generator<Token> Macro::use_tokens(void) const & {
   if (auto p = parent()) {
-    return p->tokens_covering_use();
+    return p->use_tokens();
   } else {
-    return GenerateTokens(*this);
+    return GenerateUseTokens(*this);
+  }
+}
+
+// Find the tokens the expansion tokens that are actually parsed.
+gap::generator<Token> Macro::expansion_tokens(void) const & {
+  if (auto p = parent()) {
+    return p->expansion_tokens();
+  } else {
+    return GenerateExpansionTokensFromMacro(*this);
   }
 }
 

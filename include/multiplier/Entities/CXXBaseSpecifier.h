@@ -33,6 +33,7 @@ class CXXBaseSpecifierImpl;
 class Reference;
 class SourceIR;
 class Token;
+class TokenRange;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXBaseSpecifier {
@@ -51,9 +52,9 @@ class CXXBaseSpecifier {
   friend class Type;
   friend class CXXBaseSpecifierImpl;
   std::shared_ptr<const CXXBaseSpecifierImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier(const CXXBaseSpecifier &) = default;

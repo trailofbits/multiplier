@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class PackExpansionExpr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PackExpansionExpr : public Expr {
@@ -76,7 +77,6 @@ class PackExpansionExpr : public Expr {
   }
 
   Token ellipsis_token(void) const;
-  std::optional<unsigned> num_expansions(void) const;
   Expr pattern(void) const;
 };
 

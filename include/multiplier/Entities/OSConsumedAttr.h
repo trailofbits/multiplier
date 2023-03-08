@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableParamAttr.h"
 
 namespace mx {
@@ -29,6 +28,7 @@ class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
 class OSConsumedAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OSConsumedAttr : public InheritableParamAttr {
  private:

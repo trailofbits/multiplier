@@ -25,13 +25,13 @@
 #include "ExceptionSpecificationType.h"
 #include "FunctionType.h"
 #include "RefQualifierKind.h"
-#include "TypeKind.h"
 
 namespace mx {
 class Expr;
 class FunctionDecl;
 class FunctionProtoType;
 class FunctionType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FunctionProtoType : public FunctionType {
@@ -77,6 +77,7 @@ class FunctionProtoType : public FunctionType {
   ExceptionSpecificationType exception_spec_type(void) const;
   std::optional<Expr> noexcept_expression(void) const;
   std::optional<Type> nth_parameter_type(unsigned n) const;
+  unsigned num_parameter_types(void) const;
   gap::generator<Type> parameter_types(void) const &;
   RefQualifierKind reference_qualifier(void) const;
   bool has_dependent_exception_spec(void) const;
@@ -91,6 +92,7 @@ class FunctionProtoType : public FunctionType {
   bool is_template_variadic(void) const;
   bool is_variadic(void) const;
   std::optional<Type> nth_exception_type(unsigned n) const;
+  unsigned num_exception_types(void) const;
   gap::generator<Type> exception_types(void) const &;
 };
 

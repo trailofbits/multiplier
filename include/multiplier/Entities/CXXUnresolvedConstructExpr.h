@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXUnresolvedConstructExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -77,6 +78,7 @@ class CXXUnresolvedConstructExpr : public Expr {
   }
 
   std::optional<Expr> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<Expr> arguments(void) const &;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;

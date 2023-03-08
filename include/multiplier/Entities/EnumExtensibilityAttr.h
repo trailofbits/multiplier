@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "EnumExtensibilityAttrKind.h"
 #include "InheritableAttr.h"
 
@@ -29,6 +28,7 @@ namespace mx {
 class Attr;
 class EnumExtensibilityAttr;
 class InheritableAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class EnumExtensibilityAttr : public InheritableAttr {
  private:

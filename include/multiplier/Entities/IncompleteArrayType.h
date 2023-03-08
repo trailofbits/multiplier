@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "ArrayType.h"
-#include "TypeKind.h"
 
 namespace mx {
 class ArrayType;
 class IncompleteArrayType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class IncompleteArrayType : public ArrayType {

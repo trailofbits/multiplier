@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class GenericSelectionExpr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class GenericSelectionExpr : public Expr {
@@ -76,6 +77,7 @@ class GenericSelectionExpr : public Expr {
   }
 
   std::optional<Expr> nth_association_expression(unsigned n) const;
+  unsigned num_association_expressions(void) const;
   gap::generator<Expr> association_expressions(void) const &;
   Expr controlling_expression(void) const;
   Token default_token(void) const;

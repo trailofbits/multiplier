@@ -27,9 +27,39 @@ void LinkExternalReferencesInFragment(
     mx::DatabaseWriter &database, const PendingFragment &pf,
     EntityMapper &em) {
 
+  // XREF(pag): Issue #214. We want to record references to other decls that are
+  //            expressed in types. In PASTA, we don't present Clang's
+  //            `TypeLoc`s, so we need to instead go through the types to find
+  //            which ones are explicitly referenced.
+  for (const pasta::Decl &decl : pf.decls_to_serialize) {
+    mx::RawEntityId from_id = em.EntityId(decl);
+    mx::VariantId vid = mx::EntityId(from_id).Unpack();
+    if (!std::holds_alternative<mx::DeclId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    mx::DeclId did = std::get<mx::DeclId>(vid);
+    if (did.fragment_id != pf.fragment_index) {
+      assert(false);
+      continue;  // This is weird?
+    }
+
+    for (pasta::Decl ref_decl : DeclReferencesFrom(decl)) {
+      mx::RawEntityId to_id = em.EntityId(ref_decl);
+      vid = mx::EntityId(to_id).Unpack();
+      if (!std::holds_alternative<mx::DeclId>(vid)) {
+        assert(false);
+        continue;
+      }
+
+      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
+    }
+  }
+
   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    mx::RawEntityId stmt_id = em.EntityId(stmt);
-    mx::VariantId vid = mx::EntityId(stmt_id).Unpack();
+    mx::RawEntityId from_id = em.EntityId(stmt);
+    mx::VariantId vid = mx::EntityId(from_id).Unpack();
     if (!std::holds_alternative<mx::StmtId>(vid)) {
       assert(false);
       continue;
@@ -41,19 +71,38 @@ void LinkExternalReferencesInFragment(
       continue;  // This is weird?
     }
 
-    std::optional<pasta::Decl> ref_decl = ReferencedDecl(stmt);
-    if (!ref_decl) {
-      continue;
-    }
+    for (pasta::Decl ref_decl : DeclReferencesFrom(stmt)) {
+      mx::RawEntityId to_id = em.EntityId(ref_decl);
+      vid = mx::EntityId(to_id).Unpack();
+      if (!std::holds_alternative<mx::DeclId>(vid)) {
+        assert(false);
+        continue;
+      }
 
-    mx::RawEntityId decl_id = em.EntityId(ref_decl.value());
-    vid = mx::EntityId(decl_id).Unpack();
-    if (!std::holds_alternative<mx::DeclId>(vid)) {
+      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
+    }
+  }
+
+  // XREF(pag): Issue #192. Make sure we record references from designators
+  //            to fields.
+  for (const pasta::Designator &d: pf.designators_to_serialize) {
+    mx::RawEntityId from_id = em.EntityId(d);
+    mx::VariantId vid = mx::EntityId(from_id).Unpack();
+    if (!std::holds_alternative<mx::DesignatorId>(vid)) {
       assert(false);
       continue;
     }
 
-    database.AddAsync(mx::ReferenceRecord{stmt_id, decl_id});
+    if (auto to_field = d.Field()) {
+      mx::RawEntityId to_id = em.EntityId(to_field.value());
+      vid = mx::EntityId(to_id).Unpack();
+      if (!std::holds_alternative<mx::DeclId>(vid)) {
+        assert(false);
+        continue;
+      }
+
+      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
+    }
   }
 
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {

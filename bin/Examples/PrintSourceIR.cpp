@@ -4,11 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <multiplier/SourceIR.h>
+
 #include <cstdlib>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/Index.h>
 #include <sstream>
 
 DECLARE_bool(help);
@@ -37,8 +38,8 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  if (auto mlir = fragment->source_ir(); mlir) {
-    std::cout << *mlir;
+  if (auto mlir = fragment->ir(); mlir) {
+    mlir->print(std::cout);
   }
 
   return EXIT_SUCCESS;

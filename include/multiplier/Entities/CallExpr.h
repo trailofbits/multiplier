@@ -23,17 +23,21 @@
 
 #include "CallExprADLCallKind.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class Attr;
+class CUDAKernelCallExpr;
+class CXXMemberCallExpr;
+class CXXOperatorCallExpr;
 class CallExpr;
 class CastExpr;
 class Decl;
 class Expr;
 class FunctionDecl;
 class Stmt;
+class Token;
 class Type;
+class UserDefinedLiteral;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CallExpr : public Expr {
@@ -82,6 +86,7 @@ class CallExpr : public Expr {
   }
 
   std::optional<Expr> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<Expr> arguments(void) const &;
   CallExprADLCallKind adl_call_kind(void) const;
   Type call_return_type(void) const;

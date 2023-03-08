@@ -23,13 +23,14 @@
 
 #include "CapturedRegionKind.h"
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CapturedDecl;
 class CapturedStmt;
+class Decl;
 class RecordDecl;
 class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CapturedStmt : public Stmt {
  private:

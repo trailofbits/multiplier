@@ -21,15 +21,22 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
 class Decl;
 class NamedDecl;
+class ObjCCategoryDecl;
+class ObjCCategoryImplDecl;
 class ObjCContainerDecl;
+class ObjCImplementationDecl;
+class ObjCInterfaceDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
+class ObjCProtocolDecl;
+class Stmt;
+class Token;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCContainerDecl : public NamedDecl {
  private:
@@ -73,18 +80,24 @@ class ObjCContainerDecl : public NamedDecl {
   }
 
   std::optional<ObjCMethodDecl> nth_class_method(unsigned n) const;
+  unsigned num_class_methods(void) const;
   gap::generator<ObjCMethodDecl> class_methods(void) const &;
   std::optional<ObjCPropertyDecl> nth_class_propertie(unsigned n) const;
+  unsigned num_class_properties(void) const;
   gap::generator<ObjCPropertyDecl> class_properties(void) const &;
   TokenRange at_end_range(void) const;
   Token at_start_token(void) const;
   std::optional<ObjCMethodDecl> nth_instance_method(unsigned n) const;
+  unsigned num_instance_methods(void) const;
   gap::generator<ObjCMethodDecl> instance_methods(void) const &;
   std::optional<ObjCPropertyDecl> nth_instance_propertie(unsigned n) const;
+  unsigned num_instance_properties(void) const;
   gap::generator<ObjCPropertyDecl> instance_properties(void) const &;
   std::optional<ObjCMethodDecl> nth_method(unsigned n) const;
+  unsigned num_methods(void) const;
   gap::generator<ObjCMethodDecl> methods(void) const &;
   std::optional<ObjCPropertyDecl> nth_propertie(unsigned n) const;
+  unsigned num_properties(void) const;
   gap::generator<ObjCPropertyDecl> properties(void) const &;
   gap::generator<Decl> declarations_in_context(void) const &;
 };

@@ -22,10 +22,17 @@
 #include "../Token.h"
 
 #include "MacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
 class ConditionalMacroDirective;
+class ElseIfDefinedMacroDirective;
+class ElseIfMacroDirective;
+class ElseIfNotDefinedMacroDirective;
+class ElseMacroDirective;
+class EndIfMacroDirective;
+class IfDefinedMacroDirective;
+class IfMacroDirective;
+class IfNotDefinedMacroDirective;
 class Macro;
 class MacroDirective;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

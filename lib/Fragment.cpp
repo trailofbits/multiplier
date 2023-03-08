@@ -6,6 +6,7 @@
 
 #include "Fragment.h"
 
+#include <iostream>
 #include <cassert>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Decl.h>
@@ -22,6 +23,7 @@
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
+#include "SourceIR.h"
 #include "WeggliImpl.h"
 
 namespace mx {
@@ -221,15 +223,6 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
   }
 }
 
-// Returns source IR for the fragment.
-std::optional<std::string_view> Fragment::source_ir(void) const noexcept {
-  auto mlir = impl->SourceIR();
-  if (!mlir.empty()) {
-    return mlir;
-  }
-  return std::nullopt;
-}
-
 // Run a Weggli search over this fragment.
 gap::generator<WeggliQueryMatch> Fragment::query(
     const WeggliQuery &query) const & {
@@ -246,6 +239,19 @@ gap::generator<RegexQueryMatch> Fragment::query(
   for (auto match : res.Enumerate()) {
     co_yield match;
   }
+}
+
+std::optional<SourceIR> Fragment::ir(void) const noexcept {
+#ifdef MX_ENABLE_SOURCEIR
+  if (auto mlir = impl->SourceIR(); !mlir.empty()) {
+    auto ir_obj = std::make_shared<const SourceIRImpl>(impl, mlir);
+    if (!ir_obj->mod.get()) {
+      return std::nullopt;
+    }
+    return SourceIR(std::move(ir_obj));
+  }
+#endif
+  return std::nullopt;
 }
 
 }  // namespace mx

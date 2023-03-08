@@ -3460,34 +3460,34 @@ PureAttrSpelling FromPasta(pasta::PureAttrSpelling e) {
   }
 }
 
-QualTypeDestructionKind FromPasta(pasta::QualTypeDestructionKind e) {
+QualifiedTypeDestructionKind FromPasta(pasta::QualifiedTypeDestructionKind e) {
   switch (static_cast<unsigned>(e)) {
-    case 0: return QualTypeDestructionKind::NONE;
-    case 1: return QualTypeDestructionKind::CXX_DESTRUCTOR;
-    case 2: return QualTypeDestructionKind::OBJC_STRONG_LIFETIME;
-    case 3: return QualTypeDestructionKind::OBJC_WEAK_LIFETIME;
-    case 4: return QualTypeDestructionKind::NONTRIVIAL_C_STRUCT;
+    case 0: return QualifiedTypeDestructionKind::NONE;
+    case 1: return QualifiedTypeDestructionKind::CXX_DESTRUCTOR;
+    case 2: return QualifiedTypeDestructionKind::OBJC_STRONG_LIFETIME;
+    case 3: return QualifiedTypeDestructionKind::OBJC_WEAK_LIFETIME;
+    case 4: return QualifiedTypeDestructionKind::NONTRIVIAL_C_STRUCT;
     default: __builtin_unreachable();
   }
 }
 
-QualTypePrimitiveCopyKind FromPasta(pasta::QualTypePrimitiveCopyKind e) {
+QualifiedTypePrimitiveCopyKind FromPasta(pasta::QualifiedTypePrimitiveCopyKind e) {
   switch (static_cast<unsigned>(e)) {
-    case 0: return QualTypePrimitiveCopyKind::TRIVIAL;
-    case 1: return QualTypePrimitiveCopyKind::VOLATILE_TRIVIAL;
-    case 2: return QualTypePrimitiveCopyKind::ARC_STRONG;
-    case 3: return QualTypePrimitiveCopyKind::ARC_WEAK;
-    case 4: return QualTypePrimitiveCopyKind::STRUCT;
+    case 0: return QualifiedTypePrimitiveCopyKind::TRIVIAL;
+    case 1: return QualifiedTypePrimitiveCopyKind::VOLATILE_TRIVIAL;
+    case 2: return QualifiedTypePrimitiveCopyKind::ARC_STRONG;
+    case 3: return QualifiedTypePrimitiveCopyKind::ARC_WEAK;
+    case 4: return QualifiedTypePrimitiveCopyKind::STRUCT;
     default: __builtin_unreachable();
   }
 }
 
-QualTypePrimitiveDefaultInitializeKind FromPasta(pasta::QualTypePrimitiveDefaultInitializeKind e) {
+QualifiedTypePrimitiveDefaultInitializeKind FromPasta(pasta::QualifiedTypePrimitiveDefaultInitializeKind e) {
   switch (static_cast<unsigned>(e)) {
-    case 0: return QualTypePrimitiveDefaultInitializeKind::TRIVIAL;
-    case 1: return QualTypePrimitiveDefaultInitializeKind::ARC_STRONG;
-    case 2: return QualTypePrimitiveDefaultInitializeKind::ARC_WEAK;
-    case 3: return QualTypePrimitiveDefaultInitializeKind::STRUCT;
+    case 0: return QualifiedTypePrimitiveDefaultInitializeKind::TRIVIAL;
+    case 1: return QualifiedTypePrimitiveDefaultInitializeKind::ARC_STRONG;
+    case 2: return QualifiedTypePrimitiveDefaultInitializeKind::ARC_WEAK;
+    case 3: return QualifiedTypePrimitiveDefaultInitializeKind::STRUCT;
     default: __builtin_unreachable();
   }
 }
@@ -4338,6 +4338,7 @@ TypeKind FromPasta(pasta::TypeKind e) {
     case 51: return TypeKind::USING;
     case 52: return TypeKind::VECTOR;
     case 53: return TypeKind::EXT_VECTOR;
+    case 54: return TypeKind::QUALIFIED;
     default: __builtin_unreachable();
   }
 }

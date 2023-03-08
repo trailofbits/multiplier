@@ -22,11 +22,15 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class Decl;
+class OMPAllocateDecl;
 class OMPDeclarativeDirectiveDecl;
+class OMPRequiresDecl;
+class OMPThreadPrivateDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDeclarativeDirectiveDecl : public Decl {
  private:

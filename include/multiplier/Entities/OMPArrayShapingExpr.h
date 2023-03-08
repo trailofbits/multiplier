@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class OMPArrayShapingExpr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPArrayShapingExpr : public Expr {
@@ -77,6 +78,7 @@ class OMPArrayShapingExpr : public Expr {
 
   Expr base(void) const;
   std::optional<Expr> nth_dimension(unsigned n) const;
+  unsigned num_dimensions(void) const;
   gap::generator<Expr> dimensions(void) const &;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;

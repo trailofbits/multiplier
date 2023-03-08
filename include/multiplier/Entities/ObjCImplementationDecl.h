@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "ObjCImplDecl.h"
 
 namespace mx {
@@ -32,6 +31,8 @@ class ObjCImplDecl;
 class ObjCImplementationDecl;
 class ObjCInterfaceDecl;
 class ObjCIvarDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCImplementationDecl : public ObjCImplDecl {
  private:
@@ -88,6 +89,7 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   bool has_destructors(void) const;
   bool has_non_zero_constructors(void) const;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
+  unsigned num_instance_variables(void) const;
   gap::generator<ObjCIvarDecl> instance_variables(void) const &;
 };
 

@@ -15,7 +15,8 @@ set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 capnp_generate_cpp(MX_RPC_SOURCES MX_RPC_HEADERS RPC.capnp)
 capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file.
 
-file(GLOB entity_headers CONFIGURE_DEPENDS "${source_include_dir}/Entities/*.h")
+file(GLOB entity_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}/*.h")
+file(GLOB entity_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}/*.cpp")
 
 add_library("mx-entities" INTERFACE)
 set_target_properties("mx-entities"
@@ -85,15 +86,15 @@ set(api_headers
   "${source_include_dir}/Reference.h"
   "${source_include_dir}/Token.h"
   "${source_include_dir}/Types.h"
+  "${source_include_dir}/SourceIR.h"
   "${source_include_dir}/Weggli.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
 
 add_library("mx-api" STATIC
   ${api_headers}
-  ${entity_headers}
-
-  "${MX_BOOTSTRAP_LIB_AST_CPP}"  # Auto-generated
+  ${entity_headers}  # Auto-generated
+  ${entity_sources}  # Auto-generated
   
   "API.cpp"
   "API.h"
@@ -101,9 +102,11 @@ add_library("mx-api" STATIC
   "Attr.cpp"
   "CachingEntityProvider.cpp"
   "CachingEntityProvider.h"
+  "CXXBaseSpecifier.h"
   "Database.cpp"
   "Decl.h"
   "Decl.cpp"
+  "Designator.h"
   "Entity.h"
   "File.cpp"
   "FileImpl.cpp"
@@ -130,6 +133,10 @@ add_library("mx-api" STATIC
   "SQLiteStore.h"
   "Stmt.h"
   "Stmt.cpp"
+  "SourceIR.cpp"
+  "SourceIR.h"
+  "TemplateArgument.h"
+  "TemplateParameterList.h"
   "ThreadLocal.cpp"
   "ThreadLocal.h"
   "TokenContext.cpp"
@@ -190,6 +197,13 @@ else()
       "MX_DISABLE_WEGGLI")
 endif()
 
+if(MX_ENABLE_VAST)
+  target_compile_definitions("mx-api"
+    PRIVATE
+      "MX_ENABLE_SOURCEIR"
+  )
+endif()
+
 target_compile_options("mx-api"
   PRIVATE
     "-Wno-unknown-warning-option"
@@ -237,9 +251,11 @@ set_target_properties("mx-mlir"
       YES
 )
 
+if(MX_ENABLE_VAST)
 target_link_libraries("mx-mlir"
   INTERFACE
     vast::vast
+    vast::MLIRCore
     vast::MLIRMeta
     MLIRDialect
     MLIRMLProgramDialect
@@ -262,12 +278,16 @@ target_link_libraries("mx-mlir"
     MLIRSPIRVDialect
     MLIRTensorInferTypeOpInterfaceImpl
 )
+else(MX_ENABLE_VAST)
+target_link_libraries("mx-mlir" INTERFACE)
+endif(MX_ENABLE_VAST)
 
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "mx-entities"
-    EXPORT "${PROJECT_NAME}Targets"
+    EXPORT
+      "${PROJECT_NAME}Targets"
     PUBLIC_HEADER
       DESTINATION
         "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}/Entities"
@@ -276,7 +296,8 @@ if(MX_ENABLE_INSTALL)
     TARGETS
       "mx-api"
       "mx-mlir"
-    EXPORT "${PROJECT_NAME}Targets"
+    EXPORT
+      "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
         "${CMAKE_INSTALL_BINDIR}"
@@ -291,3 +312,5 @@ if(MX_ENABLE_INSTALL)
         "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}"
   )
 endif(MX_ENABLE_INSTALL)
+
+add_subdirectory("Analysis")

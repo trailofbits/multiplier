@@ -23,13 +23,16 @@
 
 #include "CXXConstructExprConstructionKind.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXConstructExpr;
 class CXXConstructorDecl;
+class CXXTemporaryObjectExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
+class TokenRange;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXConstructExpr : public Expr {
@@ -78,6 +81,7 @@ class CXXConstructExpr : public Expr {
   }
 
   std::optional<Expr> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<Expr> arguments(void) const &;
   CXXConstructExprConstructionKind construction_kind(void) const;
   CXXConstructorDecl constructor(void) const;

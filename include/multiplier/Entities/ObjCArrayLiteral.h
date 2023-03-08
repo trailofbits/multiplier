@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class ObjCArrayLiteral;
 class ObjCMethodDecl;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCArrayLiteral : public Expr {
@@ -78,6 +79,7 @@ class ObjCArrayLiteral : public Expr {
 
   ObjCMethodDecl array_with_objects_method(void) const;
   std::optional<Expr> nth_element(unsigned n) const;
+  unsigned num_elements(void) const;
   gap::generator<Expr> elements(void) const &;
 };
 

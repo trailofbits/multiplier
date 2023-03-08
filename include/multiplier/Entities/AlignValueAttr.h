@@ -22,12 +22,12 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 
 namespace mx {
 class AlignValueAttr;
 class Attr;
 class Expr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AlignValueAttr : public Attr {
  private:

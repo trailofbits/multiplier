@@ -21,16 +21,19 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "ObjCContainerDecl.h"
 
 namespace mx {
 class Decl;
 class NamedDecl;
+class ObjCCategoryImplDecl;
 class ObjCContainerDecl;
 class ObjCImplDecl;
+class ObjCImplementationDecl;
 class ObjCInterfaceDecl;
 class ObjCPropertyImplDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCImplDecl : public ObjCContainerDecl {
  private:
@@ -76,6 +79,7 @@ class ObjCImplDecl : public ObjCContainerDecl {
 
   ObjCInterfaceDecl class_interface(void) const;
   std::optional<ObjCPropertyImplDecl> nth_property_implementation(unsigned n) const;
+  unsigned num_property_implementations(void) const;
   gap::generator<ObjCPropertyImplDecl> property_implementations(void) const &;
 };
 

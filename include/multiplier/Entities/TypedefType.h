@@ -22,9 +22,9 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class Token;
 class Type;
 class TypedefNameDecl;
 class TypedefType;

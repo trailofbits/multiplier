@@ -21,14 +21,15 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "VarTemplateSpecializationDecl.h"
 
 namespace mx {
 class Decl;
 class DeclaratorDecl;
 class NamedDecl;
+class Stmt;
 class TemplateParameterList;
+class Token;
 class ValueDecl;
 class VarDecl;
 class VarTemplatePartialSpecializationDecl;

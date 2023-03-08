@@ -21,16 +21,20 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "RecordDeclArgPassingKind.h"
 #include "TagDecl.h"
 
 namespace mx {
+class CXXRecordDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
 class Decl;
 class FieldDecl;
 class NamedDecl;
 class RecordDecl;
+class Stmt;
 class TagDecl;
+class Token;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RecordDecl : public TagDecl {
@@ -82,6 +86,7 @@ class RecordDecl : public TagDecl {
 
   bool can_pass_in_registers(void) const;
   std::optional<FieldDecl> nth_field(unsigned n) const;
+  unsigned num_fields(void) const;
   gap::generator<FieldDecl> fields(void) const &;
   RecordDeclArgPassingKind argument_passing_restrictions(void) const;
   bool has_flexible_array_member(void) const;

@@ -22,18 +22,20 @@
 #include "../Token.h"
 
 #include "CXXRecordDecl.h"
-#include "DeclKind.h"
 #include "TemplateSpecializationKind.h"
 
 namespace mx {
 class CXXRecordDecl;
 class ClassTemplateDecl;
+class ClassTemplatePartialSpecializationDecl;
 class ClassTemplateSpecializationDecl;
 class Decl;
 class NamedDecl;
 class RecordDecl;
+class Stmt;
 class TagDecl;
 class TemplateArgument;
+class Token;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -91,8 +93,10 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   TemplateSpecializationKind specialization_kind(void) const;
   ClassTemplateDecl specialized_template(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  unsigned num_template_arguments(void) const;
   gap::generator<TemplateArgument> template_arguments(void) const &;
   std::optional<TemplateArgument> nth_template_instantiation_argument(unsigned n) const;
+  unsigned num_template_instantiation_arguments(void) const;
   gap::generator<TemplateArgument> template_instantiation_arguments(void) const &;
   Token template_keyword_token(void) const;
   std::optional<Type> type_as_written(void) const;

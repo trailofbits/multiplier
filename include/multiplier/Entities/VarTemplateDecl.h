@@ -21,14 +21,15 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "RedeclarableTemplateDecl.h"
 
 namespace mx {
 class Decl;
 class NamedDecl;
 class RedeclarableTemplateDecl;
+class Stmt;
 class TemplateDecl;
+class Token;
 class VarTemplateDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarTemplateDecl : public RedeclarableTemplateDecl {

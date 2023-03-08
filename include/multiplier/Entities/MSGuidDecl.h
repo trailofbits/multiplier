@@ -21,13 +21,14 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "ValueDecl.h"
 
 namespace mx {
 class Decl;
 class MSGuidDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MSGuidDecl : public ValueDecl {

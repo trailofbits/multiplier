@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "FieldDecl.h"
 #include "ObjCIvarDeclAccessControl.h"
 
@@ -32,6 +31,8 @@ class FieldDecl;
 class NamedDecl;
 class ObjCInterfaceDecl;
 class ObjCIvarDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCIvarDecl : public FieldDecl {

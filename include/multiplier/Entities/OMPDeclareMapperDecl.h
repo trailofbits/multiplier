@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "OMPDeclarativeDirectiveValueDecl.h"
 
 namespace mx {
@@ -30,6 +29,8 @@ class Expr;
 class NamedDecl;
 class OMPDeclarativeDirectiveValueDecl;
 class OMPDeclareMapperDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {

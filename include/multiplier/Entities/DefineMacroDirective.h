@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "MacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
 class DefineMacroDirective;
@@ -72,7 +71,6 @@ class DefineMacroDirective : public MacroDirective {
 
   Token name(void) const;
   gap::generator<MacroOrToken> body(void) const &;
-  unsigned num_explicit_parameters(void) const;
   bool is_variadic(void) const;
   bool is_function_like(void) const;
   gap::generator<MacroOrToken> parameters(void) const &;

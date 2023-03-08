@@ -23,12 +23,13 @@
 
 #include "AtomicExprAtomicOp.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class AtomicExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -92,6 +93,7 @@ class AtomicExpr : public Expr {
   bool is_open_cl(void) const;
   bool is_volatile(void) const;
   std::optional<Expr> nth_sub_expression(unsigned n) const;
+  unsigned num_sub_expressions(void) const;
   gap::generator<Expr> sub_expressions(void) const &;
 };
 

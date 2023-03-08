@@ -22,11 +22,13 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EnumType;
+class RecordType;
 class TagDecl;
 class TagType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TagType : public Type {

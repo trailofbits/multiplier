@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class CXXMethodDecl;
 class ClassScopeFunctionSpecializationDecl;
 class Decl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ClassScopeFunctionSpecializationDecl : public Decl {
  private:

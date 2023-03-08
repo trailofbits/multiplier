@@ -22,11 +22,35 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 
 namespace mx {
+class AddressSpaceAttr;
+class AnnotateTypeAttr;
+class ArmMveStrictPolymorphismAttr;
 class Attr;
+class BTFTypeTagAttr;
+class CmseNSCallAttr;
+class NoDerefAttr;
+class ObjCGCAttr;
+class ObjCInertUnsafeUnretainedAttr;
+class ObjCKindOfAttr;
+class OpenCLConstantAddressSpaceAttr;
+class OpenCLGenericAddressSpaceAttr;
+class OpenCLGlobalAddressSpaceAttr;
+class OpenCLGlobalDeviceAddressSpaceAttr;
+class OpenCLGlobalHostAddressSpaceAttr;
+class OpenCLLocalAddressSpaceAttr;
+class OpenCLPrivateAddressSpaceAttr;
+class Ptr32Attr;
+class Ptr64Attr;
+class SPtrAttr;
+class Token;
 class TypeAttr;
+class TypeNonNullAttr;
+class TypeNullUnspecifiedAttr;
+class TypeNullableAttr;
+class TypeNullableResultAttr;
+class UPtrAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeAttr : public Attr {
  private:

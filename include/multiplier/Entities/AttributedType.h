@@ -24,10 +24,10 @@
 #include "AttrKind.h"
 #include "NullabilityKind.h"
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
 class AttributedType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AttributedType : public Type {

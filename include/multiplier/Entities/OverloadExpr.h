@@ -22,13 +22,16 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXRecordDecl;
+class Decl;
 class Expr;
 class OverloadExpr;
 class Stmt;
+class Token;
+class UnresolvedLookupExpr;
+class UnresolvedMemberExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OverloadExpr : public Expr {

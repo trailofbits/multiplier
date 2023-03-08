@@ -21,13 +21,13 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "WarnUnusedResultAttrSpelling.h"
 
 namespace mx {
 class Attr;
 class InheritableAttr;
+class Token;
 class WarnUnusedResultAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class WarnUnusedResultAttr : public InheritableAttr {

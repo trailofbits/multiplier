@@ -23,12 +23,13 @@
 
 #include "BinaryOperatorKind.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXFoldExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class UnresolvedLookupExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -82,7 +83,6 @@ class CXXFoldExpr : public Expr {
   Expr initializer(void) const;
   Expr lhs(void) const;
   Token l_paren_token(void) const;
-  std::optional<unsigned> num_expansions(void) const;
   BinaryOperatorKind operator_(void) const;
   Expr pattern(void) const;
   Expr rhs(void) const;

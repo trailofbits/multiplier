@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "TemplateSpecializationKind.h"
 #include "VarDecl.h"
 
@@ -29,11 +28,14 @@ namespace mx {
 class Decl;
 class DeclaratorDecl;
 class NamedDecl;
+class Stmt;
 class TemplateArgument;
+class Token;
 class Type;
 class ValueDecl;
 class VarDecl;
 class VarTemplateDecl;
+class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarTemplateSpecializationDecl : public VarDecl {
@@ -88,8 +90,10 @@ class VarTemplateSpecializationDecl : public VarDecl {
   TemplateSpecializationKind specialization_kind(void) const;
   VarTemplateDecl specialized_template(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  unsigned num_template_arguments(void) const;
   gap::generator<TemplateArgument> template_arguments(void) const &;
   std::optional<TemplateArgument> nth_template_instantiation_argument(unsigned n) const;
+  unsigned num_template_instantiation_arguments(void) const;
   gap::generator<TemplateArgument> template_instantiation_arguments(void) const &;
   Token template_keyword_token(void) const;
   Type type_as_written(void) const;

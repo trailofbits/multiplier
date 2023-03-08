@@ -23,12 +23,13 @@
 
 #include "CharacterLiteralCharacterKind.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CharacterLiteral;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CharacterLiteral : public Expr {

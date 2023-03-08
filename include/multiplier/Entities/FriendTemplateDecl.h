@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class Decl;
 class FriendTemplateDecl;
 class NamedDecl;
+class Stmt;
 class TemplateParameterList;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FriendTemplateDecl : public Decl {
@@ -79,6 +80,7 @@ class FriendTemplateDecl : public Decl {
   Token friend_token(void) const;
   Type friend_type(void) const;
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
+  unsigned num_template_parameter_lists(void) const;
   gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
 };
 

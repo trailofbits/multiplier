@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "OwnershipAttrOwnershipKind.h"
 #include "OwnershipAttrSpelling.h"
@@ -30,6 +29,7 @@ namespace mx {
 class Attr;
 class InheritableAttr;
 class OwnershipAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OwnershipAttr : public InheritableAttr {
  private:

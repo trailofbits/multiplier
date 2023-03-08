@@ -21,13 +21,16 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
 class BaseUsingDecl;
 class Decl;
 class NamedDecl;
+class Stmt;
+class Token;
+class UsingDecl;
+class UsingEnumDecl;
 class UsingShadowDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BaseUsingDecl : public NamedDecl {
@@ -72,6 +75,7 @@ class BaseUsingDecl : public NamedDecl {
   }
 
   std::optional<UsingShadowDecl> nth_shadow(unsigned n) const;
+  unsigned num_shadows(void) const;
   gap::generator<UsingShadowDecl> shadows(void) const &;
 };
 

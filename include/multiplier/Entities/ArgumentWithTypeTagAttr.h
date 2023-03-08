@@ -22,13 +22,13 @@
 #include "../Token.h"
 
 #include "ArgumentWithTypeTagAttrSpelling.h"
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
 class ArgumentWithTypeTagAttr;
 class Attr;
 class InheritableAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ArgumentWithTypeTagAttr : public InheritableAttr {
  private:

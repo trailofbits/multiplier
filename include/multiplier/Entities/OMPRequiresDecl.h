@@ -21,13 +21,14 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "OMPDeclarativeDirectiveDecl.h"
 
 namespace mx {
 class Decl;
 class OMPDeclarativeDirectiveDecl;
 class OMPRequiresDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
  private:

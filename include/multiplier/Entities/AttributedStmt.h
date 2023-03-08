@@ -21,13 +21,14 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "StmtKind.h"
 #include "ValueStmt.h"
 
 namespace mx {
 class Attr;
 class AttributedStmt;
+class Decl;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AttributedStmt : public ValueStmt {
@@ -76,6 +77,7 @@ class AttributedStmt : public ValueStmt {
 
   Token attribute_token(void) const;
   std::optional<Attr> nth_attribute(unsigned n) const;
+  unsigned num_attributes(void) const;
   gap::generator<Attr> attributes(void) const &;
   Stmt sub_statement(void) const;
 };

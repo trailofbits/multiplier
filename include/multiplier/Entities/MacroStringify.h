@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "MacroKind.h"
 #include "MacroSubstitution.h"
 
 namespace mx {

@@ -29,19 +29,19 @@ class MetaGenerator {
   MetaGenerator(const pasta::AST &ast, mlir::MLIRContext *mctx,  const EntityMapper &em)
   : ast(ast), em(em), mctx(mctx) {}
 
-  vast::hl::DefaultMeta get(const clang::Decl *decl) const {
+  vast::cg::DefaultMeta get(const clang::Decl *decl) const {
     return {Location(decl)};
   }
 
-  vast::hl::DefaultMeta get(const clang::Stmt *stmt) const {
+  vast::cg::DefaultMeta get(const clang::Stmt *stmt) const {
     return {Location(stmt)};
   }
 
-  vast::hl::DefaultMeta get(const clang::Type *type) const {
+  vast::cg::DefaultMeta get(const clang::Type *type) const {
     return {Location(type)};
   }
 
-  vast::hl::DefaultMeta get(const clang::QualType type) const {
+  vast::cg::DefaultMeta get(const clang::QualType type) const {
     if (auto type_ptr = type.getTypePtrOrNull()) {
       return {Location(type_ptr)};
     }

@@ -23,18 +23,20 @@
 
 #include "Expr.h"
 #include "LambdaCaptureDefault.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXMethodDecl;
 class CXXRecordDecl;
 class CompoundStmt;
+class Decl;
 class Expr;
 class FunctionTemplateDecl;
 class LambdaExpr;
 class NamedDecl;
 class Stmt;
 class TemplateParameterList;
+class Token;
+class TokenRange;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LambdaExpr : public Expr {
@@ -89,6 +91,7 @@ class LambdaExpr : public Expr {
   CompoundStmt compound_statement_body(void) const;
   std::optional<FunctionTemplateDecl> dependent_call_operator(void) const;
   std::optional<NamedDecl> nth_explicit_template_parameter(unsigned n) const;
+  unsigned num_explicit_template_parameters(void) const;
   gap::generator<NamedDecl> explicit_template_parameters(void) const &;
   TokenRange introducer_range(void) const;
   CXXRecordDecl lambda_class(void) const;

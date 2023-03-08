@@ -22,11 +22,12 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
 class ObjCInterfaceDecl;
+class ObjCInterfaceType;
 class ObjCObjectType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCObjectType : public Type {
@@ -68,6 +69,7 @@ class ObjCObjectType : public Type {
   ObjCInterfaceDecl interface(void) const;
   std::optional<Type> super_class_type(void) const;
   std::optional<Type> nth_type_argument(unsigned n) const;
+  unsigned num_type_arguments(void) const;
   gap::generator<Type> type_arguments(void) const &;
   gap::generator<Type> type_arguments_as_written(void) const &;
   bool is_kind_of_type(void) const;

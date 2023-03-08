@@ -21,12 +21,13 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
 class Decl;
 class NamedDecl;
+class Stmt;
+class Token;
 class UsingDirectiveDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UsingDirectiveDecl : public NamedDecl {

@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 #include "TypeTrait.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class TypeTraitExpr;
 class ValueStmt;
@@ -80,6 +81,7 @@ class TypeTraitExpr : public Expr {
   TypeTrait trait(void) const;
   std::optional<bool> value(void) const;
   std::optional<Type> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<Type> arguments(void) const &;
 };
 

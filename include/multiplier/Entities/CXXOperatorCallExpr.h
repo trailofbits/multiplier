@@ -23,13 +23,14 @@
 
 #include "CallExpr.h"
 #include "OverloadedOperatorKind.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXOperatorCallExpr;
 class CallExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXOperatorCallExpr : public CallExpr {

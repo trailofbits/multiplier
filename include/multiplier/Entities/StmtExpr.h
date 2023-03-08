@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CompoundStmt;
+class Decl;
 class Expr;
 class Stmt;
 class StmtExpr;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class StmtExpr : public Expr {

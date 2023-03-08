@@ -22,14 +22,50 @@
 #include "../Token.h"
 
 #include "OMPLoopBasedDirective.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
+class OMPDistributeDirective;
+class OMPDistributeParallelForDirective;
+class OMPDistributeParallelForSimdDirective;
+class OMPDistributeSimdDirective;
 class OMPExecutableDirective;
+class OMPForDirective;
+class OMPForSimdDirective;
+class OMPGenericLoopDirective;
 class OMPLoopBasedDirective;
 class OMPLoopDirective;
+class OMPMaskedTaskLoopDirective;
+class OMPMaskedTaskLoopSimdDirective;
+class OMPMasterTaskLoopDirective;
+class OMPMasterTaskLoopSimdDirective;
+class OMPParallelForDirective;
+class OMPParallelForSimdDirective;
+class OMPParallelGenericLoopDirective;
+class OMPParallelMaskedTaskLoopDirective;
+class OMPParallelMaskedTaskLoopSimdDirective;
+class OMPParallelMasterTaskLoopDirective;
+class OMPParallelMasterTaskLoopSimdDirective;
+class OMPSimdDirective;
+class OMPTargetParallelForDirective;
+class OMPTargetParallelForSimdDirective;
+class OMPTargetParallelGenericLoopDirective;
+class OMPTargetSimdDirective;
+class OMPTargetTeamsDistributeDirective;
+class OMPTargetTeamsDistributeParallelForDirective;
+class OMPTargetTeamsDistributeParallelForSimdDirective;
+class OMPTargetTeamsDistributeSimdDirective;
+class OMPTargetTeamsGenericLoopDirective;
+class OMPTaskLoopDirective;
+class OMPTaskLoopSimdDirective;
+class OMPTeamsDistributeDirective;
+class OMPTeamsDistributeParallelForDirective;
+class OMPTeamsDistributeParallelForSimdDirective;
+class OMPTeamsDistributeSimdDirective;
+class OMPTeamsGenericLoopDirective;
 class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPLoopDirective : public OMPLoopBasedDirective {
  private:
@@ -73,14 +109,19 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   }
 
   std::optional<Expr> nth_counter(unsigned n) const;
+  unsigned num_counters(void) const;
   gap::generator<Expr> counters(void) const &;
   std::optional<Expr> nth_dependent_counter(unsigned n) const;
+  unsigned num_dependent_counters(void) const;
   gap::generator<Expr> dependent_counters(void) const &;
   std::optional<Expr> nth_dependent_initializer(unsigned n) const;
+  unsigned num_dependent_initializers(void) const;
   gap::generator<Expr> dependent_initializers(void) const &;
   std::optional<Expr> nth_final(unsigned n) const;
+  unsigned num_finals(void) const;
   gap::generator<Expr> finals(void) const &;
   std::optional<Expr> nth_finals_condition(unsigned n) const;
+  unsigned num_finals_conditions(void) const;
   gap::generator<Expr> finals_conditions(void) const &;
   Stmt body(void) const;
   Expr calculate_last_iteration(void) const;
@@ -104,7 +145,6 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   Expr lower_bound_variable(void) const;
   Expr next_lower_bound(void) const;
   Expr next_upper_bound(void) const;
-  Expr num_iterations(void) const;
   Expr pre_condition(void) const;
   Stmt pre_initializers(void) const;
   Expr prev_ensure_upper_bound(void) const;
@@ -113,10 +153,13 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   Expr stride_variable(void) const;
   Expr upper_bound_variable(void) const;
   std::optional<Expr> nth_initializer(unsigned n) const;
+  unsigned num_initializers(void) const;
   gap::generator<Expr> initializers(void) const &;
   std::optional<Expr> nth_private_counter(unsigned n) const;
+  unsigned num_private_counters(void) const;
   gap::generator<Expr> private_counters(void) const &;
   std::optional<Expr> nth_update(unsigned n) const;
+  unsigned num_updates(void) const;
   gap::generator<Expr> updates(void) const &;
 };
 

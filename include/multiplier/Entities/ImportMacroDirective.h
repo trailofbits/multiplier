@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "IncludeLikeMacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
 class ImportMacroDirective;

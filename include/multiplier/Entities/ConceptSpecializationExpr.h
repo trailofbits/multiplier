@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class ConceptSpecializationExpr;
+class Decl;
 class Expr;
 class Stmt;
 class TemplateArgument;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConceptSpecializationExpr : public Expr {
@@ -77,6 +78,7 @@ class ConceptSpecializationExpr : public Expr {
   }
 
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  unsigned num_template_arguments(void) const;
   gap::generator<TemplateArgument> template_arguments(void) const &;
   bool is_satisfied(void) const;
 };

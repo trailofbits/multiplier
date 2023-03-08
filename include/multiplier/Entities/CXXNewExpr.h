@@ -23,14 +23,16 @@
 
 #include "CXXNewExprInitializationStyle.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXConstructExpr;
 class CXXNewExpr;
+class Decl;
 class Expr;
 class FunctionDecl;
 class Stmt;
+class Token;
+class TokenRange;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -95,6 +97,7 @@ class CXXNewExpr : public Expr {
   bool is_parenthesis_type_id(void) const;
   bool pass_alignment(void) const;
   std::optional<Expr> nth_placement_argument(unsigned n) const;
+  unsigned num_placement_arguments(void) const;
   gap::generator<Expr> placement_arguments(void) const &;
   bool should_null_check_allocation(void) const;
 };

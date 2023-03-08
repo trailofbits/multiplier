@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 #include "LoopHintAttrLoopHintState.h"
 #include "LoopHintAttrOptionType.h"
 #include "LoopHintAttrSpelling.h"
@@ -31,6 +30,7 @@ namespace mx {
 class Attr;
 class Expr;
 class LoopHintAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LoopHintAttr : public Attr {
  private:

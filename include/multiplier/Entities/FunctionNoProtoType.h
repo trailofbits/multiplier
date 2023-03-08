@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "FunctionType.h"
-#include "TypeKind.h"
 
 namespace mx {
 class FunctionNoProtoType;
 class FunctionType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FunctionNoProtoType : public FunctionType {

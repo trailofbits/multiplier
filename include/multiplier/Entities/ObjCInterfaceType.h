@@ -22,12 +22,12 @@
 #include "../Token.h"
 
 #include "ObjCObjectType.h"
-#include "TypeKind.h"
 
 namespace mx {
 class ObjCInterfaceDecl;
 class ObjCInterfaceType;
 class ObjCObjectType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCInterfaceType : public ObjCObjectType {

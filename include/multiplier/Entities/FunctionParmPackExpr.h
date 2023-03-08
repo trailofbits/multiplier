@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class FunctionParmPackExpr;
 class Stmt;
+class Token;
 class ValueStmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -79,6 +80,7 @@ class FunctionParmPackExpr : public Expr {
   VarDecl parameter_pack(void) const;
   Token parameter_pack_token(void) const;
   std::optional<VarDecl> nth_expansion(unsigned n) const;
+  unsigned num_expansions(void) const;
   gap::generator<VarDecl> expansions(void) const &;
 };
 

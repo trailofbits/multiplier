@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "MacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
 class Macro;

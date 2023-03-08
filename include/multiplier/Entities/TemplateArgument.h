@@ -50,9 +50,9 @@ class TemplateArgument {
   friend class Type;
   friend class TemplateArgumentImpl;
   std::shared_ptr<const TemplateArgumentImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   TemplateArgument(TemplateArgument &&) noexcept = default;
   TemplateArgument(const TemplateArgument &) = default;

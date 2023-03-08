@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "DiagnoseIfAttrDiagnosticType.h"
 #include "InheritableAttr.h"
 
@@ -31,6 +30,7 @@ class DiagnoseIfAttr;
 class Expr;
 class InheritableAttr;
 class NamedDecl;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DiagnoseIfAttr : public InheritableAttr {
  private:

@@ -22,11 +22,11 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 
 namespace mx {
 class Attr;
 class InitSegAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InitSegAttr : public Attr {
  private:

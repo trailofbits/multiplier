@@ -22,13 +22,14 @@
 #include "../Token.h"
 
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class ObjCAtCatchStmt;
 class ObjCAtFinallyStmt;
 class ObjCAtTryStmt;
 class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCAtTryStmt : public Stmt {
  private:
@@ -77,6 +78,7 @@ class ObjCAtTryStmt : public Stmt {
   ObjCAtFinallyStmt finally_statement(void) const;
   Stmt try_body(void) const;
   std::optional<ObjCAtCatchStmt> nth_catch_statement(unsigned n) const;
+  unsigned num_catch_statements(void) const;
   gap::generator<ObjCAtCatchStmt> catch_statements(void) const &;
 };
 

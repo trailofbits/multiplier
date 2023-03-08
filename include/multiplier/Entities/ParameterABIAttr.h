@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableParamAttr.h"
 #include "ParameterABI.h"
 
@@ -30,6 +29,11 @@ class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
 class ParameterABIAttr;
+class SwiftAsyncContextAttr;
+class SwiftContextAttr;
+class SwiftErrorResultAttr;
+class SwiftIndirectResultAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ParameterABIAttr : public InheritableParamAttr {
  private:

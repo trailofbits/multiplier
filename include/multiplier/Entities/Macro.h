@@ -26,6 +26,9 @@
 #include "MacroKind.h"
 
 namespace mx {
+class File;
+class Fragment;
+class Index;
 class Macro;
 class MacroImpl;
 class Reference;
@@ -48,9 +51,9 @@ class Macro {
   friend class Type;
   friend class MacroImpl;
   std::shared_ptr<const MacroImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Macro(Macro &&) noexcept = default;
   Macro(const Macro &) = default;
@@ -78,6 +81,9 @@ class Macro {
   static gap::generator<Macro> containing_internal(const Token &token);
 
  public:
+  gap::generator<Token> use_tokens(void) const &;
+  gap::generator<Token> expansion_tokens(void) const &;
+
   static gap::generator<Macro> in(const Fragment &frag, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const File &file, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const Index &index, std::span<MacroKind> kinds);
@@ -112,7 +118,6 @@ class Macro {
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;
   gap::generator<MacroOrToken> children(void) const &;
-  gap::generator<Token> tokens_covering_use(void) const &;
 };
 
 #endif

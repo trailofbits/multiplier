@@ -277,9 +277,9 @@ enum class PreserveAllAttrSpelling : unsigned;
 enum class PreserveMostAttrSpelling : unsigned;
 enum class PtGuardedVarAttrSpelling : unsigned;
 enum class PureAttrSpelling : unsigned;
-enum class QualTypeDestructionKind : unsigned;
-enum class QualTypePrimitiveCopyKind : unsigned;
-enum class QualTypePrimitiveDefaultInitializeKind : unsigned;
+enum class QualifiedTypeDestructionKind : unsigned;
+enum class QualifiedTypePrimitiveCopyKind : unsigned;
+enum class QualifiedTypePrimitiveDefaultInitializeKind : unsigned;
 enum class RISCVInterruptAttrInterruptType : unsigned;
 enum class RISCVInterruptAttrSpelling : unsigned;
 enum class RandomizeLayoutAttrSpelling : unsigned;
@@ -1359,14 +1359,14 @@ PtGuardedVarAttrSpelling FromPasta(pasta::PtGuardedVarAttrSpelling pasta_val);
 enum class PureAttrSpelling : unsigned char;
 PureAttrSpelling FromPasta(pasta::PureAttrSpelling pasta_val);
 
-enum class QualTypeDestructionKind : unsigned char;
-QualTypeDestructionKind FromPasta(pasta::QualTypeDestructionKind pasta_val);
+enum class QualifiedTypeDestructionKind : unsigned char;
+QualifiedTypeDestructionKind FromPasta(pasta::QualifiedTypeDestructionKind pasta_val);
 
-enum class QualTypePrimitiveCopyKind : unsigned char;
-QualTypePrimitiveCopyKind FromPasta(pasta::QualTypePrimitiveCopyKind pasta_val);
+enum class QualifiedTypePrimitiveCopyKind : unsigned char;
+QualifiedTypePrimitiveCopyKind FromPasta(pasta::QualifiedTypePrimitiveCopyKind pasta_val);
 
-enum class QualTypePrimitiveDefaultInitializeKind : unsigned char;
-QualTypePrimitiveDefaultInitializeKind FromPasta(pasta::QualTypePrimitiveDefaultInitializeKind pasta_val);
+enum class QualifiedTypePrimitiveDefaultInitializeKind : unsigned char;
+QualifiedTypePrimitiveDefaultInitializeKind FromPasta(pasta::QualifiedTypePrimitiveDefaultInitializeKind pasta_val);
 
 enum class RISCVInterruptAttrInterruptType : unsigned char;
 RISCVInterruptAttrInterruptType FromPasta(pasta::RISCVInterruptAttrInterruptType pasta_val);

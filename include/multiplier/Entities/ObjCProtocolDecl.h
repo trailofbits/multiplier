@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "ObjCContainerDecl.h"
 
 namespace mx {
@@ -29,7 +28,9 @@ class Decl;
 class NamedDecl;
 class ObjCContainerDecl;
 class ObjCProtocolDecl;
+class Stmt;
 class Token;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCProtocolDecl : public ObjCContainerDecl {
  private:
@@ -82,8 +83,10 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   bool is_non_runtime_protocol(void) const;
   bool is_this_declaration_a_definition(void) const;
   std::optional<Token> nth_protocol_token(unsigned n) const;
+  unsigned num_protocol_tokens(void) const;
   gap::generator<Token> protocol_tokens(void) const &;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
+  unsigned num_protocols(void) const;
   gap::generator<ObjCProtocolDecl> protocols(void) const &;
 };
 

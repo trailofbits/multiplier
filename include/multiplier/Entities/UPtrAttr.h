@@ -21,11 +21,11 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "TypeAttr.h"
 
 namespace mx {
 class Attr;
+class Token;
 class TypeAttr;
 class UPtrAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

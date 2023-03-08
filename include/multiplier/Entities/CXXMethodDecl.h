@@ -21,16 +21,20 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "FunctionDecl.h"
 #include "RefQualifierKind.h"
 
 namespace mx {
+class CXXConstructorDecl;
+class CXXConversionDecl;
+class CXXDestructorDecl;
 class CXXMethodDecl;
 class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -94,6 +98,7 @@ class CXXMethodDecl : public FunctionDecl {
   bool is_virtual(void) const;
   bool is_volatile(void) const;
   std::optional<CXXMethodDecl> nth_overridden_method(unsigned n) const;
+  unsigned num_overridden_methods(void) const;
   gap::generator<CXXMethodDecl> overridden_methods(void) const &;
 };
 

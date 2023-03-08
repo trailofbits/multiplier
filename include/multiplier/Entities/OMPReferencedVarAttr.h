@@ -22,12 +22,12 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 
 namespace mx {
 class Attr;
 class Expr;
 class OMPReferencedVarAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPReferencedVarAttr : public Attr {
  private:

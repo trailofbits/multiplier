@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "ObjCImplDecl.h"
 
 namespace mx {
@@ -31,6 +30,8 @@ class ObjCCategoryDecl;
 class ObjCCategoryImplDecl;
 class ObjCContainerDecl;
 class ObjCImplDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCCategoryImplDecl : public ObjCImplDecl {
  private:

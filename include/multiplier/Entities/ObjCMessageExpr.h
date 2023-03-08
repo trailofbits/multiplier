@@ -24,15 +24,16 @@
 #include "Expr.h"
 #include "ObjCMessageExprReceiverKind.h"
 #include "ObjCMethodFamily.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class ObjCInterfaceDecl;
 class ObjCMessageExpr;
 class ObjCMethodDecl;
 class Stmt;
 class Token;
+class TokenRange;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -82,6 +83,7 @@ class ObjCMessageExpr : public Expr {
   }
 
   std::optional<Expr> nth_argument(unsigned n) const;
+  unsigned num_arguments(void) const;
   gap::generator<Expr> arguments(void) const &;
   Type call_return_type(void) const;
   Type class_receiver(void) const;
@@ -103,6 +105,7 @@ class ObjCMessageExpr : public Expr {
   bool is_implicit(void) const;
   bool is_instance_message(void) const;
   std::optional<Token> nth_selector_token(unsigned n) const;
+  unsigned num_selector_tokens(void) const;
   gap::generator<Token> selector_tokens(void) const &;
 };
 

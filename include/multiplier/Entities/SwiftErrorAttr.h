@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "SwiftErrorAttrConventionKind.h"
 
@@ -29,6 +28,7 @@ namespace mx {
 class Attr;
 class InheritableAttr;
 class SwiftErrorAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class SwiftErrorAttr : public InheritableAttr {
  private:

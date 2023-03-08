@@ -22,13 +22,13 @@
 #include "../Token.h"
 
 #include "Attr.h"
-#include "AttrKind.h"
 #include "OMPDeclareSimdDeclAttrBranchStateTy.h"
 
 namespace mx {
 class Attr;
 class Expr;
 class OMPDeclareSimdDeclAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDeclareSimdDeclAttr : public Attr {
  private:

@@ -22,14 +22,15 @@
 #include "../Token.h"
 
 #include "AsmStmt.h"
-#include "StmtKind.h"
 
 namespace mx {
 class AddrLabelExpr;
 class AsmStmt;
+class Decl;
 class GCCAsmStmt;
 class Stmt;
 class StringLiteral;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class GCCAsmStmt : public AsmStmt {
  private:
@@ -79,16 +80,21 @@ class GCCAsmStmt : public AsmStmt {
   Token r_paren_token(void) const;
   bool is_assembly_goto(void) const;
   std::optional<AddrLabelExpr> nth_label(unsigned n) const;
+  unsigned num_labels(void) const;
   gap::generator<AddrLabelExpr> labels(void) const &;
   std::optional<StringLiteral> nth_output_constraint_literal(unsigned n) const;
+  unsigned num_output_constraint_literals(void) const;
   gap::generator<StringLiteral> output_constraint_literals(void) const &;
   gap::generator<std::string_view> output_names(void) const &;
   std::optional<StringLiteral> nth_input_constraint_literal(unsigned n) const;
+  unsigned num_input_constraint_literals(void) const;
   gap::generator<StringLiteral> input_constraint_literals(void) const &;
   gap::generator<std::string_view> input_names(void) const &;
   std::optional<StringLiteral> nth_clobber_string_literal(unsigned n) const;
+  unsigned num_clobber_string_literals(void) const;
   gap::generator<StringLiteral> clobber_string_literals(void) const &;
   std::optional<AddrLabelExpr> nth_label_expression(unsigned n) const;
+  unsigned num_label_expressions(void) const;
   gap::generator<AddrLabelExpr> label_expressions(void) const &;
   gap::generator<std::string_view> label_names(void) const &;
 };

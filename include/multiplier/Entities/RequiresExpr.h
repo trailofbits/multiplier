@@ -22,14 +22,15 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class ParmVarDecl;
 class RequiresExpr;
 class RequiresExprBodyDecl;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RequiresExpr : public Expr {
@@ -79,6 +80,7 @@ class RequiresExpr : public Expr {
 
   RequiresExprBodyDecl body(void) const;
   std::optional<ParmVarDecl> nth_local_parameter(unsigned n) const;
+  unsigned num_local_parameters(void) const;
   gap::generator<ParmVarDecl> local_parameters(void) const &;
   Token r_brace_token(void) const;
   Token requires_keyword_token(void) const;

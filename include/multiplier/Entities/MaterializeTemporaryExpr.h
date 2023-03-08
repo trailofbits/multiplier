@@ -22,14 +22,15 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 #include "StorageDuration.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class LifetimeExtendedTemporaryDecl;
 class MaterializeTemporaryExpr;
 class Stmt;
+class Token;
 class ValueDecl;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

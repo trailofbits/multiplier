@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "TagDecl.h"
 #include "TemplateSpecializationKind.h"
 
@@ -30,7 +29,10 @@ class Decl;
 class EnumConstantDecl;
 class EnumDecl;
 class NamedDecl;
+class Stmt;
 class TagDecl;
+class Token;
+class TokenRange;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -82,6 +84,7 @@ class EnumDecl : public TagDecl {
   }
 
   std::optional<EnumConstantDecl> nth_enumerator(unsigned n) const;
+  unsigned num_enumerators(void) const;
   gap::generator<EnumConstantDecl> enumerators(void) const &;
   std::optional<EnumDecl> instantiated_from_member_enum(void) const;
   std::optional<Type> integer_type(void) const;

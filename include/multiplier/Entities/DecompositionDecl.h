@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "VarDecl.h"
 
 namespace mx {
@@ -30,6 +29,8 @@ class Decl;
 class DeclaratorDecl;
 class DecompositionDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -82,6 +83,7 @@ class DecompositionDecl : public VarDecl {
   }
 
   std::optional<BindingDecl> nth_binding(unsigned n) const;
+  unsigned num_bindings(void) const;
   gap::generator<BindingDecl> bindings(void) const &;
 };
 

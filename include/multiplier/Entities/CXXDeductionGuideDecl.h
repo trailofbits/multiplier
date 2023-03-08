@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "FunctionDecl.h"
 
 namespace mx {
@@ -31,7 +30,9 @@ class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
 class NamedDecl;
+class Stmt;
 class TemplateDecl;
+class Token;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXDeductionGuideDecl : public FunctionDecl {

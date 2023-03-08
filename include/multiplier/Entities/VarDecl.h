@@ -21,10 +21,8 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "DeclaratorDecl.h"
 #include "LanguageLinkage.h"
-#include "QualTypeDestructionKind.h"
 #include "StorageClass.h"
 #include "StorageDuration.h"
 #include "TemplateSpecializationKind.h"
@@ -35,11 +33,19 @@
 namespace mx {
 class Decl;
 class DeclaratorDecl;
+class DecompositionDecl;
 class Expr;
+class ImplicitParamDecl;
 class NamedDecl;
+class OMPCapturedExprDecl;
+class ParmVarDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VarDecl;
 class VarTemplateDecl;
+class VarTemplatePartialSpecializationDecl;
+class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarDecl : public DeclaratorDecl {
  private:
@@ -138,7 +144,6 @@ class VarDecl : public DeclaratorDecl {
   bool is_this_declaration_a_demoted_definition(void) const;
   bool is_usable_in_constant_expressions(void) const;
   bool might_be_usable_in_constant_expressions(void) const;
-  QualTypeDestructionKind needs_destruction(void) const;
 };
 
 static_assert(sizeof(VarDecl) == sizeof(DeclaratorDecl));

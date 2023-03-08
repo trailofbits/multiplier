@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class CapturedDecl;
 class Decl;
 class ImplicitParamDecl;
+class Stmt;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CapturedDecl : public Decl {
  private:
@@ -76,6 +77,7 @@ class CapturedDecl : public Decl {
   ImplicitParamDecl context_parameter(void) const;
   bool is_nothrow(void) const;
   std::optional<ImplicitParamDecl> nth_parameter(unsigned n) const;
+  unsigned num_parameters(void) const;
   gap::generator<ImplicitParamDecl> parameters(void) const &;
   gap::generator<Decl> declarations_in_context(void) const &;
 };

@@ -22,7 +22,6 @@
 #include "../Token.h"
 
 #include "ClassTemplateSpecializationDecl.h"
-#include "DeclKind.h"
 
 namespace mx {
 class CXXRecordDecl;
@@ -31,8 +30,10 @@ class ClassTemplateSpecializationDecl;
 class Decl;
 class NamedDecl;
 class RecordDecl;
+class Stmt;
 class TagDecl;
 class TemplateParameterList;
+class Token;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

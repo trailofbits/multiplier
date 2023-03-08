@@ -21,7 +21,6 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "DeclKind.h"
 #include "OMPDeclareReductionDeclInitKind.h"
 #include "ValueDecl.h"
 
@@ -30,6 +29,8 @@ class Decl;
 class Expr;
 class NamedDecl;
 class OMPDeclareReductionDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDeclareReductionDecl : public ValueDecl {

@@ -32,6 +32,7 @@ class Reference;
 class SourceIR;
 class TemplateParameterList;
 class TemplateParameterListImpl;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
  protected:
@@ -49,9 +50,9 @@ class TemplateParameterList {
   friend class Type;
   friend class TemplateParameterListImpl;
   std::shared_ptr<const TemplateParameterListImpl> impl;
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
-  inline static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   TemplateParameterList(TemplateParameterList &&) noexcept = default;
   TemplateParameterList(const TemplateParameterList &) = default;
@@ -91,8 +92,6 @@ class TemplateParameterList {
     return t.as_template_parameter_list();
   }
 
-  unsigned num_parameters(void) const;
-  unsigned num_required_parameters(void) const;
   unsigned depth(void) const;
   bool has_unexpanded_parameter_pack(void) const;
   bool has_parameter_pack(void) const;
@@ -102,6 +101,7 @@ class TemplateParameterList {
   Token right_angle_token(void) const;
   TokenRange tokens(void) const;
   std::optional<NamedDecl> nth_parameter(unsigned n) const;
+  unsigned num_parameters(void) const;
   gap::generator<NamedDecl> parameters(void) const &;
 };
 

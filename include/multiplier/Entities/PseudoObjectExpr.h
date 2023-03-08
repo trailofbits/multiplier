@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class PseudoObjectExpr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PseudoObjectExpr : public Expr {
@@ -78,8 +79,10 @@ class PseudoObjectExpr : public Expr {
   Expr result_expression(void) const;
   Expr syntactic_form(void) const;
   std::optional<Expr> nth_semantic(unsigned n) const;
+  unsigned num_semantics(void) const;
   gap::generator<Expr> semantics(void) const &;
   std::optional<Expr> nth_semantic_expression(unsigned n) const;
+  unsigned num_semantic_expressions(void) const;
   gap::generator<Expr> semantic_expressions(void) const &;
 };
 

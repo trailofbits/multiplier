@@ -170,12 +170,12 @@ VariantEntity Index::entity(EntityId eid) const {
 
   // It's a reference to a parsed token resident in a fragment.
   if (std::holds_alternative<ParsedTokenId>(vid)) {
-    ParsedTokenId id = std::get<ParsedTokenId>(vid);
-    FragmentId fid(id.fragment_id);
+    ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
 
     if (FragmentImplPtr fptr = impl->FragmentFor(impl, fid);
-        id.offset < fptr->num_parsed_tokens) {
-      Token tok(fptr->ParsedTokenReader(fptr), id.offset);
+        tid.offset < fptr->num_parsed_tokens) {
+      Token tok(fptr->ParsedTokenReader(fptr), tid.offset);
       if (tok.id() == eid) {
         return tok;
       }
@@ -184,12 +184,12 @@ VariantEntity Index::entity(EntityId eid) const {
 
   // It's a reference to a macro token resident in a fragment.
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
-    MacroTokenId id = std::get<MacroTokenId>(vid);
-    FragmentId fid(id.fragment_id);
+    MacroTokenId tid = std::get<MacroTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
 
     if (FragmentImplPtr frag_ptr = impl->FragmentFor(impl, fid);
-        frag_ptr && id.offset < frag_ptr->num_tokens) {
-      Token tok(frag_ptr->MacroTokenReader(frag_ptr), id.offset);
+        frag_ptr && tid.offset < frag_ptr->num_tokens) {
+      Token tok(frag_ptr->MacroTokenReader(frag_ptr), tid.offset);
       if (tok.id() == eid) {
         return tok;
       }
@@ -198,12 +198,12 @@ VariantEntity Index::entity(EntityId eid) const {
 
   // It's a reference to a file token.
   } else if (std::holds_alternative<FileTokenId>(vid)) {
-    FileTokenId id = std::get<FileTokenId>(vid);
-    FileId fid(id.file_id);
+    FileTokenId tid = std::get<FileTokenId>(vid);
+    FileId fid(tid.file_id);
 
     if (FileImplPtr file_ptr = impl->FileFor(impl, fid);
-        file_ptr && id.offset < file_ptr->num_tokens) {
-      Token tok(file_ptr->TokenReader(file_ptr), id.offset);
+        file_ptr && tid.offset < file_ptr->num_tokens) {
+      Token tok(file_ptr->TokenReader(file_ptr), tid.offset);
       if (tok.id() == eid) {
         return tok;
       }

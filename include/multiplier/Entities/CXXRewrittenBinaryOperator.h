@@ -23,12 +23,13 @@
 
 #include "BinaryOperatorKind.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
 class CXXRewrittenBinaryOperator;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXRewrittenBinaryOperator : public Expr {

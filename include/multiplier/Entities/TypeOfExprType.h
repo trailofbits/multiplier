@@ -22,10 +22,10 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
 class Expr;
+class Token;
 class Type;
 class TypeOfExprType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

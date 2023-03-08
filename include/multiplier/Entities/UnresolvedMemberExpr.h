@@ -22,12 +22,13 @@
 #include "../Token.h"
 
 #include "OverloadExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class Decl;
 class Expr;
 class OverloadExpr;
 class Stmt;
+class Token;
 class Type;
 class UnresolvedMemberExpr;
 class ValueStmt;

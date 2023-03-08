@@ -21,13 +21,13 @@
 #include "../Types.h"
 #include "../Token.h"
 
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "TypeVisibilityAttrVisibilityType.h"
 
 namespace mx {
 class Attr;
 class InheritableAttr;
+class Token;
 class TypeVisibilityAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeVisibilityAttr : public InheritableAttr {

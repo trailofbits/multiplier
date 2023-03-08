@@ -22,13 +22,13 @@
 #include "../Token.h"
 
 #include "AssertCapabilityAttrSpelling.h"
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
 class AssertCapabilityAttr;
 class Attr;
 class InheritableAttr;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AssertCapabilityAttr : public InheritableAttr {
  private:

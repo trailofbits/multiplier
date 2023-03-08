@@ -22,12 +22,12 @@
 #include "../Token.h"
 
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
 class CXXRecordDecl;
 class InjectedClassNameType;
 class TemplateSpecializationType;
+class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InjectedClassNameType : public Type {
