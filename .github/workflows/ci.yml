@@ -10,9 +10,8 @@ on:
       - "*"
 
 env:
-  VCPKG_ROOT: ${{ github.workspace }}/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
-  INSTALL_DIR: ${{ github.workspace }}/install
-  DOCKER_RUN: docker run -v ${{ github.workspace }}:/build -w /build -e VCPKG_ROOT -e INSTALL_DIR ghcr.io/trailofbits/multiplier
+  VCPKG_ROOT: /build/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
+  DOCKER_RUN: docker run -v ${{ github.workspace }}:/build -w /build -e VCPKG_ROOT ghcr.io/trailofbits/multiplier
 
 # Cancel in progress runs for PRs but not main
 concurrency:
@@ -33,24 +32,26 @@ jobs:
         run: |
           ${DOCKER_RUN} cmake \
             --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-            -S '${{ github.workspace }}/src/multiplier' \
-            -B '${{ github.workspace }}/build/multiplier' \
+            -S '/build/src/multiplier' \
+            -B '/build/build/multiplier' \
             -G Ninja \
             -DVCPKG_ROOT="$VCPKG_ROOT" \
             -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER="$(which clang-15)" \
             -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_INSTALL_PREFIX="/build/install" \
             -DMX_ENABLE_INSTALL=ON \
             -DMX_ENABLE_BOOTSTRAP=OFF \
             -DMX_ENABLE_VAST=OFF \
-            -DMX_ENABLE_WEGGLI=ON
-          ${DOCKER_RUN} cmake --build '${{ github.workspace }}/build/multiplier' --target install
+            -DMX_ENABLE_WEGGLI=ON \
+          && ${DOCKER_RUN} cmake --build '/build/build/multiplier' --target install
 
       - name: Upload build artifacts on merge to main
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: actions/upload-artifact@v3
         with:
           name: multiplier
-          path: "${{ env.INSTALL_DIR }}"
+          path: "${{ github.workspace }}/install"
