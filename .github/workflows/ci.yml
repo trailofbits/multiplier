@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   build-release:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-22.04
     steps:
       - name: Install dependencies
         run: |
