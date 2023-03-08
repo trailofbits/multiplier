@@ -12,7 +12,7 @@ on:
 env:
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
   INSTALL_DIR: ${{ github.workspace }}/install
-  DOCKER_RUN: docker run -v $(pwd):/build -w /build -e VCPKG_ROOT -e INSTALL_DIR ghcr.io/trailofbits/multiplier
+  DOCKER_RUN: docker run -v ${{ github.workspace }}:/build -w /build -e VCPKG_ROOT -e INSTALL_DIR ghcr.io/trailofbits/multiplier
 
 # Cancel in progress runs for PRs but not main
 concurrency:
