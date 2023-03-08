@@ -5,14 +5,16 @@ on:
     branches:
       - "main"
 
-  # pull_request:
-  #   branches:
-  #     - "*"
+  pull_request:
+    branches:
+      - "*"
 
 env:
   CXX_COMMON_URL: https://github.com/lifting-bits/cxx-common/releases/download/v0.2.23/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
   INSTALL_DIR: ${{ github.workspace }}/install
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 # Cancel in progress runs for PRs but not main
 concurrency:
@@ -22,7 +24,7 @@ concurrency:
 jobs:
   build-release:
     runs-on: ubuntu-22.04
-    container: 
+    container: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
     steps:
       - name: Download multiplier
         uses: actions/checkout@v3
