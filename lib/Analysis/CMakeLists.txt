@@ -12,16 +12,19 @@ set(source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/Anal
 
 set(analysis_headers
   "${source_include_dir}/Taint.h"
+  "${source_include_dir}/IRAnalysis.h"
 )
 
 add_library("mx-analysis" STATIC
   "${analysis_headers}"
   "Taint.cpp"
+  "IRAnalysis.cpp"
 )
 
 target_link_libraries("mx-analysis"
   PUBLIC
     "mx-api"
+    "mx-mlir"
 )
 
 target_compile_options("mx-analysis"
