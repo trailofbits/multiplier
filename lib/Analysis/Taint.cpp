@@ -16,6 +16,7 @@
 #include <multiplier/Entities/ConditionalOperator.h>
 #include <multiplier/Entities/DeclKind.h>
 #include <multiplier/Entities/DeclRefExpr.h>
+#include <multiplier/Entities/DeclStmt.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/DoStmt.h>
 #include <multiplier/Entities/ForStmt.h>
@@ -574,6 +575,12 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
     case StmtKind::COYIELD_EXPR:
       return AcceptReturn(std::move(stmt));
 
+    case StmtKind::DECL_STMT:
+      if (auto single_decl = DeclStmt::from(stmt)->single_declaration()) {
+        return AcceptDecl(std::move(single_decl.value()));
+      }
+      [[clang::fallthrough]];
+
     default:
       if (IsNonValueStatement(kind)) {
         return NoTaints();
@@ -611,6 +618,18 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
     case StmtKind::CORETURN_STMT:
     case StmtKind::COYIELD_EXPR:
       return AcceptReturn(std::move(stmt));
+
+    // Propagates through an assignment to a declaration.
+    case StmtKind::DECL_STMT:
+      for (Decl d : DeclStmt::from(stmt)->declarations()) {
+        if (std::optional<VarDecl> vd = VarDecl::from(d)) {
+          if (std::optional<Expr> init = vd->initializer();
+              init && init.value() == stmt) {
+            return AcceptDecl(std::move(d));
+          }
+        }
+      }
+      return NoTaints();
 
     case StmtKind::DECL_REF_EXPR:
       assert(false);  // Shouldn't have children.
