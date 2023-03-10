@@ -93,6 +93,24 @@ std::optional<Stmt> TraintTrackingEdge::as_statement(void) const noexcept {
 TaintTracker::TaintTracker(const Index &index)
     : impl(std::make_shared<TaintTrackerImpl>(index)) {}
 
+// Taint the declaration or statement.
+TaintTrackingResults TaintTracker::add_source(const VariantEntity &entity) & {
+  if (std::holds_alternative<Decl>(entity)) {
+    for (TaintTrackingResult res :
+             impl->AcceptDecl(std::move(std::get<Decl>(entity)))) {
+      co_yield res;
+    }
+
+  } else if (std::holds_alternative<Stmt>(entity)) {
+    for (TaintTrackingResult res :
+             impl->AcceptStmt(std::move(std::get<Stmt>(entity)))) {
+      co_yield res;
+    }
+  } else {
+    co_return;
+  }
+}
+
 // Taint the declaration or statement associated with an existing taint
 // tracking edge.
 TaintTrackingResults TaintTracker::add_source(
