@@ -623,14 +623,6 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
       break;
     }
 
-    case StmtKind::CALL_EXPR: {
-      auto call = CallExpr::from(parent).value();
-      if (call.callee() != stmt) {
-        return TaintCallArgument(std::move(stmt), std::move(call));
-      }
-      [[clang::fallthrough]];
-    }
-
     case StmtKind::SWITCH_STMT: {
       auto switch_ = SwitchStmt::from(parent).value();
       if (switch_.condition() == stmt) {
@@ -665,6 +657,14 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
         return TaintCondition(std::move(parent.value()));
       }
       break;
+    }
+
+    case StmtKind::CALL_EXPR: {
+      auto call = CallExpr::from(parent).value();
+      if (call.callee() != stmt) {
+        return TaintCallArgument(std::move(stmt), std::move(call));
+      }
+      [[clang::fallthrough]];
     }
 
     // Not sure.
