@@ -54,6 +54,7 @@ class TaintTrackerImpl final
 
   TaintTrackingResults AcceptReturn(Stmt stmt);
   TaintTrackingResults AcceptStmt(Stmt stmt);
+  TaintTrackingResults AcceptDeclStmt(Stmt stmt);
 
   TaintTrackingResults TaintConditionalOperator(
       Stmt child, ConditionalOperator parent);
@@ -562,6 +563,14 @@ TaintTrackingResults TaintTrackerImpl::TaintCallArgument(
   }
 }
 
+TaintTrackingResults TaintTrackerImpl::AcceptDeclStmt(Stmt stmt) {
+  for (Decl d : DeclStmt::from(stmt)->declarations()) {
+    for (TaintTrackingResult res : AcceptDecl(std::move(d))) {
+      co_yield res;
+    }
+  }
+}
+
 // Given that `stmt` is tainted, go and try to figure out how it is used, and
 // generate the next taint from there.
 TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
@@ -576,10 +585,7 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
       return AcceptReturn(std::move(stmt));
 
     case StmtKind::DECL_STMT:
-      if (auto single_decl = DeclStmt::from(stmt)->single_declaration()) {
-        return AcceptDecl(std::move(single_decl.value()));
-      }
-      [[clang::fallthrough]];
+      return AcceptDeclStmt(std::move(stmt));
 
     default:
       if (IsNonValueStatement(kind)) {
@@ -617,11 +623,11 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
     case StmtKind::RETURN_STMT:
     case StmtKind::CORETURN_STMT:
     case StmtKind::COYIELD_EXPR:
-      return AcceptReturn(std::move(stmt));
+      return AcceptReturn(std::move(parent.value()));
 
     // Propagates through an assignment to a declaration.
     case StmtKind::DECL_STMT:
-      for (Decl d : DeclStmt::from(stmt)->declarations()) {
+      for (Decl d : DeclStmt::from(parent)->declarations()) {
         if (std::optional<VarDecl> vd = VarDecl::from(d)) {
           if (std::optional<Expr> init = vd->initializer();
               init && init.value() == stmt) {
