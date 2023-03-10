@@ -10,8 +10,12 @@ string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 
 set(source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/Analysis")
 
-add_library("mx-analysis" STATIC
+set(analysis_headers
   "${source_include_dir}/Taint.h"
+)
+
+add_library("mx-analysis" STATIC
+  "${analysis_headers}"
   "Taint.cpp"
 )
 
@@ -41,7 +45,7 @@ set_target_properties("mx-analysis"
     LINKER_LANGUAGE
       CXX
     PUBLIC_HEADER
-      "${api_headers}"
+      "${analysis_headers}"
     VISIBILITY_INLINES_HIDDEN
       YES
     CXX_VISIBILITY_PRESET
