@@ -25,6 +25,11 @@
 "directory": ""
 },
 {
+"file": "DefineInMacroUse.c",
+"command": "clang DefineInMacroUse.c",
+"directory": ""
+},
+{
 "file": "DeferredPragmaCancellation.c",
 "command": "clang DeferredPragmaCancellation.c",
 "directory": ""

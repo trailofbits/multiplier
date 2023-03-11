@@ -125,6 +125,7 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
                                    PathCache &cache) {
   EnvVariableMap &envp = command.env;
   std::vector<std::string> to_remove;
+  std::vector<std::string> new_vec;
   std::string path;
 
   for (auto &[key, val] : envp) {
@@ -136,6 +137,40 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
     }
   }
 
+  auto is_quoted = [] (const char *arg) {
+    return (arg[0] == '\'' || arg[0] == '"') && arg[strlen(arg) - 1u] == arg[0];
+  };
+
+  // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
+  auto has_quoted = false;
+  for (const char *arg : command.vec.Arguments()) {
+    if (is_quoted(arg)) {
+      has_quoted = true;
+      break;
+    }
+  }
+
+  // If there are quoted arguments, then unquote them.
+  if (has_quoted) {
+    for (const char *arg : command.vec.Arguments()) {
+      if (!is_quoted(arg)) {
+        new_vec.emplace_back(arg);
+      } else {
+        std::string new_arg;
+        auto max_i = strlen(arg);
+        new_arg.reserve(max_i);
+        for (size_t i = 1u; i < max_i - 1; ++i) {
+          if (arg[i] != '\\') {
+            new_arg.push_back(arg[i]);
+          }
+        }
+        new_vec.emplace_back(std::move(new_arg));
+      }
+    }
+    command.vec.Reset(new_vec);
+    new_vec.clear();
+  }
+
   // Try to get the path of the target executable, and if we succeed, then
   // use it, otherwise drop `_`.
   std::string exe_name_var("_");
@@ -144,7 +179,6 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
 
     // Overwrite the first argument in the vector with the fully realized
     // path of the compiler.
-    std::vector<std::string> new_vec;
     for (const char *arg : command.vec.Arguments()) {
       new_vec.emplace_back(arg);
     }
@@ -291,6 +325,11 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
       new_args.emplace_back(arg);
       new_args.emplace_back("/dev/null");
       continue;
+
+    // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
+    } else if ((arg[0] == '\'' || arg[0] == '"') && arg[1] == '-' &&
+               arg[strlen(arg) - 1u] == arg[0]) {
+      continue;
     }
 
     new_args.emplace_back(arg);
@@ -301,7 +340,7 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
   new_args.emplace_back("-P");  // Disable preprocessor line markers.
   new_args.emplace_back("-v");
 //  new_args.emplace_back("-dD");  // Print macro definitions in -E mode.
-  new_args.emplace_back("-E");  // Only run the preprocessor.
+//  new_args.emplace_back("-E");  // Only run the preprocessor.
 
   // Include a non-existent file. This guarantees a fatal error in all cases,
   // which prevents any compilation jobs from proceeding.
@@ -333,6 +372,7 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
 
   new_args.emplace_back("-isysroot");
   new_args.emplace_back(command.working_dir + "/trail_of_bits");
+
   ret = Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output.no_sysroot);
 
