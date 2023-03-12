@@ -81,11 +81,5 @@ target_link_libraries("mx-dump-json"
 if(MX_ENABLE_VAST)
   define_example("mx-print-sourceir" "PrintSourceIR.cpp")
   define_example("mx-dump-sourceir" "DumpSourceIR.cpp")
-  define_example("mx-list-variable-sourceir" "ListVariablesSourceIR.cpp")
   define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")
-
-  target_link_libraries("mx-dump-sourceir"
-    PRIVATE
-      "mx-mlir"
-  )
 endif(MX_ENABLE_VAST)

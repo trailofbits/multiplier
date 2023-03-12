@@ -5,7 +5,6 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <gap/core/generator.hpp>
-#include <multiplier/Analysis/Taint.h>
 #include <multiplier/SourceIR.h>
 #include <multiplier/Index.h>
 
@@ -15,48 +14,78 @@ class Value;
 } // namespace mlir
 
 namespace mx {
-namespace iranalysis {
 
-class TaintEdge;
-class TaintTrackingCondition;
-class TaintTrackingSink;
-class TaintTrackingStep;
+enum class OperationKind {
+  ADDRESS_OF,
+  ASSIGN,
+  CALL,
+  CMP,
+  COND_YIELD,
+  DEREF,
+  INDIRECT_CALL,
+  RETURN,
+  SIZE_OF,
+  SUBSCRIPT,
+  UNREACHABLE,
+  VALUE_YIELD,
+  OTHER,
+};
 
-using TaintTrackingResult = std::variant<TaintTrackingStep, TaintTrackingSink,
-                                         TaintTrackingCondition>;
-using TaintTrackingResults = gap::generator<TaintTrackingResult>;
+#define MX_FOR_EACH_OPERATION_KIND(m) \
+		m("hl.addressof", address_of, ADDRESS_OF) \
+		m("hl.assign", assign, ASSIGN) \
+		m("hl.call", call, CALL) \
+		m("hl.cmp", cmp, CMP) \
+		m("hl.cond.yield", cond_yield, COND_YIELD)\
+		m("hl.deref", deref, DEREF) \
+		m("hl.indirect_call", indirect_call, INDIRECT_CALL) \
+		m("hl.return", return_, RETURN) \
+		m("hl.sizeof", size_of, SIZE_OF) \
+		m("hl.subscript", subscript, SUBSCRIPT) \
+		m("hl.unrechable", unrechable, UNREACHABLE) \
+		m("hl.value.yield", value_yield, VALUE_YIELD)
 
-class TaintTracker {
+class DependencyTrackingEdge;
+class DependencyTrackingCondition;
+class DependencyTrackingSink;
+class DependencyTrackingStep;
+
+using DependencyTrackingResult = std::variant<DependencyTrackingStep,
+    DependencyTrackingSink, DependencyTrackingCondition>;
+using DependencyTrackingResults = gap::generator<DependencyTrackingResult>;
+
+class DependencyAnalysis {
  private:
   class Impl;
   friend class Impl;
 
   std::shared_ptr<Impl> impl;
 
-  TaintTracker(void) = delete;
+  DependencyAnalysis(void) = delete;
 
  public:
-  TaintTracker(const Index &);
+  DependencyAnalysis(const Index &);
 
-  // Taint the declaration or statement associated with an existing taint
-  // tracking edge.
-  TaintTrackingResults add_source(const TaintEdge &) &;
+  // Add DependencyTrackingEdge as one of the dependency source and do the
+  // taint propagation to get next edge.
+  DependencyTrackingResults add_dependecy_source(const DependencyTrackingEdge &) &;
 
-  // Taint the operation associated with an existing taint tracking edge
-  TaintTrackingResults add_source(const mlir::Operation *) &;
+  // Add mlir::Operation as one of the dependency source and do the
+  // taint propagation to get next edge.
+  DependencyTrackingResults add_dependecy_source(const mlir::Operation *) &;
 
-  // Taint the Value associated with an existing taint tracking edge
-  TaintTrackingResults add_source(const mlir::Value &) &;
+  // Add mlir::Value as source and taint uses of the value
+  DependencyTrackingResults add_dependecy_source(const mlir::Value &) &;
 };
 
-class TaintEdge {
+class DependencyTrackingEdge {
  protected:
-  friend class TaintTrackingSink;
-  friend class TaintTrackingStep;
+  friend class DependencyTrackingSink;
+  friend class DependencyTrackingStep;
 
   const mlir::Operation *op;
 
-  inline TaintEdge(const mlir::Operation *op_)
+  inline DependencyTrackingEdge(const mlir::Operation *op_)
       : op(op_) {}
 
  public:
@@ -68,10 +97,9 @@ class TaintEdge {
   inline VariantEntity as_variant(mx::SourceIR &ir) const noexcept {
     return ir.entity_for(op);
   }
-
 };
 
-enum class TaintTrackingSinkKind {
+enum class DependencySinkKind {
   UNHANDLED_ADDRESS_OF,
   UNHANDLED_SIZEOF_OF,
   UNHANDLED_REFERENCE,
@@ -86,20 +114,19 @@ enum class TaintTrackingSinkKind {
   CONDITIONAL_BRANCH
 };
 
-class TaintTrackingSink final : public TaintEdge {
+class DependencyTrackingSink final : public DependencyTrackingEdge {
  private:
-  friend class TaintTracker;
-  friend class TaintTrackerImpl;
+  friend class DependencyAnalysis;
 
   std::string message_;
-  TaintTrackingSinkKind kind_;
+  DependencySinkKind kind_;
 
-  TaintTrackingSink(void) = delete;
+  DependencyTrackingSink(void) = delete;
 
-  inline TaintTrackingSink(
+  inline DependencyTrackingSink(
       const mlir::Operation *op_, std::string message__,
-      TaintTrackingSinkKind kind__)
-      : TaintEdge(std::move(op_)),
+      DependencySinkKind kind__)
+      : DependencyTrackingEdge(std::move(op_)),
         message_(std::move(message__)),
         kind_(kind__){}
 
@@ -113,21 +140,20 @@ class TaintTrackingSink final : public TaintEdge {
     return std::move(message_);
   }
 
-  inline TaintTrackingSinkKind kind(void) const & noexcept {
+  inline DependencySinkKind kind(void) const & noexcept {
     return kind_;
   }
 
 };
 
-class TaintTrackingCondition final : public TaintEdge {
+class DependencyTrackingCondition final : public DependencyTrackingEdge {
  private:
-  friend class TaintTracker;
-  friend class TaintTrackerImpl;
+  friend class DependencyAnalysis;
 
-  using TaintEdge::TaintEdge;
+  using DependencyTrackingEdge::DependencyTrackingEdge;
 };
 
-enum class TaintTrackingStepKind {
+enum class DependencyStepKind {
   NORMAL,
   ARGUMENT_TO_PARAMETER,
   RETURN_TO_FUNCTION,
@@ -136,23 +162,21 @@ enum class TaintTrackingStepKind {
   ARRAY_ELEMENT_ACCESS
 };
 
-class TaintTrackingStep : public TaintEdge {
+class DependencyTrackingStep : public DependencyTrackingEdge {
  private:
-  friend class TaintTracker;
-  friend class TaintTrackerImpl;
+  friend class DependencyAnalysis;
 
-  TaintTrackingStepKind kind_;
+  DependencyStepKind kind_;
 
-  inline TaintTrackingStep(
+  inline DependencyTrackingStep(
       const mlir::Operation *op_,
-      TaintTrackingStepKind kind__=TaintTrackingStepKind::NORMAL)
-      : TaintEdge(std::move(op_)), kind_(kind__) {}
+      DependencyStepKind kind__=DependencyStepKind::NORMAL)
+      : DependencyTrackingEdge(std::move(op_)), kind_(kind__) {}
 
  public:
-  inline TaintTrackingStepKind kind(void) const & noexcept {
+  inline DependencyStepKind kind(void) const & noexcept {
     return kind_;
   }
 };
 
-} // namespace iranalysis
 } // namespace mx

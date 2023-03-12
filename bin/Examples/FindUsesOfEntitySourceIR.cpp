@@ -25,7 +25,6 @@ DEFINE_uint64(entity_id, 0, "ID of the fragment from which to print variable nam
 DEFINE_string(entity_name, "", "Name of the entity to be matched.");
 
 using EntityType = std::variant<mx::VariantEntity, mx::NamedEntity>;
-using OperationResults = gap::generator<const mlir::Operation*>;
 
 // Go and find the entity that will be the source of our taints.
 static std::optional<EntityType> FindEntity(const mx::Index &index) {
@@ -44,25 +43,7 @@ static std::optional<EntityType> FindEntity(const mx::Index &index) {
   return std::nullopt;
 }
 
-OperationResults FindOperations(const mx::SourceIR &ir, mx::VariantEntity &entity) {
-  if (std::holds_alternative<mx::Decl>(entity)) {
-    mx::Decl decl = std::get<mx::Decl>(entity);
-    mx::OperationRange range = ir.for_declaration(decl);
-    for (auto iter = range.begin(); iter != range.end(); iter++) {
-      co_yield (*iter).get();
-    }
-  } else if (std::holds_alternative<mx::Stmt>(entity)) {
-    mx::Stmt stmt = std::get<mx::Stmt>(entity);
-    mx::OperationRange range = ir.for_statement(stmt);
-    for (auto iter = range.begin(); iter != range.end(); iter++) {
-      co_yield (*iter).get();
-    }
-  } else {
-    co_return;
-  }
-}
-
-void PrintEdge(const mx::SourceIR &ir, const mx::iranalysis::TaintEdge &edge) {
+void PrintEdge(const mx::SourceIR &ir, const mx::DependencyTrackingEdge &edge) {
   std::string op_string;
   llvm::raw_string_ostream os(op_string);
   auto op = edge.as_operation();
@@ -72,27 +53,27 @@ void PrintEdge(const mx::SourceIR &ir, const mx::iranalysis::TaintEdge &edge) {
 }
 
 void PrintNext(const mx::SourceIR &ir,
-               mx::iranalysis::TaintTracker &tracker,
-               mx::iranalysis::TaintTrackingResult res,
+               mx::DependencyAnalysis &tracker,
+               mx::DependencyTrackingResult res,
                int depth) {
   for (auto i = 0; i < depth; ++i) {
     std::cout << "  ";
   }
-  if (std::holds_alternative<mx::iranalysis::TaintTrackingStep>(res)) {
-    const auto &step = std::get<mx::iranalysis::TaintTrackingStep>(res);
+  if (std::holds_alternative<mx::DependencyTrackingStep>(res)) {
+    const auto &step = std::get<mx::DependencyTrackingStep>(res);
     PrintEdge(ir, step);
 
-    for (mx::iranalysis::TaintTrackingResult next_res : tracker.add_source(step)) {
+    for (mx::DependencyTrackingResult next_res : tracker.add_dependecy_source(step)) {
       PrintNext(ir, tracker, std::move(next_res), depth + 1);
     }
 
-  } else if (std::holds_alternative<mx::iranalysis::TaintTrackingCondition>(res)) {
-    const auto &cond = std::get<mx::iranalysis::TaintTrackingCondition>(res);
+  } else if (std::holds_alternative<mx::DependencyTrackingCondition>(res)) {
+    const auto &cond = std::get<mx::DependencyTrackingCondition>(res);
     PrintEdge(ir, cond);
     std::cout << " <condition>\n";
 
-  } else if (std::holds_alternative<mx::iranalysis::TaintTrackingSink>(res)) {
-    std::cout << std::get<mx::iranalysis::TaintTrackingSink>(res).message() << '\n';
+  } else if (std::holds_alternative<mx::DependencyTrackingSink>(res)) {
+    std::cout << std::get<mx::DependencyTrackingSink>(res).message() << '\n';
   }
 }
 
@@ -140,7 +121,7 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   mx::Index index = InitExample();
-  mx::iranalysis::TaintTracker tracker(index);
+  mx::DependencyAnalysis tracker(index);
   int depth = 0;
 
   auto fragment = index.fragment(FLAGS_fragment_id);
@@ -169,9 +150,10 @@ extern "C" int main(int argc, char *argv[]) {
     // Get entity value
     auto entity_value = std::get<mx::VariantEntity>(entity);
     PrintSource(sourceir, entity_value);
-
-    for (auto op : FindOperations(sourceir, entity_value)) {
-      for (mx::iranalysis::TaintTrackingResult res : tracker.add_source(op)) {
+    auto range = sourceir.for_entity(entity_value);
+    for (auto iter = range.begin(); iter != range.end(); iter++) {
+      auto ir_operation = *iter;
+      for (mx::DependencyTrackingResult res : tracker.add_dependecy_source(ir_operation.get())) {
         PrintNext(sourceir, tracker, std::move(res), depth + 1);
       }
     }
@@ -179,7 +161,4 @@ extern "C" int main(int argc, char *argv[]) {
 
   return EXIT_SUCCESS;
 }
-
-
-
 
