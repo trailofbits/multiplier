@@ -27,13 +27,13 @@ DEFINE_string(entity_name, "", "Name of the entity to be matched.");
 using EntityType = std::variant<mx::VariantEntity, mx::NamedEntity>;
 
 // Go and find the entity that will be the source of our taints.
-static std::optional<EntityType> FindEntity(const mx::Index &index) {
+static std::optional<mx::VariantEntity> FindEntity(const mx::Index &index) {
   if (!FLAGS_entity_name.empty()) {
     for (mx::NamedEntity ne : index.query_entities(FLAGS_entity_name)) {
       if (std::holds_alternative<mx::NamedDecl>(ne)) {
         mx::NamedDecl nd = std::move(std::get<mx::NamedDecl>(ne));
         if (nd.name() == FLAGS_entity_name) {
-          return ne;
+          return nd;
         }
       }
     }
@@ -63,7 +63,7 @@ void PrintNext(const mx::SourceIR &ir,
     const auto &step = std::get<mx::DependencyTrackingStep>(res);
     PrintEdge(ir, step);
 
-    for (mx::DependencyTrackingResult next_res : tracker.add_dependecy_source(step)) {
+    for (mx::DependencyTrackingResult next_res : tracker.dependents(step)) {
       PrintNext(ir, tracker, std::move(next_res), depth + 1);
     }
 
@@ -77,7 +77,7 @@ void PrintNext(const mx::SourceIR &ir,
   }
 }
 
-void PrintSource(const mx::SourceIR &ir, mx::VariantEntity &entity) {
+void PrintSource(const mx::SourceIR &ir, mx::VariantEntity entity) {
   std::string op_string;
   llvm::raw_string_ostream os(op_string);
   if (std::holds_alternative<mx::Decl>(entity)) {
@@ -139,23 +139,19 @@ extern "C" int main(int argc, char *argv[]) {
   auto sourceir = maybe_sourceir.value();
   sourceir.print(std::cout);
 
-  std::optional<EntityType> mabe_entity = FindEntity(index);
+  std::optional<mx::VariantEntity> mabe_entity = FindEntity(index);
   if (!mabe_entity) {
     std::cerr << "Could not find entity by id or name.\n";
     return EXIT_FAILURE;
   }
 
   auto entity = mabe_entity.value();
-  if (std::holds_alternative<mx::VariantEntity>(entity)) {
-    // Get entity value
-    auto entity_value = std::get<mx::VariantEntity>(entity);
-    PrintSource(sourceir, entity_value);
-    auto range = sourceir.for_entity(entity_value);
-    for (auto iter = range.begin(); iter != range.end(); iter++) {
-      auto ir_operation = *iter;
-      for (mx::DependencyTrackingResult res : tracker.add_dependecy_source(ir_operation.get())) {
-        PrintNext(sourceir, tracker, std::move(res), depth + 1);
-      }
+  PrintSource(sourceir, entity);
+  auto range = sourceir.for_entity(entity);
+  for (auto iter = range.begin(); iter != range.end(); iter++) {
+    auto ir_operation = *iter;
+    for (mx::DependencyTrackingResult res : tracker.dependents(ir_operation.get())) {
+      PrintNext(sourceir, tracker, std::move(res), depth + 1);
     }
   }
 

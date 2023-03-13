@@ -15,35 +15,27 @@ class Value;
 
 namespace mx {
 
+#define MX_FOR_EACH_OPERATION_KIND(m) \
+    m("hl.addressof", address_of, ADDRESS_OF) \
+    m("hl.assign", assign, ASSIGN) \
+    m("hl.call", call, CALL) \
+    m("hl.cmp", cmp, CMP) \
+    m("hl.cond.yield", cond_yield, COND_YIELD)\
+    m("hl.deref", deref, DEREF) \
+    m("hl.indirect_call", indirect_call, INDIRECT_CALL) \
+    m("hl.return", return_, RETURN) \
+    m("hl.sizeof", size_of, SIZE_OF) \
+    m("hl.subscript", subscript, SUBSCRIPT) \
+    m("hl.unrechable", unrechable, UNREACHABLE) \
+    m("hl.value.yield", value_yield, VALUE_YIELD)
+
 enum class OperationKind {
-  ADDRESS_OF,
-  ASSIGN,
-  CALL,
-  CMP,
-  COND_YIELD,
-  DEREF,
-  INDIRECT_CALL,
-  RETURN,
-  SIZE_OF,
-  SUBSCRIPT,
-  UNREACHABLE,
-  VALUE_YIELD,
+#define MX_ENUM_DEFINE(dial, name, kind) kind,
+
+  MX_FOR_EACH_OPERATION_KIND(MX_ENUM_DEFINE)
   OTHER,
 };
 
-#define MX_FOR_EACH_OPERATION_KIND(m) \
-		m("hl.addressof", address_of, ADDRESS_OF) \
-		m("hl.assign", assign, ASSIGN) \
-		m("hl.call", call, CALL) \
-		m("hl.cmp", cmp, CMP) \
-		m("hl.cond.yield", cond_yield, COND_YIELD)\
-		m("hl.deref", deref, DEREF) \
-		m("hl.indirect_call", indirect_call, INDIRECT_CALL) \
-		m("hl.return", return_, RETURN) \
-		m("hl.sizeof", size_of, SIZE_OF) \
-		m("hl.subscript", subscript, SUBSCRIPT) \
-		m("hl.unrechable", unrechable, UNREACHABLE) \
-		m("hl.value.yield", value_yield, VALUE_YIELD)
 
 class DependencyTrackingEdge;
 class DependencyTrackingCondition;
@@ -66,16 +58,17 @@ class DependencyAnalysis {
  public:
   DependencyAnalysis(const Index &);
 
-  // Add DependencyTrackingEdge as one of the dependency source and do the
+  // Add DependencyTrackingEdge as one of the dependents source and do the
   // taint propagation to get next edge.
-  DependencyTrackingResults add_dependecy_source(const DependencyTrackingEdge &) &;
+  DependencyTrackingResults dependents(const DependencyTrackingEdge &) &;
 
-  // Add mlir::Operation as one of the dependency source and do the
+  // Add mlir::Operation as one of the dependents source and do the
   // taint propagation to get next edge.
-  DependencyTrackingResults add_dependecy_source(const mlir::Operation *) &;
+  DependencyTrackingResults dependents(const mlir::Operation *) &;
 
-  // Add mlir::Value as source and taint uses of the value
-  DependencyTrackingResults add_dependecy_source(const mlir::Value &) &;
+  // Add mlir::Value as one of the dependents source and do the
+  // taint propagation to get next edge.
+  DependencyTrackingResults dependents(const mlir::Value &) &;
 };
 
 class DependencyTrackingEdge {

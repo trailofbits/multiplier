@@ -18,7 +18,7 @@
 namespace mx {
 namespace {
 
-static inline OperationKind ClassifyOperation(std::string name) {
+static inline OperationKind ClassifyOperation(llvm::StringRef name) {
 #define CLASSIFY_DIALECT(d, _, kind) \
   if (name == d) { \
     return OperationKind::kind; \
@@ -27,14 +27,6 @@ MX_FOR_EACH_OPERATION_KIND(CLASSIFY_DIALECT);
 
   // Fallback to it if none of the dialect name matches
   return OperationKind::OTHER;
-}
-
-static inline OperationKind getOperationKind(const mlir::Operation *op) {
-  std::string name_as_string;
-  auto name = const_cast<mlir::Operation*>(op)->getName();
-  llvm::raw_string_ostream ss(name_as_string);
-  name.print(ss);
-  return ClassifyOperation(name_as_string);
 }
 
 std::string OperationToString(const mlir::Operation *op) {
@@ -178,7 +170,8 @@ DependencyTrackingResults DependencyAnalysis::Impl::TaintArraySubscript(
 
 DependencyTrackingResults DependencyAnalysis::Impl::TaintOperation(
     const mlir::Operation *user, const mlir::Operation *tainted) {
-    auto type = getOperationKind(user);
+    auto type = ClassifyOperation(
+        const_cast<mlir::Operation*>(user)->getName().getStringRef());
     switch(type) {
       case OperationKind::ADDRESS_OF:
         return TaintAddressOf(user);
@@ -216,15 +209,15 @@ DependencyTrackingResults DependencyAnalysis::Impl::AcceptOperation(const mlir::
 DependencyAnalysis::DependencyAnalysis(const Index &index)
     : impl(std::make_shared<Impl>(index)) {}
 
-DependencyTrackingResults DependencyAnalysis::add_dependecy_source(const mlir::Operation *op) &{
+DependencyTrackingResults DependencyAnalysis::dependents(const mlir::Operation *op) &{
   return impl->AcceptOperation(op);
 }
 
-DependencyTrackingResults DependencyAnalysis::add_dependecy_source(const mlir::Value &val) &{
+DependencyTrackingResults DependencyAnalysis::dependents(const mlir::Value &val) &{
   return impl->AcceptOperation(val.getDefiningOp());
 }
 
-DependencyTrackingResults DependencyAnalysis::add_dependecy_source(const DependencyTrackingEdge &edge) &{
+DependencyTrackingResults DependencyAnalysis::dependents(const DependencyTrackingEdge &edge) &{
   if (auto op = edge.as_operation()) {
     return impl->AcceptOperation(op);
   }
@@ -254,15 +247,15 @@ class DependencyAnalysis::Impl final
 DependencyAnalysis::DependencyAnalysis(const Index &index)
     : impl(std::make_shared<Impl>(index)) {}
 
-DependencyTrackingResults DependencyAnalysis::add_dependecy_source(const mlir::Operation *) &{
+DependencyTrackingResults DependencyAnalysis::dependents(const mlir::Operation *) &{
   return impl->NoTaints();
 }
 
-DependencyTrackingResults DependencyAnalysis::add_dependecy_source(const mlir::Value &) &{
+DependencyTrackingResults DependencyAnalysis::dependents(const mlir::Value &) &{
   return impl->NoTaints();
 }
 
-DependencyTrackingResults DependencyAnalysis::add_dependecy_source(const DependencyTrackingEdge &) &{
+DependencyTrackingResults DependencyAnalysis::dependents(const DependencyTrackingEdge &) &{
   return impl->NoTaints();
 }
 
