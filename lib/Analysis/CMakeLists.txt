@@ -61,6 +61,13 @@ set_target_properties("mx-analysis"
       cxx_std_20
 )
 
+if(MX_ENABLE_VAST)
+  target_compile_definitions("mx-analysis"
+    PRIVATE
+      "MX_ENABLE_SOURCEIR"
+  )
+endif(MX_ENABLE_VAST)
+
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS

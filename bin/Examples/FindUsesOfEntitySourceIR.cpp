@@ -24,9 +24,7 @@ DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print variable n
 DEFINE_uint64(entity_id, 0, "ID of the fragment from which to print variable names");
 DEFINE_string(entity_name, "", "Name of the entity to be matched.");
 
-using EntityType = std::variant<mx::VariantEntity, mx::NamedEntity>;
-
-// Go and find the entity that will be the source of our taints.
+// Go and find the entity that will be the source of dependency analysis.
 static std::optional<mx::VariantEntity> FindEntity(const mx::Index &index) {
   if (!FLAGS_entity_name.empty()) {
     for (mx::NamedEntity ne : index.query_entities(FLAGS_entity_name)) {
