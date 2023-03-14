@@ -46,12 +46,11 @@ using DependencyTrackingResult = std::variant<DependencyTrackingStep,
     DependencyTrackingSink, DependencyTrackingCondition>;
 using DependencyTrackingResults = gap::generator<DependencyTrackingResult>;
 
+class DependencyAnalysisImpl;
+
 class DependencyAnalysis {
  private:
-  class Impl;
-  friend class Impl;
-
-  std::shared_ptr<Impl> impl;
+  friend class DependencyAnalysisImpl;
 
   DependencyAnalysis(void) = delete;
 
@@ -64,11 +63,11 @@ class DependencyAnalysis {
 
   // Add mlir::Operation as one of the dependents source and do the
   // taint propagation to get next edge.
-  DependencyTrackingResults dependents(const mlir::Operation *) &;
+  DependencyTrackingResults dependents(MLIROperationPtr) &;
 
   // Add mlir::Value as one of the dependents source and do the
   // taint propagation to get next edge.
-  DependencyTrackingResults dependents(const mlir::Value &) &;
+  DependencyTrackingResults dependents(MLIRValuePtr) &;
 };
 
 class DependencyTrackingEdge {
@@ -76,18 +75,18 @@ class DependencyTrackingEdge {
   friend class DependencyTrackingSink;
   friend class DependencyTrackingStep;
 
-  const mlir::Operation *op;
+  MLIROperationPtr op;
 
-  inline DependencyTrackingEdge(const mlir::Operation *op_)
-      : op(op_) {}
+  inline DependencyTrackingEdge(MLIROperationPtr op_)
+      : op(std::move(op_)) {}
 
  public:
 
-  inline const mlir::Operation *as_operation(void) const noexcept {
+  inline MLIROperationPtr as_operation(void) const noexcept {
     return op;
   }
 
-  inline VariantEntity as_variant(mx::SourceIR &ir) const noexcept {
+  inline VariantEntity as_variant(const mx::SourceIR &ir) const noexcept {
     return ir.entity_for(op);
   }
 };
@@ -117,8 +116,7 @@ class DependencyTrackingSink final : public DependencyTrackingEdge {
   DependencyTrackingSink(void) = delete;
 
   inline DependencyTrackingSink(
-      const mlir::Operation *op_, std::string message__,
-      DependencySinkKind kind__)
+      MLIROperationPtr op_, std::string message__, DependencySinkKind kind__)
       : DependencyTrackingEdge(std::move(op_)),
         message_(std::move(message__)),
         kind_(kind__){}
@@ -162,7 +160,7 @@ class DependencyTrackingStep : public DependencyTrackingEdge {
   DependencyStepKind kind_;
 
   inline DependencyTrackingStep(
-      const mlir::Operation *op_,
+      MLIROperationPtr op_,
       DependencyStepKind kind__=DependencyStepKind::NORMAL)
       : DependencyTrackingEdge(std::move(op_)), kind_(kind__) {}
 

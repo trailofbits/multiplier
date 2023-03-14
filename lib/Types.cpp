@@ -8,6 +8,9 @@
 
 #include <cassert>
 #include <multiplier/AST.h>
+#include <multiplier/Entity.h>
+#include <multiplier/File.h>
+#include <multiplier/Fragment.h>
 
 namespace mx {
 namespace {
@@ -950,5 +953,20 @@ VariantId EntityId::Unpack(void) const noexcept {
 
   return InvalidId{};
 }
+
+struct IdVisitor {
+  inline RawEntityId operator()(const NotAnEntity &) const noexcept {
+    return kInvalidEntityId;
+  }
+  template <typename T>
+  inline RawEntityId operator()(const T &e) const noexcept {
+    return e.id().Pack();
+  }
+};
+
+// Explicit specialization to get the entity id.
+template <>
+EntityId::EntityId(const VariantEntity &ent)
+    : opaque(std::visit<RawEntityId>(IdVisitor{}, ent)) {}
 
 }  // namespace mx

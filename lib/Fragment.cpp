@@ -91,6 +91,20 @@ std::optional<Fragment> Fragment::containing(const Token &entity) {
   }
 }
 
+std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
+#define GET_FRAGMENT(type_name, lower_name, enum_name, category) \
+      } else if (std::holds_alternative<type_name>(entity)) { \
+        return Fragment::containing(std::get<type_name>(entity));
+
+  if (false) {
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY, GET_FRAGMENT,
+                                GET_FRAGMENT, GET_FRAGMENT, GET_FRAGMENT)
+  } else {
+    return std::nullopt;
+  }
+#undef GET_FRAGMENT
+}
+
 // Return the ID of this fragment.
 SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
   return FragmentId(impl->fragment_id);

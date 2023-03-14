@@ -380,6 +380,9 @@ class EntityId final {
   template <typename T>
   /* implicit */ inline EntityId(SpecificEntityId<T>);
 
+  template <typename... Types>
+  /* implicit */ EntityId(const std::variant<Types...> &) = delete;
+
   inline EntityId &operator=(DeclId id) {
     EntityId self(id);
     opaque = self.opaque;

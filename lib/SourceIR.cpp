@@ -83,15 +83,16 @@ static OperationMap Deserialize(mlir::Operation *scope) {
                               MX_DEFINE_ENTITY_FUNCTION)
 #undef MX_DEFINE_ENTITY_FUNCTION
 
+std::shared_ptr<const mlir::Module> SourceIR::module(void) const {
+  return sts::shared_ptr<const mlir::Module>(impl, impl->mod.get());
+}
 
-VariantEntity
-SourceIR::entity_for(const mlir::Operation *op) const {
+VariantEntity SourceIR::entity_for(const mlir::Operation *op) const {
   auto loc = const_cast<mlir::Operation *>(op)->getLoc();
   return impl->EntityFor(MetaIdFromLocation(loc));
 }
 
-VariantEntity
-SourceIR::entity_for(const std::shared_ptr<const mlir::Operation> &op) const {
+VariantEntity SourceIR::entity_for(const std::shared_ptr<const mlir::Operation> &op) const {
   return entity_for(op.get());
 }
 
@@ -263,14 +264,15 @@ namespace mx {
                               MX_DEFINE_ENTITY_FUNCTION)
 #undef MX_DEFINE_ENTITY_FUNCTION
 
-
-VariantEntity
-SourceIR::entity_for(const mlir::Operation *) const {
+std::shared_ptr<const mlir::Module> SourceIR::module(void) const {
   return {};
 }
 
-VariantEntity
-SourceIR::entity_for(const std::shared_ptr<const mlir::Operation> &) const {
+VariantEntity SourceIR::entity_for(const mlir::Operation *) const {
+  return {};
+}
+
+VariantEntity SourceIR::entity_for(const std::shared_ptr<const mlir::Operation> &) const {
   return {};
 }
 

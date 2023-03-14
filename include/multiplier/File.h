@@ -11,6 +11,7 @@
 #include <memory>
 #include <string_view>
 
+#include "Entity.h"
 #include "Token.h"
 
 namespace mx {
@@ -114,6 +115,10 @@ class File {
   // Return the file containing a specific weggli query match.
   static std::optional<File> containing(const WeggliQueryMatch &match);
 
+  inline static File containing(const File &file) {
+    return file;
+  }
+
 #define MX_DECLARE_CONTAINING(type_name, lower_name, enum_name, category) \
     static std::optional<File> containing(const type_name &entity);
 
@@ -123,6 +128,8 @@ class File {
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING)
 #undef MX_DECLARE_CONTAINING
+
+  static std::optional<File> containing(const VariantEntity &);
 
   // Return the file containing a specific token.
   //
