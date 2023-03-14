@@ -95,12 +95,29 @@ gap::generator<const mlir::Operation *> DependencyAnalysisImpl::FindUses(
 
 DependencyTrackingResults DependencyAnalysisImpl::TaintCallArgument(
     const mlir::Operation *op, const mlir::Operation *tainted) {
+  bool found_tainted_param = false;
   for (auto iter = const_cast<mlir::Operation *>(op)->operand_begin();
       iter != const_cast<mlir::Operation *>(op)->operand_end(); iter++) {
     const mlir::Operation *param = (*iter).getDefiningOp();
     if (param == tainted) {
-      co_yield DependencyTrackingStep(MLIROperationPtr(module, op));
+      found_tainted_param = true;
+      // NOTE: if the tainted operation will match one of the operand params, it
+      //       will pass the check and get the next dependency tracking steps.
+      //       The next step will have the mlir::Operation associated with the
+      //       call instruction since it is the owner of the operand value.
+      co_yield DependencyTrackingStep(
+          MLIROperationPtr(module, op), DependencyStepKind::ARGUMENT_TO_PARAMETER);
     }
+  }
+
+  if (!found_tainted_param) {
+    std::stringstream ss;
+    ss << "Can't find callee(s) tainted argument of call: "
+       << OperationToString(op) << '.';
+    co_yield DependencyTrackingSink(
+        MLIROperationPtr(module, op), ss.str(),
+        DependencySinkKind::UNMATCHED_ARGUMENT);
+
   }
 }
 
@@ -125,9 +142,8 @@ DependencyTrackingResults DependencyAnalysisImpl::TaintCondYield(
 DependencyTrackingResults DependencyAnalysisImpl::TaintMemDref(
     const mlir::Operation *op, const mlir::Operation *tainted) {
   std::stringstream ss;
-  std::string op_string = OperationToString(op);
   ss << "Memory access through tainted member: "
-     << op_string << '.';
+     << OperationToString(op) << '.';
   co_yield DependencyTrackingSink(
       MLIROperationPtr(module, op), ss.str(),
       DependencySinkKind::UNCONTROLLED_INDIRECT_MEMBER);
@@ -136,9 +152,8 @@ DependencyTrackingResults DependencyAnalysisImpl::TaintMemDref(
 DependencyTrackingResults DependencyAnalysisImpl::TaintAddressOf(
     const mlir::Operation *op) {
   std::stringstream ss;
-  std::string op_string = OperationToString(op);
   ss << "Unhandled address of on tainted value: "
-     << op_string << '.';
+     << OperationToString(op) << '.';
   co_yield DependencyTrackingSink(
       MLIROperationPtr(module, op), ss.str(),
       DependencySinkKind::UNHANDLED_ADDRESS_OF);
@@ -147,9 +162,8 @@ DependencyTrackingResults DependencyAnalysisImpl::TaintAddressOf(
 DependencyTrackingResults DependencyAnalysisImpl::TaintSizeOf(
     const mlir::Operation *op) {
   std::stringstream ss;
-  std::string op_string = OperationToString(op);
   ss << "Unhandled size of on tainted value: "
-     << op_string << '.';
+     << OperationToString(op) << '.';
   co_yield DependencyTrackingSink(
       MLIROperationPtr(module, op), ss.str(),
       DependencySinkKind::UNHANDLED_SIZEOF_OF);
