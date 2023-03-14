@@ -9,7 +9,6 @@
 #include "Index.h"
 
 namespace mlir {
-class ModuleOp;
 class Operation;
 class Value;
 } // namespace mlir
