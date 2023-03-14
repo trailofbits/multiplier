@@ -36,6 +36,8 @@
 namespace indexer {
 namespace {
 
+static const std::string kEmpty;
+
 static clang::FunctionDecl *WalkUpToFunction(const clang::Decl *decl);
 
 static clang::FunctionDecl *WalkUpToFunction(const clang::DeclContext *dc) {
@@ -76,6 +78,8 @@ class NameManglerImpl {
   const std::string &GetMangledName(const clang::Decl *decl);
 
   const std::string &GetMangledNameRec(const clang::FunctionDecl *decl);
+  const std::string &GetMangledNameRec(const clang::BlockDecl *decl);
+  const std::string &GetMangledNameRec(const clang::ObjCMethodDecl *decl);
   const std::string &GetMangledNameRec(const clang::FieldDecl *decl);
   const std::string &GetMangledNameRec(const clang::ParmVarDecl *decl);
   const std::string &GetMangledNameRec(const clang::ImplicitParamDecl *decl);
@@ -157,6 +161,27 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   return mangled_name;
 }
 
+// NOTE(pag): Blocks don't have names, so from the perspective of finding
+//            redeclarations, we don't want blocks to participate in the
+//            process of linking against one-another.
+const std::string &NameManglerImpl::GetMangledNameRec(
+    const clang::BlockDecl *) {
+  return kEmpty;
+}
+
+const std::string &NameManglerImpl::GetMangledNameRec(
+    const clang::ObjCMethodDecl *decl) {
+
+  (void) GetMangledNameImpl(decl);
+
+  if (!decl->isExternallyVisible() && decl->isDefined()) {
+    mangled_name_os << " tu:" << tu;
+    mangled_name_os.flush();
+  }
+
+  return mangled_name;
+}
+
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::FieldDecl *decl) {
   if (!GetMangledNameImpl(decl->getParent()).empty()) {
@@ -207,12 +232,32 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::ParmVarDecl *decl) {
-  auto parent_decl = clang::Decl::castFromDeclContext(decl->getParentFunctionOrMethod());
-  auto func_decl = clang::dyn_cast<clang::FunctionDecl>(parent_decl);
-  if (!GetMangledNameRec(func_decl).empty()) {
-    mangled_name_os
-        << " param:" << decl->getFunctionScopeIndex();
-    mangled_name_os.flush();
+  const clang::Decl *parent_decl = clang::Decl::castFromDeclContext(
+      decl->getParentFunctionOrMethod());
+
+  if (auto func_decl = clang::dyn_cast<clang::FunctionDecl>(parent_decl)) {
+    if (!GetMangledNameRec(func_decl).empty()) {
+      mangled_name_os
+          << " param:" << decl->getFunctionScopeIndex();
+      mangled_name_os.flush();
+    }
+  } else if (auto block_decl = clang::dyn_cast<clang::BlockDecl>(parent_decl)) {
+    if (!GetMangledNameRec(block_decl).empty()) {
+      mangled_name_os
+          << " param:" << decl->getFunctionScopeIndex();
+      mangled_name_os.flush();
+    }
+  } else if (auto meth_decl = clang::dyn_cast<clang::ObjCMethodDecl>(parent_decl)) {
+    if (!GetMangledNameRec(meth_decl).empty()) {
+      mangled_name_os
+          << " param:" << decl->getFunctionScopeIndex();
+      mangled_name_os.flush();
+    }
+  } else {
+    assert(false);
+    LOG(ERROR) << "Unhandled ParmVarDecl context in name mangler: "
+               << parent_decl->getDeclKindName();
+    return kEmpty;
   }
   return mangled_name;
 }
@@ -331,6 +376,12 @@ const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
   // `...` as their mangled name, because that is really what gets called.
   } else if (auto func_decl = clang::dyn_cast<clang::FunctionDecl>(decl)) {
     return GetMangledNameRec(func_decl);
+
+  } else if (auto block_decl = clang::dyn_cast<clang::BlockDecl>(decl)) {
+    return GetMangledNameRec(block_decl);
+
+  } else if (auto meth_decl = clang::dyn_cast<clang::ObjCMethodDecl>(decl)) {
+    return GetMangledNameRec(meth_decl);
 
   // Handle fields in terms of the mangled name of their struct/union/class
   // whatever.

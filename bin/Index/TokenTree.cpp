@@ -140,6 +140,9 @@ class Substitution {
   // argument pre-expansion stuff.
   bool before_after_bounds_are_same{false};
 
+  // Is this node dead?
+  bool is_dead{false};
+
   explicit Substitution(mx::MacroKind kind_)
       : kind(kind_) {}
 
@@ -758,7 +761,8 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
     for (const Substitution::Node &ent : nodes) {
       if (std::holds_alternative<Substitution *>(ent)) {
         Substitution *s = std::get<Substitution *>(ent);
-        assert(s->parent == self || s->before.has_error || s->after.has_error);
+        assert(s->parent == self || s->is_dead || s->before.has_error ||
+               s->after.has_error);
         s->PrintDOT(os, false);
         auto other = reinterpret_cast<const void *>(s);
         os << prefix << self << ":s" << other << " -> s" << other << ";\n";
@@ -1125,6 +1129,7 @@ Substitution *TokenTreeImpl::MergeArguments(
   pre_exp->after.clear();
   pre_exp->macro.reset();
   pre_exp->parent = nullptr;
+  pre_exp->is_dead = true;
 
   return sub;
 }
@@ -1323,6 +1328,7 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
   FixupNodeParents(sub);
 
   pre_exp->parent = nullptr;
+  pre_exp->is_dead = true;
   pre_exp->before.clear();
 
   D( indent.resize(indent.size() - 2u); )

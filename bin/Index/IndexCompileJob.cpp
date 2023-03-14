@@ -557,6 +557,7 @@ static void AddDeclRangeToEntityList(
   // can get the contextual information from parsed tokens, which is often
   // more useful.
   LOG_IF(FATAL, ShouldFindDeclInTokenContexts(decl) &&
+                decl.Kind() != pasta::DeclKind::kBlock &&
                 !TokenIsInContextOfDecl(tok, decl) &&
                 !IsProbablyABuiltinDecl(decl))
       << "Could not find location of " << decl.KindName()
@@ -1138,7 +1139,8 @@ static void CreatePendingFragment(
 //      continue;
 //    }
 //
-//    if (nd->Name() == "init_ssl_lib" && !nd->IsThisDeclarationADefinition()) {
+//    if (nd->Name() == "sched_clutch_bucket_group_cpu_adjust" &&
+//        nd->IsThisDeclarationADefinition()) {
 //      found = true;
 //      break;
 //    }
