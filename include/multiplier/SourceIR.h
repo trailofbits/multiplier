@@ -141,6 +141,8 @@ class SourceIR {
 
   VariantEntity entity_for(const std::shared_ptr<const mlir::Operation> &op) const;
 
+  OperationRange for_entity(const VariantEntity &entity) const;
+
 #define MX_DECLARE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
   OperationRange for_##lower_name(const type_name &lower_name) const; \
 

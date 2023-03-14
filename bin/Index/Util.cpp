@@ -448,7 +448,7 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type_) {
   return std::nullopt;
 }
 
-// Try to find the `Decl` referenced by a particular `stmt`.
+// Try to find the `Decl` referenced by a particular `decl`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Decl decl) {
 
   // NOTE(pag): We'll get the parameter type references through visiting the

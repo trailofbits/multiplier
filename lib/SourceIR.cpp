@@ -95,6 +95,22 @@ SourceIR::entity_for(const std::shared_ptr<const mlir::Operation> &op) const {
   return entity_for(op.get());
 }
 
+OperationRange SourceIR::for_entity(const VariantEntity &entity) const {
+#define MX_DEFINE_FOR_ENTRITY(type_name, lower_name, enum_name, val) \
+    if (std::holds_alternative<type_name>(entity)) { \
+      auto lower_name = std::get<type_name>(entity); \
+      return for_##lower_name(lower_name); \
+    }
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DEFINE_FOR_ENTRITY,
+                              MX_DEFINE_FOR_ENTRITY)
+#undef MX_DEFINE_FOR_ENTRITY
+    return {};
+}
+
 #define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, enum_name, val) \
   std::optional<mx::type_name> SourceIR::lower_name ##_for(const mlir::Operation *op) const { \
     auto ent = entity_for(op); \
