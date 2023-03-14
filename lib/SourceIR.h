@@ -45,6 +45,7 @@ class SourceIRImpl {
  private:
   friend class Fragment;
   friend class RegistryInitializer;
+  friend class SourceIR;
 
   MLIRContext mctx;
   OwningModuleRef mod;

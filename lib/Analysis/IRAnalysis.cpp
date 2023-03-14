@@ -41,9 +41,9 @@ std::string OperationToString(const mlir::Operation *op) {
 class DependencyAnalysisImpl final {
  public:
 
-  std::shared_ptr<const void> module;
+  std::shared_ptr<const mlir::Operation> module;
 
-  inline DependencyAnalysisImpl(const std::shared_ptr<const void> &module_)
+  inline DependencyAnalysisImpl(const std::shared_ptr<const mlir::Operation> &module_)
       : module(module_) {}
 
   DependencyTrackingResults AcceptOperation(const mlir::Operation *op);
@@ -117,7 +117,6 @@ DependencyTrackingResults DependencyAnalysisImpl::TaintCallArgument(
     co_yield DependencyTrackingSink(
         MLIROperationPtr(module, op), ss.str(),
         DependencySinkKind::UNMATCHED_ARGUMENT);
-
   }
 }
 
@@ -235,24 +234,25 @@ DependencyAnalysis::DependencyAnalysis(const Index &) {}
 // taint propagation to get next edge.
 DependencyTrackingResults DependencyAnalysis::dependents(
     MLIROperationPtr op) & {
-  DependencyAnalysis impl(op);
-  return impl.AcceptOperation(std::move(op));
+  DependencyAnalysisImpl impl(op);
+  return impl.AcceptOperation(op.get());
 }
 
 DependencyTrackingResults DependencyAnalysis::dependents(
     MLIRValuePtr val) & {
   const mlir::Operation *op_ptr = val->getDefiningOp();
   std::shared_ptr<const mlir::Operation> op(std::move(val), op_ptr);
-  DependencyAnalysis impl(op);
-  return impl.AcceptOperation(std::move(op));
+  DependencyAnalysisImpl impl(op);
+  return impl.AcceptOperation(op.get());
 }
 
 DependencyTrackingResults DependencyAnalysis::dependents(
     const DependencyTrackingEdge &edge) & {
   if (auto op = edge.as_operation()) {
-    return impl->AcceptOperation(op.get());
+    DependencyAnalysisImpl impl(op);
+    return impl.AcceptOperation(op.get());
   }
-  return impl->NoTaints();
+  return DependencyAnalysisImpl::NoTaints();
 }
 
 } // namespace mx
