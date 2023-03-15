@@ -35,6 +35,8 @@ RUN git clone https://github.com/lifting-bits/gap.git /work/src/gap \
         -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DUSE_SYSTEM_DEPENDENCIES=ON \
+        -DCMAKE_C_COMPILER="$(which clang-15)" \
+        -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
         -DGAP_ENABLE_WARNINGS=OFF \
         -DGAP_ENABLE_TESTING=OFF \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
@@ -61,8 +63,8 @@ RUN git clone https://github.com/trailofbits/pasta /work/src/pasta \
         -DVCPKG_ROOT="${VCPKG_ROOT}" \
         -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_C_COMPILER="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm/clang" \
-        -DCMAKE_CXX_COMPILER="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm/clang++" \
+        -DCMAKE_C_COMPILER="$(which clang-15)" \
+        -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
         -DPASTA_BOOTSTRAP_MACROS=OFF \
         -DPASTA_BOOTSTRAP_TYPES=OFF \
