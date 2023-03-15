@@ -272,7 +272,7 @@ OperationRange SourceIR::for_entity(const VariantEntity &) const {
   return {};
 }
 
-std::shared_ptr<const mlir::ModuleOp> SourceIR::module(void) const {
+MLIRModulePtr SourceIR::module(void) const {
   return {};
 }
 
