@@ -1,5 +1,5 @@
 FROM --platform=linux/amd64 ubuntu:22.04
-ENV CXX_COMMON_URL=https://github.com/lifting-bits/cxx-common/releases/download/v0.2.23/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz \
+ENV CXX_COMMON_URL=https://github.com/lifting-bits/cxx-common/releases/download/v0.2.24/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz \
     VCPKG_ROOT=/work/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64 \
     INSTALL_DIR=/work/install
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
