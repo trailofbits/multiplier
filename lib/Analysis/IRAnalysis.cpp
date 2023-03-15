@@ -41,9 +41,9 @@ std::string OperationToString(const mlir::Operation *op) {
 class DependencyAnalysisImpl final {
  public:
 
-  std::shared_ptr<const void> module;
+  std::shared_ptr<const mlir::Operation> module;
 
-  inline DependencyAnalysisImpl(const std::shared_ptr<const void> &module_)
+  inline DependencyAnalysisImpl(const std::shared_ptr<const mlir::Operation> &module_)
       : module(module_) {}
 
   DependencyTrackingResults AcceptOperation(const mlir::Operation *op);
@@ -95,12 +95,28 @@ gap::generator<const mlir::Operation *> DependencyAnalysisImpl::FindUses(
 
 DependencyTrackingResults DependencyAnalysisImpl::TaintCallArgument(
     const mlir::Operation *op, const mlir::Operation *tainted) {
+  bool found_tainted_param = false;
   for (auto iter = const_cast<mlir::Operation *>(op)->operand_begin();
       iter != const_cast<mlir::Operation *>(op)->operand_end(); iter++) {
     const mlir::Operation *param = (*iter).getDefiningOp();
     if (param == tainted) {
-      co_yield DependencyTrackingStep(MLIROperationPtr(module, op));
+      found_tainted_param = true;
+      // NOTE: if the tainted operation will match one of the operand params, it
+      //       will pass the check and get the next dependency tracking steps.
+      //       The next step will have the mlir::Operation associated with the
+      //       call instruction since it is the owner of the operand value.
+      co_yield DependencyTrackingStep(
+          MLIROperationPtr(module, op), DependencyStepKind::ARGUMENT_TO_PARAMETER);
     }
+  }
+
+  if (!found_tainted_param) {
+    std::stringstream ss;
+    ss << "Can't find callee(s) tainted argument of call: "
+       << OperationToString(op) << '.';
+    co_yield DependencyTrackingSink(
+        MLIROperationPtr(module, op), ss.str(),
+        DependencySinkKind::UNMATCHED_ARGUMENT);
   }
 }
 
@@ -119,15 +135,19 @@ DependencyTrackingResults DependencyAnalysisImpl::TaintValueYield(
 
 DependencyTrackingResults DependencyAnalysisImpl::TaintCondYield(
     const mlir::Operation *op, const mlir::Operation *) {
-  co_yield DependencyTrackingCondition(MLIROperationPtr(module, op));
+  std::stringstream ss;
+  ss << "Tainted conditional yield: "
+     << OperationToString(op) << '.';
+  co_yield DependencyTrackingSink(
+      MLIROperationPtr(module, op), ss.str(),
+      DependencySinkKind::CONDITIONAL_BRANCH);
 }
 
 DependencyTrackingResults DependencyAnalysisImpl::TaintMemDref(
     const mlir::Operation *op, const mlir::Operation *tainted) {
   std::stringstream ss;
-  std::string op_string = OperationToString(op);
   ss << "Memory access through tainted member: "
-     << op_string << '.';
+     << OperationToString(op) << '.';
   co_yield DependencyTrackingSink(
       MLIROperationPtr(module, op), ss.str(),
       DependencySinkKind::UNCONTROLLED_INDIRECT_MEMBER);
@@ -136,9 +156,8 @@ DependencyTrackingResults DependencyAnalysisImpl::TaintMemDref(
 DependencyTrackingResults DependencyAnalysisImpl::TaintAddressOf(
     const mlir::Operation *op) {
   std::stringstream ss;
-  std::string op_string = OperationToString(op);
   ss << "Unhandled address of on tainted value: "
-     << op_string << '.';
+     << OperationToString(op) << '.';
   co_yield DependencyTrackingSink(
       MLIROperationPtr(module, op), ss.str(),
       DependencySinkKind::UNHANDLED_ADDRESS_OF);
@@ -147,9 +166,8 @@ DependencyTrackingResults DependencyAnalysisImpl::TaintAddressOf(
 DependencyTrackingResults DependencyAnalysisImpl::TaintSizeOf(
     const mlir::Operation *op) {
   std::stringstream ss;
-  std::string op_string = OperationToString(op);
   ss << "Unhandled size of on tainted value: "
-     << op_string << '.';
+     << OperationToString(op) << '.';
   co_yield DependencyTrackingSink(
       MLIROperationPtr(module, op), ss.str(),
       DependencySinkKind::UNHANDLED_SIZEOF_OF);
@@ -221,24 +239,25 @@ DependencyAnalysis::DependencyAnalysis(const Index &) {}
 // taint propagation to get next edge.
 DependencyTrackingResults DependencyAnalysis::dependents(
     MLIROperationPtr op) & {
-  DependencyAnalysis impl(op);
-  return impl.AcceptOperation(std::move(op));
+  DependencyAnalysisImpl impl(op);
+  return impl.AcceptOperation(op.get());
 }
 
 DependencyTrackingResults DependencyAnalysis::dependents(
     MLIRValuePtr val) & {
   const mlir::Operation *op_ptr = val->getDefiningOp();
   std::shared_ptr<const mlir::Operation> op(std::move(val), op_ptr);
-  DependencyAnalysis impl(op);
-  return impl.AcceptOperation(std::move(op));
+  DependencyAnalysisImpl impl(op);
+  return impl.AcceptOperation(op.get());
 }
 
 DependencyTrackingResults DependencyAnalysis::dependents(
     const DependencyTrackingEdge &edge) & {
   if (auto op = edge.as_operation()) {
-    return impl->AcceptOperation(op.get());
+    DependencyAnalysisImpl impl(op);
+    return impl.AcceptOperation(op.get());
   }
-  return impl->NoTaints();
+  return DependencyAnalysisImpl::NoTaints();
 }
 
 } // namespace mx

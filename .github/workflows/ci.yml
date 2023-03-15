@@ -58,6 +58,8 @@ jobs:
           -G Ninja \
           -DCMAKE_BUILD_TYPE=Debug \
           -DUSE_SYSTEM_DEPENDENCIES=ON \
+          -DCMAKE_C_COMPILER="$(which clang-15)" \
+          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
           -DGAP_ENABLE_WARNINGS=OFF \
           -DGAP_ENABLE_TESTING=OFF \
           -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
@@ -95,8 +97,8 @@ jobs:
           -DVCPKG_ROOT="$VCPKG_ROOT" \
           -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_C_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang" \
-          -DCMAKE_CXX_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang++" \
+          -DCMAKE_C_COMPILER="$(which clang-15)" \
+          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
           -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
           -DPASTA_BOOTSTRAP_MACROS=OFF \
           -DPASTA_BOOTSTRAP_TYPES=OFF \
@@ -174,6 +176,8 @@ jobs:
           -B '${{ github.workspace }}/build/gap' \
           -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_C_COMPILER="$(which clang-15)" \
+          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
           -DUSE_SYSTEM_DEPENDENCIES=ON \
           -DGAP_ENABLE_WARNINGS=OFF \
           -DGAP_ENABLE_TESTING=OFF \
@@ -212,8 +216,8 @@ jobs:
           -DVCPKG_ROOT="$VCPKG_ROOT" \
           -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang" \
-          -DCMAKE_CXX_COMPILER="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang++" \
+          -DCMAKE_C_COMPILER="$(which clang-15)" \
+          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
           -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
           -DPASTA_BOOTSTRAP_MACROS=OFF \
           -DPASTA_BOOTSTRAP_TYPES=OFF \

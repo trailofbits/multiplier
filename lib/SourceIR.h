@@ -15,18 +15,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include <mlir/IR/BuiltinOps.h>
+#include <mlir/IR/MLIRContext.h>
 #include <mlir/IR/OwningOpRef.h>
-#include <mlir/InitAllDialects.h>
 
 namespace llvm {
 class SourceMgr;
 } // namespace llvm
-
-namespace mlir {
-class MLIRContext;
-class Operation;
-} // namespace mlir
-
 namespace mx {
 
 class Fragment;
@@ -45,6 +40,7 @@ class SourceIRImpl {
  private:
   friend class Fragment;
   friend class RegistryInitializer;
+  friend class SourceIR;
 
   MLIRContext mctx;
   OwningModuleRef mod;
@@ -52,8 +48,6 @@ class SourceIRImpl {
   OperationMap deserialized_ops;
 
   std::shared_ptr<const FragmentImpl> frag;
-
-  static mlir::DialectRegistry gRegistry;
 
  public:
   virtual ~SourceIRImpl(void);
