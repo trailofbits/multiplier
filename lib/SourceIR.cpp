@@ -264,7 +264,7 @@ namespace mx {
                               MX_DEFINE_ENTITY_FUNCTION)
 #undef MX_DEFINE_ENTITY_FUNCTION
 
-std::shared_ptr<const mlir::Module> SourceIR::module(void) const {
+std::shared_ptr<const mlir::ModuleOp> SourceIR::module(void) const {
   return {};
 }
 

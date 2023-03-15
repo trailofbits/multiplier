@@ -9,6 +9,7 @@
 #include "Index.h"
 
 namespace mlir {
+class ModuleOp;
 class Operation;
 class Value;
 } // namespace mlir
@@ -126,7 +127,7 @@ class OperationRange {
   }
 };
 
-using MLIRModulePtr = std::shared_ptr<const mlir::Operation>;
+using MLIRModulePtr = std::shared_ptr<const mlir::ModuleOp>;
 using MLIROperationPtr = std::shared_ptr<const mlir::Operation>;
 using MLIRValuePtr = std::shared_ptr<const mlir::Value>;
 
