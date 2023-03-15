@@ -64,13 +64,13 @@ void PrintNext(const mx::SourceIR &ir,
     for (mx::DependencyTrackingResult next_res : tracker.dependents(step)) {
       PrintNext(ir, tracker, std::move(next_res), depth + 1);
     }
-
-  } else if (std::holds_alternative<mx::DependencyTrackingCondition>(res)) {
-    const auto &cond = std::get<mx::DependencyTrackingCondition>(res);
-    PrintEdge(ir, cond);
-    std::cout << " <condition>\n";
-
   } else if (std::holds_alternative<mx::DependencyTrackingSink>(res)) {
+    const auto &sink = std::get<mx::DependencyTrackingSink>(res);
+    if (sink.kind() == mx::DependencySinkKind::CONDITIONAL_BRANCH
+        || sink.kind() == mx::DependencySinkKind::CONDITIONAL_EXPRESSION) {
+      PrintEdge(ir, sink);
+      std::cout << " <condition>\n";
+    }
     std::cout << std::get<mx::DependencyTrackingSink>(res).message() << '\n';
   }
 }

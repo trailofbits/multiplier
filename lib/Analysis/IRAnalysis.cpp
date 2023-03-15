@@ -135,7 +135,12 @@ DependencyTrackingResults DependencyAnalysisImpl::TaintValueYield(
 
 DependencyTrackingResults DependencyAnalysisImpl::TaintCondYield(
     const mlir::Operation *op, const mlir::Operation *) {
-  co_yield DependencyTrackingCondition(MLIROperationPtr(module, op));
+  std::stringstream ss;
+  ss << "Tainted conditional yield: "
+     << OperationToString(op) << '.';
+  co_yield DependencyTrackingSink(
+      MLIROperationPtr(module, op), ss.str(),
+      DependencySinkKind::CONDITIONAL_BRANCH);
 }
 
 DependencyTrackingResults DependencyAnalysisImpl::TaintMemDref(

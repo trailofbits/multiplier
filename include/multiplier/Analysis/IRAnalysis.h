@@ -38,12 +38,10 @@ enum class OperationKind {
 
 
 class DependencyTrackingEdge;
-class DependencyTrackingCondition;
 class DependencyTrackingSink;
 class DependencyTrackingStep;
 
-using DependencyTrackingResult = std::variant<DependencyTrackingStep,
-    DependencyTrackingSink, DependencyTrackingCondition>;
+using DependencyTrackingResult = std::variant<DependencyTrackingStep, DependencyTrackingSink>;
 using DependencyTrackingResults = gap::generator<DependencyTrackingResult>;
 
 class DependencyAnalysisImpl;
@@ -136,14 +134,6 @@ class DependencyTrackingSink final : public DependencyTrackingEdge {
     return kind_;
   }
 
-};
-
-class DependencyTrackingCondition final : public DependencyTrackingEdge {
- private:
-  friend class DependencyAnalysis;
-  friend class DependencyAnalysisImpl;
-
-  using DependencyTrackingEdge::DependencyTrackingEdge;
 };
 
 enum class DependencyStepKind {
