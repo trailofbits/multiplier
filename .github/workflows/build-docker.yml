@@ -1,14 +1,14 @@
 name: Build Docker
 
 on:
-  # pull_request:
+  workflow_dispatch:
   schedule:
     # At 02:00 every day.
     - cron: "0 2 * * *"
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}-build
 
 jobs:
   build-docker-ci:
