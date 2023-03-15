@@ -158,6 +158,14 @@ gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::in(const File &file) {
   }
 }
 
+std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const Reference &r) {
+  return BuiltinTemplateDecl::from(r.as_declaration());
+}
+
+std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const TokenContext &t) {
+  return BuiltinTemplateDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

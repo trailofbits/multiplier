@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TypeAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class ObjCGCAttr;
 class Token;
@@ -56,13 +45,8 @@ class ObjCGCAttr : public TypeAttr {
     }
   }
 
-  inline static std::optional<ObjCGCAttr> from(const Reference &r) {
-    return ObjCGCAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCGCAttr> from(const TokenContext &t) {
-    return ObjCGCAttr::from(t.as_attribute());
-  }
+  static std::optional<ObjCGCAttr> from(const Reference &r);
+  static std::optional<ObjCGCAttr> from(const TokenContext &t);
 
 };
 

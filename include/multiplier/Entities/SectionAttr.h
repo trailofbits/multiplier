@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "SectionAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class SectionAttr;
@@ -57,13 +46,8 @@ class SectionAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<SectionAttr> from(const Reference &r) {
-    return SectionAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<SectionAttr> from(const TokenContext &t) {
-    return SectionAttr::from(t.as_attribute());
-  }
+  static std::optional<SectionAttr> from(const Reference &r);
+  static std::optional<SectionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;
   SectionAttrSpelling semantic_spelling(void) const;

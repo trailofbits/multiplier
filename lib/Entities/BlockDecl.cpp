@@ -159,6 +159,14 @@ gap::generator<BlockDecl> BlockDecl::in(const File &file) {
   }
 }
 
+std::optional<BlockDecl> BlockDecl::from(const Reference &r) {
+  return BlockDecl::from(r.as_declaration());
+}
+
+std::optional<BlockDecl> BlockDecl::from(const TokenContext &t) {
+  return BlockDecl::from(t.as_declaration());
+}
+
 bool BlockDecl::block_missing_return_type(void) const {
   return impl->reader.getVal46();
 }

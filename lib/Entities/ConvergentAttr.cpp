@@ -96,6 +96,14 @@ gap::generator<ConvergentAttr> ConvergentAttr::in(const File &file) {
   }
 }
 
+std::optional<ConvergentAttr> ConvergentAttr::from(const Reference &r) {
+  return ConvergentAttr::from(r.as_attribute());
+}
+
+std::optional<ConvergentAttr> ConvergentAttr::from(const TokenContext &t) {
+  return ConvergentAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

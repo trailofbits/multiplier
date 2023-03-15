@@ -96,6 +96,14 @@ gap::generator<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::in(const File &
   }
 }
 
+std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from(const Reference &r) {
+  return ArgumentWithTypeTagAttr::from(r.as_attribute());
+}
+
+std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from(const TokenContext &t) {
+  return ArgumentWithTypeTagAttr::from(t.as_attribute());
+}
+
 bool ArgumentWithTypeTagAttr::is_pointer(void) const {
   return impl->reader.getVal12();
 }

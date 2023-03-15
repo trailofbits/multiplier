@@ -96,6 +96,14 @@ gap::generator<CPUSpecificAttr> CPUSpecificAttr::in(const File &file) {
   }
 }
 
+std::optional<CPUSpecificAttr> CPUSpecificAttr::from(const Reference &r) {
+  return CPUSpecificAttr::from(r.as_attribute());
+}
+
+std::optional<CPUSpecificAttr> CPUSpecificAttr::from(const TokenContext &t) {
+  return CPUSpecificAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

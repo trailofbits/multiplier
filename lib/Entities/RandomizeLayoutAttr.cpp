@@ -96,6 +96,14 @@ gap::generator<RandomizeLayoutAttr> RandomizeLayoutAttr::in(const File &file) {
   }
 }
 
+std::optional<RandomizeLayoutAttr> RandomizeLayoutAttr::from(const Reference &r) {
+  return RandomizeLayoutAttr::from(r.as_attribute());
+}
+
+std::optional<RandomizeLayoutAttr> RandomizeLayoutAttr::from(const TokenContext &t) {
+  return RandomizeLayoutAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

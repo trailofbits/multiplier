@@ -96,6 +96,14 @@ gap::generator<ObjCOwnershipAttr> ObjCOwnershipAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCOwnershipAttr> ObjCOwnershipAttr::from(const Reference &r) {
+  return ObjCOwnershipAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCOwnershipAttr> ObjCOwnershipAttr::from(const TokenContext &t) {
+  return ObjCOwnershipAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

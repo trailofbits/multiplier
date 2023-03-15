@@ -95,6 +95,14 @@ gap::generator<BitIntType> BitIntType::in(const File &file) {
   }
 }
 
+std::optional<BitIntType> BitIntType::from(const Reference &r) {
+  return BitIntType::from(r.as_type());
+}
+
+std::optional<BitIntType> BitIntType::from(const TokenContext &t) {
+  return BitIntType::from(t.as_type());
+}
+
 Type BitIntType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

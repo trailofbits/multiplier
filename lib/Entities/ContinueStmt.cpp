@@ -144,6 +144,14 @@ gap::generator<ContinueStmt> ContinueStmt::in(const File &file) {
   }
 }
 
+std::optional<ContinueStmt> ContinueStmt::from(const Reference &r) {
+  return ContinueStmt::from(r.as_statement());
+}
+
+std::optional<ContinueStmt> ContinueStmt::from(const TokenContext &t) {
+  return ContinueStmt::from(t.as_statement());
+}
+
 Token ContinueStmt::continue_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

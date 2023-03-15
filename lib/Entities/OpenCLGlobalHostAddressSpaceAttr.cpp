@@ -96,6 +96,14 @@ gap::generator<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAtt
   }
 }
 
+std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr::from(const Reference &r) {
+  return OpenCLGlobalHostAddressSpaceAttr::from(r.as_attribute());
+}
+
+std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr::from(const TokenContext &t) {
+  return OpenCLGlobalHostAddressSpaceAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

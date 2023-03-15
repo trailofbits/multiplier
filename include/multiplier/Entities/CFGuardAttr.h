@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CFGuardAttrGuardArg.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class CFGuardAttr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class CFGuardAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<CFGuardAttr> from(const Reference &r) {
-    return CFGuardAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<CFGuardAttr> from(const TokenContext &t) {
-    return CFGuardAttr::from(t.as_attribute());
-  }
+  static std::optional<CFGuardAttr> from(const Reference &r);
+  static std::optional<CFGuardAttr> from(const TokenContext &t);
 
   CFGuardAttrGuardArg guard(void) const;
 };

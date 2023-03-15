@@ -147,6 +147,14 @@ gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Fi
   }
 }
 
+std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const Reference &r) {
+  return ConceptSpecializationExpr::from(r.as_statement());
+}
+
+std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const TokenContext &t) {
+  return ConceptSpecializationExpr::from(t.as_statement());
+}
+
 unsigned ConceptSpecializationExpr::num_template_arguments(void) const {
   return impl->reader.getVal15().size();
 }

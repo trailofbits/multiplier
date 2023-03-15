@@ -96,6 +96,14 @@ gap::generator<MinSizeAttr> MinSizeAttr::in(const File &file) {
   }
 }
 
+std::optional<MinSizeAttr> MinSizeAttr::from(const Reference &r) {
+  return MinSizeAttr::from(r.as_attribute());
+}
+
+std::optional<MinSizeAttr> MinSizeAttr::from(const TokenContext &t) {
+  return MinSizeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -146,6 +146,14 @@ gap::generator<FixedPointLiteral> FixedPointLiteral::in(const File &file) {
   }
 }
 
+std::optional<FixedPointLiteral> FixedPointLiteral::from(const Reference &r) {
+  return FixedPointLiteral::from(r.as_statement());
+}
+
+std::optional<FixedPointLiteral> FixedPointLiteral::from(const TokenContext &t) {
+  return FixedPointLiteral::from(t.as_statement());
+}
+
 Token FixedPointLiteral::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

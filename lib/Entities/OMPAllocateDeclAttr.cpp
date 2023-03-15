@@ -97,6 +97,14 @@ gap::generator<OMPAllocateDeclAttr> OMPAllocateDeclAttr::in(const File &file) {
   }
 }
 
+std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::from(const Reference &r) {
+  return OMPAllocateDeclAttr::from(r.as_attribute());
+}
+
+std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::from(const TokenContext &t) {
+  return OMPAllocateDeclAttr::from(t.as_attribute());
+}
+
 Expr OMPAllocateDeclAttr::alignment(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

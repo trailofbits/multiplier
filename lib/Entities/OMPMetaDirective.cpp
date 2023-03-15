@@ -145,6 +145,14 @@ gap::generator<OMPMetaDirective> OMPMetaDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPMetaDirective> OMPMetaDirective::from(const Reference &r) {
+  return OMPMetaDirective::from(r.as_statement());
+}
+
+std::optional<OMPMetaDirective> OMPMetaDirective::from(const TokenContext &t) {
+  return OMPMetaDirective::from(t.as_statement());
+}
+
 Stmt OMPMetaDirective::if_statement(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

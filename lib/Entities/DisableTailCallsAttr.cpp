@@ -96,6 +96,14 @@ gap::generator<DisableTailCallsAttr> DisableTailCallsAttr::in(const File &file) 
   }
 }
 
+std::optional<DisableTailCallsAttr> DisableTailCallsAttr::from(const Reference &r) {
+  return DisableTailCallsAttr::from(r.as_attribute());
+}
+
+std::optional<DisableTailCallsAttr> DisableTailCallsAttr::from(const TokenContext &t) {
+  return DisableTailCallsAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

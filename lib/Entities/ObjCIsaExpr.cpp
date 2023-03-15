@@ -146,6 +146,14 @@ gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Reference &r) {
+  return ObjCIsaExpr::from(r.as_statement());
+}
+
+std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const TokenContext &t) {
+  return ObjCIsaExpr::from(t.as_statement());
+}
+
 Expr ObjCIsaExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

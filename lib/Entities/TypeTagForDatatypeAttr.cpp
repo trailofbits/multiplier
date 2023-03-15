@@ -97,6 +97,14 @@ gap::generator<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::in(const File &fi
   }
 }
 
+std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::from(const Reference &r) {
+  return TypeTagForDatatypeAttr::from(r.as_attribute());
+}
+
+std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::from(const TokenContext &t) {
+  return TypeTagForDatatypeAttr::from(t.as_attribute());
+}
+
 bool TypeTagForDatatypeAttr::layout_compatible(void) const {
   return impl->reader.getVal12();
 }

@@ -18,6 +18,50 @@ capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file
 file(GLOB entity_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}/*.h")
 file(GLOB entity_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}/*.cpp")
 
+add_library("mx-mlir" INTERFACE)
+set_target_properties("mx-mlir"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+)
+
+if(MX_ENABLE_VAST)
+  target_link_libraries("mx-mlir"
+    INTERFACE
+      vast::vast
+      vast::MLIRCore
+      vast::MLIRMeta
+      MLIRDialect
+      MLIRMLProgramDialect
+      MLIROpenMPDialect
+      MLIRTosaDialect
+  
+      MLIRBufferizationTransformOps
+      MLIRSparseTensorTransforms
+      MLIROpenACCDialect
+      MLIRLLVMIRTransforms
+      MLIRROCDLDialect
+      MLIRAsyncDialect
+      MLIRSCFTransformOps
+      MLIREmitCDialect
+      MLIRNVGPUDialect
+      MLIRShapeDialect
+      MLIRAMDGPUDialect
+      MLIRShapeOpsTransforms
+      MLIRLinalgTransformOps
+      MLIRSPIRVDialect
+      MLIRTensorInferTypeOpInterfaceImpl
+  )
+else(MX_ENABLE_VAST)
+  target_link_libraries("mx-mlir" INTERFACE)
+endif(MX_ENABLE_VAST)
+
 add_library("mx-entities" INTERFACE)
 set_target_properties("mx-entities"
   PROPERTIES
@@ -174,16 +218,28 @@ target_link_libraries("mx-api"
     $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
 )
 
+if(MX_ENABLE_VAST)
+  target_link_libraries("mx-api"
+    PUBLIC
+      "mx-mlir"
+  )
+  
+  target_compile_definitions("mx-api"
+    PRIVATE
+      "MX_ENABLE_SOURCEIR"
+  )
+endif(MX_ENABLE_VAST)
+
 if(MX_ENABLE_RE2)
   target_link_libraries("mx-api"
     PRIVATE
       "re2::re2"
   )
-else()
+else(MX_ENABLE_RE2)
   target_compile_definitions("mx-api"
     PUBLIC
       "MX_DISABLE_RE2")
-endif()
+endif(MX_ENABLE_RE2)
 
 
 if(MX_ENABLE_WEGGLI)
@@ -191,18 +247,11 @@ if(MX_ENABLE_WEGGLI)
     PRIVATE
       "weggli_native::static"
   )
-else()
+else(MX_ENABLE_WEGGLI)
   target_compile_definitions("mx-api"
     PUBLIC
       "MX_DISABLE_WEGGLI")
-endif()
-
-if(MX_ENABLE_VAST)
-  target_compile_definitions("mx-api"
-    PRIVATE
-      "MX_ENABLE_SOURCEIR"
-  )
-endif()
+endif(MX_ENABLE_WEGGLI)
 
 target_compile_options("mx-api"
   PRIVATE
@@ -237,50 +286,6 @@ set_target_properties("mx-api"
     INTERFACE_COMPILE_FEATURES
       cxx_std_20
 )
-
-add_library("mx-mlir" INTERFACE)
-set_target_properties("mx-mlir"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX
-    VISIBILITY_INLINES_HIDDEN
-      YES
-    CXX_VISIBILITY_PRESET
-      hidden
-    POSITION_INDEPENDENT_CODE
-      YES
-)
-
-if(MX_ENABLE_VAST)
-target_link_libraries("mx-mlir"
-  INTERFACE
-    vast::vast
-    vast::MLIRCore
-    vast::MLIRMeta
-    MLIRDialect
-    MLIRMLProgramDialect
-    MLIROpenMPDialect
-    MLIRTosaDialect
-
-    MLIRBufferizationTransformOps
-    MLIRSparseTensorTransforms
-    MLIROpenACCDialect
-    MLIRLLVMIRTransforms
-    MLIRROCDLDialect
-    MLIRAsyncDialect
-    MLIRSCFTransformOps
-    MLIREmitCDialect
-    MLIRNVGPUDialect
-    MLIRShapeDialect
-    MLIRAMDGPUDialect
-    MLIRShapeOpsTransforms
-    MLIRLinalgTransformOps
-    MLIRSPIRVDialect
-    MLIRTensorInferTypeOpInterfaceImpl
-)
-else(MX_ENABLE_VAST)
-target_link_libraries("mx-mlir" INTERFACE)
-endif(MX_ENABLE_VAST)
 
 if(MX_ENABLE_INSTALL)
   install(

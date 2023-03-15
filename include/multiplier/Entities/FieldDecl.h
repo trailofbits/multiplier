@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "DeclaratorDecl.h"
 #include "InClassInitStyle.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class Expr;
@@ -76,13 +65,8 @@ class FieldDecl : public DeclaratorDecl {
     }
   }
 
-  inline static std::optional<FieldDecl> from(const Reference &r) {
-    return FieldDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<FieldDecl> from(const TokenContext &t) {
-    return FieldDecl::from(t.as_declaration());
-  }
+  static std::optional<FieldDecl> from(const Reference &r);
+  static std::optional<FieldDecl> from(const TokenContext &t);
 
   std::optional<Expr> bit_width(void) const;
   std::optional<VariableArrayType> captured_vla_type(void) const;

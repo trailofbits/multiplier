@@ -95,6 +95,14 @@ gap::generator<ObjCDirectAttr> ObjCDirectAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCDirectAttr> ObjCDirectAttr::from(const Reference &r) {
+  return ObjCDirectAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCDirectAttr> ObjCDirectAttr::from(const TokenContext &t) {
+  return ObjCDirectAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -148,6 +148,14 @@ gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const File &file) {
   }
 }
 
+std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Reference &r) {
+  return SizeOfPackExpr::from(r.as_statement());
+}
+
+std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const TokenContext &t) {
+  return SizeOfPackExpr::from(t.as_statement());
+}
+
 Token SizeOfPackExpr::operator_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

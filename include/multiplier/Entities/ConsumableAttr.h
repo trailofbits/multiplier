@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ConsumableAttrConsumedState.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class ConsumableAttr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class ConsumableAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<ConsumableAttr> from(const Reference &r) {
-    return ConsumableAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<ConsumableAttr> from(const TokenContext &t) {
-    return ConsumableAttr::from(t.as_attribute());
-  }
+  static std::optional<ConsumableAttr> from(const Reference &r);
+  static std::optional<ConsumableAttr> from(const TokenContext &t);
 
   ConsumableAttrConsumedState default_state(void) const;
 };

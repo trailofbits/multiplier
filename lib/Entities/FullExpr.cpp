@@ -150,6 +150,14 @@ gap::generator<FullExpr> FullExpr::in(const File &file) {
   }
 }
 
+std::optional<FullExpr> FullExpr::from(const Reference &r) {
+  return FullExpr::from(r.as_statement());
+}
+
+std::optional<FullExpr> FullExpr::from(const TokenContext &t) {
+  return FullExpr::from(t.as_statement());
+}
+
 Expr FullExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

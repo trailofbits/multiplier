@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AlignedAttrSpelling.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AlignedAttr;
 class Attr;
 class Expr;
@@ -59,13 +48,8 @@ class AlignedAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<AlignedAttr> from(const Reference &r) {
-    return AlignedAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<AlignedAttr> from(const TokenContext &t) {
-    return AlignedAttr::from(t.as_attribute());
-  }
+  static std::optional<AlignedAttr> from(const Reference &r);
+  static std::optional<AlignedAttr> from(const TokenContext &t);
 
   std::optional<Expr> alignment_expression(void) const;
   std::optional<Type> alignment_type(void) const;

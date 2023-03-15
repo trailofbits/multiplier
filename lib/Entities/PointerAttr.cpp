@@ -97,6 +97,14 @@ gap::generator<PointerAttr> PointerAttr::in(const File &file) {
   }
 }
 
+std::optional<PointerAttr> PointerAttr::from(const Reference &r) {
+  return PointerAttr::from(r.as_attribute());
+}
+
+std::optional<PointerAttr> PointerAttr::from(const TokenContext &t) {
+  return PointerAttr::from(t.as_attribute());
+}
+
 Type PointerAttr::deref_type(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -95,6 +95,14 @@ gap::generator<AliasAttr> AliasAttr::in(const File &file) {
   }
 }
 
+std::optional<AliasAttr> AliasAttr::from(const Reference &r) {
+  return AliasAttr::from(r.as_attribute());
+}
+
+std::optional<AliasAttr> AliasAttr::from(const TokenContext &t) {
+  return AliasAttr::from(t.as_attribute());
+}
+
 std::string_view AliasAttr::aliasee(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

@@ -146,6 +146,14 @@ gap::generator<StringLiteral> StringLiteral::in(const File &file) {
   }
 }
 
+std::optional<StringLiteral> StringLiteral::from(const Reference &r) {
+  return StringLiteral::from(r.as_statement());
+}
+
+std::optional<StringLiteral> StringLiteral::from(const TokenContext &t) {
+  return StringLiteral::from(t.as_statement());
+}
+
 std::optional<bool> StringLiteral::contains_non_ascii(void) const {
   if (!impl->reader.getVal89()) {
     return std::nullopt;

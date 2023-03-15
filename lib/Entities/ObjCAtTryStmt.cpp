@@ -146,6 +146,14 @@ gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::in(const File &file) {
   }
 }
 
+std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const Reference &r) {
+  return ObjCAtTryStmt::from(r.as_statement());
+}
+
+std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const TokenContext &t) {
+  return ObjCAtTryStmt::from(t.as_statement());
+}
+
 Token ObjCAtTryStmt::at_try_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

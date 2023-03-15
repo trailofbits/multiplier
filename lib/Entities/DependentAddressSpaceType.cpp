@@ -96,6 +96,14 @@ gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::in(const Fi
   }
 }
 
+std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const Reference &r) {
+  return DependentAddressSpaceType::from(r.as_type());
+}
+
+std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const TokenContext &t) {
+  return DependentAddressSpaceType::from(t.as_type());
+}
+
 Type DependentAddressSpaceType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -105,6 +105,14 @@ gap::generator<ArrayType> ArrayType::in(const File &file) {
   }
 }
 
+std::optional<ArrayType> ArrayType::from(const Reference &r) {
+  return ArrayType::from(r.as_type());
+}
+
+std::optional<ArrayType> ArrayType::from(const TokenContext &t) {
+  return ArrayType::from(t.as_type());
+}
+
 Type ArrayType::element_type(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DependentBitIntType;
 class Expr;
 class Token;
@@ -55,13 +44,8 @@ class DependentBitIntType : public Type {
     }
   }
 
-  inline static std::optional<DependentBitIntType> from(const Reference &r) {
-    return DependentBitIntType::from(r.as_type());
-  }
-
-  inline static std::optional<DependentBitIntType> from(const TokenContext &t) {
-    return DependentBitIntType::from(t.as_type());
-  }
+  static std::optional<DependentBitIntType> from(const Reference &r);
+  static std::optional<DependentBitIntType> from(const TokenContext &t);
 
   Type desugar(void) const;
   Expr num_bits_expression(void) const;

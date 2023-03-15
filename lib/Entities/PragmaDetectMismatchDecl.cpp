@@ -156,6 +156,14 @@ gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const File
   }
 }
 
+std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Reference &r) {
+  return PragmaDetectMismatchDecl::from(r.as_declaration());
+}
+
+std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const TokenContext &t) {
+  return PragmaDetectMismatchDecl::from(t.as_declaration());
+}
+
 std::string_view PragmaDetectMismatchDecl::name(void) const {
   capnp::Text::Reader data = impl->reader.getVal59();
   return std::string_view(data.cStr(), data.size());

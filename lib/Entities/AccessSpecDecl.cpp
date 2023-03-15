@@ -156,6 +156,14 @@ gap::generator<AccessSpecDecl> AccessSpecDecl::in(const File &file) {
   }
 }
 
+std::optional<AccessSpecDecl> AccessSpecDecl::from(const Reference &r) {
+  return AccessSpecDecl::from(r.as_declaration());
+}
+
+std::optional<AccessSpecDecl> AccessSpecDecl::from(const TokenContext &t) {
+  return AccessSpecDecl::from(t.as_declaration());
+}
+
 Token AccessSpecDecl::access_specifier_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }

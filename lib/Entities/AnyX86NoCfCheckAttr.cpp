@@ -96,6 +96,14 @@ gap::generator<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::in(const File &file) {
   }
 }
 
+std::optional<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::from(const Reference &r) {
+  return AnyX86NoCfCheckAttr::from(r.as_attribute());
+}
+
+std::optional<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::from(const TokenContext &t) {
+  return AnyX86NoCfCheckAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

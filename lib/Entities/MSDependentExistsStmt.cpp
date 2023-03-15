@@ -145,6 +145,14 @@ gap::generator<MSDependentExistsStmt> MSDependentExistsStmt::in(const File &file
   }
 }
 
+std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const Reference &r) {
+  return MSDependentExistsStmt::from(r.as_statement());
+}
+
+std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const TokenContext &t) {
+  return MSDependentExistsStmt::from(t.as_statement());
+}
+
 Token MSDependentExistsStmt::keyword_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

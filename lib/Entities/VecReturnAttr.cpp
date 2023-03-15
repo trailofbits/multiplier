@@ -96,6 +96,14 @@ gap::generator<VecReturnAttr> VecReturnAttr::in(const File &file) {
   }
 }
 
+std::optional<VecReturnAttr> VecReturnAttr::from(const Reference &r) {
+  return VecReturnAttr::from(r.as_attribute());
+}
+
+std::optional<VecReturnAttr> VecReturnAttr::from(const TokenContext &t) {
+  return VecReturnAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

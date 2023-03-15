@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Attr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AArch64SVEPcsAttr;
 class AArch64VectorPcsAttr;
 class AMDGPUFlatWorkGroupSizeAttr;
@@ -349,13 +338,8 @@ class InheritableAttr : public Attr {
     }
   }
 
-  inline static std::optional<InheritableAttr> from(const Reference &r) {
-    return InheritableAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<InheritableAttr> from(const TokenContext &t) {
-    return InheritableAttr::from(t.as_attribute());
-  }
+  static std::optional<InheritableAttr> from(const Reference &r);
+  static std::optional<InheritableAttr> from(const TokenContext &t);
 
   bool should_inherit_even_if_already_present(void) const;
 };

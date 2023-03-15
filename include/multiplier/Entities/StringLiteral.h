@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "StringLiteralStringKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class Stmt;
@@ -69,13 +58,8 @@ class StringLiteral : public Expr {
     }
   }
 
-  inline static std::optional<StringLiteral> from(const Reference &r) {
-    return StringLiteral::from(r.as_statement());
-  }
-
-  inline static std::optional<StringLiteral> from(const TokenContext &t) {
-    return StringLiteral::from(t.as_statement());
-  }
+  static std::optional<StringLiteral> from(const Reference &r);
+  static std::optional<StringLiteral> from(const TokenContext &t);
 
   std::optional<bool> contains_non_ascii(void) const;
   std::optional<bool> contains_non_ascii_or_null(void) const;

@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ImplicitParamDeclImplicitParamKind.h"
 #include "VarDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class ImplicitParamDecl;
@@ -74,13 +63,8 @@ class ImplicitParamDecl : public VarDecl {
     }
   }
 
-  inline static std::optional<ImplicitParamDecl> from(const Reference &r) {
-    return ImplicitParamDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ImplicitParamDecl> from(const TokenContext &t) {
-    return ImplicitParamDecl::from(t.as_declaration());
-  }
+  static std::optional<ImplicitParamDecl> from(const Reference &r);
+  static std::optional<ImplicitParamDecl> from(const TokenContext &t);
 
   ImplicitParamDeclImplicitParamKind parameter_kind(void) const;
 };

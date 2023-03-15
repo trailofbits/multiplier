@@ -8,24 +8,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "SwiftNewTypeAttrNewtypeKind.h"
 #include "SwiftNewTypeAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class SwiftNewTypeAttr;
@@ -58,13 +47,8 @@ class SwiftNewTypeAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<SwiftNewTypeAttr> from(const Reference &r) {
-    return SwiftNewTypeAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftNewTypeAttr> from(const TokenContext &t) {
-    return SwiftNewTypeAttr::from(t.as_attribute());
-  }
+  static std::optional<SwiftNewTypeAttr> from(const Reference &r);
+  static std::optional<SwiftNewTypeAttr> from(const TokenContext &t);
 
   SwiftNewTypeAttrNewtypeKind newtype_kind(void) const;
   SwiftNewTypeAttrSpelling semantic_spelling(void) const;

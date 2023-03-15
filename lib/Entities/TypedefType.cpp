@@ -96,6 +96,14 @@ gap::generator<TypedefType> TypedefType::in(const File &file) {
   }
 }
 
+std::optional<TypedefType> TypedefType::from(const Reference &r) {
+  return TypedefType::from(r.as_type());
+}
+
+std::optional<TypedefType> TypedefType::from(const TokenContext &t) {
+  return TypedefType::from(t.as_type());
+}
+
 Type TypedefType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

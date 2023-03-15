@@ -8,8 +8,6 @@
 
 #include <multiplier/Entities/TypeTrait.h>
 
-
-#include "../API.h"
 namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
@@ -79,6 +77,7 @@ const char *EnumeratorName(TypeTrait e) {
     case TypeTrait::REFERENCE_BINDS_TO_TEMPORARY: return "REFERENCE_BINDS_TO_TEMPORARY";
     case TypeTrait::IS_SAME: return "IS_SAME";
     case TypeTrait::IS_CONVERTIBLE: return "IS_CONVERTIBLE";
+    case TypeTrait::XNU_TYPE_COMPATIBLE: return "XNU_TYPE_COMPATIBLE";
     case TypeTrait::IS_CONSTRUCTIBLE: return "IS_CONSTRUCTIBLE";
     case TypeTrait::IS_NOTHROW_CONSTRUCTIBLE: return "IS_NOTHROW_CONSTRUCTIBLE";
     case TypeTrait::IS_TRIVIALLY_CONSTRUCTIBLE: return "IS_TRIVIALLY_CONSTRUCTIBLE";

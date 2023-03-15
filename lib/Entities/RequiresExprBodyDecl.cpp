@@ -156,6 +156,14 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::in(const File &file) 
   }
 }
 
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Reference &r) {
+  return RequiresExprBodyDecl::from(r.as_declaration());
+}
+
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const TokenContext &t) {
+  return RequiresExprBodyDecl::from(t.as_declaration());
+}
+
 gap::generator<Decl> RequiresExprBodyDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
   auto list = impl->reader.getVal47();

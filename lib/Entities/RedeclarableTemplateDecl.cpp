@@ -168,6 +168,14 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::in(const File
   }
 }
 
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Reference &r) {
+  return RedeclarableTemplateDecl::from(r.as_declaration());
+}
+
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const TokenContext &t) {
+  return RedeclarableTemplateDecl::from(t.as_declaration());
+}
+
 RedeclarableTemplateDecl RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
   RawEntityId eid = impl->reader.getVal54();
   return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

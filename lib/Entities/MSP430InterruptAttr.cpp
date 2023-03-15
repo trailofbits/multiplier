@@ -96,6 +96,14 @@ gap::generator<MSP430InterruptAttr> MSP430InterruptAttr::in(const File &file) {
   }
 }
 
+std::optional<MSP430InterruptAttr> MSP430InterruptAttr::from(const Reference &r) {
+  return MSP430InterruptAttr::from(r.as_attribute());
+}
+
+std::optional<MSP430InterruptAttr> MSP430InterruptAttr::from(const TokenContext &t) {
+  return MSP430InterruptAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

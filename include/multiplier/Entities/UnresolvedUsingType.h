@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Token;
 class Type;
 class UnresolvedUsingType;
@@ -55,13 +44,8 @@ class UnresolvedUsingType : public Type {
     }
   }
 
-  inline static std::optional<UnresolvedUsingType> from(const Reference &r) {
-    return UnresolvedUsingType::from(r.as_type());
-  }
-
-  inline static std::optional<UnresolvedUsingType> from(const TokenContext &t) {
-    return UnresolvedUsingType::from(t.as_type());
-  }
+  static std::optional<UnresolvedUsingType> from(const Reference &r);
+  static std::optional<UnresolvedUsingType> from(const TokenContext &t);
 
   Type desugar(void) const;
   UnresolvedUsingTypenameDecl declaration(void) const;

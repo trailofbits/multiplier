@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DependentAddressSpaceType;
 class Expr;
 class Token;
@@ -55,13 +44,8 @@ class DependentAddressSpaceType : public Type {
     }
   }
 
-  inline static std::optional<DependentAddressSpaceType> from(const Reference &r) {
-    return DependentAddressSpaceType::from(r.as_type());
-  }
-
-  inline static std::optional<DependentAddressSpaceType> from(const TokenContext &t) {
-    return DependentAddressSpaceType::from(t.as_type());
-  }
+  static std::optional<DependentAddressSpaceType> from(const Reference &r);
+  static std::optional<DependentAddressSpaceType> from(const TokenContext &t);
 
   Type desugar(void) const;
   Expr address_space_expression(void) const;

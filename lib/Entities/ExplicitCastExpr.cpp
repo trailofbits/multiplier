@@ -173,6 +173,14 @@ gap::generator<ExplicitCastExpr> ExplicitCastExpr::in(const File &file) {
   }
 }
 
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const Reference &r) {
+  return ExplicitCastExpr::from(r.as_statement());
+}
+
+std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const TokenContext &t) {
+  return ExplicitCastExpr::from(t.as_statement());
+}
+
 Type ExplicitCastExpr::type_as_written(void) const {
   RawEntityId eid = impl->reader.getVal42();
   return Type(impl->ep->TypeFor(impl->ep, eid));

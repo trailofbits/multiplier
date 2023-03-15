@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class EnforceTCBAttr;
 class InheritableAttr;
@@ -56,13 +45,8 @@ class EnforceTCBAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<EnforceTCBAttr> from(const Reference &r) {
-    return EnforceTCBAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<EnforceTCBAttr> from(const TokenContext &t) {
-    return EnforceTCBAttr::from(t.as_attribute());
-  }
+  static std::optional<EnforceTCBAttr> from(const Reference &r);
+  static std::optional<EnforceTCBAttr> from(const TokenContext &t);
 
   std::string_view tcb_name(void) const;
 };

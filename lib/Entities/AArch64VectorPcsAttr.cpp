@@ -96,6 +96,14 @@ gap::generator<AArch64VectorPcsAttr> AArch64VectorPcsAttr::in(const File &file) 
   }
 }
 
+std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from(const Reference &r) {
+  return AArch64VectorPcsAttr::from(r.as_attribute());
+}
+
+std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from(const TokenContext &t) {
+  return AArch64VectorPcsAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -97,6 +97,14 @@ gap::generator<ObjCInterfaceType> ObjCInterfaceType::in(const File &file) {
   }
 }
 
+std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const Reference &r) {
+  return ObjCInterfaceType::from(r.as_type());
+}
+
+std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const TokenContext &t) {
+  return ObjCInterfaceType::from(t.as_type());
+}
+
 ObjCInterfaceDecl ObjCInterfaceType::declaration(void) const {
   RawEntityId eid = impl->reader.getVal265();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

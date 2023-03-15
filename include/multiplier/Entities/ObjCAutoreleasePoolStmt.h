@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class ObjCAutoreleasePoolStmt;
 class Stmt;
@@ -64,13 +53,8 @@ class ObjCAutoreleasePoolStmt : public Stmt {
     }
   }
 
-  inline static std::optional<ObjCAutoreleasePoolStmt> from(const Reference &r) {
-    return ObjCAutoreleasePoolStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCAutoreleasePoolStmt> from(const TokenContext &t) {
-    return ObjCAutoreleasePoolStmt::from(t.as_statement());
-  }
+  static std::optional<ObjCAutoreleasePoolStmt> from(const Reference &r);
+  static std::optional<ObjCAutoreleasePoolStmt> from(const TokenContext &t);
 
   Token at_token(void) const;
   Stmt sub_statement(void) const;

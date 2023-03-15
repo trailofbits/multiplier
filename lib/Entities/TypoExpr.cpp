@@ -146,6 +146,14 @@ gap::generator<TypoExpr> TypoExpr::in(const File &file) {
   }
 }
 
+std::optional<TypoExpr> TypoExpr::from(const Reference &r) {
+  return TypoExpr::from(r.as_statement());
+}
+
+std::optional<TypoExpr> TypoExpr::from(const TokenContext &t) {
+  return TypoExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class NonTypeTemplateParmDecl;
@@ -70,13 +59,8 @@ class SubstNonTypeTemplateParmExpr : public Expr {
     }
   }
 
-  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const Reference &r) {
-    return SubstNonTypeTemplateParmExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<SubstNonTypeTemplateParmExpr> from(const TokenContext &t) {
-    return SubstNonTypeTemplateParmExpr::from(t.as_statement());
-  }
+  static std::optional<SubstNonTypeTemplateParmExpr> from(const Reference &r);
+  static std::optional<SubstNonTypeTemplateParmExpr> from(const TokenContext &t);
 
   Token name_token(void) const;
   NonTypeTemplateParmDecl parameter(void) const;

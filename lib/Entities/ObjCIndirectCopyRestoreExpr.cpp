@@ -146,6 +146,14 @@ gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::in(cons
   }
 }
 
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const Reference &r) {
+  return ObjCIndirectCopyRestoreExpr::from(r.as_statement());
+}
+
+std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(const TokenContext &t) {
+  return ObjCIndirectCopyRestoreExpr::from(t.as_statement());
+}
+
 Expr ObjCIndirectCopyRestoreExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

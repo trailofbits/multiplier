@@ -96,6 +96,14 @@ gap::generator<MSStructAttr> MSStructAttr::in(const File &file) {
   }
 }
 
+std::optional<MSStructAttr> MSStructAttr::from(const Reference &r) {
+  return MSStructAttr::from(r.as_attribute());
+}
+
+std::optional<MSStructAttr> MSStructAttr::from(const TokenContext &t) {
+  return MSStructAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

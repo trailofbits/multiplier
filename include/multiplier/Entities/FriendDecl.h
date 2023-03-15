@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class FriendDecl;
 class NamedDecl;
@@ -68,13 +57,8 @@ class FriendDecl : public Decl {
     }
   }
 
-  inline static std::optional<FriendDecl> from(const Reference &r) {
-    return FriendDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<FriendDecl> from(const TokenContext &t) {
-    return FriendDecl::from(t.as_declaration());
-  }
+  static std::optional<FriendDecl> from(const Reference &r);
+  static std::optional<FriendDecl> from(const TokenContext &t);
 
   std::optional<NamedDecl> friend_declaration(void) const;
   Token friend_token(void) const;

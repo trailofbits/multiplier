@@ -146,6 +146,14 @@ gap::generator<CoroutineBodyStmt> CoroutineBodyStmt::in(const File &file) {
   }
 }
 
+std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const Reference &r) {
+  return CoroutineBodyStmt::from(r.as_statement());
+}
+
+std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const TokenContext &t) {
+  return CoroutineBodyStmt::from(t.as_statement());
+}
+
 Expr CoroutineBodyStmt::allocate(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

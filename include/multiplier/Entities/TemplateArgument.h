@@ -8,29 +8,31 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
-
-#include <compare>
 
 #include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class File;
+class Fragment;
 class Reference;
 class SourceIR;
 class TemplateArgument;
 class TemplateArgumentImpl;
+class Token;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -84,13 +86,9 @@ class TemplateArgument {
     return self;
   }
 
-  inline static std::optional<TemplateArgument> from(const Reference &r) {
-    return r.as_template_argument();
-  }
+  static std::optional<TemplateArgument> from(const Reference &r);
 
-  inline static std::optional<TemplateArgument> from(const TokenContext &t) {
-    return t.as_template_argument();
-  }
+  static std::optional<TemplateArgument> from(const TokenContext &t);
 
   TemplateArgumentKind kind(void) const;
   bool is_null(void) const;

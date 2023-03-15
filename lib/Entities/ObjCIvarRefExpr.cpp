@@ -147,6 +147,14 @@ gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Reference &r) {
+  return ObjCIvarRefExpr::from(r.as_statement());
+}
+
+std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const TokenContext &t) {
+  return ObjCIvarRefExpr::from(t.as_statement());
+}
+
 Expr ObjCIvarRefExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

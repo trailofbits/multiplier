@@ -96,6 +96,14 @@ gap::generator<ObjCRootClassAttr> ObjCRootClassAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCRootClassAttr> ObjCRootClassAttr::from(const Reference &r) {
+  return ObjCRootClassAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCRootClassAttr> ObjCRootClassAttr::from(const TokenContext &t) {
+  return ObjCRootClassAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

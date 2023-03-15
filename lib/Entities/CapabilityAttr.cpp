@@ -96,6 +96,14 @@ gap::generator<CapabilityAttr> CapabilityAttr::in(const File &file) {
   }
 }
 
+std::optional<CapabilityAttr> CapabilityAttr::from(const Reference &r) {
+  return CapabilityAttr::from(r.as_attribute());
+}
+
+std::optional<CapabilityAttr> CapabilityAttr::from(const TokenContext &t) {
+  return CapabilityAttr::from(t.as_attribute());
+}
+
 std::string_view CapabilityAttr::name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

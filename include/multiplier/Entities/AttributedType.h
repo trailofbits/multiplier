@@ -8,24 +8,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AttrKind.h"
 #include "NullabilityKind.h"
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AttributedType;
 class Token;
 class Type;
@@ -56,13 +45,8 @@ class AttributedType : public Type {
     }
   }
 
-  inline static std::optional<AttributedType> from(const Reference &r) {
-    return AttributedType::from(r.as_type());
-  }
-
-  inline static std::optional<AttributedType> from(const TokenContext &t) {
-    return AttributedType::from(t.as_type());
-  }
+  static std::optional<AttributedType> from(const Reference &r);
+  static std::optional<AttributedType> from(const TokenContext &t);
 
   Type desugar(void) const;
   AttrKind attribute_kind(void) const;

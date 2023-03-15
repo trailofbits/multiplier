@@ -150,6 +150,14 @@ gap::generator<CXXNewExpr> CXXNewExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXNewExpr> CXXNewExpr::from(const Reference &r) {
+  return CXXNewExpr::from(r.as_statement());
+}
+
+std::optional<CXXNewExpr> CXXNewExpr::from(const TokenContext &t) {
+  return CXXNewExpr::from(t.as_statement());
+}
+
 bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
   return impl->reader.getVal88();
 }

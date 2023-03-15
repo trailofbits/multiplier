@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Attr.h"
 #include "OpenCLAccessAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class OpenCLAccessAttr;
 class Token;
@@ -55,13 +44,8 @@ class OpenCLAccessAttr : public Attr {
     }
   }
 
-  inline static std::optional<OpenCLAccessAttr> from(const Reference &r) {
-    return OpenCLAccessAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLAccessAttr> from(const TokenContext &t) {
-    return OpenCLAccessAttr::from(t.as_attribute());
-  }
+  static std::optional<OpenCLAccessAttr> from(const Reference &r);
+  static std::optional<OpenCLAccessAttr> from(const TokenContext &t);
 
   OpenCLAccessAttrSpelling semantic_spelling(void) const;
   bool is_read_only(void) const;

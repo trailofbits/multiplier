@@ -147,6 +147,14 @@ gap::generator<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributePar
   }
 }
 
+std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const Reference &r) {
+  return OMPTeamsDistributeParallelForSimdDirective::from(r.as_statement());
+}
+
+std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::from(const TokenContext &t) {
+  return OMPTeamsDistributeParallelForSimdDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

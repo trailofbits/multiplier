@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CoroutineSuspendExpr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CoroutineSuspendExpr;
 class CoyieldExpr;
 class Decl;
@@ -70,13 +59,8 @@ class CoyieldExpr : public CoroutineSuspendExpr {
     }
   }
 
-  inline static std::optional<CoyieldExpr> from(const Reference &r) {
-    return CoyieldExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CoyieldExpr> from(const TokenContext &t) {
-    return CoyieldExpr::from(t.as_statement());
-  }
+  static std::optional<CoyieldExpr> from(const Reference &r);
+  static std::optional<CoyieldExpr> from(const TokenContext &t);
 
 };
 

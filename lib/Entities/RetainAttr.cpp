@@ -96,6 +96,14 @@ gap::generator<RetainAttr> RetainAttr::in(const File &file) {
   }
 }
 
+std::optional<RetainAttr> RetainAttr::from(const Reference &r) {
+  return RetainAttr::from(r.as_attribute());
+}
+
+std::optional<RetainAttr> RetainAttr::from(const TokenContext &t) {
+  return RetainAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

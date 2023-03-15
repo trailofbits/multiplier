@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OpenCLLocalAddressSpaceAttrSpelling.h"
 #include "TypeAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class OpenCLLocalAddressSpaceAttr;
 class Token;
@@ -57,13 +46,8 @@ class OpenCLLocalAddressSpaceAttr : public TypeAttr {
     }
   }
 
-  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const Reference &r) {
-    return OpenCLLocalAddressSpaceAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const TokenContext &t) {
-    return OpenCLLocalAddressSpaceAttr::from(t.as_attribute());
-  }
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const Reference &r);
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const TokenContext &t);
 
   OpenCLLocalAddressSpaceAttrSpelling semantic_spelling(void) const;
 };

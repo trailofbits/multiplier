@@ -96,6 +96,14 @@ gap::generator<ArtificialAttr> ArtificialAttr::in(const File &file) {
   }
 }
 
+std::optional<ArtificialAttr> ArtificialAttr::from(const Reference &r) {
+  return ArtificialAttr::from(r.as_attribute());
+}
+
+std::optional<ArtificialAttr> ArtificialAttr::from(const TokenContext &t) {
+  return ArtificialAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

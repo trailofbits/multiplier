@@ -111,6 +111,14 @@ gap::generator<StmtAttr> StmtAttr::in(const File &file) {
   }
 }
 
+std::optional<StmtAttr> StmtAttr::from(const Reference &r) {
+  return StmtAttr::from(r.as_attribute());
+}
+
+std::optional<StmtAttr> StmtAttr::from(const TokenContext &t) {
+  return StmtAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

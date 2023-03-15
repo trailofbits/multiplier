@@ -95,6 +95,14 @@ gap::generator<MacroQualifiedType> MacroQualifiedType::in(const File &file) {
   }
 }
 
+std::optional<MacroQualifiedType> MacroQualifiedType::from(const Reference &r) {
+  return MacroQualifiedType::from(r.as_type());
+}
+
+std::optional<MacroQualifiedType> MacroQualifiedType::from(const TokenContext &t) {
+  return MacroQualifiedType::from(t.as_type());
+}
+
 Type MacroQualifiedType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

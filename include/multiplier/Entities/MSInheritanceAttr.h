@@ -8,24 +8,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "MSInheritanceAttrSpelling.h"
 #include "MSInheritanceModel.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class MSInheritanceAttr;
@@ -58,13 +47,8 @@ class MSInheritanceAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<MSInheritanceAttr> from(const Reference &r) {
-    return MSInheritanceAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<MSInheritanceAttr> from(const TokenContext &t) {
-    return MSInheritanceAttr::from(t.as_attribute());
-  }
+  static std::optional<MSInheritanceAttr> from(const Reference &r);
+  static std::optional<MSInheritanceAttr> from(const TokenContext &t);
 
   bool best_case(void) const;
   MSInheritanceModel inheritance_model(void) const;

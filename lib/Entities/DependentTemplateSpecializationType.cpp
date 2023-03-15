@@ -97,6 +97,14 @@ gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializat
   }
 }
 
+std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializationType::from(const Reference &r) {
+  return DependentTemplateSpecializationType::from(r.as_type());
+}
+
+std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializationType::from(const TokenContext &t) {
+  return DependentTemplateSpecializationType::from(t.as_type());
+}
+
 Type DependentTemplateSpecializationType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -165,6 +165,14 @@ gap::generator<TypeAttr> TypeAttr::in(const File &file) {
   }
 }
 
+std::optional<TypeAttr> TypeAttr::from(const Reference &r) {
+  return TypeAttr::from(r.as_attribute());
+}
+
+std::optional<TypeAttr> TypeAttr::from(const TokenContext &t) {
+  return TypeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

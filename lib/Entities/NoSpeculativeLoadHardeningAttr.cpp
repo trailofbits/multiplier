@@ -96,6 +96,14 @@ gap::generator<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::i
   }
 }
 
+std::optional<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::from(const Reference &r) {
+  return NoSpeculativeLoadHardeningAttr::from(r.as_attribute());
+}
+
+std::optional<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::from(const TokenContext &t) {
+  return NoSpeculativeLoadHardeningAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

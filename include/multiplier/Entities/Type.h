@@ -8,20 +8,17 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
-
-#include <compare>
 
 #include "Linkage.h"
 #include "NullabilityKind.h"
@@ -30,6 +27,8 @@
 #include "Visibility.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXRecordDecl;
 class File;
 class Fragment;
@@ -100,13 +99,9 @@ class Type {
     return self;
   }
 
-  inline static std::optional<Type> from(const Reference &r) {
-    return r.as_type();
-  }
+  static std::optional<Type> from(const Reference &r);
 
-  inline static std::optional<Type> from(const TokenContext &t) {
-    return t.as_type();
-  }
+  static std::optional<Type> from(const TokenContext &t);
 
   Type desugared_type(void) const;
   Type canonical_type(void) const;

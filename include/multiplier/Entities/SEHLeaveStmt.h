@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class SEHLeaveStmt;
 class Stmt;
@@ -64,13 +53,8 @@ class SEHLeaveStmt : public Stmt {
     }
   }
 
-  inline static std::optional<SEHLeaveStmt> from(const Reference &r) {
-    return SEHLeaveStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<SEHLeaveStmt> from(const TokenContext &t) {
-    return SEHLeaveStmt::from(t.as_statement());
-  }
+  static std::optional<SEHLeaveStmt> from(const Reference &r);
+  static std::optional<SEHLeaveStmt> from(const TokenContext &t);
 
   Token leave_token(void) const;
 };

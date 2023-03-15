@@ -96,6 +96,14 @@ gap::generator<FlattenAttr> FlattenAttr::in(const File &file) {
   }
 }
 
+std::optional<FlattenAttr> FlattenAttr::from(const Reference &r) {
+  return FlattenAttr::from(r.as_attribute());
+}
+
+std::optional<FlattenAttr> FlattenAttr::from(const TokenContext &t) {
+  return FlattenAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

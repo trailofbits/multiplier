@@ -163,6 +163,14 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const Reference &r) {
+  return ObjCMethodDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const TokenContext &t) {
+  return ObjCMethodDecl::from(t.as_declaration());
+}
+
 bool ObjCMethodDecl::defined_in_ns_object(void) const {
   return impl->reader.getVal70();
 }

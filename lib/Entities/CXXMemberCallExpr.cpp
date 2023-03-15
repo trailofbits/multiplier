@@ -150,6 +150,14 @@ gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const Reference &r) {
+  return CXXMemberCallExpr::from(r.as_statement());
+}
+
+std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const TokenContext &t) {
+  return CXXMemberCallExpr::from(t.as_statement());
+}
+
 Expr CXXMemberCallExpr::implicit_object_argument(void) const {
   RawEntityId eid = impl->reader.getVal44();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

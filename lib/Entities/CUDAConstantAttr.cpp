@@ -96,6 +96,14 @@ gap::generator<CUDAConstantAttr> CUDAConstantAttr::in(const File &file) {
   }
 }
 
+std::optional<CUDAConstantAttr> CUDAConstantAttr::from(const Reference &r) {
+  return CUDAConstantAttr::from(r.as_attribute());
+}
+
+std::optional<CUDAConstantAttr> CUDAConstantAttr::from(const TokenContext &t) {
+  return CUDAConstantAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

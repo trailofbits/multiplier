@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "RestrictAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class RestrictAttr;
@@ -57,13 +46,8 @@ class RestrictAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<RestrictAttr> from(const Reference &r) {
-    return RestrictAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<RestrictAttr> from(const TokenContext &t) {
-    return RestrictAttr::from(t.as_attribute());
-  }
+  static std::optional<RestrictAttr> from(const Reference &r);
+  static std::optional<RestrictAttr> from(const TokenContext &t);
 
   RestrictAttrSpelling semantic_spelling(void) const;
 };

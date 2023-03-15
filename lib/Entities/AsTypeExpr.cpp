@@ -146,6 +146,14 @@ gap::generator<AsTypeExpr> AsTypeExpr::in(const File &file) {
   }
 }
 
+std::optional<AsTypeExpr> AsTypeExpr::from(const Reference &r) {
+  return AsTypeExpr::from(r.as_statement());
+}
+
+std::optional<AsTypeExpr> AsTypeExpr::from(const TokenContext &t) {
+  return AsTypeExpr::from(t.as_statement());
+}
+
 Token AsTypeExpr::builtin_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

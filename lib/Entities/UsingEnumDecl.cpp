@@ -159,6 +159,14 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::in(const File &file) {
   }
 }
 
+std::optional<UsingEnumDecl> UsingEnumDecl::from(const Reference &r) {
+  return UsingEnumDecl::from(r.as_declaration());
+}
+
+std::optional<UsingEnumDecl> UsingEnumDecl::from(const TokenContext &t) {
+  return UsingEnumDecl::from(t.as_declaration());
+}
+
 EnumDecl UsingEnumDecl::enum_declaration(void) const {
   RawEntityId eid = impl->reader.getVal52();
   return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

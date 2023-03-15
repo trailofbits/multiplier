@@ -96,6 +96,14 @@ gap::generator<SwiftNameAttr> SwiftNameAttr::in(const File &file) {
   }
 }
 
+std::optional<SwiftNameAttr> SwiftNameAttr::from(const Reference &r) {
+  return SwiftNameAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftNameAttr> SwiftNameAttr::from(const TokenContext &t) {
+  return SwiftNameAttr::from(t.as_attribute());
+}
+
 std::string_view SwiftNameAttr::name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

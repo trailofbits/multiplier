@@ -146,6 +146,14 @@ gap::generator<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const Reference &r) {
+  return ObjCBoolLiteralExpr::from(r.as_statement());
+}
+
+std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const TokenContext &t) {
+  return ObjCBoolLiteralExpr::from(t.as_statement());
+}
+
 Token ObjCBoolLiteralExpr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

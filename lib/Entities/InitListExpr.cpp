@@ -147,6 +147,14 @@ gap::generator<InitListExpr> InitListExpr::in(const File &file) {
   }
 }
 
+std::optional<InitListExpr> InitListExpr::from(const Reference &r) {
+  return InitListExpr::from(r.as_statement());
+}
+
+std::optional<InitListExpr> InitListExpr::from(const TokenContext &t) {
+  return InitListExpr::from(t.as_statement());
+}
+
 std::optional<Expr> InitListExpr::array_filler(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal38();

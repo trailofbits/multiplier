@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "BaseUsingDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BaseUsingDecl;
 class Decl;
 class NamedDecl;
@@ -69,13 +58,8 @@ class UsingDecl : public BaseUsingDecl {
     }
   }
 
-  inline static std::optional<UsingDecl> from(const Reference &r) {
-    return UsingDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<UsingDecl> from(const TokenContext &t) {
-    return UsingDecl::from(t.as_declaration());
-  }
+  static std::optional<UsingDecl> from(const Reference &r);
+  static std::optional<UsingDecl> from(const TokenContext &t);
 
   Token using_token(void) const;
   bool has_typename(void) const;

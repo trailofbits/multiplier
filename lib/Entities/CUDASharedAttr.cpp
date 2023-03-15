@@ -96,6 +96,14 @@ gap::generator<CUDASharedAttr> CUDASharedAttr::in(const File &file) {
   }
 }
 
+std::optional<CUDASharedAttr> CUDASharedAttr::from(const Reference &r) {
+  return CUDASharedAttr::from(r.as_attribute());
+}
+
+std::optional<CUDASharedAttr> CUDASharedAttr::from(const TokenContext &t) {
+  return CUDASharedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

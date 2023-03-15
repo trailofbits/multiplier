@@ -96,6 +96,14 @@ gap::generator<NoProfileFunctionAttr> NoProfileFunctionAttr::in(const File &file
   }
 }
 
+std::optional<NoProfileFunctionAttr> NoProfileFunctionAttr::from(const Reference &r) {
+  return NoProfileFunctionAttr::from(r.as_attribute());
+}
+
+std::optional<NoProfileFunctionAttr> NoProfileFunctionAttr::from(const TokenContext &t) {
+  return NoProfileFunctionAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

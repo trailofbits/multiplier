@@ -9,7 +9,9 @@
 #include "Index.h"
 
 namespace mlir {
+class Module;
 class Operation;
+class Value;
 } // namespace mlir
 
 namespace mx {
@@ -125,6 +127,10 @@ class OperationRange {
   }
 };
 
+using MLIRModulePtr = std::shared_ptr<const mlir::Module>;
+using MLIROperationPtr = std::shared_ptr<const mlir::Operation>;
+using MLIRValuePtr = std::shared_ptr<const mlir::Value>;
+
 class SourceIR {
  private:
   friend class Fragment;
@@ -137,9 +143,13 @@ class SourceIR {
       : impl(std::move(impl_)) {}
 
  public:
+  MLIRModulePtr module(void) const;
+
   VariantEntity entity_for(const mlir::Operation *op) const;
 
-  VariantEntity entity_for(const std::shared_ptr<const mlir::Operation> &op) const;
+  VariantEntity entity_for(const MLIROperationPtr &op) const;
+
+  OperationRange for_entity(const VariantEntity &entity) const;
 
 #define MX_DECLARE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
   OperationRange for_##lower_name(const type_name &lower_name) const; \

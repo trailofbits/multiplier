@@ -96,6 +96,14 @@ gap::generator<AlignNaturalAttr> AlignNaturalAttr::in(const File &file) {
   }
 }
 
+std::optional<AlignNaturalAttr> AlignNaturalAttr::from(const Reference &r) {
+  return AlignNaturalAttr::from(r.as_attribute());
+}
+
+std::optional<AlignNaturalAttr> AlignNaturalAttr::from(const TokenContext &t) {
+  return AlignNaturalAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

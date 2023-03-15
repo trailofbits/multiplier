@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXRecordDecl;
 class MemberPointerType;
 class Token;
@@ -55,13 +44,8 @@ class MemberPointerType : public Type {
     }
   }
 
-  inline static std::optional<MemberPointerType> from(const Reference &r) {
-    return MemberPointerType::from(r.as_type());
-  }
-
-  inline static std::optional<MemberPointerType> from(const TokenContext &t) {
-    return MemberPointerType::from(t.as_type());
-  }
+  static std::optional<MemberPointerType> from(const Reference &r);
+  static std::optional<MemberPointerType> from(const TokenContext &t);
 
   Type desugar(void) const;
   Type class_(void) const;

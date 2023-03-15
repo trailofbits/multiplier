@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class Stmt;
@@ -69,13 +58,8 @@ class UnresolvedUsingValueDecl : public ValueDecl {
     }
   }
 
-  inline static std::optional<UnresolvedUsingValueDecl> from(const Reference &r) {
-    return UnresolvedUsingValueDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &t) {
-    return UnresolvedUsingValueDecl::from(t.as_declaration());
-  }
+  static std::optional<UnresolvedUsingValueDecl> from(const Reference &r);
+  static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &t);
 
   Token ellipsis_token(void) const;
   Token using_token(void) const;

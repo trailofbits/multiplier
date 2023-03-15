@@ -124,6 +124,14 @@ gap::generator<Attr> Attr::in(const File &file, std::span<AttrKind> kinds) {
   }
 }
 
+std::optional<Attr> Attr::from(const Reference &r) {
+  return r.as_attribute();
+}
+
+std::optional<Attr> Attr::from(const TokenContext &t) {
+  return t.as_attribute();
+}
+
 Token Attr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal0());
 }

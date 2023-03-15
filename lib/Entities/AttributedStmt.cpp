@@ -146,6 +146,14 @@ gap::generator<AttributedStmt> AttributedStmt::in(const File &file) {
   }
 }
 
+std::optional<AttributedStmt> AttributedStmt::from(const Reference &r) {
+  return AttributedStmt::from(r.as_statement());
+}
+
+std::optional<AttributedStmt> AttributedStmt::from(const TokenContext &t) {
+  return AttributedStmt::from(t.as_statement());
+}
+
 Token AttributedStmt::attribute_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }

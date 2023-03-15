@@ -102,6 +102,14 @@ gap::generator<TypeWithKeyword> TypeWithKeyword::in(const File &file) {
   }
 }
 
+std::optional<TypeWithKeyword> TypeWithKeyword::from(const Reference &r) {
+  return TypeWithKeyword::from(r.as_type());
+}
+
+std::optional<TypeWithKeyword> TypeWithKeyword::from(const TokenContext &t) {
+  return TypeWithKeyword::from(t.as_type());
+}
+
 ElaboratedTypeKeyword TypeWithKeyword::keyword(void) const {
   return static_cast<ElaboratedTypeKeyword>(impl->reader.getVal235());
 }

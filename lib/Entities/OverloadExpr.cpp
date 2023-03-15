@@ -151,6 +151,14 @@ gap::generator<OverloadExpr> OverloadExpr::in(const File &file) {
   }
 }
 
+std::optional<OverloadExpr> OverloadExpr::from(const Reference &r) {
+  return OverloadExpr::from(r.as_statement());
+}
+
+std::optional<OverloadExpr> OverloadExpr::from(const TokenContext &t) {
+  return OverloadExpr::from(t.as_statement());
+}
+
 Token OverloadExpr::l_angle_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

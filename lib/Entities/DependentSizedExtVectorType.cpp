@@ -96,6 +96,14 @@ gap::generator<DependentSizedExtVectorType> DependentSizedExtVectorType::in(cons
   }
 }
 
+std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(const Reference &r) {
+  return DependentSizedExtVectorType::from(r.as_type());
+}
+
+std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(const TokenContext &t) {
+  return DependentSizedExtVectorType::from(t.as_type());
+}
+
 Type DependentSizedExtVectorType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

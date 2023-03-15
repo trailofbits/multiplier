@@ -146,6 +146,14 @@ gap::generator<ChooseExpr> ChooseExpr::in(const File &file) {
   }
 }
 
+std::optional<ChooseExpr> ChooseExpr::from(const Reference &r) {
+  return ChooseExpr::from(r.as_statement());
+}
+
+std::optional<ChooseExpr> ChooseExpr::from(const TokenContext &t) {
+  return ChooseExpr::from(t.as_statement());
+}
+
 Token ChooseExpr::builtin_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

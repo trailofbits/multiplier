@@ -99,6 +99,14 @@ gap::generator<ReferenceType> ReferenceType::in(const File &file) {
   }
 }
 
+std::optional<ReferenceType> ReferenceType::from(const Reference &r) {
+  return ReferenceType::from(r.as_type());
+}
+
+std::optional<ReferenceType> ReferenceType::from(const TokenContext &t) {
+  return ReferenceType::from(t.as_type());
+}
+
 Type ReferenceType::pointee_type_as_written(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

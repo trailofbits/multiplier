@@ -144,6 +144,14 @@ gap::generator<SEHLeaveStmt> SEHLeaveStmt::in(const File &file) {
   }
 }
 
+std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const Reference &r) {
+  return SEHLeaveStmt::from(r.as_statement());
+}
+
+std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const TokenContext &t) {
+  return SEHLeaveStmt::from(t.as_statement());
+}
+
 Token SEHLeaveStmt::leave_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

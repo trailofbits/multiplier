@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CompoundStmt;
 class Decl;
 class Expr;
@@ -66,13 +55,8 @@ class SEHExceptStmt : public Stmt {
     }
   }
 
-  inline static std::optional<SEHExceptStmt> from(const Reference &r) {
-    return SEHExceptStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<SEHExceptStmt> from(const TokenContext &t) {
-    return SEHExceptStmt::from(t.as_statement());
-  }
+  static std::optional<SEHExceptStmt> from(const Reference &r);
+  static std::optional<SEHExceptStmt> from(const TokenContext &t);
 
   CompoundStmt block(void) const;
   Token except_token(void) const;

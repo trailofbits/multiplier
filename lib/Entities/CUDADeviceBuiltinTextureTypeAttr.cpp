@@ -96,6 +96,14 @@ gap::generator<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAtt
   }
 }
 
+std::optional<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr::from(const Reference &r) {
+  return CUDADeviceBuiltinTextureTypeAttr::from(r.as_attribute());
+}
+
+std::optional<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr::from(const TokenContext &t) {
+  return CUDADeviceBuiltinTextureTypeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

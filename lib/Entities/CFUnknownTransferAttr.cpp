@@ -96,6 +96,14 @@ gap::generator<CFUnknownTransferAttr> CFUnknownTransferAttr::in(const File &file
   }
 }
 
+std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const Reference &r) {
+  return CFUnknownTransferAttr::from(r.as_attribute());
+}
+
+std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const TokenContext &t) {
+  return CFUnknownTransferAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

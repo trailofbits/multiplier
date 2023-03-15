@@ -96,6 +96,14 @@ gap::generator<MSAllocatorAttr> MSAllocatorAttr::in(const File &file) {
   }
 }
 
+std::optional<MSAllocatorAttr> MSAllocatorAttr::from(const Reference &r) {
+  return MSAllocatorAttr::from(r.as_attribute());
+}
+
+std::optional<MSAllocatorAttr> MSAllocatorAttr::from(const TokenContext &t) {
+  return MSAllocatorAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

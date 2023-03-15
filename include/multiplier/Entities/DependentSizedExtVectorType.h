@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DependentSizedExtVectorType;
 class Expr;
 class Token;
@@ -55,13 +44,8 @@ class DependentSizedExtVectorType : public Type {
     }
   }
 
-  inline static std::optional<DependentSizedExtVectorType> from(const Reference &r) {
-    return DependentSizedExtVectorType::from(r.as_type());
-  }
-
-  inline static std::optional<DependentSizedExtVectorType> from(const TokenContext &t) {
-    return DependentSizedExtVectorType::from(t.as_type());
-  }
+  static std::optional<DependentSizedExtVectorType> from(const Reference &r);
+  static std::optional<DependentSizedExtVectorType> from(const TokenContext &t);
 
   Type desugar(void) const;
   Token attribute_token(void) const;

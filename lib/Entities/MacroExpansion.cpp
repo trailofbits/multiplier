@@ -113,6 +113,14 @@ gap::generator<MacroExpansion> MacroExpansion::in(const File &file) {
   }
 }
 
+std::optional<MacroExpansion> MacroExpansion::from(const Reference &r) {
+  return MacroExpansion::from(r.as_macro());
+}
+
+std::optional<MacroExpansion> MacroExpansion::from(const TokenContext &t) {
+  return MacroExpansion::from(t.as_macro());
+}
+
 std::optional<DefineMacroDirective> MacroExpansion::definition(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal4();

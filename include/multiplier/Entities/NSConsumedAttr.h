@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableParamAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
@@ -58,13 +47,8 @@ class NSConsumedAttr : public InheritableParamAttr {
     }
   }
 
-  inline static std::optional<NSConsumedAttr> from(const Reference &r) {
-    return NSConsumedAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<NSConsumedAttr> from(const TokenContext &t) {
-    return NSConsumedAttr::from(t.as_attribute());
-  }
+  static std::optional<NSConsumedAttr> from(const Reference &r);
+  static std::optional<NSConsumedAttr> from(const TokenContext &t);
 
 };
 

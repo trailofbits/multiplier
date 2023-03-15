@@ -96,6 +96,14 @@ gap::generator<ExtVectorType> ExtVectorType::in(const File &file) {
   }
 }
 
+std::optional<ExtVectorType> ExtVectorType::from(const Reference &r) {
+  return ExtVectorType::from(r.as_type());
+}
+
+std::optional<ExtVectorType> ExtVectorType::from(const TokenContext &t) {
+  return ExtVectorType::from(t.as_type());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

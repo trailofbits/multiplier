@@ -146,6 +146,14 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const File &file) 
   }
 }
 
+std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Reference &r) {
+  return GenericSelectionExpr::from(r.as_statement());
+}
+
+std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const TokenContext &t) {
+  return GenericSelectionExpr::from(t.as_statement());
+}
+
 unsigned GenericSelectionExpr::num_association_expressions(void) const {
   return impl->reader.getVal15().size();
 }

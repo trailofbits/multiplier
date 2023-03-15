@@ -160,6 +160,14 @@ gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::in(const File &file) {
   }
 }
 
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const Reference &r) {
+  return OMPCapturedExprDecl::from(r.as_declaration());
+}
+
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const TokenContext &t) {
+  return OMPCapturedExprDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

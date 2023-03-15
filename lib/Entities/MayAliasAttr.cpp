@@ -96,6 +96,14 @@ gap::generator<MayAliasAttr> MayAliasAttr::in(const File &file) {
   }
 }
 
+std::optional<MayAliasAttr> MayAliasAttr::from(const Reference &r) {
+  return MayAliasAttr::from(r.as_attribute());
+}
+
+std::optional<MayAliasAttr> MayAliasAttr::from(const TokenContext &t) {
+  return MayAliasAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

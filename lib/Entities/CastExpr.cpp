@@ -176,6 +176,14 @@ gap::generator<CastExpr> CastExpr::in(const File &file) {
   }
 }
 
+std::optional<CastExpr> CastExpr::from(const Reference &r) {
+  return CastExpr::from(r.as_statement());
+}
+
+std::optional<CastExpr> CastExpr::from(const TokenContext &t) {
+  return CastExpr::from(t.as_statement());
+}
+
 CastKind CastExpr::cast_kind(void) const {
   return static_cast<CastKind>(impl->reader.getVal93());
 }

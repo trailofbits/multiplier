@@ -147,6 +147,14 @@ gap::generator<ForStmt> ForStmt::in(const File &file) {
   }
 }
 
+std::optional<ForStmt> ForStmt::from(const Reference &r) {
+  return ForStmt::from(r.as_statement());
+}
+
+std::optional<ForStmt> ForStmt::from(const TokenContext &t) {
+  return ForStmt::from(t.as_statement());
+}
+
 Stmt ForStmt::body(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

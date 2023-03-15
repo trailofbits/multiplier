@@ -147,6 +147,14 @@ gap::generator<GCCAsmStmt> GCCAsmStmt::in(const File &file) {
   }
 }
 
+std::optional<GCCAsmStmt> GCCAsmStmt::from(const Reference &r) {
+  return GCCAsmStmt::from(r.as_statement());
+}
+
+std::optional<GCCAsmStmt> GCCAsmStmt::from(const TokenContext &t) {
+  return GCCAsmStmt::from(t.as_statement());
+}
+
 StringLiteral GCCAsmStmt::assembly_string(void) const {
   RawEntityId eid = impl->reader.getVal10();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

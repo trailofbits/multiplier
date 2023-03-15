@@ -96,6 +96,14 @@ gap::generator<TestTypestateAttr> TestTypestateAttr::in(const File &file) {
   }
 }
 
+std::optional<TestTypestateAttr> TestTypestateAttr::from(const Reference &r) {
+  return TestTypestateAttr::from(r.as_attribute());
+}
+
+std::optional<TestTypestateAttr> TestTypestateAttr::from(const TokenContext &t) {
+  return TestTypestateAttr::from(t.as_attribute());
+}
+
 TestTypestateAttrConsumedState TestTypestateAttr::test_state(void) const {
   return static_cast<TestTypestateAttrConsumedState>(impl->reader.getVal10());
 }

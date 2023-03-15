@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class EnumType;
 class RecordType;
 class TagDecl;
@@ -53,13 +42,8 @@ class TagType : public Type {
     }
   }
 
-  inline static std::optional<TagType> from(const Reference &r) {
-    return TagType::from(r.as_type());
-  }
-
-  inline static std::optional<TagType> from(const TokenContext &t) {
-    return TagType::from(t.as_type());
-  }
+  static std::optional<TagType> from(const Reference &r);
+  static std::optional<TagType> from(const TokenContext &t);
 
   TagDecl declaration(void) const;
   bool is_being_defined(void) const;

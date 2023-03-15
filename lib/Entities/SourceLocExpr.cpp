@@ -146,6 +146,14 @@ gap::generator<SourceLocExpr> SourceLocExpr::in(const File &file) {
   }
 }
 
+std::optional<SourceLocExpr> SourceLocExpr::from(const Reference &r) {
+  return SourceLocExpr::from(r.as_statement());
+}
+
+std::optional<SourceLocExpr> SourceLocExpr::from(const TokenContext &t) {
+  return SourceLocExpr::from(t.as_statement());
+}
+
 std::string_view SourceLocExpr::builtin_string(void) const {
   capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());

@@ -250,6 +250,14 @@ gap::generator<OMPLoopDirective> OMPLoopDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPLoopDirective> OMPLoopDirective::from(const Reference &r) {
+  return OMPLoopDirective::from(r.as_statement());
+}
+
+std::optional<OMPLoopDirective> OMPLoopDirective::from(const TokenContext &t) {
+  return OMPLoopDirective::from(t.as_statement());
+}
+
 unsigned OMPLoopDirective::num_counters(void) const {
   return impl->reader.getVal15().size();
 }

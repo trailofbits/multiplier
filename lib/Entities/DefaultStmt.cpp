@@ -145,6 +145,14 @@ gap::generator<DefaultStmt> DefaultStmt::in(const File &file) {
   }
 }
 
+std::optional<DefaultStmt> DefaultStmt::from(const Reference &r) {
+  return DefaultStmt::from(r.as_statement());
+}
+
+std::optional<DefaultStmt> DefaultStmt::from(const TokenContext &t) {
+  return DefaultStmt::from(t.as_statement());
+}
+
 Token DefaultStmt::default_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }

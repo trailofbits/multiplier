@@ -148,6 +148,14 @@ gap::generator<BuiltinBitCastExpr> BuiltinBitCastExpr::in(const File &file) {
   }
 }
 
+std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const Reference &r) {
+  return BuiltinBitCastExpr::from(r.as_statement());
+}
+
+std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const TokenContext &t) {
+  return BuiltinBitCastExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

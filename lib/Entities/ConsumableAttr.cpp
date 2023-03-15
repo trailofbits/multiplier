@@ -96,6 +96,14 @@ gap::generator<ConsumableAttr> ConsumableAttr::in(const File &file) {
   }
 }
 
+std::optional<ConsumableAttr> ConsumableAttr::from(const Reference &r) {
+  return ConsumableAttr::from(r.as_attribute());
+}
+
+std::optional<ConsumableAttr> ConsumableAttr::from(const TokenContext &t) {
+  return ConsumableAttr::from(t.as_attribute());
+}
+
 ConsumableAttrConsumedState ConsumableAttr::default_state(void) const {
   return static_cast<ConsumableAttrConsumedState>(impl->reader.getVal10());
 }

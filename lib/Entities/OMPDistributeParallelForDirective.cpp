@@ -148,6 +148,14 @@ gap::generator<OMPDistributeParallelForDirective> OMPDistributeParallelForDirect
   }
 }
 
+std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::from(const Reference &r) {
+  return OMPDistributeParallelForDirective::from(r.as_statement());
+}
+
+std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::from(const TokenContext &t) {
+  return OMPDistributeParallelForDirective::from(t.as_statement());
+}
+
 Expr OMPDistributeParallelForDirective::task_reduction_reference_expression(void) const {
   RawEntityId eid = impl->reader.getVal55();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

@@ -96,6 +96,14 @@ gap::generator<NoDestroyAttr> NoDestroyAttr::in(const File &file) {
   }
 }
 
+std::optional<NoDestroyAttr> NoDestroyAttr::from(const Reference &r) {
+  return NoDestroyAttr::from(r.as_attribute());
+}
+
+std::optional<NoDestroyAttr> NoDestroyAttr::from(const TokenContext &t) {
+  return NoDestroyAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

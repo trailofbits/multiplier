@@ -100,6 +100,14 @@ gap::generator<TagType> TagType::in(const File &file) {
   }
 }
 
+std::optional<TagType> TagType::from(const Reference &r) {
+  return TagType::from(r.as_type());
+}
+
+std::optional<TagType> TagType::from(const TokenContext &t) {
+  return TagType::from(t.as_type());
+}
+
 TagDecl TagType::declaration(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

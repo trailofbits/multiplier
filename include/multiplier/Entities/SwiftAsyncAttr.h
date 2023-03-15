@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class SwiftAsyncAttr;
@@ -56,13 +45,8 @@ class SwiftAsyncAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<SwiftAsyncAttr> from(const Reference &r) {
-    return SwiftAsyncAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<SwiftAsyncAttr> from(const TokenContext &t) {
-    return SwiftAsyncAttr::from(t.as_attribute());
-  }
+  static std::optional<SwiftAsyncAttr> from(const Reference &r);
+  static std::optional<SwiftAsyncAttr> from(const TokenContext &t);
 
 };
 

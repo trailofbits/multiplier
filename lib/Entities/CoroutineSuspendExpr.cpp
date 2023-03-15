@@ -151,6 +151,14 @@ gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const File &file) 
   }
 }
 
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Reference &r) {
+  return CoroutineSuspendExpr::from(r.as_statement());
+}
+
+std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const TokenContext &t) {
+  return CoroutineSuspendExpr::from(t.as_statement());
+}
+
 Expr CoroutineSuspendExpr::common_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

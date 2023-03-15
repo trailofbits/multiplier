@@ -95,6 +95,14 @@ gap::generator<BlockPointerType> BlockPointerType::in(const File &file) {
   }
 }
 
+std::optional<BlockPointerType> BlockPointerType::from(const Reference &r) {
+  return BlockPointerType::from(r.as_type());
+}
+
+std::optional<BlockPointerType> BlockPointerType::from(const TokenContext &t) {
+  return BlockPointerType::from(t.as_type());
+}
+
 Type BlockPointerType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

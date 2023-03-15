@@ -66,6 +66,12 @@ FilePathMap CachingEntityProvider::ListFiles(const Ptr &self) {
   return file_list;
 }
 
+// Get the list of paths associated with a given file id.
+gap::generator<std::filesystem::path> CachingEntityProvider::ListPathsForFile(
+    const Ptr &self, PackedFileId id) {
+  return next->ListPathsForFile(self, id);
+}
+
 // Get the current list of fragment IDs associated with a file.
 //
 // TODO(pag): Re-evaluate if caching this is beneficial/useful.

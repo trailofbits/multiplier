@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "MacroDirective.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Macro;
 class MacroDirective;
 class OtherMacroDirective;
@@ -60,13 +49,8 @@ class OtherMacroDirective : public MacroDirective {
     }
   }
 
-  inline static std::optional<OtherMacroDirective> from(const Reference &r) {
-    return OtherMacroDirective::from(r.as_macro());
-  }
-
-  inline static std::optional<OtherMacroDirective> from(const TokenContext &t) {
-    return OtherMacroDirective::from(t.as_macro());
-  }
+  static std::optional<OtherMacroDirective> from(const Reference &r);
+  static std::optional<OtherMacroDirective> from(const TokenContext &t);
 
 };
 

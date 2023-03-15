@@ -145,6 +145,14 @@ gap::generator<SEHFinallyStmt> SEHFinallyStmt::in(const File &file) {
   }
 }
 
+std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const Reference &r) {
+  return SEHFinallyStmt::from(r.as_statement());
+}
+
+std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const TokenContext &t) {
+  return SEHFinallyStmt::from(t.as_statement());
+}
+
 CompoundStmt SEHFinallyStmt::block(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

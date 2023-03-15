@@ -96,6 +96,14 @@ gap::generator<ObjCPreciseLifetimeAttr> ObjCPreciseLifetimeAttr::in(const File &
   }
 }
 
+std::optional<ObjCPreciseLifetimeAttr> ObjCPreciseLifetimeAttr::from(const Reference &r) {
+  return ObjCPreciseLifetimeAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCPreciseLifetimeAttr> ObjCPreciseLifetimeAttr::from(const TokenContext &t) {
+  return ObjCPreciseLifetimeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

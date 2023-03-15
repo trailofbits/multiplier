@@ -96,6 +96,14 @@ gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const File &file
   }
 }
 
+std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const Reference &r) {
+  return ReleaseCapabilityAttr::from(r.as_attribute());
+}
+
+std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const TokenContext &t) {
+  return ReleaseCapabilityAttr::from(t.as_attribute());
+}
+
 ReleaseCapabilityAttrSpelling ReleaseCapabilityAttr::semantic_spelling(void) const {
   return static_cast<ReleaseCapabilityAttrSpelling>(impl->reader.getVal10());
 }

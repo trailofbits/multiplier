@@ -146,6 +146,14 @@ gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::in(const File &file) {
   }
 }
 
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Reference &r) {
+  return MatrixSubscriptExpr::from(r.as_statement());
+}
+
+std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const TokenContext &t) {
+  return MatrixSubscriptExpr::from(t.as_statement());
+}
+
 Expr MatrixSubscriptExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

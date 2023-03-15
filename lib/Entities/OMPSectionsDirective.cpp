@@ -146,6 +146,14 @@ gap::generator<OMPSectionsDirective> OMPSectionsDirective::in(const File &file) 
   }
 }
 
+std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const Reference &r) {
+  return OMPSectionsDirective::from(r.as_statement());
+}
+
+std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const TokenContext &t) {
+  return OMPSectionsDirective::from(t.as_statement());
+}
+
 Expr OMPSectionsDirective::task_reduction_reference_expression(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

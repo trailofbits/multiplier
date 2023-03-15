@@ -162,6 +162,14 @@ gap::generator<EnumDecl> EnumDecl::in(const File &file) {
   }
 }
 
+std::optional<EnumDecl> EnumDecl::from(const Reference &r) {
+  return EnumDecl::from(r.as_declaration());
+}
+
+std::optional<EnumDecl> EnumDecl::from(const TokenContext &t) {
+  return EnumDecl::from(t.as_declaration());
+}
+
 unsigned EnumDecl::num_enumerators(void) const {
   return impl->reader.getVal58().size();
 }

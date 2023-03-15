@@ -97,6 +97,14 @@ gap::generator<ElaboratedType> ElaboratedType::in(const File &file) {
   }
 }
 
+std::optional<ElaboratedType> ElaboratedType::from(const Reference &r) {
+  return ElaboratedType::from(r.as_type());
+}
+
+std::optional<ElaboratedType> ElaboratedType::from(const TokenContext &t) {
+  return ElaboratedType::from(t.as_type());
+}
+
 Type ElaboratedType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

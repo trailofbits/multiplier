@@ -96,6 +96,14 @@ gap::generator<UninitializedAttr> UninitializedAttr::in(const File &file) {
   }
 }
 
+std::optional<UninitializedAttr> UninitializedAttr::from(const Reference &r) {
+  return UninitializedAttr::from(r.as_attribute());
+}
+
+std::optional<UninitializedAttr> UninitializedAttr::from(const TokenContext &t) {
+  return UninitializedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

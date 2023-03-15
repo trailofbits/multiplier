@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "BuiltinTypeKind.h"
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BuiltinType;
 class Token;
 class Type;
@@ -55,13 +44,8 @@ class BuiltinType : public Type {
     }
   }
 
-  inline static std::optional<BuiltinType> from(const Reference &r) {
-    return BuiltinType::from(r.as_type());
-  }
-
-  inline static std::optional<BuiltinType> from(const TokenContext &t) {
-    return BuiltinType::from(t.as_type());
-  }
+  static std::optional<BuiltinType> from(const Reference &r);
+  static std::optional<BuiltinType> from(const TokenContext &t);
 
   Type desugar(void) const;
   BuiltinTypeKind builtin_kind(void) const;

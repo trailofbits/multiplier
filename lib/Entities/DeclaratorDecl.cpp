@@ -212,6 +212,14 @@ gap::generator<DeclaratorDecl> DeclaratorDecl::in(const File &file) {
   }
 }
 
+std::optional<DeclaratorDecl> DeclaratorDecl::from(const Reference &r) {
+  return DeclaratorDecl::from(r.as_declaration());
+}
+
+std::optional<DeclaratorDecl> DeclaratorDecl::from(const TokenContext &t) {
+  return DeclaratorDecl::from(t.as_declaration());
+}
+
 Token DeclaratorDecl::first_inner_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }

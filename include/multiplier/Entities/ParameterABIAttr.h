@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableParamAttr.h"
 #include "ParameterABI.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
@@ -59,13 +48,8 @@ class ParameterABIAttr : public InheritableParamAttr {
     }
   }
 
-  inline static std::optional<ParameterABIAttr> from(const Reference &r) {
-    return ParameterABIAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<ParameterABIAttr> from(const TokenContext &t) {
-    return ParameterABIAttr::from(t.as_attribute());
-  }
+  static std::optional<ParameterABIAttr> from(const Reference &r);
+  static std::optional<ParameterABIAttr> from(const TokenContext &t);
 
   ParameterABI abi(void) const;
 };

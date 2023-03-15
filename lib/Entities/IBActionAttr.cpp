@@ -96,6 +96,14 @@ gap::generator<IBActionAttr> IBActionAttr::in(const File &file) {
   }
 }
 
+std::optional<IBActionAttr> IBActionAttr::from(const Reference &r) {
+  return IBActionAttr::from(r.as_attribute());
+}
+
+std::optional<IBActionAttr> IBActionAttr::from(const TokenContext &t) {
+  return IBActionAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

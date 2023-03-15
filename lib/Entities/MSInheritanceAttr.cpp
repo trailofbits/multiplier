@@ -96,6 +96,14 @@ gap::generator<MSInheritanceAttr> MSInheritanceAttr::in(const File &file) {
   }
 }
 
+std::optional<MSInheritanceAttr> MSInheritanceAttr::from(const Reference &r) {
+  return MSInheritanceAttr::from(r.as_attribute());
+}
+
+std::optional<MSInheritanceAttr> MSInheritanceAttr::from(const TokenContext &t) {
+  return MSInheritanceAttr::from(t.as_attribute());
+}
+
 bool MSInheritanceAttr::best_case(void) const {
   return impl->reader.getVal12();
 }

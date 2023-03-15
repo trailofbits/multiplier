@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CallExpr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CUDAKernelCallExpr;
 class CallExpr;
 class Decl;
@@ -70,13 +59,8 @@ class CUDAKernelCallExpr : public CallExpr {
     }
   }
 
-  inline static std::optional<CUDAKernelCallExpr> from(const Reference &r) {
-    return CUDAKernelCallExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CUDAKernelCallExpr> from(const TokenContext &t) {
-    return CUDAKernelCallExpr::from(t.as_statement());
-  }
+  static std::optional<CUDAKernelCallExpr> from(const Reference &r);
+  static std::optional<CUDAKernelCallExpr> from(const TokenContext &t);
 
   CallExpr config(void) const;
 };

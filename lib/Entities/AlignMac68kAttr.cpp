@@ -96,6 +96,14 @@ gap::generator<AlignMac68kAttr> AlignMac68kAttr::in(const File &file) {
   }
 }
 
+std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const Reference &r) {
+  return AlignMac68kAttr::from(r.as_attribute());
+}
+
+std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const TokenContext &t) {
+  return AlignMac68kAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

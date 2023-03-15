@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CXXConstructExprConstructionKind.h"
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConstructorDecl;
 class CXXInheritedCtorInitExpr;
 class Decl;
@@ -70,13 +59,8 @@ class CXXInheritedCtorInitExpr : public Expr {
     }
   }
 
-  inline static std::optional<CXXInheritedCtorInitExpr> from(const Reference &r) {
-    return CXXInheritedCtorInitExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXInheritedCtorInitExpr> from(const TokenContext &t) {
-    return CXXInheritedCtorInitExpr::from(t.as_statement());
-  }
+  static std::optional<CXXInheritedCtorInitExpr> from(const Reference &r);
+  static std::optional<CXXInheritedCtorInitExpr> from(const TokenContext &t);
 
   bool constructs_virtual_base(void) const;
   CXXConstructExprConstructionKind construction_kind(void) const;

@@ -26,6 +26,12 @@ FilePathMap InvalidEntityProvider::ListFiles(const Ptr &) {
   return {};
 }
 
+// Get the list of paths associated with a given file id.
+gap::generator<std::filesystem::path> InvalidEntityProvider::ListPathsForFile(
+    const Ptr &, PackedFileId) {
+  co_return;
+}
+
 FragmentIdList InvalidEntityProvider::ListFragmentsInFile(
     const Ptr &, SpecificEntityId<FileId>) {
   return {};

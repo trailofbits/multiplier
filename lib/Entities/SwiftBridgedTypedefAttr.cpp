@@ -96,6 +96,14 @@ gap::generator<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::in(const File &
   }
 }
 
+std::optional<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::from(const Reference &r) {
+  return SwiftBridgedTypedefAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::from(const TokenContext &t) {
+  return SwiftBridgedTypedefAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

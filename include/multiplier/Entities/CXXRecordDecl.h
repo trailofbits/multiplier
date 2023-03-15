@@ -8,19 +8,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "LambdaCaptureDefault.h"
 #include "MSInheritanceModel.h"
 #include "MSVtorDispMode.h"
@@ -28,6 +15,8 @@
 #include "TemplateSpecializationKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXBaseSpecifier;
 class CXXConstructorDecl;
 class CXXDestructorDecl;
@@ -89,13 +78,8 @@ class CXXRecordDecl : public RecordDecl {
     }
   }
 
-  inline static std::optional<CXXRecordDecl> from(const Reference &r) {
-    return CXXRecordDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXRecordDecl> from(const TokenContext &t) {
-    return CXXRecordDecl::from(t.as_declaration());
-  }
+  static std::optional<CXXRecordDecl> from(const Reference &r);
+  static std::optional<CXXRecordDecl> from(const TokenContext &t);
 
   std::optional<bool> allow_const_default_initializer(void) const;
   std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;

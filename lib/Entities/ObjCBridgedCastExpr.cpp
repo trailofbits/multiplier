@@ -148,6 +148,14 @@ gap::generator<ObjCBridgedCastExpr> ObjCBridgedCastExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const Reference &r) {
+  return ObjCBridgedCastExpr::from(r.as_statement());
+}
+
+std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const TokenContext &t) {
+  return ObjCBridgedCastExpr::from(t.as_statement());
+}
+
 Token ObjCBridgedCastExpr::bridge_keyword_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }

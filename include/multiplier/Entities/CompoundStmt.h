@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CompoundStmt;
 class Decl;
 class Stmt;
@@ -64,13 +53,8 @@ class CompoundStmt : public Stmt {
     }
   }
 
-  inline static std::optional<CompoundStmt> from(const Reference &r) {
-    return CompoundStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<CompoundStmt> from(const TokenContext &t) {
-    return CompoundStmt::from(t.as_statement());
-  }
+  static std::optional<CompoundStmt> from(const Reference &r);
+  static std::optional<CompoundStmt> from(const TokenContext &t);
 
   Token left_brace_token(void) const;
   Token right_brace_token(void) const;

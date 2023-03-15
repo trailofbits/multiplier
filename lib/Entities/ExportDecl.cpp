@@ -156,6 +156,14 @@ gap::generator<ExportDecl> ExportDecl::in(const File &file) {
   }
 }
 
+std::optional<ExportDecl> ExportDecl::from(const Reference &r) {
+  return ExportDecl::from(r.as_declaration());
+}
+
+std::optional<ExportDecl> ExportDecl::from(const TokenContext &t) {
+  return ExportDecl::from(t.as_declaration());
+}
+
 Token ExportDecl::export_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }

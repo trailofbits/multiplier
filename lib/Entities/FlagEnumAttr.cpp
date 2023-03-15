@@ -96,6 +96,14 @@ gap::generator<FlagEnumAttr> FlagEnumAttr::in(const File &file) {
   }
 }
 
+std::optional<FlagEnumAttr> FlagEnumAttr::from(const Reference &r) {
+  return FlagEnumAttr::from(r.as_attribute());
+}
+
+std::optional<FlagEnumAttr> FlagEnumAttr::from(const TokenContext &t) {
+  return FlagEnumAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

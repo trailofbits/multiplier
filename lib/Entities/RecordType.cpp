@@ -96,6 +96,14 @@ gap::generator<RecordType> RecordType::in(const File &file) {
   }
 }
 
+std::optional<RecordType> RecordType::from(const Reference &r) {
+  return RecordType::from(r.as_type());
+}
+
+std::optional<RecordType> RecordType::from(const TokenContext &t) {
+  return RecordType::from(t.as_type());
+}
+
 Type RecordType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));

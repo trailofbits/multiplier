@@ -96,6 +96,14 @@ gap::generator<HLSLShaderAttr> HLSLShaderAttr::in(const File &file) {
   }
 }
 
+std::optional<HLSLShaderAttr> HLSLShaderAttr::from(const Reference &r) {
+  return HLSLShaderAttr::from(r.as_attribute());
+}
+
+std::optional<HLSLShaderAttr> HLSLShaderAttr::from(const TokenContext &t) {
+  return HLSLShaderAttr::from(t.as_attribute());
+}
+
 HLSLShaderAttrShaderType HLSLShaderAttr::type(void) const {
   return static_cast<HLSLShaderAttrShaderType>(impl->reader.getVal10());
 }

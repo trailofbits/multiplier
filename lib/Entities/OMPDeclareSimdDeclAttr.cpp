@@ -96,6 +96,14 @@ gap::generator<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::in(const File &fi
   }
 }
 
+std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const Reference &r) {
+  return OMPDeclareSimdDeclAttr::from(r.as_attribute());
+}
+
+std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const TokenContext &t) {
+  return OMPDeclareSimdDeclAttr::from(t.as_attribute());
+}
+
 OMPDeclareSimdDeclAttrBranchStateTy OMPDeclareSimdDeclAttr::branch_state(void) const {
   return static_cast<OMPDeclareSimdDeclAttrBranchStateTy>(impl->reader.getVal10());
 }

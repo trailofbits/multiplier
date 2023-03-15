@@ -96,6 +96,14 @@ gap::generator<FinalAttr> FinalAttr::in(const File &file) {
   }
 }
 
+std::optional<FinalAttr> FinalAttr::from(const Reference &r) {
+  return FinalAttr::from(r.as_attribute());
+}
+
+std::optional<FinalAttr> FinalAttr::from(const TokenContext &t) {
+  return FinalAttr::from(t.as_attribute());
+}
+
 FinalAttrSpelling FinalAttr::semantic_spelling(void) const {
   return static_cast<FinalAttrSpelling>(impl->reader.getVal10());
 }

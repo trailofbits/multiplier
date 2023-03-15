@@ -148,6 +148,14 @@ gap::generator<OMPForDirective> OMPForDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPForDirective> OMPForDirective::from(const Reference &r) {
+  return OMPForDirective::from(r.as_statement());
+}
+
+std::optional<OMPForDirective> OMPForDirective::from(const TokenContext &t) {
+  return OMPForDirective::from(t.as_statement());
+}
+
 Expr OMPForDirective::task_reduction_reference_expression(void) const {
   RawEntityId eid = impl->reader.getVal55();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

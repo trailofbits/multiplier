@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class PackExpansionExpr;
@@ -68,13 +57,8 @@ class PackExpansionExpr : public Expr {
     }
   }
 
-  inline static std::optional<PackExpansionExpr> from(const Reference &r) {
-    return PackExpansionExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<PackExpansionExpr> from(const TokenContext &t) {
-    return PackExpansionExpr::from(t.as_statement());
-  }
+  static std::optional<PackExpansionExpr> from(const Reference &r);
+  static std::optional<PackExpansionExpr> from(const TokenContext &t);
 
   Token ellipsis_token(void) const;
   Expr pattern(void) const;

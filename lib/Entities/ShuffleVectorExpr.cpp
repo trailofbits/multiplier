@@ -146,6 +146,14 @@ gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::in(const File &file) {
   }
 }
 
+std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const Reference &r) {
+  return ShuffleVectorExpr::from(r.as_statement());
+}
+
+std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const TokenContext &t) {
+  return ShuffleVectorExpr::from(t.as_statement());
+}
+
 Token ShuffleVectorExpr::builtin_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

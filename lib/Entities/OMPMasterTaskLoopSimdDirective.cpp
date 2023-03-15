@@ -147,6 +147,14 @@ gap::generator<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::i
   }
 }
 
+std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::from(const Reference &r) {
+  return OMPMasterTaskLoopSimdDirective::from(r.as_statement());
+}
+
+std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::from(const TokenContext &t) {
+  return OMPMasterTaskLoopSimdDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

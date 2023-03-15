@@ -96,6 +96,14 @@ gap::generator<MipsLongCallAttr> MipsLongCallAttr::in(const File &file) {
   }
 }
 
+std::optional<MipsLongCallAttr> MipsLongCallAttr::from(const Reference &r) {
+  return MipsLongCallAttr::from(r.as_attribute());
+}
+
+std::optional<MipsLongCallAttr> MipsLongCallAttr::from(const TokenContext &t) {
+  return MipsLongCallAttr::from(t.as_attribute());
+}
+
 MipsLongCallAttrSpelling MipsLongCallAttr::semantic_spelling(void) const {
   return static_cast<MipsLongCallAttrSpelling>(impl->reader.getVal10());
 }

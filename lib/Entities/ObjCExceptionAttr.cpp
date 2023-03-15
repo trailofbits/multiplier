@@ -96,6 +96,14 @@ gap::generator<ObjCExceptionAttr> ObjCExceptionAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCExceptionAttr> ObjCExceptionAttr::from(const Reference &r) {
+  return ObjCExceptionAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCExceptionAttr> ObjCExceptionAttr::from(const TokenContext &t) {
+  return ObjCExceptionAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

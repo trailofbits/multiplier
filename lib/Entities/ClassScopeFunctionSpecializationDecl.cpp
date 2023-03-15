@@ -157,6 +157,14 @@ gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializ
   }
 }
 
+std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::from(const Reference &r) {
+  return ClassScopeFunctionSpecializationDecl::from(r.as_declaration());
+}
+
+std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::from(const TokenContext &t) {
+  return ClassScopeFunctionSpecializationDecl::from(t.as_declaration());
+}
+
 CXXMethodDecl ClassScopeFunctionSpecializationDecl::specialization(void) const {
   RawEntityId eid = impl->reader.getVal45();
   return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

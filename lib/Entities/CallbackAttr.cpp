@@ -96,6 +96,14 @@ gap::generator<CallbackAttr> CallbackAttr::in(const File &file) {
   }
 }
 
+std::optional<CallbackAttr> CallbackAttr::from(const Reference &r) {
+  return CallbackAttr::from(r.as_attribute());
+}
+
+std::optional<CallbackAttr> CallbackAttr::from(const TokenContext &t) {
+  return CallbackAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

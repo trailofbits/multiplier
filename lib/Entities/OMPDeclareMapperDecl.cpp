@@ -160,6 +160,14 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::in(const File &file) 
   }
 }
 
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const Reference &r) {
+  return OMPDeclareMapperDecl::from(r.as_declaration());
+}
+
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const TokenContext &t) {
+  return OMPDeclareMapperDecl::from(t.as_declaration());
+}
+
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
   RawEntityId eid = impl->reader.getVal53();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

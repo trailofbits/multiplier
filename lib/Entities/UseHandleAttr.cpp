@@ -97,6 +97,14 @@ gap::generator<UseHandleAttr> UseHandleAttr::in(const File &file) {
   }
 }
 
+std::optional<UseHandleAttr> UseHandleAttr::from(const Reference &r) {
+  return UseHandleAttr::from(r.as_attribute());
+}
+
+std::optional<UseHandleAttr> UseHandleAttr::from(const TokenContext &t) {
+  return UseHandleAttr::from(t.as_attribute());
+}
+
 std::string_view UseHandleAttr::handle_type(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

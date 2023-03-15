@@ -237,6 +237,14 @@ gap::generator<ValueDecl> ValueDecl::in(const File &file) {
   }
 }
 
+std::optional<ValueDecl> ValueDecl::from(const Reference &r) {
+  return ValueDecl::from(r.as_declaration());
+}
+
+std::optional<ValueDecl> ValueDecl::from(const TokenContext &t) {
+  return ValueDecl::from(t.as_declaration());
+}
+
 Type ValueDecl::type(void) const {
   RawEntityId eid = impl->reader.getVal52();
   return Type(impl->ep->TypeFor(impl->ep, eid));

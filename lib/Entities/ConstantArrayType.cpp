@@ -97,6 +97,14 @@ gap::generator<ConstantArrayType> ConstantArrayType::in(const File &file) {
   }
 }
 
+std::optional<ConstantArrayType> ConstantArrayType::from(const Reference &r) {
+  return ConstantArrayType::from(r.as_type());
+}
+
+std::optional<ConstantArrayType> ConstantArrayType::from(const TokenContext &t) {
+  return ConstantArrayType::from(t.as_type());
+}
+
 Type ConstantArrayType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));

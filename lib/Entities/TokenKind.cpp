@@ -8,8 +8,6 @@
 
 #include <multiplier/Entities/TokenKind.h>
 
-
-#include "../API.h"
 namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push
@@ -298,6 +296,11 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD___ARRAY_EXTENT: return "KEYWORD___ARRAY_EXTENT";
     case TokenKind::KEYWORD___PRIVATE_EXTERN__: return "KEYWORD___PRIVATE_EXTERN__";
     case TokenKind::KEYWORD___MODULE_PRIVATE__: return "KEYWORD___MODULE_PRIVATE__";
+    case TokenKind::KEYWORD___BUILTIN_PTRAUTH_TYPE_DISCRIMINATOR: return "KEYWORD___BUILTIN_PTRAUTH_TYPE_DISCRIMINATOR";
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPE_SIGNATURE: return "KEYWORD___BUILTIN_XNU_TYPE_SIGNATURE";
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPE_SUMMARY: return "KEYWORD___BUILTIN_XNU_TYPE_SUMMARY";
+    case TokenKind::KEYWORD___BUILTIN_TMO_TYPE_METADATA: return "KEYWORD___BUILTIN_TMO_TYPE_METADATA";
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPES_COMPATIBLE: return "KEYWORD___BUILTIN_XNU_TYPES_COMPATIBLE";
     case TokenKind::KEYWORD___DECLSPEC: return "KEYWORD___DECLSPEC";
     case TokenKind::KEYWORD___CDECL: return "KEYWORD___CDECL";
     case TokenKind::KEYWORD___STDCALL: return "KEYWORD___STDCALL";

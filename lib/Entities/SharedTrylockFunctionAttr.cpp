@@ -97,6 +97,14 @@ gap::generator<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::in(const Fi
   }
 }
 
+std::optional<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::from(const Reference &r) {
+  return SharedTrylockFunctionAttr::from(r.as_attribute());
+}
+
+std::optional<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::from(const TokenContext &t) {
+  return SharedTrylockFunctionAttr::from(t.as_attribute());
+}
+
 Expr SharedTrylockFunctionAttr::success_value(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

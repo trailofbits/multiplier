@@ -157,6 +157,14 @@ gap::generator<NamespaceDecl> NamespaceDecl::in(const File &file) {
   }
 }
 
+std::optional<NamespaceDecl> NamespaceDecl::from(const Reference &r) {
+  return NamespaceDecl::from(r.as_declaration());
+}
+
+std::optional<NamespaceDecl> NamespaceDecl::from(const TokenContext &t) {
+  return NamespaceDecl::from(t.as_declaration());
+}
+
 gap::generator<Decl> NamespaceDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
   auto list = impl->reader.getVal47();

@@ -146,6 +146,14 @@ gap::generator<RecoveryExpr> RecoveryExpr::in(const File &file) {
   }
 }
 
+std::optional<RecoveryExpr> RecoveryExpr::from(const Reference &r) {
+  return RecoveryExpr::from(r.as_statement());
+}
+
+std::optional<RecoveryExpr> RecoveryExpr::from(const TokenContext &t) {
+  return RecoveryExpr::from(t.as_statement());
+}
+
 unsigned RecoveryExpr::num_sub_expressions(void) const {
   return impl->reader.getVal15().size();
 }

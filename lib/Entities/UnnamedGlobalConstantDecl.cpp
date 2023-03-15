@@ -158,6 +158,14 @@ gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::in(const Fi
   }
 }
 
+std::optional<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::from(const Reference &r) {
+  return UnnamedGlobalConstantDecl::from(r.as_declaration());
+}
+
+std::optional<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::from(const TokenContext &t) {
+  return UnnamedGlobalConstantDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

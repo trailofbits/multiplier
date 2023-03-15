@@ -96,6 +96,14 @@ gap::generator<NotTailCalledAttr> NotTailCalledAttr::in(const File &file) {
   }
 }
 
+std::optional<NotTailCalledAttr> NotTailCalledAttr::from(const Reference &r) {
+  return NotTailCalledAttr::from(r.as_attribute());
+}
+
+std::optional<NotTailCalledAttr> NotTailCalledAttr::from(const TokenContext &t) {
+  return NotTailCalledAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

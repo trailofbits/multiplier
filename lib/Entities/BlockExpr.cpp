@@ -148,6 +148,14 @@ gap::generator<BlockExpr> BlockExpr::in(const File &file) {
   }
 }
 
+std::optional<BlockExpr> BlockExpr::from(const Reference &r) {
+  return BlockExpr::from(r.as_statement());
+}
+
+std::optional<BlockExpr> BlockExpr::from(const TokenContext &t) {
+  return BlockExpr::from(t.as_statement());
+}
+
 BlockDecl BlockExpr::block_declaration(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return BlockDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

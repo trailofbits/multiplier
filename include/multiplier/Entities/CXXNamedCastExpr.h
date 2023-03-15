@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ExplicitCastExpr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXAddrspaceCastExpr;
 class CXXConstCastExpr;
 class CXXDynamicCastExpr;
@@ -74,13 +63,8 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
     }
   }
 
-  inline static std::optional<CXXNamedCastExpr> from(const Reference &r) {
-    return CXXNamedCastExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXNamedCastExpr> from(const TokenContext &t) {
-    return CXXNamedCastExpr::from(t.as_statement());
-  }
+  static std::optional<CXXNamedCastExpr> from(const Reference &r);
+  static std::optional<CXXNamedCastExpr> from(const TokenContext &t);
 
   TokenRange angle_brackets(void) const;
   std::string_view cast_name(void) const;

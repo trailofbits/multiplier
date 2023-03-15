@@ -158,6 +158,14 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(
   }
 }
 
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const Reference &r) {
+  return LifetimeExtendedTemporaryDecl::from(r.as_declaration());
+}
+
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const TokenContext &t) {
+  return LifetimeExtendedTemporaryDecl::from(t.as_declaration());
+}
+
 gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const & {
   auto list = impl->reader.getVal47();
   EntityProvider::Ptr ep = impl->ep;

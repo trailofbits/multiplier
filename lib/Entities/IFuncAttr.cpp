@@ -95,6 +95,14 @@ gap::generator<IFuncAttr> IFuncAttr::in(const File &file) {
   }
 }
 
+std::optional<IFuncAttr> IFuncAttr::from(const Reference &r) {
+  return IFuncAttr::from(r.as_attribute());
+}
+
+std::optional<IFuncAttr> IFuncAttr::from(const TokenContext &t) {
+  return IFuncAttr::from(t.as_attribute());
+}
+
 std::string_view IFuncAttr::resolver(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

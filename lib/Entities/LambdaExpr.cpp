@@ -153,6 +153,14 @@ gap::generator<LambdaExpr> LambdaExpr::in(const File &file) {
   }
 }
 
+std::optional<LambdaExpr> LambdaExpr::from(const Reference &r) {
+  return LambdaExpr::from(r.as_statement());
+}
+
+std::optional<LambdaExpr> LambdaExpr::from(const TokenContext &t) {
+  return LambdaExpr::from(t.as_statement());
+}
+
 Stmt LambdaExpr::body(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

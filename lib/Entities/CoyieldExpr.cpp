@@ -147,6 +147,14 @@ gap::generator<CoyieldExpr> CoyieldExpr::in(const File &file) {
   }
 }
 
+std::optional<CoyieldExpr> CoyieldExpr::from(const Reference &r) {
+  return CoyieldExpr::from(r.as_statement());
+}
+
+std::optional<CoyieldExpr> CoyieldExpr::from(const TokenContext &t) {
+  return CoyieldExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

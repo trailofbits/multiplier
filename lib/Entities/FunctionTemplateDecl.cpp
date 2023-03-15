@@ -159,6 +159,14 @@ gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::in(const File &file) 
   }
 }
 
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const Reference &r) {
+  return FunctionTemplateDecl::from(r.as_declaration());
+}
+
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const TokenContext &t) {
+  return FunctionTemplateDecl::from(t.as_declaration());
+}
+
 bool FunctionTemplateDecl::is_abbreviated(void) const {
   return impl->reader.getVal72();
 }

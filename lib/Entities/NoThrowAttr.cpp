@@ -96,6 +96,14 @@ gap::generator<NoThrowAttr> NoThrowAttr::in(const File &file) {
   }
 }
 
+std::optional<NoThrowAttr> NoThrowAttr::from(const Reference &r) {
+  return NoThrowAttr::from(r.as_attribute());
+}
+
+std::optional<NoThrowAttr> NoThrowAttr::from(const TokenContext &t) {
+  return NoThrowAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

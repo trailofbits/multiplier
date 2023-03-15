@@ -147,6 +147,14 @@ gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const File &file) {
   }
 }
 
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Reference &r) {
+  return ObjCArrayLiteral::from(r.as_statement());
+}
+
+std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const TokenContext &t) {
+  return ObjCArrayLiteral::from(t.as_statement());
+}
+
 ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

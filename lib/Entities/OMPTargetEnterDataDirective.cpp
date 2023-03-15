@@ -145,6 +145,14 @@ gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::in(cons
   }
 }
 
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const Reference &r) {
+  return OMPTargetEnterDataDirective::from(r.as_statement());
+}
+
+std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(const TokenContext &t) {
+  return OMPTargetEnterDataDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

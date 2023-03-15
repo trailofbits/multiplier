@@ -163,6 +163,14 @@ gap::generator<ParmVarDecl> ParmVarDecl::in(const File &file) {
   }
 }
 
+std::optional<ParmVarDecl> ParmVarDecl::from(const Reference &r) {
+  return ParmVarDecl::from(r.as_declaration());
+}
+
+std::optional<ParmVarDecl> ParmVarDecl::from(const TokenContext &t) {
+  return ParmVarDecl::from(t.as_declaration());
+}
+
 std::optional<Expr> ParmVarDecl::default_argument(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal123();

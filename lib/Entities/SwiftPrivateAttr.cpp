@@ -96,6 +96,14 @@ gap::generator<SwiftPrivateAttr> SwiftPrivateAttr::in(const File &file) {
   }
 }
 
+std::optional<SwiftPrivateAttr> SwiftPrivateAttr::from(const Reference &r) {
+  return SwiftPrivateAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftPrivateAttr> SwiftPrivateAttr::from(const TokenContext &t) {
+  return SwiftPrivateAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

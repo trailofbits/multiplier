@@ -150,6 +150,14 @@ gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Reference &r) {
+  return ObjCPropertyRefExpr::from(r.as_statement());
+}
+
+std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const TokenContext &t) {
+  return ObjCPropertyRefExpr::from(t.as_statement());
+}
+
 Expr ObjCPropertyRefExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

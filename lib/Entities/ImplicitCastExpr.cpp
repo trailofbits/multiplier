@@ -147,6 +147,14 @@ gap::generator<ImplicitCastExpr> ImplicitCastExpr::in(const File &file) {
   }
 }
 
+std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const Reference &r) {
+  return ImplicitCastExpr::from(r.as_statement());
+}
+
+std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const TokenContext &t) {
+  return ImplicitCastExpr::from(t.as_statement());
+}
+
 bool ImplicitCastExpr::is_part_of_explicit_cast(void) const {
   return impl->reader.getVal89();
 }

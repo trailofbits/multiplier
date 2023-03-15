@@ -96,6 +96,14 @@ gap::generator<AddressSpaceAttr> AddressSpaceAttr::in(const File &file) {
   }
 }
 
+std::optional<AddressSpaceAttr> AddressSpaceAttr::from(const Reference &r) {
+  return AddressSpaceAttr::from(r.as_attribute());
+}
+
+std::optional<AddressSpaceAttr> AddressSpaceAttr::from(const TokenContext &t) {
+  return AddressSpaceAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

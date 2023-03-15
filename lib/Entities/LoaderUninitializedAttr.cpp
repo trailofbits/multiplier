@@ -95,6 +95,14 @@ gap::generator<LoaderUninitializedAttr> LoaderUninitializedAttr::in(const File &
   }
 }
 
+std::optional<LoaderUninitializedAttr> LoaderUninitializedAttr::from(const Reference &r) {
+  return LoaderUninitializedAttr::from(r.as_attribute());
+}
+
+std::optional<LoaderUninitializedAttr> LoaderUninitializedAttr::from(const TokenContext &t) {
+  return LoaderUninitializedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

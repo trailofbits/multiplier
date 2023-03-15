@@ -161,6 +161,14 @@ gap::generator<DecompositionDecl> DecompositionDecl::in(const File &file) {
   }
 }
 
+std::optional<DecompositionDecl> DecompositionDecl::from(const Reference &r) {
+  return DecompositionDecl::from(r.as_declaration());
+}
+
+std::optional<DecompositionDecl> DecompositionDecl::from(const TokenContext &t) {
+  return DecompositionDecl::from(t.as_declaration());
+}
+
 unsigned DecompositionDecl::num_bindings(void) const {
   return impl->reader.getVal48().size();
 }

@@ -146,6 +146,14 @@ gap::generator<IntegerLiteral> IntegerLiteral::in(const File &file) {
   }
 }
 
+std::optional<IntegerLiteral> IntegerLiteral::from(const Reference &r) {
+  return IntegerLiteral::from(r.as_statement());
+}
+
+std::optional<IntegerLiteral> IntegerLiteral::from(const TokenContext &t) {
+  return IntegerLiteral::from(t.as_statement());
+}
+
 Token IntegerLiteral::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

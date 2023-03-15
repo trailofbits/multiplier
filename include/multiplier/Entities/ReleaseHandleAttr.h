@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableParamAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
@@ -58,13 +47,8 @@ class ReleaseHandleAttr : public InheritableParamAttr {
     }
   }
 
-  inline static std::optional<ReleaseHandleAttr> from(const Reference &r) {
-    return ReleaseHandleAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<ReleaseHandleAttr> from(const TokenContext &t) {
-    return ReleaseHandleAttr::from(t.as_attribute());
-  }
+  static std::optional<ReleaseHandleAttr> from(const Reference &r);
+  static std::optional<ReleaseHandleAttr> from(const TokenContext &t);
 
   std::string_view handle_type(void) const;
 };

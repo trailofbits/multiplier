@@ -96,6 +96,14 @@ gap::generator<OpenCLUnrollHintAttr> OpenCLUnrollHintAttr::in(const File &file) 
   }
 }
 
+std::optional<OpenCLUnrollHintAttr> OpenCLUnrollHintAttr::from(const Reference &r) {
+  return OpenCLUnrollHintAttr::from(r.as_attribute());
+}
+
+std::optional<OpenCLUnrollHintAttr> OpenCLUnrollHintAttr::from(const TokenContext &t) {
+  return OpenCLUnrollHintAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

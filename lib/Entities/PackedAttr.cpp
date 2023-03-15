@@ -96,6 +96,14 @@ gap::generator<PackedAttr> PackedAttr::in(const File &file) {
   }
 }
 
+std::optional<PackedAttr> PackedAttr::from(const Reference &r) {
+  return PackedAttr::from(r.as_attribute());
+}
+
+std::optional<PackedAttr> PackedAttr::from(const TokenContext &t) {
+  return PackedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

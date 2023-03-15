@@ -157,6 +157,14 @@ gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::in(const File &file) {
   }
 }
 
+std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const Reference &r) {
+  return NamespaceAliasDecl::from(r.as_declaration());
+}
+
+std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const TokenContext &t) {
+  return NamespaceAliasDecl::from(t.as_declaration());
+}
+
 Token NamespaceAliasDecl::alias_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }

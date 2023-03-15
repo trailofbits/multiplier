@@ -96,6 +96,14 @@ gap::generator<DLLImportAttr> DLLImportAttr::in(const File &file) {
   }
 }
 
+std::optional<DLLImportAttr> DLLImportAttr::from(const Reference &r) {
+  return DLLImportAttr::from(r.as_attribute());
+}
+
+std::optional<DLLImportAttr> DLLImportAttr::from(const TokenContext &t) {
+  return DLLImportAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

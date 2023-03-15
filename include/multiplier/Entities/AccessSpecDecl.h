@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AccessSpecDecl;
 class Decl;
 class Stmt;
@@ -65,13 +54,8 @@ class AccessSpecDecl : public Decl {
     }
   }
 
-  inline static std::optional<AccessSpecDecl> from(const Reference &r) {
-    return AccessSpecDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<AccessSpecDecl> from(const TokenContext &t) {
-    return AccessSpecDecl::from(t.as_declaration());
-  }
+  static std::optional<AccessSpecDecl> from(const Reference &r);
+  static std::optional<AccessSpecDecl> from(const TokenContext &t);
 
   Token access_specifier_token(void) const;
   Token colon_token(void) const;

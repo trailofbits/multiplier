@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXTypeidExpr;
 class Decl;
 class Expr;
@@ -69,13 +58,8 @@ class CXXTypeidExpr : public Expr {
     }
   }
 
-  inline static std::optional<CXXTypeidExpr> from(const Reference &r) {
-    return CXXTypeidExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXTypeidExpr> from(const TokenContext &t) {
-    return CXXTypeidExpr::from(t.as_statement());
-  }
+  static std::optional<CXXTypeidExpr> from(const Reference &r);
+  static std::optional<CXXTypeidExpr> from(const TokenContext &t);
 
   std::optional<Expr> expression_operand(void) const;
   Type type_operand(void) const;

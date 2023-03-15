@@ -96,6 +96,14 @@ gap::generator<AMDGPUKernelCallAttr> AMDGPUKernelCallAttr::in(const File &file) 
   }
 }
 
+std::optional<AMDGPUKernelCallAttr> AMDGPUKernelCallAttr::from(const Reference &r) {
+  return AMDGPUKernelCallAttr::from(r.as_attribute());
+}
+
+std::optional<AMDGPUKernelCallAttr> AMDGPUKernelCallAttr::from(const TokenContext &t) {
+  return AMDGPUKernelCallAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

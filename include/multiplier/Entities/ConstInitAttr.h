@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ConstInitAttrSpelling.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class ConstInitAttr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class ConstInitAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<ConstInitAttr> from(const Reference &r) {
-    return ConstInitAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<ConstInitAttr> from(const TokenContext &t) {
-    return ConstInitAttr::from(t.as_attribute());
-  }
+  static std::optional<ConstInitAttr> from(const Reference &r);
+  static std::optional<ConstInitAttr> from(const TokenContext &t);
 
   ConstInitAttrSpelling semantic_spelling(void) const;
   bool is_constinit(void) const;

@@ -514,6 +514,14 @@ gap::generator<Expr> Expr::in(const File &file) {
   }
 }
 
+std::optional<Expr> Expr::from(const Reference &r) {
+  return Expr::from(r.as_statement());
+}
+
+std::optional<Expr> Expr::from(const TokenContext &t) {
+  return Expr::from(t.as_statement());
+}
+
 bool Expr::has_side_effects(void) const {
   return impl->reader.getVal12();
 }

@@ -158,6 +158,14 @@ gap::generator<StaticAssertDecl> StaticAssertDecl::in(const File &file) {
   }
 }
 
+std::optional<StaticAssertDecl> StaticAssertDecl::from(const Reference &r) {
+  return StaticAssertDecl::from(r.as_declaration());
+}
+
+std::optional<StaticAssertDecl> StaticAssertDecl::from(const TokenContext &t) {
+  return StaticAssertDecl::from(t.as_declaration());
+}
+
 Expr StaticAssertDecl::assert_expression(void) const {
   RawEntityId eid = impl->reader.getVal45();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

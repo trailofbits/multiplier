@@ -96,6 +96,14 @@ gap::generator<HIPManagedAttr> HIPManagedAttr::in(const File &file) {
   }
 }
 
+std::optional<HIPManagedAttr> HIPManagedAttr::from(const Reference &r) {
+  return HIPManagedAttr::from(r.as_attribute());
+}
+
+std::optional<HIPManagedAttr> HIPManagedAttr::from(const TokenContext &t) {
+  return HIPManagedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

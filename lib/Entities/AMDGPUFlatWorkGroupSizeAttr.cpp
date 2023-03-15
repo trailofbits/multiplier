@@ -97,6 +97,14 @@ gap::generator<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::in(cons
   }
 }
 
+std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::from(const Reference &r) {
+  return AMDGPUFlatWorkGroupSizeAttr::from(r.as_attribute());
+}
+
+std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::from(const TokenContext &t) {
+  return AMDGPUFlatWorkGroupSizeAttr::from(t.as_attribute());
+}
+
 Expr AMDGPUFlatWorkGroupSizeAttr::max(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

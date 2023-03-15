@@ -145,6 +145,14 @@ gap::generator<OMPCancelDirective> OMPCancelDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPCancelDirective> OMPCancelDirective::from(const Reference &r) {
+  return OMPCancelDirective::from(r.as_statement());
+}
+
+std::optional<OMPCancelDirective> OMPCancelDirective::from(const TokenContext &t) {
+  return OMPCancelDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

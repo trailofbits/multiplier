@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ArrayType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ArrayType;
 class IncompleteArrayType;
 class Token;
@@ -56,13 +45,8 @@ class IncompleteArrayType : public ArrayType {
     }
   }
 
-  inline static std::optional<IncompleteArrayType> from(const Reference &r) {
-    return IncompleteArrayType::from(r.as_type());
-  }
-
-  inline static std::optional<IncompleteArrayType> from(const TokenContext &t) {
-    return IncompleteArrayType::from(t.as_type());
-  }
+  static std::optional<IncompleteArrayType> from(const Reference &r);
+  static std::optional<IncompleteArrayType> from(const TokenContext &t);
 
   Type desugar(void) const;
   bool is_sugared(void) const;

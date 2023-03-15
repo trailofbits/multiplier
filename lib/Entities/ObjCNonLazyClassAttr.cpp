@@ -95,6 +95,14 @@ gap::generator<ObjCNonLazyClassAttr> ObjCNonLazyClassAttr::in(const File &file) 
   }
 }
 
+std::optional<ObjCNonLazyClassAttr> ObjCNonLazyClassAttr::from(const Reference &r) {
+  return ObjCNonLazyClassAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCNonLazyClassAttr> ObjCNonLazyClassAttr::from(const TokenContext &t) {
+  return ObjCNonLazyClassAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

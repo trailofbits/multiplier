@@ -8,24 +8,23 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
-
-#include <compare>
 
 #include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class File;
 class Fragment;
@@ -110,13 +109,9 @@ class Stmt {
     return self;
   }
 
-  inline static std::optional<Stmt> from(const Reference &r) {
-    return r.as_statement();
-  }
+  static std::optional<Stmt> from(const Reference &r);
 
-  inline static std::optional<Stmt> from(const TokenContext &t) {
-    return t.as_statement();
-  }
+  static std::optional<Stmt> from(const TokenContext &t);
 
   Stmt ignore_containers(void) const;
   gap::generator<Stmt> children(void) const &;

@@ -164,6 +164,14 @@ gap::generator<ObjCImplDecl> ObjCImplDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCImplDecl> ObjCImplDecl::from(const Reference &r) {
+  return ObjCImplDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCImplDecl> ObjCImplDecl::from(const TokenContext &t) {
+  return ObjCImplDecl::from(t.as_declaration());
+}
+
 ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
   RawEntityId eid = impl->reader.getVal62();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

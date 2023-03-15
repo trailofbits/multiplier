@@ -146,6 +146,14 @@ gap::generator<OffsetOfExpr> OffsetOfExpr::in(const File &file) {
   }
 }
 
+std::optional<OffsetOfExpr> OffsetOfExpr::from(const Reference &r) {
+  return OffsetOfExpr::from(r.as_statement());
+}
+
+std::optional<OffsetOfExpr> OffsetOfExpr::from(const TokenContext &t) {
+  return OffsetOfExpr::from(t.as_statement());
+}
+
 Token OffsetOfExpr::operator_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

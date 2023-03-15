@@ -147,6 +147,14 @@ gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::in(const File &file) 
   }
 }
 
+std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Reference &r) {
+  return FunctionParmPackExpr::from(r.as_statement());
+}
+
+std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const TokenContext &t) {
+  return FunctionParmPackExpr::from(t.as_statement());
+}
+
 VarDecl FunctionParmPackExpr::parameter_pack(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

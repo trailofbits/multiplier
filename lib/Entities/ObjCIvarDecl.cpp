@@ -161,6 +161,14 @@ gap::generator<ObjCIvarDecl> ObjCIvarDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const Reference &r) {
+  return ObjCIvarDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const TokenContext &t) {
+  return ObjCIvarDecl::from(t.as_declaration());
+}
+
 ObjCIvarDeclAccessControl ObjCIvarDecl::access_control(void) const {
   return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal79());
 }

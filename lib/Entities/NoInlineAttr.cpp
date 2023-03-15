@@ -97,6 +97,14 @@ gap::generator<NoInlineAttr> NoInlineAttr::in(const File &file) {
   }
 }
 
+std::optional<NoInlineAttr> NoInlineAttr::from(const Reference &r) {
+  return NoInlineAttr::from(r.as_attribute());
+}
+
+std::optional<NoInlineAttr> NoInlineAttr::from(const TokenContext &t) {
+  return NoInlineAttr::from(t.as_attribute());
+}
+
 bool NoInlineAttr::is_clang_no_inline(void) const {
   return impl->reader.getVal12();
 }

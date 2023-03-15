@@ -162,6 +162,14 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::in(const File &file) {
   }
 }
 
+std::optional<BaseUsingDecl> BaseUsingDecl::from(const Reference &r) {
+  return BaseUsingDecl::from(r.as_declaration());
+}
+
+std::optional<BaseUsingDecl> BaseUsingDecl::from(const TokenContext &t) {
+  return BaseUsingDecl::from(t.as_declaration());
+}
+
 unsigned BaseUsingDecl::num_shadows(void) const {
   return impl->reader.getVal47().size();
 }

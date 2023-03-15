@@ -93,6 +93,9 @@ class TaintTracker {
  public:
   TaintTracker(const Index &);
 
+  // Taint the declaration or statement.
+  TaintTrackingResults add_source(const VariantEntity &entity) &;
+
   // Taint the declaration or statement associated with an existing taint
   // tracking edge.
   TaintTrackingResults add_source(const TraintTrackingEdge &) &;

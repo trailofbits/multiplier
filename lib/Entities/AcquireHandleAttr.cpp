@@ -96,6 +96,14 @@ gap::generator<AcquireHandleAttr> AcquireHandleAttr::in(const File &file) {
   }
 }
 
+std::optional<AcquireHandleAttr> AcquireHandleAttr::from(const Reference &r) {
+  return AcquireHandleAttr::from(r.as_attribute());
+}
+
+std::optional<AcquireHandleAttr> AcquireHandleAttr::from(const TokenContext &t) {
+  return AcquireHandleAttr::from(t.as_attribute());
+}
+
 std::string_view AcquireHandleAttr::handle_type(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

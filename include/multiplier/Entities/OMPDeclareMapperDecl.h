@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPDeclarativeDirectiveValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class NamedDecl;
@@ -72,13 +61,8 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
     }
   }
 
-  inline static std::optional<OMPDeclareMapperDecl> from(const Reference &r) {
-    return OMPDeclareMapperDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const TokenContext &t) {
-    return OMPDeclareMapperDecl::from(t.as_declaration());
-  }
+  static std::optional<OMPDeclareMapperDecl> from(const Reference &r);
+  static std::optional<OMPDeclareMapperDecl> from(const TokenContext &t);
 
   Expr mapper_variable_reference(void) const;
   gap::generator<Decl> declarations_in_context(void) const &;

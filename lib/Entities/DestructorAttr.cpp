@@ -96,6 +96,14 @@ gap::generator<DestructorAttr> DestructorAttr::in(const File &file) {
   }
 }
 
+std::optional<DestructorAttr> DestructorAttr::from(const Reference &r) {
+  return DestructorAttr::from(r.as_attribute());
+}
+
+std::optional<DestructorAttr> DestructorAttr::from(const TokenContext &t) {
+  return DestructorAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -146,6 +146,14 @@ gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::in(const 
   }
 }
 
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const Reference &r) {
+  return CXXRewrittenBinaryOperator::from(r.as_statement());
+}
+
+std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const TokenContext &t) {
+  return CXXRewrittenBinaryOperator::from(t.as_statement());
+}
+
 Expr CXXRewrittenBinaryOperator::lhs(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

@@ -146,6 +146,14 @@ gap::generator<CXXBindTemporaryExpr> CXXBindTemporaryExpr::in(const File &file) 
   }
 }
 
+std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const Reference &r) {
+  return CXXBindTemporaryExpr::from(r.as_statement());
+}
+
+std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const TokenContext &t) {
+  return CXXBindTemporaryExpr::from(t.as_statement());
+}
+
 Expr CXXBindTemporaryExpr::sub_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

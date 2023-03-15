@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TemplateDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class Stmt;
@@ -69,13 +58,8 @@ class TemplateTemplateParmDecl : public TemplateDecl {
     }
   }
 
-  inline static std::optional<TemplateTemplateParmDecl> from(const Reference &r) {
-    return TemplateTemplateParmDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<TemplateTemplateParmDecl> from(const TokenContext &t) {
-    return TemplateTemplateParmDecl::from(t.as_declaration());
-  }
+  static std::optional<TemplateTemplateParmDecl> from(const Reference &r);
+  static std::optional<TemplateTemplateParmDecl> from(const TokenContext &t);
 
   bool default_argument_was_inherited(void) const;
   Token default_argument_token(void) const;

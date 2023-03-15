@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class ObjCIndirectCopyRestoreExpr;
@@ -68,13 +57,8 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
     }
   }
 
-  inline static std::optional<ObjCIndirectCopyRestoreExpr> from(const Reference &r) {
-    return ObjCIndirectCopyRestoreExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCIndirectCopyRestoreExpr> from(const TokenContext &t) {
-    return ObjCIndirectCopyRestoreExpr::from(t.as_statement());
-  }
+  static std::optional<ObjCIndirectCopyRestoreExpr> from(const Reference &r);
+  static std::optional<ObjCIndirectCopyRestoreExpr> from(const TokenContext &t);
 
   Expr sub_expression(void) const;
   bool should_copy(void) const;

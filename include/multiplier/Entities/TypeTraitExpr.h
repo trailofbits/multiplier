@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "TypeTrait.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class Stmt;
@@ -70,13 +59,8 @@ class TypeTraitExpr : public Expr {
     }
   }
 
-  inline static std::optional<TypeTraitExpr> from(const Reference &r) {
-    return TypeTraitExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<TypeTraitExpr> from(const TokenContext &t) {
-    return TypeTraitExpr::from(t.as_statement());
-  }
+  static std::optional<TypeTraitExpr> from(const Reference &r);
+  static std::optional<TypeTraitExpr> from(const TokenContext &t);
 
   TypeTrait trait(void) const;
   std::optional<bool> value(void) const;

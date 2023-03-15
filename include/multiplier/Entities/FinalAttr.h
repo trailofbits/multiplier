@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "FinalAttrSpelling.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class FinalAttr;
 class InheritableAttr;
@@ -57,13 +46,8 @@ class FinalAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<FinalAttr> from(const Reference &r) {
-    return FinalAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<FinalAttr> from(const TokenContext &t) {
-    return FinalAttr::from(t.as_attribute());
-  }
+  static std::optional<FinalAttr> from(const Reference &r);
+  static std::optional<FinalAttr> from(const TokenContext &t);
 
   FinalAttrSpelling semantic_spelling(void) const;
   bool is_spelled_as_sealed(void) const;

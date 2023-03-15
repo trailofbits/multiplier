@@ -148,6 +148,14 @@ gap::generator<SwitchStmt> SwitchStmt::in(const File &file) {
   }
 }
 
+std::optional<SwitchStmt> SwitchStmt::from(const Reference &r) {
+  return SwitchStmt::from(r.as_statement());
+}
+
+std::optional<SwitchStmt> SwitchStmt::from(const TokenContext &t) {
+  return SwitchStmt::from(t.as_statement());
+}
+
 Stmt SwitchStmt::body(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));

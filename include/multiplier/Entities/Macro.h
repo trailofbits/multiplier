@@ -8,24 +8,23 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
-
-#include <compare>
 
 #include "MacroKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class File;
 class Fragment;
 class Index;
@@ -107,13 +106,9 @@ class Macro {
     return self;
   }
 
-  inline static std::optional<Macro> from(const Reference &r) {
-    return r.as_macro();
-  }
+  static std::optional<Macro> from(const Reference &r);
 
-  inline static std::optional<Macro> from(const TokenContext &t) {
-    return t.as_macro();
-  }
+  static std::optional<Macro> from(const TokenContext &t);
 
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;

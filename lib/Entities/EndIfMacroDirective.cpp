@@ -112,6 +112,14 @@ gap::generator<EndIfMacroDirective> EndIfMacroDirective::in(const File &file) {
   }
 }
 
+std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const Reference &r) {
+  return EndIfMacroDirective::from(r.as_macro());
+}
+
+std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const TokenContext &t) {
+  return EndIfMacroDirective::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

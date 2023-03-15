@@ -96,6 +96,14 @@ gap::generator<FunctionNoProtoType> FunctionNoProtoType::in(const File &file) {
   }
 }
 
+std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const Reference &r) {
+  return FunctionNoProtoType::from(r.as_type());
+}
+
+std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const TokenContext &t) {
+  return FunctionNoProtoType::from(t.as_type());
+}
+
 Type FunctionNoProtoType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal234();
   return Type(impl->ep->TypeFor(impl->ep, eid));

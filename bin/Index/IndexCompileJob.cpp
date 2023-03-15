@@ -557,6 +557,7 @@ static void AddDeclRangeToEntityList(
   // can get the contextual information from parsed tokens, which is often
   // more useful.
   LOG_IF(FATAL, ShouldFindDeclInTokenContexts(decl) &&
+                decl.Kind() != pasta::DeclKind::kBlock &&
                 !TokenIsInContextOfDecl(tok, decl) &&
                 !IsProbablyABuiltinDecl(decl))
       << "Could not find location of " << decl.KindName()
@@ -622,6 +623,30 @@ static pasta::Macro RootMacroFrom(pasta::Macro node) {
   }
 }
 
+// Generate all top-level macro defintions. They can be nested inside of macro
+// expansions.
+static gap::generator<pasta::DefineMacroDirective>
+FindDefinesInMacro(pasta::Macro mn) {
+  switch (mn.Kind()) {
+    case pasta::MacroKind::kArgument:
+    case pasta::MacroKind::kExpansion:
+    case pasta::MacroKind::kSubstitution:
+      for (pasta::Macro child : mn.Children()) {
+        for (auto def : FindDefinesInMacro(child)) {
+          co_yield def;
+        }
+      }
+      break;
+
+    case pasta::MacroKind::kDefineDirective:
+      co_yield reinterpret_cast<pasta::DefineMacroDirective &>(mn);
+      break;
+
+    default:
+      break;
+  }
+}
+
 // Go find the macro definitions, and for each definition, find the uses, then
 // find the "root" of that use.
 static std::vector<OrderedMacro> FindTLMs(
@@ -636,32 +661,9 @@ static std::vector<OrderedMacro> FindTLMs(
   auto order = 0u;
   for (pasta::Macro mn : ast.Macros()) {
 
-    // Include all defined macros, as well as the other non-`#define`s.
-    if (auto md = pasta::DefineMacroDirective::From(mn)) {
-
-      // If this macro definition doesn't have a name, then it's in a
-      // conditionally disabled region.
-      auto name = md->Name();
-      if (!name) {
-        continue;
-      }
-
-      // Builtin or command-line specified macros have no location.
-      //
-      // NOTE(pag): The persistence for macros re-interprets macros with no
-      //            definition site as substitutions instead of macro
-      //            expansions.
-      //
-      // TODO(pag): Find a way to give these file locations.
-      if (!name->FileLocation()) {
-        continue;
-      }
-
-      tlms.emplace_back(std::move(mn), order++);
-      defs.push_back(std::move(md.value()));
-
     // Include all `#include`s, `#pragma`s, `#if`s, etc.
-    } else if (auto dir = pasta::MacroDirective::From(mn)) {
+    if (auto dir = pasta::MacroDirective::From(mn);
+        dir && dir->Kind() != pasta::MacroKind::kDefineDirective) {
       if (!dir->Hash().FileLocation()) {
         continue;
       }
@@ -708,6 +710,38 @@ static std::vector<OrderedMacro> FindTLMs(
         // Map the EOF marker to the BOM marker token for the `#include`.
         eof_to_include.emplace(it->second, j);
         break;
+      }
+    } else {
+      for (pasta::DefineMacroDirective md : FindDefinesInMacro(mn)) {
+
+        // If this macro definition doesn't have a name, then it's in a
+        // conditionally disabled region.
+        std::optional<pasta::MacroToken> name = md.Name();
+        if (!name) {
+          continue;
+        }
+
+        // Builtin or command-line specified macros have no location.
+        //
+        // NOTE(pag): The persistence for macros re-interprets macros with no
+        //            definition site as substitutions instead of macro
+        //            expansions.
+        //
+        // TODO(pag): Find a way to give these file locations.
+        if (!name->FileLocation()) {
+          continue;
+        }
+
+        // We found a nested macro definition.
+        if (md.RawMacro() != mn.RawMacro()) {
+          tlms.emplace_back(md, order++);
+
+        // We found a top-level macro definition.
+        } else {
+          tlms.emplace_back(mn, order++);
+        }
+
+        defs.push_back(std::move(md));
       }
     }
   }
@@ -759,8 +793,12 @@ static void AddMacroRangeToEntityList(
     const pasta::TokenRange &tok_range, std::string_view main_file_path,
     std::vector<EntityRange> &entity_ranges, pasta::Macro node) {
 
-  std::optional<pasta::MacroToken> bt = node.BeginToken();
-  std::optional<pasta::MacroToken> et = node.EndToken();
+  // NOTE(pag): It's possible we're dealing with a `define` inside of a
+  //            macro expansion.
+  pasta::Macro root_node = RootMacroFrom(node);
+
+  std::optional<pasta::MacroToken> bt = root_node.BeginToken();
+  std::optional<pasta::MacroToken> et = root_node.EndToken();
 
   LOG_IF(FATAL, !bt && !et)
       << "Unable to find either the beginning or ending of macro node in "
@@ -1101,7 +1139,8 @@ static void CreatePendingFragment(
 //      continue;
 //    }
 //
-//    if (nd->Name() == "init_ssl_lib" && !nd->IsThisDeclarationADefinition()) {
+//    if (nd->Name() == "sched_clutch_bucket_group_cpu_adjust" &&
+//        nd->IsThisDeclarationADefinition()) {
 //      found = true;
 //      break;
 //    }

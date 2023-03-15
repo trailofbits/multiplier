@@ -148,6 +148,14 @@ gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::in(cons
   }
 }
 
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const Reference &r) {
+  return CXXDependentScopeMemberExpr::from(r.as_statement());
+}
+
+std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(const TokenContext &t) {
+  return CXXDependentScopeMemberExpr::from(t.as_statement());
+}
+
 std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal38();

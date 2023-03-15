@@ -96,6 +96,14 @@ gap::generator<SuppressAttr> SuppressAttr::in(const File &file) {
   }
 }
 
+std::optional<SuppressAttr> SuppressAttr::from(const Reference &r) {
+  return SuppressAttr::from(r.as_attribute());
+}
+
+std::optional<SuppressAttr> SuppressAttr::from(const TokenContext &t) {
+  return SuppressAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

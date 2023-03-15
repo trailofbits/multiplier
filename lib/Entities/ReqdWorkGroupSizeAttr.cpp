@@ -96,6 +96,14 @@ gap::generator<ReqdWorkGroupSizeAttr> ReqdWorkGroupSizeAttr::in(const File &file
   }
 }
 
+std::optional<ReqdWorkGroupSizeAttr> ReqdWorkGroupSizeAttr::from(const Reference &r) {
+  return ReqdWorkGroupSizeAttr::from(r.as_attribute());
+}
+
+std::optional<ReqdWorkGroupSizeAttr> ReqdWorkGroupSizeAttr::from(const TokenContext &t) {
+  return ReqdWorkGroupSizeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

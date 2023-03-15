@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AlwaysInlineAttrSpelling.h"
 #include "DeclOrStmtAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AlwaysInlineAttr;
 class Attr;
 class DeclOrStmtAttr;
@@ -59,13 +48,8 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
     }
   }
 
-  inline static std::optional<AlwaysInlineAttr> from(const Reference &r) {
-    return AlwaysInlineAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<AlwaysInlineAttr> from(const TokenContext &t) {
-    return AlwaysInlineAttr::from(t.as_attribute());
-  }
+  static std::optional<AlwaysInlineAttr> from(const Reference &r);
+  static std::optional<AlwaysInlineAttr> from(const TokenContext &t);
 
   AlwaysInlineAttrSpelling semantic_spelling(void) const;
   bool is_clang_always_inline(void) const;

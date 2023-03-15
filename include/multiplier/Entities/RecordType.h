@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TagType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class RecordType;
 class TagType;
 class Token;
@@ -56,13 +45,8 @@ class RecordType : public TagType {
     }
   }
 
-  inline static std::optional<RecordType> from(const Reference &r) {
-    return RecordType::from(r.as_type());
-  }
-
-  inline static std::optional<RecordType> from(const TokenContext &t) {
-    return RecordType::from(t.as_type());
-  }
+  static std::optional<RecordType> from(const Reference &r);
+  static std::optional<RecordType> from(const TokenContext &t);
 
   Type desugar(void) const;
   bool has_const_fields(void) const;

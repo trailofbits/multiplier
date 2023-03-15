@@ -6,10 +6,12 @@
 
 #pragma once
 
+#include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <string_view>
-#include <gap/core/generator.hpp>
 
+#include "Entity.h"
 #include "Token.h"
 
 namespace mx {
@@ -113,6 +115,10 @@ class File {
   // Return the file containing a specific weggli query match.
   static std::optional<File> containing(const WeggliQueryMatch &match);
 
+  inline static File containing(const File &file) {
+    return file;
+  }
+
 #define MX_DECLARE_CONTAINING(type_name, lower_name, enum_name, category) \
     static std::optional<File> containing(const type_name &entity);
 
@@ -122,6 +128,8 @@ class File {
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING)
 #undef MX_DECLARE_CONTAINING
+
+  static std::optional<File> containing(const VariantEntity &);
 
   // Return the file containing a specific token.
   //
@@ -143,6 +151,9 @@ class File {
 
   // Return a list of fragments in this file.
   gap::generator<Fragment> fragments(void) const &;
+
+  // Return all file paths associated with this file.
+  gap::generator<std::filesystem::path> paths(void) const &;
 
   // Return the list of fragment ids in the file
   FragmentIdList fragment_ids(void) const;

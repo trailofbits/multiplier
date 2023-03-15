@@ -146,6 +146,14 @@ gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::in(const File &file) {
   }
 }
 
+std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Reference &r) {
+  return OMPArraySectionExpr::from(r.as_statement());
+}
+
+std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const TokenContext &t) {
+  return OMPArraySectionExpr::from(t.as_statement());
+}
+
 Expr OMPArraySectionExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

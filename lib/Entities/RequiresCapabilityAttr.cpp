@@ -96,6 +96,14 @@ gap::generator<RequiresCapabilityAttr> RequiresCapabilityAttr::in(const File &fi
   }
 }
 
+std::optional<RequiresCapabilityAttr> RequiresCapabilityAttr::from(const Reference &r) {
+  return RequiresCapabilityAttr::from(r.as_attribute());
+}
+
+std::optional<RequiresCapabilityAttr> RequiresCapabilityAttr::from(const TokenContext &t) {
+  return RequiresCapabilityAttr::from(t.as_attribute());
+}
+
 RequiresCapabilityAttrSpelling RequiresCapabilityAttr::semantic_spelling(void) const {
   return static_cast<RequiresCapabilityAttrSpelling>(impl->reader.getVal10());
 }

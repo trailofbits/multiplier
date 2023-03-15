@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class EnableIfAttr;
 class Expr;
@@ -57,13 +46,8 @@ class EnableIfAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<EnableIfAttr> from(const Reference &r) {
-    return EnableIfAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<EnableIfAttr> from(const TokenContext &t) {
-    return EnableIfAttr::from(t.as_attribute());
-  }
+  static std::optional<EnableIfAttr> from(const Reference &r);
+  static std::optional<EnableIfAttr> from(const TokenContext &t);
 
   Expr condition(void) const;
   std::string_view message(void) const;

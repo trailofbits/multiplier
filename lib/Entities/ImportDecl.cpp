@@ -157,6 +157,14 @@ gap::generator<ImportDecl> ImportDecl::in(const File &file) {
   }
 }
 
+std::optional<ImportDecl> ImportDecl::from(const Reference &r) {
+  return ImportDecl::from(r.as_declaration());
+}
+
+std::optional<ImportDecl> ImportDecl::from(const TokenContext &t) {
+  return ImportDecl::from(t.as_declaration());
+}
+
 unsigned ImportDecl::num_identifier_tokens(void) const {
   return impl->reader.getVal47().size();
 }

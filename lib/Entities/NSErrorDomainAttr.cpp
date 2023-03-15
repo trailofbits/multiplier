@@ -97,6 +97,14 @@ gap::generator<NSErrorDomainAttr> NSErrorDomainAttr::in(const File &file) {
   }
 }
 
+std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const Reference &r) {
+  return NSErrorDomainAttr::from(r.as_attribute());
+}
+
+std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const TokenContext &t) {
+  return NSErrorDomainAttr::from(t.as_attribute());
+}
+
 VarDecl NSErrorDomainAttr::error_domain(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

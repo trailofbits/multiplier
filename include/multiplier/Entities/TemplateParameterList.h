@@ -8,30 +8,32 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
-
-#include <compare>
 
 #include "PseudoKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Expr;
+class File;
+class Fragment;
 class NamedDecl;
 class Reference;
 class SourceIR;
 class TemplateParameterList;
 class TemplateParameterListImpl;
+class Token;
 class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
@@ -84,13 +86,9 @@ class TemplateParameterList {
     return self;
   }
 
-  inline static std::optional<TemplateParameterList> from(const Reference &r) {
-    return r.as_template_parameter_list();
-  }
+  static std::optional<TemplateParameterList> from(const Reference &r);
 
-  inline static std::optional<TemplateParameterList> from(const TokenContext &t) {
-    return t.as_template_parameter_list();
-  }
+  static std::optional<TemplateParameterList> from(const TokenContext &t);
 
   unsigned depth(void) const;
   bool has_unexpanded_parameter_pack(void) const;

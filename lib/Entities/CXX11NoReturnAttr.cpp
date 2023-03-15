@@ -96,6 +96,14 @@ gap::generator<CXX11NoReturnAttr> CXX11NoReturnAttr::in(const File &file) {
   }
 }
 
+std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const Reference &r) {
+  return CXX11NoReturnAttr::from(r.as_attribute());
+}
+
+std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const TokenContext &t) {
+  return CXX11NoReturnAttr::from(t.as_attribute());
+}
+
 CXX11NoReturnAttrSpelling CXX11NoReturnAttr::semantic_spelling(void) const {
   return static_cast<CXX11NoReturnAttrSpelling>(impl->reader.getVal10());
 }

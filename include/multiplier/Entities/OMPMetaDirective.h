@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPExecutableDirective.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class OMPExecutableDirective;
 class OMPMetaDirective;
@@ -66,13 +55,8 @@ class OMPMetaDirective : public OMPExecutableDirective {
     }
   }
 
-  inline static std::optional<OMPMetaDirective> from(const Reference &r) {
-    return OMPMetaDirective::from(r.as_statement());
-  }
-
-  inline static std::optional<OMPMetaDirective> from(const TokenContext &t) {
-    return OMPMetaDirective::from(t.as_statement());
-  }
+  static std::optional<OMPMetaDirective> from(const Reference &r);
+  static std::optional<OMPMetaDirective> from(const TokenContext &t);
 
   Stmt if_statement(void) const;
 };

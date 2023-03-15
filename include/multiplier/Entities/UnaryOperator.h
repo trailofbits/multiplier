@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "UnaryOperatorKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class Stmt;
@@ -69,13 +58,8 @@ class UnaryOperator : public Expr {
     }
   }
 
-  inline static std::optional<UnaryOperator> from(const Reference &r) {
-    return UnaryOperator::from(r.as_statement());
-  }
-
-  inline static std::optional<UnaryOperator> from(const TokenContext &t) {
-    return UnaryOperator::from(t.as_statement());
-  }
+  static std::optional<UnaryOperator> from(const Reference &r);
+  static std::optional<UnaryOperator> from(const TokenContext &t);
 
   bool can_overflow(void) const;
   UnaryOperatorKind opcode(void) const;

@@ -146,6 +146,14 @@ gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::in(const File &file) {
   }
 }
 
+std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const Reference &r) {
+  return OMPCanonicalLoop::from(r.as_statement());
+}
+
+std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const TokenContext &t) {
+  return OMPCanonicalLoop::from(t.as_statement());
+}
+
 CapturedStmt OMPCanonicalLoop::distance_func(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

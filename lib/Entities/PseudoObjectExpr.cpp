@@ -146,6 +146,14 @@ gap::generator<PseudoObjectExpr> PseudoObjectExpr::in(const File &file) {
   }
 }
 
+std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const Reference &r) {
+  return PseudoObjectExpr::from(r.as_statement());
+}
+
+std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const TokenContext &t) {
+  return PseudoObjectExpr::from(t.as_statement());
+}
+
 Expr PseudoObjectExpr::result_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

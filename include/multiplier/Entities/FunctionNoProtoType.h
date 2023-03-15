@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "FunctionType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class FunctionNoProtoType;
 class FunctionType;
 class Token;
@@ -56,13 +45,8 @@ class FunctionNoProtoType : public FunctionType {
     }
   }
 
-  inline static std::optional<FunctionNoProtoType> from(const Reference &r) {
-    return FunctionNoProtoType::from(r.as_type());
-  }
-
-  inline static std::optional<FunctionNoProtoType> from(const TokenContext &t) {
-    return FunctionNoProtoType::from(t.as_type());
-  }
+  static std::optional<FunctionNoProtoType> from(const Reference &r);
+  static std::optional<FunctionNoProtoType> from(const TokenContext &t);
 
   Type desugar(void) const;
   bool is_sugared(void) const;

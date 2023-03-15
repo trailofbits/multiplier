@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AddrLabelExpr;
 class ArrayInitIndexExpr;
 class ArrayInitLoopExpr;
@@ -186,13 +175,8 @@ class ValueStmt : public Stmt {
     }
   }
 
-  inline static std::optional<ValueStmt> from(const Reference &r) {
-    return ValueStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<ValueStmt> from(const TokenContext &t) {
-    return ValueStmt::from(t.as_statement());
-  }
+  static std::optional<ValueStmt> from(const Reference &r);
+  static std::optional<ValueStmt> from(const TokenContext &t);
 
   std::optional<Expr> expression_statement(void) const;
 };

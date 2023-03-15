@@ -96,6 +96,14 @@ gap::generator<UnresolvedUsingType> UnresolvedUsingType::in(const File &file) {
   }
 }
 
+std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const Reference &r) {
+  return UnresolvedUsingType::from(r.as_type());
+}
+
+std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const TokenContext &t) {
+  return UnresolvedUsingType::from(t.as_type());
+}
+
 Type UnresolvedUsingType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

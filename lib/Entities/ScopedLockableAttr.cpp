@@ -96,6 +96,14 @@ gap::generator<ScopedLockableAttr> ScopedLockableAttr::in(const File &file) {
   }
 }
 
+std::optional<ScopedLockableAttr> ScopedLockableAttr::from(const Reference &r) {
+  return ScopedLockableAttr::from(r.as_attribute());
+}
+
+std::optional<ScopedLockableAttr> ScopedLockableAttr::from(const TokenContext &t) {
+  return ScopedLockableAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

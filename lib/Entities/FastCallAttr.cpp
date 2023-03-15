@@ -96,6 +96,14 @@ gap::generator<FastCallAttr> FastCallAttr::in(const File &file) {
   }
 }
 
+std::optional<FastCallAttr> FastCallAttr::from(const Reference &r) {
+  return FastCallAttr::from(r.as_attribute());
+}
+
+std::optional<FastCallAttr> FastCallAttr::from(const TokenContext &t) {
+  return FastCallAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

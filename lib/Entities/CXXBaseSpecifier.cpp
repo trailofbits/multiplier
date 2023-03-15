@@ -8,6 +8,8 @@
 
 #include <multiplier/Entities/CXXBaseSpecifier.h>
 
+#include <multiplier/Entities/File.h>
+#include <multiplier/Entities/Fragment.h>
 #include <multiplier/Entities/Reference.h>
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
@@ -32,6 +34,14 @@ std::shared_ptr<EntityProvider> CXXBaseSpecifier::entity_provider_of(const Fragm
 
 std::shared_ptr<EntityProvider> CXXBaseSpecifier::entity_provider_of(const File &file_) {
   return file_.impl->ep;
+}
+
+std::optional<CXXBaseSpecifier> CXXBaseSpecifier::from(const Reference &r) {
+  return r.as_cxx_base_specifier();
+}
+
+std::optional<CXXBaseSpecifier> CXXBaseSpecifier::from(const TokenContext &t) {
+  return t.as_cxx_base_specifier();
 }
 
 TokenRange CXXBaseSpecifier::tokens(void) const {

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AMDGPUNumVGPRAttr;
 class Attr;
 class InheritableAttr;
@@ -56,13 +45,8 @@ class AMDGPUNumVGPRAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<AMDGPUNumVGPRAttr> from(const Reference &r) {
-    return AMDGPUNumVGPRAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<AMDGPUNumVGPRAttr> from(const TokenContext &t) {
-    return AMDGPUNumVGPRAttr::from(t.as_attribute());
-  }
+  static std::optional<AMDGPUNumVGPRAttr> from(const Reference &r);
+  static std::optional<AMDGPUNumVGPRAttr> from(const TokenContext &t);
 
 };
 

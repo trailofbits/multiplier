@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AsmStmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AsmStmt;
 class Decl;
 class Expr;
@@ -67,13 +56,8 @@ class MSAsmStmt : public AsmStmt {
     }
   }
 
-  inline static std::optional<MSAsmStmt> from(const Reference &r) {
-    return MSAsmStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<MSAsmStmt> from(const TokenContext &t) {
-    return MSAsmStmt::from(t.as_statement());
-  }
+  static std::optional<MSAsmStmt> from(const Reference &r);
+  static std::optional<MSAsmStmt> from(const TokenContext &t);
 
   gap::generator<std::string_view> all_constraints(void) const &;
   std::optional<Expr> nth_all_expression(unsigned n) const;

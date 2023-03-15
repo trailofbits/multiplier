@@ -8,19 +8,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ConstexprSpecKind.h"
 #include "DeclaratorDecl.h"
 #include "ExceptionSpecificationType.h"
@@ -32,6 +19,8 @@
 #include "TemplateSpecializationKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConstructorDecl;
 class CXXConversionDecl;
 class CXXDeductionGuideDecl;
@@ -89,13 +78,8 @@ class FunctionDecl : public DeclaratorDecl {
     }
   }
 
-  inline static std::optional<FunctionDecl> from(const Reference &r) {
-    return FunctionDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<FunctionDecl> from(const TokenContext &t) {
-    return FunctionDecl::from(t.as_declaration());
-  }
+  static std::optional<FunctionDecl> from(const Reference &r);
+  static std::optional<FunctionDecl> from(const TokenContext &t);
 
   bool uses_fp_intrin(void) const;
   std::optional<bool> does_declaration_force_externally_visible_definition(void) const;

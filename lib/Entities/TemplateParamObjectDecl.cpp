@@ -158,6 +158,14 @@ gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::in(const File &
   }
 }
 
+std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const Reference &r) {
+  return TemplateParamObjectDecl::from(r.as_declaration());
+}
+
+std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const TokenContext &t) {
+  return TemplateParamObjectDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

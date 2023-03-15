@@ -1870,27 +1870,43 @@ MethodListPtr CodeGenerator::RunOnClass(
     return parent_methods;
   }
 
+  std::string base_name;
+  std::string category = "NOT_AN_ENTITY";
+  if (false) {
+
+#define SET_BASE_NAME(name, lower_name) \
+    } else if (is_ ## lower_name) { \
+      base_name = #name; \
+      category = SnakeCaseToEnumCase(#lower_name);
+
+  FOR_EACH_ENTITY_CATEGORY(SET_BASE_NAME)
+#undef SET_STORAGE
+  }
+
   std::ofstream os(entities_include_dir / (class_name + ".h"),
                    std::ios::trunc | std::ios::out);
   os
-    << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-    << "// All rights reserved.\n"
-    << "//\n"
-    << "// This source code is licensed in accordance with the terms specified in\n"
-    << "// the LICENSE file found in the root directory of this source tree.\n\n"
-    << "// Auto-generated file; do not modify!\n\n"
-    << "#pragma once\n\n"
-    << "#include <cstdint>\n"
-    << "#include <filesystem>\n"
-    << "#include <memory>\n"
-    << "#include <optional>\n"
-    << "#include <span>\n"
-    << "#include <vector>\n\n"
-    << "#include <gap/core/generator.hpp>\n"
-    << "#include \"../Iterator.h\"\n"
-    << "#include \"../Reference.h\"\n"
-    << "#include \"../Types.h\"\n"
-    << "#include \"../Token.h\"\n\n";
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n";
+
+  if (class_name == base_name) {
+    os
+        << "#include <compare>\n"
+        << "#include <cstdint>\n"
+        << "#include <filesystem>\n"
+        << "#include <gap/core/generator.hpp>\n"
+        << "#include <memory>\n"
+        << "#include <optional>\n"
+        << "#include <span>\n"
+        << "#include <vector>\n\n"
+        << "#include \"../Iterator.h\"\n"
+        << "#include \"../Types.h\"\n\n";
+  }
 
   include_h_os << "#include \"Entities/" << class_name << ".h\"\n";
 
@@ -1917,19 +1933,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   serialize_inc_os
       << "\n#endif\n\n";
-
-  std::string base_name;
-  std::string category = "NOT_AN_ENTITY";
-  if (false) {
-
-#define SET_BASE_NAME(name, lower_name) \
-    } else if (is_ ## lower_name) { \
-      base_name = #name; \
-      category = SnakeCaseToEnumCase(#lower_name);
-
-  FOR_EACH_ENTITY_CATEGORY(SET_BASE_NAME)
-#undef SET_STORAGE
-  }
 
   if (is_declaration) {
 
@@ -2236,6 +2239,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  std::shared_ptr<const " << class_name << "Impl> impl;\n";
 
     if (class_name == base_name) {
+      forward_decls.insert("File");
+      forward_decls.insert("Fragment");
       class_os
           << "  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);\n"
           << "  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);\n"
@@ -2943,6 +2948,8 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (false) {
 #define DECLARE_DEFINE_FROM(type_name, lower_name) \
     } else if (class_name == #type_name) { \
+      forward_decls.insert("Reference"); \
+      forward_decls.insert("Token"); \
       class_os \
           << "  inline static std::optional<" << class_name \
           << "> from(const " << class_name << " &self) {\n" \
@@ -2953,25 +2960,37 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "> &self) {\n" \
           << "    return self;\n" \
           << "  }\n\n" \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const Reference &r) {\n" \
-          << "    return r.as_" #lower_name "();\n" \
-          << "  }\n\n" \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const TokenContext &t) {\n" \
-          << "    return t.as_" #lower_name "();\n" \
-          << "  }\n\n"; \
+          << "  static std::optional<" << class_name \
+          << "> from(const Reference &r);\n\n" \
+          << "  static std::optional<" << class_name \
+          << "> from(const TokenContext &t);\n\n"; \
+      \
+      lib_cpp_os \
+          << "std::optional<" << class_name \
+          << "> " << class_name << "::from(const Reference &r) {\n" \
+          << "  return r.as_" #lower_name "();\n" \
+          << "}\n\n" \
+          << "std::optional<" << class_name \
+          << "> " << class_name << "::from(const TokenContext &t) {\n" \
+          << "  return t.as_" #lower_name "();\n" \
+          << "}\n\n"; \
       \
     } else if (g ## type_name ## Names.count(class_name)) { \
       class_os \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const Reference &r) {\n" \
-          << "    return " << class_name << "::from(r.as_" #lower_name "());\n" \
-          << "  }\n\n" \
-          << "  inline static std::optional<" << class_name \
-          << "> from(const TokenContext &t) {\n" \
-          << "    return " << class_name << "::from(t.as_" #lower_name "());\n" \
-          << "  }\n\n";
+          << "  static std::optional<" << class_name \
+          << "> from(const Reference &r);\n" \
+          << "  static std::optional<" << class_name \
+          << "> from(const TokenContext &t);\n\n"; \
+      \
+      lib_cpp_os \
+          << "std::optional<" << class_name \
+          << "> " << class_name << "::from(const Reference &r) {\n" \
+          << "  return " << class_name << "::from(r.as_" #lower_name "());\n" \
+          << "}\n\n" \
+          << "std::optional<" << class_name \
+          << "> " << class_name << "::from(const TokenContext &t) {\n" \
+          << "  return " << class_name << "::from(t.as_" #lower_name "());\n" \
+          << "}\n\n";
 
   FOR_EACH_ENTITY_CATEGORY(DECLARE_DEFINE_FROM)
 #undef DECLARE_DEFINE_FROM
@@ -3533,13 +3552,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   class_os << "};\n\n";
 
-  if (class_name == base_name) {
-    os << "#include <compare>\n\n";
-  }
   for (auto needed : needed_decls) {
     os << "#include \"" << needed << ".h\"\n";
   }
-  os << "\nnamespace mx {\n";
+  os
+      << "\nnamespace mx {\n"
+      << "class EntityProvider;\n"
+      << "class Index;\n";
+
   for (auto fwd : forward_decls) {
     os << "class " << fwd << ";\n";
   }
@@ -3873,7 +3893,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     }
   }
 
-  auto end_libcpp_os = [&] (std::string name, bool is_root) {
+  auto end_libcpp_os = [&] (std::string name, bool is_root, bool is_enum) {
     std::ofstream fs(entities_lib_dir / (name + ".cpp"),
                      std::ios::trunc | std::ios::out);
 
@@ -3897,7 +3917,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       }
     }
 
-    fs << "\n#include \"../API.h\"\n";
+    if (!is_enum) {
+      fs << "\n#include \"../API.h\"\n";
+    }
     if (is_root) {
       fs << "#include \"../File.h\"\n";
     }
@@ -3930,7 +3952,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   for (const pasta::EnumDecl &tag : enums) {
     if (auto itype = CxxIntType(tag.IntegerType())) {
       if (RunOnEnum(tag)) {
-        end_libcpp_os(tag.Name(), false);
+        end_libcpp_os(tag.Name(), false, true);
       }
     }
   }
@@ -3958,7 +3980,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     work_list.pop_back();
 
     auto seen_methods = RunOnClass(cls, std::move(parent_methods));
-    end_libcpp_os(cls->record.Name(), cls->base == nullptr);
+    end_libcpp_os(cls->record.Name(), cls->base == nullptr, false);
 
     for (auto derived_cls : cls->derived) {
       work_list.emplace_back(derived_cls, seen_methods);

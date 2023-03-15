@@ -96,6 +96,14 @@ gap::generator<DependentVectorType> DependentVectorType::in(const File &file) {
   }
 }
 
+std::optional<DependentVectorType> DependentVectorType::from(const Reference &r) {
+  return DependentVectorType::from(r.as_type());
+}
+
+std::optional<DependentVectorType> DependentVectorType::from(const TokenContext &t) {
+  return DependentVectorType::from(t.as_type());
+}
+
 Type DependentVectorType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

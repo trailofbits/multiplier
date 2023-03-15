@@ -96,6 +96,14 @@ gap::generator<OwnershipAttr> OwnershipAttr::in(const File &file) {
   }
 }
 
+std::optional<OwnershipAttr> OwnershipAttr::from(const Reference &r) {
+  return OwnershipAttr::from(r.as_attribute());
+}
+
+std::optional<OwnershipAttr> OwnershipAttr::from(const TokenContext &t) {
+  return OwnershipAttr::from(t.as_attribute());
+}
+
 OwnershipAttrOwnershipKind OwnershipAttr::own_kind(void) const {
   return static_cast<OwnershipAttrOwnershipKind>(impl->reader.getVal10());
 }

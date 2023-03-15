@@ -16,6 +16,7 @@
 #include <multiplier/Entities/ConditionalOperator.h>
 #include <multiplier/Entities/DeclKind.h>
 #include <multiplier/Entities/DeclRefExpr.h>
+#include <multiplier/Entities/DeclStmt.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/DoStmt.h>
 #include <multiplier/Entities/ForStmt.h>
@@ -53,6 +54,7 @@ class TaintTrackerImpl final
 
   TaintTrackingResults AcceptReturn(Stmt stmt);
   TaintTrackingResults AcceptStmt(Stmt stmt);
+  TaintTrackingResults AcceptDeclStmt(Stmt stmt);
 
   TaintTrackingResults TaintConditionalOperator(
       Stmt child, ConditionalOperator parent);
@@ -92,6 +94,24 @@ std::optional<Stmt> TraintTrackingEdge::as_statement(void) const noexcept {
 
 TaintTracker::TaintTracker(const Index &index)
     : impl(std::make_shared<TaintTrackerImpl>(index)) {}
+
+// Taint the declaration or statement.
+TaintTrackingResults TaintTracker::add_source(const VariantEntity &entity) & {
+  if (std::holds_alternative<Decl>(entity)) {
+    for (TaintTrackingResult res :
+             impl->AcceptDecl(std::move(std::get<Decl>(entity)))) {
+      co_yield res;
+    }
+
+  } else if (std::holds_alternative<Stmt>(entity)) {
+    for (TaintTrackingResult res :
+             impl->AcceptStmt(std::move(std::get<Stmt>(entity)))) {
+      co_yield res;
+    }
+  } else {
+    co_return;
+  }
+}
 
 // Taint the declaration or statement associated with an existing taint
 // tracking edge.
@@ -543,6 +563,14 @@ TaintTrackingResults TaintTrackerImpl::TaintCallArgument(
   }
 }
 
+TaintTrackingResults TaintTrackerImpl::AcceptDeclStmt(Stmt stmt) {
+  for (Decl d : DeclStmt::from(stmt)->declarations()) {
+    for (TaintTrackingResult res : AcceptDecl(std::move(d))) {
+      co_yield res;
+    }
+  }
+}
+
 // Given that `stmt` is tainted, go and try to figure out how it is used, and
 // generate the next taint from there.
 TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
@@ -555,6 +583,9 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
     case StmtKind::CORETURN_STMT:
     case StmtKind::COYIELD_EXPR:
       return AcceptReturn(std::move(stmt));
+
+    case StmtKind::DECL_STMT:
+      return AcceptDeclStmt(std::move(stmt));
 
     default:
       if (IsNonValueStatement(kind)) {
@@ -592,7 +623,19 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
     case StmtKind::RETURN_STMT:
     case StmtKind::CORETURN_STMT:
     case StmtKind::COYIELD_EXPR:
-      return AcceptReturn(std::move(stmt));
+      return AcceptReturn(std::move(parent.value()));
+
+    // Propagates through an assignment to a declaration.
+    case StmtKind::DECL_STMT:
+      for (Decl d : DeclStmt::from(parent)->declarations()) {
+        if (std::optional<VarDecl> vd = VarDecl::from(d)) {
+          if (std::optional<Expr> init = vd->initializer();
+              init && init.value() == stmt) {
+            return AcceptDecl(std::move(d));
+          }
+        }
+      }
+      return NoTaints();
 
     case StmtKind::DECL_REF_EXPR:
       assert(false);  // Shouldn't have children.
@@ -603,14 +646,6 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
           std::move(stmt),
           ConditionalOperator::from(parent).value());
       break;
-    }
-
-    case StmtKind::CALL_EXPR: {
-      auto call = CallExpr::from(parent).value();
-      if (call.callee() != stmt) {
-        return TaintCallArgument(std::move(stmt), std::move(call));
-      }
-      [[clang::fallthrough]];
     }
 
     case StmtKind::SWITCH_STMT: {
@@ -647,6 +682,14 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
         return TaintCondition(std::move(parent.value()));
       }
       break;
+    }
+
+    case StmtKind::CALL_EXPR: {
+      auto call = CallExpr::from(parent).value();
+      if (call.callee() != stmt) {
+        return TaintCallArgument(std::move(stmt), std::move(call));
+      }
+      [[clang::fallthrough]];
     }
 
     // Not sure.

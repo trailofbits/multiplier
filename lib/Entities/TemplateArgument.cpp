@@ -8,7 +8,10 @@
 
 #include <multiplier/Entities/TemplateArgument.h>
 
+#include <multiplier/Entities/File.h>
+#include <multiplier/Entities/Fragment.h>
 #include <multiplier/Entities/Reference.h>
+#include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueDecl.h>
 
@@ -32,6 +35,14 @@ std::shared_ptr<EntityProvider> TemplateArgument::entity_provider_of(const Fragm
 
 std::shared_ptr<EntityProvider> TemplateArgument::entity_provider_of(const File &file_) {
   return file_.impl->ep;
+}
+
+std::optional<TemplateArgument> TemplateArgument::from(const Reference &r) {
+  return r.as_template_argument();
+}
+
+std::optional<TemplateArgument> TemplateArgument::from(const TokenContext &t) {
+  return t.as_template_argument();
 }
 
 TemplateArgumentKind TemplateArgument::kind(void) const {

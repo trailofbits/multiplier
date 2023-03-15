@@ -160,6 +160,14 @@ gap::generator<ImplicitParamDecl> ImplicitParamDecl::in(const File &file) {
   }
 }
 
+std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const Reference &r) {
+  return ImplicitParamDecl::from(r.as_declaration());
+}
+
+std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const TokenContext &t) {
+  return ImplicitParamDecl::from(t.as_declaration());
+}
+
 ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const {
   return static_cast<ImplicitParamDeclImplicitParamKind>(impl->reader.getVal126());
 }

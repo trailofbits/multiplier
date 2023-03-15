@@ -96,6 +96,14 @@ gap::generator<SYCLSpecialClassAttr> SYCLSpecialClassAttr::in(const File &file) 
   }
 }
 
+std::optional<SYCLSpecialClassAttr> SYCLSpecialClassAttr::from(const Reference &r) {
+  return SYCLSpecialClassAttr::from(r.as_attribute());
+}
+
+std::optional<SYCLSpecialClassAttr> SYCLSpecialClassAttr::from(const TokenContext &t) {
+  return SYCLSpecialClassAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

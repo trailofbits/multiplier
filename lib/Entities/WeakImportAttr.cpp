@@ -96,6 +96,14 @@ gap::generator<WeakImportAttr> WeakImportAttr::in(const File &file) {
   }
 }
 
+std::optional<WeakImportAttr> WeakImportAttr::from(const Reference &r) {
+  return WeakImportAttr::from(r.as_attribute());
+}
+
+std::optional<WeakImportAttr> WeakImportAttr::from(const TokenContext &t) {
+  return WeakImportAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

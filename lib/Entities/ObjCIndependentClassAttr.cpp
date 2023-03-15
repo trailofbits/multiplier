@@ -96,6 +96,14 @@ gap::generator<ObjCIndependentClassAttr> ObjCIndependentClassAttr::in(const File
   }
 }
 
+std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const Reference &r) {
+  return ObjCIndependentClassAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const TokenContext &t) {
+  return ObjCIndependentClassAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -149,6 +149,14 @@ gap::generator<BinaryOperator> BinaryOperator::in(const File &file) {
   }
 }
 
+std::optional<BinaryOperator> BinaryOperator::from(const Reference &r) {
+  return BinaryOperator::from(r.as_statement());
+}
+
+std::optional<BinaryOperator> BinaryOperator::from(const TokenContext &t) {
+  return BinaryOperator::from(t.as_statement());
+}
+
 Expr BinaryOperator::lhs(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

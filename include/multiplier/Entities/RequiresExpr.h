@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class ParmVarDecl;
@@ -70,13 +59,8 @@ class RequiresExpr : public Expr {
     }
   }
 
-  inline static std::optional<RequiresExpr> from(const Reference &r) {
-    return RequiresExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<RequiresExpr> from(const TokenContext &t) {
-    return RequiresExpr::from(t.as_statement());
-  }
+  static std::optional<RequiresExpr> from(const Reference &r);
+  static std::optional<RequiresExpr> from(const TokenContext &t);
 
   RequiresExprBodyDecl body(void) const;
   std::optional<ParmVarDecl> nth_local_parameter(unsigned n) const;

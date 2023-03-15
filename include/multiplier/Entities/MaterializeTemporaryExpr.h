@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "StorageDuration.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class LifetimeExtendedTemporaryDecl;
@@ -71,13 +60,8 @@ class MaterializeTemporaryExpr : public Expr {
     }
   }
 
-  inline static std::optional<MaterializeTemporaryExpr> from(const Reference &r) {
-    return MaterializeTemporaryExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<MaterializeTemporaryExpr> from(const TokenContext &t) {
-    return MaterializeTemporaryExpr::from(t.as_statement());
-  }
+  static std::optional<MaterializeTemporaryExpr> from(const Reference &r);
+  static std::optional<MaterializeTemporaryExpr> from(const TokenContext &t);
 
   std::optional<ValueDecl> extending_declaration(void) const;
   std::optional<LifetimeExtendedTemporaryDecl> lifetime_extended_temporary_declaration(void) const;

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class ExportDecl;
 class Stmt;
@@ -65,13 +54,8 @@ class ExportDecl : public Decl {
     }
   }
 
-  inline static std::optional<ExportDecl> from(const Reference &r) {
-    return ExportDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ExportDecl> from(const TokenContext &t) {
-    return ExportDecl::from(t.as_declaration());
-  }
+  static std::optional<ExportDecl> from(const Reference &r);
+  static std::optional<ExportDecl> from(const TokenContext &t);
 
   Token export_token(void) const;
   Token r_brace_token(void) const;

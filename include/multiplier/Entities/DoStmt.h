@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DoStmt;
 class Expr;
@@ -65,13 +54,8 @@ class DoStmt : public Stmt {
     }
   }
 
-  inline static std::optional<DoStmt> from(const Reference &r) {
-    return DoStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<DoStmt> from(const TokenContext &t) {
-    return DoStmt::from(t.as_statement());
-  }
+  static std::optional<DoStmt> from(const Reference &r);
+  static std::optional<DoStmt> from(const TokenContext &t);
 
   Stmt body(void) const;
   Expr condition(void) const;

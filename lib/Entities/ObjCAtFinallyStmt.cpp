@@ -144,6 +144,14 @@ gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const File &file) {
   }
 }
 
+std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Reference &r) {
+  return ObjCAtFinallyStmt::from(r.as_statement());
+}
+
+std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const TokenContext &t) {
+  return ObjCAtFinallyStmt::from(t.as_statement());
+}
+
 Token ObjCAtFinallyStmt::at_finally_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

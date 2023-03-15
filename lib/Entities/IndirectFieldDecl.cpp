@@ -160,6 +160,14 @@ gap::generator<IndirectFieldDecl> IndirectFieldDecl::in(const File &file) {
   }
 }
 
+std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const Reference &r) {
+  return IndirectFieldDecl::from(r.as_declaration());
+}
+
+std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const TokenContext &t) {
+  return IndirectFieldDecl::from(t.as_declaration());
+}
+
 gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const & {
   auto list = impl->reader.getVal47();
   EntityProvider::Ptr ep = impl->ep;

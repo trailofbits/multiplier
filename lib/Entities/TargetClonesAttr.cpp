@@ -96,6 +96,14 @@ gap::generator<TargetClonesAttr> TargetClonesAttr::in(const File &file) {
   }
 }
 
+std::optional<TargetClonesAttr> TargetClonesAttr::from(const Reference &r) {
+  return TargetClonesAttr::from(r.as_attribute());
+}
+
+std::optional<TargetClonesAttr> TargetClonesAttr::from(const TokenContext &t) {
+  return TargetClonesAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TemplateSpecializationKind.h"
 #include "VarDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class NamedDecl;
@@ -78,13 +67,8 @@ class VarTemplateSpecializationDecl : public VarDecl {
     }
   }
 
-  inline static std::optional<VarTemplateSpecializationDecl> from(const Reference &r) {
-    return VarTemplateSpecializationDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<VarTemplateSpecializationDecl> from(const TokenContext &t) {
-    return VarTemplateSpecializationDecl::from(t.as_declaration());
-  }
+  static std::optional<VarTemplateSpecializationDecl> from(const Reference &r);
+  static std::optional<VarTemplateSpecializationDecl> from(const TokenContext &t);
 
   Token extern_token(void) const;
   TemplateSpecializationKind specialization_kind(void) const;

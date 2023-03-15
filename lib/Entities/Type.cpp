@@ -125,6 +125,14 @@ gap::generator<Type> Type::in(const File &file, std::span<TypeKind> kinds) {
   }
 }
 
+std::optional<Type> Type::from(const Reference &r) {
+  return r.as_type();
+}
+
+std::optional<Type> Type::from(const TokenContext &t) {
+  return t.as_type();
+}
+
 Type Type::desugared_type(void) const {
   RawEntityId eid = impl->reader.getVal0();
   return Type(impl->ep->TypeFor(impl->ep, eid));

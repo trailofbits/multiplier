@@ -147,6 +147,14 @@ gap::generator<AtomicExpr> AtomicExpr::in(const File &file) {
   }
 }
 
+std::optional<AtomicExpr> AtomicExpr::from(const Reference &r) {
+  return AtomicExpr::from(r.as_statement());
+}
+
+std::optional<AtomicExpr> AtomicExpr::from(const TokenContext &t) {
+  return AtomicExpr::from(t.as_statement());
+}
+
 Token AtomicExpr::builtin_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

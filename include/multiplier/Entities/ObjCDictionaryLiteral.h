@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class ObjCDictionaryLiteral;
@@ -69,13 +58,8 @@ class ObjCDictionaryLiteral : public Expr {
     }
   }
 
-  inline static std::optional<ObjCDictionaryLiteral> from(const Reference &r) {
-    return ObjCDictionaryLiteral::from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCDictionaryLiteral> from(const TokenContext &t) {
-    return ObjCDictionaryLiteral::from(t.as_statement());
-  }
+  static std::optional<ObjCDictionaryLiteral> from(const Reference &r);
+  static std::optional<ObjCDictionaryLiteral> from(const TokenContext &t);
 
   ObjCMethodDecl dictionary_with_objects_method(void) const;
 };

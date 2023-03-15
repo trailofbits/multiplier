@@ -159,6 +159,14 @@ gap::generator<ConceptDecl> ConceptDecl::in(const File &file) {
   }
 }
 
+std::optional<ConceptDecl> ConceptDecl::from(const Reference &r) {
+  return ConceptDecl::from(r.as_declaration());
+}
+
+std::optional<ConceptDecl> ConceptDecl::from(const TokenContext &t) {
+  return ConceptDecl::from(t.as_declaration());
+}
+
 Expr ConceptDecl::constraint_expression(void) const {
   RawEntityId eid = impl->reader.getVal54();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

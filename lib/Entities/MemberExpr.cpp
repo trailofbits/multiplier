@@ -147,6 +147,14 @@ gap::generator<MemberExpr> MemberExpr::in(const File &file) {
   }
 }
 
+std::optional<MemberExpr> MemberExpr::from(const Reference &r) {
+  return MemberExpr::from(r.as_statement());
+}
+
+std::optional<MemberExpr> MemberExpr::from(const TokenContext &t) {
+  return MemberExpr::from(t.as_statement());
+}
+
 Expr MemberExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

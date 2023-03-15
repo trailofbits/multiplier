@@ -162,6 +162,14 @@ gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializ
   }
 }
 
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const Reference &r) {
+  return VarTemplatePartialSpecializationDecl::from(r.as_declaration());
+}
+
+std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::from(const TokenContext &t) {
+  return VarTemplatePartialSpecializationDecl::from(t.as_declaration());
+}
+
 VarTemplatePartialSpecializationDecl VarTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
   RawEntityId eid = impl->reader.getVal128();
   return VarTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

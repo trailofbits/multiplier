@@ -8,24 +8,23 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
-
-#include <compare>
 
 #include "AttrKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class AttrImpl;
 class File;
@@ -96,13 +95,9 @@ class Attr {
     return self;
   }
 
-  inline static std::optional<Attr> from(const Reference &r) {
-    return r.as_attribute();
-  }
+  static std::optional<Attr> from(const Reference &r);
 
-  inline static std::optional<Attr> from(const TokenContext &t) {
-    return t.as_attribute();
-  }
+  static std::optional<Attr> from(const TokenContext &t);
 
   Token token(void) const;
   bool is_implicit(void) const;

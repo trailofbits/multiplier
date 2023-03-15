@@ -96,6 +96,14 @@ gap::generator<ParamTypestateAttr> ParamTypestateAttr::in(const File &file) {
   }
 }
 
+std::optional<ParamTypestateAttr> ParamTypestateAttr::from(const Reference &r) {
+  return ParamTypestateAttr::from(r.as_attribute());
+}
+
+std::optional<ParamTypestateAttr> ParamTypestateAttr::from(const TokenContext &t) {
+  return ParamTypestateAttr::from(t.as_attribute());
+}
+
 ParamTypestateAttrConsumedState ParamTypestateAttr::parameter_state(void) const {
   return static_cast<ParamTypestateAttrConsumedState>(impl->reader.getVal10());
 }

@@ -95,6 +95,14 @@ gap::generator<AttributedType> AttributedType::in(const File &file) {
   }
 }
 
+std::optional<AttributedType> AttributedType::from(const Reference &r) {
+  return AttributedType::from(r.as_type());
+}
+
+std::optional<AttributedType> AttributedType::from(const TokenContext &t) {
+  return AttributedType::from(t.as_type());
+}
+
 Type AttributedType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -146,6 +146,14 @@ gap::generator<CXXThrowExpr> CXXThrowExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXThrowExpr> CXXThrowExpr::from(const Reference &r) {
+  return CXXThrowExpr::from(r.as_statement());
+}
+
+std::optional<CXXThrowExpr> CXXThrowExpr::from(const TokenContext &t) {
+  return CXXThrowExpr::from(t.as_statement());
+}
+
 std::optional<Expr> CXXThrowExpr::sub_expression(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal38();

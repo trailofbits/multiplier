@@ -149,6 +149,14 @@ gap::generator<AsmStmt> AsmStmt::in(const File &file) {
   }
 }
 
+std::optional<AsmStmt> AsmStmt::from(const Reference &r) {
+  return AsmStmt::from(r.as_statement());
+}
+
+std::optional<AsmStmt> AsmStmt::from(const TokenContext &t) {
+  return AsmStmt::from(t.as_statement());
+}
+
 std::string_view AsmStmt::generate_assembly_string(void) const {
   capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());

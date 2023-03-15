@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "PredefinedExprIdentKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class PredefinedExpr;
@@ -70,13 +59,8 @@ class PredefinedExpr : public Expr {
     }
   }
 
-  inline static std::optional<PredefinedExpr> from(const Reference &r) {
-    return PredefinedExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<PredefinedExpr> from(const TokenContext &t) {
-    return PredefinedExpr::from(t.as_statement());
-  }
+  static std::optional<PredefinedExpr> from(const Reference &r);
+  static std::optional<PredefinedExpr> from(const TokenContext &t);
 
   StringLiteral function_name(void) const;
   PredefinedExprIdentKind identifier_kind(void) const;

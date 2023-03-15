@@ -99,6 +99,14 @@ gap::generator<MatrixType> MatrixType::in(const File &file) {
   }
 }
 
+std::optional<MatrixType> MatrixType::from(const Reference &r) {
+  return MatrixType::from(r.as_type());
+}
+
+std::optional<MatrixType> MatrixType::from(const TokenContext &t) {
+  return MatrixType::from(t.as_type());
+}
+
 Type MatrixType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

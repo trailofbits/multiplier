@@ -96,6 +96,14 @@ gap::generator<PureAttr> PureAttr::in(const File &file) {
   }
 }
 
+std::optional<PureAttr> PureAttr::from(const Reference &r) {
+  return PureAttr::from(r.as_attribute());
+}
+
+std::optional<PureAttr> PureAttr::from(const TokenContext &t) {
+  return PureAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

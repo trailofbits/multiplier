@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ObjCTypeParamDecl;
 class ObjCTypeParamType;
 class Token;
@@ -55,13 +44,8 @@ class ObjCTypeParamType : public Type {
     }
   }
 
-  inline static std::optional<ObjCTypeParamType> from(const Reference &r) {
-    return ObjCTypeParamType::from(r.as_type());
-  }
-
-  inline static std::optional<ObjCTypeParamType> from(const TokenContext &t) {
-    return ObjCTypeParamType::from(t.as_type());
-  }
+  static std::optional<ObjCTypeParamType> from(const Reference &r);
+  static std::optional<ObjCTypeParamType> from(const TokenContext &t);
 
   Type desugar(void) const;
   ObjCTypeParamDecl declaration(void) const;

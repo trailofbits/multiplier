@@ -96,6 +96,14 @@ gap::generator<DLLExportAttr> DLLExportAttr::in(const File &file) {
   }
 }
 
+std::optional<DLLExportAttr> DLLExportAttr::from(const Reference &r) {
+  return DLLExportAttr::from(r.as_attribute());
+}
+
+std::optional<DLLExportAttr> DLLExportAttr::from(const TokenContext &t) {
+  return DLLExportAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

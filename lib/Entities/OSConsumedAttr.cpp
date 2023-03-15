@@ -97,6 +97,14 @@ gap::generator<OSConsumedAttr> OSConsumedAttr::in(const File &file) {
   }
 }
 
+std::optional<OSConsumedAttr> OSConsumedAttr::from(const Reference &r) {
+  return OSConsumedAttr::from(r.as_attribute());
+}
+
+std::optional<OSConsumedAttr> OSConsumedAttr::from(const TokenContext &t) {
+  return OSConsumedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

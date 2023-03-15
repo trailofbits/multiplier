@@ -160,6 +160,14 @@ gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const Reference &r) {
+  return ObjCPropertyDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const TokenContext &t) {
+  return ObjCPropertyDecl::from(t.as_declaration());
+}
+
 Token ObjCPropertyDecl::at_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }

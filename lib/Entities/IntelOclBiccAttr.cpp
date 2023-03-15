@@ -96,6 +96,14 @@ gap::generator<IntelOclBiccAttr> IntelOclBiccAttr::in(const File &file) {
   }
 }
 
+std::optional<IntelOclBiccAttr> IntelOclBiccAttr::from(const Reference &r) {
+  return IntelOclBiccAttr::from(r.as_attribute());
+}
+
+std::optional<IntelOclBiccAttr> IntelOclBiccAttr::from(const TokenContext &t) {
+  return IntelOclBiccAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -144,6 +144,14 @@ gap::generator<CompoundStmt> CompoundStmt::in(const File &file) {
   }
 }
 
+std::optional<CompoundStmt> CompoundStmt::from(const Reference &r) {
+  return CompoundStmt::from(r.as_statement());
+}
+
+std::optional<CompoundStmt> CompoundStmt::from(const TokenContext &t) {
+  return CompoundStmt::from(t.as_statement());
+}
+
 Token CompoundStmt::left_brace_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

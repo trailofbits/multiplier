@@ -96,6 +96,14 @@ gap::generator<DeducedTemplateSpecializationType> DeducedTemplateSpecializationT
   }
 }
 
+std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const Reference &r) {
+  return DeducedTemplateSpecializationType::from(r.as_type());
+}
+
+std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const TokenContext &t) {
+  return DeducedTemplateSpecializationType::from(t.as_type());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

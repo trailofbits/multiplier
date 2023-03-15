@@ -96,6 +96,14 @@ gap::generator<OptimizeNoneAttr> OptimizeNoneAttr::in(const File &file) {
   }
 }
 
+std::optional<OptimizeNoneAttr> OptimizeNoneAttr::from(const Reference &r) {
+  return OptimizeNoneAttr::from(r.as_attribute());
+}
+
+std::optional<OptimizeNoneAttr> OptimizeNoneAttr::from(const TokenContext &t) {
+  return OptimizeNoneAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

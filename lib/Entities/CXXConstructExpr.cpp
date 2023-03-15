@@ -151,6 +151,14 @@ gap::generator<CXXConstructExpr> CXXConstructExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXConstructExpr> CXXConstructExpr::from(const Reference &r) {
+  return CXXConstructExpr::from(r.as_statement());
+}
+
+std::optional<CXXConstructExpr> CXXConstructExpr::from(const TokenContext &t) {
+  return CXXConstructExpr::from(t.as_statement());
+}
+
 unsigned CXXConstructExpr::num_arguments(void) const {
   return impl->reader.getVal15().size();
 }

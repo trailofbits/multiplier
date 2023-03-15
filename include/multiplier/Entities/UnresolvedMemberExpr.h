@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OverloadExpr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class OverloadExpr;
@@ -71,13 +60,8 @@ class UnresolvedMemberExpr : public OverloadExpr {
     }
   }
 
-  inline static std::optional<UnresolvedMemberExpr> from(const Reference &r) {
-    return UnresolvedMemberExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<UnresolvedMemberExpr> from(const TokenContext &t) {
-    return UnresolvedMemberExpr::from(t.as_statement());
-  }
+  static std::optional<UnresolvedMemberExpr> from(const Reference &r);
+  static std::optional<UnresolvedMemberExpr> from(const TokenContext &t);
 
   Expr base(void) const;
   Type base_type(void) const;

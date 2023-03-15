@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXCatchStmt;
 class Decl;
 class Stmt;
@@ -66,13 +55,8 @@ class CXXCatchStmt : public Stmt {
     }
   }
 
-  inline static std::optional<CXXCatchStmt> from(const Reference &r) {
-    return CXXCatchStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<CXXCatchStmt> from(const TokenContext &t) {
-    return CXXCatchStmt::from(t.as_statement());
-  }
+  static std::optional<CXXCatchStmt> from(const Reference &r);
+  static std::optional<CXXCatchStmt> from(const TokenContext &t);
 
   Token catch_token(void) const;
   Type caught_type(void) const;

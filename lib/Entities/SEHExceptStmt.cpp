@@ -146,6 +146,14 @@ gap::generator<SEHExceptStmt> SEHExceptStmt::in(const File &file) {
   }
 }
 
+std::optional<SEHExceptStmt> SEHExceptStmt::from(const Reference &r) {
+  return SEHExceptStmt::from(r.as_statement());
+}
+
+std::optional<SEHExceptStmt> SEHExceptStmt::from(const TokenContext &t) {
+  return SEHExceptStmt::from(t.as_statement());
+}
+
 CompoundStmt SEHExceptStmt::block(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

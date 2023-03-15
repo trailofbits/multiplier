@@ -96,6 +96,14 @@ gap::generator<AVRSignalAttr> AVRSignalAttr::in(const File &file) {
   }
 }
 
+std::optional<AVRSignalAttr> AVRSignalAttr::from(const Reference &r) {
+  return AVRSignalAttr::from(r.as_attribute());
+}
+
+std::optional<AVRSignalAttr> AVRSignalAttr::from(const TokenContext &t) {
+  return AVRSignalAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

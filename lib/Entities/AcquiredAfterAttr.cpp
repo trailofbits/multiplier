@@ -96,6 +96,14 @@ gap::generator<AcquiredAfterAttr> AcquiredAfterAttr::in(const File &file) {
   }
 }
 
+std::optional<AcquiredAfterAttr> AcquiredAfterAttr::from(const Reference &r) {
+  return AcquiredAfterAttr::from(r.as_attribute());
+}
+
+std::optional<AcquiredAfterAttr> AcquiredAfterAttr::from(const TokenContext &t) {
+  return AcquiredAfterAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -186,6 +186,14 @@ gap::generator<TypeDecl> TypeDecl::in(const File &file) {
   }
 }
 
+std::optional<TypeDecl> TypeDecl::from(const Reference &r) {
+  return TypeDecl::from(r.as_declaration());
+}
+
+std::optional<TypeDecl> TypeDecl::from(const TokenContext &t) {
+  return TypeDecl::from(t.as_declaration());
+}
+
 std::optional<Type> TypeDecl::type_for_declaration(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal52();

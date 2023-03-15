@@ -144,6 +144,14 @@ gap::generator<NullStmt> NullStmt::in(const File &file) {
   }
 }
 
+std::optional<NullStmt> NullStmt::from(const Reference &r) {
+  return NullStmt::from(r.as_statement());
+}
+
+std::optional<NullStmt> NullStmt::from(const TokenContext &t) {
+  return NullStmt::from(t.as_statement());
+}
+
 Token NullStmt::semi_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

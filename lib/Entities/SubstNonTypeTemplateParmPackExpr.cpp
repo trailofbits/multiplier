@@ -147,6 +147,14 @@ gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExp
   }
 }
 
+std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::from(const Reference &r) {
+  return SubstNonTypeTemplateParmPackExpr::from(r.as_statement());
+}
+
+std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::from(const TokenContext &t) {
+  return SubstNonTypeTemplateParmPackExpr::from(t.as_statement());
+}
+
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmPackExpr::parameter_pack(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

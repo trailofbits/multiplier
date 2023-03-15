@@ -146,6 +146,14 @@ gap::generator<CXXBoolLiteralExpr> CXXBoolLiteralExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const Reference &r) {
+  return CXXBoolLiteralExpr::from(r.as_statement());
+}
+
+std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const TokenContext &t) {
+  return CXXBoolLiteralExpr::from(t.as_statement());
+}
+
 Token CXXBoolLiteralExpr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

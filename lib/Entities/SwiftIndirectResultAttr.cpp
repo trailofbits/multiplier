@@ -98,6 +98,14 @@ gap::generator<SwiftIndirectResultAttr> SwiftIndirectResultAttr::in(const File &
   }
 }
 
+std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const Reference &r) {
+  return SwiftIndirectResultAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const TokenContext &t) {
+  return SwiftIndirectResultAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

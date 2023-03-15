@@ -96,6 +96,14 @@ gap::generator<AnyX86InterruptAttr> AnyX86InterruptAttr::in(const File &file) {
   }
 }
 
+std::optional<AnyX86InterruptAttr> AnyX86InterruptAttr::from(const Reference &r) {
+  return AnyX86InterruptAttr::from(r.as_attribute());
+}
+
+std::optional<AnyX86InterruptAttr> AnyX86InterruptAttr::from(const TokenContext &t) {
+  return AnyX86InterruptAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

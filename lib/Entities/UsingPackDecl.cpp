@@ -157,6 +157,14 @@ gap::generator<UsingPackDecl> UsingPackDecl::in(const File &file) {
   }
 }
 
+std::optional<UsingPackDecl> UsingPackDecl::from(const Reference &r) {
+  return UsingPackDecl::from(r.as_declaration());
+}
+
+std::optional<UsingPackDecl> UsingPackDecl::from(const TokenContext &t) {
+  return UsingPackDecl::from(t.as_declaration());
+}
+
 unsigned UsingPackDecl::num_expansions(void) const {
   return impl->reader.getVal47().size();
 }

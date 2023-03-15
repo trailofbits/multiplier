@@ -160,6 +160,14 @@ gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const File &file) 
   }
 }
 
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Reference &r) {
+  return ObjCCategoryImplDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const TokenContext &t) {
+  return ObjCCategoryImplDecl::from(t.as_declaration());
+}
+
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
   RawEntityId eid = impl->reader.getVal63();
   return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

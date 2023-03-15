@@ -145,6 +145,14 @@ gap::generator<OMPTeamsDirective> OMPTeamsDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const Reference &r) {
+  return OMPTeamsDirective::from(r.as_statement());
+}
+
+std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const TokenContext &t) {
+  return OMPTeamsDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

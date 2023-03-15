@@ -162,6 +162,14 @@ gap::generator<CXXConversionDecl> CXXConversionDecl::in(const File &file) {
   }
 }
 
+std::optional<CXXConversionDecl> CXXConversionDecl::from(const Reference &r) {
+  return CXXConversionDecl::from(r.as_declaration());
+}
+
+std::optional<CXXConversionDecl> CXXConversionDecl::from(const TokenContext &t) {
+  return CXXConversionDecl::from(t.as_declaration());
+}
+
 Type CXXConversionDecl::conversion_type(void) const {
   RawEntityId eid = impl->reader.getVal170();
   return Type(impl->ep->TypeFor(impl->ep, eid));

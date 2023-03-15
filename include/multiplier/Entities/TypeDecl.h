@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "NamedDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXRecordDecl;
 class ClassTemplatePartialSpecializationDecl;
 class ClassTemplateSpecializationDecl;
@@ -74,13 +63,8 @@ class TypeDecl : public NamedDecl {
     }
   }
 
-  inline static std::optional<TypeDecl> from(const Reference &r) {
-    return TypeDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<TypeDecl> from(const TokenContext &t) {
-    return TypeDecl::from(t.as_declaration());
-  }
+  static std::optional<TypeDecl> from(const Reference &r);
+  static std::optional<TypeDecl> from(const TokenContext &t);
 
   std::optional<Type> type_for_declaration(void) const;
 };

@@ -111,6 +111,14 @@ gap::generator<MacroParameter> MacroParameter::in(const File &file) {
   }
 }
 
+std::optional<MacroParameter> MacroParameter::from(const Reference &r) {
+  return MacroParameter::from(r.as_macro());
+}
+
+std::optional<MacroParameter> MacroParameter::from(const TokenContext &t) {
+  return MacroParameter::from(t.as_macro());
+}
+
 Token MacroParameter::variadic_dots(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal4();

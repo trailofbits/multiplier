@@ -146,6 +146,14 @@ gap::generator<OpaqueValueExpr> OpaqueValueExpr::in(const File &file) {
   }
 }
 
+std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const Reference &r) {
+  return OpaqueValueExpr::from(r.as_statement());
+}
+
+std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const TokenContext &t) {
+  return OpaqueValueExpr::from(t.as_statement());
+}
+
 Token OpaqueValueExpr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

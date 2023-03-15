@@ -158,6 +158,14 @@ gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::in(const File
   }
 }
 
+std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const Reference &r) {
+  return UnresolvedUsingValueDecl::from(r.as_declaration());
+}
+
+std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const TokenContext &t) {
+  return UnresolvedUsingValueDecl::from(t.as_declaration());
+}
+
 Token UnresolvedUsingValueDecl::ellipsis_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }

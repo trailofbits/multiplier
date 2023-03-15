@@ -159,6 +159,14 @@ gap::generator<ClassTemplateDecl> ClassTemplateDecl::in(const File &file) {
   }
 }
 
+std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const Reference &r) {
+  return ClassTemplateDecl::from(r.as_declaration());
+}
+
+std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const TokenContext &t) {
+  return ClassTemplateDecl::from(t.as_declaration());
+}
+
 bool ClassTemplateDecl::is_this_declaration_a_definition(void) const {
   return impl->reader.getVal72();
 }

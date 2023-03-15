@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CaseStmt;
 class Decl;
 class DefaultStmt;
@@ -62,13 +51,8 @@ class SwitchCase : public Stmt {
     }
   }
 
-  inline static std::optional<SwitchCase> from(const Reference &r) {
-    return SwitchCase::from(r.as_statement());
-  }
-
-  inline static std::optional<SwitchCase> from(const TokenContext &t) {
-    return SwitchCase::from(t.as_statement());
-  }
+  static std::optional<SwitchCase> from(const Reference &r);
+  static std::optional<SwitchCase> from(const TokenContext &t);
 
   Token colon_token(void) const;
   Token keyword_token(void) const;

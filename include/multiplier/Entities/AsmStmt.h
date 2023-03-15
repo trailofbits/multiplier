@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AsmStmt;
 class Decl;
 class Expr;
@@ -63,13 +52,8 @@ class AsmStmt : public Stmt {
     }
   }
 
-  inline static std::optional<AsmStmt> from(const Reference &r) {
-    return AsmStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<AsmStmt> from(const TokenContext &t) {
-    return AsmStmt::from(t.as_statement());
-  }
+  static std::optional<AsmStmt> from(const Reference &r);
+  static std::optional<AsmStmt> from(const TokenContext &t);
 
   std::string_view generate_assembly_string(void) const;
   Token assembly_token(void) const;

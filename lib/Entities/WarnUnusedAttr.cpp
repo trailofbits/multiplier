@@ -96,6 +96,14 @@ gap::generator<WarnUnusedAttr> WarnUnusedAttr::in(const File &file) {
   }
 }
 
+std::optional<WarnUnusedAttr> WarnUnusedAttr::from(const Reference &r) {
+  return WarnUnusedAttr::from(r.as_attribute());
+}
+
+std::optional<WarnUnusedAttr> WarnUnusedAttr::from(const TokenContext &t) {
+  return WarnUnusedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

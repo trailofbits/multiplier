@@ -257,6 +257,20 @@ std::optional<File> File::containing(const WeggliQueryMatch &match) {
                               MX_DEFINE_CONTAINING)
 #undef MX_DEFINE_CONTAINING
 
+std::optional<File> File::containing(const VariantEntity &entity) {
+#define GET_FILE(type_name, lower_name, enum_name, category) \
+      } else if (std::holds_alternative<type_name>(entity)) { \
+        return File::containing(std::get<type_name>(entity));
+
+  if (false) {
+    MX_FOR_EACH_ENTITY_CATEGORY(GET_FILE, GET_FILE,
+                                GET_FILE, GET_FILE, GET_FILE)
+  } else {
+    return std::nullopt;
+  }
+#undef GET_FILE
+}
+
 // Return the ID of this file.
 SpecificEntityId<FileId> File::id(void) const noexcept {
   return FileId{impl->file_id};
@@ -273,6 +287,11 @@ gap::generator<Fragment> File::fragments(void) const & {
       assert(false);
     }
   }
+}
+
+// Return all file paths associated with this file.
+gap::generator<std::filesystem::path> File::paths(void) const & {
+  return impl->ep->ListPathsForFile(impl->ep, FileId(impl->file_id));
 }
 
 FragmentIdList File::fragment_ids(void) const {

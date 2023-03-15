@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ArrayTypeTrait.h"
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ArrayTypeTraitExpr;
 class Decl;
 class Expr;
@@ -70,13 +59,8 @@ class ArrayTypeTraitExpr : public Expr {
     }
   }
 
-  inline static std::optional<ArrayTypeTraitExpr> from(const Reference &r) {
-    return ArrayTypeTraitExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ArrayTypeTraitExpr> from(const TokenContext &t) {
-    return ArrayTypeTraitExpr::from(t.as_statement());
-  }
+  static std::optional<ArrayTypeTraitExpr> from(const Reference &r);
+  static std::optional<ArrayTypeTraitExpr> from(const TokenContext &t);
 
   Expr dimension_expression(void) const;
   Type queried_type(void) const;

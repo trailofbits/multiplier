@@ -95,6 +95,14 @@ gap::generator<ObjCDesignatedInitializerAttr> ObjCDesignatedInitializerAttr::in(
   }
 }
 
+std::optional<ObjCDesignatedInitializerAttr> ObjCDesignatedInitializerAttr::from(const Reference &r) {
+  return ObjCDesignatedInitializerAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCDesignatedInitializerAttr> ObjCDesignatedInitializerAttr::from(const TokenContext &t) {
+  return ObjCDesignatedInitializerAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

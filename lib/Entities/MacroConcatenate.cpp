@@ -111,6 +111,14 @@ gap::generator<MacroConcatenate> MacroConcatenate::in(const File &file) {
   }
 }
 
+std::optional<MacroConcatenate> MacroConcatenate::from(const Reference &r) {
+  return MacroConcatenate::from(r.as_macro());
+}
+
+std::optional<MacroConcatenate> MacroConcatenate::from(const TokenContext &t) {
+  return MacroConcatenate::from(t.as_macro());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

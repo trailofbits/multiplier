@@ -147,6 +147,14 @@ gap::generator<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::in(const File
   }
 }
 
+std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Reference &r) {
+  return UnaryExprOrTypeTraitExpr::from(r.as_statement());
+}
+
+std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const TokenContext &t) {
+  return UnaryExprOrTypeTraitExpr::from(t.as_statement());
+}
+
 std::optional<Expr> UnaryExprOrTypeTraitExpr::argument_expression(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal38();

@@ -96,6 +96,14 @@ gap::generator<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::in(const Fi
   }
 }
 
+std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from(const Reference &r) {
+  return PragmaClangBSSSectionAttr::from(r.as_attribute());
+}
+
+std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from(const TokenContext &t) {
+  return PragmaClangBSSSectionAttr::from(t.as_attribute());
+}
+
 std::string_view PragmaClangBSSSectionAttr::name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

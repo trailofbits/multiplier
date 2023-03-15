@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class CleanupAttr;
 class FunctionDecl;
@@ -57,13 +46,8 @@ class CleanupAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<CleanupAttr> from(const Reference &r) {
-    return CleanupAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<CleanupAttr> from(const TokenContext &t) {
-    return CleanupAttr::from(t.as_attribute());
-  }
+  static std::optional<CleanupAttr> from(const Reference &r);
+  static std::optional<CleanupAttr> from(const TokenContext &t);
 
   FunctionDecl function_declaration(void) const;
 };

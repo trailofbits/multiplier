@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ExplicitCastExpr.h"
 #include "ObjCBridgeCastKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CastExpr;
 class Decl;
 class ExplicitCastExpr;
@@ -73,13 +62,8 @@ class ObjCBridgedCastExpr : public ExplicitCastExpr {
     }
   }
 
-  inline static std::optional<ObjCBridgedCastExpr> from(const Reference &r) {
-    return ObjCBridgedCastExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCBridgedCastExpr> from(const TokenContext &t) {
-    return ObjCBridgedCastExpr::from(t.as_statement());
-  }
+  static std::optional<ObjCBridgedCastExpr> from(const Reference &r);
+  static std::optional<ObjCBridgedCastExpr> from(const TokenContext &t);
 
   Token bridge_keyword_token(void) const;
   ObjCBridgeCastKind bridge_kind(void) const;

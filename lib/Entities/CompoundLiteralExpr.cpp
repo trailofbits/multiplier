@@ -146,6 +146,14 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::in(const File &file) {
   }
 }
 
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Reference &r) {
+  return CompoundLiteralExpr::from(r.as_statement());
+}
+
+std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const TokenContext &t) {
+  return CompoundLiteralExpr::from(t.as_statement());
+}
+
 Expr CompoundLiteralExpr::initializer(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

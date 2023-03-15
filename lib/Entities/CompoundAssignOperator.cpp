@@ -148,6 +148,14 @@ gap::generator<CompoundAssignOperator> CompoundAssignOperator::in(const File &fi
   }
 }
 
+std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const Reference &r) {
+  return CompoundAssignOperator::from(r.as_statement());
+}
+
+std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const TokenContext &t) {
+  return CompoundAssignOperator::from(t.as_statement());
+}
+
 Type CompoundAssignOperator::computation_lhs_type(void) const {
   RawEntityId eid = impl->reader.getVal41();
   return Type(impl->ep->TypeFor(impl->ep, eid));

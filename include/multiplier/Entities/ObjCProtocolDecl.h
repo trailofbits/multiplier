@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ObjCContainerDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class ObjCContainerDecl;
@@ -70,13 +59,8 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
     }
   }
 
-  inline static std::optional<ObjCProtocolDecl> from(const Reference &r) {
-    return ObjCProtocolDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCProtocolDecl> from(const TokenContext &t) {
-    return ObjCProtocolDecl::from(t.as_declaration());
-  }
+  static std::optional<ObjCProtocolDecl> from(const Reference &r);
+  static std::optional<ObjCProtocolDecl> from(const TokenContext &t);
 
   std::string_view obj_c_runtime_name_as_string(void) const;
   bool has_definition(void) const;

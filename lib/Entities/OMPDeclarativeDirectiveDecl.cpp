@@ -163,6 +163,14 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::in(cons
   }
 }
 
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const Reference &r) {
+  return OMPDeclarativeDirectiveDecl::from(r.as_declaration());
+}
+
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(const TokenContext &t) {
+  return OMPDeclarativeDirectiveDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

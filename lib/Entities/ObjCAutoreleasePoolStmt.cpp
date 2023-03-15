@@ -144,6 +144,14 @@ gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::in(const File &
   }
 }
 
+std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Reference &r) {
+  return ObjCAutoreleasePoolStmt::from(r.as_statement());
+}
+
+std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const TokenContext &t) {
+  return ObjCAutoreleasePoolStmt::from(t.as_statement());
+}
+
 Token ObjCAutoreleasePoolStmt::at_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

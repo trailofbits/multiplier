@@ -96,6 +96,14 @@ gap::generator<NoRandomizeLayoutAttr> NoRandomizeLayoutAttr::in(const File &file
   }
 }
 
+std::optional<NoRandomizeLayoutAttr> NoRandomizeLayoutAttr::from(const Reference &r) {
+  return NoRandomizeLayoutAttr::from(r.as_attribute());
+}
+
+std::optional<NoRandomizeLayoutAttr> NoRandomizeLayoutAttr::from(const TokenContext &t) {
+  return NoRandomizeLayoutAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

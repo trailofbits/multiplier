@@ -146,6 +146,14 @@ gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const Reference &r) {
+  return OMPAtomicDirective::from(r.as_statement());
+}
+
+std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const TokenContext &t) {
+  return OMPAtomicDirective::from(t.as_statement());
+}
+
 Expr OMPAtomicDirective::condition_expression(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

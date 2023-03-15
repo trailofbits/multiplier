@@ -145,6 +145,14 @@ gap::generator<OMPBarrierDirective> OMPBarrierDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPBarrierDirective> OMPBarrierDirective::from(const Reference &r) {
+  return OMPBarrierDirective::from(r.as_statement());
+}
+
+std::optional<OMPBarrierDirective> OMPBarrierDirective::from(const TokenContext &t) {
+  return OMPBarrierDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

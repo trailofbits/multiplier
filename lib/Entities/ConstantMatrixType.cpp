@@ -96,6 +96,14 @@ gap::generator<ConstantMatrixType> ConstantMatrixType::in(const File &file) {
   }
 }
 
+std::optional<ConstantMatrixType> ConstantMatrixType::from(const Reference &r) {
+  return ConstantMatrixType::from(r.as_type());
+}
+
+std::optional<ConstantMatrixType> ConstantMatrixType::from(const TokenContext &t) {
+  return ConstantMatrixType::from(t.as_type());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

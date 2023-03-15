@@ -146,6 +146,14 @@ gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::in(const Fi
   }
 }
 
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const Reference &r) {
+  return ObjCAvailabilityCheckExpr::from(r.as_statement());
+}
+
+std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const TokenContext &t) {
+  return ObjCAvailabilityCheckExpr::from(t.as_statement());
+}
+
 bool ObjCAvailabilityCheckExpr::has_version(void) const {
   return impl->reader.getVal88();
 }

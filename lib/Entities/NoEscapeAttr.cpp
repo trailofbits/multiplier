@@ -95,6 +95,14 @@ gap::generator<NoEscapeAttr> NoEscapeAttr::in(const File &file) {
   }
 }
 
+std::optional<NoEscapeAttr> NoEscapeAttr::from(const Reference &r) {
+  return NoEscapeAttr::from(r.as_attribute());
+}
+
+std::optional<NoEscapeAttr> NoEscapeAttr::from(const TokenContext &t) {
+  return NoEscapeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

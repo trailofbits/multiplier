@@ -96,6 +96,14 @@ gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> CUDADeviceBuiltinSurfaceTypeAtt
   }
 }
 
+std::optional<CUDADeviceBuiltinSurfaceTypeAttr> CUDADeviceBuiltinSurfaceTypeAttr::from(const Reference &r) {
+  return CUDADeviceBuiltinSurfaceTypeAttr::from(r.as_attribute());
+}
+
+std::optional<CUDADeviceBuiltinSurfaceTypeAttr> CUDADeviceBuiltinSurfaceTypeAttr::from(const TokenContext &t) {
+  return CUDADeviceBuiltinSurfaceTypeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

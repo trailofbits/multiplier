@@ -8,20 +8,17 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
-
-#include <compare>
 
 #include "AccessSpecifier.h"
 #include "AvailabilityResult.h"
@@ -31,6 +28,8 @@
 #include "DeclModuleOwnershipKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class Decl;
 class DeclImpl;
@@ -122,13 +121,9 @@ class Decl {
     return self;
   }
 
-  inline static std::optional<Decl> from(const Reference &r) {
-    return r.as_declaration();
-  }
+  static std::optional<Decl> from(const Reference &r);
 
-  inline static std::optional<Decl> from(const TokenContext &t) {
-    return t.as_declaration();
-  }
+  static std::optional<Decl> from(const TokenContext &t);
 
   std::optional<Attr> nth_attribute(unsigned n) const;
   unsigned num_attributes(void) const;

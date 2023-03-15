@@ -95,6 +95,14 @@ gap::generator<PipeType> PipeType::in(const File &file) {
   }
 }
 
+std::optional<PipeType> PipeType::from(const Reference &r) {
+  return PipeType::from(r.as_type());
+}
+
+std::optional<PipeType> PipeType::from(const TokenContext &t) {
+  return PipeType::from(t.as_type());
+}
+
 Type PipeType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

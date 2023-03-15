@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ConstantExprResultStorageKind.h"
 #include "FullExpr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConstantExpr;
 class Decl;
 class Expr;
@@ -71,13 +60,8 @@ class ConstantExpr : public FullExpr {
     }
   }
 
-  inline static std::optional<ConstantExpr> from(const Reference &r) {
-    return ConstantExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<ConstantExpr> from(const TokenContext &t) {
-    return ConstantExpr::from(t.as_statement());
-  }
+  static std::optional<ConstantExpr> from(const Reference &r);
+  static std::optional<ConstantExpr> from(const TokenContext &t);
 
   ConstantExprResultStorageKind result_storage_kind(void) const;
   bool has_ap_value_result(void) const;

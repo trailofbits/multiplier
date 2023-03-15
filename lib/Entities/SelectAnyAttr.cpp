@@ -96,6 +96,14 @@ gap::generator<SelectAnyAttr> SelectAnyAttr::in(const File &file) {
   }
 }
 
+std::optional<SelectAnyAttr> SelectAnyAttr::from(const Reference &r) {
+  return SelectAnyAttr::from(r.as_attribute());
+}
+
+std::optional<SelectAnyAttr> SelectAnyAttr::from(const TokenContext &t) {
+  return SelectAnyAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

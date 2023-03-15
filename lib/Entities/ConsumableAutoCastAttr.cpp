@@ -96,6 +96,14 @@ gap::generator<ConsumableAutoCastAttr> ConsumableAutoCastAttr::in(const File &fi
   }
 }
 
+std::optional<ConsumableAutoCastAttr> ConsumableAutoCastAttr::from(const Reference &r) {
+  return ConsumableAutoCastAttr::from(r.as_attribute());
+}
+
+std::optional<ConsumableAutoCastAttr> ConsumableAutoCastAttr::from(const TokenContext &t) {
+  return ConsumableAutoCastAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

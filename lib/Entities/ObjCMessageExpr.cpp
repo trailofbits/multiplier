@@ -150,6 +150,14 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Reference &r) {
+  return ObjCMessageExpr::from(r.as_statement());
+}
+
+std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const TokenContext &t) {
+  return ObjCMessageExpr::from(t.as_statement());
+}
+
 unsigned ObjCMessageExpr::num_arguments(void) const {
   return impl->reader.getVal15().size();
 }

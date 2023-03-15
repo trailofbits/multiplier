@@ -96,6 +96,14 @@ gap::generator<ObjCKindOfAttr> ObjCKindOfAttr::in(const File &file) {
   }
 }
 
+std::optional<ObjCKindOfAttr> ObjCKindOfAttr::from(const Reference &r) {
+  return ObjCKindOfAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCKindOfAttr> ObjCKindOfAttr::from(const TokenContext &t) {
+  return ObjCKindOfAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

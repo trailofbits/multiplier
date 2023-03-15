@@ -96,6 +96,14 @@ gap::generator<OpenCLKernelAttr> OpenCLKernelAttr::in(const File &file) {
   }
 }
 
+std::optional<OpenCLKernelAttr> OpenCLKernelAttr::from(const Reference &r) {
+  return OpenCLKernelAttr::from(r.as_attribute());
+}
+
+std::optional<OpenCLKernelAttr> OpenCLKernelAttr::from(const TokenContext &t) {
+  return OpenCLKernelAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

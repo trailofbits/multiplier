@@ -149,6 +149,14 @@ gap::generator<CXXConstCastExpr> CXXConstCastExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const Reference &r) {
+  return CXXConstCastExpr::from(r.as_statement());
+}
+
+std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const TokenContext &t) {
+  return CXXConstCastExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -96,6 +96,14 @@ gap::generator<DecayedType> DecayedType::in(const File &file) {
   }
 }
 
+std::optional<DecayedType> DecayedType::from(const Reference &r) {
+  return DecayedType::from(r.as_type());
+}
+
+std::optional<DecayedType> DecayedType::from(const TokenContext &t) {
+  return DecayedType::from(t.as_type());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

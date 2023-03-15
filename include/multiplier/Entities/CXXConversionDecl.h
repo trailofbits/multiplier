@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CXXMethodDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConversionDecl;
 class CXXMethodDecl;
 class Decl;
@@ -76,13 +65,8 @@ class CXXConversionDecl : public CXXMethodDecl {
     }
   }
 
-  inline static std::optional<CXXConversionDecl> from(const Reference &r) {
-    return CXXConversionDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXConversionDecl> from(const TokenContext &t) {
-    return CXXConversionDecl::from(t.as_declaration());
-  }
+  static std::optional<CXXConversionDecl> from(const Reference &r);
+  static std::optional<CXXConversionDecl> from(const TokenContext &t);
 
   Type conversion_type(void) const;
   bool is_explicit(void) const;

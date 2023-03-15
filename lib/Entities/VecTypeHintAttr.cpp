@@ -97,6 +97,14 @@ gap::generator<VecTypeHintAttr> VecTypeHintAttr::in(const File &file) {
   }
 }
 
+std::optional<VecTypeHintAttr> VecTypeHintAttr::from(const Reference &r) {
+  return VecTypeHintAttr::from(r.as_attribute());
+}
+
+std::optional<VecTypeHintAttr> VecTypeHintAttr::from(const TokenContext &t) {
+  return VecTypeHintAttr::from(t.as_attribute());
+}
+
 Type VecTypeHintAttr::type_hint(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Type(impl->ep->TypeFor(impl->ep, eid));

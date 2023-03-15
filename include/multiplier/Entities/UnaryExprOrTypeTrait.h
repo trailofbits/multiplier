@@ -15,6 +15,10 @@ enum class UnaryExprOrTypeTrait : unsigned char {
   SIZE_OF,
   ALIGN_OF,
   PREFERRED_ALIGN_OF,
+  POINTER_AUTH_TYPE_DISCRIMINATOR,
+  XNU_TYPE_SIGNATURE,
+  XNU_TYPE_SUMMARY,
+  TMO_TYPE_GET_METADATA,
   VEC_STEP,
   OPEN_MP_REQUIRED_SIMD_ALIGN,
 };
@@ -24,7 +28,7 @@ inline static const char *EnumerationName(UnaryExprOrTypeTrait) {
 }
 
 inline static constexpr unsigned NumEnumerators(UnaryExprOrTypeTrait) {
-  return 5;
+  return 9;
 }
 
 const char *EnumeratorName(UnaryExprOrTypeTrait);

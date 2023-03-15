@@ -96,6 +96,14 @@ gap::generator<ConstructorAttr> ConstructorAttr::in(const File &file) {
   }
 }
 
+std::optional<ConstructorAttr> ConstructorAttr::from(const Reference &r) {
+  return ConstructorAttr::from(r.as_attribute());
+}
+
+std::optional<ConstructorAttr> ConstructorAttr::from(const TokenContext &t) {
+  return ConstructorAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

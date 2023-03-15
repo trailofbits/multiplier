@@ -159,6 +159,14 @@ gap::generator<TypedefDecl> TypedefDecl::in(const File &file) {
   }
 }
 
+std::optional<TypedefDecl> TypedefDecl::from(const Reference &r) {
+  return TypedefDecl::from(r.as_declaration());
+}
+
+std::optional<TypedefDecl> TypedefDecl::from(const TokenContext &t) {
+  return TypedefDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

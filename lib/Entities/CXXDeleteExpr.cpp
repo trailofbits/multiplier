@@ -148,6 +148,14 @@ gap::generator<CXXDeleteExpr> CXXDeleteExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const Reference &r) {
+  return CXXDeleteExpr::from(r.as_statement());
+}
+
+std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const TokenContext &t) {
+  return CXXDeleteExpr::from(t.as_statement());
+}
+
 bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
   return impl->reader.getVal88();
 }

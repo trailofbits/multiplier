@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TypeAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class OpenCLGlobalHostAddressSpaceAttr;
 class Token;
@@ -56,13 +45,8 @@ class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
     }
   }
 
-  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Reference &r) {
-    return OpenCLGlobalHostAddressSpaceAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const TokenContext &t) {
-    return OpenCLGlobalHostAddressSpaceAttr::from(t.as_attribute());
-  }
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Reference &r);
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const TokenContext &t);
 
 };
 

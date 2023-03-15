@@ -167,6 +167,14 @@ gap::generator<FieldDecl> FieldDecl::in(const File &file) {
   }
 }
 
+std::optional<FieldDecl> FieldDecl::from(const Reference &r) {
+  return FieldDecl::from(r.as_declaration());
+}
+
+std::optional<FieldDecl> FieldDecl::from(const TokenContext &t) {
+  return FieldDecl::from(t.as_declaration());
+}
+
 std::optional<Expr> FieldDecl::bit_width(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal73();

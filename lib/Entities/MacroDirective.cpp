@@ -157,6 +157,14 @@ gap::generator<MacroDirective> MacroDirective::in(const File &file) {
   }
 }
 
+std::optional<MacroDirective> MacroDirective::from(const Reference &r) {
+  return MacroDirective::from(r.as_macro());
+}
+
+std::optional<MacroDirective> MacroDirective::from(const TokenContext &t) {
+  return MacroDirective::from(t.as_macro());
+}
+
 Token MacroDirective::hash(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal4());
 }

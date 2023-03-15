@@ -96,6 +96,14 @@ gap::generator<UnlikelyAttr> UnlikelyAttr::in(const File &file) {
   }
 }
 
+std::optional<UnlikelyAttr> UnlikelyAttr::from(const Reference &r) {
+  return UnlikelyAttr::from(r.as_attribute());
+}
+
+std::optional<UnlikelyAttr> UnlikelyAttr::from(const TokenContext &t) {
+  return UnlikelyAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

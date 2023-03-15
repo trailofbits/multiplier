@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ObjCObjectType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ObjCInterfaceDecl;
 class ObjCInterfaceType;
 class ObjCObjectType;
@@ -57,13 +46,8 @@ class ObjCInterfaceType : public ObjCObjectType {
     }
   }
 
-  inline static std::optional<ObjCInterfaceType> from(const Reference &r) {
-    return ObjCInterfaceType::from(r.as_type());
-  }
-
-  inline static std::optional<ObjCInterfaceType> from(const TokenContext &t) {
-    return ObjCInterfaceType::from(t.as_type());
-  }
+  static std::optional<ObjCInterfaceType> from(const Reference &r);
+  static std::optional<ObjCInterfaceType> from(const TokenContext &t);
 
   ObjCInterfaceDecl declaration(void) const;
 };

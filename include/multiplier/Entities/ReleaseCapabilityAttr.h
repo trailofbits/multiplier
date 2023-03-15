@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "InheritableAttr.h"
 #include "ReleaseCapabilityAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class ReleaseCapabilityAttr;
@@ -57,13 +46,8 @@ class ReleaseCapabilityAttr : public InheritableAttr {
     }
   }
 
-  inline static std::optional<ReleaseCapabilityAttr> from(const Reference &r) {
-    return ReleaseCapabilityAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<ReleaseCapabilityAttr> from(const TokenContext &t) {
-    return ReleaseCapabilityAttr::from(t.as_attribute());
-  }
+  static std::optional<ReleaseCapabilityAttr> from(const Reference &r);
+  static std::optional<ReleaseCapabilityAttr> from(const TokenContext &t);
 
   ReleaseCapabilityAttrSpelling semantic_spelling(void) const;
   bool is_generic(void) const;

@@ -96,6 +96,14 @@ gap::generator<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::in(cons
   }
 }
 
+std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(const Reference &r) {
+  return PragmaClangRelroSectionAttr::from(r.as_attribute());
+}
+
+std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(const TokenContext &t) {
+  return PragmaClangRelroSectionAttr::from(t.as_attribute());
+}
+
 std::string_view PragmaClangRelroSectionAttr::name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

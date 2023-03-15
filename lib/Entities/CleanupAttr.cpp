@@ -97,6 +97,14 @@ gap::generator<CleanupAttr> CleanupAttr::in(const File &file) {
   }
 }
 
+std::optional<CleanupAttr> CleanupAttr::from(const Reference &r) {
+  return CleanupAttr::from(r.as_attribute());
+}
+
+std::optional<CleanupAttr> CleanupAttr::from(const TokenContext &t) {
+  return CleanupAttr::from(t.as_attribute());
+}
+
 FunctionDecl CleanupAttr::function_declaration(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();

@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TagTypeKind.h"
 #include "TypeDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXRecordDecl;
 class ClassTemplatePartialSpecializationDecl;
 class ClassTemplateSpecializationDecl;
@@ -74,13 +63,8 @@ class TagDecl : public TypeDecl {
     }
   }
 
-  inline static std::optional<TagDecl> from(const Reference &r) {
-    return TagDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<TagDecl> from(const TokenContext &t) {
-    return TagDecl::from(t.as_declaration());
-  }
+  static std::optional<TagDecl> from(const Reference &r);
+  static std::optional<TagDecl> from(const TokenContext &t);
 
   TokenRange brace_range(void) const;
   Token first_inner_token(void) const;

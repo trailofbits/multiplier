@@ -8,8 +8,6 @@
 
 #include <multiplier/Entities/NoMips16AttrSpelling.h>
 
-
-#include "../API.h"
 namespace mx {
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 #pragma GCC diagnostic push

@@ -147,6 +147,14 @@ gap::generator<PredefinedExpr> PredefinedExpr::in(const File &file) {
   }
 }
 
+std::optional<PredefinedExpr> PredefinedExpr::from(const Reference &r) {
+  return PredefinedExpr::from(r.as_statement());
+}
+
+std::optional<PredefinedExpr> PredefinedExpr::from(const TokenContext &t) {
+  return PredefinedExpr::from(t.as_statement());
+}
+
 StringLiteral PredefinedExpr::function_name(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

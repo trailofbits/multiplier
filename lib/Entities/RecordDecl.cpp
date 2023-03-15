@@ -169,6 +169,14 @@ gap::generator<RecordDecl> RecordDecl::in(const File &file) {
   }
 }
 
+std::optional<RecordDecl> RecordDecl::from(const Reference &r) {
+  return RecordDecl::from(r.as_declaration());
+}
+
+std::optional<RecordDecl> RecordDecl::from(const TokenContext &t) {
+  return RecordDecl::from(t.as_declaration());
+}
+
 bool RecordDecl::can_pass_in_registers(void) const {
   return impl->reader.getVal100();
 }

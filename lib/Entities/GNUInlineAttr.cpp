@@ -96,6 +96,14 @@ gap::generator<GNUInlineAttr> GNUInlineAttr::in(const File &file) {
   }
 }
 
+std::optional<GNUInlineAttr> GNUInlineAttr::from(const Reference &r) {
+  return GNUInlineAttr::from(r.as_attribute());
+}
+
+std::optional<GNUInlineAttr> GNUInlineAttr::from(const TokenContext &t) {
+  return GNUInlineAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

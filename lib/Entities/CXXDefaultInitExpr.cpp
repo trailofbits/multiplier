@@ -147,6 +147,14 @@ gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::in(const File &file) {
   }
 }
 
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Reference &r) {
+  return CXXDefaultInitExpr::from(r.as_statement());
+}
+
+std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const TokenContext &t) {
+  return CXXDefaultInitExpr::from(t.as_statement());
+}
+
 std::optional<Expr> CXXDefaultInitExpr::expression(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal38();

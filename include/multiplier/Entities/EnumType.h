@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TagType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class EnumType;
 class TagType;
 class Token;
@@ -56,13 +45,8 @@ class EnumType : public TagType {
     }
   }
 
-  inline static std::optional<EnumType> from(const Reference &r) {
-    return EnumType::from(r.as_type());
-  }
-
-  inline static std::optional<EnumType> from(const TokenContext &t) {
-    return EnumType::from(t.as_type());
-  }
+  static std::optional<EnumType> from(const Reference &r);
+  static std::optional<EnumType> from(const TokenContext &t);
 
   Type desugar(void) const;
   bool is_sugared(void) const;

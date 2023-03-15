@@ -96,6 +96,14 @@ gap::generator<TypeVisibilityAttr> TypeVisibilityAttr::in(const File &file) {
   }
 }
 
+std::optional<TypeVisibilityAttr> TypeVisibilityAttr::from(const Reference &r) {
+  return TypeVisibilityAttr::from(r.as_attribute());
+}
+
+std::optional<TypeVisibilityAttr> TypeVisibilityAttr::from(const TokenContext &t) {
+  return TypeVisibilityAttr::from(t.as_attribute());
+}
+
 TypeVisibilityAttrVisibilityType TypeVisibilityAttr::visibility(void) const {
   return static_cast<TypeVisibilityAttrVisibilityType>(impl->reader.getVal10());
 }

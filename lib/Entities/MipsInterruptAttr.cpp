@@ -96,6 +96,14 @@ gap::generator<MipsInterruptAttr> MipsInterruptAttr::in(const File &file) {
   }
 }
 
+std::optional<MipsInterruptAttr> MipsInterruptAttr::from(const Reference &r) {
+  return MipsInterruptAttr::from(r.as_attribute());
+}
+
+std::optional<MipsInterruptAttr> MipsInterruptAttr::from(const TokenContext &t) {
+  return MipsInterruptAttr::from(t.as_attribute());
+}
+
 MipsInterruptAttrInterruptType MipsInterruptAttr::interrupt(void) const {
   return static_cast<MipsInterruptAttrInterruptType>(impl->reader.getVal10());
 }

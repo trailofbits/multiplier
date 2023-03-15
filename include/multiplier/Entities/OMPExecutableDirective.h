@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CapturedStmt;
 class Decl;
 class OMPAtomicDirective;
@@ -131,13 +120,8 @@ class OMPExecutableDirective : public Stmt {
     }
   }
 
-  inline static std::optional<OMPExecutableDirective> from(const Reference &r) {
-    return OMPExecutableDirective::from(r.as_statement());
-  }
-
-  inline static std::optional<OMPExecutableDirective> from(const TokenContext &t) {
-    return OMPExecutableDirective::from(t.as_statement());
-  }
+  static std::optional<OMPExecutableDirective> from(const Reference &r);
+  static std::optional<OMPExecutableDirective> from(const TokenContext &t);
 
   Stmt associated_statement(void) const;
   CapturedStmt innermost_captured_statement(void) const;

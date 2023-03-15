@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "FunctionDecl.h"
 #include "RefQualifierKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConstructorDecl;
 class CXXConversionDecl;
 class CXXDestructorDecl;
@@ -78,13 +67,8 @@ class CXXMethodDecl : public FunctionDecl {
     }
   }
 
-  inline static std::optional<CXXMethodDecl> from(const Reference &r) {
-    return CXXMethodDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXMethodDecl> from(const TokenContext &t) {
-    return CXXMethodDecl::from(t.as_declaration());
-  }
+  static std::optional<CXXMethodDecl> from(const Reference &r);
+  static std::optional<CXXMethodDecl> from(const TokenContext &t);
 
   RefQualifierKind reference_qualifier(void) const;
   std::optional<Type> this_object_type(void) const;

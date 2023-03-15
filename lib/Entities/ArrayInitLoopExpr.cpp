@@ -147,6 +147,14 @@ gap::generator<ArrayInitLoopExpr> ArrayInitLoopExpr::in(const File &file) {
   }
 }
 
+std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const Reference &r) {
+  return ArrayInitLoopExpr::from(r.as_statement());
+}
+
+std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const TokenContext &t) {
+  return ArrayInitLoopExpr::from(t.as_statement());
+}
+
 OpaqueValueExpr ArrayInitLoopExpr::common_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

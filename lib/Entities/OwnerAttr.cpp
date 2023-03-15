@@ -97,6 +97,14 @@ gap::generator<OwnerAttr> OwnerAttr::in(const File &file) {
   }
 }
 
+std::optional<OwnerAttr> OwnerAttr::from(const Reference &r) {
+  return OwnerAttr::from(r.as_attribute());
+}
+
+std::optional<OwnerAttr> OwnerAttr::from(const TokenContext &t) {
+  return OwnerAttr::from(t.as_attribute());
+}
+
 Type OwnerAttr::deref_type(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Type(impl->ep->TypeFor(impl->ep, eid));

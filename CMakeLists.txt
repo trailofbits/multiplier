@@ -78,7 +78,7 @@ elseif(PLATFORM_LINUX)
 endif()
 
 if(MX_ENABLE_VAST)
-  find_package(vast CONFIG REQUIRED)
+  find_package(VAST CONFIG REQUIRED)
   find_package(MLIR CONFIG REQUIRED)
 endif(MX_ENABLE_VAST)
 

@@ -96,6 +96,14 @@ gap::generator<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::in(
   }
 }
 
+std::optional<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::from(const Reference &r) {
+  return ObjCInertUnsafeUnretainedAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::from(const TokenContext &t) {
+  return ObjCInertUnsafeUnretainedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -96,6 +96,14 @@ gap::generator<OpenCLPrivateAddressSpaceAttr> OpenCLPrivateAddressSpaceAttr::in(
   }
 }
 
+std::optional<OpenCLPrivateAddressSpaceAttr> OpenCLPrivateAddressSpaceAttr::from(const Reference &r) {
+  return OpenCLPrivateAddressSpaceAttr::from(r.as_attribute());
+}
+
+std::optional<OpenCLPrivateAddressSpaceAttr> OpenCLPrivateAddressSpaceAttr::from(const TokenContext &t) {
+  return OpenCLPrivateAddressSpaceAttr::from(t.as_attribute());
+}
+
 OpenCLPrivateAddressSpaceAttrSpelling OpenCLPrivateAddressSpaceAttr::semantic_spelling(void) const {
   return static_cast<OpenCLPrivateAddressSpaceAttrSpelling>(impl->reader.getVal10());
 }

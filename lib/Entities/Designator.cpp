@@ -9,7 +9,10 @@
 #include <multiplier/Entities/Designator.h>
 
 #include <multiplier/Entities/FieldDecl.h>
+#include <multiplier/Entities/File.h>
+#include <multiplier/Entities/Fragment.h>
 #include <multiplier/Entities/Reference.h>
+#include <multiplier/Entities/Token.h>
 
 #include "../API.h"
 #include "../File.h"
@@ -31,6 +34,14 @@ std::shared_ptr<EntityProvider> Designator::entity_provider_of(const Fragment &f
 
 std::shared_ptr<EntityProvider> Designator::entity_provider_of(const File &file_) {
   return file_.impl->ep;
+}
+
+std::optional<Designator> Designator::from(const Reference &r) {
+  return r.as_designator();
+}
+
+std::optional<Designator> Designator::from(const TokenContext &t) {
+  return t.as_designator();
 }
 
 bool Designator::is_field_designator(void) const {

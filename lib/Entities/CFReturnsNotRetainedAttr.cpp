@@ -96,6 +96,14 @@ gap::generator<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::in(const File
   }
 }
 
+std::optional<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::from(const Reference &r) {
+  return CFReturnsNotRetainedAttr::from(r.as_attribute());
+}
+
+std::optional<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::from(const TokenContext &t) {
+  return CFReturnsNotRetainedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -145,6 +145,14 @@ gap::generator<OMPTargetDirective> OMPTargetDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPTargetDirective> OMPTargetDirective::from(const Reference &r) {
+  return OMPTargetDirective::from(r.as_statement());
+}
+
+std::optional<OMPTargetDirective> OMPTargetDirective::from(const TokenContext &t) {
+  return OMPTargetDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

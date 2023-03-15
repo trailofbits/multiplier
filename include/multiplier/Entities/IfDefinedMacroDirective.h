@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ConditionalMacroDirective.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConditionalMacroDirective;
 class IfDefinedMacroDirective;
 class Macro;
@@ -62,13 +51,8 @@ class IfDefinedMacroDirective : public ConditionalMacroDirective {
     }
   }
 
-  inline static std::optional<IfDefinedMacroDirective> from(const Reference &r) {
-    return IfDefinedMacroDirective::from(r.as_macro());
-  }
-
-  inline static std::optional<IfDefinedMacroDirective> from(const TokenContext &t) {
-    return IfDefinedMacroDirective::from(t.as_macro());
-  }
+  static std::optional<IfDefinedMacroDirective> from(const Reference &r);
+  static std::optional<IfDefinedMacroDirective> from(const TokenContext &t);
 
 };
 

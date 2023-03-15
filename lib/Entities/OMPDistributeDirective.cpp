@@ -147,6 +147,14 @@ gap::generator<OMPDistributeDirective> OMPDistributeDirective::in(const File &fi
   }
 }
 
+std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const Reference &r) {
+  return OMPDistributeDirective::from(r.as_statement());
+}
+
+std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const TokenContext &t) {
+  return OMPDistributeDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

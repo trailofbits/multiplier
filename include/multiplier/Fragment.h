@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "File.h"
-#include "Types.h"
 
 namespace mx {
 
@@ -81,8 +80,11 @@ class Fragment {
 
   // Return the fragment containing a query match.
   static Fragment containing(const WeggliQueryMatch &);
-
   static Fragment containing(const RegexQueryMatch &);
+
+  inline static Fragment containing(const Fragment &fragment) {
+    return fragment;
+  }
 
   static Fragment containing(const Decl &);
   static Fragment containing(const Stmt &);
@@ -94,6 +96,7 @@ class Fragment {
   static Fragment containing(const Designator &);
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const Macro &);
+  static std::optional<Fragment> containing(const VariantEntity &);
 
   inline static constexpr EntityCategory entity_category(void) {
     return EntityCategory::FRAGMENT;

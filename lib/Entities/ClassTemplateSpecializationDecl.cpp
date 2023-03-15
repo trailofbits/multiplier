@@ -167,6 +167,14 @@ gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl:
   }
 }
 
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const Reference &r) {
+  return ClassTemplateSpecializationDecl::from(r.as_declaration());
+}
+
+std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const TokenContext &t) {
+  return ClassTemplateSpecializationDecl::from(t.as_declaration());
+}
+
 Token ClassTemplateSpecializationDecl::extern_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal127());
 }

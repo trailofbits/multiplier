@@ -8,25 +8,14 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "DeclObjCDeclQualifier.h"
 #include "NamedDecl.h"
 #include "ObjCMethodDeclImplementationControl.h"
 #include "ObjCMethodFamily.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class ImplicitParamDecl;
 class NamedDecl;
@@ -76,13 +65,8 @@ class ObjCMethodDecl : public NamedDecl {
     }
   }
 
-  inline static std::optional<ObjCMethodDecl> from(const Reference &r) {
-    return ObjCMethodDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCMethodDecl> from(const TokenContext &t) {
-    return ObjCMethodDecl::from(t.as_declaration());
-  }
+  static std::optional<ObjCMethodDecl> from(const Reference &r);
+  static std::optional<ObjCMethodDecl> from(const TokenContext &t);
 
   bool defined_in_ns_object(void) const;
   ObjCPropertyDecl find_property_declaration(void) const;

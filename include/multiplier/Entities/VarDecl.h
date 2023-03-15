@@ -8,19 +8,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "DeclaratorDecl.h"
 #include "LanguageLinkage.h"
 #include "StorageClass.h"
@@ -31,6 +18,8 @@
 #include "VarDeclTLSKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class DecompositionDecl;
@@ -86,13 +75,8 @@ class VarDecl : public DeclaratorDecl {
     }
   }
 
-  inline static std::optional<VarDecl> from(const Reference &r) {
-    return VarDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<VarDecl> from(const TokenContext &t) {
-    return VarDecl::from(t.as_declaration());
-  }
+  static std::optional<VarDecl> from(const Reference &r);
+  static std::optional<VarDecl> from(const TokenContext &t);
 
   std::optional<VarDecl> acting_definition(void) const;
   std::optional<VarTemplateDecl> described_variable_template(void) const;

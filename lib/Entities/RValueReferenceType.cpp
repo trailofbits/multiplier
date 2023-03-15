@@ -96,6 +96,14 @@ gap::generator<RValueReferenceType> RValueReferenceType::in(const File &file) {
   }
 }
 
+std::optional<RValueReferenceType> RValueReferenceType::from(const Reference &r) {
+  return RValueReferenceType::from(r.as_type());
+}
+
+std::optional<RValueReferenceType> RValueReferenceType::from(const TokenContext &t) {
+  return RValueReferenceType::from(t.as_type());
+}
+
 Type RValueReferenceType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));

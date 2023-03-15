@@ -147,6 +147,14 @@ gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const Reference &r) {
+  return ObjCBoxedExpr::from(r.as_statement());
+}
+
+std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const TokenContext &t) {
+  return ObjCBoxedExpr::from(t.as_statement());
+}
+
 Token ObjCBoxedExpr::at_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

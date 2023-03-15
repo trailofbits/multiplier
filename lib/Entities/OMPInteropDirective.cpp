@@ -145,6 +145,14 @@ gap::generator<OMPInteropDirective> OMPInteropDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPInteropDirective> OMPInteropDirective::from(const Reference &r) {
+  return OMPInteropDirective::from(r.as_statement());
+}
+
+std::optional<OMPInteropDirective> OMPInteropDirective::from(const TokenContext &t) {
+  return OMPInteropDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

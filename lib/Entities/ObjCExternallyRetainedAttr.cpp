@@ -96,6 +96,14 @@ gap::generator<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::in(const 
   }
 }
 
+std::optional<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::from(const Reference &r) {
+  return ObjCExternallyRetainedAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::from(const TokenContext &t) {
+  return ObjCExternallyRetainedAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

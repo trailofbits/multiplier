@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "DeducedType.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DeducedTemplateSpecializationType;
 class DeducedType;
 class Token;
@@ -56,13 +45,8 @@ class DeducedTemplateSpecializationType : public DeducedType {
     }
   }
 
-  inline static std::optional<DeducedTemplateSpecializationType> from(const Reference &r) {
-    return DeducedTemplateSpecializationType::from(r.as_type());
-  }
-
-  inline static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &t) {
-    return DeducedTemplateSpecializationType::from(t.as_type());
-  }
+  static std::optional<DeducedTemplateSpecializationType> from(const Reference &r);
+  static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &t);
 
 };
 

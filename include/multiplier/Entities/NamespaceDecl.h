@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "NamedDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class NamespaceDecl;
@@ -67,13 +56,8 @@ class NamespaceDecl : public NamedDecl {
     }
   }
 
-  inline static std::optional<NamespaceDecl> from(const Reference &r) {
-    return NamespaceDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<NamespaceDecl> from(const TokenContext &t) {
-    return NamespaceDecl::from(t.as_declaration());
-  }
+  static std::optional<NamespaceDecl> from(const Reference &r);
+  static std::optional<NamespaceDecl> from(const TokenContext &t);
 
   gap::generator<Decl> declarations_in_context(void) const &;
 };

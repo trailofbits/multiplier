@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "BinaryOperatorKind.h"
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BinaryOperator;
 class CompoundAssignOperator;
 class Decl;
@@ -70,13 +59,8 @@ class BinaryOperator : public Expr {
     }
   }
 
-  inline static std::optional<BinaryOperator> from(const Reference &r) {
-    return BinaryOperator::from(r.as_statement());
-  }
-
-  inline static std::optional<BinaryOperator> from(const TokenContext &t) {
-    return BinaryOperator::from(t.as_statement());
-  }
+  static std::optional<BinaryOperator> from(const Reference &r);
+  static std::optional<BinaryOperator> from(const TokenContext &t);
 
   Expr lhs(void) const;
   BinaryOperatorKind opcode(void) const;

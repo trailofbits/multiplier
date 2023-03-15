@@ -96,6 +96,14 @@ gap::generator<LTOVisibilityPublicAttr> LTOVisibilityPublicAttr::in(const File &
   }
 }
 
+std::optional<LTOVisibilityPublicAttr> LTOVisibilityPublicAttr::from(const Reference &r) {
+  return LTOVisibilityPublicAttr::from(r.as_attribute());
+}
+
+std::optional<LTOVisibilityPublicAttr> LTOVisibilityPublicAttr::from(const TokenContext &t) {
+  return LTOVisibilityPublicAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

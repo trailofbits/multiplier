@@ -146,6 +146,14 @@ gap::generator<ImplicitValueInitExpr> ImplicitValueInitExpr::in(const File &file
   }
 }
 
+std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const Reference &r) {
+  return ImplicitValueInitExpr::from(r.as_statement());
+}
+
+std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const TokenContext &t) {
+  return ImplicitValueInitExpr::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

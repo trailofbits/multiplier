@@ -293,6 +293,11 @@ enum class TokenKind : unsigned short {
   KEYWORD___ARRAY_EXTENT,
   KEYWORD___PRIVATE_EXTERN__,
   KEYWORD___MODULE_PRIVATE__,
+  KEYWORD___BUILTIN_PTRAUTH_TYPE_DISCRIMINATOR,
+  KEYWORD___BUILTIN_XNU_TYPE_SIGNATURE,
+  KEYWORD___BUILTIN_XNU_TYPE_SUMMARY,
+  KEYWORD___BUILTIN_TMO_TYPE_METADATA,
+  KEYWORD___BUILTIN_XNU_TYPES_COMPATIBLE,
   KEYWORD___DECLSPEC,
   KEYWORD___CDECL,
   KEYWORD___STDCALL,
@@ -466,7 +471,7 @@ inline static const char *EnumerationName(TokenKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenKind) {
-  return 447;
+  return 452;
 }
 
 const char *EnumeratorName(TokenKind);

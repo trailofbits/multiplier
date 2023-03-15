@@ -146,6 +146,14 @@ gap::generator<ObjCSelectorExpr> ObjCSelectorExpr::in(const File &file) {
   }
 }
 
+std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const Reference &r) {
+  return ObjCSelectorExpr::from(r.as_statement());
+}
+
+std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const TokenContext &t) {
+  return ObjCSelectorExpr::from(t.as_statement());
+}
+
 Token ObjCSelectorExpr::at_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

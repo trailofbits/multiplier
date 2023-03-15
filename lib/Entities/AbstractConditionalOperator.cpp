@@ -150,6 +150,14 @@ gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::in(cons
   }
 }
 
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const Reference &r) {
+  return AbstractConditionalOperator::from(r.as_statement());
+}
+
+std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const TokenContext &t) {
+  return AbstractConditionalOperator::from(t.as_statement());
+}
+
 Token AbstractConditionalOperator::colon_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

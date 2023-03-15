@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "NonOdrUseReason.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclRefExpr;
 class Expr;
@@ -71,13 +60,8 @@ class DeclRefExpr : public Expr {
     }
   }
 
-  inline static std::optional<DeclRefExpr> from(const Reference &r) {
-    return DeclRefExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<DeclRefExpr> from(const TokenContext &t) {
-    return DeclRefExpr::from(t.as_statement());
-  }
+  static std::optional<DeclRefExpr> from(const Reference &r);
+  static std::optional<DeclRefExpr> from(const TokenContext &t);
 
   ValueDecl declaration(void) const;
   NamedDecl found_declaration(void) const;

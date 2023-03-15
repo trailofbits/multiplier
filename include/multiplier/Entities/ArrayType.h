@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ArrayTypeArraySizeModifier.h"
 #include "Type.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ArrayType;
 class ConstantArrayType;
 class DependentSizedArrayType;
@@ -55,13 +44,8 @@ class ArrayType : public Type {
     }
   }
 
-  inline static std::optional<ArrayType> from(const Reference &r) {
-    return ArrayType::from(r.as_type());
-  }
-
-  inline static std::optional<ArrayType> from(const TokenContext &t) {
-    return ArrayType::from(t.as_type());
-  }
+  static std::optional<ArrayType> from(const Reference &r);
+  static std::optional<ArrayType> from(const TokenContext &t);
 
   Type element_type(void) const;
   ArrayTypeArraySizeModifier size_modifier(void) const;

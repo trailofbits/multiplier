@@ -96,6 +96,14 @@ gap::generator<PreserveAllAttr> PreserveAllAttr::in(const File &file) {
   }
 }
 
+std::optional<PreserveAllAttr> PreserveAllAttr::from(const Reference &r) {
+  return PreserveAllAttr::from(r.as_attribute());
+}
+
+std::optional<PreserveAllAttr> PreserveAllAttr::from(const TokenContext &t) {
+  return PreserveAllAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

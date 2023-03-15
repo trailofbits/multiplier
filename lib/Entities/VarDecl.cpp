@@ -179,6 +179,14 @@ gap::generator<VarDecl> VarDecl::in(const File &file) {
   }
 }
 
+std::optional<VarDecl> VarDecl::from(const Reference &r) {
+  return VarDecl::from(r.as_declaration());
+}
+
+std::optional<VarDecl> VarDecl::from(const TokenContext &t) {
+  return VarDecl::from(t.as_declaration());
+}
+
 std::optional<VarDecl> VarDecl::acting_definition(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal73();

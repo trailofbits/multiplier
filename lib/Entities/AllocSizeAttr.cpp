@@ -96,6 +96,14 @@ gap::generator<AllocSizeAttr> AllocSizeAttr::in(const File &file) {
   }
 }
 
+std::optional<AllocSizeAttr> AllocSizeAttr::from(const Reference &r) {
+  return AllocSizeAttr::from(r.as_attribute());
+}
+
+std::optional<AllocSizeAttr> AllocSizeAttr::from(const TokenContext &t) {
+  return AllocSizeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

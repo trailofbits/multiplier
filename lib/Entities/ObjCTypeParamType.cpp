@@ -96,6 +96,14 @@ gap::generator<ObjCTypeParamType> ObjCTypeParamType::in(const File &file) {
   }
 }
 
+std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const Reference &r) {
+  return ObjCTypeParamType::from(r.as_type());
+}
+
+std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const TokenContext &t) {
+  return ObjCTypeParamType::from(t.as_type());
+}
+
 Type ObjCTypeParamType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

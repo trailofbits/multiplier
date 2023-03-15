@@ -146,6 +146,14 @@ gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const File &
   }
 }
 
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Reference &r) {
+  return MSPropertySubscriptExpr::from(r.as_statement());
+}
+
+std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const TokenContext &t) {
+  return MSPropertySubscriptExpr::from(t.as_statement());
+}
+
 Expr MSPropertySubscriptExpr::base(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

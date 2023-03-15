@@ -147,6 +147,14 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::in(const File &file) {
   }
 }
 
+std::optional<TypeTraitExpr> TypeTraitExpr::from(const Reference &r) {
+  return TypeTraitExpr::from(r.as_statement());
+}
+
+std::optional<TypeTraitExpr> TypeTraitExpr::from(const TokenContext &t) {
+  return TypeTraitExpr::from(t.as_statement());
+}
+
 TypeTrait TypeTraitExpr::trait(void) const {
   return static_cast<TypeTrait>(impl->reader.getVal93());
 }

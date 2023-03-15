@@ -146,6 +146,14 @@ gap::generator<ExpressionTraitExpr> ExpressionTraitExpr::in(const File &file) {
   }
 }
 
+std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const Reference &r) {
+  return ExpressionTraitExpr::from(r.as_statement());
+}
+
+std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const TokenContext &t) {
+  return ExpressionTraitExpr::from(t.as_statement());
+}
+
 Expr ExpressionTraitExpr::queried_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

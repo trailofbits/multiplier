@@ -147,6 +147,14 @@ gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::in(const File &file) {
   }
 }
 
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Reference &r) {
+  return ArrayTypeTraitExpr::from(r.as_statement());
+}
+
+std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const TokenContext &t) {
+  return ArrayTypeTraitExpr::from(t.as_statement());
+}
+
 Expr ArrayTypeTraitExpr::dimension_expression(void) const {
   RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

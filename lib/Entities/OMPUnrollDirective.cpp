@@ -147,6 +147,14 @@ gap::generator<OMPUnrollDirective> OMPUnrollDirective::in(const File &file) {
   }
 }
 
+std::optional<OMPUnrollDirective> OMPUnrollDirective::from(const Reference &r) {
+  return OMPUnrollDirective::from(r.as_statement());
+}
+
+std::optional<OMPUnrollDirective> OMPUnrollDirective::from(const TokenContext &t) {
+  return OMPUnrollDirective::from(t.as_statement());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

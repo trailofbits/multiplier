@@ -146,6 +146,14 @@ gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::in(const Fi
   }
 }
 
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const Reference &r) {
+  return DependentScopeDeclRefExpr::from(r.as_statement());
+}
+
+std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const TokenContext &t) {
+  return DependentScopeDeclRefExpr::from(t.as_statement());
+}
+
 Token DependentScopeDeclRefExpr::l_angle_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

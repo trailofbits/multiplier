@@ -95,6 +95,14 @@ gap::generator<BuiltinType> BuiltinType::in(const File &file) {
   }
 }
 
+std::optional<BuiltinType> BuiltinType::from(const Reference &r) {
+  return BuiltinType::from(r.as_type());
+}
+
+std::optional<BuiltinType> BuiltinType::from(const TokenContext &t) {
+  return BuiltinType::from(t.as_type());
+}
+
 Type BuiltinType::desugar(void) const {
   RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));

@@ -108,6 +108,10 @@ class EntityProvider {
   // in the returned list of fetched files will be `start_at`.
   virtual FilePathMap ListFiles(const Ptr &) = 0;
 
+  // Get the list of paths associated with a given file id.
+  virtual gap::generator<std::filesystem::path> ListPathsForFile(
+      const Ptr &, PackedFileId id) = 0;
+
   // Download a list of fragment IDs contained in a specific file.
   virtual FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) = 0;
 

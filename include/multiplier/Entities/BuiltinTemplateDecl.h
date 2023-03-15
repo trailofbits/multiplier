@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TemplateDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BuiltinTemplateDecl;
 class Decl;
 class NamedDecl;
@@ -69,13 +58,8 @@ class BuiltinTemplateDecl : public TemplateDecl {
     }
   }
 
-  inline static std::optional<BuiltinTemplateDecl> from(const Reference &r) {
-    return BuiltinTemplateDecl::from(r.as_declaration());
-  }
-
-  inline static std::optional<BuiltinTemplateDecl> from(const TokenContext &t) {
-    return BuiltinTemplateDecl::from(t.as_declaration());
-  }
+  static std::optional<BuiltinTemplateDecl> from(const Reference &r);
+  static std::optional<BuiltinTemplateDecl> from(const TokenContext &t);
 
 };
 

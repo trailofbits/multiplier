@@ -157,6 +157,14 @@ gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::in(cons
   }
 }
 
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const Reference &r) {
+  return UnresolvedUsingIfExistsDecl::from(r.as_declaration());
+}
+
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(const TokenContext &t) {
+  return UnresolvedUsingIfExistsDecl::from(t.as_declaration());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

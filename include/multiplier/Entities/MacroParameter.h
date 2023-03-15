@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Macro.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Macro;
 class MacroParameter;
 class Token;
@@ -59,13 +48,8 @@ class MacroParameter : public Macro {
     }
   }
 
-  inline static std::optional<MacroParameter> from(const Reference &r) {
-    return MacroParameter::from(r.as_macro());
-  }
-
-  inline static std::optional<MacroParameter> from(const TokenContext &t) {
-    return MacroParameter::from(t.as_macro());
-  }
+  static std::optional<MacroParameter> from(const Reference &r);
+  static std::optional<MacroParameter> from(const TokenContext &t);
 
   Token variadic_dots(void) const;
   Token name(void) const;

@@ -147,6 +147,14 @@ gap::generator<SEHTryStmt> SEHTryStmt::in(const File &file) {
   }
 }
 
+std::optional<SEHTryStmt> SEHTryStmt::from(const Reference &r) {
+  return SEHTryStmt::from(r.as_statement());
+}
+
+std::optional<SEHTryStmt> SEHTryStmt::from(const TokenContext &t) {
+  return SEHTryStmt::from(t.as_statement());
+}
+
 SEHExceptStmt SEHTryStmt::except_handler(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return SEHExceptStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

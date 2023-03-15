@@ -96,6 +96,14 @@ gap::generator<SwiftBridgeAttr> SwiftBridgeAttr::in(const File &file) {
   }
 }
 
+std::optional<SwiftBridgeAttr> SwiftBridgeAttr::from(const Reference &r) {
+  return SwiftBridgeAttr::from(r.as_attribute());
+}
+
+std::optional<SwiftBridgeAttr> SwiftBridgeAttr::from(const TokenContext &t) {
+  return SwiftBridgeAttr::from(t.as_attribute());
+}
+
 std::string_view SwiftBridgeAttr::swift_type(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

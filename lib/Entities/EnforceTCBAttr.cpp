@@ -96,6 +96,14 @@ gap::generator<EnforceTCBAttr> EnforceTCBAttr::in(const File &file) {
   }
 }
 
+std::optional<EnforceTCBAttr> EnforceTCBAttr::from(const Reference &r) {
+  return EnforceTCBAttr::from(r.as_attribute());
+}
+
+std::optional<EnforceTCBAttr> EnforceTCBAttr::from(const TokenContext &t) {
+  return EnforceTCBAttr::from(t.as_attribute());
+}
+
 std::string_view EnforceTCBAttr::tcb_name(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

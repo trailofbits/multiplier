@@ -96,6 +96,14 @@ gap::generator<AlignValueAttr> AlignValueAttr::in(const File &file) {
   }
 }
 
+std::optional<AlignValueAttr> AlignValueAttr::from(const Reference &r) {
+  return AlignValueAttr::from(r.as_attribute());
+}
+
+std::optional<AlignValueAttr> AlignValueAttr::from(const TokenContext &t) {
+  return AlignValueAttr::from(t.as_attribute());
+}
+
 Expr AlignValueAttr::alignment(void) const {
   RawEntityId eid = impl->reader.getVal8();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

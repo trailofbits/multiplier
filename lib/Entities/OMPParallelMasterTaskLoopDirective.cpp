@@ -147,6 +147,14 @@ gap::generator<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDire
   }
 }
 
+std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::from(const Reference &r) {
+  return OMPParallelMasterTaskLoopDirective::from(r.as_statement());
+}
+
+std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::from(const TokenContext &t) {
+  return OMPParallelMasterTaskLoopDirective::from(t.as_statement());
+}
+
 bool OMPParallelMasterTaskLoopDirective::has_cancel(void) const {
   return impl->reader.getVal23();
 }

@@ -148,6 +148,14 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::in(const File
   }
 }
 
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Reference &r) {
+  return MaterializeTemporaryExpr::from(r.as_statement());
+}
+
+std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const TokenContext &t) {
+  return MaterializeTemporaryExpr::from(t.as_statement());
+}
+
 std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal38();

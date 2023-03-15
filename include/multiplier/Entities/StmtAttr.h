@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Attr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class FallThroughAttr;
 class LikelyAttr;
@@ -56,13 +45,8 @@ class StmtAttr : public Attr {
     }
   }
 
-  inline static std::optional<StmtAttr> from(const Reference &r) {
-    return StmtAttr::from(r.as_attribute());
-  }
-
-  inline static std::optional<StmtAttr> from(const TokenContext &t) {
-    return StmtAttr::from(t.as_attribute());
-  }
+  static std::optional<StmtAttr> from(const Reference &r);
+  static std::optional<StmtAttr> from(const TokenContext &t);
 
 };
 

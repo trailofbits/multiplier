@@ -146,6 +146,14 @@ gap::generator<GNUNullExpr> GNUNullExpr::in(const File &file) {
   }
 }
 
+std::optional<GNUNullExpr> GNUNullExpr::from(const Reference &r) {
+  return GNUNullExpr::from(r.as_statement());
+}
+
+std::optional<GNUNullExpr> GNUNullExpr::from(const TokenContext &t) {
+  return GNUNullExpr::from(t.as_statement());
+}
+
 Token GNUNullExpr::token_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }

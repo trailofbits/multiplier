@@ -96,6 +96,14 @@ gap::generator<MicroMipsAttr> MicroMipsAttr::in(const File &file) {
   }
 }
 
+std::optional<MicroMipsAttr> MicroMipsAttr::from(const Reference &r) {
+  return MicroMipsAttr::from(r.as_attribute());
+}
+
+std::optional<MicroMipsAttr> MicroMipsAttr::from(const TokenContext &t) {
+  return MicroMipsAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

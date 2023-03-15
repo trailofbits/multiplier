@@ -97,6 +97,14 @@ gap::generator<NoMergeAttr> NoMergeAttr::in(const File &file) {
   }
 }
 
+std::optional<NoMergeAttr> NoMergeAttr::from(const Reference &r) {
+  return NoMergeAttr::from(r.as_attribute());
+}
+
+std::optional<NoMergeAttr> NoMergeAttr::from(const TokenContext &t) {
+  return NoMergeAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CompoundStmt;
 class Decl;
 class SEHExceptStmt;
@@ -67,13 +56,8 @@ class SEHTryStmt : public Stmt {
     }
   }
 
-  inline static std::optional<SEHTryStmt> from(const Reference &r) {
-    return SEHTryStmt::from(r.as_statement());
-  }
-
-  inline static std::optional<SEHTryStmt> from(const TokenContext &t) {
-    return SEHTryStmt::from(t.as_statement());
-  }
+  static std::optional<SEHTryStmt> from(const Reference &r);
+  static std::optional<SEHTryStmt> from(const TokenContext &t);
 
   SEHExceptStmt except_handler(void) const;
   SEHFinallyStmt finally_handler(void) const;

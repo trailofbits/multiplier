@@ -95,6 +95,14 @@ gap::generator<CalledOnceAttr> CalledOnceAttr::in(const File &file) {
   }
 }
 
+std::optional<CalledOnceAttr> CalledOnceAttr::from(const Reference &r) {
+  return CalledOnceAttr::from(r.as_attribute());
+}
+
+std::optional<CalledOnceAttr> CalledOnceAttr::from(const TokenContext &t) {
+  return CalledOnceAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

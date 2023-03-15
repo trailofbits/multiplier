@@ -95,6 +95,14 @@ gap::generator<InitSegAttr> InitSegAttr::in(const File &file) {
   }
 }
 
+std::optional<InitSegAttr> InitSegAttr::from(const Reference &r) {
+  return InitSegAttr::from(r.as_attribute());
+}
+
+std::optional<InitSegAttr> InitSegAttr::from(const TokenContext &t) {
+  return InitSegAttr::from(t.as_attribute());
+}
+
 std::string_view InitSegAttr::section(void) const {
   capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());

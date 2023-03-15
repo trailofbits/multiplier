@@ -8,22 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AddrLabelExpr;
 class Decl;
 class Expr;
@@ -69,13 +58,8 @@ class AddrLabelExpr : public Expr {
     }
   }
 
-  inline static std::optional<AddrLabelExpr> from(const Reference &r) {
-    return AddrLabelExpr::from(r.as_statement());
-  }
-
-  inline static std::optional<AddrLabelExpr> from(const TokenContext &t) {
-    return AddrLabelExpr::from(t.as_statement());
-  }
+  static std::optional<AddrLabelExpr> from(const Reference &r);
+  static std::optional<AddrLabelExpr> from(const TokenContext &t);
 
   Token amp_amp_token(void) const;
   LabelDecl label(void) const;

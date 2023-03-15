@@ -96,6 +96,14 @@ gap::generator<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::in(cons
   }
 }
 
+std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(const Reference &r) {
+  return ObjCReturnsInnerPointerAttr::from(r.as_attribute());
+}
+
+std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(const TokenContext &t) {
+  return ObjCReturnsInnerPointerAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

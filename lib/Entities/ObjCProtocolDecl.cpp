@@ -159,6 +159,14 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::in(const File &file) {
   }
 }
 
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const Reference &r) {
+  return ObjCProtocolDecl::from(r.as_declaration());
+}
+
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const TokenContext &t) {
+  return ObjCProtocolDecl::from(t.as_declaration());
+}
+
 std::string_view ObjCProtocolDecl::obj_c_runtime_name_as_string(void) const {
   capnp::Text::Reader data = impl->reader.getVal69();
   return std::string_view(data.cStr(), data.size());

@@ -133,6 +133,14 @@ gap::generator<InheritableParamAttr> InheritableParamAttr::in(const File &file) 
   }
 }
 
+std::optional<InheritableParamAttr> InheritableParamAttr::from(const Reference &r) {
+  return InheritableParamAttr::from(r.as_attribute());
+}
+
+std::optional<InheritableParamAttr> InheritableParamAttr::from(const TokenContext &t) {
+  return InheritableParamAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

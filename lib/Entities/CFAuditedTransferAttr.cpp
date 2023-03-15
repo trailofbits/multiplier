@@ -96,6 +96,14 @@ gap::generator<CFAuditedTransferAttr> CFAuditedTransferAttr::in(const File &file
   }
 }
 
+std::optional<CFAuditedTransferAttr> CFAuditedTransferAttr::from(const Reference &r) {
+  return CFAuditedTransferAttr::from(r.as_attribute());
+}
+
+std::optional<CFAuditedTransferAttr> CFAuditedTransferAttr::from(const TokenContext &t) {
+  return CFAuditedTransferAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

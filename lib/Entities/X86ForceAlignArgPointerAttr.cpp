@@ -96,6 +96,14 @@ gap::generator<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::in(cons
   }
 }
 
+std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const Reference &r) {
+  return X86ForceAlignArgPointerAttr::from(r.as_attribute());
+}
+
+std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const TokenContext &t) {
+  return X86ForceAlignArgPointerAttr::from(t.as_attribute());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

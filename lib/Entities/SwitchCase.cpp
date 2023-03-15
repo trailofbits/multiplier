@@ -148,6 +148,14 @@ gap::generator<SwitchCase> SwitchCase::in(const File &file) {
   }
 }
 
+std::optional<SwitchCase> SwitchCase::from(const Reference &r) {
+  return SwitchCase::from(r.as_statement());
+}
+
+std::optional<SwitchCase> SwitchCase::from(const TokenContext &t) {
+  return SwitchCase::from(t.as_statement());
+}
+
 Token SwitchCase::colon_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }

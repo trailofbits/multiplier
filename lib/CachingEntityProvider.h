@@ -75,6 +75,10 @@ class CachingEntityProvider final : public EntityProvider {
 
   FilePathMap ListFiles(const Ptr &) final;
 
+  // Get the list of paths associated with a given file id.
+  gap::generator<std::filesystem::path> ListPathsForFile(
+      const Ptr &, PackedFileId id) final;
+
   FragmentIdList ListFragmentsInFile(
       const Ptr &, SpecificEntityId<FileId> id) final;
 

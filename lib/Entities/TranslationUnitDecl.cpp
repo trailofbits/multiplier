@@ -156,6 +156,14 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::in(const File &file) {
   }
 }
 
+std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const Reference &r) {
+  return TranslationUnitDecl::from(r.as_declaration());
+}
+
+std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const TokenContext &t) {
+  return TranslationUnitDecl::from(t.as_declaration());
+}
+
 gap::generator<Decl> TranslationUnitDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
   auto list = impl->reader.getVal47();
