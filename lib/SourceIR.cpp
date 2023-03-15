@@ -83,8 +83,8 @@ static OperationMap Deserialize(mlir::Operation *scope) {
                               MX_DEFINE_ENTITY_FUNCTION)
 #undef MX_DEFINE_ENTITY_FUNCTION
 
-std::shared_ptr<const mlir::Module> SourceIR::module(void) const {
-  return sts::shared_ptr<const mlir::Module>(impl, impl->mod.get());
+  MLIRModulePtr SourceIR::module(void) const {
+  return MLIRModulePtr(impl, impl->mod.get());
 }
 
 VariantEntity SourceIR::entity_for(const mlir::Operation *op) const {

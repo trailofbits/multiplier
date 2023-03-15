@@ -109,6 +109,7 @@ enum class DependencySinkKind {
 class DependencyTrackingSink final : public DependencyTrackingEdge {
  private:
   friend class DependencyAnalysis;
+  friend class DependencyAnalysisImpl;
 
   std::string message_;
   DependencySinkKind kind_;
@@ -140,6 +141,7 @@ class DependencyTrackingSink final : public DependencyTrackingEdge {
 class DependencyTrackingCondition final : public DependencyTrackingEdge {
  private:
   friend class DependencyAnalysis;
+  friend class DependencyAnalysisImpl;
 
   using DependencyTrackingEdge::DependencyTrackingEdge;
 };
@@ -156,6 +158,7 @@ enum class DependencyStepKind {
 class DependencyTrackingStep : public DependencyTrackingEdge {
  private:
   friend class DependencyAnalysis;
+  friend class DependencyAnalysisImpl;
 
   DependencyStepKind kind_;
 

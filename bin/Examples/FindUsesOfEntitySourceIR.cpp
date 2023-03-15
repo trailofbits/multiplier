@@ -45,7 +45,7 @@ void PrintEdge(const mx::SourceIR &ir, const mx::DependencyTrackingEdge &edge) {
   std::string op_string;
   llvm::raw_string_ostream os(op_string);
   auto op = edge.as_operation();
-  const_cast<mlir::Operation*>(op)->print(os);
+  const_cast<mlir::Operation*>(op.get())->print(os);
   std::cout << op_string << std::endl;
   (void)ir;
 }
@@ -148,7 +148,7 @@ extern "C" int main(int argc, char *argv[]) {
   auto range = sourceir.for_entity(entity);
   for (auto iter = range.begin(); iter != range.end(); iter++) {
     auto ir_operation = *iter;
-    for (mx::DependencyTrackingResult res : tracker.dependents(ir_operation.get())) {
+    for (mx::DependencyTrackingResult res : tracker.dependents(ir_operation)) {
       PrintNext(sourceir, tracker, std::move(res), depth + 1);
     }
   }
