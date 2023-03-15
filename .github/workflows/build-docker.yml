@@ -1,7 +1,7 @@
 name: Build Docker
 
 on:
-  workflow_dispatch:
+  pull_request:
   schedule:
     # At 02:00 every day.
     - cron: "0 2 * * *"
