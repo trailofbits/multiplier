@@ -22,6 +22,7 @@
 
 #ifdef MX_ENABLE_SOURCEIR
 #include <llvm/Support/SourceMgr.h>
+#include <mlir/InitAllDialects.h>
 #include <mlir/Parser/Parser.h>
 
 #include <vast/Dialect/Dialects.hpp>
@@ -29,7 +30,6 @@
 #include <vast/Translation/CodeGenBuilder.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
 #include <vast/Dialect/Dialects.hpp>
-
 
 namespace mx {
 namespace {
@@ -51,14 +51,15 @@ static RawEntityId MetaIdFromLocation(mlir::Location loc) {
 // to an entity to operation map.
 static OperationMap Deserialize(mlir::Operation *scope) {
   OperationMap entities;
-  auto result = scope->walk<mlir::WalkOrder::PreOrder>([&] (mlir::Operation *child) {
-    auto loc = child->getLoc();
-    auto id = MetaIdFromLocation(loc);
-    if (id != kInvalidEntityId) {
-      entities[id].emplace_back(const_cast<const mlir::Operation *>(child));
-    }
-    return mlir::WalkResult::advance();
-  });
+  auto result = scope->walk<mlir::WalkOrder::PreOrder>(
+      [&] (mlir::Operation *child) {
+        auto loc = child->getLoc();
+        auto id = MetaIdFromLocation(loc);
+        if (id != kInvalidEntityId) {
+          entities[id].emplace_back(const_cast<RawMLIROperationPtr>(child));
+        }
+        return mlir::WalkResult::advance();
+      });
 
   // Add assert to check if it gets hit at anytime?
   assert(result != mlir::WalkResult::interrupt());
@@ -69,7 +70,8 @@ static OperationMap Deserialize(mlir::Operation *scope) {
 } // namespace
 
 #define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
-  OperationRange SourceIR::for_##lower_name(const mx::type_name &lower_name) const { \
+  OperationRange SourceIR::for_##lower_name(\
+      const type_name &lower_name) const { \
     if (auto ops = impl->For##type_name(lower_name); ops) { \
       return OperationRange(OperationRange::OpVecPtr(impl, ops)); \
     } \
@@ -83,25 +85,25 @@ static OperationMap Deserialize(mlir::Operation *scope) {
                               MX_DEFINE_ENTITY_FUNCTION)
 #undef MX_DEFINE_ENTITY_FUNCTION
 
-  MLIRModulePtr SourceIR::module(void) const {
-  return MLIRModulePtr(impl, impl->mod.get());
+MLIRModulePtr SourceIR::module(void) const {
+  return MLIRModulePtr(impl, impl->mod.get().getOperation());
 }
 
-VariantEntity SourceIR::entity_for(const mlir::Operation *op) const {
+VariantEntity SourceIR::entity_for(RawMLIROperationPtr op) const {
   auto loc = const_cast<mlir::Operation *>(op)->getLoc();
   return impl->EntityFor(MetaIdFromLocation(loc));
 }
 
-VariantEntity SourceIR::entity_for(const std::shared_ptr<const mlir::Operation> &op) const {
+VariantEntity SourceIR::entity_for(const MLIROperationPtr &op) const {
   return entity_for(op.get());
 }
 
 OperationRange SourceIR::for_entity(const VariantEntity &entity) const {
+  if (false) {
 #define MX_DEFINE_FOR_ENTRITY(type_name, lower_name, enum_name, val) \
-    if (std::holds_alternative<type_name>(entity)) { \
+    } else if (std::holds_alternative<type_name>(entity)) { \
       auto lower_name = std::get<type_name>(entity); \
-      return for_##lower_name(lower_name); \
-    }
+      return for_##lower_name(lower_name);
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -109,19 +111,22 @@ OperationRange SourceIR::for_entity(const VariantEntity &entity) const {
                               MX_DEFINE_FOR_ENTRITY,
                               MX_DEFINE_FOR_ENTRITY)
 #undef MX_DEFINE_FOR_ENTRITY
+  } else {
     return {};
+  }
 }
 
 #define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, enum_name, val) \
-  std::optional<mx::type_name> SourceIR::lower_name ##_for(const mlir::Operation *op) const { \
+  std::optional<mx::type_name> SourceIR::lower_name ##_for( \
+      RawMLIROperationPtr op) const { \
     auto ent = entity_for(op); \
     if (std::holds_alternative<type_name>(ent)) { \
-       return std::move(std::get<type_name>(ent)); \
+      return std::move(std::get<type_name>(ent)); \
     } \
     return std::nullopt; \
   } \
-  std::optional<mx::type_name> SourceIR::lower_name ##_for \
-    (const std::shared_ptr<const mlir::Operation> &op) const { \
+  std::optional<mx::type_name> SourceIR::lower_name ##_for( \
+      const MLIROperationPtr &op) const { \
     return lower_name ##_for(op.get()); \
   }
 
@@ -137,25 +142,25 @@ void SourceIR::print(std::ostream &os) const {
   impl->print(os);
 }
 
-mlir::DialectRegistry SourceIRImpl::gRegistry;
-
 namespace {
 
 class RegistryInitializer {
  public:
-  RegistryInitializer() {
-     vast::registerAllDialects(SourceIRImpl::gRegistry);
-     mlir::registerAllDialects(SourceIRImpl::gRegistry);
-   }
+  mlir::DialectRegistry registry;
+
+  RegistryInitializer(void) {
+    vast::registerAllDialects(registry);
+    mlir::registerAllDialects(registry);
+  }
 };
 
-static RegistryInitializer init_guard;
+static RegistryInitializer gMLIR;
 
 } // namespace
 
 SourceIRImpl::SourceIRImpl(std::shared_ptr<const FragmentImpl> frag_,
                            std::string_view mlir)
-    : mctx(gRegistry),
+    : mctx(gMLIR.registry),
       frag(std::move(frag_)) {
   llvm::SourceMgr sm;
   auto buffer = llvm::MemoryBuffer::getMemBuffer(mlir);
@@ -168,17 +173,16 @@ SourceIRImpl::SourceIRImpl(std::shared_ptr<const FragmentImpl> frag_,
 
 SourceIRImpl::~SourceIRImpl(void) {}
 
-const mlir::Operation *SourceIRImpl::scope(void) const {
+RawMLIROperationPtr SourceIRImpl::scope(void) const {
   return mod.get();
 }
 
 const OperationRange::OpVec *
 SourceIRImpl::ForDecl(const Decl &decl) const {
   auto id = decl.id().Pack();
-  // Note: A decl can have multiple redeclaration. If the
-  //       entity id of the decl is not available in the
-  //       source ir, it will fallback to checking for the
-  //       entity ids of redeclarations.
+  // NOTE(kumarak): A decl can have multiple redeclaration. If the entity id of
+  //                the decl is not available in the source ir, it will fall
+  //                back to checking for the entity ids of redeclarations.
   auto found_item = deserialized_ops.find(id);
   if (found_item != deserialized_ops.end()) {
     return &found_item->second;
@@ -253,38 +257,42 @@ void SourceIRImpl::print(std::ostream &os) const {
 namespace mx {
 
 #define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
-	OperationRange SourceIR::for_##lower_name(const mx::type_name &) const { \
-    return {}; \
-  }
+    OperationRange SourceIR::for_##lower_name(const mx::type_name &) const { \
+      return {}; \
+    }
 
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DEFINE_ENTITY_FUNCTION,
-                              MX_DEFINE_ENTITY_FUNCTION)
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_ENTITY_FUNCTION,
+                            MX_DEFINE_ENTITY_FUNCTION)
 #undef MX_DEFINE_ENTITY_FUNCTION
+
+OperationRange SourceIR::for_entity(const VariantEntity &) const {
+  return {};
+}
 
 std::shared_ptr<const mlir::ModuleOp> SourceIR::module(void) const {
   return {};
 }
 
-VariantEntity SourceIR::entity_for(const mlir::Operation *) const {
+VariantEntity SourceIR::entity_for(RawMLIROperationPtr) const {
   return {};
 }
 
-VariantEntity SourceIR::entity_for(const std::shared_ptr<const mlir::Operation> &) const {
+VariantEntity SourceIR::entity_for(const MLIROperationPtr &) const {
   return {};
 }
 
 #define MX_DEFINE_ENTITY_FUNCTION(type_name, lower_name, e, v) \
-  std::optional<mx::type_name> SourceIR::lower_name ##_for \
-    (const mlir::Operation *) const { \
+    std::optional<mx::type_name> SourceIR::lower_name ##_for( \
+        RawMLIROperationPtr) const { \
       return {}; \
     } \
-  std::optional<mx::type_name> SourceIR::lower_name ##_for \
-    (const std::shared_ptr<const mlir::Operation> &) const { \
-    return {}; \
-  }
+    std::optional<mx::type_name> SourceIR::lower_name ##_for( \
+        const MLIROperationPtr &) const { \
+      return {}; \
+    }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_ENTITY_FUNCTION,
                             MX_IGNORE_ENTITY_CATEGORY,

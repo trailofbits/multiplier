@@ -18,12 +18,17 @@ namespace mx {
 
 class SourceIRImpl;
 
+using MLIRModulePtr = std::shared_ptr<const mlir::Operation>;
+using RawMLIROperationPtr = const mlir::Operation *;
+using MLIROperationPtr = std::shared_ptr<const mlir::Operation>;
+using MLIRValuePtr = std::shared_ptr<const mlir::Value>;
+
 // Forward-only iterator that traverses through the vector of operations
 class OperationRangeIterator {
  public:
-  using OpVec     = std::vector<const mlir::Operation *>;
+  using OpVec     = std::vector<RawMLIROperationPtr>;
   using OpVecPtr  = std::shared_ptr<const OpVec>;
-  using OpPtr     = std::shared_ptr<const mlir::Operation>;
+  using OpPtr     = MLIROperationPtr;
 
   using EndIteratorType = IteratorEnd;
 
@@ -36,15 +41,20 @@ class OperationRangeIterator {
   bool operator!=(const OperationRangeIterator &) = delete;
 
   inline OperationRangeIterator(OpVecPtr ops_, unsigned offset_, unsigned num_elem)
-      : ops(ops_), offset(offset_), num_elements(num_elem) {}
+      : ops(ops_),
+        offset(offset_),
+        num_elements(num_elem) {}
 
  public:
   inline OperationRangeIterator(OpVecPtr ops_)
-      : ops(ops_), offset(0),
+      : ops(ops_),
+        offset(0),
         num_elements(ops_ ? static_cast<unsigned>(ops_->size()) : 0){}
 
   inline OperationRangeIterator(void)
-      : ops(nullptr), offset(0), num_elements(0) {}
+      : ops(nullptr),
+        offset(0),
+        num_elements(0) {}
 
   inline bool operator==(EndIteratorType) const noexcept {
     return offset >= num_elements;
@@ -59,7 +69,7 @@ class OperationRangeIterator {
   }
 
   inline OpPtr operator*(void) && noexcept {
-    const mlir::Operation *op = (*ops)[offset];
+    RawMLIROperationPtr op = (*ops)[offset];
     return OpPtr(std::move(ops), op);
   }
 
@@ -127,10 +137,6 @@ class OperationRange {
   }
 };
 
-using MLIRModulePtr = std::shared_ptr<const mlir::ModuleOp>;
-using MLIROperationPtr = std::shared_ptr<const mlir::Operation>;
-using MLIRValuePtr = std::shared_ptr<const mlir::Value>;
-
 class SourceIR {
  private:
   friend class Fragment;
@@ -145,7 +151,7 @@ class SourceIR {
  public:
   MLIRModulePtr module(void) const;
 
-  VariantEntity entity_for(const mlir::Operation *op) const;
+  VariantEntity entity_for(RawMLIROperationPtr op) const;
 
   VariantEntity entity_for(const MLIROperationPtr &op) const;
 
