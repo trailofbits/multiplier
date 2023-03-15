@@ -30,3 +30,4 @@ jobs:
           -f build.Dockerfile \
           -t ghcr.io/trailofbits/multiplier-build \
           .
+        working-directory: .github/docker
