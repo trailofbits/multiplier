@@ -45,7 +45,7 @@ void PrintEdge(const mx::SourceIR &ir, const mx::DependencyTrackingEdge &edge) {
   std::string op_string;
   llvm::raw_string_ostream os(op_string);
   auto op = edge.as_operation();
-  const_cast<mlir::Operation*>(op)->print(os);
+  const_cast<mlir::Operation*>(op.get())->print(os);
   std::cout << op_string << std::endl;
   (void)ir;
 }
@@ -64,13 +64,13 @@ void PrintNext(const mx::SourceIR &ir,
     for (mx::DependencyTrackingResult next_res : tracker.dependents(step)) {
       PrintNext(ir, tracker, std::move(next_res), depth + 1);
     }
-
-  } else if (std::holds_alternative<mx::DependencyTrackingCondition>(res)) {
-    const auto &cond = std::get<mx::DependencyTrackingCondition>(res);
-    PrintEdge(ir, cond);
-    std::cout << " <condition>\n";
-
   } else if (std::holds_alternative<mx::DependencyTrackingSink>(res)) {
+    const auto &sink = std::get<mx::DependencyTrackingSink>(res);
+    if (sink.kind() == mx::DependencySinkKind::CONDITIONAL_BRANCH
+        || sink.kind() == mx::DependencySinkKind::CONDITIONAL_EXPRESSION) {
+      PrintEdge(ir, sink);
+      std::cout << " <condition>\n";
+    }
     std::cout << std::get<mx::DependencyTrackingSink>(res).message() << '\n';
   }
 }
@@ -148,7 +148,7 @@ extern "C" int main(int argc, char *argv[]) {
   auto range = sourceir.for_entity(entity);
   for (auto iter = range.begin(); iter != range.end(); iter++) {
     auto ir_operation = *iter;
-    for (mx::DependencyTrackingResult res : tracker.dependents(ir_operation.get())) {
+    for (mx::DependencyTrackingResult res : tracker.dependents(ir_operation)) {
       PrintNext(sourceir, tracker, std::move(res), depth + 1);
     }
   }
