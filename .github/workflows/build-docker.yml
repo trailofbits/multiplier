@@ -21,16 +21,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Show docker images
+      - name: Build and load Docker image
         run: |
-          docker images
-          docker inspect ghcr.io/trailofbits/multiplier-build
-
-      # - name: Build and load Docker image
-      #   run: |
-      #     docker buildx build \
-      #     --load \
-      #     -f build.Dockerfile \
-      #     -t ${REGISTRY}:{$IMAGE_NAME} \
-      #     .
-      #   working-directory: .github/docker
+          docker buildx build \
+          --load \
+          -f build.Dockerfile \
+          -t ${REGISTRY}:{$IMAGE_NAME} \
+          .
+        working-directory: .github/docker
