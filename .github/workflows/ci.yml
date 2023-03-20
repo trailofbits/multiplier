@@ -50,33 +50,30 @@ jobs:
           path: "${{ github.workspace }}/src/multiplier"
           submodules: "recursive"
 
-      - name: ls
-        run: ${DOCKER_RUN} ls -la
+      - name: Build and install multiplier
+        run: |
+          ${DOCKER_RUN} cmake \
+            --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -S '/build/src/multiplier' \
+            -B '/build/build/multiplier' \
+            -G Ninja \
+            -DVCPKG_ROOT="$VCPKG_ROOT" \
+            -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER="$(which clang-15)" \
+            -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_INSTALL_PREFIX="/build/install" \
+            -DMX_ENABLE_INSTALL=ON \
+            -DMX_ENABLE_BOOTSTRAP=OFF \
+            -DMX_ENABLE_VAST=OFF \
+            -DMX_ENABLE_WEGGLI=ON \
+          && ${DOCKER_RUN} cmake --build '/build/build/multiplier' --target install
 
-      # - name: Build and install multiplier
-      #   run: |
-      #     ${DOCKER_RUN} cmake \
-      #       --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-      #       -S '/build/src/multiplier' \
-      #       -B '/build/build/multiplier' \
-      #       -G Ninja \
-      #       -DVCPKG_ROOT="$VCPKG_ROOT" \
-      #       -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-      #       -DCMAKE_BUILD_TYPE=Release \
-      #       -DCMAKE_C_COMPILER="$(which clang-15)" \
-      #       -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-      #       -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-      #       -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-      #       -DCMAKE_INSTALL_PREFIX="/build/install" \
-      #       -DMX_ENABLE_INSTALL=ON \
-      #       -DMX_ENABLE_BOOTSTRAP=OFF \
-      #       -DMX_ENABLE_VAST=OFF \
-      #       -DMX_ENABLE_WEGGLI=ON \
-      #     && ${DOCKER_RUN} cmake --build '/build/build/multiplier' --target install
-
-      # - name: Upload build artifacts on merge to main
-      #   if: ${{ github.ref == 'refs/heads/main' }}
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: multiplier
-      #     path: "${{ github.workspace }}/install"
+      - name: Upload build artifacts on merge to main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: multiplier
+          path: "${{ github.workspace }}/install"
