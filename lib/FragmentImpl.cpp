@@ -221,12 +221,6 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
   return kInvalidEntityId;
 }
 
-// Return the token reader for another file.
-TokenReader::Ptr ReadMacroTokensFromFragment::ReaderForToken(
-    const TokenReader::Ptr &self, RawEntityId eid) const {
-  return TokenReader::ReaderForToken(self, fragment->ep, eid);
-}
-
 // Returns `true` if `this` is logically equivalent to `that`.
 bool ReadMacroTokensFromFragment::Equals(const class TokenReader *that_) const {
   if (!dynamic_cast<const ReadMacroTokensFromFragment *>(that_)) {

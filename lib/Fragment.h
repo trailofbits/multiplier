@@ -62,10 +62,6 @@ class ReadMacroTokensFromFragment : public TokenReader {
   EntityId NthTokenId(EntityOffset token_index) const override;
   EntityId NthFileTokenId(EntityOffset token_index) const override;
 
-  // Return the token reader for another file.
-  TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
-                                  RawEntityId id) const final;
-
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const override;
 

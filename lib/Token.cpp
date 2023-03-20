@@ -804,15 +804,134 @@ EntityId InvalidTokenReader::NthFileTokenId(EntityOffset) const {
   return kInvalidEntityId;
 }
 
-// Return the token reader for another file.
-TokenReader::Ptr InvalidTokenReader::ReaderForToken(
-    const Ptr &, RawEntityId ) const {
-  return {};
-}
-
 // Returns `true` if `this` is logically equivalent to `that`.
 bool InvalidTokenReader::Equals(const TokenReader *) const {
   return false;
+}
+
+CustomTokenReader::CustomTokenReader(
+    std::shared_ptr<const FragmentImpl> fragment_)
+    : fragment(std::move(fragment_)) {
+  data_offset.push_back(0u);
+}
+
+CustomTokenReader::~CustomTokenReader(void) noexcept {}
+
+// Append a token into this reader.
+void CustomTokenReader::Append(TokenImplPtr tr, EntityOffset to) noexcept {
+  std::string_view tok_data = tr->NthTokenData(to).data();
+  data.insert(data.end(), tok_data.begin(), tok_data.end());
+  data_offset.push_back(static_cast<EntityOffset>(data.size()));
+  derived_token_ids.push_back(tr->NthDerivedTokenId(to).Pack());
+  parsed_token_ids.push_back(tr->NthParsedTokenId(to).Pack());
+  containing_macro_ids.push_back(tr->NthContainingMacroId(to).Pack());
+  related_entity_ids.push_back(tr->NthRelatedEntityId(to).Pack());
+  token_ids.push_back(tr->NthTokenId(to).Pack());
+  file_token_ids.push_back(tr->NthFileTokenId(to).Pack());
+}
+
+// Return the number of tokens accessible to this reader.
+EntityOffset CustomTokenReader::NumTokens(void) const {
+  return static_cast<EntityOffset>(token_ids.size());
+}
+
+// Return the kind of the Nth token.
+TokenKind CustomTokenReader::NthTokenKind(EntityOffset to) const {
+  if (to < token_ids.size()) {
+    VariantId vid = EntityId(token_ids[to]).Unpack();
+    if (std::holds_alternative<ParsedTokenId>(vid)) {
+      return std::get<ParsedTokenId>(vid).kind;
+    } else if (std::holds_alternative<MacroTokenId>(vid)) {
+      return std::get<MacroTokenId>(vid).kind;
+    } else if (std::holds_alternative<FileTokenId>(vid)) {
+      return std::get<FileTokenId>(vid).kind;
+    } else if (!std::holds_alternative<InvalidId>(vid) ){
+      assert(false);
+    }
+  }
+  return TokenKind::UNKNOWN;
+}
+
+// Return the data of the Nth token.
+std::string_view CustomTokenReader::NthTokenData(EntityOffset to) const {
+  if ((to + 1u) < data_offset.size()) {
+    auto begin_offset = data_offset[to];
+    auto end_offset = data_offset[to + 1u];
+    if (end_offset < begin_offset) {
+      assert(false);
+      return {};
+    }
+
+    return std::string_view(data).substr(
+        begin_offset, end_offset - begin_offset);
+  }
+  return {};
+}
+
+// Return the id of the token from which the Nth token is derived.
+EntityId CustomTokenReader::NthDerivedTokenId(EntityOffset to) const {
+  if (to < derived_token_ids.size()) {
+    return derived_token_ids[to];
+  }
+  return kInvalidEntityId;
+}
+
+// Return the id of the parsed token which is derived from the Nth token.
+EntityId CustomTokenReader::NthParsedTokenId(EntityOffset to) const {
+  if (to < parsed_token_ids.size()) {
+    return parsed_token_ids[to];
+  }
+  return kInvalidEntityId;
+}
+
+// Return the id of the macro containing the Nth token.
+EntityId CustomTokenReader::NthContainingMacroId(EntityOffset to) const {
+  if (to < containing_macro_ids.size()) {
+    return containing_macro_ids[to];
+  }
+  return kInvalidEntityId;
+}
+
+// Return an entity id associated with the Nth token.
+EntityId CustomTokenReader::NthRelatedEntityId(EntityOffset to) const {
+  if (to < related_entity_ids.size()) {
+    return related_entity_ids[to];
+  }
+  return kInvalidEntityId;
+}
+
+// Return the id of the Nth token.
+EntityId CustomTokenReader::NthTokenId(EntityOffset to) const {
+  if (to < token_ids.size()) {
+    return token_ids[to];
+  }
+  return kInvalidEntityId;
+}
+
+EntityId CustomTokenReader::NthFileTokenId(EntityOffset to) const {
+  if (to < file_token_ids.size()) {
+    return file_token_ids[to];
+  }
+  return kInvalidEntityId;
+}
+
+// Returns `true` if `this` is logically equivalent to `that`.
+bool CustomTokenReader::Equals(const TokenReader *that_) const {
+  if (this == that_) {
+    return true;
+  }
+
+  auto that = dynamic_cast<const CustomTokenReader *>(that_);
+  if (!that) {
+    return false;
+  }
+
+  return token_ids == that->token_ids;
+}
+
+
+const FragmentImpl *CustomTokenReader::OwningFragment(void) const noexcept {
+  return fragment.get();
 }
 
 Token::Token(void)
@@ -1106,7 +1225,7 @@ static Token LogicalFileLocation(Macro macro, RawEntityId prev_entity,
 
   // If it was in an expansion, then go find the first file token in the range.
   if (first) {
-    for (Token tok : macro.use_tokens()) {
+    for (Token tok : macro.root().generate_use_tokens()) {
       if (Token file_tok = tok.file_token()) {
         return file_tok;
       }
@@ -1117,7 +1236,7 @@ static Token LogicalFileLocation(Macro macro, RawEntityId prev_entity,
 
   // If it was in an expansion, then go find the last file token in the range.
   Token last;
-  for (Token tok : macro.use_tokens()) {
+  for (Token tok : macro.root().generate_use_tokens()) {
     if (Token file_tok = tok.file_token()) {
       last = std::move(file_tok);
     }

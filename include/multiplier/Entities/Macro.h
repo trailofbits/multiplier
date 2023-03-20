@@ -33,6 +33,7 @@ class MacroImpl;
 class Reference;
 class SourceIR;
 class Token;
+class TokenRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
@@ -80,8 +81,11 @@ class Macro {
   static gap::generator<Macro> containing_internal(const Token &token);
 
  public:
-  gap::generator<Token> use_tokens(void) const &;
-  gap::generator<Token> expansion_tokens(void) const &;
+  Macro root(void) const &;
+  TokenRange use_tokens(void) const &;
+  gap::generator<Token> generate_use_tokens(void) const &;
+  TokenRange expansion_tokens(void) const &;
+  gap::generator<Token> generate_expansion_tokens(void) const &;
 
   static gap::generator<Macro> in(const Fragment &frag, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const File &file, std::span<MacroKind> kinds);

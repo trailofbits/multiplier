@@ -96,12 +96,6 @@ EntityId ReadFileTokensFromFile::NthFileTokenId(unsigned token_index) const {
   return NthTokenId(token_index);
 }
 
-// Return the token reader for another file/fragment.
-TokenReader::Ptr ReadFileTokensFromFile::ReaderForToken(
-    const TokenReader::Ptr &self, RawEntityId eid) const {
-  return TokenReader::ReaderForToken(self, file->ep, eid);
-}
-
 // Returns `true` if `this` is logically equivalent to `that`.
 bool ReadFileTokensFromFile::Equals(const class TokenReader *that_) const {
   if (!dynamic_cast<const ReadFileTokensFromFile *>(that_)) {

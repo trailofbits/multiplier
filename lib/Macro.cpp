@@ -123,21 +123,55 @@ gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro) {
 
 }  // namespace
 
-gap::generator<Token> Macro::use_tokens(void) const & {
-  if (auto p = parent()) {
-    return p->use_tokens();
+
+Macro Macro::root(void) const & {
+  if (std::optional<Macro> p = parent()) {
+    return p->root();
   } else {
-    return GenerateUseTokens(*this);
+    return *this;
   }
 }
 
-// Find the tokens the expansion tokens that are actually parsed.
-gap::generator<Token> Macro::expansion_tokens(void) const & {
-  if (auto p = parent()) {
-    return p->expansion_tokens();
-  } else {
-    return GenerateExpansionTokensFromMacro(*this);
+TokenRange Macro::use_tokens(void) const & {
+  auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  if (!frag) {
+    assert(false);
+    return TokenRange();
   }
+
+  auto reader = std::make_shared<CustomTokenReader>(std::move(frag));
+  EntityOffset num_toks = 0u;
+  for (Token tok : GenerateUseTokens(*this)) {
+    reader->Append(std::move(tok.impl), tok.offset);
+    ++num_toks;
+  }
+  return TokenRange(std::move(reader), 0u, num_toks);
+}
+
+// Find the tokens the expansion tokens that are actually parsed.
+TokenRange Macro::expansion_tokens(void) const & {
+  auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  if (!frag) {
+    assert(false);
+    return TokenRange();
+  }
+
+  auto reader = std::make_shared<CustomTokenReader>(std::move(frag));
+  EntityOffset num_toks = 0u;
+  for (Token tok : GenerateExpansionTokensFromMacro(*this)) {
+    reader->Append(std::move(tok.impl), tok.offset);
+    ++num_toks;
+  }
+  return TokenRange(std::move(reader), 0u, num_toks);
+}
+
+gap::generator<Token> Macro::generate_use_tokens(void) const & {
+  return GenerateUseTokens(*this);
+}
+
+// Find the tokens the expansion tokens that are actually parsed.
+gap::generator<Token> Macro::generate_expansion_tokens(void) const & {
+  return GenerateExpansionTokensFromMacro(*this);
 }
 
 }  // namespace mx
