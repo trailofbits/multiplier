@@ -5,12 +5,14 @@ on:
     branches:
       - "main"
 
-  # pull_request:
-  #   branches:
-  #     - "*"
+  pull_request:
+    branches:
+      - "*"
 
 env:
   VCPKG_ROOT: /build/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}-build
   DOCKER_RUN: docker run -v ${{ github.workspace }}/multiplier:/build -w /build -e VCPKG_ROOT ghcr.io/trailofbits/multiplier-build
 
 # Cancel in progress runs for PRs but not main
@@ -19,8 +21,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build-docker:
+    runs-on: multiplier
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build and load Docker image
+        run: |
+          docker buildx build \
+          --load \
+          -f build.Dockerfile \
+          -t ${REGISTRY}/${IMAGE_NAME}:latest \
+          .
+        working-directory: .github/docker
+
   build-release:
     runs-on: multiplier
+    needs: build-docker
     steps:
       - name: Download multiplier
         uses: actions/checkout@v3
