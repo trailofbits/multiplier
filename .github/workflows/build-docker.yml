@@ -26,6 +26,6 @@ jobs:
           docker buildx build \
           --load \
           -f build.Dockerfile \
-          -t ${REGISTRY}:{$IMAGE_NAME} \
+          -t ${REGISTRY}/{$IMAGE_NAME}:latest \
           .
         working-directory: .github/docker
