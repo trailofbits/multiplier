@@ -79,20 +79,22 @@ RUN cmake \
     -S '/work/src/multiplier' \
     -B '/work/build/multiplier' \
     -G Ninja \
-    -DVCPKG_ROOT="$VCPKG_ROOT" \
+    -DVCPKG_ROOT="${VCPKG_ROOT}" \
     -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_C_COMPILER="$(which clang-15)" \
     -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
     # -DCMAKE_C_COMPILER_LAUNCHER=ccache \
     # -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-    -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+    -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
     -DMX_ENABLE_INSTALL=ON \
     -DMX_ENABLE_BOOTSTRAP=OFF \
     -DMX_ENABLE_VAST=OFF \
     -DMX_ENABLE_WEGGLI=ON 
-RUN cmake --build '${{ github.workspace }}/build/multiplier' --target install
+RUN cmake --build '/work/build/multiplier' --target install
 
 
 FROM --platform=linux/amd64 ${IMAGE} as release
-COPY --from=builder /work/install/multiplier /multiplier
+COPY --from=builder /work/install /work/install
+RUN chmod +x /work/install/bin/*
+ENV PATH="/work/install/bin:${PATH}"
