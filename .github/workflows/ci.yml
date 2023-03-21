@@ -38,7 +38,9 @@ jobs:
 
       - name: Start EC2 runner
         id: start_ec2_runner
-        run: aws ec2 start-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
+        run: |
+          aws ec2 start-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
+          aws ec2 wait instance-running --instance-ids ${{ env.EC2_RUNNER_ID }}
 
   build-docker:
     runs-on: multiplier
