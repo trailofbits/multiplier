@@ -63,17 +63,6 @@ jobs:
           -t ${REGISTRY}/${IMAGE_NAME} \
           .
 
-      - name: Copy multiplier install directory
-        run: |
-          ${DOCKER_RUN} cp /work/install /github/install
-
-      - name: Upload build artifacts on merge to main
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: multiplier
-          path: "${{ github.workspace }}/install"
-
   stop-ec2-runner:
     if: always()
     runs-on: ubuntu-latest
@@ -86,7 +75,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.EC2_GITHUB_RUNNER_AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Stop EC2 runner
         run: aws ec2 stop-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
