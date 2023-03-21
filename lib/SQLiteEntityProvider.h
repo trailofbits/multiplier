@@ -33,7 +33,7 @@ class SQLiteEntityProviderImpl;
 class SQLiteDecompressionDictionary;
 
 class SQLiteEntityProvider final : public EntityProvider {
- private:
+ public:
   friend class SQLiteEntityProviderImpl;
 
   using ImplPtr = std::shared_ptr<SQLiteEntityProviderImpl>;
@@ -46,7 +46,6 @@ class SQLiteEntityProvider final : public EntityProvider {
   RawEntityIdList ReadRedeclarations(SQLiteEntityProviderImpl &context,
                                      EntityCategory category);
 
- public:
   virtual ~SQLiteEntityProvider(void) noexcept;
   SQLiteEntityProvider(std::filesystem::path path);
 

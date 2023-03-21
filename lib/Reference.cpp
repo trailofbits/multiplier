@@ -118,6 +118,23 @@ std::string ReferenceKind::kind(void) const && noexcept {
   return impl->kind_data;
 }
 
+// Return the kind of this reference.
+ReferenceKind Reference::kind(void) const noexcept {
+  ReferenceKindImplPtr rptr;
+  if (std::optional<Index> index = Index::containing(as_variant())) {
+    const EntityProvider::Ptr &ep = index->impl;
+    rptr = ep->ReferenceKindFor(ep, kind_id);
+  }
+
+  if (!rptr) {
+    assert(false);
+    rptr = std::make_shared<ReferenceKindImpl>(
+        kInvalidEP, ~0ull, "<invalid>");
+  }
+
+  return rptr;
+}
+
 // Add a reference between two entities.
 bool Reference::add(const ReferenceKind &kind, RawEntityId from_id,
                     RawEntityId to_id, int) {

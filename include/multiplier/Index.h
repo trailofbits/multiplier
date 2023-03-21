@@ -262,6 +262,7 @@ class Index {
   static Index containing(const Macro &entity);
   static Index containing(const Designator &entity);
   static std::optional<Index> containing(const Token &entity);
+  static std::optional<Index> containing(const VariantEntity &entity);
 
   // Return the status of the index.
   IndexStatus status(bool block=false) const;

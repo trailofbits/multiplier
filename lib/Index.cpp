@@ -103,6 +103,25 @@ std::optional<Index> Index::containing(const Token &entity) {
   }
 }
 
+namespace {
+
+struct IndexFromEntityVisitor {
+  inline std::optional<Index> operator()(const NotAnEntity &) const {
+    return std::nullopt;
+  }
+  template <typename T>
+  inline std::optional<Index> operator()(const T &ent) const {
+    return Index::containing(ent);
+  }
+};
+
+}  // namespace
+
+std::optional<Index> Index::containing(const VariantEntity &entity) {
+  return std::visit<std::optional<Index>>(
+      IndexFromEntityVisitor{}, entity);
+}
+
 // Clear any internal caches.
 void Index::clear_caches(void) const {
   impl->ClearCache();

@@ -706,11 +706,54 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
   }
 }
 
+// Go collect a "page" of matched name entries. We go one page at a time so
+// that we can avoid having do to any kind of clever query caching to make
+// generators / coroutines work.
+static unsigned ReadSymbolPage(
+    ThreadLocal<SQLiteEntityProviderImpl> &impl, const std::string &symbol,
+    int64_t &lower_bound, bool &found,
+    std::array<RawEntityId, MX_ID_LIST_PAGE_SIZE> &paged_results) {
+
+  auto num_paged_results = 0u;
+
+  SQLiteEntityProvider::ImplPtr context = impl.Lock();
+  sqlite::Statement &list_ids = context->get_entities_by_name;
+
+  // (Re)do the join to get the next page of entity references.
+  list_ids.BindValuesWithoutCopying(symbol, lower_bound);
+  try {
+    while (list_ids.ExecuteStep()) {
+      found = true;
+      RawEntityId found_id = kInvalidEntityId;
+      list_ids.Row().Columns(found_id);
+
+      // For next page.
+      lower_bound = std::max(lower_bound, static_cast<int64_t>(found_id));
+
+      VariantId vid = EntityId(found_id).Unpack();
+      if (std::holds_alternative<InvalidId>(vid)) {
+        assert(found_id == kInvalidEntityId);
+        continue;
+      } else if (std::holds_alternative<MacroId>(vid) ||
+                 std::holds_alternative<DeclId>(vid) ||
+                 std::holds_alternative<FileId>(vid)) {
+        paged_results[num_paged_results] = found_id;
+        ++num_paged_results;
+      } else {
+        assert(false);
+        continue;
+      }
+    }
+  } catch (const sqlite::Error &) {
+    // TODO(pag): Probably an FTS5 syntax error. See issue #338.
+  }
+
+  list_ids.Reset();
+  return num_paged_results;
+}
+
 gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
     const Ptr &self, std::string symbol) & {
-
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &list_ids = context->get_entities_by_name;
 
   // NOTE(pag): SQLite doesn't understand unsigned integers. When it sees our
   //            entity IDs, if the high bit is `1`, then it treats those as
@@ -727,40 +770,8 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
   auto version = self->VersionNumber();
   for (auto found = true; found; ) {
     found = false;
-    auto num_paged_results = 0u;
-
-    // Go collect a "page" of matched name entries. We go one page at a time so
-    // that we can avoid having do to any kind of clever query caching to make
-    // generators / coroutines work.
-    do {
-
-      // (Re)do the join to get the next page of entity references.
-      list_ids.BindValuesWithoutCopying(symbol, lower_bound);
-      while (list_ids.ExecuteStep()) {
-        found = true;
-        RawEntityId found_id = kInvalidEntityId;
-        list_ids.Row().Columns(found_id);
-
-        // For next page.
-        lower_bound = std::max(lower_bound, static_cast<int64_t>(found_id));
-
-        VariantId vid = EntityId(found_id).Unpack();
-        if (std::holds_alternative<InvalidId>(vid)) {
-          assert(found_id == kInvalidEntityId);
-          continue;
-        } else if (std::holds_alternative<MacroId>(vid) ||
-                   std::holds_alternative<DeclId>(vid) ||
-                   std::holds_alternative<FileId>(vid)) {
-          paged_results[num_paged_results] = found_id;
-          ++num_paged_results;
-        } else {
-          assert(false);
-          continue;
-        }
-      }
-
-      list_ids.Reset();
-    } while (false);
+    auto num_paged_results = ReadSymbolPage(
+        impl, symbol, lower_bound, found, paged_results);
 
     for (auto i = 0u; i < num_paged_results; ++i) {
       co_yield paged_results[i];

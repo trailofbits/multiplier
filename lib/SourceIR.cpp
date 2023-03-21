@@ -239,7 +239,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 
 
 VariantEntity SourceIRImpl::EntityFor(EntityId eid) const {
-  return Index::containing(frag).entity(eid);
+  Fragment f(frag);
+  return Index::containing(f).entity(eid);
 }
 
 void SourceIRImpl::print(std::ostream &os) const {
