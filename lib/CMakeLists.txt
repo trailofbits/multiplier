@@ -37,6 +37,8 @@ if(MX_ENABLE_VAST)
       vast::vast
       vast::MLIRCore
       vast::MLIRMeta
+      vast::MLIRLowLevel
+      vast::MLIRHighLevel
       MLIRDialect
       MLIRMLProgramDialect
       MLIROpenMPDialect
