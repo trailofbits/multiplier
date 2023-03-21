@@ -12,8 +12,10 @@ on:
 env:
   VCPKG_ROOT: /work/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-build
+  IMAGE_NAME: ${{ github.repository }}
   DOCKER_RUN: docker run -v ${{ github.workspace }}:/github ghcr.io/trailofbits/multiplier:latest
+  EC2_RUNNER_ID: i-0829aea272db4290b
+  AWS_REGION: us-east-1
 
 # Cancel in progress runs for PRs but not main
 concurrency:
@@ -21,8 +23,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  start-ec2-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start_ec2_runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start_ec2_runner.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Start EC2 runner
+        id: start_ec2_runner
+        run: aws ec2 start-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
+
   build-docker:
     runs-on: multiplier
+    needs: start-ec2-runner
     permissions:
       contents: read
       packages: write
@@ -51,3 +71,20 @@ jobs:
         with:
           name: multiplier
           path: "${{ github.workspace }}/install"
+
+  stop-ec2-runner:
+    if: always()
+    runs-on: ubuntu-latest
+    needs:
+      - start-ec2-runner
+      - build-docker
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.EC2_GITHUB_RUNNER_AWS_REGION }}
+
+      - name: Stop EC2 runner
+        run: aws ec2 stop-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
