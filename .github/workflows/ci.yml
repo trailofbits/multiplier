@@ -10,10 +10,10 @@ on:
       - "*"
 
 env:
-  VCPKG_ROOT: /build/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
+  VCPKG_ROOT: /work/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}-build
-  DOCKER_RUN: docker run -v ${{ github.workspace }}:/build -w /build -e VCPKG_ROOT ghcr.io/trailofbits/multiplier-build
+  DOCKER_RUN: docker run -v ${{ github.workspace }}:/github ghcr.io/trailofbits/multiplier-build
 
 # Cancel in progress runs for PRs but not main
 concurrency:
@@ -30,15 +30,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
       - name: Build and load Docker image
         run: |
           docker buildx build \
           --load \
-          -f build.Dockerfile \
+          -f .github/docker/build.Dockerfile \
           -t ${REGISTRY}/${IMAGE_NAME}:latest \
           .
-        working-directory: .github/docker
 
   build-release:
     runs-on: multiplier
@@ -50,26 +51,9 @@ jobs:
           path: "${{ github.workspace }}/src/multiplier"
           submodules: "recursive"
 
-      - name: Build and install multiplier
+      - name: Copy multiplier install directory
         run: |
-          ${DOCKER_RUN} cmake \
-            --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-            -S '/build/src/multiplier' \
-            -B '/build/build/multiplier' \
-            -G Ninja \
-            -DVCPKG_ROOT="$VCPKG_ROOT" \
-            -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_COMPILER="$(which clang-15)" \
-            -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_INSTALL_PREFIX="/build/install" \
-            -DMX_ENABLE_INSTALL=ON \
-            -DMX_ENABLE_BOOTSTRAP=OFF \
-            -DMX_ENABLE_VAST=OFF \
-            -DMX_ENABLE_WEGGLI=ON \
-          && ${DOCKER_RUN} cmake --build '/build/build/multiplier' --target install
+          ${DOCKER_RUN} cp /work/install /github/install
 
       - name: Upload build artifacts on merge to main
         if: ${{ github.ref == 'refs/heads/main' }}

@@ -1,4 +1,5 @@
-FROM --platform=linux/amd64 ubuntu:22.04
+ARG IMAGE=ubuntu:22.04
+FROM --platform=linux/amd64 ${IMAGE} as builder
 ENV CXX_COMMON_URL=https://github.com/lifting-bits/cxx-common/releases/download/v0.2.24/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz \
     VCPKG_ROOT=/work/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64 \
     INSTALL_DIR=/work/install
@@ -72,3 +73,26 @@ RUN git clone https://github.com/trailofbits/pasta /work/src/pasta \
         -DPASTA_ENABLE_INSTALL=ON \
     && cmake --build '/work/build/pasta' --target install
 
+COPY . /work/src/multiplier
+RUN cmake \
+    --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+    -S '/work/src/multiplier' \
+    -B '/work/build/multiplier' \
+    -G Ninja \
+    -DVCPKG_ROOT="$VCPKG_ROOT" \
+    -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_C_COMPILER="$(which clang-15)" \
+    -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
+    # -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+    # -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+    -DMX_ENABLE_INSTALL=ON \
+    -DMX_ENABLE_BOOTSTRAP=OFF \
+    -DMX_ENABLE_VAST=OFF \
+    -DMX_ENABLE_WEGGLI=ON 
+RUN cmake --build '${{ github.workspace }}/build/multiplier' --target install
+
+
+FROM --platform=linux/amd64 ${IMAGE} as release
+COPY --from=builder /work/install/multiplier /multiplier
