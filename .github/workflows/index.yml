@@ -7,7 +7,7 @@ on:
     - cron: "0 0 * * 6"
 
 env:
-  DOCKER_SHELL: docker run -v ${{ github.workspace }}:/github ghcr.io/trailofbits/multiplier:builder {0}
+  DOCKER_IMAGE: ghcr.io/trailofbits/multiplier:builder
   EC2_RUNNER_ID: i-0829aea272db4290b
   AWS_REGION: us-east-1
 
@@ -31,11 +31,12 @@ jobs:
   index-lua:
     runs-on: multiplier
     needs: start-ec2-runner
-    defaults:
-      run:
-        shell: ${{ env.DOCKER_SHELL }}
+    container: 
+      image: ${{ env.DOCKER_IMAGE }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.github_token }}
     steps:
-
       - name: Download and build Lua
         run: |
           curl --silent --location \
@@ -62,8 +63,13 @@ jobs:
 
   index-pcre2:
     runs-on: multiplier
+    needs: start-ec2-runner
+    container: 
+      image: ${{ env.DOCKER_IMAGE }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.github_token }}
     steps:
-
       - name: Download, configure and build PCRE2
         run: |
           curl --silent --location \
@@ -94,8 +100,13 @@ jobs:
   index-sqlite:
     runs-on: multiplier
     continue-on-error: true
+    needs: start-ec2-runner
+    container: 
+      image: ${{ env.DOCKER_IMAGE }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.github_token }}
     steps:
-
       - name: Download, configure and build SQLite
         run: |
           ${DOCKER_SHELL} curl --silent --location \
@@ -127,34 +138,14 @@ jobs:
     # Indexing linux takes too long and eats up all our CI points, skip for now
     if: false
     needs: start-ec2-runner
+    container: 
+      image: ${{ env.DOCKER_IMAGE }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.github_token }}
     runs-on: multiplier
     continue-on-error: true
     steps:
-      - name: Install dependencies
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install -y \
-               gpg wget curl zip unzip tar git pkg-config \
-               ninja-build clang-tidy cppcheck ccache build-essential \
-               doctest-dev clang-15 libtool autoconf flex bison \
-               libncurses-dev libssl-dev libelf-dev lld
-          mkdir src
-          mkdir build
-
-      - name: Download cxx-common
-        run: |
-          curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-      - name: Download multiplier
-        uses: actions/download-artifact@v3
-        with:
-          name: multiplier
-          path: install
-
       - name: Download, configure and build Linux
         run: |
           curl --silent --location \
