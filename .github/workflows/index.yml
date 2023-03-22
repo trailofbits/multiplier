@@ -7,6 +7,11 @@ on:
     # At 00:00 every Saturday.
     - cron: "0 0 * * 6"
 
+# Cancel any in-progress run
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 env:
   EC2_RUNNER_ID: i-0829aea272db4290b
   AWS_REGION: us-east-1
@@ -109,7 +114,7 @@ jobs:
       - name: Download, configure and build SQLite
         run: |
           curl --silent --location \
-            https://www.sqlite.org/2022/sqlite-autoconf-3400000.tar.gz | tar xz -C '/work/src' \
+            https://www.sqlite.org/2022/sqlite-autoconf-3400000.tar.gz | tar xz -C '/work/src'
           mkdir '/work/build/sqlite-autoconf-3400000'
           cd '/work/build/sqlite-autoconf-3400000'
           /work/src/sqlite-autoconf-3400000/configure
