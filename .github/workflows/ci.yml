@@ -50,12 +50,20 @@ jobs:
         with:
           submodules: "recursive"
 
-      - name: Build and load Docker image
+      - name: Build builder image
         run: |
           docker buildx build \
           --load \
           -t ${REGISTRY}/${IMAGE_NAME} \
+          --target builder \
           .
+
+      - name: Build release image
+        run: |
+          docker buildx build \
+          --load \
+          -t ${REGISTRY}/${IMAGE_NAME} \
+          .      
 
   stop-ec2-runner:
     if: always()
