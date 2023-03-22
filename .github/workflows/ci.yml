@@ -53,26 +53,31 @@ jobs:
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
-      - name: Build and push builder image
+      - name: Build builder image
         run: |
           docker buildx build \
           --load \
-          --push \
           -t ${REGISTRY}/${IMAGE_NAME}:builder \
           --target builder \
           .
 
-      - name: Build and push release image
+      - name: Build release image
         run: |
           docker buildx build \
           --load \
-          --push \
           -t ${REGISTRY}/${IMAGE_NAME} \
           .
 
       - name: Prune Docker
         run: |
           docker system prune -f
+
+      - name: Push Docker images on merge to main
+        # TODO: reenable this check
+        # if: github.ref == 'refs/heads/main'
+        run: |
+          docker push ${REGISTRY}/${IMAGE_NAME}:builder
+          docker push ${REGISTRY}/${IMAGE_NAME}:latest
 
   # TODO: reenable this
   stop-ec2-runner:
