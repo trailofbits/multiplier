@@ -50,18 +50,23 @@ jobs:
         with:
           submodules: "recursive"
 
-      - name: Build builder image
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Build and push builder image
         run: |
           docker buildx build \
           --load \
+          --push \
           -t ${REGISTRY}/${IMAGE_NAME}:builder \
           --target builder \
           .
 
-      - name: Build release image
+      - name: Build and push release image
         run: |
           docker buildx build \
           --load \
+          --push \
           -t ${REGISTRY}/${IMAGE_NAME} \
           .
 
