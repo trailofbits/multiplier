@@ -54,7 +54,7 @@ jobs:
         run: |
           docker buildx build \
           --load \
-          -t ${REGISTRY}/${IMAGE_NAME} \
+          -t ${REGISTRY}/${IMAGE_NAME}:builder \
           --target builder \
           .
 
@@ -63,10 +63,15 @@ jobs:
           docker buildx build \
           --load \
           -t ${REGISTRY}/${IMAGE_NAME} \
-          .      
+          .
 
+      - name: Prune Docker
+        run: |
+          docker system prune -f
+
+  # TODO: reenable this
   stop-ec2-runner:
-    if: always()
+    if: false #always()
     runs-on: ubuntu-latest
     needs:
       - start-ec2-runner

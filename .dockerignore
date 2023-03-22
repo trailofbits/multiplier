@@ -1,1 +1,8 @@
-build.Dockerfile
+Dockerfile
+.git/
+.github/
+docs/
+example/
+*.md
+LICENSE
+.gitignore
