@@ -7,7 +7,7 @@ on:
     - cron: "0 0 * * 6"
 
 env:
-  DOCKER_SHELL: docker run -it -v ${{ github.workspace }}:/github ghcr.io/trailofbits/multiplier:builder /bin/bash -e {0}
+  DOCKER_SHELL: docker run -it -v ${{ github.workspace }}:/github ghcr.io/trailofbits/multiplier:builder {0}
   EC2_RUNNER_ID: i-0829aea272db4290b
   AWS_REGION: us-east-1
 
