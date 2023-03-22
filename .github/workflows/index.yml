@@ -102,6 +102,8 @@ jobs:
           path: /tmp/pcre2-10.42.mx
 
   index-sqlite:
+    # this is currently not working
+    if: false
     runs-on: multiplier
     continue-on-error: true
     needs: start-ec2-runner
@@ -182,7 +184,7 @@ jobs:
     needs:
       - index-lua
       - index-pcre2
-      - index-sqlite
+      # - index-sqlite
       # - index-linux
     steps:
       - name: Configure AWS credentials
