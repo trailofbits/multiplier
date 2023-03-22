@@ -176,14 +176,13 @@ jobs:
           name: linux-6.1.6
           path: /tmp/linux-6.1.6.mx
 
-  # TODO: reenable this
   stop-ec2-runner:
-    if: false #always()
+    if: always()
     runs-on: ubuntu-latest
     needs:
-      - start-ec2-runner
-      - index-sqlite
+      - index-lua
       - index-pcre2
+      - index-sqlite
       # - index-linux
     steps:
       - name: Configure AWS credentials
