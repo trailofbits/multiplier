@@ -5,15 +5,13 @@ on:
     branches:
       - "main"
 
-  pull_request:
-    branches:
-      - "*"
+  # pull_request:
+  #   branches:
+  #     - "*"
 
 env:
-  VCPKG_ROOT: /work/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  DOCKER_RUN: docker run -v ${{ github.workspace }}:/github ghcr.io/trailofbits/multiplier:latest
   EC2_RUNNER_ID: i-0829aea272db4290b
   AWS_REGION: us-east-1
 
@@ -25,9 +23,6 @@ concurrency:
 jobs:
   start-ec2-runner:
     runs-on: ubuntu-latest
-    outputs:
-      label: ${{ steps.start_ec2_runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start_ec2_runner.outputs.ec2-instance-id }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -59,7 +54,6 @@ jobs:
         run: |
           docker buildx build \
           --load \
-          -f .github/docker/build.Dockerfile \
           -t ${REGISTRY}/${IMAGE_NAME} \
           .
 
