@@ -73,18 +73,15 @@ jobs:
           docker system prune -f
 
       - name: Push Docker images on merge to main
-        # TODO: reenable this check
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: |
           docker push ${REGISTRY}/${IMAGE_NAME}:builder
           docker push ${REGISTRY}/${IMAGE_NAME}:latest
 
-  # TODO: reenable this
   stop-ec2-runner:
-    if: false #always()
+    if: always()
     runs-on: ubuntu-latest
     needs:
-      - start-ec2-runner
       - build-docker
     steps:
       - name: Configure AWS credentials
