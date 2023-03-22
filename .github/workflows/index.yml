@@ -1,7 +1,6 @@
 name: Index
 
 on:
-  pull_request:
   workflow_dispatch:
   schedule:
     # At 00:00 every Saturday.
