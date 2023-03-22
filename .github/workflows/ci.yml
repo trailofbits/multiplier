@@ -3,255 +3,93 @@ name: Build and Test
 on:
   push:
     branches:
-      - 'main'
-
-    tags:
-      - '*'
+      - "main"
 
   pull_request:
     branches:
-      - '*'
+      - "*"
 
 env:
-  CXX_COMMON_URL: https://github.com/lifting-bits/cxx-common/releases/download/v0.2.24/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz
-  VCPKG_ROOT: ${{ github.workspace }}/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64
-  INSTALL_DIR: ${{ github.workspace }}/install
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  EC2_RUNNER_ID: i-0829aea272db4290b
+  AWS_REGION: us-east-1
+
+# Cancel in progress runs for PRs but not main
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-22.04
+  start-ec2-runner:
+    runs-on: ubuntu-latest
     steps:
-    - name: Install dependencies
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y \
-             gpg wget curl zip unzip tar git pkg-config \
-             ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear
-        mkdir src
-        mkdir build
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-          toolchain: stable
+      - name: Start EC2 runner
+        id: start_ec2_runner
+        run: |
+          aws ec2 start-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
+          aws ec2 wait instance-running --instance-ids ${{ env.EC2_RUNNER_ID }}
 
-    - name: Download cxx-common
-      run: |
-        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
+  build-docker:
+    runs-on: multiplier
+    needs: start-ec2-runner
+    permissions:
+      contents: read
+      packages: write
 
-    - name: Download gap
-      uses: actions/checkout@v3
-      with:
-          repository: 'lifting-bits/gap'
-          path: '${{ github.workspace }}/src/gap'
-
-    - name: Build and install gap
-      run: |
-        cmake \
-          -S '${{ github.workspace }}/src/gap' \
-          -B '${{ github.workspace }}/build/gap' \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DUSE_SYSTEM_DEPENDENCIES=ON \
-          -DCMAKE_C_COMPILER="$(which clang-15)" \
-          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-          -DGAP_ENABLE_WARNINGS=OFF \
-          -DGAP_ENABLE_TESTING=OFF \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-        cmake --build '${{ github.workspace }}/build/gap' --target install
-
-    - name: Download weggli-native
-      uses: actions/checkout@v3
-      with:
-          repository: 'trailofbits/weggli-native'
-          path: '${{ github.workspace }}/src/weggli-native'
-
-    - name: Build and install weggli-native
-      run: |
-        cmake \
-          -S '${{ github.workspace }}/src/weggli-native' \
-          -B '${{ github.workspace }}/build/weggli-native' \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-        cmake --build '${{ github.workspace }}/build/weggli-native' --target install
-
-    - name: Download pasta
-      uses: actions/checkout@v3
-      with:
-          repository: 'trailofbits/pasta'
-          path: '${{ github.workspace }}/src/pasta'
-
-    - name: Build and install pasta
-      run: |
-        cmake \
-          --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -S '${{ github.workspace }}/src/pasta' \
-          -B '${{ github.workspace }}/build/pasta' \
-          -G Ninja \
-          -DVCPKG_ROOT="$VCPKG_ROOT" \
-          -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_C_COMPILER="$(which clang-15)" \
-          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-          -DPASTA_BOOTSTRAP_MACROS=OFF \
-          -DPASTA_BOOTSTRAP_TYPES=OFF \
-          -DPASTA_ENABLE_TESTING=OFF \
-          -DPASTA_ENABLE_INSTALL=ON
-        cmake --build '${{ github.workspace }}/build/pasta' --target install
-
-    - name: Download multiplier
-      uses: actions/checkout@v3
-      with:
-          path: '${{ github.workspace }}/src/multiplier'
-          submodules: 'recursive'
-
-    - name: Build and install multiplier
-      run: |
-        cmake \
-          --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -S '${{ github.workspace }}/src/multiplier' \
-          -B '${{ github.workspace }}/build/multiplier' \
-          -G Ninja \
-          -DVCPKG_ROOT="$VCPKG_ROOT" \
-          -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_C_COMPILER="$(which clang-15)" \
-          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-          -DMX_ENABLE_INSTALL=ON \
-          -DMX_ENABLE_BOOTSTRAP=OFF \
-          -DMX_ENABLE_VAST=OFF \
-          -DMX_ENABLE_WEGGLI=ON
-        cmake --build '${{ github.workspace }}/build/multiplier' --target install
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: multiplier
-        path: '${{ env.INSTALL_DIR }}'
-
-  build-release:
-    runs-on: ubuntu-22.04
     steps:
-    - name: Install dependencies
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install -y \
-             gpg wget curl zip unzip tar git pkg-config \
-             ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear
-        mkdir src
-        mkdir build
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-          toolchain: stable
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
-    - name: Download cxx-common
-      run: |
-        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
+      - name: Build builder image
+        run: |
+          docker buildx build \
+          --load \
+          -t ${REGISTRY}/${IMAGE_NAME}:builder \
+          --target builder \
+          .
 
-    - name: Download gap
-      uses: actions/checkout@v3
-      with:
-          repository: 'lifting-bits/gap'
-          path: '${{ github.workspace }}/src/gap'
+      - name: Build release image
+        run: |
+          docker buildx build \
+          --load \
+          -t ${REGISTRY}/${IMAGE_NAME} \
+          .
 
-    - name: Build and install gap
-      run: |
-        cmake \
-          -S '${{ github.workspace }}/src/gap' \
-          -B '${{ github.workspace }}/build/gap' \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_COMPILER="$(which clang-15)" \
-          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-          -DUSE_SYSTEM_DEPENDENCIES=ON \
-          -DGAP_ENABLE_WARNINGS=OFF \
-          -DGAP_ENABLE_TESTING=OFF \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-        cmake --build '${{ github.workspace }}/build/gap' --target install
+      - name: Prune Docker
+        run: |
+          docker system prune -f
 
-    - name: Download weggli-native
-      uses: actions/checkout@v3
-      with:
-          repository: 'trailofbits/weggli-native'
-          path: '${{ github.workspace }}/src/weggli-native'
+      - name: Push Docker images on merge to main
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker push ${REGISTRY}/${IMAGE_NAME}:builder
+          docker push ${REGISTRY}/${IMAGE_NAME}:latest
 
-    - name: Build and install weggli-native
-      run: |
-        cmake \
-          -S '${{ github.workspace }}/src/weggli-native' \
-          -B '${{ github.workspace }}/build/weggli-native' \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
-        cmake --build '${{ github.workspace }}/build/weggli-native' --target install
+  stop-ec2-runner:
+    if: always()
+    runs-on: ubuntu-latest
+    needs:
+      - build-docker
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Download pasta
-      uses: actions/checkout@v3
-      with:
-          repository: 'trailofbits/pasta'
-          path: '${{ github.workspace }}/src/pasta'
-
-    - name: Build and install pasta
-      run: |
-        cmake \
-          --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -S '${{ github.workspace }}/src/pasta' \
-          -B '${{ github.workspace }}/build/pasta' \
-          -G Ninja \
-          -DVCPKG_ROOT="$VCPKG_ROOT" \
-          -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_COMPILER="$(which clang-15)" \
-          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-          -DPASTA_BOOTSTRAP_MACROS=OFF \
-          -DPASTA_BOOTSTRAP_TYPES=OFF \
-          -DPASTA_ENABLE_TESTING=OFF \
-          -DPASTA_ENABLE_INSTALL=ON
-        cmake --build '${{ github.workspace }}/build/pasta' --target install
-
-    - name: Download multiplier
-      uses: actions/checkout@v3
-      with:
-          path: '${{ github.workspace }}/src/multiplier'
-          submodules: 'recursive'
-
-    - name: Build and install multiplier
-      run: |
-        cmake \
-          --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -S '${{ github.workspace }}/src/multiplier' \
-          -B '${{ github.workspace }}/build/multiplier' \
-          -G Ninja \
-          -DVCPKG_ROOT="$VCPKG_ROOT" \
-          -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_COMPILER="$(which clang-15)" \
-          -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-          -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-          -DMX_ENABLE_INSTALL=ON \
-          -DMX_ENABLE_BOOTSTRAP=OFF \
-          -DMX_ENABLE_VAST=OFF \
-          -DMX_ENABLE_WEGGLI=ON
-        cmake --build '${{ github.workspace }}/build/multiplier' --target install
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: multiplier-rel
-        path: '${{ env.INSTALL_DIR }}'
+      - name: Stop EC2 runner
+        run: aws ec2 stop-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
