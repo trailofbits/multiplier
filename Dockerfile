@@ -93,8 +93,8 @@ RUN cmake \
     -DMX_ENABLE_WEGGLI=ON 
 RUN cmake --build '/work/build/multiplier' --target install
 RUN chmod +x /work/install/bin/*
+ENV PATH="/work/install/bin:${PATH}"
 
 
 FROM --platform=linux/amd64 ${IMAGE} as release
 COPY --from=builder /work/install /work/install
-ENV PATH="/work/install/bin:${PATH}"
