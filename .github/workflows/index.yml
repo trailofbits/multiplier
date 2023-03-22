@@ -7,7 +7,6 @@ on:
     - cron: "0 0 * * 6"
 
 env:
-  DOCKER_IMAGE: ghcr.io/trailofbits/multiplier:builder
   EC2_RUNNER_ID: i-0829aea272db4290b
   AWS_REGION: us-east-1
 
@@ -32,7 +31,7 @@ jobs:
     runs-on: multiplier
     needs: start-ec2-runner
     container: 
-      image: ${{ env.DOCKER_IMAGE }}
+      image: ghcr.io/trailofbits/multiplier:builder
       credentials:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.github_token }}
@@ -65,7 +64,7 @@ jobs:
     runs-on: multiplier
     needs: start-ec2-runner
     container: 
-      image: ${{ env.DOCKER_IMAGE }}
+      image: ghcr.io/trailofbits/multiplier:builder
       credentials:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.github_token }}
@@ -102,7 +101,7 @@ jobs:
     continue-on-error: true
     needs: start-ec2-runner
     container: 
-      image: ${{ env.DOCKER_IMAGE }}
+      image: ghcr.io/trailofbits/multiplier:builder
       credentials:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.github_token }}
@@ -139,7 +138,7 @@ jobs:
     if: false
     needs: start-ec2-runner
     container: 
-      image: ${{ env.DOCKER_IMAGE }}
+      image: ghcr.io/trailofbits/multiplier:builder
       credentials:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.github_token }}
