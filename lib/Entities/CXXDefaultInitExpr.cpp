@@ -173,8 +173,17 @@ FieldDecl CXXDefaultInitExpr::field(void) const {
   return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
+Expr CXXDefaultInitExpr::rewritten_expression(void) const {
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
 Token CXXDefaultInitExpr::used_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+}
+
+bool CXXDefaultInitExpr::has_rewritten_initializer(void) const {
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

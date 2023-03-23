@@ -43,6 +43,11 @@ enum class TypeTrait : unsigned char {
   IS_UNION,
   HAS_UNIQUE_OBJECT_REPRESENTATIONS,
   IS_TRIVIALLY_RELOCATABLE,
+  IS_BOUNDED_ARRAY,
+  IS_UNBOUNDED_ARRAY,
+  IS_NULL_POINTER,
+  IS_SCOPED_ENUM,
+  IS_REFERENCEABLE,
   IS_ARITHMETIC,
   IS_FLOATING_POINT,
   IS_INTEGRAL,
@@ -85,7 +90,7 @@ inline static const char *EnumerationName(TypeTrait) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeTrait) {
-  return 66;
+  return 71;
 }
 
 const char *EnumeratorName(TypeTrait);

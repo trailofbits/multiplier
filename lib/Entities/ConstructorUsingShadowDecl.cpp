@@ -168,17 +168,17 @@ std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const
 }
 
 bool ConstructorUsingShadowDecl::constructs_virtual_base(void) const {
-  return impl->reader.getVal70();
+  return impl->reader.getVal72();
 }
 
 CXXRecordDecl ConstructorUsingShadowDecl::constructed_base_class(void) const {
-  RawEntityId eid = impl->reader.getVal62();
+  RawEntityId eid = impl->reader.getVal64();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::constructed_base_class_shadow_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal63();
+    RawEntityId eid = impl->reader.getVal65();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -190,13 +190,13 @@ std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::constructe
 }
 
 CXXRecordDecl ConstructorUsingShadowDecl::nominated_base_class(void) const {
-  RawEntityId eid = impl->reader.getVal64();
+  RawEntityId eid = impl->reader.getVal66();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal73();
+    RawEntityId eid = impl->reader.getVal76();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

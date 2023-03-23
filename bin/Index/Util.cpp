@@ -8,6 +8,15 @@
 
 #include <glog/logging.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/Attr.h>
 #include <clang/AST/Decl.h>
@@ -15,6 +24,7 @@
 #include <clang/AST/DeclObjC.h>
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/PrettyPrinter.h>
+#pragma clang diagnostic pop
 
 #include <multiplier/AST.h>
 #include <pasta/AST/AST.h>
@@ -801,7 +811,7 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
     }
     case pasta::TypeKind::kTypeOf: {
       auto &tt = reinterpret_cast<const pasta::TypeOfType &>(type);
-      GEN(tt.UnderlyingType());
+      GEN(tt.UnmodifiedType());
       break;
     }
     case pasta::TypeKind::kTypedef: {

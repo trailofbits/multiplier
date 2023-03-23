@@ -112,7 +112,6 @@ class VarDecl : public DeclaratorDecl {
   bool is_function_or_method_variable_declaration(void) const;
   bool is_in_extern_c_context(void) const;
   bool is_in_extern_cxx_context(void) const;
-  bool is_initializer_capture(void) const;
   bool is_inline(void) const;
   bool is_inline_specified(void) const;
   bool is_known_to_be_defined(void) const;

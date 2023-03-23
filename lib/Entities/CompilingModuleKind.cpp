@@ -17,7 +17,6 @@ const char *EnumeratorName(CompilingModuleKind e) {
   switch (e) {
     case CompilingModuleKind::NONE: return "NONE";
     case CompilingModuleKind::MODULE_MAP: return "MODULE_MAP";
-    case CompilingModuleKind::HEADER_MODULE: return "HEADER_MODULE";
     case CompilingModuleKind::HEADER_UNIT: return "HEADER_UNIT";
     case CompilingModuleKind::MODULE_INTERFACE: return "MODULE_INTERFACE";
     default: return "<invalid>";

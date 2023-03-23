@@ -166,12 +166,12 @@ std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializa
 }
 
 CXXMethodDecl ClassScopeFunctionSpecializationDecl::specialization(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal47();
   return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal46();
+  return impl->reader.getVal48();
 }
 
 #pragma GCC diagnostic pop

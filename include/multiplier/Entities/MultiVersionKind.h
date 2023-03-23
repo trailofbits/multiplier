@@ -17,6 +17,7 @@ enum class MultiVersionKind : unsigned char {
   CPU_SPECIFIC,
   CPU_DISPATCH,
   TARGET_CLONES,
+  TARGET_VERSION,
 };
 
 inline static const char *EnumerationName(MultiVersionKind) {
@@ -24,7 +25,7 @@ inline static const char *EnumerationName(MultiVersionKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(MultiVersionKind) {
-  return 5;
+  return 6;
 }
 
 const char *EnumeratorName(MultiVersionKind);

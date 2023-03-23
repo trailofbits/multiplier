@@ -167,11 +167,11 @@ std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const TokenContex
 }
 
 unsigned OMPThreadPrivateDecl::num_varlists(void) const {
-  return impl->reader.getVal47().size();
+  return impl->reader.getVal49().size();
 }
 
 std::optional<Expr> OMPThreadPrivateDecl::nth_varlist(unsigned n) const {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -185,12 +185,12 @@ std::optional<Expr> OMPThreadPrivateDecl::nth_varlist(unsigned n) const {
 }
 
 gap::generator<Expr> OMPThreadPrivateDecl::varlists(void) const & {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d47)))) {
+    if (auto d49 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d49)))) {
         co_yield std::move(*e);
       }
     }

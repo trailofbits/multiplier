@@ -170,41 +170,41 @@ std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const TokenCo
 }
 
 Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal63());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
 }
 
 Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal69();
+  capnp::Text::Reader data = impl->reader.getVal71();
   return std::string_view(data.cStr(), data.size());
 }
 
 ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
-  RawEntityId eid = impl->reader.getVal73();
+  RawEntityId eid = impl->reader.getVal76();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal75());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal77());
 }
 
 bool ObjCImplementationDecl::has_destructors(void) const {
-  return impl->reader.getVal70();
+  return impl->reader.getVal72();
 }
 
 bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
-  return impl->reader.getVal71();
+  return impl->reader.getVal73();
 }
 
 unsigned ObjCImplementationDecl::num_instance_variables(void) const {
-  return impl->reader.getVal335().size();
+  return impl->reader.getVal339().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal335();
+  auto list = impl->reader.getVal339();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -218,12 +218,12 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
-  auto list = impl->reader.getVal335();
+  auto list = impl->reader.getVal339();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d335 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(std::move(d335)))) {
+    if (auto d339 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from(Decl(std::move(d339)))) {
         co_yield std::move(*e);
       }
     }

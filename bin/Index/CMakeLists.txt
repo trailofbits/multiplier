@@ -74,6 +74,14 @@ target_link_libraries("${exe_name}"
     ${MX_END_FORCE_LOAD_GROUP}
 )
 
+# When we're bootstrapping, we might be using a different version of Clang and
+# LLVM. But if we're still using cxx-common for the 'old' LLVM, then the include
+# paths might make the indexer find the old LVLM, rather than the new one.
+target_include_directories("${exe_name}"
+  PRIVATE
+    "$<BUILD_INTERFACE:${LLVM_INCLUDE_DIRS};${LLVM_INCLUDE_DIR};${CLANG_INCLUDE_DIRS}>"
+)
+
 target_compile_options("${exe_name}"
   PRIVATE
     "-Wno-unknown-warning-option"

@@ -61,6 +61,7 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const Reference &r);
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const TokenContext &t);
 
+  Decl associated_declaration(void) const;
   NonTypeTemplateParmDecl parameter_pack(void) const;
   Token parameter_pack_token(void) const;
 };

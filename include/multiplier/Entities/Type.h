@@ -282,14 +282,15 @@ class Type {
   bool is_pipe_type(void) const;
   bool is_placeholder_type(void) const;
   bool is_pointer_type(void) const;
-  bool is_promotable_integer_type(void) const;
   bool is_queue_t(void) const;
+  bool is_rvv_type(void) const;
   bool is_r_value_reference_type(void) const;
   bool is_real_floating_type(void) const;
   bool is_real_type(void) const;
   bool is_record_type(void) const;
   bool is_reference_type(void) const;
   bool is_reserve_idt(void) const;
+  bool is_sve_sizeless_builtin_type(void) const;
   bool is_sampler_t(void) const;
   bool is_saturated_fixed_point_type(void) const;
   bool is_scalar_type(void) const;

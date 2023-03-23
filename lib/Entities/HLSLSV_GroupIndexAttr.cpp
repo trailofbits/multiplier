@@ -9,6 +9,7 @@
 #include <multiplier/Entities/HLSLSV_GroupIndexAttr.h>
 
 #include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/HLSLAnnotationAttr.h>
 #include <multiplier/Entities/InheritableAttr.h>
 #include <multiplier/Entities/Token.h>
 

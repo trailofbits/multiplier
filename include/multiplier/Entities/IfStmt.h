@@ -68,6 +68,7 @@ class IfStmt : public Stmt {
   Token if_token(void) const;
   std::optional<Stmt> initializer(void) const;
   Token l_paren_token(void) const;
+  std::optional<Stmt> nondiscarded_case(void) const;
   Token r_paren_token(void) const;
   IfStatementKind statement_kind(void) const;
   Stmt then(void) const;

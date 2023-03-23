@@ -165,12 +165,12 @@ std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Tok
 }
 
 std::string_view PragmaDetectMismatchDecl::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal59();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view PragmaDetectMismatchDecl::value(void) const {
-  capnp::Text::Reader data = impl->reader.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal62();
   return std::string_view(data.cStr(), data.size());
 }
 

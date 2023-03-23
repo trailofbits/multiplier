@@ -119,6 +119,9 @@
 #include <multiplier/Entities/GuardedVarAttr.h>
 #include <multiplier/Entities/HIPManagedAttr.h>
 #include <multiplier/Entities/HLSLNumThreadsAttr.h>
+#include <multiplier/Entities/HLSLResourceAttr.h>
+#include <multiplier/Entities/HLSLResourceBindingAttr.h>
+#include <multiplier/Entities/HLSLSV_DispatchThreadIDAttr.h>
 #include <multiplier/Entities/HLSLSV_GroupIndexAttr.h>
 #include <multiplier/Entities/HLSLShaderAttr.h>
 #include <multiplier/Entities/HotAttr.h>
@@ -145,6 +148,7 @@
 #include <multiplier/Entities/MSVtorDispAttr.h>
 #include <multiplier/Entities/MaxFieldAlignmentAttr.h>
 #include <multiplier/Entities/MayAliasAttr.h>
+#include <multiplier/Entities/MaybeUndefAttr.h>
 #include <multiplier/Entities/MicroMipsAttr.h>
 #include <multiplier/Entities/MinSizeAttr.h>
 #include <multiplier/Entities/MinVectorWidthAttr.h>
@@ -179,6 +183,7 @@
 #include <multiplier/Entities/NoThreadSafetyAnalysisAttr.h>
 #include <multiplier/Entities/NoThrowAttr.h>
 #include <multiplier/Entities/NoUniqueAddressAttr.h>
+#include <multiplier/Entities/NoUwtableAttr.h>
 #include <multiplier/Entities/NonNullAttr.h>
 #include <multiplier/Entities/NotTailCalledAttr.h>
 #include <multiplier/Entities/OMPAllocateDeclAttr.h>
@@ -234,6 +239,7 @@
 #include <multiplier/Entities/PureAttr.h>
 #include <multiplier/Entities/RISCVInterruptAttr.h>
 #include <multiplier/Entities/RandomizeLayoutAttr.h>
+#include <multiplier/Entities/ReadOnlyPlacementAttr.h>
 #include <multiplier/Entities/RegCallAttr.h>
 #include <multiplier/Entities/ReinitializesAttr.h>
 #include <multiplier/Entities/ReleaseCapabilityAttr.h>
@@ -257,6 +263,7 @@
 #include <multiplier/Entities/StandaloneDebugAttr.h>
 #include <multiplier/Entities/StdCallAttr.h>
 #include <multiplier/Entities/StrictFPAttr.h>
+#include <multiplier/Entities/StrictGuardStackCheckAttr.h>
 #include <multiplier/Entities/SwiftAsyncAttr.h>
 #include <multiplier/Entities/SwiftAsyncCallAttr.h>
 #include <multiplier/Entities/SwiftAsyncContextAttr.h>
@@ -277,6 +284,7 @@
 #include <multiplier/Entities/TLSModelAttr.h>
 #include <multiplier/Entities/TargetAttr.h>
 #include <multiplier/Entities/TargetClonesAttr.h>
+#include <multiplier/Entities/TargetVersionAttr.h>
 #include <multiplier/Entities/TestTypestateAttr.h>
 #include <multiplier/Entities/ThisCallAttr.h>
 #include <multiplier/Entities/Token.h>
@@ -365,6 +373,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     MSVtorDispAttr::static_kind(),
     MaxFieldAlignmentAttr::static_kind(),
     MayAliasAttr::static_kind(),
+    MaybeUndefAttr::static_kind(),
     MicroMipsAttr::static_kind(),
     MinSizeAttr::static_kind(),
     MinVectorWidthAttr::static_kind(),
@@ -396,6 +405,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     NoThreadSafetyAnalysisAttr::static_kind(),
     NoThrowAttr::static_kind(),
     NoUniqueAddressAttr::static_kind(),
+    NoUwtableAttr::static_kind(),
     NotTailCalledAttr::static_kind(),
     OMPAllocateDeclAttr::static_kind(),
     OMPCaptureNoInitAttr::static_kind(),
@@ -448,6 +458,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     PureAttr::static_kind(),
     RISCVInterruptAttr::static_kind(),
     RandomizeLayoutAttr::static_kind(),
+    ReadOnlyPlacementAttr::static_kind(),
     RegCallAttr::static_kind(),
     ReinitializesAttr::static_kind(),
     ReleaseCapabilityAttr::static_kind(),
@@ -470,6 +481,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     StandaloneDebugAttr::static_kind(),
     StdCallAttr::static_kind(),
     StrictFPAttr::static_kind(),
+    StrictGuardStackCheckAttr::static_kind(),
     SwiftAsyncAttr::static_kind(),
     SwiftAsyncCallAttr::static_kind(),
     SwiftAsyncErrorAttr::static_kind(),
@@ -486,6 +498,7 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     TLSModelAttr::static_kind(),
     TargetAttr::static_kind(),
     TargetClonesAttr::static_kind(),
+    TargetVersionAttr::static_kind(),
     TestTypestateAttr::static_kind(),
     ThisCallAttr::static_kind(),
     TransparentUnionAttr::static_kind(),
@@ -622,7 +635,8 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     GuardedVarAttr::static_kind(),
     HIPManagedAttr::static_kind(),
     HLSLNumThreadsAttr::static_kind(),
-    HLSLSV_GroupIndexAttr::static_kind(),
+    HLSLResourceAttr::static_kind(),
+    HLSLResourceBindingAttr::static_kind(),
     HLSLShaderAttr::static_kind(),
     HotAttr::static_kind(),
     IBActionAttr::static_kind(),
@@ -640,6 +654,8 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
     NoInlineAttr::static_kind(),
     NoMergeAttr::static_kind(),
     AlwaysInlineAttr::static_kind(),
+    HLSLSV_DispatchThreadIDAttr::static_kind(),
+    HLSLSV_GroupIndexAttr::static_kind(),
     SwiftAsyncContextAttr::static_kind(),
     SwiftContextAttr::static_kind(),
     SwiftErrorResultAttr::static_kind(),
@@ -668,6 +684,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case MSVtorDispAttr::static_kind():
     case MaxFieldAlignmentAttr::static_kind():
     case MayAliasAttr::static_kind():
+    case MaybeUndefAttr::static_kind():
     case MicroMipsAttr::static_kind():
     case MinSizeAttr::static_kind():
     case MinVectorWidthAttr::static_kind():
@@ -699,6 +716,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case NoThreadSafetyAnalysisAttr::static_kind():
     case NoThrowAttr::static_kind():
     case NoUniqueAddressAttr::static_kind():
+    case NoUwtableAttr::static_kind():
     case NotTailCalledAttr::static_kind():
     case OMPAllocateDeclAttr::static_kind():
     case OMPCaptureNoInitAttr::static_kind():
@@ -751,6 +769,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case PureAttr::static_kind():
     case RISCVInterruptAttr::static_kind():
     case RandomizeLayoutAttr::static_kind():
+    case ReadOnlyPlacementAttr::static_kind():
     case RegCallAttr::static_kind():
     case ReinitializesAttr::static_kind():
     case ReleaseCapabilityAttr::static_kind():
@@ -773,6 +792,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case StandaloneDebugAttr::static_kind():
     case StdCallAttr::static_kind():
     case StrictFPAttr::static_kind():
+    case StrictGuardStackCheckAttr::static_kind():
     case SwiftAsyncAttr::static_kind():
     case SwiftAsyncCallAttr::static_kind():
     case SwiftAsyncErrorAttr::static_kind():
@@ -789,6 +809,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case TLSModelAttr::static_kind():
     case TargetAttr::static_kind():
     case TargetClonesAttr::static_kind():
+    case TargetVersionAttr::static_kind():
     case TestTypestateAttr::static_kind():
     case ThisCallAttr::static_kind():
     case TransparentUnionAttr::static_kind():
@@ -925,7 +946,8 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case GuardedVarAttr::static_kind():
     case HIPManagedAttr::static_kind():
     case HLSLNumThreadsAttr::static_kind():
-    case HLSLSV_GroupIndexAttr::static_kind():
+    case HLSLResourceAttr::static_kind():
+    case HLSLResourceBindingAttr::static_kind():
     case HLSLShaderAttr::static_kind():
     case HotAttr::static_kind():
     case IBActionAttr::static_kind():
@@ -943,6 +965,8 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
     case NoInlineAttr::static_kind():
     case NoMergeAttr::static_kind():
     case AlwaysInlineAttr::static_kind():
+    case HLSLSV_DispatchThreadIDAttr::static_kind():
+    case HLSLSV_GroupIndexAttr::static_kind():
     case SwiftAsyncContextAttr::static_kind():
     case SwiftContextAttr::static_kind():
     case SwiftErrorResultAttr::static_kind():

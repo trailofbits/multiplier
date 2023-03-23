@@ -63,7 +63,9 @@ class CXXDefaultInitExpr : public Expr {
 
   std::optional<Expr> expression(void) const;
   FieldDecl field(void) const;
+  Expr rewritten_expression(void) const;
   Token used_token(void) const;
+  bool has_rewritten_initializer(void) const;
 };
 
 static_assert(sizeof(CXXDefaultInitExpr) == sizeof(Expr));

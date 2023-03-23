@@ -14,7 +14,6 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <kj/io.h>
-#include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
@@ -24,6 +23,19 @@
 #include <sstream>
 #include <utility>
 #include <unordered_set>
+
+// NOTE(pag): We use the UTF-8 functions from the `llvm::json` namespace.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <llvm/Support/JSON.h>
+#pragma clang diagnostic pop
 
 #include "Codegen.h"
 #include "EntityMapper.h"

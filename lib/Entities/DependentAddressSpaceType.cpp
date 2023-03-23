@@ -105,21 +105,21 @@ std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const T
 }
 
 Type DependentAddressSpaceType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentAddressSpaceType::address_space_expression(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal230();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token DependentAddressSpaceType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal234());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal236());
 }
 
 bool DependentAddressSpaceType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal231();
 }
 
 #pragma GCC diagnostic pop

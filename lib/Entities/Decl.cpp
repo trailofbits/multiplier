@@ -343,106 +343,114 @@ bool Decl::is_discarded_in_global_module_fragment(void) const {
   return impl->reader.getVal18();
 }
 
-bool Decl::is_function_or_function_template(void) const {
+bool Decl::is_file_context_declaration(void) const {
   return impl->reader.getVal19();
 }
 
-bool Decl::is_implicit(void) const {
+bool Decl::is_function_or_function_template(void) const {
   return impl->reader.getVal20();
 }
 
-bool Decl::is_in_anonymous_namespace(void) const {
+bool Decl::is_implicit(void) const {
   return impl->reader.getVal21();
 }
 
-bool Decl::is_in_export_declaration_context(void) const {
+bool Decl::is_in_anonymous_namespace(void) const {
   return impl->reader.getVal22();
 }
 
-bool Decl::is_in_local_scope_for_instantiation(void) const {
+bool Decl::is_in_export_declaration_context(void) const {
   return impl->reader.getVal23();
 }
 
-bool Decl::is_in_std_namespace(void) const {
+bool Decl::is_in_local_scope_for_instantiation(void) const {
   return impl->reader.getVal24();
 }
 
-bool Decl::is_invalid_declaration(void) const {
+bool Decl::is_in_std_namespace(void) const {
   return impl->reader.getVal25();
 }
 
-bool Decl::is_invisible_outside_the_owning_module(void) const {
+bool Decl::is_invalid_declaration(void) const {
   return impl->reader.getVal26();
 }
 
-bool Decl::is_module_private(void) const {
+bool Decl::is_invisible_outside_the_owning_module(void) const {
   return impl->reader.getVal27();
 }
 
-bool Decl::is_out_of_line(void) const {
+bool Decl::is_local_extern_declaration(void) const {
   return impl->reader.getVal28();
 }
 
-bool Decl::is_parameter_pack(void) const {
+bool Decl::is_module_private(void) const {
   return impl->reader.getVal29();
 }
 
-bool Decl::is_reachable(void) const {
+bool Decl::is_out_of_line(void) const {
   return impl->reader.getVal30();
 }
 
-bool Decl::is_template_declaration(void) const {
+bool Decl::is_parameter_pack(void) const {
   return impl->reader.getVal31();
 }
 
-bool Decl::is_template_parameter(void) const {
+bool Decl::is_reachable(void) const {
   return impl->reader.getVal32();
 }
 
-bool Decl::is_template_parameter_pack(void) const {
+bool Decl::is_template_declaration(void) const {
   return impl->reader.getVal33();
 }
 
-bool Decl::is_templated(void) const {
+bool Decl::is_template_parameter(void) const {
   return impl->reader.getVal34();
 }
 
-bool Decl::is_this_declaration_referenced(void) const {
+bool Decl::is_template_parameter_pack(void) const {
   return impl->reader.getVal35();
 }
 
-bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
+bool Decl::is_templated(void) const {
   return impl->reader.getVal36();
 }
 
-bool Decl::is_unavailable(void) const {
+bool Decl::is_this_declaration_referenced(void) const {
   return impl->reader.getVal37();
 }
 
-bool Decl::is_unconditionally_visible(void) const {
+bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
   return impl->reader.getVal38();
 }
 
-bool Decl::is_weak_imported(void) const {
+bool Decl::is_unavailable(void) const {
   return impl->reader.getVal39();
 }
 
+bool Decl::is_unconditionally_visible(void) const {
+  return impl->reader.getVal40();
+}
+
+bool Decl::is_weak_imported(void) const {
+  return impl->reader.getVal41();
+}
+
 DeclKind Decl::kind(void) const {
-  return static_cast<DeclKind>(impl->reader.getVal40());
+  return static_cast<DeclKind>(impl->reader.getVal42());
 }
 
 DeclCategory Decl::category(void) const {
-  return static_cast<DeclCategory>(impl->reader.getVal41());
+  return static_cast<DeclCategory>(impl->reader.getVal43());
 }
 
 Token Decl::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 TokenRange Decl::tokens(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal43(), impl->reader.getVal44());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal45(), impl->reader.getVal46());
 }
 
 #pragma GCC diagnostic pop

@@ -168,7 +168,7 @@ std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const TokenContext &t) 
 }
 
 bool ClassTemplateDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal75();
 }
 
 #pragma GCC diagnostic pop

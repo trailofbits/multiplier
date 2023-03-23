@@ -50,6 +50,7 @@ class TypedefType : public Type {
   Type desugar(void) const;
   TypedefNameDecl declaration(void) const;
   bool is_sugared(void) const;
+  bool type_matches_declaration(void) const;
 };
 
 static_assert(sizeof(TypedefType) == sizeof(Type));

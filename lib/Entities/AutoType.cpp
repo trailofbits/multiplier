@@ -107,15 +107,15 @@ std::optional<AutoType> AutoType::from(const TokenContext &t) {
 }
 
 AutoTypeKeyword AutoType::keyword(void) const {
-  return static_cast<AutoTypeKeyword>(impl->reader.getVal235());
+  return static_cast<AutoTypeKeyword>(impl->reader.getVal238());
 }
 
 unsigned AutoType::num_type_constraint_arguments(void) const {
-  return impl->reader.getVal233().size();
+  return impl->reader.getVal234().size();
 }
 
 std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned n) const {
-  auto list = impl->reader.getVal233();
+  auto list = impl->reader.getVal234();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -129,12 +129,12 @@ std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned 
 }
 
 gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const & {
-  auto list = impl->reader.getVal233();
+  auto list = impl->reader.getVal234();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d233 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d233));
+    if (auto d234 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d234));
     }
   }
   co_return;
@@ -142,7 +142,7 @@ gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const
 
 std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal234();
+    RawEntityId eid = impl->reader.getVal236();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -154,15 +154,15 @@ std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
 }
 
 bool AutoType::is_constrained(void) const {
-  return impl->reader.getVal232();
+  return impl->reader.getVal233();
 }
 
 bool AutoType::is_decltype_auto(void) const {
-  return impl->reader.getVal236();
+  return impl->reader.getVal239();
 }
 
 bool AutoType::is_gnu_auto_type(void) const {
-  return impl->reader.getVal237();
+  return impl->reader.getVal240();
 }
 
 #pragma GCC diagnostic pop

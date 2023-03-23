@@ -42,6 +42,7 @@ const char *EnumeratorName(StmtKind e) {
     case StmtKind::OMP_CRITICAL_DIRECTIVE: return "OMP_CRITICAL_DIRECTIVE";
     case StmtKind::OMP_DEPOBJ_DIRECTIVE: return "OMP_DEPOBJ_DIRECTIVE";
     case StmtKind::OMP_DISPATCH_DIRECTIVE: return "OMP_DISPATCH_DIRECTIVE";
+    case StmtKind::OMP_ERROR_DIRECTIVE: return "OMP_ERROR_DIRECTIVE";
     case StmtKind::OMP_FLUSH_DIRECTIVE: return "OMP_FLUSH_DIRECTIVE";
     case StmtKind::OMP_INTEROP_DIRECTIVE: return "OMP_INTEROP_DIRECTIVE";
     case StmtKind::OMP_DISTRIBUTE_DIRECTIVE: return "OMP_DISTRIBUTE_DIRECTIVE";
@@ -146,6 +147,7 @@ const char *EnumeratorName(StmtKind e) {
     case StmtKind::CXX_NEW_EXPR: return "CXX_NEW_EXPR";
     case StmtKind::CXX_NOEXCEPT_EXPR: return "CXX_NOEXCEPT_EXPR";
     case StmtKind::CXX_NULL_PTR_LITERAL_EXPR: return "CXX_NULL_PTR_LITERAL_EXPR";
+    case StmtKind::CXX_PAREN_LIST_INIT_EXPR: return "CXX_PAREN_LIST_INIT_EXPR";
     case StmtKind::CXX_PSEUDO_DESTRUCTOR_EXPR: return "CXX_PSEUDO_DESTRUCTOR_EXPR";
     case StmtKind::CXX_REWRITTEN_BINARY_OPERATOR: return "CXX_REWRITTEN_BINARY_OPERATOR";
     case StmtKind::CXX_SCALAR_VALUE_INIT_EXPR: return "CXX_SCALAR_VALUE_INIT_EXPR";

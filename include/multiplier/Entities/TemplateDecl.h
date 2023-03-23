@@ -66,6 +66,7 @@ class TemplateDecl : public NamedDecl {
   TemplateParameterList template_parameters(void) const;
   NamedDecl templated_declaration(void) const;
   bool has_associated_constraints(void) const;
+  bool is_type_alias(void) const;
 };
 
 static_assert(sizeof(TemplateDecl) == sizeof(NamedDecl));

@@ -40,6 +40,7 @@
 #include <multiplier/Entities/CXXNoexceptExpr.h>
 #include <multiplier/Entities/CXXNullPtrLiteralExpr.h>
 #include <multiplier/Entities/CXXOperatorCallExpr.h>
+#include <multiplier/Entities/CXXParenListInitExpr.h>
 #include <multiplier/Entities/CXXPseudoDestructorExpr.h>
 #include <multiplier/Entities/CXXReinterpretCastExpr.h>
 #include <multiplier/Entities/CXXRewrittenBinaryOperator.h>
@@ -302,6 +303,7 @@ static const StmtKind kValueStmtDerivedKinds[] = {
     CXXNewExpr::static_kind(),
     CXXNoexceptExpr::static_kind(),
     CXXNullPtrLiteralExpr::static_kind(),
+    CXXParenListInitExpr::static_kind(),
     CXXPseudoDestructorExpr::static_kind(),
     CXXRewrittenBinaryOperator::static_kind(),
     CXXScalarValueInitExpr::static_kind(),
@@ -431,6 +433,7 @@ std::optional<ValueStmt> ValueStmt::from(const Stmt &parent) {
     case CXXNewExpr::static_kind():
     case CXXNoexceptExpr::static_kind():
     case CXXNullPtrLiteralExpr::static_kind():
+    case CXXParenListInitExpr::static_kind():
     case CXXPseudoDestructorExpr::static_kind():
     case CXXRewrittenBinaryOperator::static_kind():
     case CXXScalarValueInitExpr::static_kind():

@@ -46,6 +46,11 @@ const char *EnumeratorName(TypeTrait e) {
     case TypeTrait::IS_UNION: return "IS_UNION";
     case TypeTrait::HAS_UNIQUE_OBJECT_REPRESENTATIONS: return "HAS_UNIQUE_OBJECT_REPRESENTATIONS";
     case TypeTrait::IS_TRIVIALLY_RELOCATABLE: return "IS_TRIVIALLY_RELOCATABLE";
+    case TypeTrait::IS_BOUNDED_ARRAY: return "IS_BOUNDED_ARRAY";
+    case TypeTrait::IS_UNBOUNDED_ARRAY: return "IS_UNBOUNDED_ARRAY";
+    case TypeTrait::IS_NULL_POINTER: return "IS_NULL_POINTER";
+    case TypeTrait::IS_SCOPED_ENUM: return "IS_SCOPED_ENUM";
+    case TypeTrait::IS_REFERENCEABLE: return "IS_REFERENCEABLE";
     case TypeTrait::IS_ARITHMETIC: return "IS_ARITHMETIC";
     case TypeTrait::IS_FLOATING_POINT: return "IS_FLOATING_POINT";
     case TypeTrait::IS_INTEGRAL: return "IS_INTEGRAL";

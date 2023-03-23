@@ -170,11 +170,11 @@ std::optional<DecompositionDecl> DecompositionDecl::from(const TokenContext &t) 
 }
 
 unsigned DecompositionDecl::num_bindings(void) const {
-  return impl->reader.getVal48().size();
+  return impl->reader.getVal50().size();
 }
 
 std::optional<BindingDecl> DecompositionDecl::nth_binding(unsigned n) const {
-  auto list = impl->reader.getVal48();
+  auto list = impl->reader.getVal50();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -188,12 +188,12 @@ std::optional<BindingDecl> DecompositionDecl::nth_binding(unsigned n) const {
 }
 
 gap::generator<BindingDecl> DecompositionDecl::bindings(void) const & {
-  auto list = impl->reader.getVal48();
+  auto list = impl->reader.getVal50();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d48 = ep->DeclFor(ep, v)) {
-      if (auto e = BindingDecl::from(Decl(std::move(d48)))) {
+    if (auto d50 = ep->DeclFor(ep, v)) {
+      if (auto e = BindingDecl::from(Decl(std::move(d50)))) {
         co_yield std::move(*e);
       }
     }

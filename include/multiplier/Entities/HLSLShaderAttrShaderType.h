@@ -18,6 +18,7 @@ enum class HLSLShaderAttrShaderType : unsigned char {
   HULL,
   DOMAIN_,
   COMPUTE,
+  LIBRARY,
   RAY_GENERATION,
   INTERSECTION,
   ANY_HIT,
@@ -33,7 +34,7 @@ inline static const char *EnumerationName(HLSLShaderAttrShaderType) {
 }
 
 inline static constexpr unsigned NumEnumerators(HLSLShaderAttrShaderType) {
-  return 14;
+  return 15;
 }
 
 const char *EnumeratorName(HLSLShaderAttrShaderType);

@@ -171,7 +171,7 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const TokenContext &t
 
 std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal170();
+    RawEntityId eid = impl->reader.getVal176();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -183,23 +183,23 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) c
 }
 
 bool CXXConstructorDecl::is_default_constructor(void) const {
-  return impl->reader.getVal172();
+  return impl->reader.getVal178();
 }
 
 bool CXXConstructorDecl::is_delegating_constructor(void) const {
-  return impl->reader.getVal173();
+  return impl->reader.getVal179();
 }
 
 bool CXXConstructorDecl::is_explicit(void) const {
-  return impl->reader.getVal174();
+  return impl->reader.getVal180();
 }
 
 bool CXXConstructorDecl::is_inheriting_constructor(void) const {
-  return impl->reader.getVal175();
+  return impl->reader.getVal181();
 }
 
 bool CXXConstructorDecl::is_specialization_copying_object(void) const {
-  return impl->reader.getVal176();
+  return impl->reader.getVal182();
 }
 
 #pragma GCC diagnostic pop

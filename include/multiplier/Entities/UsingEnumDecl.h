@@ -19,6 +19,7 @@ class EnumDecl;
 class NamedDecl;
 class Stmt;
 class Token;
+class Type;
 class UsingEnumDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UsingEnumDecl : public BaseUsingDecl {
@@ -64,6 +65,7 @@ class UsingEnumDecl : public BaseUsingDecl {
 
   EnumDecl enum_declaration(void) const;
   Token enum_token(void) const;
+  Type enum_type(void) const;
   Token using_token(void) const;
 };
 

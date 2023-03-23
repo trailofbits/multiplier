@@ -16,6 +16,7 @@ namespace mx {
 const char *EnumeratorName(OMPDeclareTargetDeclAttrMapTypeTy e) {
   switch (e) {
     case OMPDeclareTargetDeclAttrMapTypeTy::TO: return "TO";
+    case OMPDeclareTargetDeclAttrMapTypeTy::ENTER: return "ENTER";
     case OMPDeclareTargetDeclAttrMapTypeTy::LINK: return "LINK";
     default: return "<invalid>";
   }

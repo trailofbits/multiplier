@@ -143,6 +143,7 @@ class Decl {
   bool is_defined_outside_function_or_method(void) const;
   bool is_deprecated(void) const;
   bool is_discarded_in_global_module_fragment(void) const;
+  bool is_file_context_declaration(void) const;
   bool is_function_or_function_template(void) const;
   bool is_implicit(void) const;
   bool is_in_anonymous_namespace(void) const;
@@ -151,6 +152,7 @@ class Decl {
   bool is_in_std_namespace(void) const;
   bool is_invalid_declaration(void) const;
   bool is_invisible_outside_the_owning_module(void) const;
+  bool is_local_extern_declaration(void) const;
   bool is_module_private(void) const;
   bool is_out_of_line(void) const;
   bool is_parameter_pack(void) const;

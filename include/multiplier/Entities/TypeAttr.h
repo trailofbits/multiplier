@@ -19,6 +19,7 @@ class ArmMveStrictPolymorphismAttr;
 class Attr;
 class BTFTypeTagAttr;
 class CmseNSCallAttr;
+class HLSLGroupSharedAddressSpaceAttr;
 class NoDerefAttr;
 class ObjCGCAttr;
 class ObjCInertUnsafeUnretainedAttr;

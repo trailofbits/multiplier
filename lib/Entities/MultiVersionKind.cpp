@@ -20,6 +20,7 @@ const char *EnumeratorName(MultiVersionKind e) {
     case MultiVersionKind::CPU_SPECIFIC: return "CPU_SPECIFIC";
     case MultiVersionKind::CPU_DISPATCH: return "CPU_DISPATCH";
     case MultiVersionKind::TARGET_CLONES: return "TARGET_CLONES";
+    case MultiVersionKind::TARGET_VERSION: return "TARGET_VERSION";
     default: return "<invalid>";
   }
 }

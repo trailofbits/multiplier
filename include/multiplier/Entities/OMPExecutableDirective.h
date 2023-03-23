@@ -26,6 +26,7 @@ class OMPDistributeDirective;
 class OMPDistributeParallelForDirective;
 class OMPDistributeParallelForSimdDirective;
 class OMPDistributeSimdDirective;
+class OMPErrorDirective;
 class OMPExecutableDirective;
 class OMPFlushDirective;
 class OMPForDirective;

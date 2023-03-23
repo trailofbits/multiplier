@@ -13,6 +13,7 @@
 namespace mx {
 enum class OMPDeclareTargetDeclAttrMapTypeTy : unsigned char {
   TO,
+  ENTER,
   LINK,
 };
 
@@ -21,7 +22,7 @@ inline static const char *EnumerationName(OMPDeclareTargetDeclAttrMapTypeTy) {
 }
 
 inline static constexpr unsigned NumEnumerators(OMPDeclareTargetDeclAttrMapTypeTy) {
-  return 2;
+  return 3;
 }
 
 const char *EnumeratorName(OMPDeclareTargetDeclAttrMapTypeTy);

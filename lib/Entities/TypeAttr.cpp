@@ -14,6 +14,7 @@
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/BTFTypeTagAttr.h>
 #include <multiplier/Entities/CmseNSCallAttr.h>
+#include <multiplier/Entities/HLSLGroupSharedAddressSpaceAttr.h>
 #include <multiplier/Entities/NoDerefAttr.h>
 #include <multiplier/Entities/ObjCGCAttr.h>
 #include <multiplier/Entities/ObjCInertUnsafeUnretainedAttr.h>
@@ -80,6 +81,7 @@ static const AttrKind kTypeAttrDerivedKinds[] = {
     ArmMveStrictPolymorphismAttr::static_kind(),
     BTFTypeTagAttr::static_kind(),
     CmseNSCallAttr::static_kind(),
+    HLSLGroupSharedAddressSpaceAttr::static_kind(),
     NoDerefAttr::static_kind(),
     ObjCGCAttr::static_kind(),
     ObjCInertUnsafeUnretainedAttr::static_kind(),
@@ -108,6 +110,7 @@ std::optional<TypeAttr> TypeAttr::from(const Attr &parent) {
     case ArmMveStrictPolymorphismAttr::static_kind():
     case BTFTypeTagAttr::static_kind():
     case CmseNSCallAttr::static_kind():
+    case HLSLGroupSharedAddressSpaceAttr::static_kind():
     case NoDerefAttr::static_kind():
     case ObjCGCAttr::static_kind():
     case ObjCInertUnsafeUnretainedAttr::static_kind():

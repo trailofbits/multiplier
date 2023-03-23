@@ -18,6 +18,7 @@ const char *EnumeratorName(NoStackProtectorAttrSpelling e) {
     case NoStackProtectorAttrSpelling::GNU_NO_STACK_PROTECTOR: return "GNU_NO_STACK_PROTECTOR";
     case NoStackProtectorAttrSpelling::CXX11_CLANG_NO_STACK_PROTECTOR: return "CXX11_CLANG_NO_STACK_PROTECTOR";
     case NoStackProtectorAttrSpelling::C2X_CLANG_NO_STACK_PROTECTOR: return "C2X_CLANG_NO_STACK_PROTECTOR";
+    case NoStackProtectorAttrSpelling::DECLSPEC_SAFEBUFFERS: return "DECLSPEC_SAFEBUFFERS";
     case NoStackProtectorAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -15,6 +15,21 @@ namespace mx {
 
 const char *EnumeratorName(UnaryTransformTypeUTTKind e) {
   switch (e) {
+    case UnaryTransformTypeUTTKind::ADD_LVALUE_REFERENCE: return "ADD_LVALUE_REFERENCE";
+    case UnaryTransformTypeUTTKind::ADD_POINTER: return "ADD_POINTER";
+    case UnaryTransformTypeUTTKind::ADD_RVALUE_REFERENCE: return "ADD_RVALUE_REFERENCE";
+    case UnaryTransformTypeUTTKind::DECAY: return "DECAY";
+    case UnaryTransformTypeUTTKind::MAKE_SIGNED: return "MAKE_SIGNED";
+    case UnaryTransformTypeUTTKind::MAKE_UNSIGNED: return "MAKE_UNSIGNED";
+    case UnaryTransformTypeUTTKind::REMOVE_ALL_EXTENTS: return "REMOVE_ALL_EXTENTS";
+    case UnaryTransformTypeUTTKind::REMOVE_CONST: return "REMOVE_CONST";
+    case UnaryTransformTypeUTTKind::REMOVE_CV: return "REMOVE_CV";
+    case UnaryTransformTypeUTTKind::REMOVE_CV_REFERENCE: return "REMOVE_CV_REFERENCE";
+    case UnaryTransformTypeUTTKind::REMOVE_EXTENT: return "REMOVE_EXTENT";
+    case UnaryTransformTypeUTTKind::REMOVE_POINTER: return "REMOVE_POINTER";
+    case UnaryTransformTypeUTTKind::REMOVE_REFERENCE: return "REMOVE_REFERENCE";
+    case UnaryTransformTypeUTTKind::REMOVE_RESTRICT: return "REMOVE_RESTRICT";
+    case UnaryTransformTypeUTTKind::REMOVE_VOLATILE: return "REMOVE_VOLATILE";
     case UnaryTransformTypeUTTKind::ENUM_UNDERLYING_TYPE: return "ENUM_UNDERLYING_TYPE";
     default: return "<invalid>";
   }

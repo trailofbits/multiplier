@@ -21,6 +21,7 @@
 #include <multiplier/Entities/OMPDistributeParallelForDirective.h>
 #include <multiplier/Entities/OMPDistributeParallelForSimdDirective.h>
 #include <multiplier/Entities/OMPDistributeSimdDirective.h>
+#include <multiplier/Entities/OMPErrorDirective.h>
 #include <multiplier/Entities/OMPFlushDirective.h>
 #include <multiplier/Entities/OMPForDirective.h>
 #include <multiplier/Entities/OMPForSimdDirective.h>
@@ -199,6 +200,7 @@ static const StmtKind kOMPExecutableDirectiveDerivedKinds[] = {
     OMPCriticalDirective::static_kind(),
     OMPDepobjDirective::static_kind(),
     OMPDispatchDirective::static_kind(),
+    OMPErrorDirective::static_kind(),
     OMPMaskedTaskLoopDirective::static_kind(),
     OMPMaskedTaskLoopSimdDirective::static_kind(),
     OMPMasterTaskLoopDirective::static_kind(),
@@ -273,6 +275,7 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &p
     case OMPCriticalDirective::static_kind():
     case OMPDepobjDirective::static_kind():
     case OMPDispatchDirective::static_kind():
+    case OMPErrorDirective::static_kind():
     case OMPMaskedTaskLoopDirective::static_kind():
     case OMPMaskedTaskLoopSimdDirective::static_kind():
     case OMPMasterTaskLoopDirective::static_kind():

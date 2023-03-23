@@ -106,20 +106,20 @@ std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializati
 }
 
 Type DependentTemplateSpecializationType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool DependentTemplateSpecializationType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal231();
 }
 
 unsigned DependentTemplateSpecializationType::num_template_arguments(void) const {
-  return impl->reader.getVal233().size();
+  return impl->reader.getVal234().size();
 }
 
 std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal233();
+  auto list = impl->reader.getVal234();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -133,12 +133,12 @@ std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_templat
 }
 
 gap::generator<TemplateArgument> DependentTemplateSpecializationType::template_arguments(void) const & {
-  auto list = impl->reader.getVal233();
+  auto list = impl->reader.getVal234();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d233 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d233));
+    if (auto d234 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d234));
     }
   }
   co_return;

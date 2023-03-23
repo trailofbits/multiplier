@@ -13,8 +13,9 @@
 namespace mx {
 class EntityProvider;
 class Index;
+class Decl;
 class SubstTemplateTypeParmType;
-class TemplateTypeParmType;
+class TemplateTypeParmDecl;
 class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -48,7 +49,9 @@ class SubstTemplateTypeParmType : public Type {
   static std::optional<SubstTemplateTypeParmType> from(const TokenContext &t);
 
   Type desugar(void) const;
-  TemplateTypeParmType replaced_parameter(void) const;
+  Decl associated_declaration(void) const;
+  std::optional<unsigned> pack_index(void) const;
+  TemplateTypeParmDecl replaced_parameter(void) const;
   Type replacement_type(void) const;
   bool is_sugared(void) const;
 };

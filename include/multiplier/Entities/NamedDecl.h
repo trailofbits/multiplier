@@ -36,6 +36,7 @@ class EnumDecl;
 class FieldDecl;
 class FunctionDecl;
 class FunctionTemplateDecl;
+class HLSLBufferDecl;
 class ImplicitParamDecl;
 class IndirectFieldDecl;
 class LabelDecl;

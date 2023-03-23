@@ -171,11 +171,11 @@ std::optional<BaseUsingDecl> BaseUsingDecl::from(const TokenContext &t) {
 }
 
 unsigned BaseUsingDecl::num_shadows(void) const {
-  return impl->reader.getVal47().size();
+  return impl->reader.getVal49().size();
 }
 
 std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -189,12 +189,12 @@ std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
 }
 
 gap::generator<UsingShadowDecl> BaseUsingDecl::shadows(void) const & {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = ep->DeclFor(ep, v)) {
-      if (auto e = UsingShadowDecl::from(Decl(std::move(d47)))) {
+    if (auto d49 = ep->DeclFor(ep, v)) {
+      if (auto e = UsingShadowDecl::from(Decl(std::move(d49)))) {
         co_yield std::move(*e);
       }
     }

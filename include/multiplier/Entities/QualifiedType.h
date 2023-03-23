@@ -71,6 +71,7 @@ class QualifiedType : public Type {
   bool is_obj_cgc_strong(void) const;
   bool is_obj_cgc_weak(void) const;
   bool is_pod_type(void) const;
+  bool is_referenceable(void) const;
   bool is_restrict_qualified(void) const;
   bool is_trivial_type(void) const;
   bool is_trivially_copyable_type(void) const;

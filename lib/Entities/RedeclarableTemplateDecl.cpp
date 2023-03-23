@@ -177,12 +177,12 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Tok
 }
 
 RedeclarableTemplateDecl RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {
-  return impl->reader.getVal71();
+  return impl->reader.getVal74();
 }
 
 #pragma GCC diagnostic pop

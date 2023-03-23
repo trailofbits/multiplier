@@ -135,7 +135,11 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::GUARDED_BY: return "GUARDED_BY";
     case AttrKind::GUARDED_VAR: return "GUARDED_VAR";
     case AttrKind::HIP_MANAGED: return "HIP_MANAGED";
+    case AttrKind::HLSL_GROUP_SHARED_ADDRESS_SPACE: return "HLSL_GROUP_SHARED_ADDRESS_SPACE";
     case AttrKind::HLSL_NUM_THREADS: return "HLSL_NUM_THREADS";
+    case AttrKind::HLSL_RESOURCE: return "HLSL_RESOURCE";
+    case AttrKind::HLSL_RESOURCE_BINDING: return "HLSL_RESOURCE_BINDING";
+    case AttrKind::HLSLSV__DISPATCH_THREAD_ID: return "HLSLSV__DISPATCH_THREAD_ID";
     case AttrKind::HLSLSV__GROUP_INDEX: return "HLSLSV__GROUP_INDEX";
     case AttrKind::HLSL_SHADER: return "HLSL_SHADER";
     case AttrKind::HOT: return "HOT";
@@ -167,6 +171,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::MS_VTOR_DISP: return "MS_VTOR_DISP";
     case AttrKind::MAX_FIELD_ALIGNMENT: return "MAX_FIELD_ALIGNMENT";
     case AttrKind::MAY_ALIAS: return "MAY_ALIAS";
+    case AttrKind::MAYBE_UNDEF: return "MAYBE_UNDEF";
     case AttrKind::MICRO_MIPS: return "MICRO_MIPS";
     case AttrKind::MIN_SIZE: return "MIN_SIZE";
     case AttrKind::MIN_VECTOR_WIDTH: return "MIN_VECTOR_WIDTH";
@@ -206,6 +211,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::NO_THREAD_SAFETY_ANALYSIS: return "NO_THREAD_SAFETY_ANALYSIS";
     case AttrKind::NO_THROW: return "NO_THROW";
     case AttrKind::NO_UNIQUE_ADDRESS: return "NO_UNIQUE_ADDRESS";
+    case AttrKind::NO_UWTABLE: return "NO_UWTABLE";
     case AttrKind::NON_NULL: return "NON_NULL";
     case AttrKind::NOT_TAIL_CALLED: return "NOT_TAIL_CALLED";
     case AttrKind::OMP_ALLOCATE_DECL: return "OMP_ALLOCATE_DECL";
@@ -288,6 +294,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::PURE: return "PURE";
     case AttrKind::RISCV_INTERRUPT: return "RISCV_INTERRUPT";
     case AttrKind::RANDOMIZE_LAYOUT: return "RANDOMIZE_LAYOUT";
+    case AttrKind::READ_ONLY_PLACEMENT: return "READ_ONLY_PLACEMENT";
     case AttrKind::REG_CALL: return "REG_CALL";
     case AttrKind::REINITIALIZES: return "REINITIALIZES";
     case AttrKind::RELEASE_CAPABILITY: return "RELEASE_CAPABILITY";
@@ -313,6 +320,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::STANDALONE_DEBUG: return "STANDALONE_DEBUG";
     case AttrKind::STD_CALL: return "STD_CALL";
     case AttrKind::STRICT_FP: return "STRICT_FP";
+    case AttrKind::STRICT_GUARD_STACK_CHECK: return "STRICT_GUARD_STACK_CHECK";
     case AttrKind::SUPPRESS: return "SUPPRESS";
     case AttrKind::SWIFT_ASYNC: return "SWIFT_ASYNC";
     case AttrKind::SWIFT_ASYNC_CALL: return "SWIFT_ASYNC_CALL";
@@ -335,6 +343,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::TLS_MODEL: return "TLS_MODEL";
     case AttrKind::TARGET: return "TARGET";
     case AttrKind::TARGET_CLONES: return "TARGET_CLONES";
+    case AttrKind::TARGET_VERSION: return "TARGET_VERSION";
     case AttrKind::TEST_TYPESTATE: return "TEST_TYPESTATE";
     case AttrKind::THIS_CALL: return "THIS_CALL";
     case AttrKind::THREAD: return "THREAD";

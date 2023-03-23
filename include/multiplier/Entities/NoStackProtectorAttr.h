@@ -9,6 +9,7 @@
 #pragma once
 
 #include "InheritableAttr.h"
+#include "NoStackProtectorAttrSpelling.h"
 
 namespace mx {
 class EntityProvider;
@@ -48,6 +49,7 @@ class NoStackProtectorAttr : public InheritableAttr {
   static std::optional<NoStackProtectorAttr> from(const Reference &r);
   static std::optional<NoStackProtectorAttr> from(const TokenContext &t);
 
+  NoStackProtectorAttrSpelling semantic_spelling(void) const;
 };
 
 static_assert(sizeof(NoStackProtectorAttr) == sizeof(InheritableAttr));

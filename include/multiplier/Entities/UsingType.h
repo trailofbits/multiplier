@@ -51,6 +51,7 @@ class UsingType : public Type {
   UsingShadowDecl found_declaration(void) const;
   Type underlying_type(void) const;
   bool is_sugared(void) const;
+  bool type_matches_declaration(void) const;
 };
 
 static_assert(sizeof(UsingType) == sizeof(Type));

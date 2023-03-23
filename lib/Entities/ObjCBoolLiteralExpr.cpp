@@ -159,7 +159,7 @@ Token ObjCBoolLiteralExpr::token(void) const {
 }
 
 bool ObjCBoolLiteralExpr::value(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

@@ -18,6 +18,7 @@ const char *EnumeratorName(VarDeclInitializationStyle e) {
     case VarDeclInitializationStyle::C_INIT: return "C_INIT";
     case VarDeclInitializationStyle::CALL_INITIALIZER: return "CALL_INITIALIZER";
     case VarDeclInitializationStyle::LIST_INITIALIZER: return "LIST_INITIALIZER";
+    case VarDeclInitializationStyle::PARENTHESIS_LIST_INITIALIZER: return "PARENTHESIS_LIST_INITIALIZER";
     default: return "<invalid>";
   }
 }

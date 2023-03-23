@@ -132,7 +132,11 @@ enum class AttrKind : unsigned short {
   GUARDED_BY,
   GUARDED_VAR,
   HIP_MANAGED,
+  HLSL_GROUP_SHARED_ADDRESS_SPACE,
   HLSL_NUM_THREADS,
+  HLSL_RESOURCE,
+  HLSL_RESOURCE_BINDING,
+  HLSLSV__DISPATCH_THREAD_ID,
   HLSLSV__GROUP_INDEX,
   HLSL_SHADER,
   HOT,
@@ -164,6 +168,7 @@ enum class AttrKind : unsigned short {
   MS_VTOR_DISP,
   MAX_FIELD_ALIGNMENT,
   MAY_ALIAS,
+  MAYBE_UNDEF,
   MICRO_MIPS,
   MIN_SIZE,
   MIN_VECTOR_WIDTH,
@@ -203,6 +208,7 @@ enum class AttrKind : unsigned short {
   NO_THREAD_SAFETY_ANALYSIS,
   NO_THROW,
   NO_UNIQUE_ADDRESS,
+  NO_UWTABLE,
   NON_NULL,
   NOT_TAIL_CALLED,
   OMP_ALLOCATE_DECL,
@@ -285,6 +291,7 @@ enum class AttrKind : unsigned short {
   PURE,
   RISCV_INTERRUPT,
   RANDOMIZE_LAYOUT,
+  READ_ONLY_PLACEMENT,
   REG_CALL,
   REINITIALIZES,
   RELEASE_CAPABILITY,
@@ -310,6 +317,7 @@ enum class AttrKind : unsigned short {
   STANDALONE_DEBUG,
   STD_CALL,
   STRICT_FP,
+  STRICT_GUARD_STACK_CHECK,
   SUPPRESS,
   SWIFT_ASYNC,
   SWIFT_ASYNC_CALL,
@@ -332,6 +340,7 @@ enum class AttrKind : unsigned short {
   TLS_MODEL,
   TARGET,
   TARGET_CLONES,
+  TARGET_VERSION,
   TEST_TYPESTATE,
   THIS_CALL,
   THREAD,
@@ -377,7 +386,7 @@ inline static const char *EnumerationName(AttrKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(AttrKind) {
-  return 358;
+  return 367;
 }
 
 const char *EnumeratorName(AttrKind);

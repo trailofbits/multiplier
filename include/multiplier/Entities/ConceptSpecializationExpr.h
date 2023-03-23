@@ -16,6 +16,7 @@ class Index;
 class ConceptSpecializationExpr;
 class Decl;
 class Expr;
+class ImplicitConceptSpecializationDecl;
 class Stmt;
 class TemplateArgument;
 class Token;
@@ -61,6 +62,7 @@ class ConceptSpecializationExpr : public Expr {
   static std::optional<ConceptSpecializationExpr> from(const Reference &r);
   static std::optional<ConceptSpecializationExpr> from(const TokenContext &t);
 
+  ImplicitConceptSpecializationDecl specialization_declaration(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
   unsigned num_template_arguments(void) const;
   gap::generator<TemplateArgument> template_arguments(void) const &;

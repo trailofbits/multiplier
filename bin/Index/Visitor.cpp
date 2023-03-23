@@ -489,7 +489,7 @@ void EntityVisitor::VisitVariableArrayType(
 
 void EntityVisitor::VisitTypeOfType(const pasta::TypeOfType &type) {
   if (EnterType(type)) {
-    Accept(type.UnderlyingType());
+    Accept(type.UnmodifiedType());
   }
 }
 

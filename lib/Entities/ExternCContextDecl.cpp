@@ -166,7 +166,7 @@ std::optional<ExternCContextDecl> ExternCContextDecl::from(const TokenContext &t
 
 gap::generator<Decl> ExternCContextDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

@@ -28,6 +28,7 @@
 #include <multiplier/Entities/FieldDecl.h>
 #include <multiplier/Entities/FunctionDecl.h>
 #include <multiplier/Entities/FunctionTemplateDecl.h>
+#include <multiplier/Entities/HLSLBufferDecl.h>
 #include <multiplier/Entities/ImplicitParamDecl.h>
 #include <multiplier/Entities/IndirectFieldDecl.h>
 #include <multiplier/Entities/LabelDecl.h>
@@ -178,6 +179,7 @@ static const DeclKind kNamedDeclDerivedKinds[] = {
     UsingDirectiveDecl::static_kind(),
     UsingPackDecl::static_kind(),
     UsingShadowDecl::static_kind(),
+    HLSLBufferDecl::static_kind(),
     LabelDecl::static_kind(),
     ObjCInterfaceDecl::static_kind(),
     ObjCProtocolDecl::static_kind(),
@@ -244,6 +246,7 @@ std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
     case UsingDirectiveDecl::static_kind():
     case UsingPackDecl::static_kind():
     case UsingShadowDecl::static_kind():
+    case HLSLBufferDecl::static_kind():
     case LabelDecl::static_kind():
     case ObjCInterfaceDecl::static_kind():
     case ObjCProtocolDecl::static_kind():
@@ -349,67 +352,67 @@ std::optional<NamedDecl> NamedDecl::from(const TokenContext &t) {
 }
 
 Linkage NamedDecl::formal_linkage(void) const {
-  return static_cast<Linkage>(impl->reader.getVal61());
+  return static_cast<Linkage>(impl->reader.getVal63());
 }
 
 std::string_view NamedDecl::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal59();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCStringFormatFamily> NamedDecl::obj_cf_string_formatting_family(void) const {
-  if (!impl->reader.getVal46()) {
+  if (!impl->reader.getVal48()) {
     return std::nullopt;
   } else {
-    return static_cast<ObjCStringFormatFamily>(impl->reader.getVal65());
+    return static_cast<ObjCStringFormatFamily>(impl->reader.getVal67());
   }
   return std::nullopt;
 }
 
 std::string_view NamedDecl::qualified_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal62();
   return std::string_view(data.cStr(), data.size());
 }
 
 NamedDecl NamedDecl::underlying_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal47();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Visibility NamedDecl::visibility(void) const {
-  return static_cast<Visibility>(impl->reader.getVal66());
+  return static_cast<Visibility>(impl->reader.getVal68());
 }
 
 bool NamedDecl::has_external_formal_linkage(void) const {
-  return impl->reader.getVal49();
-}
-
-bool NamedDecl::has_linkage(void) const {
-  return impl->reader.getVal50();
-}
-
-bool NamedDecl::has_linkage_been_computed(void) const {
   return impl->reader.getVal51();
 }
 
+bool NamedDecl::has_linkage(void) const {
+  return impl->reader.getVal52();
+}
+
+bool NamedDecl::has_linkage_been_computed(void) const {
+  return impl->reader.getVal53();
+}
+
 bool NamedDecl::is_cxx_class_member(void) const {
-  return impl->reader.getVal55();
-}
-
-bool NamedDecl::is_cxx_instance_member(void) const {
-  return impl->reader.getVal56();
-}
-
-bool NamedDecl::is_externally_declarable(void) const {
   return impl->reader.getVal57();
 }
 
+bool NamedDecl::is_cxx_instance_member(void) const {
+  return impl->reader.getVal58();
+}
+
+bool NamedDecl::is_externally_declarable(void) const {
+  return impl->reader.getVal59();
+}
+
 bool NamedDecl::is_externally_visible(void) const {
-  return impl->reader.getVal67();
+  return impl->reader.getVal69();
 }
 
 bool NamedDecl::is_linkage_valid(void) const {
-  return impl->reader.getVal68();
+  return impl->reader.getVal70();
 }
 
 #pragma GCC diagnostic pop

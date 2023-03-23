@@ -10,6 +10,7 @@
 
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Expr.h>
+#include <multiplier/Entities/ImplicitConceptSpecializationDecl.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/TemplateArgument.h>
 #include <multiplier/Entities/Token.h>
@@ -155,6 +156,11 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const T
   return ConceptSpecializationExpr::from(t.as_statement());
 }
 
+ImplicitConceptSpecializationDecl ConceptSpecializationExpr::specialization_declaration(void) const {
+  RawEntityId eid = impl->reader.getVal38();
+  return ImplicitConceptSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+}
+
 unsigned ConceptSpecializationExpr::num_template_arguments(void) const {
   return impl->reader.getVal15().size();
 }
@@ -186,7 +192,7 @@ gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(v
 }
 
 bool ConceptSpecializationExpr::is_satisfied(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

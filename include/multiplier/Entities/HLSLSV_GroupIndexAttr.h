@@ -8,19 +8,21 @@
 
 #pragma once
 
-#include "InheritableAttr.h"
+#include "HLSLAnnotationAttr.h"
 
 namespace mx {
 class EntityProvider;
 class Index;
 class Attr;
+class HLSLAnnotationAttr;
 class HLSLSV_GroupIndexAttr;
 class InheritableAttr;
 class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class HLSLSV_GroupIndexAttr : public InheritableAttr {
+class HLSLSV_GroupIndexAttr : public HLSLAnnotationAttr {
  private:
   friend class FragmentImpl;
+  friend class HLSLAnnotationAttr;
   friend class InheritableAttr;
   friend class Attr;
  public:
@@ -50,7 +52,7 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
 
 };
 
-static_assert(sizeof(HLSLSV_GroupIndexAttr) == sizeof(InheritableAttr));
+static_assert(sizeof(HLSLSV_GroupIndexAttr) == sizeof(HLSLAnnotationAttr));
 
 #endif
 } // namespace mx

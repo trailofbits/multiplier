@@ -169,13 +169,13 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const TokenContex
 }
 
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
-  RawEntityId eid = impl->reader.getVal53();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);
