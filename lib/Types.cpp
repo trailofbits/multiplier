@@ -89,24 +89,36 @@ union PackedEntityId {
   } __attribute__((packed)) small_or_big;
 
   struct {
-    //  First so that `sub_kind` isn't significant in sorting.
-    uint64_t sub_kind:kSubKindNumBits;
-
     uint64_t offset:kBigFragmentIdNumBits;
 
     // 35 bits for fragment id, i.e. 34 billion IDs.
-    uint64_t code_id:(62u - (kSubKindNumBits + kBigFragmentIdNumBits));
+    uint64_t fragment_id:(62u - (kSubKindNumBits + kBigFragmentIdNumBits));
+
+    // For declarations, `sub_kind` also encodes if something is a definition,
+    // so we want it to be significant for sorting, i.e. definition IDs come
+    // before declaration IDs.
+    //
+    // We encode the `sub_kind` for definitions as a smaller number than
+    // `sub_kind` for declarations, and so signed and unsigned 64-bit
+    // interpretations of the entity ID will sort the definitions first.
+    uint64_t sub_kind:kSubKindNumBits;
+
     uint64_t is_big:1u;
     uint64_t is_fragment_entity:1u;
   } __attribute__((packed)) small_entity;
 
   struct {
-    //  First so that `sub_kind` isn't significant in sorting.
-    uint64_t sub_kind:kSubKindNumBits;
-
+    // 35 bits for the offset, as we expect a lot of things in these fragments.
+    //
+    // NOTE(pag): Could eventually drop the bit count here, e.g. to 30.
     uint64_t offset:(62u - (kSubKindNumBits + kBigFragmentIdNumBits));
 
-    uint64_t code_id:kBigFragmentIdNumBits;
+    // 16 bits for fragment id, i.e. we expect less than 2^16 really really
+    // big fragments. For those fragments, we have more "stuff" in them, so
+    // we have many more bits available for the `offset`.
+    uint64_t fragment_id:kBigFragmentIdNumBits;
+
+    uint64_t sub_kind:kSubKindNumBits;
     uint64_t is_big:1u;
     uint64_t is_fragment_entity:1u;
   } __attribute__((packed)) big_entity;
@@ -151,27 +163,32 @@ EntityId::EntityId(DeclId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
+
+      // Definitions should sort less than declarations.
       if (id.is_definition) {
+        packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind);
+      } else {
         packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind) +
                                        kActualNumDeclKinds;
-      } else {
-        packed.small_entity.sub_kind = static_cast<uint64_t>(id.kind);
       }
+
       packed.small_entity.offset = id.offset;
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
+
+      // Definitions should sort less than declarations.
       if (id.is_definition) {
+        packed.big_entity.sub_kind = static_cast<uint64_t>(id.kind);
+      } else {
         packed.big_entity.sub_kind = static_cast<uint64_t>(id.kind) +
                                      kActualNumDeclKinds;
-      } else {
-        packed.big_entity.sub_kind = static_cast<uint64_t>(id.kind);
       }
       packed.big_entity.offset = id.offset;
       assert(packed.big_entity.offset == id.offset);
@@ -233,7 +250,7 @@ EntityId::EntityId(StmtId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind = kNumDeclKinds +
@@ -242,7 +259,7 @@ EntityId::EntityId(StmtId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind = kNumDeclKinds +
@@ -264,7 +281,7 @@ EntityId::EntityId(TypeId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -273,7 +290,7 @@ EntityId::EntityId(TypeId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -295,7 +312,7 @@ EntityId::EntityId(AttrId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -305,7 +322,7 @@ EntityId::EntityId(AttrId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -328,7 +345,7 @@ EntityId::EntityId(ParsedTokenId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -338,7 +355,7 @@ EntityId::EntityId(ParsedTokenId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -361,7 +378,7 @@ EntityId::EntityId(MacroTokenId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -372,7 +389,7 @@ EntityId::EntityId(MacroTokenId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -398,7 +415,7 @@ EntityId::EntityId(MacroId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -409,7 +426,7 @@ EntityId::EntityId(MacroId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind = kNumDeclKinds + kNumStmtKinds +
@@ -433,7 +450,7 @@ EntityId::EntityId(TemplateArgumentId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind =
@@ -444,7 +461,7 @@ EntityId::EntityId(TemplateArgumentId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind =
@@ -468,7 +485,7 @@ EntityId::EntityId(TemplateParameterListId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind =
@@ -479,7 +496,7 @@ EntityId::EntityId(TemplateParameterListId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind =
@@ -504,7 +521,7 @@ EntityId::EntityId(CXXBaseSpecifierId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind =
@@ -515,7 +532,7 @@ EntityId::EntityId(CXXBaseSpecifierId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind =
@@ -539,7 +556,7 @@ EntityId::EntityId(DesignatorId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
-      packed.small_entity.code_id = id.fragment_id - kMaxBigFragmentId;
+      packed.small_entity.fragment_id = id.fragment_id - kMaxBigFragmentId;
       packed.small_entity.is_big = 0u;
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind =
@@ -550,7 +567,7 @@ EntityId::EntityId(DesignatorId id) {
       assert(packed.small_entity.offset == id.offset);
 
     } else {
-      packed.big_entity.code_id = id.fragment_id;
+      packed.big_entity.fragment_id = id.fragment_id;
       packed.big_entity.is_big = 1u;
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind =
@@ -627,9 +644,9 @@ std::optional<PackedFragmentId> FragmentIdFromEntityId(RawEntityId id) {
   }
 
   if (packed.small_or_big.is_big) {
-    return FragmentId(packed.big_entity.code_id);
+    return FragmentId(packed.big_entity.fragment_id);
   } else {
-    return FragmentId(packed.small_entity.code_id + kMaxBigFragmentId);
+    return FragmentId(packed.small_entity.fragment_id + kMaxBigFragmentId);
   }
 }
 
@@ -719,13 +736,13 @@ VariantId EntityId::Unpack(void) const noexcept {
       auto sub_kind = packed.big_entity.sub_kind;
       if (sub_kind < kNumDeclKinds) {
         DeclId id;
-        id.fragment_id = packed.big_entity.code_id;
+        id.fragment_id = packed.big_entity.fragment_id;
         if (sub_kind < kActualNumDeclKinds) {
           id.kind = static_cast<DeclKind>(sub_kind);
-          id.is_definition = false;
+          id.is_definition = true;
         } else {
           id.kind = static_cast<DeclKind>(sub_kind - kActualNumDeclKinds);
-          id.is_definition = true;
+          id.is_definition = false;
         }
         id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
@@ -734,7 +751,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumDeclKinds;
       if (sub_kind < kNumStmtKinds) {
         StmtId id;
-        id.fragment_id = packed.big_entity.code_id;
+        id.fragment_id = packed.big_entity.fragment_id;
         id.kind = static_cast<StmtKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
@@ -743,7 +760,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumStmtKinds;
       if (sub_kind < kNumTypeKinds) {
         TypeId id;
-        id.fragment_id = packed.big_entity.code_id;
+        id.fragment_id = packed.big_entity.fragment_id;
         id.kind = static_cast<TypeKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
@@ -752,7 +769,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumTypeKinds;
       if (sub_kind < kNumAttrKinds) {
         AttrId id;
-        id.fragment_id = packed.big_entity.code_id;
+        id.fragment_id = packed.big_entity.fragment_id;
         id.kind = static_cast<AttrKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
@@ -761,7 +778,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumAttrKinds;
       if (sub_kind < kNumTokenKinds) {
         ParsedTokenId id;
-        id.fragment_id = packed.big_entity.code_id;
+        id.fragment_id = packed.big_entity.fragment_id;
         id.kind = static_cast<TokenKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
@@ -770,7 +787,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumTokenKinds;
       if (sub_kind < kNumTokenKinds) {
         MacroTokenId id;
-        id.fragment_id = packed.big_entity.code_id;
+        id.fragment_id = packed.big_entity.fragment_id;
         id.kind = static_cast<TokenKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
@@ -779,7 +796,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumTokenKinds;
       if (sub_kind < kNumMacroKinds) {
         MacroId id;
-        id.fragment_id = packed.big_entity.code_id;
+        id.fragment_id = packed.big_entity.fragment_id;
         id.kind = static_cast<MacroKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
@@ -790,25 +807,25 @@ VariantId EntityId::Unpack(void) const noexcept {
         switch (static_cast<IdentifiedPseudo>(sub_kind)) {
           case IdentifiedPseudo::kTemplateArgument: {
             TemplateArgumentId id;
-            id.fragment_id = packed.big_entity.code_id;
+            id.fragment_id = packed.big_entity.fragment_id;
             id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
             return id;
           }
           case IdentifiedPseudo::kTemplateParameterList: {
             TemplateParameterListId id;
-            id.fragment_id = packed.big_entity.code_id;
+            id.fragment_id = packed.big_entity.fragment_id;
             id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
             return id;
           }
           case IdentifiedPseudo::kCXXBaseSpecifier: {
             CXXBaseSpecifierId id;
-            id.fragment_id = packed.big_entity.code_id;
+            id.fragment_id = packed.big_entity.fragment_id;
             id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
             return id;
           }
           case IdentifiedPseudo::kDesignator: {
             DesignatorId id;
-            id.fragment_id = packed.big_entity.code_id;
+            id.fragment_id = packed.big_entity.fragment_id;
             id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
             return id;
           }
@@ -824,13 +841,13 @@ VariantId EntityId::Unpack(void) const noexcept {
       auto sub_kind = packed.small_entity.sub_kind;
       if (sub_kind < kNumDeclKinds) {
         DeclId id;
-        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
         if (sub_kind < kActualNumDeclKinds) {
           id.kind = static_cast<DeclKind>(sub_kind);
-          id.is_definition = false;
+          id.is_definition = true;
         } else {
           id.kind = static_cast<DeclKind>(sub_kind - kActualNumDeclKinds);
-          id.is_definition = true;
+          id.is_definition = false;
         }
         id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
@@ -839,7 +856,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumDeclKinds;
       if (sub_kind < kNumStmtKinds) {
         StmtId id;
-        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
         id.kind = static_cast<StmtKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
@@ -848,7 +865,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumStmtKinds;
       if (sub_kind < kNumTypeKinds) {
         TypeId id;
-        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
         id.kind = static_cast<TypeKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
@@ -857,7 +874,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumTypeKinds;
       if (sub_kind < kNumAttrKinds) {
         AttrId id;
-        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
         id.kind = static_cast<AttrKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
@@ -866,7 +883,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumAttrKinds;
       if (sub_kind < kNumTokenKinds) {
         ParsedTokenId id;
-        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
         id.kind = static_cast<TokenKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
@@ -875,7 +892,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumTokenKinds;
       if (sub_kind < kNumTokenKinds) {
         MacroTokenId id;
-        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
         id.kind = static_cast<TokenKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
@@ -884,7 +901,7 @@ VariantId EntityId::Unpack(void) const noexcept {
       sub_kind -= kNumTokenKinds;
       if (sub_kind < kNumMacroKinds) {
         MacroId id;
-        id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+        id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
         id.kind = static_cast<MacroKind>(sub_kind);
         id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
@@ -895,25 +912,25 @@ VariantId EntityId::Unpack(void) const noexcept {
         switch (static_cast<IdentifiedPseudo>(sub_kind)) {
           case IdentifiedPseudo::kTemplateArgument: {
             TemplateArgumentId id;
-            id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+            id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
             id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
             return id;
           }
           case IdentifiedPseudo::kTemplateParameterList: {
             TemplateParameterListId id;
-            id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+            id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
             id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
             return id;
           }
           case IdentifiedPseudo::kCXXBaseSpecifier: {
             CXXBaseSpecifierId id;
-            id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+            id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
             id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
             return id;
           }
           case IdentifiedPseudo::kDesignator: {
             DesignatorId id;
-            id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
+            id.fragment_id = packed.small_entity.fragment_id + kMaxBigFragmentId;
             id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
             return id;
           }
