@@ -1,55 +1,62 @@
 name: Index
 
 on:
+  workflow_dispatch:
   schedule:
     # At 00:00 every Saturday.
     - cron: "0 0 * * 6"
 
+# Cancel any in-progress run
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  EC2_RUNNER_ID: i-0829aea272db4290b
+  AWS_REGION: us-east-1
+
 jobs:
-  index-lua:
-    runs-on: ubuntu-22.04
+  start-ec2-runner:
+    runs-on: ubuntu-latest
     steps:
-      - name: Install dependencies
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install -y \
-               gpg wget curl zip unzip tar git pkg-config \
-               ninja-build clang-tidy cppcheck ccache build-essential \
-               doctest-dev clang-15 bear
-          mkdir src
-          mkdir build
-
-      - name: Download cxx-common
-        run: |
-          curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-      - name: Download multiplier
-        uses: actions/download-artifact@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          name: multiplier
-          path: install
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
 
+      - name: Start EC2 runner
+        id: start_ec2_runner
+        run: |
+          aws ec2 start-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
+          aws ec2 wait instance-running --instance-ids ${{ env.EC2_RUNNER_ID }}
+
+  index-lua:
+    runs-on: multiplier
+    needs: start-ec2-runner
+    container: 
+      image: ghcr.io/trailofbits/multiplier:builder
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.github_token }}
+    steps:
       - name: Download and build Lua
         run: |
           curl --silent --location \
-            https://www.lua.org/ftp/lua-5.4.4.tar.gz | tar xz -C '${{ github.workspace }}/src'
-          cd '${{ github.workspace }}/src/lua-5.4.4'
+            https://www.lua.org/ftp/lua-5.4.4.tar.gz | tar xz -C '/work/src'
+          cd '/work/src/lua-5.4.4'
           bear -- make
 
       - name: Index Lua
         run: |
-          chmod +x install/bin/*
-          $INSTALL_DIR/bin/mx-index \
+          mx-index \
             --db /tmp/lua-5.4.4.mx \
-            --target '${{ github.workspace }}/src/lua-5.4.4/compile_commands.json'
+            --target '/work/src/lua-5.4.4/compile_commands.json'
 
       - name: List functions
         run: |
-          $INSTALL_DIR/bin/mx-list-functions \
+          mx-list-functions \
             --db /tmp/lua-5.4.4.mx
 
       - name: Upload Lua index
@@ -59,51 +66,32 @@ jobs:
           path: /tmp/lua-5.4.4.mx
 
   index-pcre2:
-    runs-on: ubuntu-22.04
+    runs-on: multiplier
+    needs: start-ec2-runner
+    container: 
+      image: ghcr.io/trailofbits/multiplier:builder
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.github_token }}
     steps:
-      - name: Install dependencies
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install -y \
-               gpg wget curl zip unzip tar git pkg-config \
-               ninja-build clang-tidy cppcheck ccache build-essential \
-               doctest-dev clang-15 bear
-          mkdir src
-          mkdir build
-
-      - name: Download cxx-common
-        run: |
-          curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-      - name: Download multiplier
-        uses: actions/download-artifact@v3
-        with:
-          name: multiplier
-          path: install
-
       - name: Download, configure and build PCRE2
         run: |
           curl --silent --location \
-            https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.bz2 | tar xj -C '${{ github.workspace }}/src'
-          mkdir '${{ github.workspace }}/build/pcre2-10.42'
-          cd '${{ github.workspace }}/build/pcre2-10.42'
-          ${{ github.workspace }}/src/pcre2-10.42/configure
+            https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.bz2 | tar xj -C '/work/src'
+          mkdir '/work/build/pcre2-10.42'
+          cd '/work/build/pcre2-10.42'
+          /work/src/pcre2-10.42/configure
           bear -- make
 
       - name: Index PCRE2
         run: |
-          chmod +x install/bin/*
-          $INSTALL_DIR/bin/mx-index \
+          mx-index \
             --db /tmp/pcre2-10.42.mx \
-            --target '${{ github.workspace }}/build/pcre2-10.42/compile_commands.json'
+            --target '/work/build/pcre2-10.42/compile_commands.json'
 
       - name: List functions
         run: |
-          $INSTALL_DIR/bin/mx-list-functions \
+          mx-list-functions \
             --db /tmp/pcre2-10.42.mx
 
       - name: Upload PCRE2 index
@@ -113,52 +101,35 @@ jobs:
           path: /tmp/pcre2-10.42.mx
 
   index-sqlite:
-    runs-on: ubuntu-22.04
+    # this is currently not working
+    if: false
+    runs-on: multiplier
     continue-on-error: true
+    needs: start-ec2-runner
+    container: 
+      image: ghcr.io/trailofbits/multiplier:builder
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.github_token }}
     steps:
-      - name: Install dependencies
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install -y \
-               gpg wget curl zip unzip tar git pkg-config \
-               ninja-build clang-tidy cppcheck ccache build-essential \
-               doctest-dev clang-15 bear
-          mkdir src
-          mkdir build
-
-      - name: Download cxx-common
-        run: |
-          curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-      - name: Download multiplier
-        uses: actions/download-artifact@v3
-        with:
-          name: multiplier
-          path: install
-
       - name: Download, configure and build SQLite
         run: |
           curl --silent --location \
-            https://www.sqlite.org/2022/sqlite-autoconf-3400000.tar.gz | tar xz -C '${{ github.workspace }}/src'
-          mkdir '${{ github.workspace }}/build/sqlite-autoconf-3400000'
-          cd '${{ github.workspace }}/build/sqlite-autoconf-3400000'
-          ${{ github.workspace }}/src/sqlite-autoconf-3400000/configure
+            https://www.sqlite.org/2022/sqlite-autoconf-3400000.tar.gz | tar xz -C '/work/src'
+          mkdir '/work/build/sqlite-autoconf-3400000'
+          cd '/work/build/sqlite-autoconf-3400000'
+          /work/src/sqlite-autoconf-3400000/configure
           bear -- make
 
       - name: Index SQLite
         run: |
-          chmod +x install/bin/*
-          $INSTALL_DIR/bin/mx-index \
+          mx-index \
             --db /tmp/sqlite-autoconf-3400000.mx \
-            --target '${{ github.workspace }}/build/sqlite-autoconf-3400000/compile_commands.json'
+            --target '/work/build/sqlite-autoconf-3400000/compile_commands.json'
 
       - name: List functions
         run: |
-          $INSTALL_DIR/bin/mx-list-functions \
+          mx-list-functions \
             --db /tmp/sqlite-autoconf-3400000.mx
 
       - name: Upload SQLite index
@@ -168,56 +139,36 @@ jobs:
           path: /tmp/sqlite-autoconf-3400000.mx
 
   index-linux:
-    runs-on: ubuntu-22.04
-    continue-on-error: true
     # Indexing linux takes too long and eats up all our CI points, skip for now
     if: false
+    needs: start-ec2-runner
+    container: 
+      image: ghcr.io/trailofbits/multiplier:builder
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.github_token }}
+    runs-on: multiplier
+    continue-on-error: true
     steps:
-      - name: Install dependencies
-        run: |
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install -y \
-               gpg wget curl zip unzip tar git pkg-config \
-               ninja-build clang-tidy cppcheck ccache build-essential \
-               doctest-dev clang-15 libtool autoconf flex bison \
-               libncurses-dev libssl-dev libelf-dev lld
-          mkdir src
-          mkdir build
-
-      - name: Download cxx-common
-        run: |
-          curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
-
-      - name: Download multiplier
-        uses: actions/download-artifact@v3
-        with:
-          name: multiplier
-          path: install
-
       - name: Download, configure and build Linux
         run: |
           curl --silent --location \
-            https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.6.tar.xz | tar xJ -C '${{ github.workspace }}/src'
-          cd '${{ github.workspace }}/src/linux-6.1.6'
+            https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.6.tar.xz | tar xJ -C '/work/src'
+          cd '/work/src/linux-6.1.6'
           PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" make LLVM=1 defconfig
           PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" make LLVM=1 compile_commands.json
           PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" env > env_vars.txt
 
       - name: Index Linux
         run: |
-          chmod +x install/bin/*
-          $INSTALL_DIR/bin/mx-index \
-            --env '${{ github.workspace }}/src/linux-6.1.6/env_vars.txt' \
+          mx-index \
+            --env '/work/src/linux-6.1.6/env_vars.txt' \
             --db /tmp/linux-6.1.6.mx \
-            --target '${{ github.workspace }}/src/linux-6.1.6/compile_commands.json'
+            --target '/work/src/linux-6.1.6/compile_commands.json'
 
       - name: List functions
         run: |
-          $INSTALL_DIR/bin/mx-list-functions \
+          mx-list-functions \
             --db /tmp/linux-6.1.6.mx
 
       - name: Upload Linux index
@@ -225,3 +176,22 @@ jobs:
         with:
           name: linux-6.1.6
           path: /tmp/linux-6.1.6.mx
+
+  stop-ec2-runner:
+    if: always()
+    runs-on: ubuntu-latest
+    needs:
+      - index-lua
+      - index-pcre2
+      # - index-sqlite
+      # - index-linux
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Stop EC2 runner
+        run: aws ec2 stop-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
