@@ -178,7 +178,7 @@ std::optional<RecordDecl> RecordDecl::from(const TokenContext &t) {
 }
 
 bool RecordDecl::can_pass_in_registers(void) const {
-  return impl->reader.getVal103();
+  return impl->reader.getVal102();
 }
 
 unsigned RecordDecl::num_fields(void) const {
@@ -214,83 +214,83 @@ gap::generator<FieldDecl> RecordDecl::fields(void) const & {
 }
 
 RecordDeclArgPassingKind RecordDecl::argument_passing_restrictions(void) const {
-  return static_cast<RecordDeclArgPassingKind>(impl->reader.getVal83());
+  return static_cast<RecordDeclArgPassingKind>(impl->reader.getVal82());
 }
 
 bool RecordDecl::has_flexible_array_member(void) const {
-  return impl->reader.getVal104();
+  return impl->reader.getVal103();
 }
 
 bool RecordDecl::has_loaded_fields_from_external_storage(void) const {
-  return impl->reader.getVal105();
+  return impl->reader.getVal104();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_copy_c_union(void) const {
-  return impl->reader.getVal106();
+  return impl->reader.getVal105();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
-  return impl->reader.getVal107();
+  return impl->reader.getVal106();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_destruct_c_union(void) const {
-  return impl->reader.getVal108();
+  return impl->reader.getVal107();
 }
 
 bool RecordDecl::has_object_member(void) const {
-  return impl->reader.getVal109();
+  return impl->reader.getVal108();
 }
 
 bool RecordDecl::has_volatile_member(void) const {
-  return impl->reader.getVal110();
+  return impl->reader.getVal109();
 }
 
 bool RecordDecl::is_anonymous_struct_or_union(void) const {
-  return impl->reader.getVal111();
+  return impl->reader.getVal110();
 }
 
 bool RecordDecl::is_captured_record(void) const {
-  return impl->reader.getVal112();
+  return impl->reader.getVal111();
 }
 
 bool RecordDecl::is_injected_class_name(void) const {
-  return impl->reader.getVal113();
+  return impl->reader.getVal112();
 }
 
 bool RecordDecl::is_lambda(void) const {
-  return impl->reader.getVal114();
+  return impl->reader.getVal113();
 }
 
 bool RecordDecl::is_ms_struct(void) const {
-  return impl->reader.getVal115();
+  return impl->reader.getVal114();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_copy(void) const {
-  return impl->reader.getVal116();
+  return impl->reader.getVal115();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_default_initialize(void) const {
-  return impl->reader.getVal117();
+  return impl->reader.getVal116();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_destroy(void) const {
-  return impl->reader.getVal118();
+  return impl->reader.getVal117();
 }
 
 bool RecordDecl::is_or_contains_union(void) const {
-  return impl->reader.getVal119();
+  return impl->reader.getVal118();
 }
 
 bool RecordDecl::is_parameter_destroyed_in_callee(void) const {
-  return impl->reader.getVal120();
+  return impl->reader.getVal119();
 }
 
 bool RecordDecl::is_randomized(void) const {
-  return impl->reader.getVal121();
+  return impl->reader.getVal120();
 }
 
 bool RecordDecl::may_insert_extra_padding(void) const {
-  return impl->reader.getVal122();
+  return impl->reader.getVal121();
 }
 
 #pragma GCC diagnostic pop

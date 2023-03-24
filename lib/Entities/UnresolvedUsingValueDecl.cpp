@@ -167,11 +167,11 @@ std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const Tok
 }
 
 Token UnresolvedUsingValueDecl::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
 }
 
 Token UnresolvedUsingValueDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 bool UnresolvedUsingValueDecl::is_access_declaration(void) const {

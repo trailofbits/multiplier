@@ -183,17 +183,17 @@ ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::i
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
-  RawEntityId eid = impl->reader.getVal144();
+  RawEntityId eid = impl->reader.getVal162();
   return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal163();
+  RawEntityId eid = impl->reader.getVal164();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal346();
+  return impl->reader.getVal345();
 }
 
 #pragma GCC diagnostic pop

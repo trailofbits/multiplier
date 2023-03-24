@@ -83,7 +83,6 @@ class ValueDecl : public NamedDecl {
   static std::optional<ValueDecl> from(const Reference &r);
   static std::optional<ValueDecl> from(const TokenContext &t);
 
-  VarDecl potentially_decomposed_variable_declaration(void) const;
   Type type(void) const;
   bool is_initializer_capture(void) const;
   bool is_weak(void) const;

@@ -217,7 +217,7 @@ std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
 
 std::optional<Type> EnumDecl::integer_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal77();
+    RawEntityId eid = impl->reader.getVal78();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -235,10 +235,10 @@ TokenRange EnumDecl::integer_type_range(void) const {
 }
 
 std::optional<unsigned> EnumDecl::odr_hash(void) const {
-  if (!impl->reader.getVal103()) {
+  if (!impl->reader.getVal102()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal140());
+    return static_cast<unsigned>(impl->reader.getVal139());
   }
   return std::nullopt;
 }
@@ -258,7 +258,7 @@ std::optional<Type> EnumDecl::promotion_type(void) const {
 
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal82();
+    RawEntityId eid = impl->reader.getVal83();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -270,35 +270,35 @@ std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
 }
 
 TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal83());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal82());
 }
 
 bool EnumDecl::is_closed(void) const {
-  return impl->reader.getVal104();
+  return impl->reader.getVal103();
 }
 
 bool EnumDecl::is_closed_flag(void) const {
-  return impl->reader.getVal105();
+  return impl->reader.getVal104();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const {
-  return impl->reader.getVal106();
+  return impl->reader.getVal105();
 }
 
 bool EnumDecl::is_complete(void) const {
-  return impl->reader.getVal107();
+  return impl->reader.getVal106();
 }
 
 bool EnumDecl::is_fixed(void) const {
-  return impl->reader.getVal108();
+  return impl->reader.getVal107();
 }
 
 bool EnumDecl::is_scoped(void) const {
-  return impl->reader.getVal109();
+  return impl->reader.getVal108();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const {
-  return impl->reader.getVal110();
+  return impl->reader.getVal109();
 }
 
 #pragma GCC diagnostic pop

@@ -186,7 +186,7 @@ Token ObjCPropertyDecl::l_paren_token(void) const {
 }
 
 ObjCPropertyDeclPropertyControl ObjCPropertyDecl::property_implementation(void) const {
-  return static_cast<ObjCPropertyDeclPropertyControl>(impl->reader.getVal78());
+  return static_cast<ObjCPropertyDeclPropertyControl>(impl->reader.getVal77());
 }
 
 ObjCIvarDecl ObjCPropertyDecl::property_instance_variable_declaration(void) const {
@@ -195,11 +195,11 @@ ObjCIvarDecl ObjCPropertyDecl::property_instance_variable_declaration(void) cons
 }
 
 ObjCPropertyQueryKind ObjCPropertyDecl::query_kind(void) const {
-  return static_cast<ObjCPropertyQueryKind>(impl->reader.getVal83());
+  return static_cast<ObjCPropertyQueryKind>(impl->reader.getVal82());
 }
 
 ObjCPropertyDeclSetterKind ObjCPropertyDecl::setter_kind(void) const {
-  return static_cast<ObjCPropertyDeclSetterKind>(impl->reader.getVal85());
+  return static_cast<ObjCPropertyDeclSetterKind>(impl->reader.getVal84());
 }
 
 ObjCMethodDecl ObjCPropertyDecl::setter_method_declaration(void) const {
@@ -212,7 +212,7 @@ Token ObjCPropertyDecl::setter_name_token(void) const {
 }
 
 Type ObjCPropertyDecl::type(void) const {
-  RawEntityId eid = impl->reader.getVal77();
+  RawEntityId eid = impl->reader.getVal78();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
@@ -233,15 +233,15 @@ bool ObjCPropertyDecl::is_instance_property(void) const {
 }
 
 bool ObjCPropertyDecl::is_optional(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool ObjCPropertyDecl::is_read_only(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool ObjCPropertyDecl::is_retaining(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

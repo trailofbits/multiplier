@@ -172,7 +172,7 @@ Token ObjCTypeParamDecl::colon_token(void) const {
 }
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
-  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal78());
+  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal77());
 }
 
 Token ObjCTypeParamDecl::variance_token(void) const {

@@ -184,7 +184,7 @@ gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const & {
 
 std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal56();
+    RawEntityId eid = impl->reader.getVal55();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -197,7 +197,7 @@ std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
 
 std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal64();
+    RawEntityId eid = impl->reader.getVal56();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
