@@ -45,6 +45,8 @@ class HLSLBufferDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  HLSLBufferDecl canonical_declaration(void) const;
+  std::optional<HLSLBufferDecl> definition(void) const;
   gap::generator<HLSLBufferDecl> redeclarations(void) const &;
   static std::optional<HLSLBufferDecl> from(const Decl &parent);
 

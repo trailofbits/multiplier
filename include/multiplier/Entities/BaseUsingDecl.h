@@ -44,6 +44,8 @@ class BaseUsingDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  BaseUsingDecl canonical_declaration(void) const;
+  std::optional<BaseUsingDecl> definition(void) const;
   gap::generator<BaseUsingDecl> redeclarations(void) const &;
   static std::optional<BaseUsingDecl> from(const Decl &parent);
 

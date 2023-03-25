@@ -87,6 +87,20 @@ bool ConceptDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ConceptDecl ConceptDecl::canonical_declaration(void) const {
+  if (auto canon = ConceptDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ConceptDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ConceptDecl> ConceptDecl::definition(void) const {
+  return ConceptDecl::from(this->Decl::definition());
+}
+
 gap::generator<ConceptDecl> ConceptDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ConceptDecl> dr = ConceptDecl::from(r)) {

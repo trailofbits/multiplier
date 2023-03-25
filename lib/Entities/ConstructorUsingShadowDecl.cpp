@@ -87,6 +87,20 @@ bool ConstructorUsingShadowDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ConstructorUsingShadowDecl ConstructorUsingShadowDecl::canonical_declaration(void) const {
+  if (auto canon = ConstructorUsingShadowDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ConstructorUsingShadowDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::definition(void) const {
+  return ConstructorUsingShadowDecl::from(this->Decl::definition());
+}
+
 gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ConstructorUsingShadowDecl> dr = ConstructorUsingShadowDecl::from(r)) {

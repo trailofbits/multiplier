@@ -86,6 +86,20 @@ bool BuiltinTemplateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+BuiltinTemplateDecl BuiltinTemplateDecl::canonical_declaration(void) const {
+  if (auto canon = BuiltinTemplateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (BuiltinTemplateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::definition(void) const {
+  return BuiltinTemplateDecl::from(this->Decl::definition());
+}
+
 gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<BuiltinTemplateDecl> dr = BuiltinTemplateDecl::from(r)) {

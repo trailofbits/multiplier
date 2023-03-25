@@ -46,6 +46,8 @@ class BlockDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  BlockDecl canonical_declaration(void) const;
+  std::optional<BlockDecl> definition(void) const;
   gap::generator<BlockDecl> redeclarations(void) const &;
   static std::optional<BlockDecl> from(const Decl &parent);
 

@@ -86,6 +86,20 @@ bool TemplateTemplateParmDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TemplateTemplateParmDecl TemplateTemplateParmDecl::canonical_declaration(void) const {
+  if (auto canon = TemplateTemplateParmDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TemplateTemplateParmDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::definition(void) const {
+  return TemplateTemplateParmDecl::from(this->Decl::definition());
+}
+
 gap::generator<TemplateTemplateParmDecl> TemplateTemplateParmDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TemplateTemplateParmDecl> dr = TemplateTemplateParmDecl::from(r)) {
@@ -179,11 +193,11 @@ bool TemplateTemplateParmDecl::has_default_argument(void) const {
 }
 
 bool TemplateTemplateParmDecl::is_expanded_parameter_pack(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal92();
 }
 
 bool TemplateTemplateParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

@@ -84,6 +84,20 @@ bool PragmaCommentDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+PragmaCommentDecl PragmaCommentDecl::canonical_declaration(void) const {
+  if (auto canon = PragmaCommentDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (PragmaCommentDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<PragmaCommentDecl> PragmaCommentDecl::definition(void) const {
+  return PragmaCommentDecl::from(this->Decl::definition());
+}
+
 gap::generator<PragmaCommentDecl> PragmaCommentDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<PragmaCommentDecl> dr = PragmaCommentDecl::from(r)) {

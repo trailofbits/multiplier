@@ -88,6 +88,20 @@ bool OMPCapturedExprDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+OMPCapturedExprDecl OMPCapturedExprDecl::canonical_declaration(void) const {
+  if (auto canon = OMPCapturedExprDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (OMPCapturedExprDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::definition(void) const {
+  return OMPCapturedExprDecl::from(this->Decl::definition());
+}
+
 gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<OMPCapturedExprDecl> dr = OMPCapturedExprDecl::from(r)) {

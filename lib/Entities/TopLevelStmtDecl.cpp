@@ -84,6 +84,20 @@ bool TopLevelStmtDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TopLevelStmtDecl TopLevelStmtDecl::canonical_declaration(void) const {
+  if (auto canon = TopLevelStmtDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TopLevelStmtDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TopLevelStmtDecl> TopLevelStmtDecl::definition(void) const {
+  return TopLevelStmtDecl::from(this->Decl::definition());
+}
+
 gap::generator<TopLevelStmtDecl> TopLevelStmtDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TopLevelStmtDecl> dr = TopLevelStmtDecl::from(r)) {

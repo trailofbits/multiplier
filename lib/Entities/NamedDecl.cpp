@@ -147,6 +147,20 @@ bool NamedDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+NamedDecl NamedDecl::canonical_declaration(void) const {
+  if (auto canon = NamedDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (NamedDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<NamedDecl> NamedDecl::definition(void) const {
+  return NamedDecl::from(this->Decl::definition());
+}
+
 gap::generator<NamedDecl> NamedDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<NamedDecl> dr = NamedDecl::from(r)) {

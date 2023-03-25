@@ -67,6 +67,8 @@ class CXXRecordDecl : public RecordDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  CXXRecordDecl canonical_declaration(void) const;
+  std::optional<CXXRecordDecl> definition(void) const;
   gap::generator<CXXRecordDecl> redeclarations(void) const &;
   static std::optional<CXXRecordDecl> from(const Decl &parent);
 

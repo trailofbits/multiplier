@@ -52,6 +52,8 @@ class TagDecl : public TypeDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TagDecl canonical_declaration(void) const;
+  std::optional<TagDecl> definition(void) const;
   gap::generator<TagDecl> redeclarations(void) const &;
   static std::optional<TagDecl> from(const Decl &parent);
 

@@ -89,6 +89,20 @@ bool NonTypeTemplateParmDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+NonTypeTemplateParmDecl NonTypeTemplateParmDecl::canonical_declaration(void) const {
+  if (auto canon = NonTypeTemplateParmDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (NonTypeTemplateParmDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::definition(void) const {
+  return NonTypeTemplateParmDecl::from(this->Decl::definition());
+}
+
 gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<NonTypeTemplateParmDecl> dr = NonTypeTemplateParmDecl::from(r)) {
@@ -175,7 +189,7 @@ bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const {
 
 std::optional<Expr> NonTypeTemplateParmDecl::default_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal76();
+    RawEntityId eid = impl->reader.getVal77();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -187,12 +201,12 @@ std::optional<Expr> NonTypeTemplateParmDecl::default_argument(void) const {
 }
 
 Token NonTypeTemplateParmDecl::default_argument_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal78());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
 }
 
 std::optional<Expr> NonTypeTemplateParmDecl::placeholder_type_constraint(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal79();
+    RawEntityId eid = impl->reader.getVal80();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -208,15 +222,15 @@ bool NonTypeTemplateParmDecl::has_default_argument(void) const {
 }
 
 bool NonTypeTemplateParmDecl::has_placeholder_type_constraint(void) const {
-  return impl->reader.getVal91();
-}
-
-bool NonTypeTemplateParmDecl::is_expanded_parameter_pack(void) const {
   return impl->reader.getVal92();
 }
 
-bool NonTypeTemplateParmDecl::is_pack_expansion(void) const {
+bool NonTypeTemplateParmDecl::is_expanded_parameter_pack(void) const {
   return impl->reader.getVal93();
+}
+
+bool NonTypeTemplateParmDecl::is_pack_expansion(void) const {
+  return impl->reader.getVal94();
 }
 
 unsigned NonTypeTemplateParmDecl::num_expansion_types(void) const {

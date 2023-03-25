@@ -85,6 +85,20 @@ bool FileScopeAsmDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+FileScopeAsmDecl FileScopeAsmDecl::canonical_declaration(void) const {
+  if (auto canon = FileScopeAsmDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (FileScopeAsmDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::definition(void) const {
+  return FileScopeAsmDecl::from(this->Decl::definition());
+}
+
 gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<FileScopeAsmDecl> dr = FileScopeAsmDecl::from(r)) {

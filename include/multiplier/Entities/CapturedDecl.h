@@ -44,6 +44,8 @@ class CapturedDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  CapturedDecl canonical_declaration(void) const;
+  std::optional<CapturedDecl> definition(void) const;
   gap::generator<CapturedDecl> redeclarations(void) const &;
   static std::optional<CapturedDecl> from(const Decl &parent);
 

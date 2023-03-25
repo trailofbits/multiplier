@@ -54,6 +54,8 @@ class ObjCMethodDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCMethodDecl canonical_declaration(void) const;
+  std::optional<ObjCMethodDecl> definition(void) const;
   gap::generator<ObjCMethodDecl> redeclarations(void) const &;
   static std::optional<ObjCMethodDecl> from(const Decl &parent);
 

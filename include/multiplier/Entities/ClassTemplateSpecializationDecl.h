@@ -58,6 +58,8 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ClassTemplateSpecializationDecl canonical_declaration(void) const;
+  std::optional<ClassTemplateSpecializationDecl> definition(void) const;
   gap::generator<ClassTemplateSpecializationDecl> redeclarations(void) const &;
   static std::optional<ClassTemplateSpecializationDecl> from(const Decl &parent);
 

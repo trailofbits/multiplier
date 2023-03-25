@@ -85,6 +85,20 @@ bool UnresolvedUsingIfExistsDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UnresolvedUsingIfExistsDecl UnresolvedUsingIfExistsDecl::canonical_declaration(void) const {
+  if (auto canon = UnresolvedUsingIfExistsDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UnresolvedUsingIfExistsDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::definition(void) const {
+  return UnresolvedUsingIfExistsDecl::from(this->Decl::definition());
+}
+
 gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UnresolvedUsingIfExistsDecl> dr = UnresolvedUsingIfExistsDecl::from(r)) {

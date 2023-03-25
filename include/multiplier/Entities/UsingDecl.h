@@ -47,6 +47,8 @@ class UsingDecl : public BaseUsingDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UsingDecl canonical_declaration(void) const;
+  std::optional<UsingDecl> definition(void) const;
   gap::generator<UsingDecl> redeclarations(void) const &;
   static std::optional<UsingDecl> from(const Decl &parent);
 

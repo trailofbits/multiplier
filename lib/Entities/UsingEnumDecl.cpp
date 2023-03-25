@@ -88,6 +88,20 @@ bool UsingEnumDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UsingEnumDecl UsingEnumDecl::canonical_declaration(void) const {
+  if (auto canon = UsingEnumDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UsingEnumDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UsingEnumDecl> UsingEnumDecl::definition(void) const {
+  return UsingEnumDecl::from(this->Decl::definition());
+}
+
 gap::generator<UsingEnumDecl> UsingEnumDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UsingEnumDecl> dr = UsingEnumDecl::from(r)) {

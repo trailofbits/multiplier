@@ -89,6 +89,20 @@ bool CXXConstructorDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+CXXConstructorDecl CXXConstructorDecl::canonical_declaration(void) const {
+  if (auto canon = CXXConstructorDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (CXXConstructorDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<CXXConstructorDecl> CXXConstructorDecl::definition(void) const {
+  return CXXConstructorDecl::from(this->Decl::definition());
+}
+
 gap::generator<CXXConstructorDecl> CXXConstructorDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<CXXConstructorDecl> dr = CXXConstructorDecl::from(r)) {
@@ -171,7 +185,7 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const TokenContext &t
 
 std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal175();
+    RawEntityId eid = impl->reader.getVal176();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -183,23 +197,23 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) c
 }
 
 bool CXXConstructorDecl::is_default_constructor(void) const {
-  return impl->reader.getVal177();
-}
-
-bool CXXConstructorDecl::is_delegating_constructor(void) const {
   return impl->reader.getVal178();
 }
 
-bool CXXConstructorDecl::is_explicit(void) const {
+bool CXXConstructorDecl::is_delegating_constructor(void) const {
   return impl->reader.getVal179();
 }
 
-bool CXXConstructorDecl::is_inheriting_constructor(void) const {
+bool CXXConstructorDecl::is_explicit(void) const {
   return impl->reader.getVal180();
 }
 
-bool CXXConstructorDecl::is_specialization_copying_object(void) const {
+bool CXXConstructorDecl::is_inheriting_constructor(void) const {
   return impl->reader.getVal181();
+}
+
+bool CXXConstructorDecl::is_specialization_copying_object(void) const {
+  return impl->reader.getVal182();
 }
 
 #pragma GCC diagnostic pop

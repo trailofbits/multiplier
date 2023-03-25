@@ -85,6 +85,20 @@ bool CapturedDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+CapturedDecl CapturedDecl::canonical_declaration(void) const {
+  if (auto canon = CapturedDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (CapturedDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<CapturedDecl> CapturedDecl::definition(void) const {
+  return CapturedDecl::from(this->Decl::definition());
+}
+
 gap::generator<CapturedDecl> CapturedDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<CapturedDecl> dr = CapturedDecl::from(r)) {

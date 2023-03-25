@@ -19,10 +19,6 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <llvm/Support/Format.h>
-#include <llvm/Support/FormatVariadic.h>
-#include <llvm/Support/JSON.h>
-#include <llvm/Support/raw_ostream.h>
 #include <multiplier/AST.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Command.h>
@@ -32,6 +28,21 @@
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <llvm/Support/Format.h>
+#include <llvm/Support/FormatVariadic.h>
+#include <llvm/Support/JSON.h>
+#include <llvm/Support/raw_ostream.h>
+#pragma clang diagnostic pop
 
 #include "Action.h"
 #include "Context.h"

@@ -47,6 +47,8 @@ class BuiltinTemplateDecl : public TemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  BuiltinTemplateDecl canonical_declaration(void) const;
+  std::optional<BuiltinTemplateDecl> definition(void) const;
   gap::generator<BuiltinTemplateDecl> redeclarations(void) const &;
   static std::optional<BuiltinTemplateDecl> from(const Decl &parent);
 

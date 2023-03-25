@@ -48,6 +48,8 @@ class EnumConstantDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  EnumConstantDecl canonical_declaration(void) const;
+  std::optional<EnumConstantDecl> definition(void) const;
   gap::generator<EnumConstantDecl> redeclarations(void) const &;
   static std::optional<EnumConstantDecl> from(const Decl &parent);
 

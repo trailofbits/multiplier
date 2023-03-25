@@ -87,6 +87,20 @@ bool FriendDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+FriendDecl FriendDecl::canonical_declaration(void) const {
+  if (auto canon = FriendDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (FriendDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<FriendDecl> FriendDecl::definition(void) const {
+  return FriendDecl::from(this->Decl::definition());
+}
+
 gap::generator<FriendDecl> FriendDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<FriendDecl> dr = FriendDecl::from(r)) {

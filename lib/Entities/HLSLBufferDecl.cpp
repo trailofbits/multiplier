@@ -85,6 +85,20 @@ bool HLSLBufferDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+HLSLBufferDecl HLSLBufferDecl::canonical_declaration(void) const {
+  if (auto canon = HLSLBufferDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (HLSLBufferDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<HLSLBufferDecl> HLSLBufferDecl::definition(void) const {
+  return HLSLBufferDecl::from(this->Decl::definition());
+}
+
 gap::generator<HLSLBufferDecl> HLSLBufferDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<HLSLBufferDecl> dr = HLSLBufferDecl::from(r)) {

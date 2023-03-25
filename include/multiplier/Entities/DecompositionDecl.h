@@ -52,6 +52,8 @@ class DecompositionDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  DecompositionDecl canonical_declaration(void) const;
+  std::optional<DecompositionDecl> definition(void) const;
   gap::generator<DecompositionDecl> redeclarations(void) const &;
   static std::optional<DecompositionDecl> from(const Decl &parent);
 

@@ -48,6 +48,8 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ConstructorUsingShadowDecl canonical_declaration(void) const;
+  std::optional<ConstructorUsingShadowDecl> definition(void) const;
   gap::generator<ConstructorUsingShadowDecl> redeclarations(void) const &;
   static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent);
 

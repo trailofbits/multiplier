@@ -86,6 +86,20 @@ bool LabelDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+LabelDecl LabelDecl::canonical_declaration(void) const {
+  if (auto canon = LabelDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (LabelDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<LabelDecl> LabelDecl::definition(void) const {
+  return LabelDecl::from(this->Decl::definition());
+}
+
 gap::generator<LabelDecl> LabelDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<LabelDecl> dr = LabelDecl::from(r)) {

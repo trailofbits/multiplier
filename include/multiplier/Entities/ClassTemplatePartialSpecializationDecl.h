@@ -57,6 +57,8 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ClassTemplatePartialSpecializationDecl canonical_declaration(void) const;
+  std::optional<ClassTemplatePartialSpecializationDecl> definition(void) const;
   gap::generator<ClassTemplatePartialSpecializationDecl> redeclarations(void) const &;
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const Decl &parent);
 

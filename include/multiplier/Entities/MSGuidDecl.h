@@ -47,6 +47,8 @@ class MSGuidDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  MSGuidDecl canonical_declaration(void) const;
+  std::optional<MSGuidDecl> definition(void) const;
   gap::generator<MSGuidDecl> redeclarations(void) const &;
   static std::optional<MSGuidDecl> from(const Decl &parent);
 

@@ -12,16 +12,27 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/Support/Host.h>
-#include <llvm/Support/InitLLVM.h>
-#include <llvm/Support/JSON.h>
-#include <llvm/Support/MemoryBuffer.h>
 #include <memory>
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/Init.h>
 #include <sstream>
 #include <system_error>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/Support/Host.h>
+#include <llvm/Support/InitLLVM.h>
+#include <llvm/Support/JSON.h>
+#include <llvm/Support/MemoryBuffer.h>
+#pragma clang diagnostic pop
 
 #include "Context.h"
 #include "Importer.h"

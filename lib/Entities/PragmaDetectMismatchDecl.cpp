@@ -84,6 +84,20 @@ bool PragmaDetectMismatchDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+PragmaDetectMismatchDecl PragmaDetectMismatchDecl::canonical_declaration(void) const {
+  if (auto canon = PragmaDetectMismatchDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (PragmaDetectMismatchDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::definition(void) const {
+  return PragmaDetectMismatchDecl::from(this->Decl::definition());
+}
+
 gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<PragmaDetectMismatchDecl> dr = PragmaDetectMismatchDecl::from(r)) {

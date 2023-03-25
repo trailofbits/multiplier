@@ -87,6 +87,20 @@ bool FunctionTemplateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+FunctionTemplateDecl FunctionTemplateDecl::canonical_declaration(void) const {
+  if (auto canon = FunctionTemplateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (FunctionTemplateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<FunctionTemplateDecl> FunctionTemplateDecl::definition(void) const {
+  return FunctionTemplateDecl::from(this->Decl::definition());
+}
+
 gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<FunctionTemplateDecl> dr = FunctionTemplateDecl::from(r)) {
@@ -172,7 +186,7 @@ bool FunctionTemplateDecl::is_abbreviated(void) const {
 }
 
 bool FunctionTemplateDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

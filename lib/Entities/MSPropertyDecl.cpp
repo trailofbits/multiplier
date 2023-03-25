@@ -87,6 +87,20 @@ bool MSPropertyDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+MSPropertyDecl MSPropertyDecl::canonical_declaration(void) const {
+  if (auto canon = MSPropertyDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (MSPropertyDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<MSPropertyDecl> MSPropertyDecl::definition(void) const {
+  return MSPropertyDecl::from(this->Decl::definition());
+}
+
 gap::generator<MSPropertyDecl> MSPropertyDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<MSPropertyDecl> dr = MSPropertyDecl::from(r)) {

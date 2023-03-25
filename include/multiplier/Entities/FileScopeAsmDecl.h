@@ -44,6 +44,8 @@ class FileScopeAsmDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  FileScopeAsmDecl canonical_declaration(void) const;
+  std::optional<FileScopeAsmDecl> definition(void) const;
   gap::generator<FileScopeAsmDecl> redeclarations(void) const &;
   static std::optional<FileScopeAsmDecl> from(const Decl &parent);
 

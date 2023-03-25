@@ -44,6 +44,8 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ClassScopeFunctionSpecializationDecl canonical_declaration(void) const;
+  std::optional<ClassScopeFunctionSpecializationDecl> definition(void) const;
   gap::generator<ClassScopeFunctionSpecializationDecl> redeclarations(void) const &;
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
 

@@ -86,6 +86,20 @@ bool StaticAssertDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+StaticAssertDecl StaticAssertDecl::canonical_declaration(void) const {
+  if (auto canon = StaticAssertDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (StaticAssertDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<StaticAssertDecl> StaticAssertDecl::definition(void) const {
+  return StaticAssertDecl::from(this->Decl::definition());
+}
+
 gap::generator<StaticAssertDecl> StaticAssertDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<StaticAssertDecl> dr = StaticAssertDecl::from(r)) {

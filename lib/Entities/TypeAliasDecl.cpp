@@ -88,6 +88,20 @@ bool TypeAliasDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TypeAliasDecl TypeAliasDecl::canonical_declaration(void) const {
+  if (auto canon = TypeAliasDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TypeAliasDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TypeAliasDecl> TypeAliasDecl::definition(void) const {
+  return TypeAliasDecl::from(this->Decl::definition());
+}
+
 gap::generator<TypeAliasDecl> TypeAliasDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TypeAliasDecl> dr = TypeAliasDecl::from(r)) {

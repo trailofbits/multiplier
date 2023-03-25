@@ -92,6 +92,20 @@ bool VarTemplateSpecializationDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+VarTemplateSpecializationDecl VarTemplateSpecializationDecl::canonical_declaration(void) const {
+  if (auto canon = VarTemplateSpecializationDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (VarTemplateSpecializationDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::definition(void) const {
+  return VarTemplateSpecializationDecl::from(this->Decl::definition());
+}
+
 gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<VarTemplateSpecializationDecl> dr = VarTemplateSpecializationDecl::from(r)) {
@@ -175,15 +189,15 @@ std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from
 }
 
 Token VarTemplateSpecializationDecl::extern_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal125());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal126());
 }
 
 TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal128());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal129());
 }
 
 VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const {
-  RawEntityId eid = impl->reader.getVal126();
+  RawEntityId eid = impl->reader.getVal127();
   return VarTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
@@ -248,24 +262,24 @@ gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_instant
 }
 
 Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal127());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal128());
 }
 
 Type VarTemplateSpecializationDecl::type_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal129();
+  RawEntityId eid = impl->reader.getVal130();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-  return impl->reader.getVal131();
-}
-
-bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   return impl->reader.getVal132();
 }
 
-bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
+bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   return impl->reader.getVal133();
+}
+
+bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
+  return impl->reader.getVal134();
 }
 
 #pragma GCC diagnostic pop

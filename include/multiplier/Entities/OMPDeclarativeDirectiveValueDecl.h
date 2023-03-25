@@ -44,6 +44,8 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  OMPDeclarativeDirectiveValueDecl canonical_declaration(void) const;
+  std::optional<OMPDeclarativeDirectiveValueDecl> definition(void) const;
   gap::generator<OMPDeclarativeDirectiveValueDecl> redeclarations(void) const &;
   static std::optional<OMPDeclarativeDirectiveValueDecl> from(const Decl &parent);
 

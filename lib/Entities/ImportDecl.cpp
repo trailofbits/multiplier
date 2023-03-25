@@ -85,6 +85,20 @@ bool ImportDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ImportDecl ImportDecl::canonical_declaration(void) const {
+  if (auto canon = ImportDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ImportDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ImportDecl> ImportDecl::definition(void) const {
+  return ImportDecl::from(this->Decl::definition());
+}
+
 gap::generator<ImportDecl> ImportDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ImportDecl> dr = ImportDecl::from(r)) {

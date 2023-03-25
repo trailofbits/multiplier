@@ -43,6 +43,8 @@ class PragmaDetectMismatchDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  PragmaDetectMismatchDecl canonical_declaration(void) const;
+  std::optional<PragmaDetectMismatchDecl> definition(void) const;
   gap::generator<PragmaDetectMismatchDecl> redeclarations(void) const &;
   static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent);
 

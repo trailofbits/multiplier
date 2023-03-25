@@ -49,6 +49,8 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  FunctionTemplateDecl canonical_declaration(void) const;
+  std::optional<FunctionTemplateDecl> definition(void) const;
   gap::generator<FunctionTemplateDecl> redeclarations(void) const &;
   static std::optional<FunctionTemplateDecl> from(const Decl &parent);
 

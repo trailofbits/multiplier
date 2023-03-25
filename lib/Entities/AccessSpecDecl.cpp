@@ -84,6 +84,20 @@ bool AccessSpecDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+AccessSpecDecl AccessSpecDecl::canonical_declaration(void) const {
+  if (auto canon = AccessSpecDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (AccessSpecDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<AccessSpecDecl> AccessSpecDecl::definition(void) const {
+  return AccessSpecDecl::from(this->Decl::definition());
+}
+
 gap::generator<AccessSpecDecl> AccessSpecDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<AccessSpecDecl> dr = AccessSpecDecl::from(r)) {

@@ -55,6 +55,8 @@ class ParmVarDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ParmVarDecl canonical_declaration(void) const;
+  std::optional<ParmVarDecl> definition(void) const;
   gap::generator<ParmVarDecl> redeclarations(void) const &;
   static std::optional<ParmVarDecl> from(const Decl &parent);
 

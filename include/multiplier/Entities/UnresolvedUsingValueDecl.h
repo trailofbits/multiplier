@@ -47,6 +47,8 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UnresolvedUsingValueDecl canonical_declaration(void) const;
+  std::optional<UnresolvedUsingValueDecl> definition(void) const;
   gap::generator<UnresolvedUsingValueDecl> redeclarations(void) const &;
   static std::optional<UnresolvedUsingValueDecl> from(const Decl &parent);
 

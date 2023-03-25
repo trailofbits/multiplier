@@ -87,6 +87,20 @@ bool BlockDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+BlockDecl BlockDecl::canonical_declaration(void) const {
+  if (auto canon = BlockDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (BlockDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<BlockDecl> BlockDecl::definition(void) const {
+  return BlockDecl::from(this->Decl::definition());
+}
+
 gap::generator<BlockDecl> BlockDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<BlockDecl> dr = BlockDecl::from(r)) {

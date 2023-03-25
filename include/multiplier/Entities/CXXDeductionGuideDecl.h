@@ -53,6 +53,8 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  CXXDeductionGuideDecl canonical_declaration(void) const;
+  std::optional<CXXDeductionGuideDecl> definition(void) const;
   gap::generator<CXXDeductionGuideDecl> redeclarations(void) const &;
   static std::optional<CXXDeductionGuideDecl> from(const Decl &parent);
 

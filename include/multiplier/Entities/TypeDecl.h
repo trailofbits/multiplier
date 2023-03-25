@@ -52,6 +52,8 @@ class TypeDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TypeDecl canonical_declaration(void) const;
+  std::optional<TypeDecl> definition(void) const;
   gap::generator<TypeDecl> redeclarations(void) const &;
   static std::optional<TypeDecl> from(const Decl &parent);
 

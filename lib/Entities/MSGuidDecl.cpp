@@ -86,6 +86,20 @@ bool MSGuidDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+MSGuidDecl MSGuidDecl::canonical_declaration(void) const {
+  if (auto canon = MSGuidDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (MSGuidDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<MSGuidDecl> MSGuidDecl::definition(void) const {
+  return MSGuidDecl::from(this->Decl::definition());
+}
+
 gap::generator<MSGuidDecl> MSGuidDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<MSGuidDecl> dr = MSGuidDecl::from(r)) {

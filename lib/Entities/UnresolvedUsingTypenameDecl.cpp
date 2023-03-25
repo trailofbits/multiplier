@@ -86,6 +86,20 @@ bool UnresolvedUsingTypenameDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UnresolvedUsingTypenameDecl UnresolvedUsingTypenameDecl::canonical_declaration(void) const {
+  if (auto canon = UnresolvedUsingTypenameDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UnresolvedUsingTypenameDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::definition(void) const {
+  return UnresolvedUsingTypenameDecl::from(this->Decl::definition());
+}
+
 gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UnresolvedUsingTypenameDecl> dr = UnresolvedUsingTypenameDecl::from(r)) {

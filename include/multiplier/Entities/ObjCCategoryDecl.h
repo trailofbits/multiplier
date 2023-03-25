@@ -52,6 +52,8 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCCategoryDecl canonical_declaration(void) const;
+  std::optional<ObjCCategoryDecl> definition(void) const;
   gap::generator<ObjCCategoryDecl> redeclarations(void) const &;
   static std::optional<ObjCCategoryDecl> from(const Decl &parent);
 

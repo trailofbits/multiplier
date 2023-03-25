@@ -85,6 +85,20 @@ bool NamespaceAliasDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+NamespaceAliasDecl NamespaceAliasDecl::canonical_declaration(void) const {
+  if (auto canon = NamespaceAliasDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (NamespaceAliasDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<NamespaceAliasDecl> NamespaceAliasDecl::definition(void) const {
+  return NamespaceAliasDecl::from(this->Decl::definition());
+}
+
 gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<NamespaceAliasDecl> dr = NamespaceAliasDecl::from(r)) {

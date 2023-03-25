@@ -44,6 +44,8 @@ class ImportDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ImportDecl canonical_declaration(void) const;
+  std::optional<ImportDecl> definition(void) const;
   gap::generator<ImportDecl> redeclarations(void) const &;
   static std::optional<ImportDecl> from(const Decl &parent);
 

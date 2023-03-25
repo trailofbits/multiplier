@@ -43,6 +43,8 @@ class RequiresExprBodyDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  RequiresExprBodyDecl canonical_declaration(void) const;
+  std::optional<RequiresExprBodyDecl> definition(void) const;
   gap::generator<RequiresExprBodyDecl> redeclarations(void) const &;
   static std::optional<RequiresExprBodyDecl> from(const Decl &parent);
 

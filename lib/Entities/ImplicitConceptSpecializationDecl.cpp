@@ -85,6 +85,20 @@ bool ImplicitConceptSpecializationDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ImplicitConceptSpecializationDecl ImplicitConceptSpecializationDecl::canonical_declaration(void) const {
+  if (auto canon = ImplicitConceptSpecializationDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ImplicitConceptSpecializationDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::definition(void) const {
+  return ImplicitConceptSpecializationDecl::from(this->Decl::definition());
+}
+
 gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ImplicitConceptSpecializationDecl> dr = ImplicitConceptSpecializationDecl::from(r)) {

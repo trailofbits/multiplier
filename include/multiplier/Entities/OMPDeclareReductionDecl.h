@@ -49,6 +49,8 @@ class OMPDeclareReductionDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  OMPDeclareReductionDecl canonical_declaration(void) const;
+  std::optional<OMPDeclareReductionDecl> definition(void) const;
   gap::generator<OMPDeclareReductionDecl> redeclarations(void) const &;
   static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
 

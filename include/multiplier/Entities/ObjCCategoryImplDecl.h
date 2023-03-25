@@ -50,6 +50,8 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCCategoryImplDecl canonical_declaration(void) const;
+  std::optional<ObjCCategoryImplDecl> definition(void) const;
   gap::generator<ObjCCategoryImplDecl> redeclarations(void) const &;
   static std::optional<ObjCCategoryImplDecl> from(const Decl &parent);
 

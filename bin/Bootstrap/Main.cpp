@@ -2737,10 +2737,24 @@ MethodListPtr CodeGenerator::RunOnClass(
   // Add derived overrides for redeclarations.
   if (class_name != "Decl" && gDeclNames.count(class_name)) {
     class_os
+        << "  " << class_name << " canonical_declaration(void) const;\n"
+        << "  std::optional<" << class_name << "> definition(void) const;\n"
         << "  gap::generator<" << class_name
         << "> redeclarations(void) const &;\n";
 
     lib_cpp_os
+        << class_name << " " << class_name << "::canonical_declaration(void) const {\n"
+        << "  if (auto canon = " << class_name << "::from(this->Decl::canonical_declaration())) {\n"
+        << "    return std::move(canon.value());\n"
+        << "  }\n"
+        << "  for (" << class_name << " redecl : redeclarations()) {\n"
+        << "    return redecl;\n"
+        << "  }\n"
+        << "  __builtin_unreachable();\n"
+        << "}\n\n"
+        << "std::optional<" << class_name << "> " << class_name << "::definition(void) const {\n"
+        << "  return " << class_name << "::from(this->Decl::definition());\n"
+        << "}\n\n"
         << "gap::generator<" << class_name
         << "> " << class_name << "::redeclarations(void) const & {\n"
         << "  for (Decl r : Decl::redeclarations()) {\n"

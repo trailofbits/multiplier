@@ -86,6 +86,20 @@ bool LifetimeExtendedTemporaryDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+LifetimeExtendedTemporaryDecl LifetimeExtendedTemporaryDecl::canonical_declaration(void) const {
+  if (auto canon = LifetimeExtendedTemporaryDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (LifetimeExtendedTemporaryDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::definition(void) const {
+  return LifetimeExtendedTemporaryDecl::from(this->Decl::definition());
+}
+
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<LifetimeExtendedTemporaryDecl> dr = LifetimeExtendedTemporaryDecl::from(r)) {

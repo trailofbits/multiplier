@@ -86,6 +86,20 @@ bool UsingDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UsingDecl UsingDecl::canonical_declaration(void) const {
+  if (auto canon = UsingDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UsingDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UsingDecl> UsingDecl::definition(void) const {
+  return UsingDecl::from(this->Decl::definition());
+}
+
 gap::generator<UsingDecl> UsingDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UsingDecl> dr = UsingDecl::from(r)) {

@@ -106,6 +106,20 @@ bool DeclaratorDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+DeclaratorDecl DeclaratorDecl::canonical_declaration(void) const {
+  if (auto canon = DeclaratorDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (DeclaratorDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<DeclaratorDecl> DeclaratorDecl::definition(void) const {
+  return DeclaratorDecl::from(this->Decl::definition());
+}
+
 gap::generator<DeclaratorDecl> DeclaratorDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<DeclaratorDecl> dr = DeclaratorDecl::from(r)) {
@@ -221,16 +235,16 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const TokenContext &t) {
 }
 
 Token DeclaratorDecl::first_inner_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 Token DeclaratorDecl::first_outer_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
 }
 
 std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal64();
+    RawEntityId eid = impl->reader.getVal65();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -242,11 +256,11 @@ std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
 }
 
 Token DeclaratorDecl::type_spec_end_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 Token DeclaratorDecl::type_spec_start_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal76());
 }
 
 unsigned DeclaratorDecl::num_template_parameter_lists(void) const {

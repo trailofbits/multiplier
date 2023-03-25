@@ -88,6 +88,20 @@ bool ObjCCategoryImplDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ObjCCategoryImplDecl ObjCCategoryImplDecl::canonical_declaration(void) const {
+  if (auto canon = ObjCCategoryImplDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ObjCCategoryImplDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::definition(void) const {
+  return ObjCCategoryImplDecl::from(this->Decl::definition());
+}
+
 gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ObjCCategoryImplDecl> dr = ObjCCategoryImplDecl::from(r)) {

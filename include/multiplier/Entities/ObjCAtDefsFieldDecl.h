@@ -51,6 +51,8 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCAtDefsFieldDecl canonical_declaration(void) const;
+  std::optional<ObjCAtDefsFieldDecl> definition(void) const;
   gap::generator<ObjCAtDefsFieldDecl> redeclarations(void) const &;
   static std::optional<ObjCAtDefsFieldDecl> from(const Decl &parent);
 

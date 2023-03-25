@@ -44,6 +44,8 @@ class ImplicitConceptSpecializationDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ImplicitConceptSpecializationDecl canonical_declaration(void) const;
+  std::optional<ImplicitConceptSpecializationDecl> definition(void) const;
   gap::generator<ImplicitConceptSpecializationDecl> redeclarations(void) const &;
   static std::optional<ImplicitConceptSpecializationDecl> from(const Decl &parent);
 

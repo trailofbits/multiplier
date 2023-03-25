@@ -49,6 +49,8 @@ class UsingEnumDecl : public BaseUsingDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UsingEnumDecl canonical_declaration(void) const;
+  std::optional<UsingEnumDecl> definition(void) const;
   gap::generator<UsingEnumDecl> redeclarations(void) const &;
   static std::optional<UsingEnumDecl> from(const Decl &parent);
 

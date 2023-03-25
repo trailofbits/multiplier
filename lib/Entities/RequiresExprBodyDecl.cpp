@@ -84,6 +84,20 @@ bool RequiresExprBodyDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+RequiresExprBodyDecl RequiresExprBodyDecl::canonical_declaration(void) const {
+  if (auto canon = RequiresExprBodyDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (RequiresExprBodyDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::definition(void) const {
+  return RequiresExprBodyDecl::from(this->Decl::definition());
+}
+
 gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<RequiresExprBodyDecl> dr = RequiresExprBodyDecl::from(r)) {

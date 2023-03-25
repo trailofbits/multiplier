@@ -85,6 +85,20 @@ bool NamespaceDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+NamespaceDecl NamespaceDecl::canonical_declaration(void) const {
+  if (auto canon = NamespaceDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (NamespaceDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<NamespaceDecl> NamespaceDecl::definition(void) const {
+  return NamespaceDecl::from(this->Decl::definition());
+}
+
 gap::generator<NamespaceDecl> NamespaceDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<NamespaceDecl> dr = NamespaceDecl::from(r)) {

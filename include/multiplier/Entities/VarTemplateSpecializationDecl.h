@@ -56,6 +56,8 @@ class VarTemplateSpecializationDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  VarTemplateSpecializationDecl canonical_declaration(void) const;
+  std::optional<VarTemplateSpecializationDecl> definition(void) const;
   gap::generator<VarTemplateSpecializationDecl> redeclarations(void) const &;
   static std::optional<VarTemplateSpecializationDecl> from(const Decl &parent);
 

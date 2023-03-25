@@ -48,6 +48,8 @@ class TemplateTypeParmDecl : public TypeDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TemplateTypeParmDecl canonical_declaration(void) const;
+  std::optional<TemplateTypeParmDecl> definition(void) const;
   gap::generator<TemplateTypeParmDecl> redeclarations(void) const &;
   static std::optional<TemplateTypeParmDecl> from(const Decl &parent);
 

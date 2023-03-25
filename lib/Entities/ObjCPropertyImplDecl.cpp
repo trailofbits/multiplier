@@ -88,6 +88,20 @@ bool ObjCPropertyImplDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ObjCPropertyImplDecl ObjCPropertyImplDecl::canonical_declaration(void) const {
+  if (auto canon = ObjCPropertyImplDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ObjCPropertyImplDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::definition(void) const {
+  return ObjCPropertyImplDecl::from(this->Decl::definition());
+}
+
 gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ObjCPropertyImplDecl> dr = ObjCPropertyImplDecl::from(r)) {

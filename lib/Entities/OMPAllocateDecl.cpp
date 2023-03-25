@@ -86,6 +86,20 @@ bool OMPAllocateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+OMPAllocateDecl OMPAllocateDecl::canonical_declaration(void) const {
+  if (auto canon = OMPAllocateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (OMPAllocateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<OMPAllocateDecl> OMPAllocateDecl::definition(void) const {
+  return OMPAllocateDecl::from(this->Decl::definition());
+}
+
 gap::generator<OMPAllocateDecl> OMPAllocateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<OMPAllocateDecl> dr = OMPAllocateDecl::from(r)) {

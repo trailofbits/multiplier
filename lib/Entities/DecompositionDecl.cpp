@@ -89,6 +89,20 @@ bool DecompositionDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+DecompositionDecl DecompositionDecl::canonical_declaration(void) const {
+  if (auto canon = DecompositionDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (DecompositionDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<DecompositionDecl> DecompositionDecl::definition(void) const {
+  return DecompositionDecl::from(this->Decl::definition());
+}
+
 gap::generator<DecompositionDecl> DecompositionDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<DecompositionDecl> dr = DecompositionDecl::from(r)) {

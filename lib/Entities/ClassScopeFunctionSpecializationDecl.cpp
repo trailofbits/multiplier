@@ -85,6 +85,20 @@ bool ClassScopeFunctionSpecializationDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ClassScopeFunctionSpecializationDecl ClassScopeFunctionSpecializationDecl::canonical_declaration(void) const {
+  if (auto canon = ClassScopeFunctionSpecializationDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ClassScopeFunctionSpecializationDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::definition(void) const {
+  return ClassScopeFunctionSpecializationDecl::from(this->Decl::definition());
+}
+
 gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ClassScopeFunctionSpecializationDecl> dr = ClassScopeFunctionSpecializationDecl::from(r)) {

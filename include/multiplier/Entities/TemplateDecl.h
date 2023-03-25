@@ -49,6 +49,8 @@ class TemplateDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TemplateDecl canonical_declaration(void) const;
+  std::optional<TemplateDecl> definition(void) const;
   gap::generator<TemplateDecl> redeclarations(void) const &;
   static std::optional<TemplateDecl> from(const Decl &parent);
 

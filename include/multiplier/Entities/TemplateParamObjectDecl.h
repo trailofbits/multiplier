@@ -47,6 +47,8 @@ class TemplateParamObjectDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TemplateParamObjectDecl canonical_declaration(void) const;
+  std::optional<TemplateParamObjectDecl> definition(void) const;
   gap::generator<TemplateParamObjectDecl> redeclarations(void) const &;
   static std::optional<TemplateParamObjectDecl> from(const Decl &parent);
 

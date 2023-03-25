@@ -93,6 +93,20 @@ bool TemplateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TemplateDecl TemplateDecl::canonical_declaration(void) const {
+  if (auto canon = TemplateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TemplateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TemplateDecl> TemplateDecl::definition(void) const {
+  return TemplateDecl::from(this->Decl::definition());
+}
+
 gap::generator<TemplateDecl> TemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TemplateDecl> dr = TemplateDecl::from(r)) {

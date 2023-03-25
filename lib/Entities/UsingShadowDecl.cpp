@@ -87,6 +87,20 @@ bool UsingShadowDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UsingShadowDecl UsingShadowDecl::canonical_declaration(void) const {
+  if (auto canon = UsingShadowDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UsingShadowDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UsingShadowDecl> UsingShadowDecl::definition(void) const {
+  return UsingShadowDecl::from(this->Decl::definition());
+}
+
 gap::generator<UsingShadowDecl> UsingShadowDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UsingShadowDecl> dr = UsingShadowDecl::from(r)) {

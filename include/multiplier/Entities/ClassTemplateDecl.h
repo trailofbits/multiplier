@@ -49,6 +49,8 @@ class ClassTemplateDecl : public RedeclarableTemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ClassTemplateDecl canonical_declaration(void) const;
+  std::optional<ClassTemplateDecl> definition(void) const;
   gap::generator<ClassTemplateDecl> redeclarations(void) const &;
   static std::optional<ClassTemplateDecl> from(const Decl &parent);
 

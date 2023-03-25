@@ -84,6 +84,20 @@ bool TranslationUnitDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TranslationUnitDecl TranslationUnitDecl::canonical_declaration(void) const {
+  if (auto canon = TranslationUnitDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TranslationUnitDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TranslationUnitDecl> TranslationUnitDecl::definition(void) const {
+  return TranslationUnitDecl::from(this->Decl::definition());
+}
+
 gap::generator<TranslationUnitDecl> TranslationUnitDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TranslationUnitDecl> dr = TranslationUnitDecl::from(r)) {

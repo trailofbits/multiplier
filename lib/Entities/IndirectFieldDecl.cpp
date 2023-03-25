@@ -88,6 +88,20 @@ bool IndirectFieldDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+IndirectFieldDecl IndirectFieldDecl::canonical_declaration(void) const {
+  if (auto canon = IndirectFieldDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (IndirectFieldDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<IndirectFieldDecl> IndirectFieldDecl::definition(void) const {
+  return IndirectFieldDecl::from(this->Decl::definition());
+}
+
 gap::generator<IndirectFieldDecl> IndirectFieldDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<IndirectFieldDecl> dr = IndirectFieldDecl::from(r)) {
@@ -184,7 +198,7 @@ gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const & {
 
 std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal55();
+    RawEntityId eid = impl->reader.getVal56();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -197,7 +211,7 @@ std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
 
 std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal56();
+    RawEntityId eid = impl->reader.getVal64();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

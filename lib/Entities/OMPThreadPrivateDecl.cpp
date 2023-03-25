@@ -86,6 +86,20 @@ bool OMPThreadPrivateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+OMPThreadPrivateDecl OMPThreadPrivateDecl::canonical_declaration(void) const {
+  if (auto canon = OMPThreadPrivateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (OMPThreadPrivateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::definition(void) const {
+  return OMPThreadPrivateDecl::from(this->Decl::definition());
+}
+
 gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<OMPThreadPrivateDecl> dr = OMPThreadPrivateDecl::from(r)) {

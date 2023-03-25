@@ -54,6 +54,8 @@ class CXXConversionDecl : public CXXMethodDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  CXXConversionDecl canonical_declaration(void) const;
+  std::optional<CXXConversionDecl> definition(void) const;
   gap::generator<CXXConversionDecl> redeclarations(void) const &;
   static std::optional<CXXConversionDecl> from(const Decl &parent);
 

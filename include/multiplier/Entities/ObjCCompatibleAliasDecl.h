@@ -46,6 +46,8 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCCompatibleAliasDecl canonical_declaration(void) const;
+  std::optional<ObjCCompatibleAliasDecl> definition(void) const;
   gap::generator<ObjCCompatibleAliasDecl> redeclarations(void) const &;
   static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent);
 

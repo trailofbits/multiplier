@@ -54,6 +54,8 @@ class RecordDecl : public TagDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  RecordDecl canonical_declaration(void) const;
+  std::optional<RecordDecl> definition(void) const;
   gap::generator<RecordDecl> redeclarations(void) const &;
   static std::optional<RecordDecl> from(const Decl &parent);
 

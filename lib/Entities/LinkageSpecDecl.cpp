@@ -84,6 +84,20 @@ bool LinkageSpecDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+LinkageSpecDecl LinkageSpecDecl::canonical_declaration(void) const {
+  if (auto canon = LinkageSpecDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (LinkageSpecDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<LinkageSpecDecl> LinkageSpecDecl::definition(void) const {
+  return LinkageSpecDecl::from(this->Decl::definition());
+}
+
 gap::generator<LinkageSpecDecl> LinkageSpecDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<LinkageSpecDecl> dr = LinkageSpecDecl::from(r)) {

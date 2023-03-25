@@ -69,6 +69,8 @@ class ValueDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ValueDecl canonical_declaration(void) const;
+  std::optional<ValueDecl> definition(void) const;
   gap::generator<ValueDecl> redeclarations(void) const &;
   static std::optional<ValueDecl> from(const Decl &parent);
 
@@ -83,6 +85,7 @@ class ValueDecl : public NamedDecl {
   static std::optional<ValueDecl> from(const Reference &r);
   static std::optional<ValueDecl> from(const TokenContext &t);
 
+  std::optional<VarDecl> potentially_decomposed_variable_declaration(void) const;
   Type type(void) const;
   bool is_initializer_capture(void) const;
   bool is_weak(void) const;

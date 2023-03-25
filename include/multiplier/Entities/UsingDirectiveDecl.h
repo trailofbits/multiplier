@@ -45,6 +45,8 @@ class UsingDirectiveDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UsingDirectiveDecl canonical_declaration(void) const;
+  std::optional<UsingDirectiveDecl> definition(void) const;
   gap::generator<UsingDirectiveDecl> redeclarations(void) const &;
   static std::optional<UsingDirectiveDecl> from(const Decl &parent);
 

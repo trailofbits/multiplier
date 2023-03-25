@@ -89,6 +89,20 @@ bool ObjCImplementationDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ObjCImplementationDecl ObjCImplementationDecl::canonical_declaration(void) const {
+  if (auto canon = ObjCImplementationDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ObjCImplementationDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ObjCImplementationDecl> ObjCImplementationDecl::definition(void) const {
+  return ObjCImplementationDecl::from(this->Decl::definition());
+}
+
 gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ObjCImplementationDecl> dr = ObjCImplementationDecl::from(r)) {
@@ -188,7 +202,7 @@ ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal78());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal77());
 }
 
 bool ObjCImplementationDecl::has_destructors(void) const {
@@ -200,11 +214,11 @@ bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
 }
 
 unsigned ObjCImplementationDecl::num_instance_variables(void) const {
-  return impl->reader.getVal338().size();
+  return impl->reader.getVal339().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
-  auto list = impl->reader.getVal338();
+  auto list = impl->reader.getVal339();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -218,12 +232,12 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
-  auto list = impl->reader.getVal338();
+  auto list = impl->reader.getVal339();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d338 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(std::move(d338)))) {
+    if (auto d339 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from(Decl(std::move(d339)))) {
         co_yield std::move(*e);
       }
     }

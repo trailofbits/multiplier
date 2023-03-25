@@ -92,6 +92,20 @@ bool ClassTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::canonical_declaration(void) const {
+  if (auto canon = ClassTemplatePartialSpecializationDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ClassTemplatePartialSpecializationDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::definition(void) const {
+  return ClassTemplatePartialSpecializationDecl::from(this->Decl::definition());
+}
+
 gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ClassTemplatePartialSpecializationDecl> dr = ClassTemplatePartialSpecializationDecl::from(r)) {
@@ -183,17 +197,17 @@ ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::i
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
-  RawEntityId eid = impl->reader.getVal162();
+  RawEntityId eid = impl->reader.getVal144();
   return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal164();
+  RawEntityId eid = impl->reader.getVal163();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal345();
+  return impl->reader.getVal346();
 }
 
 #pragma GCC diagnostic pop

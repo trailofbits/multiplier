@@ -88,6 +88,20 @@ bool BindingDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+BindingDecl BindingDecl::canonical_declaration(void) const {
+  if (auto canon = BindingDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (BindingDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<BindingDecl> BindingDecl::definition(void) const {
+  return BindingDecl::from(this->Decl::definition());
+}
+
 gap::generator<BindingDecl> BindingDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<BindingDecl> dr = BindingDecl::from(r)) {
@@ -169,17 +183,17 @@ std::optional<BindingDecl> BindingDecl::from(const TokenContext &t) {
 }
 
 Expr BindingDecl::binding(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ValueDecl BindingDecl::decomposed_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal64();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 VarDecl BindingDecl::holding_variable(void) const {
-  RawEntityId eid = impl->reader.getVal64();
+  RawEntityId eid = impl->reader.getVal65();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

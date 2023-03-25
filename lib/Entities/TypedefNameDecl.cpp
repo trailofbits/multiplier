@@ -91,6 +91,20 @@ bool TypedefNameDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TypedefNameDecl TypedefNameDecl::canonical_declaration(void) const {
+  if (auto canon = TypedefNameDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TypedefNameDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TypedefNameDecl> TypedefNameDecl::definition(void) const {
+  return TypedefNameDecl::from(this->Decl::definition());
+}
+
 gap::generator<TypedefNameDecl> TypedefNameDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TypedefNameDecl> dr = TypedefNameDecl::from(r)) {

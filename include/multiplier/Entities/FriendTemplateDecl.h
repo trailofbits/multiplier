@@ -46,6 +46,8 @@ class FriendTemplateDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  FriendTemplateDecl canonical_declaration(void) const;
+  std::optional<FriendTemplateDecl> definition(void) const;
   gap::generator<FriendTemplateDecl> redeclarations(void) const &;
   static std::optional<FriendTemplateDecl> from(const Decl &parent);
 

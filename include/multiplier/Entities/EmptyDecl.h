@@ -43,6 +43,8 @@ class EmptyDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  EmptyDecl canonical_declaration(void) const;
+  std::optional<EmptyDecl> definition(void) const;
   gap::generator<EmptyDecl> redeclarations(void) const &;
   static std::optional<EmptyDecl> from(const Decl &parent);
 

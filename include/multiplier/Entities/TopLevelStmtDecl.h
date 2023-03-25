@@ -43,6 +43,8 @@ class TopLevelStmtDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TopLevelStmtDecl canonical_declaration(void) const;
+  std::optional<TopLevelStmtDecl> definition(void) const;
   gap::generator<TopLevelStmtDecl> redeclarations(void) const &;
   static std::optional<TopLevelStmtDecl> from(const Decl &parent);
 

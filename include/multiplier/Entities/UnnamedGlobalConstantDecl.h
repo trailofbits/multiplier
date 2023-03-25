@@ -47,6 +47,8 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UnnamedGlobalConstantDecl canonical_declaration(void) const;
+  std::optional<UnnamedGlobalConstantDecl> definition(void) const;
   gap::generator<UnnamedGlobalConstantDecl> redeclarations(void) const &;
   static std::optional<UnnamedGlobalConstantDecl> from(const Decl &parent);
 
