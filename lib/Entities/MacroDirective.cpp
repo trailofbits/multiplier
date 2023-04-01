@@ -166,7 +166,7 @@ std::optional<MacroDirective> MacroDirective::from(const TokenContext &t) {
 }
 
 Token MacroDirective::hash(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal4());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal5());
 }
 
 Token MacroDirective::directive_name(void) const {

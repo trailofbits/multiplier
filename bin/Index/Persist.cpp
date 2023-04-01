@@ -222,6 +222,23 @@ void GlobalIndexingState::PersistFile(
 
 namespace {
 
+// Intermediate children include things like parameter-to argument
+// substitutions, stringization, and uses of `__VA_OPT__`. They might point
+// into the macro body itself, rather than the expansion, so make sure only
+// to collect them if they are owned by the expansion.
+static std::optional<pasta::MacroRange> IntermediateChildren(
+    const pasta::Macro &macro) {
+  if (auto exp = pasta::MacroExpansion::From(macro)) {
+    pasta::MacroRange children = exp->IntermediateChildren();
+    for (pasta::Macro child : children) {
+      if (child.Parent()->RawMacro() == exp->RawMacro()) {
+        return children;
+      }
+    }
+  }
+  return std::nullopt;
+}
+
 // Schedules the order of serialization of tokens derived from the token tree.
 // The main goal is for all tokens in the final expansion, i.e. all parsed
 // tokens, to be adjacent. The token tree code also tries to inject whitespace
@@ -340,6 +357,10 @@ struct TokenTreeSerializationSchedule {
         const void *child = sub->RawNode();
         if (sub->HasExpansion()) {
           Schedule(child, child_id, sub->ReplacementChildren());
+          if (sub->HasIntermediateChildren()) {
+            todo_list.emplace_back(
+                Todo{child, child_id, sub->IntermediateChildren()});
+          }
           todo_list.emplace_back(Todo{child, child_id, sub->Children()});
         } else {
           Schedule(child, child_id, sub->Children());
@@ -450,6 +471,14 @@ void VisitMacros(
     // Recursive visit this macro.
     VisitMacroRange(pf, em, macro.Children(), macros_to_serialize);
 
+    // Get the intermediae children. This live between the children and the
+    // replacement children. Some substitutions happen here, but their trees
+    // can't logically nest with those of the replacement children.
+    if (auto intermediates = IntermediateChildren(macro)) {
+      VisitMacroRange(pf, em, *intermediates, macros_to_serialize);
+    }
+
+    // Visit replacement children.
     if (auto sub = pasta::MacroSubstitution::From(macro)) {
       VisitMacroRange(pf, em, sub->ReplacementChildren(),
                       macros_to_serialize);
@@ -506,6 +535,11 @@ static RelatedEntityIds RelatedEntities(
       for (pasta::Macro child : parent.Children()) {
         mwl.emplace_back(std::move(child));
       }
+      if (auto intermediates = IntermediateChildren(parent)) {
+        for (pasta::Macro child : *intermediates) {
+          mwl.emplace_back(std::move(child));
+        }
+      }
       if (auto sub = pasta::MacroSubstitution::From(parent)) {
         for (pasta::Macro child : sub->ReplacementChildren()) {
           mwl.emplace_back(std::move(child));
@@ -516,7 +550,7 @@ static RelatedEntityIds RelatedEntities(
 
   // Now go through the include work list. We want to mark all remaining
   // unmarked tokens in the usage steps as being associated with the file
-  // loations.
+  // locations.
   while (!include_wl.empty()) {
     mx::RawEntityId file_eid = std::move(include_wl.back().first);
     pasta::Macro parent = std::move(include_wl.back().second);

@@ -6,7 +6,6 @@
 
 #include "PendingFragment.h"
 
-#include "Macro.h"
 #include "PASTA.h"
 #include "Util.h"
 

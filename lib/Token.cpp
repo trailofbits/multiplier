@@ -493,6 +493,8 @@ static TokenCategory ClassifyMacro(const Token &tok, MacroId id,
     case TokenCategory::THIS:
     try_param:
       switch (id.kind) {
+        case MacroKind::STRINGIFY:
+          return TokenCategory::LITERAL;
         case MacroKind::DEFINE_DIRECTIVE:
         case MacroKind::EXPANSION:
         case MacroKind::SUBSTITUTION:

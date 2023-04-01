@@ -52,6 +52,7 @@ class MacroStringify : public MacroSubstitution {
   static std::optional<MacroStringify> from(const Reference &r);
   static std::optional<MacroStringify> from(const TokenContext &t);
 
+  Token stringified_token(void) const;
 };
 
 static_assert(sizeof(MacroStringify) == sizeof(MacroSubstitution));

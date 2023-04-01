@@ -122,7 +122,7 @@ std::optional<DefineMacroDirective> DefineMacroDirective::from(const TokenContex
 
 Token DefineMacroDirective::name(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal9();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return Token();
     }
@@ -133,7 +133,7 @@ Token DefineMacroDirective::name(void) const {
 
 gap::generator<MacroOrToken> DefineMacroDirective::body(void) const & {
   Index index(impl->ep);
-  auto list = impl->reader.getVal3();
+  auto list = impl->reader.getVal4();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
@@ -147,16 +147,16 @@ gap::generator<MacroOrToken> DefineMacroDirective::body(void) const & {
 }
 
 bool DefineMacroDirective::is_variadic(void) const {
-  return impl->reader.getVal6();
+  return impl->reader.getVal3();
 }
 
 bool DefineMacroDirective::is_function_like(void) const {
-  return impl->reader.getVal10();
+  return impl->reader.getVal11();
 }
 
 gap::generator<MacroOrToken> DefineMacroDirective::parameters(void) const & {
   Index index(impl->ep);
-  auto list = impl->reader.getVal5();
+  auto list = impl->reader.getVal6();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {

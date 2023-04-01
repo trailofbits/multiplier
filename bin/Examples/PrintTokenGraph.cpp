@@ -27,6 +27,7 @@ static std::string TokData(mx::Token tok) {
       case '\r': ss << " "; break;
       case '\n': ss << " "; break;
       case '&': ss << "&amp;"; break;
+      case '\\': ss << '|'; break;
       default: ss << ch; break;
     }
   }
@@ -80,6 +81,17 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
         if (std::holds_alternative<mx::Token>(node)) {
           if (std::get<mx::Token>(node) == dt) {
             pred_prefix = "a";
+            break;
+          }
+        }
+      }
+    }
+
+    if (auto exp = mx::MacroExpansion::from(*m)) {
+      for (mx::MacroOrToken node : exp->intermediate_children()) {
+        if (std::holds_alternative<mx::Token>(node)) {
+          if (std::get<mx::Token>(node) == dt) {
+            pred_prefix = "i";
             break;
           }
         }
@@ -224,6 +236,65 @@ static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
       auto sub_id = m.id().Pack();
       os << "a" << id << ":m" << sub_id << " -> m" << sub_id << ";\n";
       PrintMacro(os, file_toks, m);
+    }
+  }
+
+  if (auto exp = mx::MacroExpansion::from(macro)) {
+    os  << "m" << id << " -> i" << id << " [label=\"between\"];\n"
+        << "i" << id
+        << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>";
+
+    empty = true;
+    for (mx::MacroOrToken node : exp->intermediate_children()) {
+      empty = false;
+      if (std::holds_alternative<mx::Token>(node)) {
+        const mx::Token &mt = std::get<mx::Token>(node);
+        os << "<TD port=\"t" << mt.id().Pack() << "\">" << TokData(mt) << "</TD>";
+      } else if (std::holds_alternative<mx::Macro>(node)) {
+        const mx::Macro &m = std::get<mx::Macro>(node);
+        os << "<TD port=\"m" << m.id().Pack() << "\"> </TD>";
+      }
+    }
+
+    if (!empty) {
+      if (FLAGS_with_categories) {
+        os << "</TR><TR>";
+        for (mx::MacroOrToken node : exp->intermediate_children()) {
+          if (std::holds_alternative<mx::Token>(node)) {
+            const mx::Token &mt = std::get<mx::Token>(node);
+            os << "<TD>" << EnumeratorName(mt.category()) << "</TD>";
+          } else {
+            os << "<TD> </TD>";
+          }
+        }
+      }
+
+      if (FLAGS_with_related_entity_ids) {
+        os << "</TR><TR>";
+        for (mx::MacroOrToken node : exp->intermediate_children()) {
+          if (std::holds_alternative<mx::Token>(node)) {
+            const mx::Token &mt = std::get<mx::Token>(node);
+            os << "<TD>" << mt.related_entity_id().Pack() << "</TD>";
+          } else {
+            os << "<TD> </TD>";
+          }
+        }
+      }
+    } else {
+      os << "<TD> </TD>";
+    }
+
+    os << "</TR></TABLE>>];\n";
+
+    for (mx::MacroOrToken node : exp->intermediate_children()) {
+      if (std::holds_alternative<mx::Token>(node)) {
+        PrintToken(os, file_toks, "i", id, std::get<mx::Token>(node));
+      } else if (std::holds_alternative<mx::Macro>(node)) {
+        const mx::Macro &m = std::get<mx::Macro>(node);
+        auto sub_id = m.id().Pack();
+        os << "i" << id << ":m" << sub_id << " -> m" << sub_id << ";\n";
+        PrintMacro(os, file_toks, m);
+      }
     }
   }
 }

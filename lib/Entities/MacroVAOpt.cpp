@@ -9,7 +9,6 @@
 #include <multiplier/Entities/MacroVAOpt.h>
 
 #include <multiplier/Entities/Macro.h>
-#include <multiplier/Entities/MacroSubstitution.h>
 
 #include "../API.h"
 #include "../Macro.h"
@@ -117,6 +116,10 @@ std::optional<MacroVAOpt> MacroVAOpt::from(const Reference &r) {
 
 std::optional<MacroVAOpt> MacroVAOpt::from(const TokenContext &t) {
   return MacroVAOpt::from(t.as_macro());
+}
+
+bool MacroVAOpt::contents_are_elided(void) const {
+  return impl->reader.getVal3();
 }
 
 #pragma GCC diagnostic pop

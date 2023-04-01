@@ -132,7 +132,7 @@ std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const T
 
 std::optional<File> IncludeLikeMacroDirective::included_file(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal9();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

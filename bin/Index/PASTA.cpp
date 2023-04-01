@@ -7732,6 +7732,11 @@ MacroKind FromPasta(pasta::MacroKind e) {
     case 18: return MacroKind::INCLUDE_NEXT_DIRECTIVE;
     case 19: return MacroKind::INCLUDE_MACROS_DIRECTIVE;
     case 20: return MacroKind::IMPORT_DIRECTIVE;
+    case 21: return MacroKind::PARAMETER_SUBSTITUTION;
+    case 22: return MacroKind::STRINGIFY;
+    case 23: return MacroKind::CONCATENATE;
+    case 24: return MacroKind::VA_OPT;
+    case 25: return MacroKind::VA_OPT_ARGUMENT;
     default: __builtin_unreachable();
   }
 }

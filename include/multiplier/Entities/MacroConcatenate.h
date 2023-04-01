@@ -52,6 +52,7 @@ class MacroConcatenate : public MacroSubstitution {
   static std::optional<MacroConcatenate> from(const Reference &r);
   static std::optional<MacroConcatenate> from(const TokenContext &t);
 
+  Token pasted_token(void) const;
 };
 
 static_assert(sizeof(MacroConcatenate) == sizeof(MacroSubstitution));

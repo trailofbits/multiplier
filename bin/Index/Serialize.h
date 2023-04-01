@@ -823,6 +823,7 @@ class MacroParameter;
 class DefineMacroDirective;
 class MacroArgument;
 class MacroSubstitution;
+class MacroParameterSubstitution;
 class MacroExpansion;
 class MacroStringify;
 class MacroConcatenate;
@@ -2213,6 +2214,7 @@ void SerializeMacroParameter(const EntityMapper &, mx::ast::Macro::Builder, cons
 void SerializeDefineMacroDirective(const EntityMapper &, mx::ast::Macro::Builder, const pasta::DefineMacroDirective &, const TokenTree *);
 void SerializeMacroArgument(const EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroArgument &, const TokenTree *);
 void SerializeMacroSubstitution(const EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroSubstitution &, const TokenTree *);
+void SerializeMacroParameterSubstitution(const EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroParameterSubstitution &, const TokenTree *);
 void SerializeMacroExpansion(const EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroExpansion &, const TokenTree *);
 void SerializeMacroStringify(const EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroStringify &, const TokenTree *);
 void SerializeMacroConcatenate(const EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroConcatenate &, const TokenTree *);

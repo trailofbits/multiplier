@@ -11,7 +11,6 @@ set(exe_name "mx-bootstrap")
 add_executable("${exe_name}"
   Main.cpp
   "${PROJECT_SOURCE_DIR}/bin/Index/Entity.h"
-  "${PROJECT_SOURCE_DIR}/bin/Index/Macro.h"
 )
 
 set_target_properties("${exe_name}"

@@ -119,11 +119,11 @@ std::optional<MacroArgument> MacroArgument::from(const TokenContext &t) {
 }
 
 bool MacroArgument::is_variadic(void) const {
-  return impl->reader.getVal6();
+  return impl->reader.getVal3();
 }
 
 unsigned MacroArgument::index(void) const {
-  return impl->reader.getVal7();
+  return impl->reader.getVal9();
 }
 
 #pragma GCC diagnostic pop

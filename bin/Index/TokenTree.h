@@ -145,16 +145,16 @@ class TokenTree {
 
   std::optional<pasta::Macro> Macro(void) const noexcept;
 
-  // Specializations of `TokenTree::Macro`.
-  std::optional<pasta::MacroDirective> MacroDirective(void) const noexcept;
-  std::optional<pasta::DefineMacroDirective> MacroDefinition(void) const noexcept;
-  std::optional<pasta::MacroExpansion> MacroExpansion(void) const noexcept;
-  std::optional<pasta::MacroArgument> MacroArgument(void) const noexcept;
-
   std::optional<TokenTree> Parent(void) const noexcept;
   TokenTreeNodeRange Children(void) const noexcept;
+  TokenTreeNodeRange IntermediateChildren(void) const noexcept;
   TokenTreeNodeRange ReplacementChildren(void) const noexcept;
 
+  // Return whether or not this node has intermediate children.
+  bool HasIntermediateChildren(void) const noexcept;
+
+  // Return whether or not this node has an expansion (i.e. replacement
+  // children).
   bool HasExpansion(void) const noexcept;
 
   // Return the number of children in this tree.

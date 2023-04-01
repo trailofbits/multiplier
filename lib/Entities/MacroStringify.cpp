@@ -119,6 +119,10 @@ std::optional<MacroStringify> MacroStringify::from(const TokenContext &t) {
   return MacroStringify::from(t.as_macro());
 }
 
+Token MacroStringify::stringified_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal5());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

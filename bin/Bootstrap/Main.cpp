@@ -32,7 +32,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "../Index/Macro.h"
 #include "../Index/Entity.h"
 
 #define IGNORE(name)
@@ -109,9 +108,6 @@ static const std::unordered_set<std::string> gUnserializableTypes{
   // TODO(pag): If we add more fine-grained handling of these in PASTA then
   //            maybe remove this.
   "LinkageSpecDecl",
-
-  // These aren't real PASTA types.
-  CUSTOM_MACRO_KINDS(MACRO_NAME)
 };
 
 static const std::unordered_set<std::string> gFragmentEntityTypes{
@@ -140,7 +136,6 @@ static const std::unordered_set<std::string> gMacroNames{
   PASTA_FOR_EACH_MACRO_IMPL(MACRO_NAME, IGNORE, MACRO_DIRECTIVE_NAME,
                             MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME,
                             MACRO_DIRECTIVE_NAME, STR_NAME)
-  CUSTOM_MACRO_KINDS(MACRO_NAME)
 };
 
 static const std::unordered_set<std::string> gTemplateArgumentNames{
@@ -232,7 +227,6 @@ static const std::unordered_set<std::string> gConcreteClassNames{
   PASTA_FOR_EACH_MACRO_IMPL(MACRO_NAME, IGNORE, MACRO_DIRECTIVE_NAME,
                             MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME,
                             MACRO_DIRECTIVE_NAME, IGNORE)
-  CUSTOM_MACRO_KINDS(MACRO_NAME)
 };
 
 static const std::unordered_set<std::string> gEntityClassNames{
@@ -248,7 +242,6 @@ static const std::unordered_set<std::string> gEntityClassNames{
   PASTA_FOR_EACH_MACRO_IMPL(MACRO_NAME, IGNORE, MACRO_DIRECTIVE_NAME,
                             MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME,
                             MACRO_DIRECTIVE_NAME, STR_NAME)
-  CUSTOM_MACRO_KINDS(MACRO_NAME)
 };
 
 // These methods can trigger asserts deep in their internals that are hard
@@ -966,25 +959,6 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       serialize_inc_os
           << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", "
           << types.first << ")\n";
-      ++i;
-    }
-
-  // We'll embed in a few things supported by `TokenTree` in the indexer that
-  // aren't covered by PASTA.
-  } else if (enum_name == "MacroKind") {
-    const char * extras[] = {"STRINGIFY", "CONCATENATE",
-                             "VA_OPT", "VA_OPT_ARGUMENT"};
-
-    for (auto enum_case : extras) {
-      os << "  " << enum_case << ",\n";
-
-      name_cases_ss
-          << "    case " << enum_name << "::" << enum_case << ": return \""
-          << enum_case << "\";\n";
-
-      serialize_inc_os
-          << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", "
-          << enum_case << ", " << types.first << ")\n";
       ++i;
     }
   }
@@ -3207,7 +3181,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         // If we have a `TokenTree`, then we want to use it for our
         // serialization (e.g. of `Macro::children`).
-        if (method_name == "Children" || method_name == "ReplacementChildren") {
+        if (method_name == "Children" || method_name == "ReplacementChildren" ||
+            method_name == "IntermediateChildren") {
           serialize_cpp_os
               << "  if (tt) {\n"
               << "    auto v" << i << " = tt->" << method_name << "();\n"
