@@ -1008,6 +1008,8 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
     }
   }
 
+  (void) macro_depth;
+
   // Link all of the tokens together.
   if (auto num_toks = tokens_alloc.size()) {
     for (auto i = 1ull, j = 0ull; i < num_toks; ++i, ++j) {
@@ -1642,7 +1644,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   // directives in the use with pre-expansion form that doesn't have the
   // conditional directives.
   if (curr->macro_tok->RawMacro() != node.RawMacro()) {
-//    assert(false);
+    assert(false);
     nodes.has_error = true;
     has_error = true;
   }
@@ -2627,12 +2629,12 @@ TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
     impl->FindSubstitutionBoundsRec(sub, nullptr, nullptr);
 
 
-    std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-    std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-    sub->Print(std::cerr);
-    std::cerr << "\n\n\n";
-    sub->PrintDOT(std::cerr);
-    std::cerr << "\n\n";
+//    std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+//    std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//    sub->Print(std::cerr);
+//    std::cerr << "\n\n\n";
+//    sub->PrintDOT(std::cerr);
+//    std::cerr << "\n\n";
 
 
 //        std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
