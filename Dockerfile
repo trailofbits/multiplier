@@ -1,7 +1,7 @@
 ARG IMAGE=ubuntu:22.04
 FROM --platform=linux/amd64 ${IMAGE} as builder
-ENV CXX_COMMON_URL=https://github.com/lifting-bits/cxx-common/releases/download/v0.2.24/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64.tar.xz \
-    VCPKG_ROOT=/work/vcpkg_ubuntu-22.04_llvm-15-pasta_amd64 \
+ENV CXX_COMMON_URL=https://github.com/lifting-bits/cxx-common/releases/download/v0.3.0/vcpkg_ubuntu-22.04_llvm-16-pasta_amd64.tar.xz \
+    VCPKG_ROOT=/work/vcpkg_ubuntu-22.04_llvm-16-pasta_amd64 \
     INSTALL_DIR=/work/install
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

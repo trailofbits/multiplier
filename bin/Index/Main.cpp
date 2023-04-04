@@ -67,7 +67,7 @@ DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level decl
 
 DEFINE_bool(attach, false, "Print out the process ID for attaching gdb/lldb.");
 
-DEFINE_string(max_queue_size, "4G", "The maximum queue size. Use a K suffix for KiB, M suffix for MiB, or a G suffix for GiB.");
+DEFINE_string(max_queue_size, "24G", "The maximum queue size. Use a K suffix for KiB, M suffix for MiB, or a G suffix for GiB.");
 
 namespace {
 

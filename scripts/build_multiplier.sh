@@ -13,8 +13,8 @@ GITHUB_ORG=git@github.com:trailofbits
 # https://vspells.ext.bbn.com/trail-of-bits/pasta.git
 # GITHUB_ORG=https://vspells.ext.bbn.com/trail-of-bits
 CXX_COMMON_URL="https://github.com/lifting-bits/cxx-common/releases/download"
-CXX_COMMON_VERSION="v0.2.8"
-LLVM_VERSION="llvm-14"
+CXX_COMMON_VERSION="v0.3.0"
+LLVM_VERSION="llvm-16"
 CMAKE_VERSION_MIN=3.19
 
 OS_VERSION=

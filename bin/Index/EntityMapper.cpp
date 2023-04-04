@@ -110,8 +110,8 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
-  if (auto it = entity_ids.find(entity.RawToken()); it != entity_ids.end()) {
-    return it->second.Pack();
+  if (auto eid = EntityId(entity.RawToken()); eid != mx::kInvalidEntityId) {
+    return eid;
 
   // If this token is derived from another one, and we don't have an entity
   // ID for it, then try to get the entity ID for the derived token.
@@ -123,7 +123,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   // an entity ID for that. We unify `Token` and `FileToken` in our serialized
   // representation, because we always want references to "point somewhere."
   } else if (auto ft = entity.FileLocation()) {
-    return this->EntityId(ft.value());
+    return EntityId(ft.value());
   
   } else {
     return mx::kInvalidEntityId;
@@ -131,16 +131,15 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
-  return EntityId(entity.ParsedLocation());
+  if (auto id = EntityId(entity.RawMacro()); id != mx::kInvalidEntityId) {
+    return id;
+  } else {
+    return EntityId(entity.ParsedLocation());
+  }
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::File &file) const {
-  if (auto fit = entity_ids.find(file.RawFile()); fit != entity_ids.end()) {
-    return fit->second.Pack();
-
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return EntityId(file.RawFile());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
