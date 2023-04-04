@@ -21,20 +21,12 @@ if(NOT TARGET @PROJECT_NAME@::mx-api)
     find_package(CapnProto CONFIG REQUIRED)
   endif()
 
-  if(NOT TARGET zstd::libzstd_shared AND NOT TARGET zstd::libzstd_static)
-    find_package(zstd CONFIG REQUIRED)
-  endif()
-
   if(MX_ENABLE_RE2 AND NOT TARGET re2::re2)
     find_package(re2 CONFIG REQUIRED)
   endif()
 
   if(NOT TARGET glog::glog)
     find_package(glog REQUIRED)
-  endif()
-
-  if(NOT TARGET SQLite3::SQLite)
-    find_package(SQLite3 3.35 REQUIRED)
   endif()
 
   if(NOT TARGET gap::gap)

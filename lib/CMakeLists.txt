@@ -209,15 +209,15 @@ add_dependencies("mx-api"
 
 target_link_libraries("mx-api"
   PUBLIC
-    "CapnProto::capnp-rpc"
     "mx-sqlite"
     "gap::gap"
     "gap::gap-core"
     "std::coroutines"
     "gap::gap-settings"
   PRIVATE
+    "CapnProto::capnp-rpc"
     $<BUILD_INTERFACE:concurrentqueue>
-    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
+    $<BUILD_INTERFACE:$<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>>
 )
 
 if(MX_ENABLE_VAST)
