@@ -480,7 +480,7 @@ static RelatedEntityIds RelatedEntities(
   // associated with file includes.
   std::vector<std::pair<mx::RawEntityId, pasta::Macro>> include_wl;
   std::vector<pasta::Macro> mwl;
-  for (pasta::Macro macro : pf.top_level_macros) {
+  for (const pasta::Macro &macro : pf.top_level_macros) {
     if (auto inc = pasta::IncludeLikeMacroDirective::From(macro)) {
       if (auto file = inc->IncludedFile()) {
         include_wl.emplace_back(em.EntityId(file.value()), macro);

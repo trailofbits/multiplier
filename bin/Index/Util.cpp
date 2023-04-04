@@ -1507,6 +1507,20 @@ mx::RawEntityId RelatedEntityId(
   std::vector<pasta::Token> wl;
   wl.push_back(tok);
 
+  auto try_enqueue_node = [&wl] (pasta::Macro &n) -> bool {
+    auto mtok = pasta::MacroToken::From(n);
+    if (!mtok) {
+      return false;
+    }
+    if (mtok->TokenKind() != pasta::TokenKind::kHash &&
+        mtok->TokenKind() != pasta::TokenKind::kHashHash &&
+        mtok->TokenKind() != pasta::TokenKind::kHashat &&
+        mtok->TokenKind() != pasta::TokenKind::kUnknown) {
+      wl.emplace_back(mtok->ParsedLocation());
+    }
+    return true;
+  };
+
   while (!wl.empty()) {
     pasta::Token t = std::move(wl.back());
     const void *raw_t = t.RawToken();
@@ -1536,26 +1550,21 @@ mx::RawEntityId RelatedEntityId(
 
     // We want to propagate the related entity ID backward through stringifies
     // (literals) and concatenates (especially decl names).
-    if (auto sub = ContainingStringifyOrConcatenate(mtok.value())) {
+    auto sub = ContainingStringifyOrConcatenate(mtok.value());
+    if (!sub) {
+      continue;
+    }
 
-      // TODO(pag): Consider these token kinds a bit more carefully.
-      for (pasta::Macro before_node : sub->Children()) {
-        if (mtok = pasta::MacroToken::From(before_node);
-            mtok &&
-            mtok->TokenKind() != pasta::TokenKind::kHash &&
-            mtok->TokenKind() != pasta::TokenKind::kHashHash &&
-            mtok->TokenKind() != pasta::TokenKind::kHashat &&
-            mtok->TokenKind() != pasta::TokenKind::kUnknown) {
-          wl.emplace_back(mtok->ParsedLocation());
+    // TODO(pag): Consider these token kinds a bit more carefully.
+    for (pasta::Macro n : sub->Children()) {
+      if (try_enqueue_node(n)) {
+        continue;
+      } else if (auto ps = pasta::MacroParameterSubstitution::From(n)) {
+        for (pasta::Macro ps_n : ps->ReplacementChildren()) {
+          try_enqueue_node(ps_n);
         }
       }
-
     }
-//    else if (mtok->Kind() == pasta::TokenKind::kHeaderName) {
-//      if (auto inc = ContainingInclude(mtok.value())) {
-//
-//      }
-//    }
   }
 
   return eid;

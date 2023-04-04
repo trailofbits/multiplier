@@ -666,6 +666,19 @@ static TokenCategory ClassifyDecl(const Token &tok, DeclId id,
   return baseline_category;
 }
 
+static TokenCategory ClassifyStmt(const Token &, StmtId id,
+                                  TokenCategory baseline_category) {
+  switch (id.kind) {
+    case StmtKind::STRING_LITERAL:
+    case StmtKind::CHARACTER_LITERAL:
+    case StmtKind::FLOATING_LITERAL:
+    case StmtKind::FIXED_POINT_LITERAL:
+      return TokenCategory::LITERAL;
+    default:
+      return baseline_category;
+  }
+}
+
 static TokenCategory ClassifyEntity(const Token &tok) {
   VariantId vid = tok.related_entity_id().Unpack();
   TokenCategory baseline_category = ClassifyToken(tok);
@@ -674,6 +687,9 @@ static TokenCategory ClassifyEntity(const Token &tok) {
 
   } else if (std::holds_alternative<DeclId>(vid)) {
     return ClassifyDecl(tok, std::get<DeclId>(vid), baseline_category);
+
+  } else if (std::holds_alternative<StmtId>(vid)) {
+    return ClassifyStmt(tok, std::get<StmtId>(vid), baseline_category);
 
   } else {
     return baseline_category;
