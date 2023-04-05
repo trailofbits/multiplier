@@ -83,7 +83,10 @@ enum class TokenCategory : unsigned char {
   kLabel,
 
   // Extra.
-  kWhitespace
+  kWhitespace,
+  kFileName,
+  kLineNumber,
+  kColumnNumber
 };
 
 }  // namespace pasta

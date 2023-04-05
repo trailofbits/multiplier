@@ -45,6 +45,9 @@ enum class TokenCategory : unsigned char {
   TEMPLATE_PARAMETER_VALUE,
   LABEL,
   WHITESPACE,
+  FILE_NAME,
+  LINE_NUMBER,
+  COLUMN_NUMBER
 };
 
 inline static const char *EnumerationName(TokenCategory) {

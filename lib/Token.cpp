@@ -37,9 +37,10 @@ static const std::shared_ptr<InvalidTokenReader> kInvalidTokenReader =
 
 // Classify a token kind into a baseline token category. These are good baseline
 // indicators for syntax coloring.
-static TokenCategory ClassifyToken(const Token &tok) {
-  switch (tok.kind()) {
+static TokenCategory ClassifyToken(TokenKind kind) {
+  switch (kind) {
     case TokenKind::COMMENT: return TokenCategory::COMMENT;
+    case TokenKind::HEADER_NAME: return TokenCategory::FILE_NAME;
     case TokenKind::NUMERIC_CONSTANT:
     case TokenKind::CHARACTER_CONSTANT:
     case TokenKind::WIDE_CHARACTER_CONSTANT:
@@ -48,7 +49,6 @@ static TokenCategory ClassifyToken(const Token &tok) {
     case TokenKind::UTF32_CHARACTER_CONSTANT:
     case TokenKind::STRING_LITERAL:
     case TokenKind::WIDE_STRING_LITERAL:
-    case TokenKind::HEADER_NAME:
     case TokenKind::UTF8_STRING_LITERAL:
     case TokenKind::UTF16_STRING_LITERAL:
     case TokenKind::UTF32_STRING_LITERAL:
@@ -450,9 +450,9 @@ static TokenCategory ClassifyToken(const Token &tok) {
   }
 }
 
-static TokenCategory ClassifyMacro(const Token &tok, MacroId id,
+static TokenCategory ClassifyMacro(TokenKind kind, MacroId id,
                                    TokenCategory baseline_category) {
-  switch (tok.kind()) {
+  switch (kind) {
     case TokenKind::PP_IF:
     case TokenKind::PP_IFDEF:
     case TokenKind::PP_IFNDEF:
@@ -666,8 +666,7 @@ static TokenCategory ClassifyDecl(const Token &tok, DeclId id,
   return baseline_category;
 }
 
-static TokenCategory ClassifyStmt(const Token &, StmtId id,
-                                  TokenCategory baseline_category) {
+static TokenCategory ClassifyStmt(StmtId id, TokenCategory baseline_category) {
   switch (id.kind) {
     case StmtKind::STRING_LITERAL:
     case StmtKind::INTEGER_LITERAL:
@@ -685,17 +684,34 @@ static TokenCategory ClassifyStmt(const Token &, StmtId id,
   }
 }
 
+static TokenCategory ClassifyFile(TokenKind kind,
+                                  TokenCategory baseline_category) {
+  switch (kind) {
+    case TokenKind::PP_IMPORT:
+    case TokenKind::PP_INCLUDE:
+    case TokenKind::PP_INCLUDE_NEXT:
+    case TokenKind::PP___INCLUDE_MACROS:
+      return baseline_category;
+    default:
+      return TokenCategory::FILE_NAME;
+  }
+}
+
 static TokenCategory ClassifyEntity(const Token &tok) {
   VariantId vid = tok.related_entity_id().Unpack();
-  TokenCategory baseline_category = ClassifyToken(tok);
+  TokenKind kind = tok.kind();
+  TokenCategory baseline_category = ClassifyToken(kind);
   if (std::holds_alternative<MacroId>(vid)) {
-    return ClassifyMacro(tok, std::get<MacroId>(vid), baseline_category);
+    return ClassifyMacro(kind, std::get<MacroId>(vid), baseline_category);
 
   } else if (std::holds_alternative<DeclId>(vid)) {
     return ClassifyDecl(tok, std::get<DeclId>(vid), baseline_category);
 
   } else if (std::holds_alternative<StmtId>(vid)) {
-    return ClassifyStmt(tok, std::get<StmtId>(vid), baseline_category);
+    return ClassifyStmt(std::get<StmtId>(vid), baseline_category);
+
+  } else if (std::holds_alternative<FileId>(vid)) {
+    return ClassifyFile(kind, baseline_category);
 
   } else {
     return baseline_category;
