@@ -691,6 +691,12 @@ static TokenCategory ClassifyFile(TokenKind kind,
     case TokenKind::PP_INCLUDE:
     case TokenKind::PP_INCLUDE_NEXT:
     case TokenKind::PP___INCLUDE_MACROS:
+    case TokenKind::HASH:
+    case TokenKind::HASH_HASH:
+    case TokenKind::HASHAT:
+    case TokenKind::COMMA:
+    case TokenKind::L_PARENTHESIS:
+    case TokenKind::R_PARENTHESIS:
       return baseline_category;
     default:
       return TokenCategory::FILE_NAME;

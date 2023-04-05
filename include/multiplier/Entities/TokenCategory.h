@@ -55,7 +55,7 @@ inline static const char *EnumerationName(TokenCategory) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenCategory) {
-  return 33;
+  return 36;
 }
 
 const char *EnumeratorName(TokenCategory);
