@@ -15,6 +15,7 @@
 DEFINE_uint64(fragment_id, 0, "ID of the fragment to print");
 DEFINE_bool(with_categories, false, "Also print out token categories?");
 DEFINE_bool(with_related_entity_ids, false, "Also print out related entity IDs?");
+DEFINE_bool(with_token_offsets, false, "Also print out token offsets?");
 
 static std::string TokData(mx::Token tok) {
   std::stringstream ss;
@@ -69,7 +70,6 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
       case mx::MacroKind::EXPANSION:
       case mx::MacroKind::STRINGIFY:
       case mx::MacroKind::CONCATENATE:
-      case mx::MacroKind::VA_OPT:
         pred_prefix = "b";
         break;
       default:
@@ -113,13 +113,31 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
   }
 }
 
+static uint64_t TokenOffset(const mx::Token &tok) {
+  mx::VariantId vid = tok.id().Unpack();
+  if (std::holds_alternative<mx::ParsedTokenId>(vid)) {
+    return std::get<mx::ParsedTokenId>(vid).offset;
+
+  } else if (std::holds_alternative<mx::MacroTokenId>(vid)) {
+    return std::get<mx::MacroTokenId>(vid).offset;
+
+  } else if (std::holds_alternative<mx::FileTokenId>(vid)) {
+    return std::get<mx::FileTokenId>(vid).offset;
+
+  } else {
+    return 0u;
+  }
+}
+
 static void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
                        const mx::Macro &macro);
 
 static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
                      const mx::MacroSubstitution &macro) {
   auto id = macro.id().Pack();
-  auto rowspan = 1 + int(FLAGS_with_categories) + int(FLAGS_with_related_entity_ids);
+  auto rowspan = 1 + int(FLAGS_with_categories) +
+                 int(FLAGS_with_related_entity_ids) +
+                 int(FLAGS_with_token_offsets);
   os
       << "m" << id
       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\" bgcolor=\"azure2\"><TR>"
@@ -170,6 +188,17 @@ static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
     }
   }
 
+  if (!empty && FLAGS_with_token_offsets) {
+    os << "</TR><TR>";
+    for (mx::MacroOrToken node : macro.children()) {
+      if (std::holds_alternative<mx::Token>(node)) {
+        os << "<TD>" << TokenOffset(std::get<mx::Token>(node)) << "</TD>";
+      } else {
+        os << "<TD> </TD>";
+      }
+    }
+  }
+
   os
       << "</TR></TABLE>>];\n"
       << "a" << id
@@ -206,6 +235,17 @@ static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
         if (std::holds_alternative<mx::Token>(node)) {
           const mx::Token &mt = std::get<mx::Token>(node);
           os << "<TD>" << mt.related_entity_id().Pack() << "</TD>";
+        } else {
+          os << "<TD> </TD>";
+        }
+      }
+    }
+
+    if (FLAGS_with_token_offsets) {
+      os << "</TR><TR>";
+      for (mx::MacroOrToken node : macro.replacement_children()) {
+        if (std::holds_alternative<mx::Token>(node)) {
+          os << "<TD>" << TokenOffset(std::get<mx::Token>(node)) << "</TD>";
         } else {
           os << "<TD> </TD>";
         }
@@ -280,6 +320,17 @@ static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
           }
         }
       }
+
+      if (FLAGS_with_token_offsets) {
+        os << "</TR><TR>";
+        for (mx::MacroOrToken node : exp->intermediate_children()) {
+          if (std::holds_alternative<mx::Token>(node)) {
+            os << "<TD>" << TokenOffset(std::get<mx::Token>(node)) << "</TD>";
+          } else {
+            os << "<TD> </TD>";
+          }
+        }
+      }
     } else {
       os << "<TD> </TD>";
     }
@@ -308,7 +359,9 @@ void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
   }
 
   auto id = macro.id().Pack();
-  auto rowspan = 1 + int(FLAGS_with_categories) + int(FLAGS_with_related_entity_ids);
+  auto rowspan = 1 + int(FLAGS_with_categories) +
+                 int(FLAGS_with_related_entity_ids) +
+                 int(FLAGS_with_token_offsets);
 
   os
       << "m" << id
@@ -347,6 +400,17 @@ void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
         if (std::holds_alternative<mx::Token>(node)) {
           const mx::Token &mt = std::get<mx::Token>(node);
           os << "<TD>" << mt.related_entity_id().Pack() << "</TD>";
+        } else {
+          os << "<TD> </TD>";
+        }
+      }
+    }
+
+    if (FLAGS_with_token_offsets) {
+      os << "</TR><TR>";
+      for (mx::MacroOrToken node : macro.children()) {
+        if (std::holds_alternative<mx::Token>(node)) {
+          os << "<TD>" << TokenOffset(std::get<mx::Token>(node)) << "</TD>";
         } else {
           os << "<TD> </TD>";
         }

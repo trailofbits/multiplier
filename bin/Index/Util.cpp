@@ -1070,6 +1070,12 @@ mx::RawEntityId RelatedEntityIdToParsedToken(
     case mx::TokenKind::UTF8_STRING_LITERAL:
     case mx::TokenKind::UTF16_STRING_LITERAL:
     case mx::TokenKind::UTF32_STRING_LITERAL:
+    case mx::TokenKind::KEYWORD___FUNC__:
+    case mx::TokenKind::KEYWORD___FUNCTION__:
+    case mx::TokenKind::KEYWORD___FUNCDNAME__:
+    case mx::TokenKind::KEYWORD___FUNCSIG__:
+    case mx::TokenKind::KEYWORD_LFUNCTION__:  // TODO(pag): Fix name.
+    case mx::TokenKind::KEYWORD_LFUNCSIG__:  // TODO(pag): Fix name.
       is_literal = true;
       break;
 
@@ -1138,9 +1144,11 @@ mx::RawEntityId RelatedEntityIdToParsedToken(
               default: break;
               case pasta::StmtKind::kUserDefinedLiteral:
               case pasta::StmtKind::kCharacterLiteral:
+              case pasta::StmtKind::kIntegerLiteral:
               case pasta::StmtKind::kFixedPointLiteral:
               case pasta::StmtKind::kFloatingLiteral:
               case pasta::StmtKind::kStringLiteral:
+              case pasta::StmtKind::kPredefinedExpr:
                 related_entity = stmt->RawStmt();
                 break;
             }
@@ -1548,20 +1556,45 @@ mx::RawEntityId RelatedEntityId(
       continue;
     }
 
-    // We want to propagate the related entity ID backward through stringifies
-    // (literals) and concatenates (especially decl names).
-    auto sub = ContainingStringifyOrConcatenate(mtok.value());
-    if (!sub) {
+    std::optional<pasta::Macro> parent = mtok->Parent();
+    if (!parent) {
+      assert(false);
       continue;
     }
 
+    // We want to propagate the related entity ID backward through stringifies
+    // (literals) and concatenates (especially decl names).
+    //
     // TODO(pag): Consider these token kinds a bit more carefully.
-    for (pasta::Macro n : sub->Children()) {
-      if (try_enqueue_node(n)) {
-        continue;
-      } else if (auto ps = pasta::MacroParameterSubstitution::From(n)) {
-        for (pasta::Macro ps_n : ps->ReplacementChildren()) {
-          try_enqueue_node(ps_n);
+    if (auto sub = ContainingStringifyOrConcatenate(parent.value())) {
+      for (pasta::Macro n : sub->Children()) {
+        if (try_enqueue_node(n)) {
+          continue;
+        } else if (auto ps = pasta::MacroParameterSubstitution::From(n)) {
+          for (pasta::Macro ps_n : ps->ReplacementChildren()) {
+            try_enqueue_node(ps_n);
+          }
+        }
+      }
+
+    // Look for string-like macro expansions, and mark them up with whatever
+    // literal expression entity IDs they led to.
+    } else if (auto exp = pasta::MacroExpansion::From(parent.value());
+               exp && !exp->Definition()) {
+      if (auto dtok = exp->BeginToken()) {
+        std::string_view tok_name = dtok->Data();
+        if (tok_name == "__FILE__" ||
+            tok_name == "__BASE_FILE__" ||
+            tok_name == "__FILE_NAME__" ||
+            tok_name == "__LINE__" ||
+            tok_name == "__DATE__" ||
+            tok_name == "__TIME__" ||
+            tok_name == "__INCLUDE_LEVEL__" ||
+            tok_name == "__TIMESTAMP__" ||
+            tok_name == "__FLT_EVAL_METHOD__" ||
+            tok_name == "__COUNTER__" ||
+            tok_name == "__MODULE__"  /* Some kind of identifier */) {
+          wl.emplace_back(dtok->ParsedLocation());
         }
       }
     }

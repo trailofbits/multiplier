@@ -4,7 +4,7 @@
 // tricky because we have to rely on a few different heuristics to get at this
 // type of info.
 
-int main(void) {
+int ParameterSubstitutions(void) {
 #define PARAMS(a, b, c) c b a
   return (PARAMS("a", "b", "c"))[0];
 }

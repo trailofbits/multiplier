@@ -670,10 +670,16 @@ static TokenCategory ClassifyStmt(const Token &, StmtId id,
                                   TokenCategory baseline_category) {
   switch (id.kind) {
     case StmtKind::STRING_LITERAL:
+    case StmtKind::INTEGER_LITERAL:
     case StmtKind::CHARACTER_LITERAL:
     case StmtKind::FLOATING_LITERAL:
     case StmtKind::FIXED_POINT_LITERAL:
       return TokenCategory::LITERAL;
+
+    // E.g. `__func__`.
+    case StmtKind::PREDEFINED_EXPR:
+      return TokenCategory::KEYWORD;
+
     default:
       return baseline_category;
   }
