@@ -25,8 +25,8 @@ RUN mkdir src build
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-ENV CC="$(which clang-15)" \
-    CXX="$(which clang++-15)"
+ENV CC=$(which clang-15) \
+    CXX=$(which clang++-15)
 
 # Download cxx-common
 RUN curl -sSL "${CXX_COMMON_URL}" | tar xJ
