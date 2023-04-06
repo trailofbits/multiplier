@@ -25,9 +25,6 @@ RUN mkdir src build
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-ENV CC=$(which clang-15) \
-    CXX=$(which clang++-15)
-
 # Download cxx-common
 RUN curl -sSL "${CXX_COMMON_URL}" | tar xJ
 
@@ -39,8 +36,8 @@ RUN git clone --depth 1 https://github.com/lifting-bits/gap.git /work/src/gap \
         -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-        -DCMAKE_C_COMPILER="${CC}" \
-        -DCMAKE_CXX_COMPILER="${CXX}" \
+        -DCMAKE_C_COMPILER="$(which clang-15)" \
+        -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
         -DVCPKG_ROOT="${VCPKG_ROOT}" \
         -DVCPKG_MANIFEST_MODE=OFF \
         -DGAP_WARNINGS_AS_ERRORS=OFF \
@@ -70,8 +67,8 @@ RUN git clone --depth 1 https://github.com/trailofbits/pasta /work/src/pasta \
         -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
         -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_C_COMPILER="${CC}" \
-        -DCMAKE_CXX_COMPILER="${CXX}" \
+        -DCMAKE_C_COMPILER="$(which clang-15)" \
+        -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
         -DPASTA_BOOTSTRAP_MACROS=OFF \
         -DPASTA_BOOTSTRAP_TYPES=OFF \
@@ -87,8 +84,8 @@ RUN cmake \
     -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
     -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER="${CC}" \
-    -DCMAKE_CXX_COMPILER="${CXX}" \
+    -DCMAKE_C_COMPILER="$(which clang-15)" \
+    -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
     -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
     -DMX_ENABLE_BOOTSTRAP=OFF \
     -DMX_ENABLE_VAST=OFF \
