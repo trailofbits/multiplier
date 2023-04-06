@@ -15,7 +15,7 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         cmake gpg zip unzip tar git pkg-config \
         ninja-build clang-tidy cppcheck ccache build-essential \
-        doctest-dev clang-15 bear \
+        doctest-dev clang-15 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /work
@@ -25,26 +25,33 @@ RUN mkdir src build
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+ENV CC="$(which clang-15)" \
+    CXX="$(which clang++-15)"
+
 # Download cxx-common
 RUN curl -sSL "${CXX_COMMON_URL}" | tar xJ
 
 # Build and install gap
-RUN git clone https://github.com/lifting-bits/gap.git /work/src/gap \
+RUN git clone --depth 1 https://github.com/lifting-bits/gap.git /work/src/gap \
     && cmake \
         -S '/work/src/gap' \
         -B '/work/build/gap' \
         -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
-        -DUSE_SYSTEM_DEPENDENCIES=ON \
-        -DCMAKE_C_COMPILER="$(which clang-15)" \
-        -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-        -DGAP_ENABLE_WARNINGS=OFF \
-        -DGAP_ENABLE_TESTING=OFF \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+        -DCMAKE_C_COMPILER="${CC}" \
+        -DCMAKE_CXX_COMPILER="${CXX}" \
+        -DVCPKG_ROOT="${VCPKG_ROOT}" \
+        -DVCPKG_MANIFEST_MODE=OFF \
+        -DGAP_WARNINGS_AS_ERRORS=OFF \
+        -DGAP_ENABLE_TESTING=OFF \
+        -DGAP_ENABLE_EXAMPLES=OFF \
+        -DGAP_ENABLE_COROUTINES=ON \
+        -DUSE_SYSTEM_DEPENDENCIES=OFF \
     && cmake --build '/work/build/gap' --target install
 
 # Build and install weggli-native
-RUN git clone https://github.com/trailofbits/weggli-native /work/src/weggli-native \
+RUN git clone --depth 1 https://github.com/trailofbits/weggli-native /work/src/weggli-native \
     && cargo install --force cbindgen \
     && cmake \
         -S '/work/src/weggli-native' \
@@ -55,17 +62,16 @@ RUN git clone https://github.com/trailofbits/weggli-native /work/src/weggli-nati
     && cmake --build '/work/build/weggli-native' --target install
 
 # Build and install pasta
-RUN git clone https://github.com/trailofbits/pasta /work/src/pasta \
+RUN git clone --depth 1 https://github.com/trailofbits/pasta /work/src/pasta \
     && cmake \
-        --toolchain "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
         -S '/work/src/pasta' \
         -B '/work/build/pasta' \
         -G Ninja \
-        -DVCPKG_ROOT="${VCPKG_ROOT}" \
+        -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
         -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_C_COMPILER="$(which clang-15)" \
-        -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
+        -DCMAKE_C_COMPILER="${CC}" \
+        -DCMAKE_CXX_COMPILER="${CXX}" \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
         -DPASTA_BOOTSTRAP_MACROS=OFF \
         -DPASTA_BOOTSTRAP_TYPES=OFF \
@@ -75,22 +81,20 @@ RUN git clone https://github.com/trailofbits/pasta /work/src/pasta \
 
 COPY . /work/src/multiplier
 RUN cmake \
-    --toolchain "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
     -S '/work/src/multiplier' \
     -B '/work/build/multiplier' \
     -G Ninja \
-    -DVCPKG_ROOT="${VCPKG_ROOT}" \
+    -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
     -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_C_COMPILER="$(which clang-15)" \
-    -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-    # -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-    # -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER="${CC}" \
+    -DCMAKE_CXX_COMPILER="${CXX}" \
     -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-    -DMX_ENABLE_INSTALL=ON \
     -DMX_ENABLE_BOOTSTRAP=OFF \
     -DMX_ENABLE_VAST=OFF \
-    -DMX_ENABLE_WEGGLI=ON 
+    -DMX_ENABLE_WEGGLI=ON \
+    -DMX_ENABLE_INSTALL=ON
+
 RUN cmake --build '/work/build/multiplier' --target install
 RUN chmod +x /work/install/bin/*
 ENV PATH="/work/install/bin:${PATH}"
