@@ -47,7 +47,7 @@ class TypeOfType : public Type {
   static std::optional<TypeOfType> from(const TokenContext &t);
 
   Type desugar(void) const;
-  Type underlying_type(void) const;
+  Type unmodified_type(void) const;
   bool is_sugared(void) const;
 };
 

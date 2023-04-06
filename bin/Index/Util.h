@@ -100,22 +100,31 @@ using RelatedEntityIds = std::unordered_map<const void *, mx::RawEntityId>;
 // token.
 mx::RawEntityId RelatedEntityId(
     const EntityMapper &em, const pasta::Token &tok,
-    RelatedEntityIds &related_ids);
+    uint64_t min_tok_index, uint64_t max_tok_index,
+    RelatedEntityIds &related_ids,
+    const RelatedEntityIds &hint_ids);
 
-// Find the entity ID of the declaration that is most related to a particular
-// token.
-mx::RawEntityId RelatedEntityId(
-    const EntityMapper &em, const pasta::MacroToken &tok,
-    RelatedEntityIds &related_ids);
+// Figure out the token from which this token is derived.
+mx::RawEntityId DerivedTokenId(
+    EntityMapper &em, const pasta::FileToken &tok, RelatedEntityIds &);
 
-template<typename T>
+// Figure out the token from which this token is derived. This may drill down
+// through macro tokens that are elided from the `TokenTree` because of merging
+// of expansions with their argument pre-expansion phase. These two phases are
+// represented as separate expansions in PASTA.
+mx::RawEntityId DerivedTokenId(
+    EntityMapper &em, const pasta::Token &tok,
+    RelatedEntityIds &derived_map);
+
+template <typename T>
 struct EntityBuilder {
   capnp::MallocMessageBuilder message;
   typename T::Builder builder;
 
-  EntityBuilder() : builder(message.initRoot<T>()) {}
+  inline EntityBuilder(void)
+      : builder(message.initRoot<T>()) {}
 };
 
-std::string GetSerializedData(capnp::MessageBuilder& builder);
+std::string GetSerializedData(capnp::MessageBuilder &builder);
 
 }  // namespace indexer

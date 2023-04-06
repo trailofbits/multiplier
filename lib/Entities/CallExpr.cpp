@@ -203,7 +203,7 @@ gap::generator<Expr> CallExpr::arguments(void) const & {
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const {
-  return static_cast<CallExprADLCallKind>(impl->reader.getVal93());
+  return static_cast<CallExprADLCallKind>(impl->reader.getVal94());
 }
 
 Type CallExpr::call_return_type(void) const {
@@ -260,27 +260,27 @@ std::optional<Attr> CallExpr::unused_result_attribute(void) const {
 }
 
 bool CallExpr::has_stored_fp_features(void) const {
-  return impl->reader.getVal88();
-}
-
-bool CallExpr::has_unused_result_attribute(void) const {
   return impl->reader.getVal89();
 }
 
-bool CallExpr::is_builtin_assume_false(void) const {
+bool CallExpr::has_unused_result_attribute(void) const {
   return impl->reader.getVal90();
 }
 
-bool CallExpr::is_call_to_std_move(void) const {
+bool CallExpr::is_builtin_assume_false(void) const {
   return impl->reader.getVal91();
 }
 
-bool CallExpr::is_unevaluated_builtin_call(void) const {
+bool CallExpr::is_call_to_std_move(void) const {
   return impl->reader.getVal92();
 }
 
+bool CallExpr::is_unevaluated_builtin_call(void) const {
+  return impl->reader.getVal93();
+}
+
 bool CallExpr::uses_adl(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal95();
 }
 
 #pragma GCC diagnostic pop

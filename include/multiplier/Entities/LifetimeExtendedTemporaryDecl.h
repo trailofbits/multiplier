@@ -46,6 +46,8 @@ class LifetimeExtendedTemporaryDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  LifetimeExtendedTemporaryDecl canonical_declaration(void) const;
+  std::optional<LifetimeExtendedTemporaryDecl> definition(void) const;
   gap::generator<LifetimeExtendedTemporaryDecl> redeclarations(void) const &;
   static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent);
 

@@ -14,6 +14,7 @@
 #include <multiplier/Entities/NamedDecl.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
+#include <multiplier/Entities/Type.h>
 
 #include "../API.h"
 #include "../Decl.h"
@@ -85,6 +86,20 @@ bool UsingEnumDecl::contains(const Stmt &stmt) {
     if (parent == *this) { return true; }
   }
   return false;
+}
+
+UsingEnumDecl UsingEnumDecl::canonical_declaration(void) const {
+  if (auto canon = UsingEnumDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UsingEnumDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UsingEnumDecl> UsingEnumDecl::definition(void) const {
+  return UsingEnumDecl::from(this->Decl::definition());
 }
 
 gap::generator<UsingEnumDecl> UsingEnumDecl::redeclarations(void) const & {
@@ -168,16 +183,21 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const TokenContext &t) {
 }
 
 EnumDecl UsingEnumDecl::enum_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal54();
   return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token UsingEnumDecl::enum_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+}
+
+Type UsingEnumDecl::enum_type(void) const {
+  RawEntityId eid = impl->reader.getVal56();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token UsingEnumDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
 }
 
 #pragma GCC diagnostic pop

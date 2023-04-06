@@ -39,6 +39,7 @@
 #include <multiplier/Entities/CXXNoexceptExpr.h>
 #include <multiplier/Entities/CXXNullPtrLiteralExpr.h>
 #include <multiplier/Entities/CXXOperatorCallExpr.h>
+#include <multiplier/Entities/CXXParenListInitExpr.h>
 #include <multiplier/Entities/CXXPseudoDestructorExpr.h>
 #include <multiplier/Entities/CXXReinterpretCastExpr.h>
 #include <multiplier/Entities/CXXRewrittenBinaryOperator.h>
@@ -300,6 +301,7 @@ static const StmtKind kExprDerivedKinds[] = {
     CXXNewExpr::static_kind(),
     CXXNoexceptExpr::static_kind(),
     CXXNullPtrLiteralExpr::static_kind(),
+    CXXParenListInitExpr::static_kind(),
     CXXPseudoDestructorExpr::static_kind(),
     CXXRewrittenBinaryOperator::static_kind(),
     CXXScalarValueInitExpr::static_kind(),
@@ -427,6 +429,7 @@ std::optional<Expr> Expr::from(const Stmt &parent) {
     case CXXNewExpr::static_kind():
     case CXXNoexceptExpr::static_kind():
     case CXXNullPtrLiteralExpr::static_kind():
+    case CXXParenListInitExpr::static_kind():
     case CXXPseudoDestructorExpr::static_kind():
     case CXXRewrittenBinaryOperator::static_kind():
     case CXXScalarValueInitExpr::static_kind():
@@ -599,6 +602,10 @@ Expr Expr::best_dynamic_class_type_expression(void) const {
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+ExprDependence Expr::dependence(void) const {
+  return static_cast<ExprDependence>(impl->reader.getVal56());
+}
+
 Token Expr::expression_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal33());
 }
@@ -617,7 +624,7 @@ std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
 }
 
 ExprObjectKind Expr::object_kind(void) const {
-  return static_cast<ExprObjectKind>(impl->reader.getVal56());
+  return static_cast<ExprObjectKind>(impl->reader.getVal69());
 }
 
 std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
@@ -660,7 +667,7 @@ std::optional<Type> Expr::type(void) const {
 }
 
 ExprValueKind Expr::value_kind(void) const {
-  return static_cast<ExprValueKind>(impl->reader.getVal69());
+  return static_cast<ExprValueKind>(impl->reader.getVal70());
 }
 
 bool Expr::has_non_trivial_call(void) const {
@@ -685,76 +692,76 @@ bool Expr::is_gl_value(void) const {
 }
 
 bool Expr::is_implicit_cxx_this(void) const {
-  return impl->reader.getVal70();
-}
-
-bool Expr::is_instantiation_dependent(void) const {
   return impl->reader.getVal71();
 }
 
+bool Expr::is_instantiation_dependent(void) const {
+  return impl->reader.getVal72();
+}
+
 std::optional<bool> Expr::is_integer_constant_expression(void) const {
-  if (!impl->reader.getVal73()) {
+  if (!impl->reader.getVal74()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal72());
+    return static_cast<bool>(impl->reader.getVal73());
   }
   return std::nullopt;
 }
 
 bool Expr::is_known_to_have_boolean_value(void) const {
-  return impl->reader.getVal74();
-}
-
-bool Expr::is_l_value(void) const {
   return impl->reader.getVal75();
 }
 
-bool Expr::is_objcgc_candidate(void) const {
+bool Expr::is_l_value(void) const {
   return impl->reader.getVal76();
 }
 
-bool Expr::is_obj_c_self_expression(void) const {
+bool Expr::is_objcgc_candidate(void) const {
   return impl->reader.getVal77();
 }
 
-bool Expr::is_ordinary_or_bit_field_object(void) const {
+bool Expr::is_obj_c_self_expression(void) const {
   return impl->reader.getVal78();
 }
 
-bool Expr::is_pr_value(void) const {
+bool Expr::is_ordinary_or_bit_field_object(void) const {
   return impl->reader.getVal79();
 }
 
-bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
+bool Expr::is_pr_value(void) const {
   return impl->reader.getVal80();
 }
 
-bool Expr::is_type_dependent(void) const {
+bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
   return impl->reader.getVal81();
 }
 
-bool Expr::is_value_dependent(void) const {
+bool Expr::is_type_dependent(void) const {
   return impl->reader.getVal82();
 }
 
-bool Expr::is_x_value(void) const {
+bool Expr::is_value_dependent(void) const {
   return impl->reader.getVal83();
 }
 
-bool Expr::refers_to_bit_field(void) const {
+bool Expr::is_x_value(void) const {
   return impl->reader.getVal84();
 }
 
-bool Expr::refers_to_global_register_variable(void) const {
+bool Expr::refers_to_bit_field(void) const {
   return impl->reader.getVal85();
 }
 
-bool Expr::refers_to_matrix_element(void) const {
+bool Expr::refers_to_global_register_variable(void) const {
   return impl->reader.getVal86();
 }
 
-bool Expr::refers_to_vector_element(void) const {
+bool Expr::refers_to_matrix_element(void) const {
   return impl->reader.getVal87();
+}
+
+bool Expr::refers_to_vector_element(void) const {
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

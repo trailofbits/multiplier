@@ -49,6 +49,8 @@ class IndirectFieldDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  IndirectFieldDecl canonical_declaration(void) const;
+  std::optional<IndirectFieldDecl> definition(void) const;
   gap::generator<IndirectFieldDecl> redeclarations(void) const &;
   static std::optional<IndirectFieldDecl> from(const Decl &parent);
 

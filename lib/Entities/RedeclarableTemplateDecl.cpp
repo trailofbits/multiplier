@@ -90,6 +90,20 @@ bool RedeclarableTemplateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+RedeclarableTemplateDecl RedeclarableTemplateDecl::canonical_declaration(void) const {
+  if (auto canon = RedeclarableTemplateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (RedeclarableTemplateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::definition(void) const {
+  return RedeclarableTemplateDecl::from(this->Decl::definition());
+}
+
 gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<RedeclarableTemplateDecl> dr = RedeclarableTemplateDecl::from(r)) {
@@ -177,12 +191,12 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Tok
 }
 
 RedeclarableTemplateDecl RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {
-  return impl->reader.getVal71();
+  return impl->reader.getVal74();
 }
 
 #pragma GCC diagnostic pop

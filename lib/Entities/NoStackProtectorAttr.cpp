@@ -104,6 +104,10 @@ std::optional<NoStackProtectorAttr> NoStackProtectorAttr::from(const TokenContex
   return NoStackProtectorAttr::from(t.as_attribute());
 }
 
+NoStackProtectorAttrSpelling NoStackProtectorAttr::semantic_spelling(void) const {
+  return static_cast<NoStackProtectorAttrSpelling>(impl->reader.getVal10());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

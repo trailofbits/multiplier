@@ -46,6 +46,8 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  OMPThreadPrivateDecl canonical_declaration(void) const;
+  std::optional<OMPThreadPrivateDecl> definition(void) const;
   gap::generator<OMPThreadPrivateDecl> redeclarations(void) const &;
   static std::optional<OMPThreadPrivateDecl> from(const Decl &parent);
 

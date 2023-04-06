@@ -43,6 +43,8 @@ class LinkageSpecDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  LinkageSpecDecl canonical_declaration(void) const;
+  std::optional<LinkageSpecDecl> definition(void) const;
   gap::generator<LinkageSpecDecl> redeclarations(void) const &;
   static std::optional<LinkageSpecDecl> from(const Decl &parent);
 

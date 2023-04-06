@@ -93,6 +93,20 @@ bool TemplateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TemplateDecl TemplateDecl::canonical_declaration(void) const {
+  if (auto canon = TemplateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TemplateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TemplateDecl> TemplateDecl::definition(void) const {
+  return TemplateDecl::from(this->Decl::definition());
+}
+
 gap::generator<TemplateDecl> TemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TemplateDecl> dr = TemplateDecl::from(r)) {
@@ -186,17 +200,21 @@ std::optional<TemplateDecl> TemplateDecl::from(const TokenContext &t) {
 }
 
 TemplateParameterList TemplateDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal54();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 NamedDecl TemplateDecl::templated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal53();
+  RawEntityId eid = impl->reader.getVal55();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool TemplateDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal70();
+  return impl->reader.getVal72();
+}
+
+bool TemplateDecl::is_type_alias(void) const {
+  return impl->reader.getVal73();
 }
 
 #pragma GCC diagnostic pop

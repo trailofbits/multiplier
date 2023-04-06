@@ -47,6 +47,8 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UnresolvedUsingTypenameDecl canonical_declaration(void) const;
+  std::optional<UnresolvedUsingTypenameDecl> definition(void) const;
   gap::generator<UnresolvedUsingTypenameDecl> redeclarations(void) const &;
   static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent);
 

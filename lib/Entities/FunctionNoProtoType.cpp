@@ -105,12 +105,12 @@ std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const TokenContext 
 }
 
 Type FunctionNoProtoType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal234();
+  RawEntityId eid = impl->reader.getVal236();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionNoProtoType::is_sugared(void) const {
-  return impl->reader.getVal239();
+  return impl->reader.getVal242();
 }
 
 #pragma GCC diagnostic pop

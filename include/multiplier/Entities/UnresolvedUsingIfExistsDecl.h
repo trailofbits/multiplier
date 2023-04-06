@@ -45,6 +45,8 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UnresolvedUsingIfExistsDecl canonical_declaration(void) const;
+  std::optional<UnresolvedUsingIfExistsDecl> definition(void) const;
   gap::generator<UnresolvedUsingIfExistsDecl> redeclarations(void) const &;
   static std::optional<UnresolvedUsingIfExistsDecl> from(const Decl &parent);
 

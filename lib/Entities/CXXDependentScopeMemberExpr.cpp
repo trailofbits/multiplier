@@ -208,19 +208,19 @@ Token CXXDependentScopeMemberExpr::template_keyword_token(void) const {
 }
 
 bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal88();
-}
-
-bool CXXDependentScopeMemberExpr::has_template_keyword(void) const {
   return impl->reader.getVal89();
 }
 
-bool CXXDependentScopeMemberExpr::is_arrow(void) const {
+bool CXXDependentScopeMemberExpr::has_template_keyword(void) const {
   return impl->reader.getVal90();
 }
 
-bool CXXDependentScopeMemberExpr::is_implicit_access(void) const {
+bool CXXDependentScopeMemberExpr::is_arrow(void) const {
   return impl->reader.getVal91();
+}
+
+bool CXXDependentScopeMemberExpr::is_implicit_access(void) const {
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

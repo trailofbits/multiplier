@@ -86,6 +86,20 @@ bool UnnamedGlobalConstantDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UnnamedGlobalConstantDecl UnnamedGlobalConstantDecl::canonical_declaration(void) const {
+  if (auto canon = UnnamedGlobalConstantDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UnnamedGlobalConstantDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::definition(void) const {
+  return UnnamedGlobalConstantDecl::from(this->Decl::definition());
+}
+
 gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UnnamedGlobalConstantDecl> dr = UnnamedGlobalConstantDecl::from(r)) {

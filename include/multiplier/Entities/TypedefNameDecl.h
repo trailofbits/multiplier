@@ -48,6 +48,8 @@ class TypedefNameDecl : public TypeDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TypedefNameDecl canonical_declaration(void) const;
+  std::optional<TypedefNameDecl> definition(void) const;
   gap::generator<TypedefNameDecl> redeclarations(void) const &;
   static std::optional<TypedefNameDecl> from(const Decl &parent);
 

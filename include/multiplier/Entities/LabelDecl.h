@@ -46,6 +46,8 @@ class LabelDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  LabelDecl canonical_declaration(void) const;
+  std::optional<LabelDecl> definition(void) const;
   gap::generator<LabelDecl> redeclarations(void) const &;
   static std::optional<LabelDecl> from(const Decl &parent);
 

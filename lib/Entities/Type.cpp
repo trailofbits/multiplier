@@ -928,11 +928,11 @@ bool Type::is_pointer_type(void) const {
   return impl->reader.getVal184();
 }
 
-bool Type::is_promotable_integer_type(void) const {
+bool Type::is_queue_t(void) const {
   return impl->reader.getVal185();
 }
 
-bool Type::is_queue_t(void) const {
+bool Type::is_rvv_type(void) const {
   return impl->reader.getVal186();
 }
 
@@ -960,146 +960,150 @@ bool Type::is_reserve_idt(void) const {
   return impl->reader.getVal192();
 }
 
-bool Type::is_sampler_t(void) const {
+bool Type::is_sve_sizeless_builtin_type(void) const {
   return impl->reader.getVal193();
 }
 
-bool Type::is_saturated_fixed_point_type(void) const {
+bool Type::is_sampler_t(void) const {
   return impl->reader.getVal194();
 }
 
-bool Type::is_scalar_type(void) const {
+bool Type::is_saturated_fixed_point_type(void) const {
   return impl->reader.getVal195();
 }
 
-bool Type::is_scoped_enumeral_type(void) const {
+bool Type::is_scalar_type(void) const {
   return impl->reader.getVal196();
 }
 
-bool Type::is_signed_fixed_point_type(void) const {
+bool Type::is_scoped_enumeral_type(void) const {
   return impl->reader.getVal197();
 }
 
-bool Type::is_signed_integer_or_enumeration_type(void) const {
+bool Type::is_signed_fixed_point_type(void) const {
   return impl->reader.getVal198();
 }
 
-bool Type::is_signed_integer_type(void) const {
+bool Type::is_signed_integer_or_enumeration_type(void) const {
   return impl->reader.getVal199();
 }
 
-bool Type::is_sizeless_builtin_type(void) const {
+bool Type::is_signed_integer_type(void) const {
   return impl->reader.getVal200();
 }
 
-bool Type::is_sizeless_type(void) const {
+bool Type::is_sizeless_builtin_type(void) const {
   return impl->reader.getVal201();
 }
 
-bool Type::is_specifier_type(void) const {
+bool Type::is_sizeless_type(void) const {
   return impl->reader.getVal202();
 }
 
+bool Type::is_specifier_type(void) const {
+  return impl->reader.getVal203();
+}
+
 std::optional<bool> Type::is_standard_layout_type(void) const {
-  if (!impl->reader.getVal204()) {
+  if (!impl->reader.getVal205()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal203());
+    return static_cast<bool>(impl->reader.getVal204());
   }
   return std::nullopt;
 }
 
 bool Type::is_std_byte_type(void) const {
-  return impl->reader.getVal205();
+  return impl->reader.getVal206();
 }
 
 std::optional<bool> Type::is_structural_type(void) const {
-  if (!impl->reader.getVal207()) {
+  if (!impl->reader.getVal208()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal206());
+    return static_cast<bool>(impl->reader.getVal207());
   }
   return std::nullopt;
 }
 
 bool Type::is_structure_or_class_type(void) const {
-  return impl->reader.getVal208();
-}
-
-bool Type::is_structure_type(void) const {
   return impl->reader.getVal209();
 }
 
-bool Type::is_template_type_parm_type(void) const {
+bool Type::is_structure_type(void) const {
   return impl->reader.getVal210();
 }
 
-bool Type::is_typedef_name_type(void) const {
+bool Type::is_template_type_parm_type(void) const {
   return impl->reader.getVal211();
 }
 
-bool Type::is_undeduced_auto_type(void) const {
+bool Type::is_typedef_name_type(void) const {
   return impl->reader.getVal212();
 }
 
-bool Type::is_undeduced_type(void) const {
+bool Type::is_undeduced_auto_type(void) const {
   return impl->reader.getVal213();
 }
 
-bool Type::is_union_type(void) const {
+bool Type::is_undeduced_type(void) const {
   return impl->reader.getVal214();
 }
 
-bool Type::is_unsaturated_fixed_point_type(void) const {
+bool Type::is_union_type(void) const {
   return impl->reader.getVal215();
 }
 
-bool Type::is_unscoped_enumeration_type(void) const {
+bool Type::is_unsaturated_fixed_point_type(void) const {
   return impl->reader.getVal216();
 }
 
-bool Type::is_unsigned_fixed_point_type(void) const {
+bool Type::is_unscoped_enumeration_type(void) const {
   return impl->reader.getVal217();
 }
 
-bool Type::is_unsigned_integer_or_enumeration_type(void) const {
+bool Type::is_unsigned_fixed_point_type(void) const {
   return impl->reader.getVal218();
 }
 
-bool Type::is_unsigned_integer_type(void) const {
+bool Type::is_unsigned_integer_or_enumeration_type(void) const {
   return impl->reader.getVal219();
 }
 
-bool Type::is_vlst_builtin_type(void) const {
+bool Type::is_unsigned_integer_type(void) const {
   return impl->reader.getVal220();
 }
 
-bool Type::is_variable_array_type(void) const {
+bool Type::is_vlst_builtin_type(void) const {
   return impl->reader.getVal221();
 }
 
-bool Type::is_variably_modified_type(void) const {
+bool Type::is_variable_array_type(void) const {
   return impl->reader.getVal222();
 }
 
-bool Type::is_vector_type(void) const {
+bool Type::is_variably_modified_type(void) const {
   return impl->reader.getVal223();
 }
 
-bool Type::is_visibility_explicit(void) const {
+bool Type::is_vector_type(void) const {
   return impl->reader.getVal224();
 }
 
-bool Type::is_void_pointer_type(void) const {
+bool Type::is_visibility_explicit(void) const {
   return impl->reader.getVal225();
 }
 
-bool Type::is_void_type(void) const {
+bool Type::is_void_pointer_type(void) const {
   return impl->reader.getVal226();
 }
 
-bool Type::is_wide_character_type(void) const {
+bool Type::is_void_type(void) const {
   return impl->reader.getVal227();
+}
+
+bool Type::is_wide_character_type(void) const {
+  return impl->reader.getVal228();
 }
 
 #pragma GCC diagnostic pop

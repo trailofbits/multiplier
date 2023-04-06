@@ -62,6 +62,7 @@ enum class CDeclAttrSpelling : unsigned;
 enum class CFAuditedTransferAttrSpelling : unsigned;
 enum class CFConsumedAttrSpelling : unsigned;
 enum class CFGuardAttrGuardArg : unsigned;
+enum class CFGuardAttrSpelling : unsigned;
 enum class CFICanonicalJumpTableAttrSpelling : unsigned;
 enum class CFReturnsNotRetainedAttrSpelling : unsigned;
 enum class CFReturnsRetainedAttrSpelling : unsigned;
@@ -139,6 +140,8 @@ enum class FunctionReturnThunksAttrSpelling : unsigned;
 enum class GNUInlineAttrSpelling : unsigned;
 enum class GuardedVarAttrSpelling : unsigned;
 enum class HIPManagedAttrSpelling : unsigned;
+enum class HLSLResourceAttrResourceClass : unsigned;
+enum class HLSLResourceAttrResourceKind : unsigned;
 enum class HLSLShaderAttrShaderType : unsigned;
 enum class HotAttrSpelling : unsigned;
 enum class IBActionAttrSpelling : unsigned;
@@ -165,6 +168,7 @@ enum class MSInheritanceAttrSpelling : unsigned;
 enum class MSP430InterruptAttrSpelling : unsigned;
 enum class MSStructAttrSpelling : unsigned;
 enum class MayAliasAttrSpelling : unsigned;
+enum class MaybeUndefAttrSpelling : unsigned;
 enum class MicroMipsAttrSpelling : unsigned;
 enum class MinSizeAttrSpelling : unsigned;
 enum class MinVectorWidthAttrSpelling : unsigned;
@@ -203,6 +207,7 @@ enum class NoSplitStackAttrSpelling : unsigned;
 enum class NoStackProtectorAttrSpelling : unsigned;
 enum class NoThreadSafetyAnalysisAttrSpelling : unsigned;
 enum class NoThrowAttrSpelling : unsigned;
+enum class NoUwtableAttrSpelling : unsigned;
 enum class NonNullAttrSpelling : unsigned;
 enum class NotTailCalledAttrSpelling : unsigned;
 enum class OMPAllocateDeclAttrAllocatorTypeTy : unsigned;
@@ -210,7 +215,6 @@ enum class OMPDeclareReductionDeclInitKind : unsigned;
 enum class OMPDeclareSimdDeclAttrBranchStateTy : unsigned;
 enum class OMPDeclareTargetDeclAttrDevTypeTy : unsigned;
 enum class OMPDeclareTargetDeclAttrMapTypeTy : unsigned;
-enum class OMPDeclareVariantAttrInteropType : unsigned;
 enum class OSConsumedAttrSpelling : unsigned;
 enum class OSConsumesThisAttrSpelling : unsigned;
 enum class OSReturnsNotRetainedAttrSpelling : unsigned;
@@ -283,6 +287,7 @@ enum class QualifiedTypePrimitiveDefaultInitializeKind : unsigned;
 enum class RISCVInterruptAttrInterruptType : unsigned;
 enum class RISCVInterruptAttrSpelling : unsigned;
 enum class RandomizeLayoutAttrSpelling : unsigned;
+enum class ReadOnlyPlacementAttrSpelling : unsigned;
 enum class RecordDeclArgPassingKind : unsigned;
 enum class RegCallAttrSpelling : unsigned;
 enum class ReinitializesAttrSpelling : unsigned;
@@ -327,6 +332,7 @@ enum class SysVABIAttrSpelling : unsigned;
 enum class TLSModelAttrSpelling : unsigned;
 enum class TargetAttrSpelling : unsigned;
 enum class TargetClonesAttrSpelling : unsigned;
+enum class TargetVersionAttrSpelling : unsigned;
 enum class TemplateArgumentKind : unsigned;
 enum class TestTypestateAttrConsumedState : unsigned;
 enum class TestTypestateAttrSpelling : unsigned;
@@ -395,6 +401,7 @@ enum class CompilingModuleKind : unsigned;
 enum class ConstexprSpecKind : int;
 enum class CoreFoundationABI : int;
 enum class DataPositionTy : unsigned long;
+enum class DebugSrcHashKind : unsigned;
 enum class DefaultArgKind : unsigned;
 enum class DefaultCallingConvention : unsigned;
 enum class DefaultVisiblityExportMapping : int;
@@ -404,6 +411,8 @@ enum class EmbedBitcodeKind : unsigned;
 enum class EscapeChar : int;
 enum class ExceptionHandlingKind : int;
 enum class ExceptionSpecificationType : unsigned;
+enum class ExcessPrecisionKind : unsigned;
+enum class ExclusionType : unsigned;
 enum class ExplicitSpecKind : unsigned;
 enum class ExprDependence : unsigned char;
 enum class ExprObjectKind : unsigned;
@@ -416,6 +425,7 @@ enum class FPEvalMethodKind : int;
 enum class FPExceptionModeKind : unsigned;
 enum class FPModeKind : unsigned;
 enum class FiniteLoopsKind : unsigned;
+enum class Flags : unsigned;
 enum class FramePointerKind : int;
 enum class GC : unsigned;
 enum class GCMode : unsigned;
@@ -468,6 +478,7 @@ enum class ObjCTypeParamVariance : unsigned char;
 enum class OnOffSwitch : unsigned;
 enum class OnStackType : unsigned;
 enum class OpenMPAdjustArgsOpKind : unsigned;
+enum class OpenMPAtClauseKind : unsigned;
 enum class OpenMPAtomicDefaultMemOrderClauseKind : unsigned;
 enum class OpenMPBindClauseKind : unsigned;
 enum class OpenMPDefaultmapClauseKind : unsigned;
@@ -476,15 +487,19 @@ enum class OpenMPDependClauseKind : unsigned;
 enum class OpenMPDeviceClauseModifier : unsigned;
 enum class OpenMPDeviceType : unsigned;
 enum class OpenMPDistScheduleClauseKind : unsigned;
+enum class OpenMPGrainsizeClauseModifier : unsigned;
 enum class OpenMPLastprivateModifier : unsigned;
 enum class OpenMPLinearClauseKind : unsigned;
 enum class OpenMPMapClauseKind : unsigned;
 enum class OpenMPMapModifierKind : unsigned;
 enum class OpenMPMotionModifierKind : unsigned;
+enum class OpenMPNumTasksClauseModifier : unsigned;
 enum class OpenMPOrderClauseKind : unsigned;
+enum class OpenMPOrderClauseModifier : unsigned;
 enum class OpenMPReductionClauseModifier : unsigned;
 enum class OpenMPScheduleClauseKind : unsigned;
 enum class OpenMPScheduleClauseModifier : unsigned;
+enum class OpenMPSeverityClauseKind : unsigned;
 enum class OverloadedOperatorKind : int;
 enum class OverloadsShown : unsigned;
 enum class PPKeywordKind : unsigned;
@@ -517,6 +532,7 @@ enum class StorageClass : unsigned;
 enum class StorageDuration : unsigned;
 enum class StoredNameKind : unsigned;
 enum class StoredSpecifierKind : unsigned;
+enum class StrictFlexArraysLevelKind : int;
 enum class StructReturnConventionKind : unsigned;
 enum class SubExpr : unsigned;
 enum class SubStmt : unsigned;
@@ -539,6 +555,7 @@ enum class TranslationUnitKind : unsigned;
 enum class TrivialAutoVarInitKind : int;
 enum class TypeDependence : unsigned char;
 enum class TypeLocClass : unsigned;
+enum class TypeOfKind : unsigned char;
 enum class TypeSpecifierSign : int;
 enum class TypeSpecifierType : unsigned;
 enum class TypeSpecifierWidth : int;
@@ -713,6 +730,9 @@ CFConsumedAttrSpelling FromPasta(pasta::CFConsumedAttrSpelling pasta_val);
 
 enum class CFGuardAttrGuardArg : unsigned char;
 CFGuardAttrGuardArg FromPasta(pasta::CFGuardAttrGuardArg pasta_val);
+
+enum class CFGuardAttrSpelling : unsigned char;
+CFGuardAttrSpelling FromPasta(pasta::CFGuardAttrSpelling pasta_val);
 
 enum class CFICanonicalJumpTableAttrSpelling : unsigned char;
 CFICanonicalJumpTableAttrSpelling FromPasta(pasta::CFICanonicalJumpTableAttrSpelling pasta_val);
@@ -945,6 +965,12 @@ GuardedVarAttrSpelling FromPasta(pasta::GuardedVarAttrSpelling pasta_val);
 enum class HIPManagedAttrSpelling : unsigned char;
 HIPManagedAttrSpelling FromPasta(pasta::HIPManagedAttrSpelling pasta_val);
 
+enum class HLSLResourceAttrResourceClass : unsigned char;
+HLSLResourceAttrResourceClass FromPasta(pasta::HLSLResourceAttrResourceClass pasta_val);
+
+enum class HLSLResourceAttrResourceKind : unsigned char;
+HLSLResourceAttrResourceKind FromPasta(pasta::HLSLResourceAttrResourceKind pasta_val);
+
 enum class HLSLShaderAttrShaderType : unsigned char;
 HLSLShaderAttrShaderType FromPasta(pasta::HLSLShaderAttrShaderType pasta_val);
 
@@ -1022,6 +1048,9 @@ MSStructAttrSpelling FromPasta(pasta::MSStructAttrSpelling pasta_val);
 
 enum class MayAliasAttrSpelling : unsigned char;
 MayAliasAttrSpelling FromPasta(pasta::MayAliasAttrSpelling pasta_val);
+
+enum class MaybeUndefAttrSpelling : unsigned char;
+MaybeUndefAttrSpelling FromPasta(pasta::MaybeUndefAttrSpelling pasta_val);
 
 enum class MicroMipsAttrSpelling : unsigned char;
 MicroMipsAttrSpelling FromPasta(pasta::MicroMipsAttrSpelling pasta_val);
@@ -1137,6 +1166,9 @@ NoThreadSafetyAnalysisAttrSpelling FromPasta(pasta::NoThreadSafetyAnalysisAttrSp
 enum class NoThrowAttrSpelling : unsigned char;
 NoThrowAttrSpelling FromPasta(pasta::NoThrowAttrSpelling pasta_val);
 
+enum class NoUwtableAttrSpelling : unsigned char;
+NoUwtableAttrSpelling FromPasta(pasta::NoUwtableAttrSpelling pasta_val);
+
 enum class NonNullAttrSpelling : unsigned char;
 NonNullAttrSpelling FromPasta(pasta::NonNullAttrSpelling pasta_val);
 
@@ -1157,9 +1189,6 @@ OMPDeclareTargetDeclAttrDevTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrDevTy
 
 enum class OMPDeclareTargetDeclAttrMapTypeTy : unsigned char;
 OMPDeclareTargetDeclAttrMapTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrMapTypeTy pasta_val);
-
-enum class OMPDeclareVariantAttrInteropType : unsigned char;
-OMPDeclareVariantAttrInteropType FromPasta(pasta::OMPDeclareVariantAttrInteropType pasta_val);
 
 enum class OSConsumedAttrSpelling : unsigned char;
 OSConsumedAttrSpelling FromPasta(pasta::OSConsumedAttrSpelling pasta_val);
@@ -1377,6 +1406,9 @@ RISCVInterruptAttrSpelling FromPasta(pasta::RISCVInterruptAttrSpelling pasta_val
 enum class RandomizeLayoutAttrSpelling : unsigned char;
 RandomizeLayoutAttrSpelling FromPasta(pasta::RandomizeLayoutAttrSpelling pasta_val);
 
+enum class ReadOnlyPlacementAttrSpelling : unsigned char;
+ReadOnlyPlacementAttrSpelling FromPasta(pasta::ReadOnlyPlacementAttrSpelling pasta_val);
+
 enum class RecordDeclArgPassingKind : unsigned char;
 RecordDeclArgPassingKind FromPasta(pasta::RecordDeclArgPassingKind pasta_val);
 
@@ -1508,6 +1540,9 @@ TargetAttrSpelling FromPasta(pasta::TargetAttrSpelling pasta_val);
 
 enum class TargetClonesAttrSpelling : unsigned char;
 TargetClonesAttrSpelling FromPasta(pasta::TargetClonesAttrSpelling pasta_val);
+
+enum class TargetVersionAttrSpelling : unsigned char;
+TargetVersionAttrSpelling FromPasta(pasta::TargetVersionAttrSpelling pasta_val);
 
 enum class TemplateArgumentKind : unsigned char;
 TemplateArgumentKind FromPasta(pasta::TemplateArgumentKind pasta_val);
@@ -1713,6 +1748,9 @@ CoreFoundationABI FromPasta(pasta::CoreFoundationABI pasta_val);
 enum class DataPositionTy : unsigned char;
 DataPositionTy FromPasta(pasta::DataPositionTy pasta_val);
 
+enum class DebugSrcHashKind : unsigned char;
+DebugSrcHashKind FromPasta(pasta::DebugSrcHashKind pasta_val);
+
 enum class DefaultArgKind : unsigned char;
 DefaultArgKind FromPasta(pasta::DefaultArgKind pasta_val);
 
@@ -1739,6 +1777,12 @@ ExceptionHandlingKind FromPasta(pasta::ExceptionHandlingKind pasta_val);
 
 enum class ExceptionSpecificationType : unsigned char;
 ExceptionSpecificationType FromPasta(pasta::ExceptionSpecificationType pasta_val);
+
+enum class ExcessPrecisionKind : unsigned char;
+ExcessPrecisionKind FromPasta(pasta::ExcessPrecisionKind pasta_val);
+
+enum class ExclusionType : unsigned char;
+ExclusionType FromPasta(pasta::ExclusionType pasta_val);
 
 enum class ExplicitSpecKind : unsigned char;
 ExplicitSpecKind FromPasta(pasta::ExplicitSpecKind pasta_val);
@@ -1775,6 +1819,9 @@ FPModeKind FromPasta(pasta::FPModeKind pasta_val);
 
 enum class FiniteLoopsKind : unsigned char;
 FiniteLoopsKind FromPasta(pasta::FiniteLoopsKind pasta_val);
+
+enum class Flags : unsigned char;
+Flags FromPasta(pasta::Flags pasta_val);
 
 enum class FramePointerKind : unsigned char;
 FramePointerKind FromPasta(pasta::FramePointerKind pasta_val);
@@ -1929,6 +1976,9 @@ OnStackType FromPasta(pasta::OnStackType pasta_val);
 enum class OpenMPAdjustArgsOpKind : unsigned char;
 OpenMPAdjustArgsOpKind FromPasta(pasta::OpenMPAdjustArgsOpKind pasta_val);
 
+enum class OpenMPAtClauseKind : unsigned char;
+OpenMPAtClauseKind FromPasta(pasta::OpenMPAtClauseKind pasta_val);
+
 enum class OpenMPAtomicDefaultMemOrderClauseKind : unsigned char;
 OpenMPAtomicDefaultMemOrderClauseKind FromPasta(pasta::OpenMPAtomicDefaultMemOrderClauseKind pasta_val);
 
@@ -1953,6 +2003,9 @@ OpenMPDeviceType FromPasta(pasta::OpenMPDeviceType pasta_val);
 enum class OpenMPDistScheduleClauseKind : unsigned char;
 OpenMPDistScheduleClauseKind FromPasta(pasta::OpenMPDistScheduleClauseKind pasta_val);
 
+enum class OpenMPGrainsizeClauseModifier : unsigned char;
+OpenMPGrainsizeClauseModifier FromPasta(pasta::OpenMPGrainsizeClauseModifier pasta_val);
+
 enum class OpenMPLastprivateModifier : unsigned char;
 OpenMPLastprivateModifier FromPasta(pasta::OpenMPLastprivateModifier pasta_val);
 
@@ -1968,8 +2021,14 @@ OpenMPMapModifierKind FromPasta(pasta::OpenMPMapModifierKind pasta_val);
 enum class OpenMPMotionModifierKind : unsigned char;
 OpenMPMotionModifierKind FromPasta(pasta::OpenMPMotionModifierKind pasta_val);
 
+enum class OpenMPNumTasksClauseModifier : unsigned char;
+OpenMPNumTasksClauseModifier FromPasta(pasta::OpenMPNumTasksClauseModifier pasta_val);
+
 enum class OpenMPOrderClauseKind : unsigned char;
 OpenMPOrderClauseKind FromPasta(pasta::OpenMPOrderClauseKind pasta_val);
+
+enum class OpenMPOrderClauseModifier : unsigned char;
+OpenMPOrderClauseModifier FromPasta(pasta::OpenMPOrderClauseModifier pasta_val);
 
 enum class OpenMPReductionClauseModifier : unsigned char;
 OpenMPReductionClauseModifier FromPasta(pasta::OpenMPReductionClauseModifier pasta_val);
@@ -1979,6 +2038,9 @@ OpenMPScheduleClauseKind FromPasta(pasta::OpenMPScheduleClauseKind pasta_val);
 
 enum class OpenMPScheduleClauseModifier : unsigned char;
 OpenMPScheduleClauseModifier FromPasta(pasta::OpenMPScheduleClauseModifier pasta_val);
+
+enum class OpenMPSeverityClauseKind : unsigned char;
+OpenMPSeverityClauseKind FromPasta(pasta::OpenMPSeverityClauseKind pasta_val);
 
 enum class OverloadedOperatorKind : unsigned char;
 OverloadedOperatorKind FromPasta(pasta::OverloadedOperatorKind pasta_val);
@@ -2073,6 +2135,9 @@ StoredNameKind FromPasta(pasta::StoredNameKind pasta_val);
 enum class StoredSpecifierKind : unsigned char;
 StoredSpecifierKind FromPasta(pasta::StoredSpecifierKind pasta_val);
 
+enum class StrictFlexArraysLevelKind : unsigned char;
+StrictFlexArraysLevelKind FromPasta(pasta::StrictFlexArraysLevelKind pasta_val);
+
 enum class StructReturnConventionKind : unsigned char;
 StructReturnConventionKind FromPasta(pasta::StructReturnConventionKind pasta_val);
 
@@ -2138,6 +2203,9 @@ TypeDependence FromPasta(pasta::TypeDependence pasta_val);
 
 enum class TypeLocClass : unsigned char;
 TypeLocClass FromPasta(pasta::TypeLocClass pasta_val);
+
+enum class TypeOfKind : unsigned char;
+TypeOfKind FromPasta(pasta::TypeOfKind pasta_val);
 
 enum class TypeSpecifierSign : unsigned char;
 TypeSpecifierSign FromPasta(pasta::TypeSpecifierSign pasta_val);

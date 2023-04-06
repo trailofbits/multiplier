@@ -45,6 +45,8 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  OMPRequiresDecl canonical_declaration(void) const;
+  std::optional<OMPRequiresDecl> definition(void) const;
   gap::generator<OMPRequiresDecl> redeclarations(void) const &;
   static std::optional<OMPRequiresDecl> from(const Decl &parent);
 

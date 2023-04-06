@@ -53,6 +53,8 @@ class ObjCIvarDecl : public FieldDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCIvarDecl canonical_declaration(void) const;
+  std::optional<ObjCIvarDecl> definition(void) const;
   gap::generator<ObjCIvarDecl> redeclarations(void) const &;
   static std::optional<ObjCIvarDecl> from(const Decl &parent);
 

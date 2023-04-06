@@ -84,6 +84,20 @@ bool TranslationUnitDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TranslationUnitDecl TranslationUnitDecl::canonical_declaration(void) const {
+  if (auto canon = TranslationUnitDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TranslationUnitDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TranslationUnitDecl> TranslationUnitDecl::definition(void) const {
+  return TranslationUnitDecl::from(this->Decl::definition());
+}
+
 gap::generator<TranslationUnitDecl> TranslationUnitDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TranslationUnitDecl> dr = TranslationUnitDecl::from(r)) {
@@ -166,7 +180,7 @@ std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const TokenContext 
 
 gap::generator<Decl> TranslationUnitDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

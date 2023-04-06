@@ -49,6 +49,8 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TypeAliasTemplateDecl canonical_declaration(void) const;
+  std::optional<TypeAliasTemplateDecl> definition(void) const;
   gap::generator<TypeAliasTemplateDecl> redeclarations(void) const &;
   static std::optional<TypeAliasTemplateDecl> from(const Decl &parent);
 

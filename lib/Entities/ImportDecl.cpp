@@ -85,6 +85,20 @@ bool ImportDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ImportDecl ImportDecl::canonical_declaration(void) const {
+  if (auto canon = ImportDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ImportDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ImportDecl> ImportDecl::definition(void) const {
+  return ImportDecl::from(this->Decl::definition());
+}
+
 gap::generator<ImportDecl> ImportDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ImportDecl> dr = ImportDecl::from(r)) {
@@ -166,11 +180,11 @@ std::optional<ImportDecl> ImportDecl::from(const TokenContext &t) {
 }
 
 unsigned ImportDecl::num_identifier_tokens(void) const {
-  return impl->reader.getVal47().size();
+  return impl->reader.getVal49().size();
 }
 
 std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -184,7 +198,7 @@ std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
 }
 
 gap::generator<Token> ImportDecl::identifier_tokens(void) const & {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   EntityProvider::Ptr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
@@ -194,8 +208,8 @@ gap::generator<Token> ImportDecl::identifier_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t47 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t47;
+    if (auto t49 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t49;
     }
   }
   co_return;

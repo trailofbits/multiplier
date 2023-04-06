@@ -86,6 +86,20 @@ bool StaticAssertDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+StaticAssertDecl StaticAssertDecl::canonical_declaration(void) const {
+  if (auto canon = StaticAssertDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (StaticAssertDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<StaticAssertDecl> StaticAssertDecl::definition(void) const {
+  return StaticAssertDecl::from(this->Decl::definition());
+}
+
 gap::generator<StaticAssertDecl> StaticAssertDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<StaticAssertDecl> dr = StaticAssertDecl::from(r)) {
@@ -167,21 +181,21 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const TokenContext &t) {
 }
 
 Expr StaticAssertDecl::assert_expression(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal47();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 StringLiteral StaticAssertDecl::message(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal54();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token StaticAssertDecl::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
 }
 
 bool StaticAssertDecl::is_failed(void) const {
-  return impl->reader.getVal46();
+  return impl->reader.getVal48();
 }
 
 #pragma GCC diagnostic pop

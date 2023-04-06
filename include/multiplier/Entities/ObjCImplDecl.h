@@ -47,6 +47,8 @@ class ObjCImplDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCImplDecl canonical_declaration(void) const;
+  std::optional<ObjCImplDecl> definition(void) const;
   gap::generator<ObjCImplDecl> redeclarations(void) const &;
   static std::optional<ObjCImplDecl> from(const Decl &parent);
 

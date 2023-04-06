@@ -45,6 +45,7 @@ class CXXNewExpr;
 class CXXNoexceptExpr;
 class CXXNullPtrLiteralExpr;
 class CXXOperatorCallExpr;
+class CXXParenListInitExpr;
 class CXXPseudoDestructorExpr;
 class CXXReinterpretCastExpr;
 class CXXRewrittenBinaryOperator;

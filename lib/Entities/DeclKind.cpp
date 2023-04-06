@@ -44,6 +44,8 @@ const char *EnumeratorName(DeclKind e) {
     case DeclKind::FRIEND_TEMPLATE: return "FRIEND_TEMPLATE";
     case DeclKind::FUNCTION: return "FUNCTION";
     case DeclKind::FUNCTION_TEMPLATE: return "FUNCTION_TEMPLATE";
+    case DeclKind::HLSL_BUFFER: return "HLSL_BUFFER";
+    case DeclKind::IMPLICIT_CONCEPT_SPECIALIZATION: return "IMPLICIT_CONCEPT_SPECIALIZATION";
     case DeclKind::IMPLICIT_PARAM: return "IMPLICIT_PARAM";
     case DeclKind::IMPORT: return "IMPORT";
     case DeclKind::INDIRECT_FIELD: return "INDIRECT_FIELD";
@@ -82,6 +84,7 @@ const char *EnumeratorName(DeclKind e) {
     case DeclKind::TEMPLATE_PARAM_OBJECT: return "TEMPLATE_PARAM_OBJECT";
     case DeclKind::TEMPLATE_TEMPLATE_PARM: return "TEMPLATE_TEMPLATE_PARM";
     case DeclKind::TEMPLATE_TYPE_PARM: return "TEMPLATE_TYPE_PARM";
+    case DeclKind::TOP_LEVEL_STMT: return "TOP_LEVEL_STMT";
     case DeclKind::TRANSLATION_UNIT: return "TRANSLATION_UNIT";
     case DeclKind::TYPE_ALIAS: return "TYPE_ALIAS";
     case DeclKind::TYPE_ALIAS_TEMPLATE: return "TYPE_ALIAS_TEMPLATE";

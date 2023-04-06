@@ -85,6 +85,20 @@ bool ClassScopeFunctionSpecializationDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ClassScopeFunctionSpecializationDecl ClassScopeFunctionSpecializationDecl::canonical_declaration(void) const {
+  if (auto canon = ClassScopeFunctionSpecializationDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ClassScopeFunctionSpecializationDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::definition(void) const {
+  return ClassScopeFunctionSpecializationDecl::from(this->Decl::definition());
+}
+
 gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ClassScopeFunctionSpecializationDecl> dr = ClassScopeFunctionSpecializationDecl::from(r)) {
@@ -166,12 +180,12 @@ std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializa
 }
 
 CXXMethodDecl ClassScopeFunctionSpecializationDecl::specialization(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal47();
   return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal46();
+  return impl->reader.getVal48();
 }
 
 #pragma GCC diagnostic pop

@@ -86,6 +86,20 @@ bool TemplateParamObjectDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TemplateParamObjectDecl TemplateParamObjectDecl::canonical_declaration(void) const {
+  if (auto canon = TemplateParamObjectDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TemplateParamObjectDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::definition(void) const {
+  return TemplateParamObjectDecl::from(this->Decl::definition());
+}
+
 gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TemplateParamObjectDecl> dr = TemplateParamObjectDecl::from(r)) {

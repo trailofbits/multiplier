@@ -50,6 +50,8 @@ class TypeAliasDecl : public TypedefNameDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TypeAliasDecl canonical_declaration(void) const;
+  std::optional<TypeAliasDecl> definition(void) const;
   gap::generator<TypeAliasDecl> redeclarations(void) const &;
   static std::optional<TypeAliasDecl> from(const Decl &parent);
 

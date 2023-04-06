@@ -54,6 +54,7 @@ class MacroExpansion : public MacroSubstitution {
   static std::optional<MacroExpansion> from(const Reference &r);
   static std::optional<MacroExpansion> from(const TokenContext &t);
 
+  gap::generator<MacroOrToken> intermediate_children(void) const &;
   std::optional<DefineMacroDirective> definition(void) const;
   std::optional<MacroArgument> nth_argument(unsigned n) const;
   unsigned num_arguments(void) const;

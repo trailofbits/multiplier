@@ -156,7 +156,7 @@ void DumpTypeToJSON(llvm::json::Object &obj, mx::Type type,
     DumpIndirectTypeToJSON(obj, std::move(td5.value()), wl);
 
   } else if (auto td6 = mx::TypeOfType::from(type)) {
-    DumpIndirectTypeToJSON(obj, std::move(td6.value()), wl);
+    DumpTypeToJSON(obj, td6->unmodified_type(), wl);
 
   } else if (auto el = mx::ElaboratedType::from(type)) {
     DumpElaboratedTypeToJSON(obj, std::move(el.value()), wl);

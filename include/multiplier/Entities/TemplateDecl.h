@@ -49,6 +49,8 @@ class TemplateDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TemplateDecl canonical_declaration(void) const;
+  std::optional<TemplateDecl> definition(void) const;
   gap::generator<TemplateDecl> redeclarations(void) const &;
   static std::optional<TemplateDecl> from(const Decl &parent);
 
@@ -66,6 +68,7 @@ class TemplateDecl : public NamedDecl {
   TemplateParameterList template_parameters(void) const;
   NamedDecl templated_declaration(void) const;
   bool has_associated_constraints(void) const;
+  bool is_type_alias(void) const;
 };
 
 static_assert(sizeof(TemplateDecl) == sizeof(NamedDecl));

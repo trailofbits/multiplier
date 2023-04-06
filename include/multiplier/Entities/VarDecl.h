@@ -64,6 +64,8 @@ class VarDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  VarDecl canonical_declaration(void) const;
+  std::optional<VarDecl> definition(void) const;
   gap::generator<VarDecl> redeclarations(void) const &;
   static std::optional<VarDecl> from(const Decl &parent);
 
@@ -112,7 +114,6 @@ class VarDecl : public DeclaratorDecl {
   bool is_function_or_method_variable_declaration(void) const;
   bool is_in_extern_c_context(void) const;
   bool is_in_extern_cxx_context(void) const;
-  bool is_initializer_capture(void) const;
   bool is_inline(void) const;
   bool is_inline_specified(void) const;
   bool is_known_to_be_defined(void) const;

@@ -88,6 +88,20 @@ bool OMPDeclareMapperDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+OMPDeclareMapperDecl OMPDeclareMapperDecl::canonical_declaration(void) const {
+  if (auto canon = OMPDeclareMapperDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (OMPDeclareMapperDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::definition(void) const {
+  return OMPDeclareMapperDecl::from(this->Decl::definition());
+}
+
 gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<OMPDeclareMapperDecl> dr = OMPDeclareMapperDecl::from(r)) {
@@ -169,13 +183,13 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const TokenContex
 }
 
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
-  RawEntityId eid = impl->reader.getVal53();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

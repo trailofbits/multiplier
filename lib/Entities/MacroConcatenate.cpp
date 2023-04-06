@@ -119,6 +119,10 @@ std::optional<MacroConcatenate> MacroConcatenate::from(const TokenContext &t) {
   return MacroConcatenate::from(t.as_macro());
 }
 
+Token MacroConcatenate::pasted_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal5());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

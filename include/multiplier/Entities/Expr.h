@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "ExprDependence.h"
 #include "ExprObjectKind.h"
 #include "ExprValueKind.h"
 #include "ValueStmt.h"
@@ -46,6 +47,7 @@ class CXXNewExpr;
 class CXXNoexceptExpr;
 class CXXNullPtrLiteralExpr;
 class CXXOperatorCallExpr;
+class CXXParenListInitExpr;
 class CXXPseudoDestructorExpr;
 class CXXReinterpretCastExpr;
 class CXXRewrittenBinaryOperator;
@@ -197,6 +199,7 @@ class Expr : public ValueStmt {
   bool contains_errors(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
   Expr best_dynamic_class_type_expression(void) const;
+  ExprDependence dependence(void) const;
   Token expression_token(void) const;
   std::optional<ObjCPropertyRefExpr> obj_c_property(void) const;
   ExprObjectKind object_kind(void) const;

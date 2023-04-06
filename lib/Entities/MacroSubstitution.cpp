@@ -11,8 +11,8 @@
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/MacroConcatenate.h>
 #include <multiplier/Entities/MacroExpansion.h>
+#include <multiplier/Entities/MacroParameterSubstitution.h>
 #include <multiplier/Entities/MacroStringify.h>
-#include <multiplier/Entities/MacroVAOpt.h>
 
 #include "../API.h"
 #include "../Macro.h"
@@ -66,19 +66,19 @@ std::optional<MacroSubstitution> MacroSubstitution::by_id(const Index &index, En
 
 static const MacroKind kMacroSubstitutionDerivedKinds[] = {
     MacroSubstitution::static_kind(),
+    MacroParameterSubstitution::static_kind(),
     MacroExpansion::static_kind(),
     MacroStringify::static_kind(),
     MacroConcatenate::static_kind(),
-    MacroVAOpt::static_kind(),
 };
 
 std::optional<MacroSubstitution> MacroSubstitution::from(const Macro &parent) {
   switch (parent.kind()) {
     case MacroSubstitution::static_kind():
+    case MacroParameterSubstitution::static_kind():
     case MacroExpansion::static_kind():
     case MacroStringify::static_kind():
     case MacroConcatenate::static_kind():
-    case MacroVAOpt::static_kind():
       return reinterpret_cast<const MacroSubstitution &>(parent);
     default:
       return std::nullopt;
@@ -132,7 +132,7 @@ std::optional<MacroSubstitution> MacroSubstitution::from(const TokenContext &t) 
 
 gap::generator<MacroOrToken> MacroSubstitution::replacement_children(void) const & {
   Index index(impl->ep);
-  auto list = impl->reader.getVal3();
+  auto list = impl->reader.getVal4();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {

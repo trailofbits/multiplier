@@ -63,6 +63,8 @@ class DeclaratorDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  DeclaratorDecl canonical_declaration(void) const;
+  std::optional<DeclaratorDecl> definition(void) const;
   gap::generator<DeclaratorDecl> redeclarations(void) const &;
   static std::optional<DeclaratorDecl> from(const Decl &parent);
 

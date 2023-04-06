@@ -43,6 +43,8 @@ class TranslationUnitDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  TranslationUnitDecl canonical_declaration(void) const;
+  std::optional<TranslationUnitDecl> definition(void) const;
   gap::generator<TranslationUnitDecl> redeclarations(void) const &;
   static std::optional<TranslationUnitDecl> from(const Decl &parent);
 

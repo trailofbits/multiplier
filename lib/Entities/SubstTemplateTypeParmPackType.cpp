@@ -8,7 +8,8 @@
 
 #include <multiplier/Entities/SubstTemplateTypeParmPackType.h>
 
-#include <multiplier/Entities/TemplateTypeParmType.h>
+#include <multiplier/Entities/Decl.h>
+#include <multiplier/Entities/TemplateTypeParmDecl.h>
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
@@ -105,17 +106,26 @@ std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from
 }
 
 Type SubstTemplateTypeParmPackType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-TemplateTypeParmType SubstTemplateTypeParmPackType::replaced_parameter(void) const {
-  RawEntityId eid = impl->reader.getVal229();
-  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
+Decl SubstTemplateTypeParmPackType::associated_declaration(void) const {
+  RawEntityId eid = impl->reader.getVal230();
+  return Decl(impl->ep->DeclFor(impl->ep, eid));
+}
+
+bool SubstTemplateTypeParmPackType::final(void) const {
+  return impl->reader.getVal231();
+}
+
+TemplateTypeParmDecl SubstTemplateTypeParmPackType::replaced_parameter(void) const {
+  RawEntityId eid = impl->reader.getVal236();
+  return TemplateTypeParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool SubstTemplateTypeParmPackType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal232();
 }
 
 #pragma GCC diagnostic pop

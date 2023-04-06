@@ -46,6 +46,8 @@ class FriendDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  FriendDecl canonical_declaration(void) const;
+  std::optional<FriendDecl> definition(void) const;
   gap::generator<FriendDecl> redeclarations(void) const &;
   static std::optional<FriendDecl> from(const Decl &parent);
 

@@ -48,6 +48,9 @@ const char *EnumeratorName(TokenCategory e) {
     case TokenCategory::TEMPLATE_PARAMETER_VALUE: return "TEMPLATE_PARAMETER_VALUE";
     case TokenCategory::LABEL: return "LABEL";
     case TokenCategory::WHITESPACE: return "WHITESPACE";
+    case TokenCategory::FILE_NAME: return "FILE_NAME";
+    case TokenCategory::LINE_NUMBER: return "LINE_NUMBER";
+    case TokenCategory::COLUMN_NUMBER: return "COLUMN_NUMBER";
     default: return "<invalid>";
   }
 }

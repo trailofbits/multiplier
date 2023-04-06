@@ -113,6 +113,20 @@ bool ValueDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ValueDecl ValueDecl::canonical_declaration(void) const {
+  if (auto canon = ValueDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ValueDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ValueDecl> ValueDecl::definition(void) const {
+  return ValueDecl::from(this->Decl::definition());
+}
+
 gap::generator<ValueDecl> ValueDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ValueDecl> dr = ValueDecl::from(r)) {
@@ -245,13 +259,30 @@ std::optional<ValueDecl> ValueDecl::from(const TokenContext &t) {
   return ValueDecl::from(t.as_declaration());
 }
 
+std::optional<VarDecl> ValueDecl::potentially_decomposed_variable_declaration(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal54();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr)));
+    }
+  }
+  return std::nullopt;
+}
+
 Type ValueDecl::type(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal55();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+bool ValueDecl::is_initializer_capture(void) const {
+  return impl->reader.getVal72();
+}
+
 bool ValueDecl::is_weak(void) const {
-  return impl->reader.getVal70();
+  return impl->reader.getVal73();
 }
 
 #pragma GCC diagnostic pop

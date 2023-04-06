@@ -84,6 +84,20 @@ bool RequiresExprBodyDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+RequiresExprBodyDecl RequiresExprBodyDecl::canonical_declaration(void) const {
+  if (auto canon = RequiresExprBodyDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (RequiresExprBodyDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::definition(void) const {
+  return RequiresExprBodyDecl::from(this->Decl::definition());
+}
+
 gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<RequiresExprBodyDecl> dr = RequiresExprBodyDecl::from(r)) {
@@ -166,7 +180,7 @@ std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const TokenContex
 
 gap::generator<Decl> RequiresExprBodyDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

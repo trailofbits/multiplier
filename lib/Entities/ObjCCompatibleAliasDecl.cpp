@@ -86,6 +86,20 @@ bool ObjCCompatibleAliasDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ObjCCompatibleAliasDecl ObjCCompatibleAliasDecl::canonical_declaration(void) const {
+  if (auto canon = ObjCCompatibleAliasDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ObjCCompatibleAliasDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::definition(void) const {
+  return ObjCCompatibleAliasDecl::from(this->Decl::definition());
+}
+
 gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ObjCCompatibleAliasDecl> dr = ObjCCompatibleAliasDecl::from(r)) {
@@ -167,7 +181,7 @@ std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Token
 }
 
 ObjCInterfaceDecl ObjCCompatibleAliasDecl::class_interface(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal54();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

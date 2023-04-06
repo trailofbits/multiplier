@@ -53,6 +53,8 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCInterfaceDecl canonical_declaration(void) const;
+  std::optional<ObjCInterfaceDecl> definition(void) const;
   gap::generator<ObjCInterfaceDecl> redeclarations(void) const &;
   static std::optional<ObjCInterfaceDecl> from(const Decl &parent);
 

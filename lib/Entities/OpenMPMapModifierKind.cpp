@@ -19,6 +19,7 @@ const char *EnumeratorName(OpenMPMapModifierKind e) {
     case OpenMPMapModifierKind::ALWAYS: return "ALWAYS";
     case OpenMPMapModifierKind::CLOSE: return "CLOSE";
     case OpenMPMapModifierKind::MAPPER: return "MAPPER";
+    case OpenMPMapModifierKind::ITERATOR: return "ITERATOR";
     case OpenMPMapModifierKind::PRESENT: return "PRESENT";
     case OpenMPMapModifierKind::OMPX_HOLD: return "OMPX_HOLD";
     default: return "<invalid>";

@@ -45,6 +45,8 @@ class NamespaceDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  NamespaceDecl canonical_declaration(void) const;
+  std::optional<NamespaceDecl> definition(void) const;
   gap::generator<NamespaceDecl> redeclarations(void) const &;
   static std::optional<NamespaceDecl> from(const Decl &parent);
 

@@ -35,6 +35,7 @@ const char *EnumeratorName(MacroKind e) {
     case MacroKind::INCLUDE_NEXT_DIRECTIVE: return "INCLUDE_NEXT_DIRECTIVE";
     case MacroKind::INCLUDE_MACROS_DIRECTIVE: return "INCLUDE_MACROS_DIRECTIVE";
     case MacroKind::IMPORT_DIRECTIVE: return "IMPORT_DIRECTIVE";
+    case MacroKind::PARAMETER_SUBSTITUTION: return "PARAMETER_SUBSTITUTION";
     case MacroKind::STRINGIFY: return "STRINGIFY";
     case MacroKind::CONCATENATE: return "CONCATENATE";
     case MacroKind::VA_OPT: return "VA_OPT";

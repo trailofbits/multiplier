@@ -50,6 +50,8 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  OMPDeclareMapperDecl canonical_declaration(void) const;
+  std::optional<OMPDeclareMapperDecl> definition(void) const;
   gap::generator<OMPDeclareMapperDecl> redeclarations(void) const &;
   static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
 

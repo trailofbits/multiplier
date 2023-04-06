@@ -48,6 +48,8 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ObjCProtocolDecl canonical_declaration(void) const;
+  std::optional<ObjCProtocolDecl> definition(void) const;
   gap::generator<ObjCProtocolDecl> redeclarations(void) const &;
   static std::optional<ObjCProtocolDecl> from(const Decl &parent);
 

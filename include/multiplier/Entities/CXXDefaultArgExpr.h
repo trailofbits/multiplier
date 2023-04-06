@@ -61,9 +61,12 @@ class CXXDefaultArgExpr : public Expr {
   static std::optional<CXXDefaultArgExpr> from(const Reference &r);
   static std::optional<CXXDefaultArgExpr> from(const TokenContext &t);
 
+  Expr adjusted_rewritten_expression(void) const;
   Expr expression(void) const;
   ParmVarDecl parameter(void) const;
+  Expr rewritten_expression(void) const;
   Token used_token(void) const;
+  bool has_rewritten_initializer(void) const;
 };
 
 static_assert(sizeof(CXXDefaultArgExpr) == sizeof(Expr));

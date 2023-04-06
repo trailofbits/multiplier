@@ -84,6 +84,20 @@ bool ExternCContextDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ExternCContextDecl ExternCContextDecl::canonical_declaration(void) const {
+  if (auto canon = ExternCContextDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ExternCContextDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ExternCContextDecl> ExternCContextDecl::definition(void) const {
+  return ExternCContextDecl::from(this->Decl::definition());
+}
+
 gap::generator<ExternCContextDecl> ExternCContextDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ExternCContextDecl> dr = ExternCContextDecl::from(r)) {
@@ -166,7 +180,7 @@ std::optional<ExternCContextDecl> ExternCContextDecl::from(const TokenContext &t
 
 gap::generator<Decl> ExternCContextDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

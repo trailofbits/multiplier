@@ -20,6 +20,7 @@ const char *EnumeratorName(VectorLibrary e) {
     case VectorLibrary::LIBMVEC: return "LIBMVEC";
     case VectorLibrary::MASSV: return "MASSV";
     case VectorLibrary::SVML: return "SVML";
+    case VectorLibrary::SLEEF: return "SLEEF";
     case VectorLibrary::DARWIN_LIBSYSTEM_M: return "DARWIN_LIBSYSTEM_M";
     default: return "<invalid>";
   }

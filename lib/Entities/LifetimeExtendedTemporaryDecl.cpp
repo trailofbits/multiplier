@@ -86,6 +86,20 @@ bool LifetimeExtendedTemporaryDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+LifetimeExtendedTemporaryDecl LifetimeExtendedTemporaryDecl::canonical_declaration(void) const {
+  if (auto canon = LifetimeExtendedTemporaryDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (LifetimeExtendedTemporaryDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::definition(void) const {
+  return LifetimeExtendedTemporaryDecl::from(this->Decl::definition());
+}
+
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<LifetimeExtendedTemporaryDecl> dr = LifetimeExtendedTemporaryDecl::from(r)) {
@@ -167,28 +181,28 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 }
 
 gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const & {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d47));
+    if (auto d49 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d49));
     }
   }
   co_return;
 }
 
 ValueDecl LifetimeExtendedTemporaryDecl::extending_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal47();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
-  return static_cast<StorageDuration>(impl->reader.getVal61());
+  return static_cast<StorageDuration>(impl->reader.getVal63());
 }
 
 Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal54();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

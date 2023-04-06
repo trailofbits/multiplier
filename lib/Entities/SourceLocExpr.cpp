@@ -160,7 +160,7 @@ std::string_view SourceLocExpr::builtin_string(void) const {
 }
 
 SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const {
-  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal93());
+  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal94());
 }
 
 Token SourceLocExpr::token(void) const {
@@ -168,7 +168,7 @@ Token SourceLocExpr::token(void) const {
 }
 
 bool SourceLocExpr::is_int_type(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

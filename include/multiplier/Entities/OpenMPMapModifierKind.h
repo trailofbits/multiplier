@@ -16,6 +16,7 @@ enum class OpenMPMapModifierKind : unsigned char {
   ALWAYS,
   CLOSE,
   MAPPER,
+  ITERATOR,
   PRESENT,
   OMPX_HOLD,
 };
@@ -25,7 +26,7 @@ inline static const char *EnumerationName(OpenMPMapModifierKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(OpenMPMapModifierKind) {
-  return 6;
+  return 7;
 }
 
 const char *EnumeratorName(OpenMPMapModifierKind);

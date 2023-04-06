@@ -49,6 +49,8 @@ class BindingDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  BindingDecl canonical_declaration(void) const;
+  std::optional<BindingDecl> definition(void) const;
   gap::generator<BindingDecl> redeclarations(void) const &;
   static std::optional<BindingDecl> from(const Decl &parent);
 

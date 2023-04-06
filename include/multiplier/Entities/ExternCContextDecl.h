@@ -43,6 +43,8 @@ class ExternCContextDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ExternCContextDecl canonical_declaration(void) const;
+  std::optional<ExternCContextDecl> definition(void) const;
   gap::generator<ExternCContextDecl> redeclarations(void) const &;
   static std::optional<ExternCContextDecl> from(const Decl &parent);
 

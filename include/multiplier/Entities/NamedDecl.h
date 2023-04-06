@@ -36,6 +36,7 @@ class EnumDecl;
 class FieldDecl;
 class FunctionDecl;
 class FunctionTemplateDecl;
+class HLSLBufferDecl;
 class ImplicitParamDecl;
 class IndirectFieldDecl;
 class LabelDecl;
@@ -104,6 +105,8 @@ class NamedDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  NamedDecl canonical_declaration(void) const;
+  std::optional<NamedDecl> definition(void) const;
   gap::generator<NamedDecl> redeclarations(void) const &;
   static std::optional<NamedDecl> from(const Decl &parent);
 

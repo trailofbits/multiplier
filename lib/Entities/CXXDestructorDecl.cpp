@@ -90,6 +90,20 @@ bool CXXDestructorDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+CXXDestructorDecl CXXDestructorDecl::canonical_declaration(void) const {
+  if (auto canon = CXXDestructorDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (CXXDestructorDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<CXXDestructorDecl> CXXDestructorDecl::definition(void) const {
+  return CXXDestructorDecl::from(this->Decl::definition());
+}
+
 gap::generator<CXXDestructorDecl> CXXDestructorDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<CXXDestructorDecl> dr = CXXDestructorDecl::from(r)) {
@@ -172,7 +186,7 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const TokenContext &t) 
 
 std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal170();
+    RawEntityId eid = impl->reader.getVal176();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -185,7 +199,7 @@ std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
 
 std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal171();
+    RawEntityId eid = impl->reader.getVal177();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

@@ -86,6 +86,20 @@ bool UnresolvedUsingTypenameDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UnresolvedUsingTypenameDecl UnresolvedUsingTypenameDecl::canonical_declaration(void) const {
+  if (auto canon = UnresolvedUsingTypenameDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UnresolvedUsingTypenameDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::definition(void) const {
+  return UnresolvedUsingTypenameDecl::from(this->Decl::definition());
+}
+
 gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UnresolvedUsingTypenameDecl> dr = UnresolvedUsingTypenameDecl::from(r)) {
@@ -167,19 +181,19 @@ std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(con
 }
 
 Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
 }
 
 Token UnresolvedUsingTypenameDecl::typename_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 Token UnresolvedUsingTypenameDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
 }
 
 bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal70();
+  return impl->reader.getVal72();
 }
 
 #pragma GCC diagnostic pop

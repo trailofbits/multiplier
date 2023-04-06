@@ -8,19 +8,17 @@
 
 #pragma once
 
-#include "MacroSubstitution.h"
+#include "Macro.h"
 
 namespace mx {
 class EntityProvider;
 class Index;
 class Macro;
-class MacroSubstitution;
 class MacroVAOpt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-class MacroVAOpt : public MacroSubstitution {
+class MacroVAOpt : public Macro {
  private:
   friend class FragmentImpl;
-  friend class MacroSubstitution;
   friend class Macro;
  public:
   static gap::generator<MacroVAOpt> in(const Fragment &frag);
@@ -52,9 +50,10 @@ class MacroVAOpt : public MacroSubstitution {
   static std::optional<MacroVAOpt> from(const Reference &r);
   static std::optional<MacroVAOpt> from(const TokenContext &t);
 
+  bool contents_are_elided(void) const;
 };
 
-static_assert(sizeof(MacroVAOpt) == sizeof(MacroSubstitution));
+static_assert(sizeof(MacroVAOpt) == sizeof(Macro));
 
 #endif
 } // namespace mx

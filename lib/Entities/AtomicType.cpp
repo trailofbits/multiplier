@@ -104,17 +104,17 @@ std::optional<AtomicType> AtomicType::from(const TokenContext &t) {
 }
 
 Type AtomicType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
-Type AtomicType::value_type(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+Type AtomicType::value_type(void) const {
+  RawEntityId eid = impl->reader.getVal230();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 bool AtomicType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal231();
 }
 
 #pragma GCC diagnostic pop

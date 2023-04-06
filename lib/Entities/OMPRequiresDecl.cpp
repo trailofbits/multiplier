@@ -85,6 +85,20 @@ bool OMPRequiresDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+OMPRequiresDecl OMPRequiresDecl::canonical_declaration(void) const {
+  if (auto canon = OMPRequiresDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (OMPRequiresDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<OMPRequiresDecl> OMPRequiresDecl::definition(void) const {
+  return OMPRequiresDecl::from(this->Decl::definition());
+}
+
 gap::generator<OMPRequiresDecl> OMPRequiresDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<OMPRequiresDecl> dr = OMPRequiresDecl::from(r)) {

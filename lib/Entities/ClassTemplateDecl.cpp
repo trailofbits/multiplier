@@ -87,6 +87,20 @@ bool ClassTemplateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ClassTemplateDecl ClassTemplateDecl::canonical_declaration(void) const {
+  if (auto canon = ClassTemplateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ClassTemplateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ClassTemplateDecl> ClassTemplateDecl::definition(void) const {
+  return ClassTemplateDecl::from(this->Decl::definition());
+}
+
 gap::generator<ClassTemplateDecl> ClassTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ClassTemplateDecl> dr = ClassTemplateDecl::from(r)) {
@@ -168,7 +182,7 @@ std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const TokenContext &t) 
 }
 
 bool ClassTemplateDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal75();
 }
 
 #pragma GCC diagnostic pop

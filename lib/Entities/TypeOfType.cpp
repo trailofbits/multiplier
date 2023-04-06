@@ -104,17 +104,17 @@ std::optional<TypeOfType> TypeOfType::from(const TokenContext &t) {
 }
 
 Type TypeOfType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
-Type TypeOfType::underlying_type(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+Type TypeOfType::unmodified_type(void) const {
+  RawEntityId eid = impl->reader.getVal230();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 bool TypeOfType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal231();
 }
 
 #pragma GCC diagnostic pop

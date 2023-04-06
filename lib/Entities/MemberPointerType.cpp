@@ -105,30 +105,30 @@ std::optional<MemberPointerType> MemberPointerType::from(const TokenContext &t) 
 }
 
 Type MemberPointerType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
-Type MemberPointerType::class_(void) const {
   RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+Type MemberPointerType::class_(void) const {
+  RawEntityId eid = impl->reader.getVal230();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 CXXRecordDecl MemberPointerType::most_recent_cxx_record_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal234();
+  RawEntityId eid = impl->reader.getVal236();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool MemberPointerType::is_member_data_pointer(void) const {
-  return impl->reader.getVal230();
-}
-
-bool MemberPointerType::is_member_function_pointer(void) const {
   return impl->reader.getVal231();
 }
 
-bool MemberPointerType::is_sugared(void) const {
+bool MemberPointerType::is_member_function_pointer(void) const {
   return impl->reader.getVal232();
+}
+
+bool MemberPointerType::is_sugared(void) const {
+  return impl->reader.getVal233();
 }
 
 #pragma GCC diagnostic pop

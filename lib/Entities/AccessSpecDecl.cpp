@@ -84,6 +84,20 @@ bool AccessSpecDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+AccessSpecDecl AccessSpecDecl::canonical_declaration(void) const {
+  if (auto canon = AccessSpecDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (AccessSpecDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<AccessSpecDecl> AccessSpecDecl::definition(void) const {
+  return AccessSpecDecl::from(this->Decl::definition());
+}
+
 gap::generator<AccessSpecDecl> AccessSpecDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<AccessSpecDecl> dr = AccessSpecDecl::from(r)) {
@@ -165,11 +179,11 @@ std::optional<AccessSpecDecl> AccessSpecDecl::from(const TokenContext &t) {
 }
 
 Token AccessSpecDecl::access_specifier_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 Token AccessSpecDecl::colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
 }
 
 #pragma GCC diagnostic pop

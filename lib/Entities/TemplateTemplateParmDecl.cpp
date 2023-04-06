@@ -86,6 +86,20 @@ bool TemplateTemplateParmDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TemplateTemplateParmDecl TemplateTemplateParmDecl::canonical_declaration(void) const {
+  if (auto canon = TemplateTemplateParmDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TemplateTemplateParmDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::definition(void) const {
+  return TemplateTemplateParmDecl::from(this->Decl::definition());
+}
+
 gap::generator<TemplateTemplateParmDecl> TemplateTemplateParmDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TemplateTemplateParmDecl> dr = TemplateTemplateParmDecl::from(r)) {
@@ -167,23 +181,23 @@ std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const Tok
 }
 
 bool TemplateTemplateParmDecl::default_argument_was_inherited(void) const {
-  return impl->reader.getVal71();
+  return impl->reader.getVal74();
 }
 
 Token TemplateTemplateParmDecl::default_argument_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 bool TemplateTemplateParmDecl::has_default_argument(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal75();
 }
 
 bool TemplateTemplateParmDecl::is_expanded_parameter_pack(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal92();
 }
 
 bool TemplateTemplateParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

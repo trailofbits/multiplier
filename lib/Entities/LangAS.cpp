@@ -34,6 +34,7 @@ const char *EnumeratorName(LangAS e) {
     case LangAS::PTR32_SPTR: return "PTR32_SPTR";
     case LangAS::PTR32_UPTR: return "PTR32_UPTR";
     case LangAS::PTR64: return "PTR64";
+    case LangAS::HLSL_GROUPSHARED: return "HLSL_GROUPSHARED";
     default: return "<invalid>";
   }
 }

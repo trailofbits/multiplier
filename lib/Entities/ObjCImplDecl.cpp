@@ -90,6 +90,20 @@ bool ObjCImplDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ObjCImplDecl ObjCImplDecl::canonical_declaration(void) const {
+  if (auto canon = ObjCImplDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ObjCImplDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ObjCImplDecl> ObjCImplDecl::definition(void) const {
+  return ObjCImplDecl::from(this->Decl::definition());
+}
+
 gap::generator<ObjCImplDecl> ObjCImplDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ObjCImplDecl> dr = ObjCImplDecl::from(r)) {
@@ -173,16 +187,16 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const TokenContext &t) {
 }
 
 ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
-  RawEntityId eid = impl->reader.getVal62();
+  RawEntityId eid = impl->reader.getVal64();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 unsigned ObjCImplDecl::num_property_implementations(void) const {
-  return impl->reader.getVal309().size();
+  return impl->reader.getVal313().size();
 }
 
 std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
-  auto list = impl->reader.getVal309();
+  auto list = impl->reader.getVal313();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -196,12 +210,12 @@ std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(un
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const & {
-  auto list = impl->reader.getVal309();
+  auto list = impl->reader.getVal313();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d309 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyImplDecl::from(Decl(std::move(d309)))) {
+    if (auto d313 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCPropertyImplDecl::from(Decl(std::move(d313)))) {
         co_yield std::move(*e);
       }
     }

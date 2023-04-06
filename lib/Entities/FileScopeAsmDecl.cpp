@@ -85,6 +85,20 @@ bool FileScopeAsmDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+FileScopeAsmDecl FileScopeAsmDecl::canonical_declaration(void) const {
+  if (auto canon = FileScopeAsmDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (FileScopeAsmDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<FileScopeAsmDecl> FileScopeAsmDecl::definition(void) const {
+  return FileScopeAsmDecl::from(this->Decl::definition());
+}
+
 gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<FileScopeAsmDecl> dr = FileScopeAsmDecl::from(r)) {
@@ -166,16 +180,16 @@ std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const TokenContext &t) {
 }
 
 Token FileScopeAsmDecl::assembly_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 StringLiteral FileScopeAsmDecl::assembly_string(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal54();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token FileScopeAsmDecl::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
 }
 
 #pragma GCC diagnostic pop

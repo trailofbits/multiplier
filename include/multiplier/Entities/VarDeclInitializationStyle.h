@@ -15,6 +15,7 @@ enum class VarDeclInitializationStyle : unsigned char {
   C_INIT,
   CALL_INITIALIZER,
   LIST_INITIALIZER,
+  PARENTHESIS_LIST_INITIALIZER,
 };
 
 inline static const char *EnumerationName(VarDeclInitializationStyle) {
@@ -22,7 +23,7 @@ inline static const char *EnumerationName(VarDeclInitializationStyle) {
 }
 
 inline static constexpr unsigned NumEnumerators(VarDeclInitializationStyle) {
-  return 3;
+  return 4;
 }
 
 const char *EnumeratorName(VarDeclInitializationStyle);

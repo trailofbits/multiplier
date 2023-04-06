@@ -46,6 +46,8 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  OMPAllocateDecl canonical_declaration(void) const;
+  std::optional<OMPAllocateDecl> definition(void) const;
   gap::generator<OMPAllocateDecl> redeclarations(void) const &;
   static std::optional<OMPAllocateDecl> from(const Decl &parent);
 

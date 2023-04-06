@@ -87,6 +87,20 @@ bool BlockDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+BlockDecl BlockDecl::canonical_declaration(void) const {
+  if (auto canon = BlockDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (BlockDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<BlockDecl> BlockDecl::definition(void) const {
+  return BlockDecl::from(this->Decl::definition());
+}
+
 gap::generator<BlockDecl> BlockDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<BlockDecl> dr = BlockDecl::from(r)) {
@@ -168,24 +182,24 @@ std::optional<BlockDecl> BlockDecl::from(const TokenContext &t) {
 }
 
 bool BlockDecl::block_missing_return_type(void) const {
-  return impl->reader.getVal46();
+  return impl->reader.getVal48();
 }
 
 bool BlockDecl::can_avoid_copy_to_heap(void) const {
-  return impl->reader.getVal49();
+  return impl->reader.getVal51();
 }
 
 bool BlockDecl::captures_cxx_this(void) const {
-  return impl->reader.getVal50();
+  return impl->reader.getVal52();
 }
 
 bool BlockDecl::does_not_escape(void) const {
-  return impl->reader.getVal51();
+  return impl->reader.getVal53();
 }
 
 std::optional<Decl> BlockDecl::block_mangling_context_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal45();
+    RawEntityId eid = impl->reader.getVal47();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -197,37 +211,37 @@ std::optional<Decl> BlockDecl::block_mangling_context_declaration(void) const {
 }
 
 Token BlockDecl::caret_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
 }
 
 CompoundStmt BlockDecl::compound_body(void) const {
-  RawEntityId eid = impl->reader.getVal53();
+  RawEntityId eid = impl->reader.getVal55();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type BlockDecl::signature_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool BlockDecl::has_captures(void) const {
-  return impl->reader.getVal55();
-}
-
-bool BlockDecl::is_conversion_from_lambda(void) const {
-  return impl->reader.getVal56();
-}
-
-bool BlockDecl::is_variadic(void) const {
   return impl->reader.getVal57();
 }
 
+bool BlockDecl::is_conversion_from_lambda(void) const {
+  return impl->reader.getVal58();
+}
+
+bool BlockDecl::is_variadic(void) const {
+  return impl->reader.getVal59();
+}
+
 unsigned BlockDecl::num_parameters(void) const {
-  return impl->reader.getVal47().size();
+  return impl->reader.getVal49().size();
 }
 
 std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -241,12 +255,12 @@ std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
 }
 
 gap::generator<ParmVarDecl> BlockDecl::parameters(void) const & {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = ep->DeclFor(ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(std::move(d47)))) {
+    if (auto d49 = ep->DeclFor(ep, v)) {
+      if (auto e = ParmVarDecl::from(Decl(std::move(d49)))) {
         co_yield std::move(*e);
       }
     }
@@ -255,11 +269,11 @@ gap::generator<ParmVarDecl> BlockDecl::parameters(void) const & {
 }
 
 unsigned BlockDecl::num_parameter_declarations(void) const {
-  return impl->reader.getVal48().size();
+  return impl->reader.getVal50().size();
 }
 
 std::optional<ParmVarDecl> BlockDecl::nth_parameter_declaration(unsigned n) const {
-  auto list = impl->reader.getVal48();
+  auto list = impl->reader.getVal50();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -273,12 +287,12 @@ std::optional<ParmVarDecl> BlockDecl::nth_parameter_declaration(unsigned n) cons
 }
 
 gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const & {
-  auto list = impl->reader.getVal48();
+  auto list = impl->reader.getVal50();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d48 = ep->DeclFor(ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(std::move(d48)))) {
+    if (auto d50 = ep->DeclFor(ep, v)) {
+      if (auto e = ParmVarDecl::from(Decl(std::move(d50)))) {
         co_yield std::move(*e);
       }
     }
@@ -288,7 +302,7 @@ gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const & {
 
 gap::generator<Decl> BlockDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal58();
+  auto list = impl->reader.getVal60();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

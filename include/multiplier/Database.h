@@ -51,26 +51,6 @@ struct FilePathRecord {
   std::string path;
 };
 
-// Maps a file id to the file's serialized data.
-struct FileRecord {
-  static constexpr const char *kTableName = "file";
-
-  static constexpr const char *kInitStatements[] =
-      {R"(CREATE TABLE IF NOT EXISTS file (
-            file_id INTEGER NOT NULL,
-            data BLOB NOT NULL,
-            PRIMARY KEY(file_id)
-          ) WITHOUT ROWID)"};
-
-  static constexpr const char *kExitStatements[] = {nullptr};
-
-  static constexpr const char *kInsertStatement =
-      "INSERT OR IGNORE INTO file (file_id, data) VALUES (?1, zstd_compress(?2))";
-
-  PackedFileId file_id;
-  std::string data;
-};
-
 // Tells us which file the "root" of a fragment belongs to. Note that a fragment
 // can span/include other files internally.
 struct FragmentFileRecord {
@@ -117,27 +97,6 @@ struct FragmentFileRangeRecord {
   PackedFragmentId fragment_id;
   PackedFileTokenId first_file_token;
   PackedFileTokenId last_file_token;
-};
-
-// Maps a fragment id to the fragment's serialized data.
-struct FragmentRecord {
-  static constexpr const char *kTableName = "fragment";
-
-  static constexpr const char *kInitStatements[] =
-      {R"(CREATE TABLE IF NOT EXISTS fragment (
-            fragment_id INTEGER NOT NULL,
-            data BLOB NOT NULL,
-            PRIMARY KEY(fragment_id)
-          ) WITHOUT ROWID)"};
-
-  static constexpr const char *kExitStatements[] = {nullptr};
-
-  static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO fragment (fragment_id, data)
-         VALUES (?1, zstd_compress(?2)))";
-
-  PackedFragmentId fragment_id;
-  std::string data;
 };
 
 // Tells us that `redecl_id` is a redeclaration of `decl_id`.

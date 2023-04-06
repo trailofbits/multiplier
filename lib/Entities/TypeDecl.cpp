@@ -96,6 +96,20 @@ bool TypeDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TypeDecl TypeDecl::canonical_declaration(void) const {
+  if (auto canon = TypeDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TypeDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TypeDecl> TypeDecl::definition(void) const {
+  return TypeDecl::from(this->Decl::definition());
+}
+
 gap::generator<TypeDecl> TypeDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TypeDecl> dr = TypeDecl::from(r)) {
@@ -196,7 +210,7 @@ std::optional<TypeDecl> TypeDecl::from(const TokenContext &t) {
 
 std::optional<Type> TypeDecl::type_for_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal52();
+    RawEntityId eid = impl->reader.getVal54();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

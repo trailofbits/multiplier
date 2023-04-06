@@ -86,6 +86,20 @@ bool OMPAllocateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+OMPAllocateDecl OMPAllocateDecl::canonical_declaration(void) const {
+  if (auto canon = OMPAllocateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (OMPAllocateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<OMPAllocateDecl> OMPAllocateDecl::definition(void) const {
+  return OMPAllocateDecl::from(this->Decl::definition());
+}
+
 gap::generator<OMPAllocateDecl> OMPAllocateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<OMPAllocateDecl> dr = OMPAllocateDecl::from(r)) {
@@ -167,11 +181,11 @@ std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const TokenContext &t) {
 }
 
 unsigned OMPAllocateDecl::num_varlists(void) const {
-  return impl->reader.getVal47().size();
+  return impl->reader.getVal49().size();
 }
 
 std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -185,12 +199,12 @@ std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
 }
 
 gap::generator<Expr> OMPAllocateDecl::varlists(void) const & {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d47)))) {
+    if (auto d49 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d49)))) {
         co_yield std::move(*e);
       }
     }

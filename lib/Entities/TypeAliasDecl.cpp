@@ -88,6 +88,20 @@ bool TypeAliasDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+TypeAliasDecl TypeAliasDecl::canonical_declaration(void) const {
+  if (auto canon = TypeAliasDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (TypeAliasDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<TypeAliasDecl> TypeAliasDecl::definition(void) const {
+  return TypeAliasDecl::from(this->Decl::definition());
+}
+
 gap::generator<TypeAliasDecl> TypeAliasDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<TypeAliasDecl> dr = TypeAliasDecl::from(r)) {
@@ -170,7 +184,7 @@ std::optional<TypeAliasDecl> TypeAliasDecl::from(const TokenContext &t) {
 
 std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal62();
+    RawEntityId eid = impl->reader.getVal64();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

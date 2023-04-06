@@ -51,6 +51,8 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  NonTypeTemplateParmDecl canonical_declaration(void) const;
+  std::optional<NonTypeTemplateParmDecl> definition(void) const;
   gap::generator<NonTypeTemplateParmDecl> redeclarations(void) const &;
   static std::optional<NonTypeTemplateParmDecl> from(const Decl &parent);
 

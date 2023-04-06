@@ -85,6 +85,20 @@ bool UsingPackDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UsingPackDecl UsingPackDecl::canonical_declaration(void) const {
+  if (auto canon = UsingPackDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UsingPackDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UsingPackDecl> UsingPackDecl::definition(void) const {
+  return UsingPackDecl::from(this->Decl::definition());
+}
+
 gap::generator<UsingPackDecl> UsingPackDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UsingPackDecl> dr = UsingPackDecl::from(r)) {
@@ -166,11 +180,11 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const TokenContext &t) {
 }
 
 unsigned UsingPackDecl::num_expansions(void) const {
-  return impl->reader.getVal47().size();
+  return impl->reader.getVal49().size();
 }
 
 std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -184,12 +198,12 @@ std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
 }
 
 gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d47)))) {
+    if (auto d49 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from(Decl(std::move(d49)))) {
         co_yield std::move(*e);
       }
     }
@@ -198,7 +212,7 @@ gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
 }
 
 NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal54();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

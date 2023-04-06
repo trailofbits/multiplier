@@ -161,7 +161,7 @@ StringLiteral PredefinedExpr::function_name(void) const {
 }
 
 PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const {
-  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal93());
+  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal94());
 }
 
 std::string_view PredefinedExpr::identifier_kind_name(void) const {

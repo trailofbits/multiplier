@@ -86,6 +86,20 @@ bool UsingDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UsingDecl UsingDecl::canonical_declaration(void) const {
+  if (auto canon = UsingDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UsingDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UsingDecl> UsingDecl::definition(void) const {
+  return UsingDecl::from(this->Decl::definition());
+}
+
 gap::generator<UsingDecl> UsingDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UsingDecl> dr = UsingDecl::from(r)) {
@@ -167,15 +181,15 @@ std::optional<UsingDecl> UsingDecl::from(const TokenContext &t) {
 }
 
 Token UsingDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
 }
 
 bool UsingDecl::has_typename(void) const {
-  return impl->reader.getVal70();
+  return impl->reader.getVal72();
 }
 
 bool UsingDecl::is_access_declaration(void) const {
-  return impl->reader.getVal71();
+  return impl->reader.getVal73();
 }
 
 #pragma GCC diagnostic pop

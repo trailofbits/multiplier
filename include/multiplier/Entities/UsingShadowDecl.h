@@ -47,6 +47,8 @@ class UsingShadowDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UsingShadowDecl canonical_declaration(void) const;
+  std::optional<UsingShadowDecl> definition(void) const;
   gap::generator<UsingShadowDecl> redeclarations(void) const &;
   static std::optional<UsingShadowDecl> from(const Decl &parent);
 

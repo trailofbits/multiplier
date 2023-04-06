@@ -87,6 +87,20 @@ bool EnumConstantDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+EnumConstantDecl EnumConstantDecl::canonical_declaration(void) const {
+  if (auto canon = EnumConstantDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (EnumConstantDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<EnumConstantDecl> EnumConstantDecl::definition(void) const {
+  return EnumConstantDecl::from(this->Decl::definition());
+}
+
 gap::generator<EnumConstantDecl> EnumConstantDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<EnumConstantDecl> dr = EnumConstantDecl::from(r)) {
@@ -169,7 +183,7 @@ std::optional<EnumConstantDecl> EnumConstantDecl::from(const TokenContext &t) {
 
 std::optional<Expr> EnumConstantDecl::initializer_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal53();
+    RawEntityId eid = impl->reader.getVal56();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

@@ -68,6 +68,7 @@ const char *EnumeratorName(SanitizerOrdinal e) {
     case SanitizerOrdinal::CFINV_CALL: return "CFINV_CALL";
     case SanitizerOrdinal::CFIV_CALL: return "CFIV_CALL";
     case SanitizerOrdinal::CFI_GROUP: return "CFI_GROUP";
+    case SanitizerOrdinal::KCFI: return "KCFI";
     case SanitizerOrdinal::SAFE_STACK: return "SAFE_STACK";
     case SanitizerOrdinal::SHADOW_CALL_STACK: return "SHADOW_CALL_STACK";
     case SanitizerOrdinal::UNDEFINED_GROUP: return "UNDEFINED_GROUP";

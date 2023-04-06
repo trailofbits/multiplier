@@ -14,7 +14,6 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <kj/io.h>
-#include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
@@ -24,6 +23,19 @@
 #include <sstream>
 #include <utility>
 #include <unordered_set>
+
+// NOTE(pag): We use the UTF-8 functions from the `llvm::json` namespace.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <llvm/Support/JSON.h>
+#pragma clang diagnostic pop
 
 #include "Codegen.h"
 #include "EntityMapper.h"
@@ -210,6 +222,23 @@ void GlobalIndexingState::PersistFile(
 
 namespace {
 
+// Intermediate children include things like parameter-to argument
+// substitutions, stringization, and uses of `__VA_OPT__`. They might point
+// into the macro body itself, rather than the expansion, so make sure only
+// to collect them if they are owned by the expansion.
+static std::optional<pasta::MacroRange> IntermediateChildren(
+    const pasta::Macro &macro) {
+  if (auto exp = pasta::MacroExpansion::From(macro)) {
+    pasta::MacroRange children = exp->IntermediateChildren();
+    for (pasta::Macro child : children) {
+      if (child.Parent()->RawMacro() == exp->RawMacro()) {
+        return children;
+      }
+    }
+  }
+  return std::nullopt;
+}
+
 // Schedules the order of serialization of tokens derived from the token tree.
 // The main goal is for all tokens in the final expansion, i.e. all parsed
 // tokens, to be adjacent. The token tree code also tries to inject whitespace
@@ -328,6 +357,10 @@ struct TokenTreeSerializationSchedule {
         const void *child = sub->RawNode();
         if (sub->HasExpansion()) {
           Schedule(child, child_id, sub->ReplacementChildren());
+          if (sub->HasIntermediateChildren()) {
+            todo_list.emplace_back(
+                Todo{child, child_id, sub->IntermediateChildren()});
+          }
           todo_list.emplace_back(Todo{child, child_id, sub->Children()});
         } else {
           Schedule(child, child_id, sub->Children());
@@ -351,32 +384,6 @@ struct TokenTreeSerializationSchedule {
       : pf(pf_),
         em(em_) {}
 };
-
-static mx::RawEntityId DerivedTokenId(
-    EntityMapper &em, const pasta::FileToken &tok) {
-  return em.EntityId(tok);
-}
-
-static mx::RawEntityId DerivedTokenId(
-    EntityMapper &em, const pasta::Token &tok) {
-  if (std::optional<pasta::Token> derived_tok = tok.DerivedLocation()) {
-    DCHECK_NE(tok.RawToken(), derived_tok->RawToken());
-    mx::RawEntityId eid = em.EntityId(derived_tok.value());
-    if (eid != mx::kInvalidEntityId) {
-      return eid;
-    }
-
-    // Might be that we have a macro token in an argument-pre expansion that
-    // we discard. So we'll go one step back and hope to find something.
-    return DerivedTokenId(em, *derived_tok);
-
-  } else if (std::optional<pasta::FileToken> file_tok = tok.FileLocation()) {
-    return DerivedTokenId(em, file_tok.value());
-
-  } else {
-    return mx::kInvalidEntityId;
-  }
-}
 
 // Get the list of parsed tokens.
 static std::vector<pasta::Token> FindParsedTokens(
@@ -438,6 +445,14 @@ void VisitMacros(
     // Recursive visit this macro.
     VisitMacroRange(pf, em, macro.Children(), macros_to_serialize);
 
+    // Get the intermediae children. This live between the children and the
+    // replacement children. Some substitutions happen here, but their trees
+    // can't logically nest with those of the replacement children.
+    if (auto intermediates = IntermediateChildren(macro)) {
+      VisitMacroRange(pf, em, *intermediates, macros_to_serialize);
+    }
+
+    // Visit replacement children.
     if (auto sub = pasta::MacroSubstitution::From(macro)) {
       VisitMacroRange(pf, em, sub->ReplacementChildren(),
                       macros_to_serialize);
@@ -448,24 +463,24 @@ void VisitMacros(
 // Pre-fill the related entities associated with tokens.
 static RelatedEntityIds RelatedEntities(
     const PendingFragment &pf, EntityMapper &em,
-    const std::vector<pasta::Token> &parsed_tokens) {
+    const std::vector<pasta::Token> &parsed_tokens,
+    RelatedEntityIds &hint_entities) {
 
   RelatedEntityIds rel_entities;
 
   // First, we do a bottom-up pass. This is good at resolving referenced
   // decls, macros, etc.
   for (const pasta::Token &tok : parsed_tokens) {
-    RelatedEntityId(em, tok, rel_entities);
+    (void) RelatedEntityId(em, tok, pf.begin_index, pf.end_index, rel_entities,
+                           hint_entities);
   }
-
-  const size_t old_size = rel_entities.size();
 
   // Then, collect the macros for two top-down passes. The first pass identifies
   // tokens associated with macro names, and the second identifies tokens
   // associated with file includes.
   std::vector<std::pair<mx::RawEntityId, pasta::Macro>> include_wl;
   std::vector<pasta::Macro> mwl;
-  for (pasta::Macro macro : pf.top_level_macros) {
+  for (const pasta::Macro &macro : pf.top_level_macros) {
     if (auto inc = pasta::IncludeLikeMacroDirective::From(macro)) {
       if (auto file = inc->IncludedFile()) {
         include_wl.emplace_back(em.EntityId(file.value()), macro);
@@ -486,13 +501,18 @@ static RelatedEntityIds RelatedEntities(
       if (auto def = pl.AssociatedMacro()) {
         mx::RawEntityId def_eid = em.EntityId(def.value());
         if (def_eid != mx::kInvalidEntityId) {
-          rel_entities.emplace(pl.RawToken(), def_eid);
+          hint_entities.emplace(pl.RawToken(), def_eid);
         }
       }
 
     } else {
       for (pasta::Macro child : parent.Children()) {
         mwl.emplace_back(std::move(child));
+      }
+      if (auto intermediates = IntermediateChildren(parent)) {
+        for (pasta::Macro child : *intermediates) {
+          mwl.emplace_back(std::move(child));
+        }
       }
       if (auto sub = pasta::MacroSubstitution::From(parent)) {
         for (pasta::Macro child : sub->ReplacementChildren()) {
@@ -504,26 +524,18 @@ static RelatedEntityIds RelatedEntities(
 
   // Now go through the include work list. We want to mark all remaining
   // unmarked tokens in the usage steps as being associated with the file
-  // loations.
+  // locations.
   while (!include_wl.empty()) {
     mx::RawEntityId file_eid = std::move(include_wl.back().first);
     pasta::Macro parent = std::move(include_wl.back().second);
     include_wl.pop_back();
     if (auto mt = pasta::MacroToken::From(parent)) {
-      rel_entities.emplace(mt->ParsedLocation().RawToken(), file_eid);
+      hint_entities.emplace(mt->ParsedLocation().RawToken(), file_eid);
 
     } else {
       for (pasta::Macro child : parent.Children()) {
         include_wl.emplace_back(file_eid, std::move(child));
       }
-    }
-  }
-
-  // If it looks like something changed, then try to re-run on the tokens
-  // with the bottom-up pass.
-  if (old_size < rel_entities.size()) {
-    for (const pasta::Token &tok : parsed_tokens) {
-      (void) RelatedEntityId(em, tok, rel_entities);
     }
   }
 
@@ -546,8 +558,10 @@ static void PersistParsedTokens(
     VisitMacros(pf, em, tlm, macros_to_serialize);
   }
 
+  RelatedEntityIds tok_derived_ids;
+  RelatedEntityIds tok_hint_related_entities;
   RelatedEntityIds tok_related_entities =
-      RelatedEntities(pf, em, parsed_tokens);
+      RelatedEntities(pf, em, parsed_tokens, tok_hint_related_entities);
 
   unsigned num_macros = static_cast<unsigned>(macros_to_serialize.size());
   unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
@@ -582,8 +596,10 @@ static void PersistParsedTokens(
 
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
     tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
-    dt.set(i, DerivedTokenId(em, tok));
-    re.set(i, RelatedEntityId(em, tok, tok_related_entities));
+    dt.set(i, DerivedTokenId(em, tok, tok_derived_ids));
+    re.set(i, RelatedEntityId(
+        em, tok, pf.begin_index, pf.end_index,
+        tok_related_entities, tok_hint_related_entities));
 
     AccumulateTokenData(utf8_fragment_data, tok);
     ++i;
@@ -649,9 +665,12 @@ static void PersistTokenTree(
   auto re = fb.initRelatedEntityId(num_tokens);
   auto i = 0u;
 
+  RelatedEntityIds tok_derived_ids;
+
   // Pre-fill the related entity IDs for the parsed tokens.
+  RelatedEntityIds tok_hint_related_entities;
   RelatedEntityIds tok_related_entities =
-      RelatedEntities(pf, em, parsed_tokens);
+      RelatedEntities(pf, em, parsed_tokens, tok_hint_related_entities);
 
   // Serialize the tokens.
   for (const TokenTreeNode &tok_node : sched.tokens) {
@@ -662,13 +681,15 @@ static void PersistTokenTree(
     if (pt) {
       AccumulateTokenData(utf8_fragment_data, pt.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(pt.value())));
-      dt.set(i, DerivedTokenId(em, pt.value()));
-      re.set(i, RelatedEntityId(em, pt.value(), tok_related_entities));
+      dt.set(i, DerivedTokenId(em, pt.value(), tok_derived_ids));
+      re.set(i, RelatedEntityId(
+          em, pt.value(), pf.begin_index, pf.end_index,
+          tok_related_entities, tok_hint_related_entities));
 
     } else if (ft) {
       AccumulateTokenData(utf8_fragment_data, ft.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(ft.value())));
-      dt.set(i, DerivedTokenId(em, ft.value()));
+      dt.set(i, DerivedTokenId(em, ft.value(), tok_derived_ids));
       re.set(i, mx::kInvalidEntityId);
 
     } else {

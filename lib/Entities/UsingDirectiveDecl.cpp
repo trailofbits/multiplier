@@ -85,6 +85,20 @@ bool UsingDirectiveDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UsingDirectiveDecl UsingDirectiveDecl::canonical_declaration(void) const {
+  if (auto canon = UsingDirectiveDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UsingDirectiveDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UsingDirectiveDecl> UsingDirectiveDecl::definition(void) const {
+  return UsingDirectiveDecl::from(this->Decl::definition());
+}
+
 gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UsingDirectiveDecl> dr = UsingDirectiveDecl::from(r)) {
@@ -166,20 +180,20 @@ std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const TokenContext &t
 }
 
 Token UsingDirectiveDecl::identifier_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
 }
 
 Token UsingDirectiveDecl::namespace_key_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
 }
 
 NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token UsingDirectiveDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
 }
 
 #pragma GCC diagnostic pop

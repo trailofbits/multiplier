@@ -52,6 +52,8 @@ class ImplicitParamDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ImplicitParamDecl canonical_declaration(void) const;
+  std::optional<ImplicitParamDecl> definition(void) const;
   gap::generator<ImplicitParamDecl> redeclarations(void) const &;
   static std::optional<ImplicitParamDecl> from(const Decl &parent);
 

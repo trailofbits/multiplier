@@ -43,6 +43,8 @@ class ExportDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  ExportDecl canonical_declaration(void) const;
+  std::optional<ExportDecl> definition(void) const;
   gap::generator<ExportDecl> redeclarations(void) const &;
   static std::optional<ExportDecl> from(const Decl &parent);
 

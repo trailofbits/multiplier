@@ -8,6 +8,15 @@
 
 #include <glog/logging.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/Attr.h>
 #include <clang/AST/Decl.h>
@@ -15,6 +24,7 @@
 #include <clang/AST/DeclObjC.h>
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/PrettyPrinter.h>
+#pragma clang diagnostic pop
 
 #include <multiplier/AST.h>
 #include <pasta/AST/AST.h>
@@ -801,7 +811,7 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
     }
     case pasta::TypeKind::kTypeOf: {
       auto &tt = reinterpret_cast<const pasta::TypeOfType &>(type);
-      GEN(tt.UnderlyingType());
+      GEN(tt.UnmodifiedType());
       break;
     }
     case pasta::TypeKind::kTypedef: {
@@ -904,49 +914,79 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
 
 namespace {
 
-static mx::RawEntityId RelatedEntityId(
-    const EntityMapper &em, const pasta::MacroToken &tok, bool &found,
-    RelatedEntityIds &related_ids);
+static mx::RawEntityId RelatedEntityIdToMacroToken(
+    const EntityMapper &em, const pasta::MacroToken &tok,
+    uint64_t min_tok_index, uint64_t max_tok_index,
+    bool &found, bool &is_new, const RelatedEntityIds &related_ids,
+    const RelatedEntityIds &hint_ids);
 
-static mx::RawEntityId RelatedEntityId(
+static mx::RawEntityId RelatedEntityIdToParsedToken(
     const EntityMapper &em, const pasta::Token &token, bool &found,
-    RelatedEntityIds &related_ids);
+    bool &is_new, const RelatedEntityIds &related_ids);
 
-static mx::RawEntityId RelatedEntityIdToDerived(
-    const EntityMapper &em, const pasta::Token &token, bool &found,
-    RelatedEntityIds &related_ids) {
+static mx::RawEntityId RelatedEntityIdToDerivedToken(
+    const EntityMapper &em, const pasta::Token &token,
+    uint64_t min_tok_index, uint64_t max_tok_index,
+    bool &found, bool &is_new, const RelatedEntityIds &related_ids,
+    const RelatedEntityIds &hint_ids) {
 
-  mx::RawEntityId eid = mx::kInvalidEntityId;
-
-  if (std::optional<pasta::Token> dtok = token.DerivedLocation()) {
-    eid = RelatedEntityId(em, dtok.value(), found, related_ids);
+  const void *raw_tok = token.RawToken();
+  if (auto it = related_ids.find(raw_tok); it != related_ids.end()) {
+    found = true;
+    return it->second;
   }
-  return eid;
+
+  if (auto it2 = hint_ids.find(raw_tok); it2 != hint_ids.end()) {
+    found = true;
+    is_new = true;
+    return it2->second;
+  }
+
+  if (auto tok_index = token.Index();
+      tok_index < min_tok_index || max_tok_index < tok_index) {
+    return mx::kInvalidEntityId;
+  }
+
+  auto dtok = token.DerivedLocation();
+  if (!dtok) {
+    return mx::kInvalidEntityId;
+  }
+
+  auto mtok = dtok->MacroLocation();
+  if (!mtok) {
+    return mx::kInvalidEntityId;
+  }
+
+  is_new = true;
+  return RelatedEntityIdToMacroToken(
+      em, mtok.value(), min_tok_index, max_tok_index, found, is_new,
+      related_ids, hint_ids);
 }
 
-static std::optional<pasta::Decl> VisitStmt(const pasta::Stmt &stmt,
-                                            const pasta::Token &token) {
+static const void *VisitStmt(const pasta::Stmt &stmt,
+                             const pasta::Token &token) {
+  const void *raw_token = token.RawToken();
   if (auto dre = pasta::DeclRefExpr::From(stmt)) {
     if (auto named_decl = pasta::NamedDecl::From(dre->Declaration())) {
-      if (dre->ExpressionToken().RawToken() == token.RawToken()) {
-        return named_decl;
+      if (dre->ExpressionToken().RawToken() == raw_token) {
+        return named_decl->RawDecl();
       }
     }
   } else if (auto me = pasta::MemberExpr::From(stmt)) {
-    auto member_decl = me->MemberDeclaration();
-    if (me->MemberToken().RawToken() == token.RawToken()) {
-      return member_decl;
+    pasta::ValueDecl member_decl = me->MemberDeclaration();
+    if (me->MemberToken().RawToken() == raw_token) {
+      return member_decl.RawDecl();
     } else {
       return VisitStmt(me->Base(), token);
     }
   } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
-    auto constructor_decl = ce->Constructor();
-    if (ce->Token().RawToken() == token.RawToken()) {
-      return constructor_decl;
+    pasta::CXXConstructorDecl constructor_decl = ce->Constructor();
+    if (ce->Token().RawToken() == raw_token) {
+      return constructor_decl.RawDecl();
     }
   } else if (auto gt = pasta::GotoStmt::From(stmt)) {
-    if (gt->LabelToken().RawToken() == token.RawToken()) {
-      return gt->Label();
+    if (gt->LabelToken().RawToken() == raw_token) {
+      return gt->Label().RawDecl();
     }
   } else if (auto di = pasta::DesignatedInitExpr::From(stmt)) {
     // TODO(pag): need support in pasta.
@@ -955,34 +995,36 @@ static std::optional<pasta::Decl> VisitStmt(const pasta::Stmt &stmt,
     // TODO(pag): Issue #192.
 
   } else if (auto ls = pasta::LabelStmt::From(stmt)) {
-    if (ls->IdentifierToken().RawToken() == token.RawToken()) {
-      return ls->Declaration();
+    if (ls->IdentifierToken().RawToken() == raw_token) {
+      return ls->Declaration().RawDecl();
     }
 
   // Backup.
   } else if (auto call = pasta::CallExpr::From(stmt)) {
-    if (call->ExpressionToken().RawToken() == token.RawToken()) {
+    if (call->ExpressionToken().RawToken() == raw_token) {
       if (auto called_decl = call->CalleeDeclaration()) {
-        return called_decl;
+        return called_decl->RawDecl();
       }
     }
   }
 
-  return std::nullopt;
+  return nullptr;
 }
 
-static std::optional<pasta::Decl> VisitType(const pasta::Type &type,
+static const void *VisitType(const pasta::Type &type,
                                             const pasta::Token &token) {
+  const std::string_view tok_data = token.Data();
+
   if (auto typedef_type = pasta::TypedefType::From(type)) {
     auto typedef_decl = typedef_type->Declaration();
-    if (typedef_decl.Name() == token.Data()) {
-      return typedef_decl;
+    if (typedef_decl.Name() == tok_data) {
+      return typedef_decl.RawDecl();
     }
 
   } else if (auto tag_type = pasta::TagType::From(type)) {
     auto tag_decl = tag_type->Declaration();
-    if (tag_decl.Name() == token.Data()) {
-      return tag_decl;
+    if (tag_decl.Name() == tok_data) {
+      return tag_decl.RawDecl();
     }
 
   } else if (auto deduced_type = pasta::DeducedType::From(type)) {
@@ -993,27 +1035,49 @@ static std::optional<pasta::Decl> VisitType(const pasta::Type &type,
     return VisitType(unqual_type, token);
   }
 
-  return std::nullopt;
+  return nullptr;
 }
 
 // Find the entity ID of the declaration that is most related to a particular
 // token.
-mx::RawEntityId RelatedEntityId(
+mx::RawEntityId RelatedEntityIdToParsedToken(
     const EntityMapper &em, const pasta::Token &token, bool &found,
-    RelatedEntityIds &related_ids) {
+    bool &is_new, const RelatedEntityIds &related_ids) {
 
   const void *self = token.RawToken();
   if (auto it = related_ids.find(self); it != related_ids.end()) {
     found = true;
-    assert(it->second != mx::kInvalidEntityId);
     return it->second;
   }
 
-  std::optional<pasta::Decl> related_decl;
+  is_new = true;
+  const void *related_entity = nullptr;
+  mx::RawEntityId eid = mx::kInvalidEntityId;
+  bool is_literal = false;
 
   switch (mx::FromPasta(token.Kind())) {
     default:
-      goto fallback;
+      return eid;
+
+    case mx::TokenKind::NUMERIC_CONSTANT:
+    case mx::TokenKind::CHARACTER_CONSTANT:
+    case mx::TokenKind::WIDE_CHARACTER_CONSTANT:
+    case mx::TokenKind::UTF8_CHARACTER_CONSTANT:
+    case mx::TokenKind::UTF16_CHARACTER_CONSTANT:
+    case mx::TokenKind::UTF32_CHARACTER_CONSTANT:
+    case mx::TokenKind::STRING_LITERAL:
+    case mx::TokenKind::WIDE_STRING_LITERAL:
+    case mx::TokenKind::UTF8_STRING_LITERAL:
+    case mx::TokenKind::UTF16_STRING_LITERAL:
+    case mx::TokenKind::UTF32_STRING_LITERAL:
+    case mx::TokenKind::KEYWORD___FUNC__:
+    case mx::TokenKind::KEYWORD___FUNCTION__:
+    case mx::TokenKind::KEYWORD___FUNCDNAME__:
+    case mx::TokenKind::KEYWORD___FUNCSIG__:
+    case mx::TokenKind::KEYWORD_LFUNCTION__:  // TODO(pag): Fix name.
+    case mx::TokenKind::KEYWORD_LFUNCSIG__:  // TODO(pag): Fix name.
+      is_literal = true;
+      break;
 
     case mx::TokenKind::L_SQUARE:
     case mx::TokenKind::R_SQUARE:
@@ -1068,47 +1132,77 @@ mx::RawEntityId RelatedEntityId(
     case mx::TokenKind::IDENTIFIER: break;
   }
 
-  for (auto context = token.Context(); !related_decl && context;
+  for (auto context = token.Context();
+       !related_entity && eid == mx::kInvalidEntityId && context;
        context = context->Parent()) {
     switch (context->Kind()) {
       case pasta::TokenContextKind::kStmt:
         if (std::optional<pasta::Stmt> stmt =
                 pasta::Stmt::From(context.value())) {
-          related_decl = VisitStmt(stmt.value(), token);
+          if (is_literal) {
+            switch (stmt->Kind()) {
+              default: break;
+              case pasta::StmtKind::kUserDefinedLiteral:
+              case pasta::StmtKind::kCharacterLiteral:
+              case pasta::StmtKind::kIntegerLiteral:
+              case pasta::StmtKind::kFixedPointLiteral:
+              case pasta::StmtKind::kFloatingLiteral:
+              case pasta::StmtKind::kStringLiteral:
+              case pasta::StmtKind::kPredefinedExpr:
+                related_entity = stmt->RawStmt();
+                break;
+            }
+          } else {
+            related_entity = VisitStmt(stmt.value(), token);
+          }
         }
         break;
       case pasta::TokenContextKind::kType:
-        related_decl = VisitType(
-            pasta::Type::From(context.value()).value(),
-            token);
+        if (!is_literal) {
+          related_entity = VisitType(
+              pasta::Type::From(context.value()).value(),
+              token);
+        }
         break;
       case pasta::TokenContextKind::kDecl:
-        if (std::optional<pasta::Decl> decl =
-                pasta::Decl::From(context.value())) {
-          if (auto nd = pasta::NamedDecl::From(decl.value());
-              nd && nd->Name() == token.Data()) {
-            related_decl = nd.value();
-          }
-          if (!related_decl &&
-              decl->Token().RawToken() == self) {
-            related_decl = std::move(decl);
+        if (!is_literal) {
+          if (std::optional<pasta::Decl> decl =
+                  pasta::Decl::From(context.value())) {
+            if (auto nd = pasta::NamedDecl::From(decl.value());
+                nd && nd->Name() == token.Data()) {
+              related_entity = nd->RawDecl();
+            }
+            if (!related_entity && decl->Token().RawToken() == self) {
+              related_entity = decl->RawDecl();
+            }
           }
         }
         break;
       case pasta::TokenContextKind::kAttr:
         if (std::optional<pasta::Attr> attr =
-                pasta::Attr::From(context.value()).value();
-            attr && attr->Token().RawToken() == self) {
-          return mx::kInvalidEntityId;
+                pasta::Attr::From(context.value()).value()) {
+
+          if (attr->Token().RawToken() == self) {
+            eid = em.EntityId(attr.value());
+          } else {
+            for (pasta::Token tok : attr->Tokens()) {
+              if (tok.RawToken() == self) {
+                eid = em.EntityId(attr.value());
+                break;
+              }
+            }
+          }
         }
         break;
       case pasta::TokenContextKind::kDesignator:
-        if (std::optional<pasta::Designator> d =
-                pasta::Designator::From(context.value())) {
-          if (d->FieldToken().RawToken() == self) {
-            if (auto field = d->Field()) {
-              related_decl = field.value();
-              break;
+        if (!is_literal) {
+          if (std::optional<pasta::Designator> d =
+                  pasta::Designator::From(context.value())) {
+            if (d->FieldToken().RawToken() == self) {
+              if (auto field = d->Field()) {
+                related_entity = field->RawDecl();
+                break;
+              }
             }
           }
         }
@@ -1119,31 +1213,13 @@ mx::RawEntityId RelatedEntityId(
     }
   }
 
-  if (related_decl) {
-    if (auto eid = em.EntityId(related_decl.value());
-        eid != mx::kInvalidEntityId) {
-      related_ids.emplace(self, eid);
-      found = true;
-      return eid;
-    }
+  if (related_entity && eid == mx::kInvalidEntityId) {
+    eid = em.EntityId(related_entity);
   }
 
-fallback:
-  if (auto mtok = token.MacroLocation()) {
-    auto eid = RelatedEntityId(em, mtok.value(), found, related_ids);
-    if (found) {
-      assert(eid != mx::kInvalidEntityId);
-      related_ids.emplace(self, eid);
-    }
-    return eid;
-  } else {
-    auto eid = RelatedEntityIdToDerived(em, token, found, related_ids);
-    if (found) {
-      assert(eid != mx::kInvalidEntityId);
-      related_ids.emplace(self, eid);
-    }
-    return eid;
-  }
+  found = eid != mx::kInvalidEntityId;
+
+  return eid;
 }
 
 static bool IsDefinableToken(pasta::TokenKind kind) {
@@ -1161,20 +1237,57 @@ static bool IsDefinableToken(pasta::TokenKind kind) {
   }
 }
 
+static std::optional<pasta::IncludeLikeMacroDirective>
+ContainingInclude(const pasta::Macro &macro) {
+  if (auto inc = pasta::IncludeLikeMacroDirective::From(macro)) {
+    return inc;
+  } else if (auto parent = macro.Parent()) {
+    return ContainingInclude(parent.value());
+  } else {
+    return std::nullopt;
+  }
+}
+
+static std::optional<pasta::MacroSubstitution>
+ContainingStringifyOrConcatenate(const pasta::Macro &macro) {
+  auto sub = pasta::MacroSubstitution::From(macro);
+  if (sub && (sub->Kind() == pasta::MacroKind::kStringify ||
+              sub->Kind() == pasta::MacroKind::kConcatenate)) {
+    return sub;
+  } else if (auto parent = macro.Parent()) {
+    return ContainingStringifyOrConcatenate(parent.value());
+  } else {
+    return std::nullopt;
+  }
+}
+
 // Find the entity ID of the declaration that is most related to a particular
 // token.
-mx::RawEntityId RelatedEntityId(
-    const EntityMapper &em, const pasta::MacroToken &mtok, bool &found,
-    RelatedEntityIds &related_ids) {
+mx::RawEntityId RelatedEntityIdToMacroToken(
+    const EntityMapper &em, const pasta::MacroToken &mtok,
+    uint64_t min_tok_index, uint64_t max_tok_index,
+    bool &found, bool &is_new, const RelatedEntityIds &related_ids,
+    const RelatedEntityIds &hint_ids) {
 
   auto tok = mtok.ParsedLocation();
-  if (auto it = related_ids.find(tok.RawToken()); it != related_ids.end()) {
+  const void *raw_tok = tok.RawToken();
+  if (auto it = related_ids.find(raw_tok); it != related_ids.end()) {
     found = true;
     return it->second;
   }
 
-  pasta::TokenKind tk = mtok.TokenKind();
-  bool is_definable_name = IsDefinableToken(tk);
+  if (auto it2 = hint_ids.find(raw_tok); it2 != hint_ids.end()) {
+    found = true;
+    is_new = true;
+    return it2->second;
+  }
+
+  if (auto tok_index = tok.Index();
+      tok_index < min_tok_index || max_tok_index < tok_index) {
+    return mx::kInvalidEntityId;
+  }
+
+  is_new = true;
 
   // In the good case, we have:
   //
@@ -1196,28 +1309,39 @@ mx::RawEntityId RelatedEntityId(
 
   auto self = mtok.RawMacro();
   auto parent = mtok.Parent();
-  while (parent) {  // NOTE(pag): We don't ascend, we just want `break`ability.
+  if (!parent) {
+    assert(false);
+    return mx::kInvalidEntityId;
+  }
 
-    // Figure out if we're inside of the expansion side.
-    auto index = 0u;
-    for (pasta::Macro child : parent->Children()) {
-      if (child.RawMacro() == self) {
-        child_index.emplace(index);
-        break;
-      }
-      ++index;
-    }
-
-    // Only let us find the first thing, i.e. the macro name.
-    if (!child_index.has_value() || index) {
+  // Figure out if we're inside of the expansion side.
+  auto index = 0u;
+  for (pasta::Macro child : parent->Children()) {
+    if (child.RawMacro() == self) {
+      child_index.emplace(index);
       break;
     }
+    ++index;
+  }
 
-    if (auto exp = pasta::MacroExpansion::From(parent.value())) {
+  // A definable name must be the first thing inside of the macro.
+  pasta::TokenKind tk = mtok.TokenKind();
+  bool is_definable_name = child_index.has_value() &&
+                           !child_index.value() &&  // First token.
+                           IsDefinableToken(tk);
+
+  switch (parent->Kind()) {
+    case pasta::MacroKind::kToken:
+      assert(false);  // Should be impossible.
+      parent.reset();
+      break;
+
+    case pasta::MacroKind::kExpansion: {
+      auto &exp = reinterpret_cast<pasta::MacroExpansion &>(parent.value());
 
       // If the macro token is the name of the macro definition used, then
       // make the related entity be the defined macro itself.
-      if (auto def = exp->Definition(); def && is_definable_name) {
+      if (auto def = exp.Definition(); def && is_definable_name) {
         if (auto name = def->Name(); name && name->Data() == mtok.Data()) {
           if (mx::RawEntityId eid = em.EntityId(def.value());
               eid != mx::kInvalidEntityId) {
@@ -1229,77 +1353,303 @@ mx::RawEntityId RelatedEntityId(
 
       // If it's the first token in an expansion, then reference the expansion
       // instead. Sometimes we have macro expansions but no definitions.
-      if (mx::RawEntityId eid = em.EntityId(exp.value());
+      if (mx::RawEntityId eid = em.EntityId(exp);
           eid != mx::kInvalidEntityId && is_definable_name) {
         found = true;
         return eid;
       }
+
+      break;
+    }
+
+    case pasta::MacroKind::kStringify:
+    case pasta::MacroKind::kConcatenate:
+    case pasta::MacroKind::kVAOptArgument:
+    case pasta::MacroKind::kArgument:
+      break;
+
+    // If it's a parameter substitution, and if the token is the parameter
+    // name, then mark the token's related entity ID as the parameter itself.
+    case pasta::MacroKind::kParameterSubstitution: {
+      auto &sub = reinterpret_cast<pasta::MacroParameterSubstitution &>(
+          parent.value());
+      if (sub.ParameterUse().RawMacro() == self ||
+          mtok.Data() == "__VA_ARGS__") {
+        auto param = sub.Parameter();
+        if (mx::RawEntityId eid = em.EntityId(param);
+            eid != mx::kInvalidEntityId) {
+          found = true;
+          return eid;
+        }
+      }
+      break;
+    }
+
+    case pasta::MacroKind::kVAOpt:
+      if (mtok.Data() == "__VA_OPT__") {
+        if (mx::RawEntityId eid = em.EntityId(parent.value());
+            eid != mx::kInvalidEntityId) {
+          found = true;
+          return eid;
+        }
+      }
+      break;
 
     // If it's the first token in a substitution, and if the token is an
     // identifier name, then reference the substitution itself.
-    } else if (auto sub = pasta::MacroSubstitution::From(parent.value())) {
-      if (mx::RawEntityId eid = em.EntityId(sub.value());
+    case pasta::MacroKind::kSubstitution: {
+      if (mx::RawEntityId eid = em.EntityId(parent.value());
           eid != mx::kInvalidEntityId && is_definable_name) {
         found = true;
         return eid;
       }
+      break;
+    }
 
-    // It's a macro parameter.
-    } else if (auto param = pasta::MacroParameter::From(parent.value())) {
-      if (mx::RawEntityId eid = em.EntityId(param.value());
+    // If we found an identifier name, or the ellipsis, then use that.
+    case pasta::MacroKind::kParameter: {
+      if (mx::RawEntityId eid = em.EntityId(parent.value());
           eid != mx::kInvalidEntityId &&
           (is_definable_name || tk == pasta::TokenKind::kEllipsis)) {
         found = true;
         return eid;
       }
+      break;
+    }
 
-    // Point the defined macro name at the macro itself.
-    } else if (auto def = pasta::DefineMacroDirective::From(parent.value())) {
-      if (auto name = def->Name(); name && is_definable_name) {
-        if (name->RawMacro() == self) {
-          if (mx::RawEntityId eid = em.EntityId(def.value());
-              eid != mx::kInvalidEntityId) {
-            found = true;
-            return eid;
-          }
+    case pasta::MacroKind::kDefineDirective: {
+      auto &def =
+          reinterpret_cast<pasta::DefineMacroDirective &>(parent.value());
+      if (auto name = def.Name(); name && name->RawMacro() == self) {
+        if (mx::RawEntityId eid = em.EntityId(def);
+            eid != mx::kInvalidEntityId) {
+          found = true;
+          return eid;
         }
       }
+
+      goto directive_case;
     }
 
     // Point the macro directive at the macro itself.
-    if (auto dir = pasta::MacroDirective::From(parent.value())) {
-      if (auto dir_name = dir->DirectiveName(); dir_name && is_definable_name) {
-        if (dir_name->RawMacro() == self) {
-          if (mx::RawEntityId eid = em.EntityId(dir.value());
-              eid != mx::kInvalidEntityId) {
-            found = true;
-            return eid;
-          }
+    case pasta::MacroKind::kOtherDirective:
+    case pasta::MacroKind::kIfDirective:
+    case pasta::MacroKind::kIfDefinedDirective:
+    case pasta::MacroKind::kIfNotDefinedDirective:
+    case pasta::MacroKind::kElseIfDirective:
+    case pasta::MacroKind::kElseIfDefinedDirective:
+    case pasta::MacroKind::kElseIfNotDefinedDirective:
+    case pasta::MacroKind::kElseDirective:
+    case pasta::MacroKind::kEndIfDirective:
+    case pasta::MacroKind::kIncludeDirective:
+    case pasta::MacroKind::kIncludeNextDirective:
+    case pasta::MacroKind::kIncludeMacrosDirective:
+    case pasta::MacroKind::kImportDirective:
+    case pasta::MacroKind::kUndefineDirective:
+    case pasta::MacroKind::kPragmaDirective:
+    directive_case: {
+      auto &dir =
+          reinterpret_cast<pasta::MacroDirective &>(parent.value());
+      if (auto dir_name = dir.DirectiveName();
+          dir_name && dir_name->RawMacro() == self) {
+        if (mx::RawEntityId eid = em.EntityId(dir);
+            eid != mx::kInvalidEntityId) {
+          found = true;
+          return eid;
         }
       }
+      break;
     }
-    break;
   }
 
   // If it's a header name then we're probably inside of the substitution of
   // sequence of tokens for a header name, and that is inside of an inclusion
   // directive, so we want to point at the included file.
-  if (tk == pasta::TokenKind::kHeaderName) {
-    for (; parent; parent = parent->Parent()) {
-      if (auto inc = pasta::IncludeLikeMacroDirective::From(parent.value())) {
-        if (auto file = inc->IncludedFile()) {
-          if (mx::RawEntityId eid = em.EntityId(file.value());
-              eid != mx::kInvalidEntityId) {
-            found = true;
-            return eid;
-          }
+  if (tk == pasta::TokenKind::kHeaderName ||
+      tk == pasta::TokenKind::kStringLiteral) {
+    if (auto inc = ContainingInclude(parent.value())) {
+      if (auto file = inc->IncludedFile()) {
+        if (mx::RawEntityId eid = em.EntityId(file.value());
+            eid != mx::kInvalidEntityId) {
+          found = true;
+          return eid;
         }
       }
     }
   }
 
-  return RelatedEntityIdToDerived(em, tok, found, related_ids);
+  return RelatedEntityIdToDerivedToken(em, tok, min_tok_index, max_tok_index,
+                                       found, is_new, related_ids, hint_ids);
 }
+
+}  // namespace
+
+// Find the entity ID of the declaration that is most related to a particular
+// token.
+mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::Token &tok,
+    uint64_t min_tok_index, uint64_t max_tok_index,
+    RelatedEntityIds &related_ids,
+    const RelatedEntityIds &hint_ids) {
+
+  bool found = false;
+  bool is_new = false;
+  mx::RawEntityId eid = mx::kInvalidEntityId;
+  if (IsParsedToken(tok)) {
+    eid = RelatedEntityIdToParsedToken(em, tok, found, is_new, related_ids);
+
+  } else {
+    eid = RelatedEntityIdToDerivedToken(
+        em, tok, min_tok_index, max_tok_index, found, is_new, related_ids,
+        hint_ids);
+  }
+
+  if (!found || !is_new) {
+    return eid;
+  }
+
+  assert(eid != mx::kInvalidEntityId);
+
+  // Back-propagate this token's related entity ID through the token derivation
+  // graph.
+  std::vector<pasta::Token> wl;
+  wl.push_back(tok);
+
+  auto try_enqueue_node = [&wl] (pasta::Macro &n) -> bool {
+    auto mtok = pasta::MacroToken::From(n);
+    if (!mtok) {
+      return false;
+    }
+    if (mtok->TokenKind() != pasta::TokenKind::kHash &&
+        mtok->TokenKind() != pasta::TokenKind::kHashHash &&
+        mtok->TokenKind() != pasta::TokenKind::kHashat &&
+        mtok->TokenKind() != pasta::TokenKind::kUnknown) {
+      wl.emplace_back(mtok->ParsedLocation());
+    }
+    return true;
+  };
+
+  while (!wl.empty()) {
+    pasta::Token t = std::move(wl.back());
+    const void *raw_t = t.RawToken();
+    wl.pop_back();
+
+    // `t` is not in the current fragment.
+    if (auto t_index = t.Index();
+        min_tok_index > t_index || max_tok_index < t_index) {
+      continue;
+    }
+
+    // `t` is already associated with an entity id.
+    if (!related_ids.emplace(raw_t, eid).second) {
+      continue;
+    }
+
+    // We've updated the related entity id for `t`.
+    if (std::optional<pasta::Token> dtok = t.DerivedLocation()) {
+      wl.emplace_back(std::move(dtok.value()));
+      continue;
+    }
+
+    std::optional<pasta::MacroToken> mtok = t.MacroLocation();
+    if (!mtok) {
+      continue;
+    }
+
+    std::optional<pasta::Macro> parent = mtok->Parent();
+    if (!parent) {
+      assert(false);
+      continue;
+    }
+
+    // We want to propagate the related entity ID backward through stringifies
+    // (literals) and concatenates (especially decl names).
+    //
+    // TODO(pag): Consider these token kinds a bit more carefully.
+    if (auto sub = ContainingStringifyOrConcatenate(parent.value())) {
+      for (pasta::Macro n : sub->Children()) {
+        if (try_enqueue_node(n)) {
+          continue;
+        } else if (auto ps = pasta::MacroParameterSubstitution::From(n)) {
+          for (pasta::Macro ps_n : ps->ReplacementChildren()) {
+            try_enqueue_node(ps_n);
+          }
+        }
+      }
+
+    // Look for string-like macro expansions, and mark them up with whatever
+    // literal expression entity IDs they led to.
+    } else if (auto exp = pasta::MacroExpansion::From(parent.value());
+               exp && !exp->Definition()) {
+      if (auto dtok = exp->BeginToken()) {
+        std::string_view tok_name = dtok->Data();
+        if (tok_name == "__FILE__" ||
+            tok_name == "__BASE_FILE__" ||
+            tok_name == "__FILE_NAME__" ||
+            tok_name == "__LINE__" ||
+            tok_name == "__DATE__" ||
+            tok_name == "__TIME__" ||
+            tok_name == "__INCLUDE_LEVEL__" ||
+            tok_name == "__TIMESTAMP__" ||
+            tok_name == "__FLT_EVAL_METHOD__" ||
+            tok_name == "__COUNTER__" ||
+            tok_name == "__MODULE__"  /* Some kind of identifier */) {
+          wl.emplace_back(dtok->ParsedLocation());
+        }
+      }
+    }
+  }
+
+  return eid;
+}
+
+// Figure out the token from which this token is derived.
+mx::RawEntityId DerivedTokenId(
+    EntityMapper &em, const pasta::FileToken &tok, RelatedEntityIds &) {
+  return em.EntityId(tok);
+}
+
+// Figure out the token from which this token is derived. This may drill down
+// through macro tokens that are elided from the `TokenTree` because of merging
+// of expansions with their argument pre-expansion phase. These two phases are
+// represented as separate expansions in PASTA.
+mx::RawEntityId DerivedTokenId(
+    EntityMapper &em, const pasta::Token &tok,
+    RelatedEntityIds &derived_map) {
+  mx::RawEntityId eid = mx::kInvalidEntityId;
+
+  auto self = tok.RawToken();
+  if (auto it = derived_map.find(self); it != derived_map.end()) {
+    return it->second;
+  }
+
+  if (std::optional<pasta::Token> derived_tok = tok.DerivedLocation()) {
+    const void *derived_self = derived_tok->RawToken();
+    DCHECK_NE(tok.RawToken(), derived_self);
+
+    // NOTE(pag): `EntityMapper::EntityId` will follow the derived tokens
+    //            backward to find the entity ID of the thing, and that
+    //            introduces worst-case O(n^2) complexity where each recursive
+    //            call to `DerivedTokenId` drills down through the same
+    //            length `n` derivation chain that `EntityMapper::EntityId`
+    //            drills through.
+    eid = em.EntityId(derived_self);
+
+    // Might be that we have a macro token in an argument-pre expansion that
+    // we discard. So we'll go one step back and hope to find something.
+    if (eid == mx::kInvalidEntityId) {
+      eid = DerivedTokenId(em, *derived_tok, derived_map);
+    }
+
+  } else if (std::optional<pasta::FileToken> file_tok = tok.FileLocation()) {
+    eid = DerivedTokenId(em, file_tok.value(), derived_map);
+  }
+
+  derived_map.emplace(self, eid);
+  return eid;
+}
+
+namespace {
 
 class StringOutputStream final : public kj::OutputStream {
  private:
@@ -1319,51 +1669,15 @@ class StringOutputStream final : public kj::OutputStream {
 
 }  // namespace
 
-// Find the entity ID of the declaration that is most related to a particular
-// token.
-mx::RawEntityId RelatedEntityId(
-    const EntityMapper &em, const pasta::Token &tok,
-    RelatedEntityIds &related_ids) {
-  bool found = false;
-  auto eid = RelatedEntityId(em, tok, found, related_ids);
-  if (!found) {
-    return eid;
-  }
-
-  // Back-propagate.
-  if (auto dloc = tok.DerivedLocation()) {
-    auto prop_eid = eid;
-    do {
-      found = false;
-      auto eid_dloc = RelatedEntityId(em, dloc.value(), found, related_ids);
-      if (found) {
-        prop_eid = eid_dloc;
-      }
-      if (prop_eid != mx::kInvalidEntityId) {
-        related_ids.emplace(dloc->RawToken(), prop_eid);
-      }
-      dloc = dloc->DerivedLocation();
-    } while (dloc);
-  }
-
-  return eid;
-}
-
-// Find the entity ID of the declaration that is most related to a particular
-// token.
-mx::RawEntityId RelatedEntityId(
-    const EntityMapper &em, const pasta::MacroToken &tok,
-    RelatedEntityIds &related_ids) {
-  return RelatedEntityId(em, tok.ParsedLocation(), related_ids);
-}
-
 std::string GetSerializedData(capnp::MessageBuilder &builder) {
   std::string ret;
   ret.reserve(builder.sizeInWords() * sizeof(capnp::word));
   StringOutputStream os(ret);
   capnp::writeMessage(os, builder);
 
-  // Pad it to a multiple of the word size.
+  // Pad it to a multiple of the word size. We pad it out so that we can
+  // allocate an aligned array of `capnp::word` on the client side for
+  // the readers.
   while (ret.size() % sizeof(capnp::word)) {
     ret.push_back('\0');
   }

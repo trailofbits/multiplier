@@ -84,6 +84,20 @@ bool PragmaCommentDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+PragmaCommentDecl PragmaCommentDecl::canonical_declaration(void) const {
+  if (auto canon = PragmaCommentDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (PragmaCommentDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<PragmaCommentDecl> PragmaCommentDecl::definition(void) const {
+  return PragmaCommentDecl::from(this->Decl::definition());
+}
+
 gap::generator<PragmaCommentDecl> PragmaCommentDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<PragmaCommentDecl> dr = PragmaCommentDecl::from(r)) {
@@ -165,12 +179,12 @@ std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const TokenContext &t) 
 }
 
 std::string_view PragmaCommentDecl::argument(void) const {
-  capnp::Text::Reader data = impl->reader.getVal59();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 PragmaMSCommentKind PragmaCommentDecl::comment_kind(void) const {
-  return static_cast<PragmaMSCommentKind>(impl->reader.getVal61());
+  return static_cast<PragmaMSCommentKind>(impl->reader.getVal63());
 }
 
 #pragma GCC diagnostic pop

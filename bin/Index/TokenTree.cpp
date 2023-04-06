@@ -125,6 +125,9 @@ class Substitution {
   // Child nodes, prior to any kind of expansion or substitution.
   NodeList before;
 
+  // Body of the macro.
+  NodeList body;
+
   // Child node, after expansion or substitution. `HasExpansion()` tells us
   // if we should look in here.
   NodeList after;
@@ -222,6 +225,16 @@ class TokenTreeImpl {
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
       Substitution::NodeList &nodes, const pasta::MacroArgument &node,
+      std::ostream &err);
+
+  Substitution *BuildMacroSubstitutions(
+      TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
+      Substitution::NodeList &nodes, const pasta::MacroVAOpt &node,
+      std::ostream &err);
+
+  Substitution *BuildMacroSubstitutions(
+      TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
+      Substitution::NodeList &nodes, const pasta::MacroVAOptArgument &node,
       std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
@@ -386,8 +399,11 @@ static bool InFileBody(const Substitution *sub) {
   switch (sub->kind) {
     // These are all in the body of a macro.
     case mx::MacroKind::PARAMETER:
+    case mx::MacroKind::PARAMETER_SUBSTITUTION:
     case mx::MacroKind::STRINGIFY:
     case mx::MacroKind::CONCATENATE:
+    case mx::MacroKind::VA_OPT:
+    case mx::MacroKind::VA_OPT_ARGUMENT:
       return true;
 
     case mx::MacroKind::OTHER_DIRECTIVE:
@@ -420,9 +436,9 @@ static bool InFileBody(const Substitution *sub) {
       } else {
         return InNodeList(sub->parent->before, sub);
       }
-
-    default:
-      return false;
+//
+//    default:
+//      return false;
   }
 }
 
@@ -456,6 +472,7 @@ static std::string TokData(const T &tok) {
       case '\'': ss << "&apos;"; break;
       case '\n': ss << " "; break;
       case '&': ss << "&amp;"; break;
+      case '\\': ss << '|'; break;
       default: ss << ch; break;
     }
   }
@@ -554,13 +571,14 @@ bool Substitution::HasExpansion(void) const noexcept {
 
     case mx::MacroKind::EXPANSION:
     case mx::MacroKind::SUBSTITUTION:
-    case mx::MacroKind::VA_OPT:
     case mx::MacroKind::STRINGIFY:
     case mx::MacroKind::CONCATENATE:
+    case mx::MacroKind::PARAMETER_SUBSTITUTION:
       return true;
 
     // Macro argument, parameter, etc.
     case mx::MacroKind::ARGUMENT:
+    case mx::MacroKind::VA_OPT:
     case mx::MacroKind::VA_OPT_ARGUMENT:
     case mx::MacroKind::PARAMETER:
       return false;
@@ -989,6 +1007,8 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
     }
   }
+
+  (void) macro_depth;
 
   // Link all of the tokens together.
   if (auto num_toks = tokens_alloc.size()) {
@@ -1664,6 +1684,60 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
+    Substitution::NodeList &nodes, const pasta::MacroVAOpt &node,
+    std::ostream &err) {
+
+  Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
+  arg_sub->parent = sub;
+  arg_sub->macro = node;
+  nodes.emplace_back(arg_sub);
+
+  Substitution *sub_exp = arg_sub;
+  for (const pasta::Macro &arg_node : node.Children()) {
+    sub_exp = BuildMacroSubstitutions(
+        prev, curr, arg_sub, arg_sub->before, arg_node, err);
+    if (!arg_sub) {
+      return nullptr;
+    }
+    assert(sub_exp == arg_sub);
+  }
+  (void) sub_exp;
+
+  LabelUseNodesIn(arg_sub->before, InFileBody(arg_sub),
+                  ContainingMacroDef(arg_sub));
+
+  return sub;
+}
+
+Substitution *TokenTreeImpl::BuildMacroSubstitutions(
+    TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
+    Substitution::NodeList &nodes, const pasta::MacroVAOptArgument &node,
+    std::ostream &err) {
+
+  Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
+  arg_sub->parent = sub;
+  arg_sub->macro = node;
+  nodes.emplace_back(arg_sub);
+
+  Substitution *sub_exp = arg_sub;
+  for (const pasta::Macro &arg_node : node.Children()) {
+    sub_exp = BuildMacroSubstitutions(
+        prev, curr, arg_sub, arg_sub->before, arg_node, err);
+    if (!arg_sub) {
+      return nullptr;
+    }
+    assert(sub_exp == arg_sub);
+  }
+  (void) sub_exp;
+
+  LabelUseNodesIn(arg_sub->before, InFileBody(arg_sub),
+                  ContainingMacroDef(arg_sub));
+
+  return sub;
+}
+
+Substitution *TokenTreeImpl::BuildMacroSubstitutions(
+    TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
     Substitution::NodeList &nodes, const pasta::MacroParameter &node,
     std::ostream &err) {
 
@@ -1728,6 +1802,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *exp = CreateSubstitution(mx::FromPasta(node.Kind()));
+
   exp->parent = sub;
   exp->macro = node;
   nodes.emplace_back(exp);
@@ -1741,6 +1816,22 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     }
     assert(sub_exp == exp);
   }
+
+  for (pasta::Macro sub_node : node.IntermediateChildren()) {
+    if (auto sub_node_parent = sub_node.Parent();
+        !sub_node_parent ||
+        sub_node_parent->RawMacro() != node.RawMacro()) {
+      break;  // This is from the body of a macro definition.
+    }
+
+    auto sub_body = BuildMacroSubstitutions(
+        prev, curr, exp, exp->body, sub_node, err);
+    if (!sub_body) {
+      return nullptr;
+    }
+    assert(sub_body == exp);
+  }
+
 
   for (pasta::Macro sub_node : node.ReplacementChildren()) {
     sub_exp = BuildMacroSubstitutions(
@@ -1815,6 +1906,11 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
       return nullptr;
     }
 
+    assert(exp->body.empty());
+    exp->body.swap(pre_exp->body);
+    exp->body.prev = pre_exp->body.prev;
+    exp->body.next = pre_exp->body.next;
+
     assert(!PreExpansionOf(exp));
   }
 
@@ -1874,7 +1970,18 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
       return BuildMacroSubstitutions(
           prev, curr, sub, nodes, pasta::MacroExpansion::From(node).value(),
           err);
+    case pasta::MacroKind::kVAOpt:
+      return BuildMacroSubstitutions(
+          prev, curr, sub, nodes, pasta::MacroVAOpt::From(node).value(),
+          err);
+    case pasta::MacroKind::kVAOptArgument:
+      return BuildMacroSubstitutions(
+          prev, curr, sub, nodes, pasta::MacroVAOptArgument::From(node).value(),
+          err);
     case pasta::MacroKind::kSubstitution:
+    case pasta::MacroKind::kParameterSubstitution:
+    case pasta::MacroKind::kStringify:
+    case pasta::MacroKind::kConcatenate:
       return BuildMacroSubstitutions(
           prev, curr, sub, nodes, pasta::MacroSubstitution::From(node).value(),
           err);
@@ -2642,38 +2749,6 @@ std::optional<pasta::Macro> TokenTree::Macro(void) const noexcept {
   return impl->macro;
 }
 
-std::optional<pasta::MacroDirective>
-TokenTree::MacroDirective(void) const noexcept {
-  if (!impl->macro) {
-    return std::nullopt;
-  }
-  return pasta::MacroDirective::From(impl->macro.value());
-}
-
-std::optional<pasta::DefineMacroDirective>
-TokenTree::MacroDefinition(void) const noexcept {
-  if (!impl->macro) {
-    return std::nullopt;
-  }
-  return pasta::DefineMacroDirective::From(impl->macro.value());
-}
-
-std::optional<pasta::MacroExpansion>
-TokenTree::MacroExpansion(void) const noexcept {
-  if (!impl->macro) {
-    return std::nullopt;
-  }
-  return pasta::MacroExpansion::From(impl->macro.value());
-}
-
-std::optional<pasta::MacroArgument>
-TokenTree::MacroArgument(void) const noexcept {
-  if (!impl->macro) {
-    return std::nullopt;
-  }
-  return pasta::MacroArgument::From(impl->macro.value());
-}
-
 std::optional<TokenTree> TokenTree::Parent(void) const noexcept {
   if (!impl->parent) {
     assert(false);  // Should never call expose the root.
@@ -2693,9 +2768,19 @@ TokenTreeNodeRange TokenTree::Children(void) const noexcept {
   return TokenTreeNodeRange(std::move(ptr));
 }
 
+TokenTreeNodeRange TokenTree::IntermediateChildren(void) const noexcept {
+  std::shared_ptr<const SubstitutionNodeList> ptr(impl, &(impl->body));
+  return TokenTreeNodeRange(std::move(ptr));
+}
+
 TokenTreeNodeRange TokenTree::ReplacementChildren(void) const noexcept {
   std::shared_ptr<const SubstitutionNodeList> ptr(impl, &(impl->after));
   return TokenTreeNodeRange(std::move(ptr));
+}
+
+// Return whether or not this node has intermediate children.
+bool TokenTree::HasIntermediateChildren(void) const noexcept {
+  return Kind() == mx::MacroKind::EXPANSION;
 }
 
 bool TokenTree::HasExpansion(void) const noexcept {

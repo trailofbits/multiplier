@@ -87,6 +87,20 @@ bool OMPDeclarativeDirectiveDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+OMPDeclarativeDirectiveDecl OMPDeclarativeDirectiveDecl::canonical_declaration(void) const {
+  if (auto canon = OMPDeclarativeDirectiveDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (OMPDeclarativeDirectiveDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::definition(void) const {
+  return OMPDeclarativeDirectiveDecl::from(this->Decl::definition());
+}
+
 gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<OMPDeclarativeDirectiveDecl> dr = OMPDeclarativeDirectiveDecl::from(r)) {

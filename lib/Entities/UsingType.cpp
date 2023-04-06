@@ -105,22 +105,26 @@ std::optional<UsingType> UsingType::from(const TokenContext &t) {
 }
 
 Type UsingType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal229();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 UsingShadowDecl UsingType::found_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal230();
   return UsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type UsingType::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal234();
+  RawEntityId eid = impl->reader.getVal236();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UsingType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal231();
+}
+
+bool UsingType::type_matches_declaration(void) const {
+  return impl->reader.getVal232();
 }
 
 #pragma GCC diagnostic pop

@@ -121,9 +121,24 @@ std::optional<MacroExpansion> MacroExpansion::from(const TokenContext &t) {
   return MacroExpansion::from(t.as_macro());
 }
 
+gap::generator<MacroOrToken> MacroExpansion::intermediate_children(void) const & {
+  Index index(impl->ep);
+  auto list = impl->reader.getVal6();
+  for (auto v : list) {
+    VariantEntity e = index.entity(EntityId(v));
+    if (std::holds_alternative<Macro>(e)) {
+      co_yield std::move(std::get<Macro>(e));
+    } else if (std::holds_alternative<Token>(e)) {
+      co_yield std::move(std::get<Token>(e));
+    } else {
+      assert(false);
+    }
+  }
+}
+
 std::optional<DefineMacroDirective> MacroExpansion::definition(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal4();
+    RawEntityId eid = impl->reader.getVal5();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -135,11 +150,11 @@ std::optional<DefineMacroDirective> MacroExpansion::definition(void) const {
 }
 
 unsigned MacroExpansion::num_arguments(void) const {
-  return impl->reader.getVal5().size();
+  return impl->reader.getVal7().size();
 }
 
 std::optional<MacroArgument> MacroExpansion::nth_argument(unsigned n) const {
-  auto list = impl->reader.getVal5();
+  auto list = impl->reader.getVal7();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -153,12 +168,12 @@ std::optional<MacroArgument> MacroExpansion::nth_argument(unsigned n) const {
 }
 
 gap::generator<MacroArgument> MacroExpansion::arguments(void) const & {
-  auto list = impl->reader.getVal5();
+  auto list = impl->reader.getVal7();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d5 = ep->MacroFor(ep, v)) {
-      if (auto e = MacroArgument::from(Macro(std::move(d5)))) {
+    if (auto d7 = ep->MacroFor(ep, v)) {
+      if (auto e = MacroArgument::from(Macro(std::move(d7)))) {
         co_yield std::move(*e);
       }
     }

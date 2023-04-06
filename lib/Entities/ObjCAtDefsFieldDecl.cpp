@@ -88,6 +88,20 @@ bool ObjCAtDefsFieldDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ObjCAtDefsFieldDecl ObjCAtDefsFieldDecl::canonical_declaration(void) const {
+  if (auto canon = ObjCAtDefsFieldDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ObjCAtDefsFieldDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::definition(void) const {
+  return ObjCAtDefsFieldDecl::from(this->Decl::definition());
+}
+
 gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ObjCAtDefsFieldDecl> dr = ObjCAtDefsFieldDecl::from(r)) {

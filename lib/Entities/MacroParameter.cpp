@@ -121,7 +121,7 @@ std::optional<MacroParameter> MacroParameter::from(const TokenContext &t) {
 
 Token MacroParameter::variadic_dots(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal4();
+    RawEntityId eid = impl->reader.getVal5();
     if (eid == kInvalidEntityId) {
       return Token();
     }
@@ -142,7 +142,7 @@ Token MacroParameter::name(void) const {
 }
 
 unsigned MacroParameter::index(void) const {
-  return impl->reader.getVal7();
+  return impl->reader.getVal9();
 }
 
 #pragma GCC diagnostic pop

@@ -84,6 +84,20 @@ bool LinkageSpecDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+LinkageSpecDecl LinkageSpecDecl::canonical_declaration(void) const {
+  if (auto canon = LinkageSpecDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (LinkageSpecDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<LinkageSpecDecl> LinkageSpecDecl::definition(void) const {
+  return LinkageSpecDecl::from(this->Decl::definition());
+}
+
 gap::generator<LinkageSpecDecl> LinkageSpecDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<LinkageSpecDecl> dr = LinkageSpecDecl::from(r)) {
@@ -166,7 +180,7 @@ std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const TokenContext &t) {
 
 gap::generator<Decl> LinkageSpecDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

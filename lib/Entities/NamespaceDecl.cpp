@@ -85,6 +85,20 @@ bool NamespaceDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+NamespaceDecl NamespaceDecl::canonical_declaration(void) const {
+  if (auto canon = NamespaceDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (NamespaceDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<NamespaceDecl> NamespaceDecl::definition(void) const {
+  return NamespaceDecl::from(this->Decl::definition());
+}
+
 gap::generator<NamespaceDecl> NamespaceDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<NamespaceDecl> dr = NamespaceDecl::from(r)) {
@@ -167,7 +181,7 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const TokenContext &t) {
 
 gap::generator<Decl> NamespaceDecl::declarations_in_context(void) const & {
   EntityProvider::Ptr ep = impl->ep;
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

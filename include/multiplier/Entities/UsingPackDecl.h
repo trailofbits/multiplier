@@ -45,6 +45,8 @@ class UsingPackDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  UsingPackDecl canonical_declaration(void) const;
+  std::optional<UsingPackDecl> definition(void) const;
   gap::generator<UsingPackDecl> redeclarations(void) const &;
   static std::optional<UsingPackDecl> from(const Decl &parent);
 

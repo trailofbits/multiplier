@@ -23,6 +23,7 @@ const char *EnumeratorName(ClangABI e) {
     case ClangABI::VER11: return "VER11";
     case ClangABI::VER12: return "VER12";
     case ClangABI::VER14: return "VER14";
+    case ClangABI::VER15: return "VER15";
     case ClangABI::LATEST: return "LATEST";
     default: return "<invalid>";
   }

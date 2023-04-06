@@ -224,8 +224,21 @@ Token IfStmt::l_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal19());
 }
 
+std::optional<Stmt> IfStmt::nondiscarded_case(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal20();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr));
+    }
+  }
+  return std::nullopt;
+}
+
 Token IfStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal21());
 }
 
 IfStatementKind IfStmt::statement_kind(void) const {
@@ -233,7 +246,7 @@ IfStatementKind IfStmt::statement_kind(void) const {
 }
 
 Stmt IfStmt::then(void) const {
-  RawEntityId eid = impl->reader.getVal21();
+  RawEntityId eid = impl->reader.getVal22();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

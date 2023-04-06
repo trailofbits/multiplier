@@ -6,9 +6,6 @@
 
 #include "Hash.h"
 
-#include <llvm/ADT/FoldingSet.h>
-#include <llvm/ADT/StringRef.h>
-#include <llvm/Support/SHA256.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
@@ -16,6 +13,20 @@
 #include <pasta/Util/File.h>
 #include <pasta/Util/FileManager.h>
 #include <sstream>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <llvm/ADT/FoldingSet.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/Support/SHA256.h>
+#pragma clang diagnostic pop
 
 #include "Util.h"
 

@@ -67,6 +67,8 @@ class FunctionDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  FunctionDecl canonical_declaration(void) const;
+  std::optional<FunctionDecl> definition(void) const;
   gap::generator<FunctionDecl> redeclarations(void) const &;
   static std::optional<FunctionDecl> from(const Decl &parent);
 
@@ -81,12 +83,14 @@ class FunctionDecl : public DeclaratorDecl {
   static std::optional<FunctionDecl> from(const Reference &r);
   static std::optional<FunctionDecl> from(const TokenContext &t);
 
+  bool friend_constraint_refers_to_enclosing_template(void) const;
   bool uses_fp_intrin(void) const;
   std::optional<bool> does_declaration_force_externally_visible_definition(void) const;
   bool does_this_declaration_have_a_body(void) const;
   Type call_result_type(void) const;
   ConstexprSpecKind constexpr_kind(void) const;
   Type declared_return_type(void) const;
+  Token default_token(void) const;
   std::optional<FunctionTemplateDecl> described_function_template(void) const;
   Token ellipsis_token(void) const;
   TokenRange exception_spec_source_range(void) const;

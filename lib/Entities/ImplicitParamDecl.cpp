@@ -88,6 +88,20 @@ bool ImplicitParamDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ImplicitParamDecl ImplicitParamDecl::canonical_declaration(void) const {
+  if (auto canon = ImplicitParamDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ImplicitParamDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ImplicitParamDecl> ImplicitParamDecl::definition(void) const {
+  return ImplicitParamDecl::from(this->Decl::definition());
+}
+
 gap::generator<ImplicitParamDecl> ImplicitParamDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ImplicitParamDecl> dr = ImplicitParamDecl::from(r)) {
@@ -169,7 +183,7 @@ std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const TokenContext &t) 
 }
 
 ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const {
-  return static_cast<ImplicitParamDeclImplicitParamKind>(impl->reader.getVal126());
+  return static_cast<ImplicitParamDeclImplicitParamKind>(impl->reader.getVal129());
 }
 
 #pragma GCC diagnostic pop

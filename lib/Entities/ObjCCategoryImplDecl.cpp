@@ -88,6 +88,20 @@ bool ObjCCategoryImplDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ObjCCategoryImplDecl ObjCCategoryImplDecl::canonical_declaration(void) const {
+  if (auto canon = ObjCCategoryImplDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ObjCCategoryImplDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::definition(void) const {
+  return ObjCCategoryImplDecl::from(this->Decl::definition());
+}
+
 gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ObjCCategoryImplDecl> dr = ObjCCategoryImplDecl::from(r)) {
@@ -169,12 +183,12 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const TokenContex
 }
 
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal63();
+  RawEntityId eid = impl->reader.getVal65();
   return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 #pragma GCC diagnostic pop

@@ -87,6 +87,20 @@ bool ConceptDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+ConceptDecl ConceptDecl::canonical_declaration(void) const {
+  if (auto canon = ConceptDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (ConceptDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<ConceptDecl> ConceptDecl::definition(void) const {
+  return ConceptDecl::from(this->Decl::definition());
+}
+
 gap::generator<ConceptDecl> ConceptDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<ConceptDecl> dr = ConceptDecl::from(r)) {
@@ -168,12 +182,12 @@ std::optional<ConceptDecl> ConceptDecl::from(const TokenContext &t) {
 }
 
 Expr ConceptDecl::constraint_expression(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool ConceptDecl::is_type_concept(void) const {
-  return impl->reader.getVal71();
+  return impl->reader.getVal74();
 }
 
 #pragma GCC diagnostic pop

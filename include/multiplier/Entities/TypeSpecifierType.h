@@ -43,7 +43,24 @@ enum class TypeSpecifierType : unsigned char {
   TYPENAME,
   TYPEOF_TYPE,
   TYPEOF_EXPRESSION,
+  TYPEOF_UNQUALIFIED_TYPE,
+  TYPEOF_UNQUALIFIED_EXPRESSION,
   DECLTYPE,
+  ADD_LVALUE_REFERENCE,
+  ADD_POINTER,
+  ADD_RVALUE_REFERENCE,
+  DECAY,
+  MAKE_SIGNED,
+  MAKE_UNSIGNED,
+  REMOVE_ALL_EXTENTS,
+  REMOVE_CONST,
+  REMOVE_CV,
+  REMOVE_CVREF,
+  REMOVE_EXTENT,
+  REMOVE_POINTER,
+  REMOVE_REFERENCE_T,
+  REMOVE_RESTRICT,
+  REMOVE_VOLATILE,
   UNDERLYING_TYPE,
   AUTO,
   DECLTYPE_AUTO,
@@ -70,7 +87,7 @@ inline static const char *EnumerationName(TypeSpecifierType) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeSpecifierType) {
-  return 51;
+  return 68;
 }
 
 const char *EnumeratorName(TypeSpecifierType);

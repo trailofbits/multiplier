@@ -32,6 +32,7 @@ enum class MacroKind : unsigned char {
   INCLUDE_NEXT_DIRECTIVE,
   INCLUDE_MACROS_DIRECTIVE,
   IMPORT_DIRECTIVE,
+  PARAMETER_SUBSTITUTION,
   STRINGIFY,
   CONCATENATE,
   VA_OPT,
@@ -43,7 +44,7 @@ inline static const char *EnumerationName(MacroKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(MacroKind) {
-  return 24;
+  return 25;
 }
 
 const char *EnumeratorName(MacroKind);

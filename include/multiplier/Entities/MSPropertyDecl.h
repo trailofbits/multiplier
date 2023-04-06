@@ -49,6 +49,8 @@ class MSPropertyDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  MSPropertyDecl canonical_declaration(void) const;
+  std::optional<MSPropertyDecl> definition(void) const;
   gap::generator<MSPropertyDecl> redeclarations(void) const &;
   static std::optional<MSPropertyDecl> from(const Decl &parent);
 

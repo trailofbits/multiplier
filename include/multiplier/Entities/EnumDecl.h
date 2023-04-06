@@ -53,6 +53,8 @@ class EnumDecl : public TagDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  EnumDecl canonical_declaration(void) const;
+  std::optional<EnumDecl> definition(void) const;
   gap::generator<EnumDecl> redeclarations(void) const &;
   static std::optional<EnumDecl> from(const Decl &parent);
 

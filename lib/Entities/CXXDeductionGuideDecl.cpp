@@ -90,6 +90,20 @@ bool CXXDeductionGuideDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+CXXDeductionGuideDecl CXXDeductionGuideDecl::canonical_declaration(void) const {
+  if (auto canon = CXXDeductionGuideDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (CXXDeductionGuideDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::definition(void) const {
+  return CXXDeductionGuideDecl::from(this->Decl::definition());
+}
+
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<CXXDeductionGuideDecl> dr = CXXDeductionGuideDecl::from(r)) {
@@ -171,21 +185,21 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const TokenCont
 }
 
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
-  RawEntityId eid = impl->reader.getVal159();
+  RawEntityId eid = impl->reader.getVal165();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
-  RawEntityId eid = impl->reader.getVal160();
+  RawEntityId eid = impl->reader.getVal166();
   return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool CXXDeductionGuideDecl::is_copy_deduction_candidate(void) const {
-  return impl->reader.getVal161();
+  return impl->reader.getVal167();
 }
 
 bool CXXDeductionGuideDecl::is_explicit(void) const {
-  return impl->reader.getVal162();
+  return impl->reader.getVal168();
 }
 
 #pragma GCC diagnostic pop

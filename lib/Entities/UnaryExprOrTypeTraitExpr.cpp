@@ -182,7 +182,7 @@ std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
 }
 
 UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::expression_or_trait_kind(void) const {
-  return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal93());
+  return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal94());
 }
 
 Token UnaryExprOrTypeTraitExpr::operator_token(void) const {
@@ -199,7 +199,7 @@ Type UnaryExprOrTypeTraitExpr::type_of_argument(void) const {
 }
 
 bool UnaryExprOrTypeTraitExpr::is_argument_type(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

@@ -73,6 +73,11 @@ define_example("mx-find-symbol" "FindSymbol.cpp")
 define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
 
+target_compile_definitions("mx-dump-json"
+  PRIVATE
+    "-DLLVM_DISABLE_ABI_BREAKING_CHECKS_ENFORCING"
+)
+
 target_link_libraries("mx-dump-json"
   PRIVATE
     LLVMCore LLVMSupport

@@ -87,6 +87,20 @@ bool UsingShadowDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+UsingShadowDecl UsingShadowDecl::canonical_declaration(void) const {
+  if (auto canon = UsingShadowDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (UsingShadowDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<UsingShadowDecl> UsingShadowDecl::definition(void) const {
+  return UsingShadowDecl::from(this->Decl::definition());
+}
+
 gap::generator<UsingShadowDecl> UsingShadowDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<UsingShadowDecl> dr = UsingShadowDecl::from(r)) {
@@ -170,13 +184,13 @@ std::optional<UsingShadowDecl> UsingShadowDecl::from(const TokenContext &t) {
 }
 
 BaseUsingDecl UsingShadowDecl::introducer(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal54();
   return BaseUsingDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal53();
+    RawEntityId eid = impl->reader.getVal55();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -188,7 +202,7 @@ std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(vo
 }
 
 NamedDecl UsingShadowDecl::target_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal56();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

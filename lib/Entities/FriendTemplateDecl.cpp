@@ -87,6 +87,20 @@ bool FriendTemplateDecl::contains(const Stmt &stmt) {
   return false;
 }
 
+FriendTemplateDecl FriendTemplateDecl::canonical_declaration(void) const {
+  if (auto canon = FriendTemplateDecl::from(this->Decl::canonical_declaration())) {
+    return std::move(canon.value());
+  }
+  for (FriendTemplateDecl redecl : redeclarations()) {
+    return redecl;
+  }
+  __builtin_unreachable();
+}
+
+std::optional<FriendTemplateDecl> FriendTemplateDecl::definition(void) const {
+  return FriendTemplateDecl::from(this->Decl::definition());
+}
+
 gap::generator<FriendTemplateDecl> FriendTemplateDecl::redeclarations(void) const & {
   for (Decl r : Decl::redeclarations()) {
     if (std::optional<FriendTemplateDecl> dr = FriendTemplateDecl::from(r)) {
@@ -168,25 +182,25 @@ std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const TokenContext &t
 }
 
 NamedDecl FriendTemplateDecl::friend_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal47();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token FriendTemplateDecl::friend_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal54());
 }
 
 Type FriendTemplateDecl::friend_type(void) const {
-  RawEntityId eid = impl->reader.getVal53();
+  RawEntityId eid = impl->reader.getVal55();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 unsigned FriendTemplateDecl::num_template_parameter_lists(void) const {
-  return impl->reader.getVal47().size();
+  return impl->reader.getVal49().size();
 }
 
 std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_list(unsigned n) const {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -200,12 +214,12 @@ std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_
 }
 
 gap::generator<TemplateParameterList> FriendTemplateDecl::template_parameter_lists(void) const & {
-  auto list = impl->reader.getVal47();
+  auto list = impl->reader.getVal49();
   EntityProvider::Ptr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = ep->TemplateParameterListFor(ep, v)) {
-      co_yield TemplateParameterList(std::move(d47));
+    if (auto d49 = ep->TemplateParameterListFor(ep, v)) {
+      co_yield TemplateParameterList(std::move(d49));
     }
   }
   co_return;
