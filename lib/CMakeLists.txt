@@ -217,7 +217,7 @@ target_link_libraries("mx-api"
   PRIVATE
     "CapnProto::capnp-rpc"
     $<BUILD_INTERFACE:concurrentqueue>
-    $<BUILD_INTERFACE:$<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>>
+    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
 )
 
 if(MX_ENABLE_VAST)
