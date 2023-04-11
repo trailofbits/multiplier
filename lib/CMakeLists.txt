@@ -214,10 +214,10 @@ target_link_libraries("mx-api"
     "gap::gap-core"
     "std::coroutines"
     "gap::gap-settings"
+    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
   PRIVATE
     "CapnProto::capnp-rpc"
     $<BUILD_INTERFACE:concurrentqueue>
-    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
 )
 
 if(MX_ENABLE_VAST)
