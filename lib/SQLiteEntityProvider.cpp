@@ -33,6 +33,17 @@
 #define MX_TO_STR_(a) #a
 #define MX_TO_STR(a) MX_TO_STR_(a)
 
+namespace std {
+
+template<>
+struct default_delete<ZSTD_DDict> {
+  void operator()(ZSTD_DDict *d) const {
+    ZSTD_freeDDict(d);
+  }
+};
+
+} // namespace std
+
 namespace mx {
 
 // Holds on to the dictionaries.
@@ -43,7 +54,7 @@ class SQLiteDecompressionDictionary {
  public:
   static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
 
-  std::array<ZSTD_DDict *, kNumEntityCategories> dict;
+  std::array<std::unique_ptr<ZSTD_DDict>, kNumEntityCategories> dict;
   std::array<bool, kNumEntityCategories> has_dict;
 
   explicit SQLiteDecompressionDictionary(
@@ -154,7 +165,7 @@ SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
     }
 
     if (!prev || !prev->has_dict[category]) {
-      dict[category] = ZSTD_createDDict(data.data(), data.size());
+      dict[category] = std::unique_ptr<ZSTD_DDict>{ZSTD_createDDict(data.data(), data.size())};
       has_dict[category] = true;
     }
   }
@@ -164,11 +175,11 @@ SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
       continue;
     }
     if (prev) {
-      dict[i] = prev->dict[i];
+      dict[i] = std::move(prev->dict[i]);
       has_dict[i] = prev->has_dict[i];
       prev->dict[i] = nullptr;
     } else {
-      dict[i] = ZSTD_createDDict("", 0);
+      dict[i] = std::unique_ptr<ZSTD_DDict>{ZSTD_createDDict("", 0)};
       has_dict[i] = false;
     }
   }
@@ -176,13 +187,7 @@ SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
   dictionaries.Reset();
 }
 
-SQLiteDecompressionDictionary::~SQLiteDecompressionDictionary(void) {
-  for (ZSTD_DDict *d : dict) {
-    if (d) {
-      ZSTD_freeDDict(d);
-    }
-  }
-}
+SQLiteDecompressionDictionary::~SQLiteDecompressionDictionary(void) = default;
 
 SQLiteEntityProviderImpl::~SQLiteEntityProviderImpl(void) {
   ZSTD_freeDCtx(decompression_context);
@@ -793,8 +798,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
       \
       assert(CategoryFromEntityId(raw_id) == EntityCategory::enum_name); \
       const auto cat_index = static_cast<unsigned>(EntityCategory::enum_name); \
-      auto ddict = dict->dict[cat_index]; \
-      if (!ddict) { \
+      if (!dict->dict[cat_index]) { \
         return {}; \
       } \
       ImplPtr context = impl.Lock(); \
@@ -812,7 +816,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
       try { \
         return std::make_shared<type_name ## Impl>( \
             self, \
-            Decompress(context->decompression_context, dict->dict[cat_index], \
+            Decompress(context->decompression_context, dict->dict[cat_index].get(), \
                        std::move(data)), \
             raw_id); \
       } catch (...) { \
