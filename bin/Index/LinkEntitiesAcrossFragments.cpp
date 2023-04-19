@@ -11,6 +11,8 @@
 #include "NameMangler.h"
 #include "PendingFragment.h"
 
+#include <glog/logging.h>
+
 namespace indexer {
 namespace {
 
@@ -74,15 +76,20 @@ void LinkEntitiesAcrossFragments(
           decl, func->Redeclarations());
 
     } else if (auto var = pasta::VarDecl::From(decl)) {
-      if (var->IsLocalVariableDeclaration()) {
-        continue;
+      switch (var->Category()) {
+        case pasta::DeclCategory::kGlobalVariable:
+        case pasta::DeclCategory::kParameterVariable:
+        case pasta::DeclCategory::kClassMember: {
+          const auto &mangled_name = mangler.Mangle(decl);
+          TrackRedeclarations(
+              database, pf, em,
+              (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
+              decl, var->Redeclarations());
+          break;
+        }
+        default:
+          break;
       }
-
-      const auto &mangled_name = mangler.Mangle(decl);
-      TrackRedeclarations(
-          database, pf, em,
-          (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
-          decl, var->Redeclarations());
 
     } else if (auto tag = pasta::TagDecl::From(decl)) {
       TrackRedeclarations(database, pf, em, dummy_mangled_name,

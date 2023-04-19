@@ -91,7 +91,8 @@ class NameManglerImpl {
   const std::string &GetMangledNameRec(const clang::ImplicitParamDecl *decl);
   const std::string &GetMangledNameRec(const clang::VarDecl *decl);
   const std::string &GetMangledNameRec(const clang::EnumConstantDecl *decl);
-  const std::string &GetMangledNameImpl(const clang::NamedDecl *decl);
+  const std::string &GetMangledNameImpl(const clang::NamedDecl *decl,
+                                        bool force=false);
 
   NameManglerImpl(void) = delete;
 };
@@ -290,7 +291,7 @@ const std::string &NameManglerImpl::GetMangledNameRec(
       return mangled_name;
 
     } else {
-      return GetMangledNameImpl(decl);
+      return GetMangledNameImpl(decl, decl->hasGlobalStorage());
     }
   }
 }
@@ -301,16 +302,15 @@ const std::string &NameManglerImpl::GetMangledNameRec(
       clang::Decl::castFromDeclContext(decl->getDeclContext()));
   if (enum_decl && !GetMangledName(enum_decl).empty()) {
     mangled_name_os.flush();
-    mangled_name_os << " ";
-    mangled_name_os << "(enumerator " << decl->getName() << ", value "
-                    << decl->getInitVal() << ")";
+    mangled_name_os << " enumerator:" << decl->getName() << " value:"
+                    << decl->getInitVal();
     mangled_name_os.flush();
   }
   return mangled_name;
 }
 
 const std::string &NameManglerImpl::GetMangledNameImpl(
-    const clang::NamedDecl *decl) {
+    const clang::NamedDecl *decl, bool force) {
 
   // Sometimes C structures, compiled in C++ mode, show up as CXXRecordDecls,
   // and we don't want to mangle them, otherwise we might end up with one
@@ -320,13 +320,17 @@ const std::string &NameManglerImpl::GetMangledNameImpl(
     return mangled_name;
   }
 
-  if (mangle_context->shouldMangleDeclName(decl)) {
+  auto should_mangle = mangle_context->shouldMangleDeclName(decl);
+  if (!should_mangle && !force) {
+    return mangled_name;
+  }
 
-    clang::index::SymbolInfo info = clang::index::getSymbolInfo(decl);
-    bool is_cxx_name = info.Lang == clang::index::SymbolLanguage::CXX &&
-                       clang::isa<clang::FunctionDecl, clang::VarDecl,
-                                  clang::TemplateParamObjectDecl>(decl);
+  clang::index::SymbolInfo info = clang::index::getSymbolInfo(decl);
+  bool is_cxx_name = info.Lang == clang::index::SymbolLanguage::CXX &&
+                     clang::isa<clang::FunctionDecl, clang::VarDecl,
+                                clang::TemplateParamObjectDecl>(decl);
 
+  if (should_mangle) {
     if (auto type_decl = clang::dyn_cast<clang::TypeDecl>(decl)) {
       if (auto type = type_decl->getTypeForDecl()) {
         clang::QualType qual_type(type, 0);
@@ -357,8 +361,19 @@ const std::string &NameManglerImpl::GetMangledNameImpl(
     // TODO(pag): Handle CUDA-attributed function decls.
 
     } else {
-      mangle_context->mangleName(decl, mangled_name_os);
+      clang::GlobalDecl gd(decl);
+      mangle_context->mangleName(gd, mangled_name_os);
     }
+    mangled_name_os.flush();
+
+  } else if (is_cxx_name) {
+
+    // TODO(pag): Figure out what to do here.
+    assert(false);
+
+  } else {
+    decl->printName(mangled_name_os);
+    mangled_name_os << " kind:" << decl->getDeclKindName();
     mangled_name_os.flush();
   }
 

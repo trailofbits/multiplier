@@ -33,10 +33,15 @@ static bool ShouldGetSymbolName(const pasta::Decl &decl) {
     case mx::DeclKind::DECOMPOSITION:
     case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
     case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-      if (reinterpret_cast<const pasta::VarDecl &>(decl).IsLocalVariableDeclaration()) {
-        return false;
-      } else {
-        return true;
+      switch (decl.Category()) {
+        case pasta::DeclCategory::kGlobalVariable:
+        case pasta::DeclCategory::kClassMember:
+        case pasta::DeclCategory::kInstanceMember:
+          return true;
+
+        // Don't record local variables in our search index.
+        default:
+          return false;
       }
 
     // Tags.
