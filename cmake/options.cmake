@@ -6,7 +6,7 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Build type")
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type")
 set(CMAKE_EXPORT_COMPILE_COMMANDS true CACHE BOOL "Generate the compile_commands.json file (forced)" FORCE)
 
 set(MX_INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "Directory in which Multiplier libraries will be installed")

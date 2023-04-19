@@ -139,12 +139,17 @@ TokenRange Macro::use_tokens(void) const & {
     return TokenRange();
   }
 
-  auto reader = std::make_shared<CustomTokenReader>(std::move(frag));
+  std::shared_ptr<CustomTokenReader> reader =
+      std::make_shared<CustomTokenReader>(std::move(frag));
   EntityOffset num_toks = 0u;
   for (Token tok : GenerateUseTokens(*this)) {
     reader->Append(std::move(tok.impl), tok.offset);
     ++num_toks;
   }
+
+  assert(reader->token_ids.size() == num_toks);
+  assert(reader->data_offset.size() == (num_toks + 1u));
+
   return TokenRange(std::move(reader), 0u, num_toks);
 }
 
