@@ -865,8 +865,10 @@ CustomTokenReader::~CustomTokenReader(void) noexcept {}
 
 // Append a token into this reader.
 void CustomTokenReader::Append(TokenImplPtr tr, EntityOffset to) noexcept {
-  std::string_view tok_data = tr->NthTokenData(to).data();
-  data.insert(data.end(), tok_data.begin(), tok_data.end());
+  std::string_view tok_data = tr->NthTokenData(to);
+  if (!tok_data.empty()) {
+    data.insert(data.end(), tok_data.begin(), tok_data.end());
+  }
   data_offset.push_back(static_cast<EntityOffset>(data.size()));
   derived_token_ids.push_back(tr->NthDerivedTokenId(to).Pack());
   parsed_token_ids.push_back(tr->NthParsedTokenId(to).Pack());
@@ -900,18 +902,21 @@ TokenKind CustomTokenReader::NthTokenKind(EntityOffset to) const {
 
 // Return the data of the Nth token.
 std::string_view CustomTokenReader::NthTokenData(EntityOffset to) const {
-  if ((to + 1u) < data_offset.size()) {
-    auto begin_offset = data_offset[to];
-    auto end_offset = data_offset[to + 1u];
-    if (end_offset < begin_offset) {
-      assert(false);
-      return {};
-    }
-
-    return std::string_view(data).substr(
-        begin_offset, end_offset - begin_offset);
+  if ((to + 1u) >= data_offset.size()) {
+    return {};
   }
-  return {};
+
+  auto begin_offset = data_offset[to];
+  auto end_offset = data_offset[to + 1u];
+  if (end_offset < begin_offset ||
+      begin_offset > data.size() ||
+      end_offset > data.size()) {
+    assert(false);
+    return {};
+  }
+
+  return std::string_view(data).substr(
+      begin_offset, end_offset - begin_offset);
 }
 
 // Return the id of the token from which the Nth token is derived.
@@ -1213,10 +1218,16 @@ std::string_view TokenRange::data(void) const & {
 
   auto data_begin = impl->NthTokenData(index);
   auto data_end = impl->NthTokenData(num_tokens - 1u);
+
+  if (data_begin.data() > data_end.data()) {
+    assert(false);
+    return {};
+  }
+
   auto size = static_cast<size_t>(data_end.data() - data_begin.data()) +
               data_end.size();
 
-  if (static_cast<uint32_t>(size) != size) {
+  if (static_cast<EntityOffset>(size) != size) {
     assert(false);
     return {};
   }

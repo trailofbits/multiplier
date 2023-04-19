@@ -6,9 +6,7 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-string(TOLOWER "${PROJECT_NAME}" lower_project_name)
-
-set(source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/Analysis")
+set(source_include_dir "${PROJECT_SOURCE_DIR}/include/multiplier/Analysis")
 
 set(analysis_headers
   "${source_include_dir}/Taint.h"
@@ -76,15 +74,15 @@ if(MX_ENABLE_INSTALL)
       "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
-        "${CMAKE_INSTALL_BINDIR}"
+        "${MX_INSTALL_BIN_DIR}"
     LIBRARY
       DESTINATION
-        "${CMAKE_INSTALL_LIBDIR}"
+        "${MX_INSTALL_LIB_DIR}"
     ARCHIVE
       DESTINATION
-        "${CMAKE_INSTALL_LIBDIR}"
+        "${MX_INSTALL_LIB_DIR}"
     PUBLIC_HEADER
       DESTINATION
-        "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}/Analysis"
+        "${MX_INSTALL_INCLUDE_DIR}/Analysis"
   )
 endif(MX_ENABLE_INSTALL)

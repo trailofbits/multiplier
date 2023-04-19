@@ -12,15 +12,15 @@ include("cmake/ccache.cmake")
 
 project("multiplier" CXX C)
 
+include(CMakeDependentOption)
+include(GNUInstallDirs)
+include("cmake/options.cmake")
+
 # Have issues with imported locations for Cap'n Proto with `RelWithDebInfo`
 # build types.
 if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   message(FATAL_ERROR "CMAKE_BUILD_TYPE must not be RelWithDebInfo")
 endif()
-
-include(CMakeDependentOption)
-include(GNUInstallDirs)
-include("cmake/options.cmake")
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden) 
 set(CMAKE_C_VISIBILITY_PRESET hidden) 
@@ -72,9 +72,9 @@ find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 if(PLATFORM_MACOS)
-  set(CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
+  set(CMAKE_INSTALL_RPATH "@executable_path/../${MX_INSTALL_LIB_DIR}")
 elseif(PLATFORM_LINUX)
-  set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/../${MX_INSTALL_LIB_DIR}")
 endif()
 
 if(MX_ENABLE_VAST)
@@ -85,7 +85,7 @@ endif(MX_ENABLE_VAST)
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")
   
-  set(cmake_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  set(cmake_install_dir "${MX_INSTALL_LIB_DIR}/cmake/${PROJECT_NAME}")
   
   include(CMakePackageConfigHelpers)
   configure_package_config_file("${PROJECT_NAME}Config.cmake.in"

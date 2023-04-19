@@ -70,15 +70,15 @@ if(MX_ENABLE_INSTALL)
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
-        "${CMAKE_INSTALL_BINDIR}"
+        "${MX_INSTALL_BIN_DIR}"
     LIBRARY
       DESTINATION
-        "${CMAKE_INSTALL_LIBDIR}"
+        "${MX_INSTALL_LIB_DIR}"
     ARCHIVE
       DESTINATION
-        "${CMAKE_INSTALL_LIBDIR}"
+        "${MX_INSTALL_LIB_DIR}"
     PUBLIC_HEADER
       DESTINATION
-        "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}"
+        "${MX_INSTALL_INCLUDE_DIR}"
   )
 endif(MX_ENABLE_INSTALL)
