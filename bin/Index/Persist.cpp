@@ -726,6 +726,8 @@ static void PersistTokenTree(
     }
   }
 
+  std::vector<const void *> derived_tokens;
+
   // Map the parsed tokens to serialized tokens.
   //
   // `ParsedTokenId::offset` needs to go through a level of indirection to
@@ -754,11 +756,27 @@ static void PersistTokenTree(
           << DiagnoseParsedTokens(parsed_tokens);
     }
 
-    // Introduce a mapping of macro tokens back to parsed tokens.
+    // Collect the token derivation chain. We'll process it earliest-to-latest,
+    // using opaque pointers, so that we don't have terrible complexity with
+    // the recursion inside of the `EntityMapper`.
     for (auto dloc = parsed_tok.DerivedLocation(); dloc;
          dloc = dloc->DerivedLocation()) {
+      derived_tokens.push_back(dloc->RawToken());
+    }
 
-      mx::VariantId vid = mx::EntityId(em.EntityId(dloc.value())).Unpack();
+    // Introduce a mapping of macro tokens back to parsed tokens.
+    mx::RawEntityId prev_dloc_id = mx::kInvalidEntityId;
+    while (!derived_tokens.empty()) {
+      const void *dloc = derived_tokens.back();
+      derived_tokens.pop_back();
+
+      mx::RawEntityId dloc_id = em.EntityId(dloc);
+      if (dloc_id == prev_dloc_id) {
+        continue;
+      }
+
+      prev_dloc_id = dloc_id;
+      mx::VariantId vid = mx::EntityId(dloc_id).Unpack();
       if (!std::holds_alternative<mx::MacroTokenId>(vid)) {
         CHECK(!std::holds_alternative<mx::ParsedTokenId>(vid));
         continue;
@@ -776,7 +794,7 @@ static void PersistTokenTree(
         // This macro token ended up being related to multiple parsed tokens.
         // Make it relate to an out-of-bounds offset, so that from the API's
         // perspective, it's not related to anything.
-        } else {
+        } else if (mti2po[mtid.offset] != i) {
           mti2po.set(mtid.offset, num_parsed_tokens + 1u);
         }
       }
