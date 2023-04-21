@@ -558,6 +558,10 @@ extern "C" int main(int argc, char *argv[]) {
     } else if (context.is_alias()) {
       bgcolor = " bgcolor=\"deepskyblue3\"";
 
+    } else if (context.as_designator()) {
+      bgcolor = " bgcolor=\"thistle3\"";
+      kind_name = "DESIGNATOR";
+
     } else {
       assert(false);
     }
