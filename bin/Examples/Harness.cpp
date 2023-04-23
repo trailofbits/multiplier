@@ -21,25 +21,47 @@ using WorkList = std::vector<mx::PackedFragmentId>;
 using DepGraph = std::set<std::pair<mx::PackedFragmentId,
                                     mx::PackedFragmentId>>;
 
-// Sometimes we see two separate definitions of an entity, e.g.
-//
-// `typedef void CURL;` and `typedef struct { ... } CURL;` where the former
-// is an opaque, exported type, and the latter is the internal type. We want
-// to find the internal version.
-static mx::Decl LongestDefinition(mx::Decl decl) {
-  size_t num_toks = 0u;
+// Get a good "canonical" decl and def pair.
+static std::pair<mx::Decl, mx::Decl> CanonicalPair(mx::Decl decl) {
+  size_t num_def_toks = 0u;
+  size_t num_decl_toks = 0u;
+
+  mx::Decl longest_redecl = decl;
+  mx::Decl longest_def = decl;
 
   for (mx::Decl redecl : decl.redeclarations()) {
-    if (decl.is_definition()) {
-      if (auto redecl_num_toks = redecl.tokens().size();
-          redecl_num_toks > num_toks) {
-        decl = redecl;
-        num_toks = redecl_num_toks;
+    auto redecl_num_toks = redecl.tokens().size();
+    if (redecl.is_definition()) {
+      if (redecl_num_toks > num_def_toks) {
+        longest_def = std::move(redecl);
+        num_def_toks = redecl_num_toks;
+      }
+    } else {
+      if (redecl_num_toks > num_decl_toks) {
+        longest_redecl = std::move(redecl);
+        num_decl_toks = redecl_num_toks;
       }
     }
   }
 
-  return decl;
+  // Sometimes we see two separate definitions of an entity, e.g.:
+  //
+  // `typedef void CURL;` and `typedef struct { ... } CURL;` where the former
+  // is an opaque, exported type, and the latter is the internal type. We want
+  // to find the internal version.
+  if (longest_def.kind() == mx::DeclKind::TYPEDEF ||
+      longest_redecl.is_definition()) {
+    longest_redecl = longest_def;
+
+  // Check for equality in terms of data.
+  } else if (num_decl_toks == num_def_toks &&
+      longest_redecl.id() != longest_def.id()) {
+    if (longest_redecl.token().data() == longest_def.token().data()) {
+      longest_redecl = longest_def;
+    }
+  }
+
+  return {longest_redecl, longest_def};
 }
 
 // Go and find the entity to be harnessed.
@@ -52,7 +74,7 @@ static std::optional<mx::Decl> FindEntity(const mx::Index &index,
       if (std::holds_alternative<mx::NamedDecl>(ne)) {
         mx::NamedDecl nd = std::move(std::get<mx::NamedDecl>(ne));
         if (nd.name() == name) {
-          return LongestDefinition(nd);
+          return CanonicalPair(nd).second;
         }
       }
     }
@@ -234,16 +256,9 @@ static void CollectEntities(
 
   // A strong connection requires a definition.
   for (mx::PackedDeclId id : strong_decl_ids) {
-    mx::Decl decl = index.entity(id).value();
-
-    // A strong connection back into our own fragment, ignore it.
-    if (mx::Fragment::containing(decl).id() == frag_id) {
-      continue;
-    }
-
-    decl = LongestDefinition(decl);
-
-    auto strong_frag_id = mx::Fragment::containing(decl).id();
+    auto decl_def = CanonicalPair(index.entity(id).value());
+    mx::Fragment def_frag = mx::Fragment::containing(decl_def.second);
+    mx::PackedFragmentId strong_frag_id = def_frag.id();
     if (frag_id != strong_frag_id) {
       deps.emplace(frag_id, strong_frag_id);
       wl.push_back(strong_frag_id);
@@ -254,28 +269,11 @@ static void CollectEntities(
   // a definition.
   for (mx::PackedDeclId id : weak_decl_ids) {
 
-    // We've already added it as a strong declaration; skip it.
-    if (std::find(strong_decl_ids.begin(), strong_decl_ids.end(), id) !=
-        strong_decl_ids.end()) {
-      continue;
-    }
-
-    mx::Decl decl = index.entity(id).value();
-
-    // A weak connection back into our own fragment, ignore it.
-    if (mx::Fragment::containing(decl).id() == frag_id) {
-      continue;
-    }
-
-    mx::Decl def = LongestDefinition(decl);
-    for (mx::Decl redecl : def.redeclarations()) {
-      if (!redecl.is_definition()) {
-        decl = redecl;
-      }
-    }
-
-    auto strong_frag_id = mx::Fragment::containing(def).id();
-    auto weak_frag_id = mx::Fragment::containing(decl).id();
+    auto decl_def = CanonicalPair(index.entity(id).value());
+    mx::Fragment decl_frag = mx::Fragment::containing(decl_def.first);
+    mx::Fragment def_frag = mx::Fragment::containing(decl_def.second);
+    mx::PackedFragmentId weak_frag_id = decl_frag.id();
+    mx::PackedFragmentId strong_frag_id = def_frag.id();
 
     // E.g. `typedef struct foo_s` { struct foo_s *x; ... } foo;`
     if (strong_frag_id == frag_id || weak_frag_id == frag_id) {
@@ -287,13 +285,11 @@ static void CollectEntities(
     // and the (forward) declaration, and then a strong link between the
     // definition and the declaration. This organization helps to break cycles.
     wl.push_back(strong_frag_id);
+    deps.emplace(frag_id, weak_frag_id);
+
     if (strong_frag_id != weak_frag_id) {
       deps.emplace(strong_frag_id, weak_frag_id);
-      deps.emplace(frag_id, weak_frag_id);
       wl.push_back(weak_frag_id);
-
-    } else {
-      deps.emplace(frag_id, weak_frag_id);
     }
   }
 }
@@ -373,7 +369,7 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   // Convert the edges of `deps` into parent-child relations in a (hopefully)
-  // DAG.
+  // directed acyclic graph.
   for (auto [from_frag_id, to_frag_id] : deps) {
     DAG &from_dag = dag[from_frag_id];
     DAG &to_dag = dag[to_frag_id];
@@ -392,6 +388,7 @@ extern "C" int main(int argc, char *argv[]) {
     frags.push_back(frag_id);
     dag[frag_id].Depth(dag);
   }
+
   std::sort(frags.begin(), frags.end(),
             [&dag] (mx::PackedFragmentId a, mx::PackedFragmentId b) {
               return dag[b].depth < dag[a].depth;
@@ -436,25 +433,6 @@ extern "C" int main(int argc, char *argv[]) {
     for (mx::Token tok : frag.parsed_tokens()) {
       std::cout << sep << tok.data();
       sep = " ";
-    }
-
-    // Add any missing semi-colons.
-    mx::TokenRange frag_file_toks = frag.file_tokens();
-    if (frag_file_toks.size()) {
-      mx::Token last_frag_file_tok = frag_file_toks.back();
-      mx::TokenRange file_toks;
-      if (auto file = mx::File::containing(last_frag_file_tok)) {
-        file_toks = file->tokens();
-      }
-      mx::FileTokenId lti = std::get<mx::FileTokenId>(
-          last_frag_file_tok.id().Unpack());
-
-      if (lti.offset + 1u < file_toks.size()) {
-        mx::Token pt = file_toks[lti.offset + 1u];
-        if (pt.kind() == mx::TokenKind::SEMI) {
-          std::cout << pt.data();
-        }
-      }
     }
 
     std::cout << "\n\n";
