@@ -12,6 +12,7 @@
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
 #include <pasta/Util/FileManager.h>
+#include <pasta/AST/Printer.h>
 #include <sstream>
 
 #pragma clang diagnostic push

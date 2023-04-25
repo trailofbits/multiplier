@@ -25,6 +25,7 @@ class File;
 class FileToken;
 class Macro;
 class MacroToken;
+class PrintedToken;
 class Stmt;
 class Token;
 class Type;
@@ -104,5 +105,8 @@ struct EntityBuilder {
 };
 
 std::string GetSerializedData(capnp::MessageBuilder &builder);
+
+template <typename Tok>
+void AccumulateTokenData(std::string &data, const Tok &tok);
 
 }  // namespace indexer

@@ -19,6 +19,7 @@
 #include <multiplier/RPC.capnp.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
+#include <pasta/AST/Printer.h>
 #include <pasta/Util/File.h>
 #include <sstream>
 #include <utility>
@@ -43,6 +44,7 @@
 #include "PendingFragment.h"
 #include "Provenance.h"
 #include "ProgressBar.h"
+#include "TypeFragment.h"
 #include "Util.h"
 
 namespace capnp {
@@ -68,7 +70,7 @@ extern void DispatchSerializeMacro(const EntityMapper &em,
 //
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
 extern void BuildPendingFragment(
-    PendingFragment &pf, EntityIdMap &entity_ids,
+    PendingFragment &pf, EntityMapper &em,
     const pasta::TokenRange &tokens);
 
 // Label the parent entity ids.
@@ -111,34 +113,6 @@ using TokenOffsetListBuilder =
 
 using TokenIdListBuilder =
     capnp::List<uint64_t, ::capnp::Kind::PRIMITIVE>::Builder;
-
-// Accumulate the token data, stripping out some unwanted characters in the
-// process.
-static void AccumulateUTF8Data(std::string &data, llvm::StringRef utf8_data) {
-  data.reserve(data.size() + utf8_data.size());
-  if (!utf8_data.contains('\r')) {
-    data.insert(data.end(), utf8_data.begin(), utf8_data.end());
-
-  } else {
-    for (char ch : utf8_data) {
-      if (ch != '\r') {
-        data += ch;
-      }
-    }
-  }
-}
-
-// Accumulate the token data, encoded as UTF-8, into `data`.
-template <typename Tok>
-static void AccumulateTokenData(std::string &data, const Tok &tok) {
-  llvm::StringRef tok_data = tok.Data();
-  if (llvm::json::isUTF8(tok_data)) {
-    AccumulateUTF8Data(data, tok_data);
-
-  } else {
-    AccumulateUTF8Data(data, llvm::json::fixUTF8(tok_data));
-  }
-}
 
 }  // namespace
 
@@ -720,45 +694,7 @@ static void PersistTokenTree(
   }
 }
 
-// Find the entity id of `canon_decl` that resides in the current fragment
-// on which the serializer is operating. Token contexts from PASTA store the
-// canonical (typically first) declaration, but we generally want the version
-// of the declaration that is inside of the fragment itself, so here we go from
-// canonical back to specific.
-//
-// TODO(pag): Eventually, we should change the serialized representation of
-//            token contexts to store full 64-bit entity IDs. Right now, they
-//            store offsets of things in the fragments, hence the actual need
-//            to go canonical->specific in the first place, and why a failure to
-//            do so results in `kInvalidEntityId` instead of just falling back
-//            on the ID of the canonical decl.
-static mx::RawEntityId IdOfRedeclInFragment(
-    const EntityMapper &em, mx::RawEntityId frag_index,
-    pasta::Decl canon_decl) {
-
-  mx::RawEntityId ret_id = em.EntityId(canon_decl);
-  for (pasta::Decl redecl : canon_decl.Redeclarations()) {
-    mx::RawEntityId eid = em.EntityId(redecl);
-    if (eid == mx::kInvalidEntityId) {
-      continue;
-    }
-
-    // If we come across a definition, then reference it if we're not able
-    // to reference a redecl that's in the right fragment.
-    if (IsDefinition(redecl)) {
-      ret_id = eid;
-    }
-
-    mx::VariantId vid = mx::EntityId(eid).Unpack();
-    CHECK(std::holds_alternative<mx::DeclId>(vid));
-    mx::DeclId id = std::get<mx::DeclId>(vid);
-    if (id.fragment_id == frag_index) {
-      return eid;
-    }
-  }
-
-  return ret_id;
-}
+}  // namespace
 
 // Persist the token contexts. The token contexts are a kind of inverted tree,
 // e.g.
@@ -778,7 +714,7 @@ static mx::RawEntityId IdOfRedeclInFragment(
 // me the SwitchStmt containing this token." Token contexts aren't pure linked
 // lists, though; there are special "alias" nodes that tend to link you further
 // down the lists, and so that takes some special handling.
-static void PersistTokenContexts(
+void PersistTokenContexts(
     EntityMapper &em, const std::vector<pasta::Token> &parsed_tokens,
     mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb) {
 
@@ -935,8 +871,6 @@ static void PersistTokenContexts(
   DCHECK_GT(fb.getTokenKinds().size(), 0u);
 }
 
-}  // namespace
-
 // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
 // de-duplication and indexing. It roughly corresponds to a sequence of one-or-
 // more syntactically overlapping "top-level declarations." For us, a top-
@@ -961,7 +895,7 @@ static void PersistTokenContexts(
 // thereof.
 void GlobalIndexingState::PersistFragment(
     const pasta::AST &ast, const pasta::TokenRange &tokens,
-    NameMangler &mangler, EntityIdMap &entity_ids,
+    NameMangler &mangler, EntityMapper &em,
     TokenProvenanceCalculator &provenance, PendingFragment &pf) {
 
   const mx::SpecificEntityId<mx::FragmentId> fragment_id = pf.fragment_id;
@@ -973,11 +907,10 @@ void GlobalIndexingState::PersistFragment(
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  BuildPendingFragment(pf, entity_ids, tokens);
-
-  EntityMapper em(entity_ids, pf);
+  BuildPendingFragment(pf, em, tokens);
 
   // Figure out parentage/inheritance between the entities.
+
   LabelParentsInPendingFragment(pf, em);
 
   // Serialize all discovered entities.
@@ -1057,6 +990,7 @@ void GlobalIndexingState::PersistFragment(
   // Add the fragment to the database.
   database.AddAsync(
       mx::EntityRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
+  (void)mangler;
 }
 
 }  // namespace indexer

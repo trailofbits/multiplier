@@ -10,6 +10,7 @@
 #include "EntityMapper.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
+#include "TypeFragment.h"
 
 #include <glog/logging.h>
 
@@ -17,7 +18,7 @@ namespace indexer {
 namespace {
 
 static void TrackRedeclarations(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
+    mx::DatabaseWriter &database, mx::RawEntityId fragment_index,
     const EntityMapper &em, const std::string &mangled_name,
     const pasta::Decl &decl, std::vector<pasta::Decl> redecls) {
 
@@ -29,7 +30,7 @@ static void TrackRedeclarations(
   }
 
   mx::DeclId decl_id = std::get<mx::DeclId>(a_vid);
-  if (decl_id.fragment_id != pf.fragment_index) {
+  if (decl_id.fragment_id != fragment_index) {
     assert(false);
     return;
   }
@@ -71,7 +72,7 @@ void LinkEntitiesAcrossFragments(
     if (auto func = pasta::FunctionDecl::From(decl)) {
       const auto &mangled_name = mangler.Mangle(decl);
       TrackRedeclarations(
-          database, pf, em,
+          database, pf.fragment_index, em,
           (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
           decl, func->Redeclarations());
 
@@ -82,7 +83,7 @@ void LinkEntitiesAcrossFragments(
         case pasta::DeclCategory::kClassMember: {
           const auto &mangled_name = mangler.Mangle(decl);
           TrackRedeclarations(
-              database, pf, em,
+              database, pf.fragment_index, em,
               (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
               decl, var->Redeclarations());
           break;
@@ -92,17 +93,50 @@ void LinkEntitiesAcrossFragments(
       }
 
     } else if (auto tag = pasta::TagDecl::From(decl)) {
-      TrackRedeclarations(database, pf, em, dummy_mangled_name,
+      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
                           decl, tag->Redeclarations());
 
     } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
-      TrackRedeclarations(database, pf, em, dummy_mangled_name,
+      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
                           decl, tpl->Redeclarations());
 
     } else {
       continue;
     }
   }
+}
+
+void LinkEntitiesAcrossFragments(
+    mx::DatabaseWriter &database, const PendingFragmentType &tf,
+    const EntityMapper &em, const NameMangler &mangler) {
+
+  std::string dummy_mangled_name;
+  for (const pasta::Decl &decl : tf.decls_in_use) {
+    mx::RawEntityId eid = em.EntityId(decl);
+    if (eid == mx::kInvalidEntityId) {
+      continue;
+    }
+
+    if (auto type = pasta::TypeDecl::From(decl)) {
+      const auto &type_name = type->Name();
+      TrackRedeclarations(
+          database, tf.fragment_index, em,
+          type_name, decl, type->Redeclarations());
+    } else if (auto typedef_decl = pasta::TypedefDecl::From(decl)) {
+      const auto &typedef_name = typedef_decl->Name();
+      TrackRedeclarations(
+          database, tf.fragment_index, em,
+          typedef_name, decl, typedef_decl->Redeclarations());
+    } else if (auto alias = pasta::TypeAliasDecl::From(decl)) {
+      const auto &alias_name = alias->Name();
+      TrackRedeclarations(
+          database, tf.fragment_index, em,
+          alias_name, decl, alias->Redeclarations());
+    } else {
+      continue;
+    }
+  }
+  (void)mangler;
 }
 
 }  // namespace indexer

@@ -16,11 +16,18 @@ namespace indexer {
 
 class TokenTree;
 class TokenTreeNode;
+class TypeMapper;
 
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
   EntityIdMap &entity_ids;
+
+  // An instance of TypeMapper that will hold type_ids of the
+  // new types encountered in a translation unit. It will be used
+  // to create the type fragments for the types that are newly
+  // encountered.
+  TypeMapper &tm;
 
   // These are "fresh" for each instance of the entity mapper, because we
   // create different token trees per fragment, though they may occupy the
@@ -30,9 +37,9 @@ class EntityMapper final {
   PendingFragment &fragment;
 
   inline explicit EntityMapper(
-      EntityIdMap &entity_ids_, PendingFragment &fragment_)
+      EntityIdMap &entity_ids_, TypeMapper &tm_, PendingFragment &fragment_)
       : entity_ids(entity_ids_),
-        token_tree_ids(entity_ids_),
+        tm(tm_), token_tree_ids(entity_ids_),
         fragment(fragment_) {}
 
   mx::RawEntityId ParentDeclId(const pasta::Decl &entity) const;

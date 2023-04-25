@@ -11,6 +11,7 @@
 #include "Context.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
+#include "TypeMapper.h"
 #include "Util.h"
 #include "Visitor.h"
 
@@ -35,6 +36,7 @@ namespace {
 class EntityLabeller final : public EntityVisitor {
  public:
   EntityIdMap &entity_ids;
+  TypeMapper &tm;
   PendingFragment &fragment;
 
   std::vector<pasta::Decl> next_decls;
@@ -48,9 +50,10 @@ class EntityLabeller final : public EntityVisitor {
   unsigned next_parsed_token_index{0u};
 
   inline explicit EntityLabeller(EntityIdMap &entity_ids_,
+                                 TypeMapper &tm_,
                                  PendingFragment &fragment_)
       : entity_ids(entity_ids_),
-        fragment(fragment_) {}
+        tm(tm_), fragment(fragment_) {}
 
   virtual ~EntityLabeller(void) = default;
 
@@ -63,7 +66,7 @@ class EntityLabeller final : public EntityVisitor {
   }
 
   bool Enter(const pasta::Type &entity) final {
-    return fragment.Add(entity);
+    return fragment.Add(entity, tm);
   }
 
   void Run(void) {
@@ -201,8 +204,8 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
 void LabelEntitiesInFragment(PendingFragment &pf, EntityIdMap &entity_ids,
-                             const pasta::TokenRange &tok_range) {
-  EntityLabeller labeller(entity_ids, pf);
+                             TypeMapper &tm, const pasta::TokenRange &tok_range) {
+  EntityLabeller labeller(entity_ids, tm, pf);
 
   for (uint64_t i = pf.begin_index; i <= pf.end_index; ++i) {
     pasta::Token tok = tok_range[i];

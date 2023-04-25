@@ -6,8 +6,11 @@
 
 #include "PendingFragment.h"
 
+#include "EntityMapper.h"
 #include "PASTA.h"
+#include "TypeMapper.h"
 #include "Util.h"
+#include "Hash.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ingored "-Wunused-function"
@@ -27,15 +30,12 @@ namespace {
 // ends up being redundant across fragments.
 class FragmentBuilder final {
  public:
-  EntityIdMap &entity_ids;
-  TypeIdMap &type_ids;
+  EntityMapper &em;
   PendingFragment &fragment;
 
-  inline explicit FragmentBuilder(EntityIdMap &entity_ids_,
-                                  TypeIdMap &type_ids_,
+  inline explicit FragmentBuilder(EntityMapper &em_,
                                   PendingFragment &fragment_)
-      : entity_ids(entity_ids_),
-        type_ids(type_ids_),
+      : em(em_),
         fragment(fragment_) {}
 
 #define MX_BEGIN_VISIT_DECL(name) void Visit ## name (const pasta::name &);
@@ -62,19 +62,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::Token &) {}
 
   void MaybeVisitNext(const pasta::Decl &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.Add(entity, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Stmt &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.Add(entity, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Type &entity) {
-    fragment.Add(entity);
+    fragment.Add(entity, em.tm);
   }
 
   void MaybeVisitNext(const pasta::Attr &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.Add(entity, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Macro &) {}
@@ -82,19 +82,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::File &) {}
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.Add(pseudo, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.Add(pseudo, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::TemplateParameterList &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.Add(pseudo, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Designator &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.Add(pseudo, em.entity_ids);
   }
 };
 
@@ -282,15 +282,18 @@ bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
   return false;
 }
 
-bool PendingFragment::Add(const pasta::Type &entity) {
+bool PendingFragment::Add(const pasta::Type &entity, TypeMapper &tm) {
   auto kind = entity.Kind();
   mx::TypeId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(types_to_serialize.size());
+  auto fragment_ = tm.GetOrCreateFragmentIdForType(entity);
+  id.fragment_id = fragment_.Unpack().fragment_id;
+
+  // Offset is set to zero since it will be the first entity in the fragment
+  id.offset = static_cast<mx::EntityOffset>(0);
   id.kind = mx::FromPasta(kind);
 
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  if (type_ids.emplace(type_key, id).second) {
+  if (tm.type_ids.emplace(type_key, id).second) {
     types_to_serialize.emplace_back(entity);  // New type found.
     return true;
   }
@@ -372,7 +375,7 @@ bool PendingFragment::Add(const pasta::Designator &entity,
 //
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
 void BuildPendingFragment(
-    PendingFragment &pf, EntityIdMap &entity_ids,
+    PendingFragment &pf, EntityMapper &em,
     const pasta::TokenRange &tokens) {
   size_t prev_num_decls = 0ul;
   size_t prev_num_stmts = 0ul;
@@ -380,7 +383,7 @@ void BuildPendingFragment(
   size_t prev_num_attrs = 0ul;
   size_t prev_num_pseudos = 0ul;
 
-  FragmentBuilder builder(entity_ids, pf.type_ids, pf);
+  FragmentBuilder builder(em, pf);
 
   // Make sure to collect everything reachable from token contexts.
   for (auto i = pf.begin_index; i <= pf.end_index; ++i) {

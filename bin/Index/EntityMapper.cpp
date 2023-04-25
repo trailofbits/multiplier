@@ -12,6 +12,8 @@
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 
+#include "Hash.h"
+#include "TypeMapper.h"
 #include "Util.h"
 
 namespace indexer {
@@ -162,15 +164,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) const {
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  assert(type_key.first != nullptr);
-  if (auto it = fragment.type_ids.find(type_key);
-      it != fragment.type_ids.end()) {
-    return it->second.Pack();
-  } else {
-    assert(false);
-    return mx::kInvalidEntityId;
-  }
+  return tm.EntityId(entity);
 }
 
 mx::RawEntityId EntityMapper::EntityId(
@@ -195,14 +189,7 @@ mx::RawEntityId EntityMapper::EntityId(
 
 mx::RawEntityId EntityMapper::EntityIdOfType(
     const void *type, uint32_t quals) const {
-  TypeKey type_key(type, quals);
-  assert(type_key.first != nullptr);
-  if (auto it = fragment.type_ids.find(type_key);
-      it != fragment.type_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return tm.EntityId(type, quals);
 }
 
 }  // namespace indexer
