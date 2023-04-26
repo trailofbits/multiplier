@@ -72,14 +72,14 @@ gap::generator<TopLevelStmtDecl> TopLevelStmtDecl::containing(const std::optiona
 
 bool TopLevelStmtDecl::contains(const Decl &decl) {
   for (auto &parent : TopLevelStmtDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TopLevelStmtDecl::contains(const Stmt &stmt) {
   for (auto &parent : TopLevelStmtDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

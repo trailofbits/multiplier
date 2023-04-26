@@ -80,14 +80,14 @@ gap::generator<CXXMethodDecl> CXXMethodDecl::containing(const std::optional<Stmt
 
 bool CXXMethodDecl::contains(const Decl &decl) {
   for (auto &parent : CXXMethodDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXMethodDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXMethodDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

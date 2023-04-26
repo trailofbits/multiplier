@@ -77,14 +77,14 @@ gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::containing(const 
 
 bool ObjCImplementationDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCImplementationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCImplementationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCImplementationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

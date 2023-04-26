@@ -76,14 +76,14 @@ gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::containing(const std:
 
 bool UnresolvedMemberExpr::contains(const Decl &decl) {
   for (auto &parent : UnresolvedMemberExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnresolvedMemberExpr::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedMemberExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

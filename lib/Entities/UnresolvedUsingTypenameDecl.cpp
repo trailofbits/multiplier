@@ -74,14 +74,14 @@ gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::contain
 
 bool UnresolvedUsingTypenameDecl::contains(const Decl &decl) {
   for (auto &parent : UnresolvedUsingTypenameDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingTypenameDecl::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedUsingTypenameDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

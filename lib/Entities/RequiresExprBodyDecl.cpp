@@ -72,14 +72,14 @@ gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::containing(const std:
 
 bool RequiresExprBodyDecl::contains(const Decl &decl) {
   for (auto &parent : RequiresExprBodyDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool RequiresExprBodyDecl::contains(const Stmt &stmt) {
   for (auto &parent : RequiresExprBodyDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -73,14 +73,14 @@ gap::generator<OMPRequiresDecl> OMPRequiresDecl::containing(const std::optional<
 
 bool OMPRequiresDecl::contains(const Decl &decl) {
   for (auto &parent : OMPRequiresDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPRequiresDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPRequiresDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

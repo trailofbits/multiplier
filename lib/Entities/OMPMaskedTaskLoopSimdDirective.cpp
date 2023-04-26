@@ -75,14 +75,14 @@ gap::generator<OMPMaskedTaskLoopSimdDirective> OMPMaskedTaskLoopSimdDirective::c
 
 bool OMPMaskedTaskLoopSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMaskedTaskLoopSimdDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMaskedTaskLoopSimdDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

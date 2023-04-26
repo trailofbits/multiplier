@@ -73,14 +73,14 @@ gap::generator<OMPInteropDirective> OMPInteropDirective::containing(const std::o
 
 bool OMPInteropDirective::contains(const Decl &decl) {
   for (auto &parent : OMPInteropDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPInteropDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPInteropDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

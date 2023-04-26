@@ -88,14 +88,14 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const std::optional<Stmt
 
 bool CXXRecordDecl::contains(const Decl &decl) {
   for (auto &parent : CXXRecordDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXRecordDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXRecordDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

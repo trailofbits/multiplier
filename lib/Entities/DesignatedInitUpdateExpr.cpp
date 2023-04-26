@@ -75,14 +75,14 @@ gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::containing(co
 
 bool DesignatedInitUpdateExpr::contains(const Decl &decl) {
   for (auto &parent : DesignatedInitUpdateExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DesignatedInitUpdateExpr::contains(const Stmt &stmt) {
   for (auto &parent : DesignatedInitUpdateExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

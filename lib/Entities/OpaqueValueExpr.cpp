@@ -74,14 +74,14 @@ gap::generator<OpaqueValueExpr> OpaqueValueExpr::containing(const std::optional<
 
 bool OpaqueValueExpr::contains(const Decl &decl) {
   for (auto &parent : OpaqueValueExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OpaqueValueExpr::contains(const Stmt &stmt) {
   for (auto &parent : OpaqueValueExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

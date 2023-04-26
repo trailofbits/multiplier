@@ -80,14 +80,14 @@ gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpeci
 
 bool ClassTemplatePartialSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ClassTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -78,14 +78,14 @@ gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::containing(const std::o
 
 bool ObjCPropertyRefExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCPropertyRefExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCPropertyRefExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

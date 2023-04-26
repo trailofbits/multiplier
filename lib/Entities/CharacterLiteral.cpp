@@ -74,14 +74,14 @@ gap::generator<CharacterLiteral> CharacterLiteral::containing(const std::optiona
 
 bool CharacterLiteral::contains(const Decl &decl) {
   for (auto &parent : CharacterLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CharacterLiteral::contains(const Stmt &stmt) {
   for (auto &parent : CharacterLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

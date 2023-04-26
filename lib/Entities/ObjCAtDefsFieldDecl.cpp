@@ -76,14 +76,14 @@ gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::containing(const std::o
 
 bool ObjCAtDefsFieldDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCAtDefsFieldDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCAtDefsFieldDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtDefsFieldDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

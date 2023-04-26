@@ -74,14 +74,14 @@ gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::containing(
 
 bool ObjCAvailabilityCheckExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCAvailabilityCheckExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCAvailabilityCheckExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAvailabilityCheckExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

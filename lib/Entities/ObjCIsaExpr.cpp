@@ -74,14 +74,14 @@ gap::generator<ObjCIsaExpr> ObjCIsaExpr::containing(const std::optional<Stmt> &s
 
 bool ObjCIsaExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCIsaExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCIsaExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCIsaExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

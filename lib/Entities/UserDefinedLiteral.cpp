@@ -75,14 +75,14 @@ gap::generator<UserDefinedLiteral> UserDefinedLiteral::containing(const std::opt
 
 bool UserDefinedLiteral::contains(const Decl &decl) {
   for (auto &parent : UserDefinedLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UserDefinedLiteral::contains(const Stmt &stmt) {
   for (auto &parent : UserDefinedLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

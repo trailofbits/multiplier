@@ -75,14 +75,14 @@ gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::containing(cons
 
 bool OMPDeclareReductionDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclareReductionDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPDeclareReductionDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclareReductionDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

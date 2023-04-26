@@ -74,14 +74,14 @@ gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::containing(const 
 
 bool ObjCAtSynchronizedStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtSynchronizedStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCAtSynchronizedStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtSynchronizedStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -75,14 +75,14 @@ gap::generator<ClassTemplateDecl> ClassTemplateDecl::containing(const std::optio
 
 bool ClassTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : ClassTemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ClassTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassTemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -75,14 +75,14 @@ gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::contain
 
 bool OMPDeclarativeDirectiveDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclarativeDirectiveDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPDeclarativeDirectiveDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclarativeDirectiveDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

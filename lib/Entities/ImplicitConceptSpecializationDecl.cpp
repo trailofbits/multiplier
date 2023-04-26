@@ -73,14 +73,14 @@ gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationD
 
 bool ImplicitConceptSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ImplicitConceptSpecializationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ImplicitConceptSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ImplicitConceptSpecializationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

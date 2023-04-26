@@ -69,13 +69,10 @@ class Decl {
   Decl &operator=(Decl &&) noexcept = default;
   Decl &operator=(const Decl &) = default;
 
-  friend inline std::strong_ordering operator<=>(const Decl &lhs, const Decl &rhs) noexcept {
-    return lhs.canonical_declaration().id().Pack() <=>
+  inline bool operator==(const Decl &rhs) const noexcept {
+    return canonical_declaration().id().Pack() ==
            rhs.canonical_declaration().id().Pack();
   }
-
-  bool operator==(const Decl &) const noexcept = default;
-  bool operator!=(const Decl &) const noexcept = default;
 
   /* implicit */ inline Decl(std::shared_ptr<const DeclImpl> impl_)
       : impl(std::move(impl_)) {}

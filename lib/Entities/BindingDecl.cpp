@@ -76,14 +76,14 @@ gap::generator<BindingDecl> BindingDecl::containing(const std::optional<Stmt> &s
 
 bool BindingDecl::contains(const Decl &decl) {
   for (auto &parent : BindingDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BindingDecl::contains(const Stmt &stmt) {
   for (auto &parent : BindingDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

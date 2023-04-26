@@ -74,14 +74,14 @@ gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::containing(
 
 bool UnnamedGlobalConstantDecl::contains(const Decl &decl) {
   for (auto &parent : UnnamedGlobalConstantDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnnamedGlobalConstantDecl::contains(const Stmt &stmt) {
   for (auto &parent : UnnamedGlobalConstantDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

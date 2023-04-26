@@ -75,14 +75,14 @@ gap::generator<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDire
 
 bool OMPParallelMasterTaskLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelMasterTaskLoopDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMasterTaskLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelMasterTaskLoopDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -73,14 +73,14 @@ gap::generator<SEHFinallyStmt> SEHFinallyStmt::containing(const std::optional<St
 
 bool SEHFinallyStmt::contains(const Decl &decl) {
   for (auto &parent : SEHFinallyStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SEHFinallyStmt::contains(const Stmt &stmt) {
   for (auto &parent : SEHFinallyStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

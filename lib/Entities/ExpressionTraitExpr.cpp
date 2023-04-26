@@ -74,14 +74,14 @@ gap::generator<ExpressionTraitExpr> ExpressionTraitExpr::containing(const std::o
 
 bool ExpressionTraitExpr::contains(const Decl &decl) {
   for (auto &parent : ExpressionTraitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ExpressionTraitExpr::contains(const Stmt &stmt) {
   for (auto &parent : ExpressionTraitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

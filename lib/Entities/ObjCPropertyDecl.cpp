@@ -76,14 +76,14 @@ gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::containing(const std::optiona
 
 bool ObjCPropertyDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCPropertyDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCPropertyDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

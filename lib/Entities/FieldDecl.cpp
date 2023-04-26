@@ -79,14 +79,14 @@ gap::generator<FieldDecl> FieldDecl::containing(const std::optional<Stmt> &stmt)
 
 bool FieldDecl::contains(const Decl &decl) {
   for (auto &parent : FieldDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FieldDecl::contains(const Stmt &stmt) {
   for (auto &parent : FieldDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

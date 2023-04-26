@@ -74,14 +74,14 @@ gap::generator<TypoExpr> TypoExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool TypoExpr::contains(const Decl &decl) {
   for (auto &parent : TypoExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TypoExpr::contains(const Stmt &stmt) {
   for (auto &parent : TypoExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

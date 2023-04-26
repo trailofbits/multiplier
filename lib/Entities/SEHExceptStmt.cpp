@@ -74,14 +74,14 @@ gap::generator<SEHExceptStmt> SEHExceptStmt::containing(const std::optional<Stmt
 
 bool SEHExceptStmt::contains(const Decl &decl) {
   for (auto &parent : SEHExceptStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SEHExceptStmt::contains(const Stmt &stmt) {
   for (auto &parent : SEHExceptStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

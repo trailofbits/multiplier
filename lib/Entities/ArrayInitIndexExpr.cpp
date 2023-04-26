@@ -74,14 +74,14 @@ gap::generator<ArrayInitIndexExpr> ArrayInitIndexExpr::containing(const std::opt
 
 bool ArrayInitIndexExpr::contains(const Decl &decl) {
   for (auto &parent : ArrayInitIndexExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ArrayInitIndexExpr::contains(const Stmt &stmt) {
   for (auto &parent : ArrayInitIndexExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

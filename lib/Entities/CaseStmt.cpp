@@ -74,14 +74,14 @@ gap::generator<CaseStmt> CaseStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool CaseStmt::contains(const Decl &decl) {
   for (auto &parent : CaseStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CaseStmt::contains(const Stmt &stmt) {
   for (auto &parent : CaseStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

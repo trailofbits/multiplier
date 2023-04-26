@@ -199,14 +199,14 @@ gap::generator<Expr> Expr::containing(const std::optional<Stmt> &stmt) {
 
 bool Expr::contains(const Decl &decl) {
   for (auto &parent : Expr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool Expr::contains(const Stmt &stmt) {
   for (auto &parent : Expr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

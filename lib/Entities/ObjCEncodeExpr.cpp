@@ -75,14 +75,14 @@ gap::generator<ObjCEncodeExpr> ObjCEncodeExpr::containing(const std::optional<St
 
 bool ObjCEncodeExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCEncodeExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCEncodeExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCEncodeExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

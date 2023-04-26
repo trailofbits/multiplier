@@ -74,14 +74,14 @@ gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::containing(const std::o
 
 bool CompoundLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : CompoundLiteralExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CompoundLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : CompoundLiteralExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

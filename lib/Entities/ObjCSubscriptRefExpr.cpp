@@ -75,14 +75,14 @@ gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::containing(const std:
 
 bool ObjCSubscriptRefExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCSubscriptRefExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCSubscriptRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCSubscriptRefExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

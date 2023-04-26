@@ -75,14 +75,14 @@ gap::generator<ExprWithCleanups> ExprWithCleanups::containing(const std::optiona
 
 bool ExprWithCleanups::contains(const Decl &decl) {
   for (auto &parent : ExprWithCleanups::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ExprWithCleanups::contains(const Stmt &stmt) {
   for (auto &parent : ExprWithCleanups::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

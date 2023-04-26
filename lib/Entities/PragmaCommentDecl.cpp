@@ -72,14 +72,14 @@ gap::generator<PragmaCommentDecl> PragmaCommentDecl::containing(const std::optio
 
 bool PragmaCommentDecl::contains(const Decl &decl) {
   for (auto &parent : PragmaCommentDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool PragmaCommentDecl::contains(const Stmt &stmt) {
   for (auto &parent : PragmaCommentDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -73,14 +73,14 @@ gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::containing(const std::optiona
 
 bool FileScopeAsmDecl::contains(const Decl &decl) {
   for (auto &parent : FileScopeAsmDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FileScopeAsmDecl::contains(const Stmt &stmt) {
   for (auto &parent : FileScopeAsmDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -78,14 +78,14 @@ gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::containing(co
 
 bool RedeclarableTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : RedeclarableTemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool RedeclarableTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : RedeclarableTemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

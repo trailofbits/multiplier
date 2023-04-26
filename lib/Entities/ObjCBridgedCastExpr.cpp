@@ -76,14 +76,14 @@ gap::generator<ObjCBridgedCastExpr> ObjCBridgedCastExpr::containing(const std::o
 
 bool ObjCBridgedCastExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCBridgedCastExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCBridgedCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCBridgedCastExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

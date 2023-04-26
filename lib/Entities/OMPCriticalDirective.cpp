@@ -73,14 +73,14 @@ gap::generator<OMPCriticalDirective> OMPCriticalDirective::containing(const std:
 
 bool OMPCriticalDirective::contains(const Decl &decl) {
   for (auto &parent : OMPCriticalDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPCriticalDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPCriticalDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

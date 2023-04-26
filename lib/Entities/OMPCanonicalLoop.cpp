@@ -74,14 +74,14 @@ gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::containing(const std::optiona
 
 bool OMPCanonicalLoop::contains(const Decl &decl) {
   for (auto &parent : OMPCanonicalLoop::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPCanonicalLoop::contains(const Stmt &stmt) {
   for (auto &parent : OMPCanonicalLoop::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

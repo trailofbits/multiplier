@@ -74,14 +74,14 @@ gap::generator<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::containing(const std::o
 
 bool ObjCBoolLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCBoolLiteralExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCBoolLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCBoolLiteralExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

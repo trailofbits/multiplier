@@ -75,14 +75,14 @@ gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::containing(const st
 
 bool ObjCDictionaryLiteral::contains(const Decl &decl) {
   for (auto &parent : ObjCDictionaryLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCDictionaryLiteral::contains(const Stmt &stmt) {
   for (auto &parent : ObjCDictionaryLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

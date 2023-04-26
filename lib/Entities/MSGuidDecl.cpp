@@ -74,14 +74,14 @@ gap::generator<MSGuidDecl> MSGuidDecl::containing(const std::optional<Stmt> &stm
 
 bool MSGuidDecl::contains(const Decl &decl) {
   for (auto &parent : MSGuidDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MSGuidDecl::contains(const Stmt &stmt) {
   for (auto &parent : MSGuidDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -76,14 +76,14 @@ gap::generator<SwitchStmt> SwitchStmt::containing(const std::optional<Stmt> &stm
 
 bool SwitchStmt::contains(const Decl &decl) {
   for (auto &parent : SwitchStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SwitchStmt::contains(const Stmt &stmt) {
   for (auto &parent : SwitchStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

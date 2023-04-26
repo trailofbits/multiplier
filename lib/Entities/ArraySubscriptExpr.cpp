@@ -74,14 +74,14 @@ gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::containing(const std::opt
 
 bool ArraySubscriptExpr::contains(const Decl &decl) {
   for (auto &parent : ArraySubscriptExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ArraySubscriptExpr::contains(const Stmt &stmt) {
   for (auto &parent : ArraySubscriptExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

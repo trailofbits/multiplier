@@ -73,14 +73,14 @@ gap::generator<OMPScanDirective> OMPScanDirective::containing(const std::optiona
 
 bool OMPScanDirective::contains(const Decl &decl) {
   for (auto &parent : OMPScanDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPScanDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPScanDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

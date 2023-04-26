@@ -75,14 +75,14 @@ gap::generator<OMPParallelForSimdDirective> OMPParallelForSimdDirective::contain
 
 bool OMPParallelForSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPParallelForSimdDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPParallelForSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPParallelForSimdDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

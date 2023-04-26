@@ -74,14 +74,14 @@ gap::generator<ChooseExpr> ChooseExpr::containing(const std::optional<Stmt> &stm
 
 bool ChooseExpr::contains(const Decl &decl) {
   for (auto &parent : ChooseExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ChooseExpr::contains(const Stmt &stmt) {
   for (auto &parent : ChooseExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

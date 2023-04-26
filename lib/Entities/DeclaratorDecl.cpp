@@ -94,14 +94,14 @@ gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const std::optional<St
 
 bool DeclaratorDecl::contains(const Decl &decl) {
   for (auto &parent : DeclaratorDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DeclaratorDecl::contains(const Stmt &stmt) {
   for (auto &parent : DeclaratorDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

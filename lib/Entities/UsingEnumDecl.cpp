@@ -76,14 +76,14 @@ gap::generator<UsingEnumDecl> UsingEnumDecl::containing(const std::optional<Stmt
 
 bool UsingEnumDecl::contains(const Decl &decl) {
   for (auto &parent : UsingEnumDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UsingEnumDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingEnumDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

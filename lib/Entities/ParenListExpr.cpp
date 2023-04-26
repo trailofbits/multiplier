@@ -74,14 +74,14 @@ gap::generator<ParenListExpr> ParenListExpr::containing(const std::optional<Stmt
 
 bool ParenListExpr::contains(const Decl &decl) {
   for (auto &parent : ParenListExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ParenListExpr::contains(const Stmt &stmt) {
   for (auto &parent : ParenListExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -76,14 +76,14 @@ gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::containing(const st
 
 bool CXXFunctionalCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXFunctionalCastExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXFunctionalCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXFunctionalCastExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

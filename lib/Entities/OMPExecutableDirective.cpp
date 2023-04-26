@@ -144,14 +144,14 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::containing(const 
 
 bool OMPExecutableDirective::contains(const Decl &decl) {
   for (auto &parent : OMPExecutableDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPExecutableDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPExecutableDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

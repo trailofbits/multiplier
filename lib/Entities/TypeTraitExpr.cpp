@@ -75,14 +75,14 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::containing(const std::optional<Stmt
 
 bool TypeTraitExpr::contains(const Decl &decl) {
   for (auto &parent : TypeTraitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TypeTraitExpr::contains(const Stmt &stmt) {
   for (auto &parent : TypeTraitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

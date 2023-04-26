@@ -75,14 +75,14 @@ gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::containing(const st
 
 bool TypeAliasTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : TypeAliasTemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TypeAliasTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypeAliasTemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

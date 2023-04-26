@@ -63,12 +63,9 @@ class Type {
   Type &operator=(Type &&) noexcept = default;
   Type &operator=(const Type &) = default;
 
-  friend inline std::strong_ordering operator<=>(const Type &lhs, const Type &rhs) noexcept {
-    return lhs.id().Pack() <=> rhs.id().Pack();
+  inline bool operator==(const Type &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
   }
-
-  bool operator==(const Type &) const noexcept = default;
-  bool operator!=(const Type &) const noexcept = default;
 
   /* implicit */ inline Type(std::shared_ptr<const TypeImpl> impl_)
       : impl(std::move(impl_)) {}

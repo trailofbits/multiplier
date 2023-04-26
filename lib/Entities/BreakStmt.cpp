@@ -72,14 +72,14 @@ gap::generator<BreakStmt> BreakStmt::containing(const std::optional<Stmt> &stmt)
 
 bool BreakStmt::contains(const Decl &decl) {
   for (auto &parent : BreakStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BreakStmt::contains(const Stmt &stmt) {
   for (auto &parent : BreakStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

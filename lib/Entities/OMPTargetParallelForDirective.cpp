@@ -76,14 +76,14 @@ gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::con
 
 bool OMPTargetParallelForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetParallelForDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetParallelForDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

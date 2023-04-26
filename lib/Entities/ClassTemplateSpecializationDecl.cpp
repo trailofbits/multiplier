@@ -81,14 +81,14 @@ gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl:
 
 bool ClassTemplateSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ClassTemplateSpecializationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ClassTemplateSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassTemplateSpecializationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

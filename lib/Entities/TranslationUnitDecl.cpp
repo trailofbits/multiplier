@@ -72,14 +72,14 @@ gap::generator<TranslationUnitDecl> TranslationUnitDecl::containing(const std::o
 
 bool TranslationUnitDecl::contains(const Decl &decl) {
   for (auto &parent : TranslationUnitDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TranslationUnitDecl::contains(const Stmt &stmt) {
   for (auto &parent : TranslationUnitDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

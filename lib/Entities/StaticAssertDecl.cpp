@@ -74,14 +74,14 @@ gap::generator<StaticAssertDecl> StaticAssertDecl::containing(const std::optiona
 
 bool StaticAssertDecl::contains(const Decl &decl) {
   for (auto &parent : StaticAssertDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool StaticAssertDecl::contains(const Stmt &stmt) {
   for (auto &parent : StaticAssertDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

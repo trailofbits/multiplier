@@ -74,14 +74,14 @@ gap::generator<OMPAllocateDecl> OMPAllocateDecl::containing(const std::optional<
 
 bool OMPAllocateDecl::contains(const Decl &decl) {
   for (auto &parent : OMPAllocateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPAllocateDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPAllocateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

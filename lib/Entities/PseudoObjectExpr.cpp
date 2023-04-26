@@ -74,14 +74,14 @@ gap::generator<PseudoObjectExpr> PseudoObjectExpr::containing(const std::optiona
 
 bool PseudoObjectExpr::contains(const Decl &decl) {
   for (auto &parent : PseudoObjectExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool PseudoObjectExpr::contains(const Stmt &stmt) {
   for (auto &parent : PseudoObjectExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

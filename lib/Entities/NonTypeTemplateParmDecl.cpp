@@ -77,14 +77,14 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::containing(cons
 
 bool NonTypeTemplateParmDecl::contains(const Decl &decl) {
   for (auto &parent : NonTypeTemplateParmDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool NonTypeTemplateParmDecl::contains(const Stmt &stmt) {
   for (auto &parent : NonTypeTemplateParmDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

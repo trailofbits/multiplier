@@ -79,14 +79,14 @@ gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::containing(const std::optiona
 
 bool ObjCCategoryDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCCategoryDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCCategoryDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCCategoryDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

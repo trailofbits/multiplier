@@ -74,14 +74,14 @@ gap::generator<SourceLocExpr> SourceLocExpr::containing(const std::optional<Stmt
 
 bool SourceLocExpr::contains(const Decl &decl) {
   for (auto &parent : SourceLocExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SourceLocExpr::contains(const Stmt &stmt) {
   for (auto &parent : SourceLocExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

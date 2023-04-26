@@ -74,14 +74,14 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::containing(const std:
 
 bool ExtVectorElementExpr::contains(const Decl &decl) {
   for (auto &parent : ExtVectorElementExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ExtVectorElementExpr::contains(const Stmt &stmt) {
   for (auto &parent : ExtVectorElementExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

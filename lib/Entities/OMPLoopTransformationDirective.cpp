@@ -76,14 +76,14 @@ gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::c
 
 bool OMPLoopTransformationDirective::contains(const Decl &decl) {
   for (auto &parent : OMPLoopTransformationDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPLoopTransformationDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPLoopTransformationDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

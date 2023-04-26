@@ -76,14 +76,14 @@ gap::generator<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistr
 
 bool OMPTargetTeamsDistributeParallelForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

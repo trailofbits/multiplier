@@ -74,14 +74,14 @@ gap::generator<UnaryOperator> UnaryOperator::containing(const std::optional<Stmt
 
 bool UnaryOperator::contains(const Decl &decl) {
   for (auto &parent : UnaryOperator::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnaryOperator::contains(const Stmt &stmt) {
   for (auto &parent : UnaryOperator::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

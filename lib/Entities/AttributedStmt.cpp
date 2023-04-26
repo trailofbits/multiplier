@@ -74,14 +74,14 @@ gap::generator<AttributedStmt> AttributedStmt::containing(const std::optional<St
 
 bool AttributedStmt::contains(const Decl &decl) {
   for (auto &parent : AttributedStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool AttributedStmt::contains(const Stmt &stmt) {
   for (auto &parent : AttributedStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

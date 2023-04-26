@@ -73,14 +73,14 @@ gap::generator<OMPMetaDirective> OMPMetaDirective::containing(const std::optiona
 
 bool OMPMetaDirective::contains(const Decl &decl) {
   for (auto &parent : OMPMetaDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPMetaDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPMetaDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

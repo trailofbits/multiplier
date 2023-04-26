@@ -75,14 +75,14 @@ gap::generator<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLo
 
 bool OMPTargetParallelGenericLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetParallelGenericLoopDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelGenericLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetParallelGenericLoopDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

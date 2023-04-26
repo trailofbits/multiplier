@@ -74,14 +74,14 @@ gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::containing(co
 
 bool SYCLUniqueStableNameExpr::contains(const Decl &decl) {
   for (auto &parent : SYCLUniqueStableNameExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SYCLUniqueStableNameExpr::contains(const Stmt &stmt) {
   for (auto &parent : SYCLUniqueStableNameExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

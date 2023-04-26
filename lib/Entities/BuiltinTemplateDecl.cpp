@@ -74,14 +74,14 @@ gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::containing(const std::o
 
 bool BuiltinTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : BuiltinTemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BuiltinTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : BuiltinTemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

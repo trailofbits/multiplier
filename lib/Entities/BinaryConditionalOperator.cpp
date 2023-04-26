@@ -76,14 +76,14 @@ gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::containing(
 
 bool BinaryConditionalOperator::contains(const Decl &decl) {
   for (auto &parent : BinaryConditionalOperator::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BinaryConditionalOperator::contains(const Stmt &stmt) {
   for (auto &parent : BinaryConditionalOperator::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

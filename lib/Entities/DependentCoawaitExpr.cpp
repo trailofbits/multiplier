@@ -75,14 +75,14 @@ gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::containing(const std:
 
 bool DependentCoawaitExpr::contains(const Decl &decl) {
   for (auto &parent : DependentCoawaitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DependentCoawaitExpr::contains(const Stmt &stmt) {
   for (auto &parent : DependentCoawaitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

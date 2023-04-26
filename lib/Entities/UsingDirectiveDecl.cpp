@@ -73,14 +73,14 @@ gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::containing(const std::opt
 
 bool UsingDirectiveDecl::contains(const Decl &decl) {
   for (auto &parent : UsingDirectiveDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UsingDirectiveDecl::contains(const Stmt &stmt) {
   for (auto &parent : UsingDirectiveDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

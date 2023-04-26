@@ -74,14 +74,14 @@ gap::generator<LabelDecl> LabelDecl::containing(const std::optional<Stmt> &stmt)
 
 bool LabelDecl::contains(const Decl &decl) {
   for (auto &parent : LabelDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool LabelDecl::contains(const Stmt &stmt) {
   for (auto &parent : LabelDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -82,14 +82,14 @@ gap::generator<TagDecl> TagDecl::containing(const std::optional<Stmt> &stmt) {
 
 bool TagDecl::contains(const Decl &decl) {
   for (auto &parent : TagDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TagDecl::contains(const Stmt &stmt) {
   for (auto &parent : TagDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

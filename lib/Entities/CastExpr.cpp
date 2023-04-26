@@ -86,14 +86,14 @@ gap::generator<CastExpr> CastExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool CastExpr::contains(const Decl &decl) {
   for (auto &parent : CastExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CastExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

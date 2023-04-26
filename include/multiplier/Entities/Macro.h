@@ -60,12 +60,9 @@ class Macro {
   Macro &operator=(Macro &&) noexcept = default;
   Macro &operator=(const Macro &) = default;
 
-  friend inline std::strong_ordering operator<=>(const Macro &lhs, const Macro &rhs) noexcept {
-    return lhs.id().Pack() <=> rhs.id().Pack();
+  inline bool operator==(const Macro &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
   }
-
-  bool operator==(const Macro &) const noexcept = default;
-  bool operator!=(const Macro &) const noexcept = default;
 
   /* implicit */ inline Macro(std::shared_ptr<const MacroImpl> impl_)
       : impl(std::move(impl_)) {}

@@ -77,14 +77,14 @@ gap::generator<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::containing(const std:
 
 bool CXXAddrspaceCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXAddrspaceCastExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXAddrspaceCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXAddrspaceCastExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

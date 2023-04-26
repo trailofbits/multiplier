@@ -74,14 +74,14 @@ gap::generator<FixedPointLiteral> FixedPointLiteral::containing(const std::optio
 
 bool FixedPointLiteral::contains(const Decl &decl) {
   for (auto &parent : FixedPointLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FixedPointLiteral::contains(const Stmt &stmt) {
   for (auto &parent : FixedPointLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

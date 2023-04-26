@@ -76,14 +76,14 @@ gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::containing(co
 
 bool MaterializeTemporaryExpr::contains(const Decl &decl) {
   for (auto &parent : MaterializeTemporaryExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MaterializeTemporaryExpr::contains(const Stmt &stmt) {
   for (auto &parent : MaterializeTemporaryExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

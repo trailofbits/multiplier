@@ -75,14 +75,14 @@ gap::generator<VAArgExpr> VAArgExpr::containing(const std::optional<Stmt> &stmt)
 
 bool VAArgExpr::contains(const Decl &decl) {
   for (auto &parent : VAArgExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool VAArgExpr::contains(const Stmt &stmt) {
   for (auto &parent : VAArgExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -77,14 +77,14 @@ gap::generator<OverloadExpr> OverloadExpr::containing(const std::optional<Stmt> 
 
 bool OverloadExpr::contains(const Decl &decl) {
   for (auto &parent : OverloadExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OverloadExpr::contains(const Stmt &stmt) {
   for (auto &parent : OverloadExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

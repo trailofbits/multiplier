@@ -75,14 +75,14 @@ gap::generator<TypedefDecl> TypedefDecl::containing(const std::optional<Stmt> &s
 
 bool TypedefDecl::contains(const Decl &decl) {
   for (auto &parent : TypedefDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TypedefDecl::contains(const Stmt &stmt) {
   for (auto &parent : TypedefDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -76,14 +76,14 @@ gap::generator<FullExpr> FullExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool FullExpr::contains(const Decl &decl) {
   for (auto &parent : FullExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FullExpr::contains(const Stmt &stmt) {
   for (auto &parent : FullExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

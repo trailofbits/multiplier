@@ -74,14 +74,14 @@ gap::generator<IndirectGotoStmt> IndirectGotoStmt::containing(const std::optiona
 
 bool IndirectGotoStmt::contains(const Decl &decl) {
   for (auto &parent : IndirectGotoStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool IndirectGotoStmt::contains(const Stmt &stmt) {
   for (auto &parent : IndirectGotoStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

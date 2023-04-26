@@ -85,14 +85,14 @@ gap::generator<FunctionDecl> FunctionDecl::containing(const std::optional<Stmt> 
 
 bool FunctionDecl::contains(const Decl &decl) {
   for (auto &parent : FunctionDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FunctionDecl::contains(const Stmt &stmt) {
   for (auto &parent : FunctionDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

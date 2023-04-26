@@ -75,14 +75,14 @@ gap::generator<CXXTypeidExpr> CXXTypeidExpr::containing(const std::optional<Stmt
 
 bool CXXTypeidExpr::contains(const Decl &decl) {
   for (auto &parent : CXXTypeidExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXTypeidExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXTypeidExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

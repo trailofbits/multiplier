@@ -74,14 +74,14 @@ gap::generator<OMPAtomicDirective> OMPAtomicDirective::containing(const std::opt
 
 bool OMPAtomicDirective::contains(const Decl &decl) {
   for (auto &parent : OMPAtomicDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPAtomicDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPAtomicDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -72,14 +72,14 @@ gap::generator<EmptyDecl> EmptyDecl::containing(const std::optional<Stmt> &stmt)
 
 bool EmptyDecl::contains(const Decl &decl) {
   for (auto &parent : EmptyDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool EmptyDecl::contains(const Stmt &stmt) {
   for (auto &parent : EmptyDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

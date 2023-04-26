@@ -73,14 +73,14 @@ gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::containing(const std:
 
 bool OMPTaskwaitDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskwaitDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTaskwaitDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskwaitDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

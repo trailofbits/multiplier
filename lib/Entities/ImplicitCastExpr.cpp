@@ -75,14 +75,14 @@ gap::generator<ImplicitCastExpr> ImplicitCastExpr::containing(const std::optiona
 
 bool ImplicitCastExpr::contains(const Decl &decl) {
   for (auto &parent : ImplicitCastExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ImplicitCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : ImplicitCastExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

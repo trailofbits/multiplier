@@ -74,14 +74,14 @@ gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::containing(const st
 
 bool CXXNullPtrLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : CXXNullPtrLiteralExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXNullPtrLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXNullPtrLiteralExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

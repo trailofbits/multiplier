@@ -75,14 +75,14 @@ gap::generator<SEHTryStmt> SEHTryStmt::containing(const std::optional<Stmt> &stm
 
 bool SEHTryStmt::contains(const Decl &decl) {
   for (auto &parent : SEHTryStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SEHTryStmt::contains(const Stmt &stmt) {
   for (auto &parent : SEHTryStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

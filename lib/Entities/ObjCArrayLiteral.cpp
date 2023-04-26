@@ -75,14 +75,14 @@ gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::containing(const std::optiona
 
 bool ObjCArrayLiteral::contains(const Decl &decl) {
   for (auto &parent : ObjCArrayLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCArrayLiteral::contains(const Stmt &stmt) {
   for (auto &parent : ObjCArrayLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

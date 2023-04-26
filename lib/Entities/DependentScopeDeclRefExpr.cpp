@@ -74,14 +74,14 @@ gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::containing(
 
 bool DependentScopeDeclRefExpr::contains(const Decl &decl) {
   for (auto &parent : DependentScopeDeclRefExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DependentScopeDeclRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : DependentScopeDeclRefExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

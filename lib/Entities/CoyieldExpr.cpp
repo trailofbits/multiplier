@@ -75,14 +75,14 @@ gap::generator<CoyieldExpr> CoyieldExpr::containing(const std::optional<Stmt> &s
 
 bool CoyieldExpr::contains(const Decl &decl) {
   for (auto &parent : CoyieldExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CoyieldExpr::contains(const Stmt &stmt) {
   for (auto &parent : CoyieldExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

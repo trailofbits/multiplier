@@ -76,14 +76,14 @@ gap::generator<CStyleCastExpr> CStyleCastExpr::containing(const std::optional<St
 
 bool CStyleCastExpr::contains(const Decl &decl) {
   for (auto &parent : CStyleCastExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CStyleCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CStyleCastExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

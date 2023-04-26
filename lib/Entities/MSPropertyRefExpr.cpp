@@ -75,14 +75,14 @@ gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::containing(const std::optio
 
 bool MSPropertyRefExpr::contains(const Decl &decl) {
   for (auto &parent : MSPropertyRefExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MSPropertyRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : MSPropertyRefExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

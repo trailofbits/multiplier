@@ -74,14 +74,14 @@ gap::generator<IntegerLiteral> IntegerLiteral::containing(const std::optional<St
 
 bool IntegerLiteral::contains(const Decl &decl) {
   for (auto &parent : IntegerLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool IntegerLiteral::contains(const Stmt &stmt) {
   for (auto &parent : IntegerLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

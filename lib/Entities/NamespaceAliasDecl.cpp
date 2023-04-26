@@ -73,14 +73,14 @@ gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::containing(const std::opt
 
 bool NamespaceAliasDecl::contains(const Decl &decl) {
   for (auto &parent : NamespaceAliasDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool NamespaceAliasDecl::contains(const Stmt &stmt) {
   for (auto &parent : NamespaceAliasDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

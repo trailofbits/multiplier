@@ -74,14 +74,14 @@ gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::containing(co
 
 bool UnresolvedUsingValueDecl::contains(const Decl &decl) {
   for (auto &parent : UnresolvedUsingValueDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingValueDecl::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedUsingValueDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

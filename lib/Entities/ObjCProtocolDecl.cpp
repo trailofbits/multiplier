@@ -75,14 +75,14 @@ gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::containing(const std::optiona
 
 bool ObjCProtocolDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCProtocolDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCProtocolDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCProtocolDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

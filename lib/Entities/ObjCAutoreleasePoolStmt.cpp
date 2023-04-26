@@ -72,14 +72,14 @@ gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::containing(cons
 
 bool ObjCAutoreleasePoolStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAutoreleasePoolStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCAutoreleasePoolStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAutoreleasePoolStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

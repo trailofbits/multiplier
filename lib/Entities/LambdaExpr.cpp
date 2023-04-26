@@ -81,14 +81,14 @@ gap::generator<LambdaExpr> LambdaExpr::containing(const std::optional<Stmt> &stm
 
 bool LambdaExpr::contains(const Decl &decl) {
   for (auto &parent : LambdaExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool LambdaExpr::contains(const Stmt &stmt) {
   for (auto &parent : LambdaExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

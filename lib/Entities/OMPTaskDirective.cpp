@@ -73,14 +73,14 @@ gap::generator<OMPTaskDirective> OMPTaskDirective::containing(const std::optiona
 
 bool OMPTaskDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTaskDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

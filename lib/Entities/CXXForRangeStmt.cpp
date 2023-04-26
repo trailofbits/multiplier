@@ -75,14 +75,14 @@ gap::generator<CXXForRangeStmt> CXXForRangeStmt::containing(const std::optional<
 
 bool CXXForRangeStmt::contains(const Decl &decl) {
   for (auto &parent : CXXForRangeStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXForRangeStmt::contains(const Stmt &stmt) {
   for (auto &parent : CXXForRangeStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

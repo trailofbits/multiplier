@@ -74,14 +74,14 @@ gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::containing(const std:
 
 bool OMPThreadPrivateDecl::contains(const Decl &decl) {
   for (auto &parent : OMPThreadPrivateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPThreadPrivateDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPThreadPrivateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

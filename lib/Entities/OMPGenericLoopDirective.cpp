@@ -75,14 +75,14 @@ gap::generator<OMPGenericLoopDirective> OMPGenericLoopDirective::containing(cons
 
 bool OMPGenericLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPGenericLoopDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPGenericLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPGenericLoopDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

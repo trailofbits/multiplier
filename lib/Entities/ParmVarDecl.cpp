@@ -79,14 +79,14 @@ gap::generator<ParmVarDecl> ParmVarDecl::containing(const std::optional<Stmt> &s
 
 bool ParmVarDecl::contains(const Decl &decl) {
   for (auto &parent : ParmVarDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ParmVarDecl::contains(const Stmt &stmt) {
   for (auto &parent : ParmVarDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

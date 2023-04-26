@@ -74,14 +74,14 @@ gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::containin
 
 bool CXXRewrittenBinaryOperator::contains(const Decl &decl) {
   for (auto &parent : CXXRewrittenBinaryOperator::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXRewrittenBinaryOperator::contains(const Stmt &stmt) {
   for (auto &parent : CXXRewrittenBinaryOperator::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -73,14 +73,14 @@ gap::generator<DefaultStmt> DefaultStmt::containing(const std::optional<Stmt> &s
 
 bool DefaultStmt::contains(const Decl &decl) {
   for (auto &parent : DefaultStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DefaultStmt::contains(const Stmt &stmt) {
   for (auto &parent : DefaultStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

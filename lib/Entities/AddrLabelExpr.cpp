@@ -75,14 +75,14 @@ gap::generator<AddrLabelExpr> AddrLabelExpr::containing(const std::optional<Stmt
 
 bool AddrLabelExpr::contains(const Decl &decl) {
   for (auto &parent : AddrLabelExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool AddrLabelExpr::contains(const Stmt &stmt) {
   for (auto &parent : AddrLabelExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

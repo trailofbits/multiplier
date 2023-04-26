@@ -75,14 +75,14 @@ gap::generator<BinaryOperator> BinaryOperator::containing(const std::optional<St
 
 bool BinaryOperator::contains(const Decl &decl) {
   for (auto &parent : BinaryOperator::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BinaryOperator::contains(const Stmt &stmt) {
   for (auto &parent : BinaryOperator::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

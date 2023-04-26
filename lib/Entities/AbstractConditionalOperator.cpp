@@ -76,14 +76,14 @@ gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::contain
 
 bool AbstractConditionalOperator::contains(const Decl &decl) {
   for (auto &parent : AbstractConditionalOperator::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool AbstractConditionalOperator::contains(const Stmt &stmt) {
   for (auto &parent : AbstractConditionalOperator::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

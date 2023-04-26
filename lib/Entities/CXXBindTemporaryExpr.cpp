@@ -74,14 +74,14 @@ gap::generator<CXXBindTemporaryExpr> CXXBindTemporaryExpr::containing(const std:
 
 bool CXXBindTemporaryExpr::contains(const Decl &decl) {
   for (auto &parent : CXXBindTemporaryExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXBindTemporaryExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXBindTemporaryExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

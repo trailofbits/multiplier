@@ -78,14 +78,14 @@ gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const st
 
 bool CXXDeductionGuideDecl::contains(const Decl &decl) {
   for (auto &parent : CXXDeductionGuideDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXDeductionGuideDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXDeductionGuideDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

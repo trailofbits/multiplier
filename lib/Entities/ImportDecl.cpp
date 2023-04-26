@@ -73,14 +73,14 @@ gap::generator<ImportDecl> ImportDecl::containing(const std::optional<Stmt> &stm
 
 bool ImportDecl::contains(const Decl &decl) {
   for (auto &parent : ImportDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ImportDecl::contains(const Stmt &stmt) {
   for (auto &parent : ImportDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

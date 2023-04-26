@@ -74,14 +74,14 @@ gap::generator<SwitchCase> SwitchCase::containing(const std::optional<Stmt> &stm
 
 bool SwitchCase::contains(const Decl &decl) {
   for (auto &parent : SwitchCase::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SwitchCase::contains(const Stmt &stmt) {
   for (auto &parent : SwitchCase::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -110,14 +110,14 @@ gap::generator<OMPLoopDirective> OMPLoopDirective::containing(const std::optiona
 
 bool OMPLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPLoopDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPLoopDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

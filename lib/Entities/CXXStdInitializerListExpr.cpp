@@ -74,14 +74,14 @@ gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::containing(
 
 bool CXXStdInitializerListExpr::contains(const Decl &decl) {
   for (auto &parent : CXXStdInitializerListExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXStdInitializerListExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXStdInitializerListExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

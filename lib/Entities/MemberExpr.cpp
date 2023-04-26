@@ -75,14 +75,14 @@ gap::generator<MemberExpr> MemberExpr::containing(const std::optional<Stmt> &stm
 
 bool MemberExpr::contains(const Decl &decl) {
   for (auto &parent : MemberExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MemberExpr::contains(const Stmt &stmt) {
   for (auto &parent : MemberExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -72,14 +72,14 @@ gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::containing(co
 
 bool PragmaDetectMismatchDecl::contains(const Decl &decl) {
   for (auto &parent : PragmaDetectMismatchDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool PragmaDetectMismatchDecl::contains(const Stmt &stmt) {
   for (auto &parent : PragmaDetectMismatchDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

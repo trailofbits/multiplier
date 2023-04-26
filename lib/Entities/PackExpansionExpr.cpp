@@ -74,14 +74,14 @@ gap::generator<PackExpansionExpr> PackExpansionExpr::containing(const std::optio
 
 bool PackExpansionExpr::contains(const Decl &decl) {
   for (auto &parent : PackExpansionExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool PackExpansionExpr::contains(const Stmt &stmt) {
   for (auto &parent : PackExpansionExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

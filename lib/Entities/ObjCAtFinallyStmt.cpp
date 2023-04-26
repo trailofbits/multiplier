@@ -72,14 +72,14 @@ gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::containing(const std::optio
 
 bool ObjCAtFinallyStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtFinallyStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCAtFinallyStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtFinallyStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

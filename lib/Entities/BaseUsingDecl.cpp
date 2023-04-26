@@ -76,14 +76,14 @@ gap::generator<BaseUsingDecl> BaseUsingDecl::containing(const std::optional<Stmt
 
 bool BaseUsingDecl::contains(const Decl &decl) {
   for (auto &parent : BaseUsingDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BaseUsingDecl::contains(const Stmt &stmt) {
   for (auto &parent : BaseUsingDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

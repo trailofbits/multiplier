@@ -77,14 +77,14 @@ gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::containing(const std::opt
 
 bool CXXDynamicCastExpr::contains(const Decl &decl) {
   for (auto &parent : CXXDynamicCastExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXDynamicCastExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXDynamicCastExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

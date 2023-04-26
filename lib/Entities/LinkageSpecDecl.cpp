@@ -72,14 +72,14 @@ gap::generator<LinkageSpecDecl> LinkageSpecDecl::containing(const std::optional<
 
 bool LinkageSpecDecl::contains(const Decl &decl) {
   for (auto &parent : LinkageSpecDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool LinkageSpecDecl::contains(const Stmt &stmt) {
   for (auto &parent : LinkageSpecDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -76,14 +76,14 @@ gap::generator<DeclRefExpr> DeclRefExpr::containing(const std::optional<Stmt> &s
 
 bool DeclRefExpr::contains(const Decl &decl) {
   for (auto &parent : DeclRefExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DeclRefExpr::contains(const Stmt &stmt) {
   for (auto &parent : DeclRefExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

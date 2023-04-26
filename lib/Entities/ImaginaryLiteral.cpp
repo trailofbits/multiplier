@@ -74,14 +74,14 @@ gap::generator<ImaginaryLiteral> ImaginaryLiteral::containing(const std::optiona
 
 bool ImaginaryLiteral::contains(const Decl &decl) {
   for (auto &parent : ImaginaryLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ImaginaryLiteral::contains(const Stmt &stmt) {
   for (auto &parent : ImaginaryLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

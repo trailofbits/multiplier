@@ -75,14 +75,14 @@ gap::generator<FriendTemplateDecl> FriendTemplateDecl::containing(const std::opt
 
 bool FriendTemplateDecl::contains(const Decl &decl) {
   for (auto &parent : FriendTemplateDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FriendTemplateDecl::contains(const Stmt &stmt) {
   for (auto &parent : FriendTemplateDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

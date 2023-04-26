@@ -75,14 +75,14 @@ gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::containin
 
 bool OMPDistributeSimdDirective::contains(const Decl &decl) {
   for (auto &parent : OMPDistributeSimdDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeSimdDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPDistributeSimdDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

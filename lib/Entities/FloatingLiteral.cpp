@@ -74,14 +74,14 @@ gap::generator<FloatingLiteral> FloatingLiteral::containing(const std::optional<
 
 bool FloatingLiteral::contains(const Decl &decl) {
   for (auto &parent : FloatingLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool FloatingLiteral::contains(const Stmt &stmt) {
   for (auto &parent : FloatingLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

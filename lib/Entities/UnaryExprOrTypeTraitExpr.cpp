@@ -75,14 +75,14 @@ gap::generator<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::containing(co
 
 bool UnaryExprOrTypeTraitExpr::contains(const Decl &decl) {
   for (auto &parent : UnaryExprOrTypeTraitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnaryExprOrTypeTraitExpr::contains(const Stmt &stmt) {
   for (auto &parent : UnaryExprOrTypeTraitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

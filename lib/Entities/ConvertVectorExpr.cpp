@@ -74,14 +74,14 @@ gap::generator<ConvertVectorExpr> ConvertVectorExpr::containing(const std::optio
 
 bool ConvertVectorExpr::contains(const Decl &decl) {
   for (auto &parent : ConvertVectorExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ConvertVectorExpr::contains(const Stmt &stmt) {
   for (auto &parent : ConvertVectorExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

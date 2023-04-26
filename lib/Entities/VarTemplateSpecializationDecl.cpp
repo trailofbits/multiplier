@@ -80,14 +80,14 @@ gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::con
 
 bool VarTemplateSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : VarTemplateSpecializationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool VarTemplateSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : VarTemplateSpecializationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

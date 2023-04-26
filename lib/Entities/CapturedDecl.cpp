@@ -73,14 +73,14 @@ gap::generator<CapturedDecl> CapturedDecl::containing(const std::optional<Stmt> 
 
 bool CapturedDecl::contains(const Decl &decl) {
   for (auto &parent : CapturedDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CapturedDecl::contains(const Stmt &stmt) {
   for (auto &parent : CapturedDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -75,14 +75,14 @@ gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::containing(const std::optio
 
 bool CXXDefaultArgExpr::contains(const Decl &decl) {
   for (auto &parent : CXXDefaultArgExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXDefaultArgExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXDefaultArgExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

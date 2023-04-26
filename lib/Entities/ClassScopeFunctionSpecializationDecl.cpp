@@ -73,14 +73,14 @@ gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializ
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Decl &decl) {
   for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Stmt &stmt) {
   for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

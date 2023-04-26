@@ -72,14 +72,14 @@ gap::generator<SEHLeaveStmt> SEHLeaveStmt::containing(const std::optional<Stmt> 
 
 bool SEHLeaveStmt::contains(const Decl &decl) {
   for (auto &parent : SEHLeaveStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SEHLeaveStmt::contains(const Stmt &stmt) {
   for (auto &parent : SEHLeaveStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

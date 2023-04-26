@@ -73,14 +73,14 @@ gap::generator<OMPCancelDirective> OMPCancelDirective::containing(const std::opt
 
 bool OMPCancelDirective::contains(const Decl &decl) {
   for (auto &parent : OMPCancelDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPCancelDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPCancelDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

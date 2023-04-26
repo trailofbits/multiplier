@@ -72,14 +72,14 @@ gap::generator<CompoundStmt> CompoundStmt::containing(const std::optional<Stmt> 
 
 bool CompoundStmt::contains(const Decl &decl) {
   for (auto &parent : CompoundStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CompoundStmt::contains(const Stmt &stmt) {
   for (auto &parent : CompoundStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -62,12 +62,9 @@ class CXXBaseSpecifier {
   CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
 
-  friend inline std::strong_ordering operator<=>(const CXXBaseSpecifier &lhs, const CXXBaseSpecifier &rhs) noexcept {
-    return lhs.id().Pack() <=> rhs.id().Pack();
+  inline bool operator==(const CXXBaseSpecifier &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
   }
-
-  bool operator==(const CXXBaseSpecifier &) const noexcept = default;
-  bool operator!=(const CXXBaseSpecifier &) const noexcept = default;
 
   /* implicit */ inline CXXBaseSpecifier(std::shared_ptr<const CXXBaseSpecifierImpl> impl_)
       : impl(std::move(impl_)) {}

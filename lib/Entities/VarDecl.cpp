@@ -83,14 +83,14 @@ gap::generator<VarDecl> VarDecl::containing(const std::optional<Stmt> &stmt) {
 
 bool VarDecl::contains(const Decl &decl) {
   for (auto &parent : VarDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool VarDecl::contains(const Stmt &stmt) {
   for (auto &parent : VarDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

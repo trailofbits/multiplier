@@ -76,14 +76,14 @@ gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::containing(
 
 bool ConceptSpecializationExpr::contains(const Decl &decl) {
   for (auto &parent : ConceptSpecializationExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ConceptSpecializationExpr::contains(const Stmt &stmt) {
   for (auto &parent : ConceptSpecializationExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

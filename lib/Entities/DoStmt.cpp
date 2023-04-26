@@ -73,14 +73,14 @@ gap::generator<DoStmt> DoStmt::containing(const std::optional<Stmt> &stmt) {
 
 bool DoStmt::contains(const Decl &decl) {
   for (auto &parent : DoStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DoStmt::contains(const Stmt &stmt) {
   for (auto &parent : DoStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

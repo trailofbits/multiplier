@@ -74,14 +74,14 @@ gap::generator<GNUNullExpr> GNUNullExpr::containing(const std::optional<Stmt> &s
 
 bool GNUNullExpr::contains(const Decl &decl) {
   for (auto &parent : GNUNullExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool GNUNullExpr::contains(const Stmt &stmt) {
   for (auto &parent : GNUNullExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

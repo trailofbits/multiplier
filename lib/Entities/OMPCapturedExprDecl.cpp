@@ -76,14 +76,14 @@ gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::containing(const std::o
 
 bool OMPCapturedExprDecl::contains(const Decl &decl) {
   for (auto &parent : OMPCapturedExprDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPCapturedExprDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPCapturedExprDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

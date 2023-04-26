@@ -75,14 +75,14 @@ gap::generator<UnresolvedLookupExpr> UnresolvedLookupExpr::containing(const std:
 
 bool UnresolvedLookupExpr::contains(const Decl &decl) {
   for (auto &parent : UnresolvedLookupExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool UnresolvedLookupExpr::contains(const Stmt &stmt) {
   for (auto &parent : UnresolvedLookupExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

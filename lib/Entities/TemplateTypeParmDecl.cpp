@@ -75,14 +75,14 @@ gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::containing(const std:
 
 bool TemplateTypeParmDecl::contains(const Decl &decl) {
   for (auto &parent : TemplateTypeParmDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool TemplateTypeParmDecl::contains(const Stmt &stmt) {
   for (auto &parent : TemplateTypeParmDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

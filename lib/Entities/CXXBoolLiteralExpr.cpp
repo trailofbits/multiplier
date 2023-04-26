@@ -74,14 +74,14 @@ gap::generator<CXXBoolLiteralExpr> CXXBoolLiteralExpr::containing(const std::opt
 
 bool CXXBoolLiteralExpr::contains(const Decl &decl) {
   for (auto &parent : CXXBoolLiteralExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXBoolLiteralExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXBoolLiteralExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

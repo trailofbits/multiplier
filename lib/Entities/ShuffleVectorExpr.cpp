@@ -74,14 +74,14 @@ gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::containing(const std::optio
 
 bool ShuffleVectorExpr::contains(const Decl &decl) {
   for (auto &parent : ShuffleVectorExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ShuffleVectorExpr::contains(const Stmt &stmt) {
   for (auto &parent : ShuffleVectorExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

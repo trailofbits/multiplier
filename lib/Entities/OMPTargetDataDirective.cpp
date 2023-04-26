@@ -73,14 +73,14 @@ gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::containing(const 
 
 bool OMPTargetDataDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetDataDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTargetDataDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetDataDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

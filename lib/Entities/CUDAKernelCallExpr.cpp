@@ -75,14 +75,14 @@ gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::containing(const std::opt
 
 bool CUDAKernelCallExpr::contains(const Decl &decl) {
   for (auto &parent : CUDAKernelCallExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CUDAKernelCallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CUDAKernelCallExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

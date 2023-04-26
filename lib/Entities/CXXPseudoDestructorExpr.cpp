@@ -75,14 +75,14 @@ gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::containing(cons
 
 bool CXXPseudoDestructorExpr::contains(const Decl &decl) {
   for (auto &parent : CXXPseudoDestructorExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXPseudoDestructorExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXPseudoDestructorExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -73,14 +73,14 @@ gap::generator<OMPDispatchDirective> OMPDispatchDirective::containing(const std:
 
 bool OMPDispatchDirective::contains(const Decl &decl) {
   for (auto &parent : OMPDispatchDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPDispatchDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPDispatchDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

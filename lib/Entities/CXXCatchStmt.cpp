@@ -74,14 +74,14 @@ gap::generator<CXXCatchStmt> CXXCatchStmt::containing(const std::optional<Stmt> 
 
 bool CXXCatchStmt::contains(const Decl &decl) {
   for (auto &parent : CXXCatchStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXCatchStmt::contains(const Stmt &stmt) {
   for (auto &parent : CXXCatchStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

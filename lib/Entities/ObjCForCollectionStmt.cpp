@@ -73,14 +73,14 @@ gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::containing(const st
 
 bool ObjCForCollectionStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCForCollectionStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCForCollectionStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCForCollectionStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

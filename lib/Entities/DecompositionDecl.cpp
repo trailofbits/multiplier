@@ -77,14 +77,14 @@ gap::generator<DecompositionDecl> DecompositionDecl::containing(const std::optio
 
 bool DecompositionDecl::contains(const Decl &decl) {
   for (auto &parent : DecompositionDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool DecompositionDecl::contains(const Stmt &stmt) {
   for (auto &parent : DecompositionDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

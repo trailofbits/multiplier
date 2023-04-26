@@ -78,14 +78,14 @@ gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const std::optional<
 
 bool ObjCMessageExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCMessageExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCMessageExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCMessageExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

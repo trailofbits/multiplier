@@ -75,14 +75,14 @@ gap::generator<WhileStmt> WhileStmt::containing(const std::optional<Stmt> &stmt)
 
 bool WhileStmt::contains(const Decl &decl) {
   for (auto &parent : WhileStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool WhileStmt::contains(const Stmt &stmt) {
   for (auto &parent : WhileStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -75,14 +75,14 @@ gap::generator<OMPTaskLoopDirective> OMPTaskLoopDirective::containing(const std:
 
 bool OMPTaskLoopDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskLoopDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTaskLoopDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskLoopDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

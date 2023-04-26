@@ -74,14 +74,14 @@ gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::containing(const std::o
 
 bool OMPArrayShapingExpr::contains(const Decl &decl) {
   for (auto &parent : OMPArrayShapingExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPArrayShapingExpr::contains(const Stmt &stmt) {
   for (auto &parent : OMPArrayShapingExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

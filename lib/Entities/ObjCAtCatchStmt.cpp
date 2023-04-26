@@ -73,14 +73,14 @@ gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::containing(const std::optional<
 
 bool ObjCAtCatchStmt::contains(const Decl &decl) {
   for (auto &parent : ObjCAtCatchStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCAtCatchStmt::contains(const Stmt &stmt) {
   for (auto &parent : ObjCAtCatchStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

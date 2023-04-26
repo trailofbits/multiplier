@@ -74,14 +74,14 @@ gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::containing(const 
 
 bool CXXScalarValueInitExpr::contains(const Decl &decl) {
   for (auto &parent : CXXScalarValueInitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXScalarValueInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXScalarValueInitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

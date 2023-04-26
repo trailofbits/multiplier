@@ -72,14 +72,14 @@ gap::generator<ContinueStmt> ContinueStmt::containing(const std::optional<Stmt> 
 
 bool ContinueStmt::contains(const Decl &decl) {
   for (auto &parent : ContinueStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ContinueStmt::contains(const Stmt &stmt) {
   for (auto &parent : ContinueStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

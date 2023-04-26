@@ -74,14 +74,14 @@ gap::generator<OMPTaskgroupDirective> OMPTaskgroupDirective::containing(const st
 
 bool OMPTaskgroupDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTaskgroupDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTaskgroupDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTaskgroupDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

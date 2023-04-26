@@ -74,14 +74,14 @@ gap::generator<OMPSectionsDirective> OMPSectionsDirective::containing(const std:
 
 bool OMPSectionsDirective::contains(const Decl &decl) {
   for (auto &parent : OMPSectionsDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPSectionsDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPSectionsDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

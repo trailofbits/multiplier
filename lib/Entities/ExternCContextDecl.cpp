@@ -72,14 +72,14 @@ gap::generator<ExternCContextDecl> ExternCContextDecl::containing(const std::opt
 
 bool ExternCContextDecl::contains(const Decl &decl) {
   for (auto &parent : ExternCContextDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ExternCContextDecl::contains(const Stmt &stmt) {
   for (auto &parent : ExternCContextDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

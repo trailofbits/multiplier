@@ -82,14 +82,14 @@ gap::generator<CallExpr> CallExpr::containing(const std::optional<Stmt> &stmt) {
 
 bool CallExpr::contains(const Decl &decl) {
   for (auto &parent : CallExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CallExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

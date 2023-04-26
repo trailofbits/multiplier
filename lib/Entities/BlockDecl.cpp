@@ -75,14 +75,14 @@ gap::generator<BlockDecl> BlockDecl::containing(const std::optional<Stmt> &stmt)
 
 bool BlockDecl::contains(const Decl &decl) {
   for (auto &parent : BlockDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool BlockDecl::contains(const Stmt &stmt) {
   for (auto &parent : BlockDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

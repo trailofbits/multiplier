@@ -76,14 +76,14 @@ gap::generator<OMPForDirective> OMPForDirective::containing(const std::optional<
 
 bool OMPForDirective::contains(const Decl &decl) {
   for (auto &parent : OMPForDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPForDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPForDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -73,14 +73,14 @@ gap::generator<OMPBarrierDirective> OMPBarrierDirective::containing(const std::o
 
 bool OMPBarrierDirective::contains(const Decl &decl) {
   for (auto &parent : OMPBarrierDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPBarrierDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPBarrierDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

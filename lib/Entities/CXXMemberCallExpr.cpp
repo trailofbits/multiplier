@@ -78,14 +78,14 @@ gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::containing(const std::optio
 
 bool CXXMemberCallExpr::contains(const Decl &decl) {
   for (auto &parent : CXXMemberCallExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXMemberCallExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXMemberCallExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

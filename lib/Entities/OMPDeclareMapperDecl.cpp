@@ -76,14 +76,14 @@ gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::containing(const std:
 
 bool OMPDeclareMapperDecl::contains(const Decl &decl) {
   for (auto &parent : OMPDeclareMapperDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPDeclareMapperDecl::contains(const Stmt &stmt) {
   for (auto &parent : OMPDeclareMapperDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

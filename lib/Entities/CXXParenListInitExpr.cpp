@@ -75,14 +75,14 @@ gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::containing(const std:
 
 bool CXXParenListInitExpr::contains(const Decl &decl) {
   for (auto &parent : CXXParenListInitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXParenListInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXParenListInitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

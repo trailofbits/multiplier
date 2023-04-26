@@ -74,14 +74,14 @@ gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::containing(const std::o
 
 bool MatrixSubscriptExpr::contains(const Decl &decl) {
   for (auto &parent : MatrixSubscriptExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MatrixSubscriptExpr::contains(const Stmt &stmt) {
   for (auto &parent : MatrixSubscriptExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

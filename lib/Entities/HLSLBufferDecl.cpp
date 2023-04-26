@@ -73,14 +73,14 @@ gap::generator<HLSLBufferDecl> HLSLBufferDecl::containing(const std::optional<St
 
 bool HLSLBufferDecl::contains(const Decl &decl) {
   for (auto &parent : HLSLBufferDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool HLSLBufferDecl::contains(const Stmt &stmt) {
   for (auto &parent : HLSLBufferDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

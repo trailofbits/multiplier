@@ -75,14 +75,14 @@ gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::containing(co
 
 bool CXXInheritedCtorInitExpr::contains(const Decl &decl) {
   for (auto &parent : CXXInheritedCtorInitExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXInheritedCtorInitExpr::contains(const Stmt &stmt) {
   for (auto &parent : CXXInheritedCtorInitExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

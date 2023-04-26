@@ -74,14 +74,14 @@ gap::generator<OffsetOfExpr> OffsetOfExpr::containing(const std::optional<Stmt> 
 
 bool OffsetOfExpr::contains(const Decl &decl) {
   for (auto &parent : OffsetOfExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OffsetOfExpr::contains(const Stmt &stmt) {
   for (auto &parent : OffsetOfExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -101,14 +101,14 @@ gap::generator<ValueDecl> ValueDecl::containing(const std::optional<Stmt> &stmt)
 
 bool ValueDecl::contains(const Decl &decl) {
   for (auto &parent : ValueDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ValueDecl::contains(const Stmt &stmt) {
   for (auto &parent : ValueDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

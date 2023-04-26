@@ -79,14 +79,14 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::containing(const std::optional<St
 
 bool ObjCMethodDecl::contains(const Decl &decl) {
   for (auto &parent : ObjCMethodDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCMethodDecl::contains(const Stmt &stmt) {
   for (auto &parent : ObjCMethodDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

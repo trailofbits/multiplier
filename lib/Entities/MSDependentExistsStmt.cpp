@@ -73,14 +73,14 @@ gap::generator<MSDependentExistsStmt> MSDependentExistsStmt::containing(const st
 
 bool MSDependentExistsStmt::contains(const Decl &decl) {
   for (auto &parent : MSDependentExistsStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MSDependentExistsStmt::contains(const Stmt &stmt) {
   for (auto &parent : MSDependentExistsStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -75,14 +75,14 @@ gap::generator<ObjCStringLiteral> ObjCStringLiteral::containing(const std::optio
 
 bool ObjCStringLiteral::contains(const Decl &decl) {
   for (auto &parent : ObjCStringLiteral::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCStringLiteral::contains(const Stmt &stmt) {
   for (auto &parent : ObjCStringLiteral::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

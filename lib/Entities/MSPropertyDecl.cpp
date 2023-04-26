@@ -75,14 +75,14 @@ gap::generator<MSPropertyDecl> MSPropertyDecl::containing(const std::optional<St
 
 bool MSPropertyDecl::contains(const Decl &decl) {
   for (auto &parent : MSPropertyDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool MSPropertyDecl::contains(const Stmt &stmt) {
   for (auto &parent : MSPropertyDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

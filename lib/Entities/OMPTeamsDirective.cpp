@@ -73,14 +73,14 @@ gap::generator<OMPTeamsDirective> OMPTeamsDirective::containing(const std::optio
 
 bool OMPTeamsDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTeamsDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTeamsDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

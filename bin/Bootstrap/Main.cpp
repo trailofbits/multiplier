@@ -2230,23 +2230,20 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  " << class_name << "(const " << class_name << " &) = default;\n"
         << "  " << class_name << " &operator=(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << " &operator=(const " << class_name << " &) = default;\n\n"
-        << "  friend inline std::strong_ordering operator<=>(const "
-        << class_name << " &lhs, const " << class_name << " &rhs) noexcept {\n";
+        << "  inline bool operator==(const " << class_name << " &rhs) const noexcept {\n";
 
       // Equality on Decls need to be tested in its canonicalized form
       if (class_name == "Decl") {
         class_os
-            << "    return lhs.canonical_declaration().id().Pack() <=>\n"
+            << "    return canonical_declaration().id().Pack() ==\n"
             << "           rhs.canonical_declaration().id().Pack();\n";
       } else {
         class_os
-            << "    return lhs.id().Pack() <=> rhs.id().Pack();\n";
+            << "    return id().Pack() == rhs.id().Pack();\n";
       }
 
       class_os
           << "  }\n\n"
-          << "  bool operator==(const " << class_name << " &) const noexcept = default;\n"
-          << "  bool operator!=(const " << class_name << " &) const noexcept = default;\n\n"
           << "  /* implicit */ inline " << class_name
           << "(std::shared_ptr<const " << class_name << "Impl> impl_)\n"
           << "      : impl(std::move(impl_)) {}\n\n";
@@ -2538,13 +2535,13 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent == *this) { return true; }\n"
+        << "    if (*this == parent) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent == *this) { return true; }\n"
+        << "    if (*this == parent) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2611,13 +2608,13 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent == *this) { return true; }\n"
+        << "    if (*this == parent) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent == *this) { return true; }\n"
+        << "    if (*this == parent) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";

@@ -74,14 +74,14 @@ gap::generator<OMPIteratorExpr> OMPIteratorExpr::containing(const std::optional<
 
 bool OMPIteratorExpr::contains(const Decl &decl) {
   for (auto &parent : OMPIteratorExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPIteratorExpr::contains(const Stmt &stmt) {
   for (auto &parent : OMPIteratorExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

@@ -78,14 +78,14 @@ gap::generator<CXXConversionDecl> CXXConversionDecl::containing(const std::optio
 
 bool CXXConversionDecl::contains(const Decl &decl) {
   for (auto &parent : CXXConversionDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool CXXConversionDecl::contains(const Stmt &stmt) {
   for (auto &parent : CXXConversionDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

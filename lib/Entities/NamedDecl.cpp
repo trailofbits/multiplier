@@ -135,14 +135,14 @@ gap::generator<NamedDecl> NamedDecl::containing(const std::optional<Stmt> &stmt)
 
 bool NamedDecl::contains(const Decl &decl) {
   for (auto &parent : NamedDecl::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool NamedDecl::contains(const Stmt &stmt) {
   for (auto &parent : NamedDecl::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

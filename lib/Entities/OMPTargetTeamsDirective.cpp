@@ -73,14 +73,14 @@ gap::generator<OMPTargetTeamsDirective> OMPTargetTeamsDirective::containing(cons
 
 bool OMPTargetTeamsDirective::contains(const Decl &decl) {
   for (auto &parent : OMPTargetTeamsDirective::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDirective::contains(const Stmt &stmt) {
   for (auto &parent : OMPTargetTeamsDirective::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

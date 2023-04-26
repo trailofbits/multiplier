@@ -76,14 +76,14 @@ gap::generator<SizeOfPackExpr> SizeOfPackExpr::containing(const std::optional<St
 
 bool SizeOfPackExpr::contains(const Decl &decl) {
   for (auto &parent : SizeOfPackExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool SizeOfPackExpr::contains(const Stmt &stmt) {
   for (auto &parent : SizeOfPackExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

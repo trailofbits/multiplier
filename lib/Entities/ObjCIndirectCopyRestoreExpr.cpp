@@ -74,14 +74,14 @@ gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::contain
 
 bool ObjCIndirectCopyRestoreExpr::contains(const Decl &decl) {
   for (auto &parent : ObjCIndirectCopyRestoreExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool ObjCIndirectCopyRestoreExpr::contains(const Stmt &stmt) {
   for (auto &parent : ObjCIndirectCopyRestoreExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

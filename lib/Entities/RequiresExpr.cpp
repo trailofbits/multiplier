@@ -76,14 +76,14 @@ gap::generator<RequiresExpr> RequiresExpr::containing(const std::optional<Stmt> 
 
 bool RequiresExpr::contains(const Decl &decl) {
   for (auto &parent : RequiresExpr::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool RequiresExpr::contains(const Stmt &stmt) {
   for (auto &parent : RequiresExpr::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }

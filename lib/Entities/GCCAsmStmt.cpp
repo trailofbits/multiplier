@@ -75,14 +75,14 @@ gap::generator<GCCAsmStmt> GCCAsmStmt::containing(const std::optional<Stmt> &stm
 
 bool GCCAsmStmt::contains(const Decl &decl) {
   for (auto &parent : GCCAsmStmt::containing(decl)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
 
 bool GCCAsmStmt::contains(const Stmt &stmt) {
   for (auto &parent : GCCAsmStmt::containing(stmt)) {
-    if (parent == *this) { return true; }
+    if (*this == parent) { return true; }
   }
   return false;
 }
