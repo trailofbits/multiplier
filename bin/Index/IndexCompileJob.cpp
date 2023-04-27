@@ -1240,13 +1240,32 @@ static void PersistParsedFragments(
   pasta::TokenRange tok_range = ast.Tokens();
   NameMangler mangler(ast);
 
+  std::string main_source_file = ast.MainFile().Path().generic_string();
   DLOG(INFO)
-      << "Main source file " << ast.MainFile().Path().generic_string()
+      << "Main source file " << main_source_file
       << " has " << pending_fragments.size() << " unique fragments";
 
   for (PendingFragment &pf : pending_fragments) {
     ProgressBarWork fragment_progress_tracker(context.serialization_progress);
+
+    auto start_time = std::chrono::system_clock::now();
     context.PersistFragment(ast, tok_range, mangler, entity_ids, pf);
+
+    // Warn if it takes really long to persist a fragment.
+    //
+    // NOTE(pag): It could take very long if we block on a queue.
+    auto end_time = std::chrono::system_clock::now();
+    auto elapsed_time_s = std::chrono::duration_cast<std::chrono::seconds>(
+        end_time - start_time).count();
+    if (elapsed_time_s >= 30 && !pf.top_level_decls.empty()) {
+      const pasta::Decl &leader_decl = pf.top_level_decls.front();
+      LOG(WARNING)
+          << DeclToString(leader_decl)
+          << PrefixedLocation(leader_decl, " at or near ")
+          << " on main job file " << main_source_file
+          << " took " << static_cast<uint64_t>(elapsed_time_s)
+          << " seconds to persist";
+    }
   }
 }
 
