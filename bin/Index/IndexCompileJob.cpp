@@ -1210,8 +1210,9 @@ static std::vector<PendingFragment> CreatePendingFragments(
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
 
+  std::string main_job_file = ast.MainFile().Path().generic_string();
   DLOG(INFO)
-      << "Main source file " << ast.MainFile().Path().generic_string()
+      << "Main source file " << main_job_file
       << " has " << decl_group_ranges.size() << " possible fragments";
 
   pasta::TokenRange tok_range = ast.Tokens();
@@ -1223,9 +1224,15 @@ static std::vector<PendingFragment> CreatePendingFragments(
        it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
 
-    const EntityGroupRange &entities_in_fragment = *it;
-    CreatePendingFragment(context.database, entity_ids, tok_range,
-                          entities_in_fragment, pending_fragments);
+    try {
+      const EntityGroupRange &entities_in_fragment = *it;
+      CreatePendingFragment(context.database, entity_ids, tok_range,
+                            entities_in_fragment, pending_fragments);
+    } catch (...) {
+      LOG(ERROR)
+          << "Caught exception in main job file " << main_job_file
+          << " when trying to create pending fragment";
+    }
   }
 
   return pending_fragments;
@@ -1249,7 +1256,24 @@ static void PersistParsedFragments(
     ProgressBarWork fragment_progress_tracker(context.serialization_progress);
 
     auto start_time = std::chrono::system_clock::now();
-    context.PersistFragment(ast, tok_range, mangler, entity_ids, pf);
+    try {
+      context.PersistFragment(ast, tok_range, mangler, entity_ids, pf);
+
+    } catch (...) {
+      if (!pf.top_level_decls.empty()) {
+        const pasta::Decl &leader_decl = pf.top_level_decls.front();
+        LOG(ERROR)
+            << "Persisting fragment"
+            << PrefixedLocation(leader_decl, " at or near ")
+            << " on main job file " << main_source_file
+            << " triggered exception";
+      } else {
+        LOG(ERROR)
+            << "Persisting fragment on main job file " << main_source_file
+            << " triggered exception";
+      }
+      continue;
+    }
 
     // Warn if it takes really long to persist a fragment.
     //
@@ -1260,7 +1284,7 @@ static void PersistParsedFragments(
     if (elapsed_time_s >= 30 && !pf.top_level_decls.empty()) {
       const pasta::Decl &leader_decl = pf.top_level_decls.front();
       LOG(WARNING)
-          << PrefixedLocation(leader_decl, " at or near ")
+          << "Fragment" << PrefixedLocation(leader_decl, " at or near ")
           << " on main job file " << main_source_file
           << " took " << static_cast<uint64_t>(elapsed_time_s)
           << " seconds to persist";
