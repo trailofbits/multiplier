@@ -142,8 +142,6 @@ add_library("mx-api" STATIC
   ${entity_headers}  # Auto-generated
   ${entity_sources}  # Auto-generated
   
-  "API.cpp"
-  "API.h"
   "Attr.h"
   "Attr.cpp"
   "CachingEntityProvider.cpp"
@@ -154,6 +152,8 @@ add_library("mx-api" STATIC
   "Decl.cpp"
   "Designator.h"
   "Entity.h"
+  "EntityProvider.cpp"
+  "EntityProvider.h"
   "File.cpp"
   "FileImpl.cpp"
   "File.h"

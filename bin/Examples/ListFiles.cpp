@@ -29,7 +29,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
+  mx::Index index(mx::Index::from_database(FLAGS_db));
   for (auto [path, id] : index.file_paths()) {
     std::cout << id << '\t' << path.generic_string() << std::endl;
   }

@@ -13,11 +13,11 @@ namespace mx {
 
 class ReferenceKindImpl {
  public:
-  const EntityProvider::Ptr ep;
+  const EntityProviderPtr ep;
   const RawEntityId kind_id;
   const std::string kind_data;
 
-  inline ReferenceKindImpl(EntityProvider::Ptr ep_, RawEntityId kind_id_,
+  inline ReferenceKindImpl(EntityProviderPtr ep_, RawEntityId kind_id_,
                            std::string kind_data_)
       : ep(std::move(ep_)),
         kind_id(kind_id_),
@@ -25,6 +25,6 @@ class ReferenceKindImpl {
 };
 
 std::pair<OpaqueImplPtr, EntityCategory> ReferencedEntity(
-    const EntityProvider::Ptr &ep, RawEntityId raw_id);
+    const EntityProviderPtr &ep, RawEntityId raw_id);
 
 }  // namespace mx

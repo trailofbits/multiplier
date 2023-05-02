@@ -172,7 +172,7 @@ gap::generator<Decl> Fragment::top_level_declarations(void) const & {
 
 // Return references to this fragment.
 gap::generator<Reference> Fragment::references(void) const & {
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
       co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
@@ -185,7 +185,7 @@ gap::generator<Reference> Fragment::references(void) const & {
 gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
 
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   for (RawEntityId eid : macro_ids) {
     VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {

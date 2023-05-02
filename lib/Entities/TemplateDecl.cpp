@@ -21,7 +21,7 @@
 #include <multiplier/Entities/TypeAliasTemplateDecl.h>
 #include <multiplier/Entities/VarTemplateDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {

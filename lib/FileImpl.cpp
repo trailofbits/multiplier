@@ -14,7 +14,7 @@ namespace mx {
 FileImpl::~FileImpl(void) noexcept {}
 
 FileImpl::FileImpl(
-    EntityProvider::Ptr ep_, kj::Array<capnp::word> data_, RawEntityId id_)
+    EntityProviderPtr ep_, kj::Array<capnp::word> data_, RawEntityId id_)
     : EntityImpl<rpc::File>(std::move(ep_), kj::mv(data_)),
       file_token_reader(this),
       file_id(EntityId(id_).Extract<FileId>()->file_id),
@@ -77,6 +77,11 @@ EntityId ReadFileTokensFromFile::NthContainingMacroId(unsigned) const {
 // Return an entity id associated with the Nth token.
 EntityId ReadFileTokensFromFile::NthRelatedEntityId(unsigned) const {
   return kInvalidEntityId;
+}
+
+// Return the entity associated with the Nth token.
+VariantEntity ReadFileTokensFromFile::NthRelatedEntity(EntityOffset) const {
+  return NotAnEntity{};
 }
 
 // Return the id of the Nth token.

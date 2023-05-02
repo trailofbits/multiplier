@@ -15,7 +15,7 @@
 
 namespace mx {
 
-FragmentImpl::FragmentImpl(EntityProvider::Ptr ep_,
+FragmentImpl::FragmentImpl(EntityProviderPtr ep_,
                            kj::Array<capnp::word> data_,
                            RawEntityId id_)
     : EntityImpl<rpc::Fragment>(std::move(ep_), kj::mv(data_)),
@@ -145,6 +145,12 @@ EntityId ReadMacroTokensFromFragment::NthRelatedEntityId(
   }
 
   return fragment->reader.getRelatedEntityId()[ti];
+}
+
+// Return the entity associated with the Nth token.
+VariantEntity ReadMacroTokensFromFragment::NthRelatedEntity(
+    EntityOffset ti) const {
+  return Index(fragment->ep).entity(NthRelatedEntityId(ti));
 }
 
 // Return the id of the Nth token.

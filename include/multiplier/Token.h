@@ -10,6 +10,7 @@
 #include <optional>
 #include <string_view>
 #include <utility>
+#include <vector>
 #include <variant>
 
 #include "Iterator.h"
@@ -33,6 +34,8 @@ class WeggliQueryResultIterator;
 
 enum class TokenKind : unsigned short;
 enum class TokenCategory : unsigned char;
+class SimpleToken;  // Defined in Index.h due to `VariantEntity`.
+using CustomToken = std::variant<SimpleToken, Token>;
 
 // A single token, e.g. from a file or from a macro expansion.
 class Token {
@@ -230,6 +233,8 @@ class TokenRange {
 
   TokenRange &operator=(const TokenRange &) = default;
   TokenRange &operator=(TokenRange &&) noexcept = default;
+
+  static TokenRange create(std::vector<CustomToken> tokens);
 
   inline operator bool(void) const noexcept {
     return !empty();

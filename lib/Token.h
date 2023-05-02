@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "API.h"
+#include "EntityProvider.h"
 
 namespace mx {
 
@@ -25,6 +25,9 @@ class TokenReader {
   // Return the kind of the Nth token.
   virtual TokenKind NthTokenKind(EntityOffset token_index) const = 0;
 
+  // Return the kind of the Nth token.
+  virtual TokenCategory NthTokenCategory(EntityOffset token_index) const;
+
   // Return the data of the Nth token.
   virtual std::string_view NthTokenData(EntityOffset token_index) const = 0;
 
@@ -39,6 +42,9 @@ class TokenReader {
 
   // Return an entity id associated with the Nth token.
   virtual EntityId NthRelatedEntityId(EntityOffset token_index) const = 0;
+
+  // Return the entity associated with the Nth token.
+  virtual VariantEntity NthRelatedEntity(EntityOffset token_index) const = 0;
 
   // Return the id of the Nth token.
   virtual EntityId NthTokenId(EntityOffset token_index) const = 0;
@@ -57,7 +63,7 @@ class TokenReader {
     return Equals(that.get());
   }
 
-  static Ptr ReaderForToken(const Ptr &self, const EntityProvider::Ptr &ep,
+  static Ptr ReaderForToken(const Ptr &self, const EntityProviderPtr &ep,
                             EntityId eid);
 
   virtual const FragmentImpl *OwningFragment(void) const noexcept;
@@ -92,6 +98,9 @@ class InvalidTokenReader final : public TokenReader {
   // Return an entity id associated with the Nth token.
   EntityId NthRelatedEntityId(EntityOffset) const override;
 
+  // Return the entity associated with the Nth token.
+  VariantEntity NthRelatedEntity(EntityOffset token_index) const override;
+
   // Return the id of the Nth token.
   EntityId NthTokenId(EntityOffset) const override;
   EntityId NthFileTokenId(EntityOffset) const override;
@@ -110,9 +119,12 @@ class CustomTokenReader final : public TokenReader {
   std::vector<RawEntityId> derived_token_ids;
   std::vector<RawEntityId> parsed_token_ids;
   std::vector<RawEntityId> containing_macro_ids;
+  std::vector<VariantEntity> related_entities;
   std::vector<RawEntityId> related_entity_ids;
   std::vector<RawEntityId> token_ids;
   std::vector<RawEntityId> file_token_ids;
+  std::vector<TokenKind> token_kinds;
+  std::vector<TokenCategory> token_categories;
 
   CustomTokenReader(std::shared_ptr<const FragmentImpl> fragment_);
 
@@ -121,11 +133,17 @@ class CustomTokenReader final : public TokenReader {
   // Append a token into this reader.
   void Append(TokenImplPtr reader, EntityOffset offset) noexcept;
 
+  // Append a simple token into this reader.
+  void Append(SimpleToken stok) noexcept;
+
   // Return the number of tokens accessible to this reader.
   EntityOffset NumTokens(void) const override;
 
   // Return the kind of the Nth token.
   TokenKind NthTokenKind(EntityOffset) const override;
+
+  // Return the category of the Nth token.
+  TokenCategory NthTokenCategory(EntityOffset) const override;
 
   // Return the data of the Nth token.
   std::string_view NthTokenData(EntityOffset) const override;
@@ -141,6 +159,9 @@ class CustomTokenReader final : public TokenReader {
 
   // Return an entity id associated with the Nth token.
   EntityId NthRelatedEntityId(EntityOffset) const override;
+
+  // Return the entity associated with the Nth token.
+  VariantEntity NthRelatedEntity(EntityOffset token_index) const override;
 
   // Return the id of the Nth token.
   EntityId NthTokenId(EntityOffset) const override;

@@ -1500,7 +1500,7 @@ void CodeGenerator::RunOnVector(
           << "  if (n >= list.size()) {\n"
           << "    return std::nullopt;\n"
           << "  }\n"
-          << "  const EntityProvider::Ptr &ep = impl->ep;\n"
+          << "  const EntityProviderPtr &ep = impl->ep;\n"
           << "  auto v = list[n];\n";
 
       if (false) {
@@ -1562,7 +1562,7 @@ void CodeGenerator::RunOnVector(
   }
 
   lib_cpp_os
-      << "  EntityProvider::Ptr ep = impl->ep;\n";
+      << "  EntityProviderPtr ep = impl->ep;\n";
   if (is_token) {
     lib_cpp_os
         << "  auto fragment = ep->FragmentFor(ep, impl->fragment_id);\n"
@@ -2772,7 +2772,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       lib_cpp_os
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Index &index) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(index);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(index);\n"
           << "  for (" << base_name << "ImplPtr eptr : ep->"
           << base_name << "sFor(ep)) {\n"
           << "    if (std::optional<" << class_name << "> e = "
@@ -2783,7 +2783,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Fragment &frag) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(frag);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
           << "  PackedFragmentId frag_id = frag.id();\n"
           << "  for (" << base_name << "ImplPtr eptr : ep->"
           << base_name << "sFor(ep, frag_id)) {\n"
@@ -2795,7 +2795,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const File &file) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(file);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
           << "  PackedFileId file_id = file.id();\n"
           << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
           << "    for (" << base_name << "ImplPtr eptr : ep->"
@@ -2809,7 +2809,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Index &index, std::span<" << class_name << "Kind> kinds) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(index);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(index);\n"
           << "  for (" << base_name << "Kind k : kinds) {\n"
           << "    for (" << base_name << "ImplPtr eptr : ep->"
           << base_name << "sFor(ep, k)) {\n"
@@ -2819,7 +2819,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Fragment &frag, std::span<" << class_name << "Kind> kinds) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(frag);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
           << "  PackedFragmentId frag_id = frag.id();\n"
           << "  for (" << base_name << "Kind k : kinds) {\n"
           << "    for (" << base_name << "ImplPtr eptr : ep->"
@@ -2830,7 +2830,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const File &file, std::span<" << class_name << "Kind> kinds) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(file);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
           << "  PackedFileId file_id = file.id();\n"
           << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
           << "    for (" << base_name << "Kind k : kinds) {\n"
@@ -2894,7 +2894,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Index &index) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(index);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(index);\n"
           << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
           << "    for (" << base_name << "ImplPtr eptr : ep->"
           << base_name << "sFor(ep, k)) {\n"
@@ -2907,7 +2907,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Fragment &frag) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(frag);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
           << "  PackedFragmentId frag_id = frag.id();\n"
           << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
           << "    for (" << base_name << "ImplPtr eptr : ep->"
@@ -2921,7 +2921,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
           << "::in(const File &file) {\n"
-          << "  const EntityProvider::Ptr ep = entity_provider_of(file);\n"
+          << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
           << "  PackedFileId file_id = file.id();\n"
           << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
           << "    for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
@@ -3505,7 +3505,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "gap::generator<Decl> "
           << class_name << "::" << api_name
           << "(void) const & {\n"
-          << "  EntityProvider::Ptr ep = impl->ep;\n"
+          << "  EntityProviderPtr ep = impl->ep;\n"
           << "  auto list = impl->reader." << getter_name << "();\n"
           << "  for (auto v : list) {\n"
           << "    if (auto eptr = ep->DeclFor(ep, v)) {\n"
@@ -3913,7 +3913,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     }
 
     if (!is_enum) {
-      fs << "\n#include \"../API.h\"\n";
+      fs << "\n#include \"../EntityProvider.h\"\n";
     }
     if (is_root) {
       fs << "#include \"../File.h\"\n";

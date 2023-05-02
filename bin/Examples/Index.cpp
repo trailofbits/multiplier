@@ -26,8 +26,8 @@ mx::Index InitExample(bool fill_locations) {
   }
 
   mx::Index index(
-      mx::EntityProvider::in_memory_cache(
-          mx::EntityProvider::from_database(FLAGS_db)));
+      mx::Index::in_memory_cache(
+          mx::Index::from_database(FLAGS_db)));
 
   if (fill_locations) {
     for (auto [path, id] : index.file_paths()) {

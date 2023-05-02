@@ -960,6 +960,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         assert(last_macro_use_token != nullptr);
         info.category = TokenInfo::kMacroUseToken;
         info.is_part_of_sub = true;
+        assert(info.file_tok.has_value());
         assert(info.macro_tok.has_value());
         last_macro_use_token = &info;
         break;

@@ -13,7 +13,7 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/TypeWithKeyword.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Type.h"
 
 namespace mx {

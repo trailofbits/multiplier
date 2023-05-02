@@ -19,7 +19,7 @@
 #include <multiplier/Entities/ValueDecl.h>
 #include <multiplier/Entities/VariableArrayType.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {

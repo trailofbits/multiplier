@@ -21,7 +21,7 @@
 #include <multiplier/Entities/TypeDecl.h>
 #include <multiplier/Entities/TypedefNameDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
 

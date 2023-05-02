@@ -24,7 +24,7 @@
 #include <multiplier/Entities/TypedefDecl.h>
 #include <multiplier/Entities/UnresolvedUsingTypenameDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {

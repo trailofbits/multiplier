@@ -34,7 +34,7 @@
 #include <multiplier/Entities/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/Entities/VarTemplateSpecializationDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {

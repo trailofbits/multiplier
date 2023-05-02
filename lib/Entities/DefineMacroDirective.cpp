@@ -12,7 +12,7 @@
 #include <multiplier/Entities/MacroDirective.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Macro.h"
 
 namespace mx {

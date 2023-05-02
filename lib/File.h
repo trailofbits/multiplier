@@ -59,6 +59,9 @@ class ReadFileTokensFromFile final : public TokenReader {
   // Return an entity id associated with the Nth token.
   EntityId NthRelatedEntityId(unsigned) const override;
 
+  // Return the entity associated with the Nth token.
+  VariantEntity NthRelatedEntity(EntityOffset) const override;
+
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const override;
   EntityId NthFileTokenId(unsigned token_index) const override;
@@ -92,7 +95,7 @@ class FileImpl final : public EntityImpl<rpc::File> {
 
   ~FileImpl(void) noexcept;
 
-  explicit FileImpl(EntityProvider::Ptr ep_, kj::Array<capnp::word> data_,
+  explicit FileImpl(EntityProviderPtr ep_, kj::Array<capnp::word> data_,
                     RawEntityId id_);
 
   // Return a reader for the tokens in the file.

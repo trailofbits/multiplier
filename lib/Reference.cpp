@@ -28,7 +28,7 @@ static const auto kInvalidEP = std::make_shared<InvalidEntityProvider>();
 }  // namespace
 
 std::pair<OpaqueImplPtr, EntityCategory> ReferencedEntity(
-    const EntityProvider::Ptr &ep, RawEntityId raw_id) {
+    const EntityProviderPtr &ep, RawEntityId raw_id) {
 
   VariantId vid = EntityId(raw_id).Unpack();
 
@@ -92,7 +92,7 @@ std::pair<OpaqueImplPtr, EntityCategory> ReferencedEntity(
 
 // Get or create a reference kind.
 ReferenceKind ReferenceKind::get(const Index &index, std::string_view name) {
-  const EntityProvider::Ptr &ep = index.impl;
+  const EntityProviderPtr &ep = index.impl;
   ReferenceKindImplPtr rptr = ep->ReferenceKindFor(ep, name);
   if (!rptr) {
     assert(false);
@@ -122,7 +122,7 @@ std::string ReferenceKind::kind(void) const && noexcept {
 ReferenceKind Reference::kind(void) const noexcept {
   ReferenceKindImplPtr rptr;
   if (std::optional<Index> index = Index::containing(as_variant())) {
-    const EntityProvider::Ptr &ep = index->impl;
+    const EntityProviderPtr &ep = index->impl;
     rptr = ep->ReferenceKindFor(ep, kind_id);
   }
 
@@ -138,7 +138,7 @@ ReferenceKind Reference::kind(void) const noexcept {
 // Add a reference between two entities.
 bool Reference::add(const ReferenceKind &kind, RawEntityId from_id,
                     RawEntityId to_id, int) {
-  const EntityProvider::Ptr &ep = kind.impl->ep;
+  const EntityProviderPtr &ep = kind.impl->ep;
   auto found = false;
   for (RawEntityId redecl_id : ep->Redeclarations(ep, from_id)) {
     from_id = redecl_id;

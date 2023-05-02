@@ -31,7 +31,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
+  mx::Index index(mx::Index::from_database(FLAGS_db));
   auto fragment = index.fragment(FLAGS_fragment_id);
   if (!fragment) {
     std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;

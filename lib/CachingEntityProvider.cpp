@@ -185,7 +185,7 @@ gap::generator<RawEntityId> CachingEntityProvider::FindSymbol(
 }
 
 // Returns an entity provider that gets entities from a UNIX domain socket.
-EntityProvider::Ptr EntityProvider::in_memory_cache(
+EntityProviderPtr EntityProvider::CreateInMemoryCache(
     Ptr next, unsigned timeout_s_) {
   auto ret = std::make_shared<CachingEntityProvider>(std::move(next));
 

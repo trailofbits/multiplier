@@ -59,6 +59,15 @@ IndexStatus Index::status(bool block) const {
   }
 }
 
+// Create an in-memory caching index provider.
+Index Index::in_memory_cache(Index next, unsigned timeout_s) {
+  return EntityProvider::CreateInMemoryCache(std::move(next.impl), timeout_s);
+}
+
+Index Index::from_database(std::filesystem::path path) {
+  return EntityProvider::CreateFromDatabase(std::move(path));
+}
+
 Index Index::containing(const Fragment &fragment) {
   return Index(fragment.impl->ep);
 }

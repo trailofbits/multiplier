@@ -27,7 +27,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/UndefineMacroDirective.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Macro.h"
 
 namespace mx {
