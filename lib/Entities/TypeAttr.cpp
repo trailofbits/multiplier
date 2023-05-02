@@ -36,7 +36,7 @@
 #include <multiplier/Entities/TypeNullableResultAttr.h>
 #include <multiplier/Entities/UPtrAttr.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Attr.h"
 
 namespace mx {

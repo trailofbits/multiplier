@@ -24,7 +24,7 @@ class WeggliQueryResultImpl final {
 
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
+  const EntityProviderPtr ep;
 
   // Buffer of fragment data.
   FragmentImplPtr frag;
@@ -38,7 +38,7 @@ class WeggliQueryResultImpl final {
 
   ~WeggliQueryResultImpl(void) noexcept;
 
-  WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
+  WeggliQueryResultImpl(const WeggliQuery &query_, EntityProviderPtr ep_,
                         FragmentIdList fragment_ids);
 
   WeggliQueryResultImpl(const WeggliQuery &query_, FragmentImplPtr frag_);

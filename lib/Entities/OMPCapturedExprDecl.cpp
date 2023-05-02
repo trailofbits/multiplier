@@ -16,7 +16,7 @@
 #include <multiplier/Entities/ValueDecl.h>
 #include <multiplier/Entities/VarDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {

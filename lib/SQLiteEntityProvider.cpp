@@ -15,7 +15,7 @@
 #include <zdict.h>
 #include <zstd.h>
 
-#include "API.h"
+#include "EntityProvider.h"
 #include "Attr.h"
 #include "Decl.h"
 #include "File.h"
@@ -1028,7 +1028,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS)
 #undef MX_DECLARE_ENTITY_LISTERS
 
-EntityProvider::Ptr EntityProvider::from_database(std::filesystem::path path) {
+EntityProviderPtr EntityProvider::CreateFromDatabase(std::filesystem::path path) {
   return std::make_shared<SQLiteEntityProvider>(path);
 }
 

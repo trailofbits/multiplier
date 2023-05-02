@@ -15,7 +15,7 @@
 #include <multiplier/Entities/UnresolvedLookupExpr.h>
 #include <multiplier/Entities/ValueStmt.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Stmt.h"
 
 namespace mx {

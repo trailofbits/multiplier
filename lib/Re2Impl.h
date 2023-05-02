@@ -23,7 +23,7 @@ class RegexQueryResultImpl final {
 
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
+  const EntityProviderPtr ep;
 
   // Maps the offsets bytes following tokens to indexes of tokens in
   // `frag_file_tokens`. This is useful to go from a match offset to a file
@@ -53,7 +53,7 @@ class RegexQueryResultImpl final {
   ~RegexQueryResultImpl(void) noexcept;
 
   RegexQueryResultImpl(
-      const RegexQuery &re_, EntityProvider::Ptr ep_,
+      const RegexQuery &re_, EntityProviderPtr ep_,
       FragmentIdList fragment_ids);
 
   RegexQueryResultImpl(const RegexQuery &re_, FragmentImplPtr frag_);

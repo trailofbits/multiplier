@@ -20,7 +20,7 @@
 #include <multiplier/Entities/VarTemplateDecl.h>
 #include <multiplier/Entities/VarTemplatePartialSpecializationDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {

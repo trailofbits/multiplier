@@ -30,7 +30,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
+  mx::Index index(mx::Index::from_database(FLAGS_db));
 
   // List all fragment IDs in a specific file.
   if (FLAGS_file_id) {

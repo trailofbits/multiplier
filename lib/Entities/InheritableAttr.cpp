@@ -318,7 +318,7 @@
 #include <multiplier/Entities/XRayLogArgsAttr.h>
 #include <multiplier/Entities/ZeroCallUsedRegsAttr.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Attr.h"
 
 namespace mx {

@@ -87,8 +87,8 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::in_memory_cache(
-      mx::EntityProvider::from_database(FLAGS_db)));
+  mx::Index index(mx::Index::in_memory_cache(
+      mx::Index::from_database(FLAGS_db)));
 
   for (auto [path, id] : index.file_paths()) {
     file_id_to_paths.emplace(id, path);

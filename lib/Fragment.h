@@ -19,12 +19,12 @@ class FragmentListImpl {
  public:
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
+  const EntityProviderPtr ep;
 
   // List of fragment IDs.
   FragmentIdList fragment_ids;
 
-  inline FragmentListImpl(EntityProvider::Ptr ep_,
+  inline FragmentListImpl(EntityProviderPtr ep_,
                           FragmentIdList fragment_ids_)
       : ep(std::move(ep_)),
         fragment_ids(std::move(fragment_ids_)) {}
@@ -57,6 +57,9 @@ class ReadMacroTokensFromFragment : public TokenReader {
 
   // Return an entity id associated with the Nth token.
   EntityId NthRelatedEntityId(EntityOffset) const override;
+
+  // Return the entity associated with the Nth token.
+  VariantEntity NthRelatedEntity(EntityOffset) const final;
 
   // Return the id of the Nth token.
   EntityId NthTokenId(EntityOffset token_index) const override;
@@ -127,7 +130,7 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   const EntityOffset num_parsed_tokens;
   const EntityOffset num_tokens;
 
-  explicit FragmentImpl(EntityProvider::Ptr ep_, kj::Array<capnp::word> data_,
+  explicit FragmentImpl(EntityProviderPtr ep_, kj::Array<capnp::word> data_,
                         RawEntityId id_);
 
   // Return the ID of the file containing the first token.

@@ -15,7 +15,7 @@
 #include <multiplier/Entities/NoMergeAttr.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Attr.h"
 
 namespace mx {

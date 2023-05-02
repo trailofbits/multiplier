@@ -13,7 +13,7 @@
 #include <multiplier/Entities/MacroArgument.h>
 #include <multiplier/Entities/MacroSubstitution.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Macro.h"
 
 namespace mx {

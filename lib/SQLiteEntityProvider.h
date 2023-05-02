@@ -9,9 +9,9 @@
 #include <array>
 #include <filesystem>
 #include <memory>
-#include <multiplier/Index.h>
 #include <vector>
 
+#include "EntityProvider.h"
 #include "ThreadLocal.h"
 #include "Types.h"
 

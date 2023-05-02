@@ -19,7 +19,7 @@
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/MacroDirective.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Macro.h"
 
 namespace mx {

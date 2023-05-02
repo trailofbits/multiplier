@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"
 #include "../CXXBaseSpecifier.h"

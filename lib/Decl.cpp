@@ -38,7 +38,7 @@ SpecificEntityId<DeclId> Decl::id(void) const {
 }
 
 std::optional<Decl> Decl::definition(void) const {
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
 
   // If we've stored the canonical ID already, then we've also computed the
   // definition ID, if any.
@@ -99,7 +99,7 @@ std::optional<Decl> Decl::definition(void) const {
 }
 
 Decl Decl::canonical_declaration(void) const {
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
 
   RawEntityId min_id = impl->canonical_id.load(std::memory_order_acquire);
   if (min_id != kInvalidEntityId) {
@@ -162,7 +162,7 @@ Decl Decl::canonical_declaration(void) const {
 
 gap::generator<Decl> Decl::redeclarations(void) const & {
   auto any = false;
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
     if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
       any = true;
@@ -177,7 +177,7 @@ gap::generator<Decl> Decl::redeclarations(void) const & {
 
 // Return references to this declaration.
 gap::generator<Reference> Decl::references(void) const & {
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
       co_yield Reference(std::move(eptr), ref_id, category, ref_kind);

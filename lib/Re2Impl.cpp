@@ -23,7 +23,7 @@ namespace mx {
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_,
+    const RegexQuery &query_, EntityProviderPtr ep_,
     FragmentIdList fragment_ids_)
     : query(query_),
       ep(std::move(ep_)),
@@ -345,7 +345,7 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
     }
   }
 
-  const EntityProvider::Ptr &ep = file.impl->ep;
+  const EntityProviderPtr &ep = file.impl->ep;
   RegexQueryResultImpl result_impl(
       *this, ep,
       ep->FragmentsCoveringTokens(ep, file.id(), std::move(matched_offsets)));
@@ -371,7 +371,7 @@ namespace mx {
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_, FragmentIdList)
+    const RegexQuery &query_, EntityProviderPtr ep_, FragmentIdList)
     : query(query_),
       ep(std::move(ep_)) {}
 

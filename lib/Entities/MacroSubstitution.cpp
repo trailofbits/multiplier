@@ -14,7 +14,7 @@
 #include <multiplier/Entities/MacroParameterSubstitution.h>
 #include <multiplier/Entities/MacroStringify.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Macro.h"
 
 namespace mx {

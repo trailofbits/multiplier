@@ -517,9 +517,10 @@ static inline TokenCategory Rebase(DeclCategory category) {
       int(category) + int(TokenCategory::COMMENT));
 }
 
-static TokenCategory ClassifyDecl(const Token &tok, DeclId id,
-                                  TokenCategory baseline_category) {
+static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
+                                  DeclId id, TokenCategory baseline_category) {
   switch (id.kind) {
+    // For this set, we don't need to ask for a related entity.
     case DeclKind::NAMESPACE:
     case DeclKind::NAMESPACE_ALIAS:
     case DeclKind::USING_DIRECTIVE:
@@ -537,60 +538,10 @@ static TokenCategory ClassifyDecl(const Token &tok, DeclId id,
     case DeclKind::TEMPLATE_TYPE_PARM:
       return TokenCategory::TEMPLATE_PARAMETER_TYPE;
 
-    case DeclKind::CONCEPT:
-    case DeclKind::BUILTIN_TEMPLATE:
-    case DeclKind::CLASS_TEMPLATE:
-    case DeclKind::VAR_TEMPLATE:
-    case DeclKind::FUNCTION_TEMPLATE:
-    case DeclKind::TYPE_ALIAS_TEMPLATE: {
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        return Rebase(std::get<Decl>(ent).category());
-      }
-
-      switch (id.kind) {
-        case DeclKind::CONCEPT:
-          return TokenCategory::CONCEPT;
-        case DeclKind::BUILTIN_TEMPLATE:
-          return TokenCategory::BUILTIN_TYPE_NAME;
-        case DeclKind::CLASS_TEMPLATE:
-          return TokenCategory::CLASS;
-        case DeclKind::VAR_TEMPLATE:
-          return TokenCategory::GLOBAL_VARIABLE;
-        case DeclKind::FUNCTION_TEMPLATE:
-          return TokenCategory::FUNCTION;
-        case DeclKind::TYPE_ALIAS_TEMPLATE:
-          return TokenCategory::TYPE_ALIAS;
-        default:
-          break;
-      }
-      break;
-    }
-    case DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION:
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        if (auto spec = ClassScopeFunctionSpecializationDecl::from(
-                std::get<Decl>(ent))) {
-          return Rebase(spec->specialization().category());
-        }
-        return Rebase(std::get<Decl>(ent).category());
-      }
-      return TokenCategory::INSTANCE_METHOD;
-
-    case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-    case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        return Rebase(std::get<Decl>(ent).category());
-      }
-      return TokenCategory::STRUCT;
-
     case DeclKind::ENUM:
       return TokenCategory::ENUM;
     case DeclKind::ENUM_CONSTANT:
       return TokenCategory::ENUMERATOR;
-    case DeclKind::RECORD:
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        return Rebase(std::get<Decl>(ent).category());
-      }
-      return TokenCategory::STRUCT;
 
     case DeclKind::USING_ENUM:
       return TokenCategory::ENUM;
@@ -614,18 +565,6 @@ static TokenCategory ClassifyDecl(const Token &tok, DeclId id,
     case DeclKind::CXX_DESTRUCTOR:
       return TokenCategory::INSTANCE_METHOD;
 
-    case DeclKind::CXX_METHOD:
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        return Rebase(std::get<Decl>(ent).category());
-      }
-      return TokenCategory::INSTANCE_METHOD;
-
-    case DeclKind::OBJ_C_METHOD:
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        return Rebase(std::get<Decl>(ent).category());
-      }
-      return TokenCategory::INSTANCE_METHOD;
-
     case DeclKind::LABEL:
       return TokenCategory::LABEL;
 
@@ -642,28 +581,64 @@ static TokenCategory ClassifyDecl(const Token &tok, DeclId id,
 
     case DeclKind::PARM_VAR:
       return TokenCategory::PARAMETER_VARIABLE;
+
+    // For the next set, we can make a good reasonable guess at the category,
+    // but we'll try to be more precise by fetching the actual decl.
+
+    case DeclKind::CONCEPT:
+      baseline_category = TokenCategory::CONCEPT;
+      break;
+    case DeclKind::BUILTIN_TEMPLATE:
+      baseline_category = TokenCategory::BUILTIN_TYPE_NAME;
+      break;
+    case DeclKind::CLASS_TEMPLATE:
+      baseline_category = TokenCategory::CLASS;
+      break;
+    case DeclKind::VAR_TEMPLATE:
+      baseline_category = TokenCategory::GLOBAL_VARIABLE;
+      break;
+    case DeclKind::FUNCTION_TEMPLATE:
+      baseline_category = TokenCategory::FUNCTION;
+      break;
+    case DeclKind::TYPE_ALIAS_TEMPLATE:
+      baseline_category = TokenCategory::TYPE_ALIAS;
+      break;
+    case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+    case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
+      baseline_category = TokenCategory::GLOBAL_VARIABLE;
+      break;
+    case DeclKind::RECORD:
+      baseline_category = TokenCategory::STRUCT;
+      break;
+    case DeclKind::CXX_METHOD:
+    case DeclKind::OBJ_C_METHOD:
+      baseline_category = TokenCategory::INSTANCE_METHOD;
+      break;
     case DeclKind::IMPLICIT_PARAM:
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        return Rebase(std::get<Decl>(ent).category());
-      }
-      return TokenCategory::PARAMETER_VARIABLE;
+      baseline_category = TokenCategory::PARAMETER_VARIABLE;
+      break;
     case DeclKind::VAR:
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        return Rebase(std::get<Decl>(ent).category());
-      }
-      return TokenCategory::LOCAL_VARIABLE;
+      baseline_category = TokenCategory::LOCAL_VARIABLE;
+      break;
 
     default:
-      if (auto ent = tok.related_entity(); std::holds_alternative<Decl>(ent)) {
-        return Rebase(std::get<Decl>(ent).category());
-      }
       break;
   }
 
-  // We had a declaration ID, but didn't classify as anything better.
-  assert(false);
+  // The related entity ID is a `DeclId`, so the related entity should be
+  // a valid `Decl`.
+  VariantEntity ent = reader->NthRelatedEntity(index);
+  if (!std::holds_alternative<Decl>(ent)) {
+    assert(false);
+    return baseline_category;
+  }
 
-  return baseline_category;
+  const Decl &decl = std::get<Decl>(ent);
+  if (auto spec = ClassScopeFunctionSpecializationDecl::from(decl)) {
+    return Rebase(spec->specialization().category());
+  } else {
+    return Rebase(decl.category());
+  }
 }
 
 static TokenCategory ClassifyStmt(StmtId id, TokenCategory baseline_category) {
@@ -703,15 +678,22 @@ static TokenCategory ClassifyFile(TokenKind kind,
   }
 }
 
-static TokenCategory ClassifyEntity(const Token &tok) {
-  VariantId vid = tok.related_entity_id().Unpack();
-  TokenKind kind = tok.kind();
+}  // namespace
+
+TokenReader::~TokenReader(void) noexcept {}
+
+// Return the kind of the Nth token.
+TokenCategory TokenReader::NthTokenCategory(EntityOffset token_index) const {
+  VariantId vid = NthRelatedEntityId(token_index).Unpack();
+  TokenKind kind = NthTokenKind(token_index);
   TokenCategory baseline_category = ClassifyToken(kind);
+
   if (std::holds_alternative<MacroId>(vid)) {
     return ClassifyMacro(kind, std::get<MacroId>(vid), baseline_category);
 
   } else if (std::holds_alternative<DeclId>(vid)) {
-    return ClassifyDecl(tok, std::get<DeclId>(vid), baseline_category);
+    return ClassifyDecl(this, token_index, std::get<DeclId>(vid),
+                        baseline_category);
 
   } else if (std::holds_alternative<StmtId>(vid)) {
     return ClassifyStmt(std::get<StmtId>(vid), baseline_category);
@@ -723,10 +705,6 @@ static TokenCategory ClassifyEntity(const Token &tok) {
     return baseline_category;
   }
 }
-
-}  // namespace
-
-TokenReader::~TokenReader(void) noexcept {}
 
 const FragmentImpl *TokenReader::OwningFragment(void) const noexcept {
   return nullptr;
@@ -749,7 +727,7 @@ Token TokenReader::TokenFor(const Ptr &self, RawEntityId eid) noexcept {
 }
 
 TokenReader::Ptr TokenReader::ReaderForToken(
-    const TokenReader::Ptr &self, const EntityProvider::Ptr &ep, EntityId eid) {
+    const TokenReader::Ptr &self, const EntityProviderPtr &ep, EntityId eid) {
 
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<FileTokenId>(vid)) {
@@ -841,6 +819,11 @@ EntityId InvalidTokenReader::NthRelatedEntityId(EntityOffset) const {
   return kInvalidEntityId;
 }
 
+// Return the entity associated with the Nth token.
+VariantEntity InvalidTokenReader::NthRelatedEntity(EntityOffset) const {
+  return NotAnEntity{};
+}
+
 // Return the id of the Nth token.
 EntityId InvalidTokenReader::NthTokenId(EntityOffset) const {
   return kInvalidEntityId;
@@ -869,13 +852,31 @@ void CustomTokenReader::Append(TokenImplPtr tr, EntityOffset to) noexcept {
   if (!tok_data.empty()) {
     data.insert(data.end(), tok_data.begin(), tok_data.end());
   }
+
   data_offset.push_back(static_cast<EntityOffset>(data.size()));
   derived_token_ids.push_back(tr->NthDerivedTokenId(to).Pack());
   parsed_token_ids.push_back(tr->NthParsedTokenId(to).Pack());
   containing_macro_ids.push_back(tr->NthContainingMacroId(to).Pack());
-  related_entity_ids.push_back(tr->NthRelatedEntityId(to).Pack());
+  related_entities.emplace_back(tr->NthRelatedEntity(to));
   token_ids.push_back(tr->NthTokenId(to).Pack());
+  token_kinds.push_back(tr->NthTokenKind(to));
+  token_categories.push_back(tr->NthTokenCategory(to));
   file_token_ids.push_back(tr->NthFileTokenId(to).Pack());
+}
+
+// Append a simple token into this reader.
+void CustomTokenReader::Append(SimpleToken stok) noexcept {
+  data.insert(data.end(), stok.data.begin(), stok.data.end());
+  data_offset.push_back(static_cast<EntityOffset>(data.size()));
+
+  derived_token_ids.push_back(kInvalidEntityId);
+  parsed_token_ids.push_back(kInvalidEntityId);
+  containing_macro_ids.push_back(kInvalidEntityId);
+  token_ids.push_back(kInvalidEntityId);
+  token_kinds.push_back(stok.kind);
+  token_categories.push_back(stok.category);
+  file_token_ids.push_back(kInvalidEntityId);
+  related_entities.emplace_back(std::move(stok.related_entity));
 }
 
 // Return the number of tokens accessible to this reader.
@@ -885,19 +886,18 @@ EntityOffset CustomTokenReader::NumTokens(void) const {
 
 // Return the kind of the Nth token.
 TokenKind CustomTokenReader::NthTokenKind(EntityOffset to) const {
-  if (to < token_ids.size()) {
-    VariantId vid = EntityId(token_ids[to]).Unpack();
-    if (std::holds_alternative<ParsedTokenId>(vid)) {
-      return std::get<ParsedTokenId>(vid).kind;
-    } else if (std::holds_alternative<MacroTokenId>(vid)) {
-      return std::get<MacroTokenId>(vid).kind;
-    } else if (std::holds_alternative<FileTokenId>(vid)) {
-      return std::get<FileTokenId>(vid).kind;
-    } else if (!std::holds_alternative<InvalidId>(vid) ){
-      assert(false);
-    }
+  if (to < token_kinds.size()) {
+    return token_kinds[to];
   }
   return TokenKind::UNKNOWN;
+}
+
+// Return the category of the Nth token.
+TokenCategory CustomTokenReader::NthTokenCategory(EntityOffset to) const {
+  if (to < token_categories.size()) {
+    return token_categories[to];
+  }
+  return TokenCategory::UNKNOWN;
 }
 
 // Return the data of the Nth token.
@@ -946,9 +946,18 @@ EntityId CustomTokenReader::NthContainingMacroId(EntityOffset to) const {
 // Return an entity id associated with the Nth token.
 EntityId CustomTokenReader::NthRelatedEntityId(EntityOffset to) const {
   if (to < related_entity_ids.size()) {
-    return related_entity_ids[to];
+    return EntityId(related_entity_ids[to]);
   }
   return kInvalidEntityId;
+}
+
+// Return the entity associated with the Nth token.
+VariantEntity CustomTokenReader::NthRelatedEntity(EntityOffset to) const {
+  if (to < related_entities.size()) {
+    return related_entities[to];
+  } else {
+    return NotAnEntity{};
+  }
 }
 
 // Return the id of the Nth token.
@@ -1011,7 +1020,7 @@ EntityId Token::id(void) const {
 
 // References to this token.
 gap::generator<Reference> Token::references(void) const & {
-  EntityProvider::Ptr ep;
+  EntityProviderPtr ep;
   if (!impl) {
     co_return;
   } else if (const FragmentImpl *frag = impl->OwningFragment()) {
@@ -1102,7 +1111,7 @@ Token Token::nearest_file_token(void) const {
 
 // The category of this token. This takes into account any related entities.
 TokenCategory Token::category(void) const {
-  return ClassifyEntity(*this);
+  return impl->NthTokenCategory(offset);
 }
 
 // Return the ID entity associated with this token.
@@ -1114,14 +1123,7 @@ EntityId Token::related_entity_id(void) const {
 
 // Return the entity associated with this token.
 VariantEntity Token::related_entity(void) const {
-  EntityId eid = impl->NthRelatedEntityId(offset);
-  if (auto tok_frag = impl->OwningFragment()) {
-    return Index(tok_frag->ep).entity(eid);
-  } else if (auto tok_file = impl->OwningFile()) {
-    return Index(tok_file->ep).entity(eid);
-  } else {
-    return {};
-  }
+  return impl->NthRelatedEntity(offset);
 }
 
 TokenRange::TokenRange(void)
@@ -1133,6 +1135,27 @@ TokenRange::TokenRange(const Token &tok)
     : impl(tok.impl),
       index(tok.offset),
       num_tokens(tok.impl ? (tok.offset + 1u) : 0u) {}
+
+TokenRange TokenRange::create(std::vector<CustomToken> tokens) {
+  auto reader = std::make_shared<CustomTokenReader>(FragmentImpl::Ptr());
+  auto num_tokens = 0u;
+  for (CustomToken &ctok : tokens) {
+    if (std::holds_alternative<Token>(ctok)) {
+      Token tok = std::move(std::get<Token>(ctok));
+      reader->Append(std::move(tok.impl), tok.offset);
+      ++num_tokens;
+
+    } else if (std::holds_alternative<SimpleToken>(ctok)) {
+      reader->Append(std::move(std::get<SimpleToken>(ctok)));
+      ++num_tokens;
+
+    } else {
+      assert(false);
+    }
+  }
+
+  return TokenRange(std::move(reader), 0u, num_tokens);
+}
 
 // Return the token at index `index`.
 Token TokenRange::operator[](size_t relative_index) const {
@@ -1315,6 +1338,8 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     return *this;
   }
 
+  // If the tokens in this range don't all belong to the same logical fragment
+  // then there's no chance of them being side-by-side in a file.
   const FragmentImpl * const frag = impl->OwningFragment();
   if (!frag) {
     return TokenRange();

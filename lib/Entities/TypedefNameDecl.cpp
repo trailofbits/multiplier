@@ -19,7 +19,7 @@
 #include <multiplier/Entities/TypeDecl.h>
 #include <multiplier/Entities/TypedefDecl.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../Decl.h"
 
 namespace mx {

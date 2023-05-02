@@ -14,7 +14,7 @@
 #include <multiplier/Entities/Reference.h>
 #include <multiplier/Entities/Token.h>
 
-#include "../API.h"
+#include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"
 #include "../Designator.h"

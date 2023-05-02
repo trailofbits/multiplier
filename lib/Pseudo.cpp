@@ -6,8 +6,7 @@
 
 #include "Pseudo.h"
 
-#include <multiplier/Index.h>
-
+#include "EntityProvider.h"
 #include "Reference.h"
 #include "Types.h"
 
@@ -28,7 +27,7 @@ namespace mx {
     } \
     \
     gap::generator<Reference> name::references(void) const & { \
-      const EntityProvider::Ptr &ep = impl->ep; \
+      const EntityProviderPtr &ep = impl->ep; \
       for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) { \
         if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) { \
           co_yield Reference(std::move(eptr), ref_id, category, ref_kind); \

@@ -31,7 +31,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
+  mx::Index index(mx::Index::from_database(FLAGS_db));
   std::optional<mx::File> file = index.file(FLAGS_file_id);
   if (!file) {
     std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;

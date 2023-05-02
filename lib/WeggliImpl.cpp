@@ -18,7 +18,7 @@ namespace mx {
 WeggliQueryResultImpl::~WeggliQueryResultImpl(void) noexcept {}
 
 WeggliQueryResultImpl::WeggliQueryResultImpl(
-    const WeggliQuery &query_, EntityProvider::Ptr ep_,
+    const WeggliQuery &query_, EntityProviderPtr ep_,
     FragmentIdList fragment_ids)
     : query(query_),
       ep(std::move(ep_)),
@@ -286,7 +286,7 @@ WeggliQuery::match_fragments(const File &file) const & {
     }
   }
 
-  const EntityProvider::Ptr &ep = file.impl->ep;
+  const EntityProviderPtr &ep = file.impl->ep;
 
   WeggliQueryResultImpl it(
       *this, ep,
