@@ -13,8 +13,6 @@
 #include <variant>
 #include <vector>
 
-#include "Util.h"
-
 namespace pasta {
 class Decl;
 class File;

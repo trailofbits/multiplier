@@ -27,7 +27,6 @@
 #include "Context.h"
 #include "PASTA.h"
 #include "TypeFragment.h"
-#include "TypeFragmentBuilder.h"
 #include "TypeMapper.h"
 
 namespace indexer {
@@ -36,10 +35,6 @@ extern void SerializeTypes(mx::DatabaseWriter &database,
                            const pasta::Type &entity,
                            const EntityMapper &em,
                            mx::RawEntityId fragment_index);
-
-extern void LinkEntitiesAcrossFragments(
-    mx::DatabaseWriter &database, const PendingFragmentType &tf,
-    const EntityMapper &em, const NameMangler &mangler);
 
 namespace {
 
@@ -296,74 +291,6 @@ void PendingFragmentType::Uses(const pasta::Attr &entity) {
   attrs_in_use.emplace_back(entity);
 }
 
-void BuildFragmentForType(PendingFragmentType &tf,
-                          const pasta::PrintedTokenRange &tokens) {
-  size_t prev_num_decls = 0ul;
-  size_t prev_num_stmts = 0ul;
-  size_t prev_num_types = 0ul;
-  size_t prev_num_attrs = 0ul;
-
-  TypeFragmentBuilder builder(tf);
-
-  // Make sure to collect everything reachable from token contexts.
-  for (auto i = 0u; i <= tokens.size(); ++i) {
-    for (auto context = tokens[i].Context(); context;
-         context = context->Parent()) {
-      if (auto decl = pasta::Decl::From(*context)) {
-        builder.MaybeVisitNext(*decl);
-
-      } else if (auto stmt = pasta::Stmt::From(*context)) {
-        builder.MaybeVisitNext(*stmt);
-
-      } else if (auto type = pasta::Type::From(*context)) {
-        builder.MaybeVisitNext(*type);
-
-      } else if (auto attr = pasta::Attr::From(*context)) {
-        builder.MaybeVisitNext(*attr);
-
-      }
-    }
-  }
-
-  for (auto changed = true; changed; ) {
-    changed = false;
-
-    size_t num_decls = tf.decls_in_use.size();
-    size_t num_stmts = tf.stmts_in_use.size();
-    size_t num_types = tf.types_in_use.size();
-    size_t num_attrs = tf.attrs_in_use.size();
-
-    for (size_t i = prev_num_decls; i < num_decls; ++i) {
-      changed = true;
-      pasta::Decl entity = tf.decls_in_use[i];
-      builder.Accept(entity);
-    }
-
-    for (size_t i = prev_num_stmts; i < num_stmts; ++i) {
-      changed = true;
-      pasta::Stmt entity = tf.stmts_in_use[i];
-      builder.Accept(entity);
-    }
-
-    for (size_t i = prev_num_types; i < num_types; ++i) {
-      changed = true;
-      pasta::Type entity = tf.types_in_use[i];
-      builder.Accept(entity);
-    }
-
-    for (size_t i = prev_num_attrs; i < num_attrs; ++i) {
-      changed = true;
-      pasta::Attr entity = tf.attrs_in_use[i];
-      builder.Accept(entity);
-    }
-
-    prev_num_decls = num_decls;
-    prev_num_stmts = num_stmts;
-    prev_num_types = num_types;
-    prev_num_attrs = num_attrs;
-  }
-}
-
 static void SerializeTypeEntity(
     mx::DatabaseWriter &database, const pasta::Type &entity,
     const PendingFragmentType &tf, const EntityMapper &em) {
@@ -436,7 +363,7 @@ void GlobalIndexingState::PersistTypes(const pasta::AST &ast, NameMangler &mangl
 
     // Identify all of the declarations, statements, types, and pseudo-entities,
     // and build lists of the entities to serialize.
-    BuildFragmentForType(tf, tok_range);
+    // BuildFragmentForType(tf, tok_range);
 
     // Serialize the type entity to create an entry for the type in entity table
     SerializeTypeEntity(database, entity, tf, em);
@@ -465,11 +392,11 @@ void GlobalIndexingState::PersistTypes(const pasta::AST &ast, NameMangler &mangl
 
     PersistPrintedTokens(em, fb, tok_range);
     PersistTokenContexts(em, tok_range, tf.fragment_index, fb);
-    LinkEntitiesAcrossFragments(database, tf, em, mangler);
 
     database.AddAsync(
         mx::EntityRecord{tf.fragment_id.Pack(), GetSerializedData(message)});
   }
+  (void)mangler;
 }
 
 }

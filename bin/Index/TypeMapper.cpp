@@ -1,4 +1,4 @@
-// Copyright (c) 2022-present, Trail of Bits, Inc.
+// Copyright (c) 2023-present, Trail of Bits, Inc.
 // All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
@@ -20,8 +20,6 @@
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wcast-align"
 #include <llvm/ADT/FoldingSet.h>
-#include <llvm/ADT/StringRef.h>
-#include <llvm/Support/SHA256.h>
 #pragma clang diagnostic pop
 
 #include <multiplier/Database.h>

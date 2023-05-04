@@ -106,37 +106,4 @@ void LinkEntitiesAcrossFragments(
   }
 }
 
-void LinkEntitiesAcrossFragments(
-    mx::DatabaseWriter &database, const PendingFragmentType &tf,
-    const EntityMapper &em, const NameMangler &mangler) {
-
-  std::string dummy_mangled_name;
-  for (const pasta::Decl &decl : tf.decls_in_use) {
-    mx::RawEntityId eid = em.EntityId(decl);
-    if (eid == mx::kInvalidEntityId) {
-      continue;
-    }
-
-    if (auto type = pasta::TypeDecl::From(decl)) {
-      const auto &type_name = type->Name();
-      TrackRedeclarations(
-          database, tf.fragment_index, em,
-          type_name, decl, type->Redeclarations());
-    } else if (auto typedef_decl = pasta::TypedefDecl::From(decl)) {
-      const auto &typedef_name = typedef_decl->Name();
-      TrackRedeclarations(
-          database, tf.fragment_index, em,
-          typedef_name, decl, typedef_decl->Redeclarations());
-    } else if (auto alias = pasta::TypeAliasDecl::From(decl)) {
-      const auto &alias_name = alias->Name();
-      TrackRedeclarations(
-          database, tf.fragment_index, em,
-          alias_name, decl, alias->Redeclarations());
-    } else {
-      continue;
-    }
-  }
-  (void)mangler;
-}
-
 }  // namespace indexer

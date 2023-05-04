@@ -6,19 +6,12 @@
 
 #pragma once
 
-#include <cassert>
 #include <cstdint>
-#include <multiplier/Types.h>
 #include <optional>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
-#include <pasta/AST/Forward.h>
-#include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
-#include <pasta/AST/Token.h>
 #include <pasta/AST/Type.h>
-#include <pasta/Util/File.h>
-#include <variant>
 
 #include "EntityMapper.h"
 
