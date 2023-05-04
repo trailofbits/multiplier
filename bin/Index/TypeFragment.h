@@ -43,7 +43,7 @@ class PendingFragmentType {
 
 
   std::vector<pasta::Decl> decls_in_use;
-  std::vector<pasta::Stmt> stmt_in_use;
+  std::vector<pasta::Stmt> stmts_in_use;
   std::vector<pasta::Type> types_in_use;
   std::vector<pasta::Attr> attrs_in_use;
 

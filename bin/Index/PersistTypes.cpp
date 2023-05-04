@@ -285,7 +285,7 @@ void PendingFragmentType::Uses(const pasta::Decl &entity) {
 }
 
 void PendingFragmentType::Uses(const pasta::Stmt &entity) {
-  stmt_in_use.emplace_back(entity);
+  stmts_in_use.emplace_back(entity);
 }
 
 void PendingFragmentType::Uses(const pasta::Type &entity) {
@@ -299,6 +299,7 @@ void PendingFragmentType::Uses(const pasta::Attr &entity) {
 void BuildFragmentForType(PendingFragmentType &tf,
                           const pasta::PrintedTokenRange &tokens) {
   size_t prev_num_decls = 0ul;
+  size_t prev_num_stmts = 0ul;
   size_t prev_num_types = 0ul;
   size_t prev_num_attrs = 0ul;
 
@@ -310,6 +311,9 @@ void BuildFragmentForType(PendingFragmentType &tf,
          context = context->Parent()) {
       if (auto decl = pasta::Decl::From(*context)) {
         builder.MaybeVisitNext(*decl);
+
+      } else if (auto stmt = pasta::Stmt::From(*context)) {
+        builder.MaybeVisitNext(*stmt);
 
       } else if (auto type = pasta::Type::From(*context)) {
         builder.MaybeVisitNext(*type);
@@ -325,12 +329,19 @@ void BuildFragmentForType(PendingFragmentType &tf,
     changed = false;
 
     size_t num_decls = tf.decls_in_use.size();
+    size_t num_stmts = tf.stmts_in_use.size();
     size_t num_types = tf.types_in_use.size();
     size_t num_attrs = tf.attrs_in_use.size();
 
     for (size_t i = prev_num_decls; i < num_decls; ++i) {
       changed = true;
       pasta::Decl entity = tf.decls_in_use[i];
+      builder.Accept(entity);
+    }
+
+    for (size_t i = prev_num_stmts; i < num_stmts; ++i) {
+      changed = true;
+      pasta::Stmt entity = tf.stmts_in_use[i];
       builder.Accept(entity);
     }
 
@@ -347,6 +358,7 @@ void BuildFragmentForType(PendingFragmentType &tf,
     }
 
     prev_num_decls = num_decls;
+    prev_num_stmts = num_stmts;
     prev_num_types = num_types;
     prev_num_attrs = num_attrs;
   }
