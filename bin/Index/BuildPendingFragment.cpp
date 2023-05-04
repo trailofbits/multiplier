@@ -283,21 +283,10 @@ bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
 }
 
 bool PendingFragment::Add(const pasta::Type &entity, TypeMapper &tm) {
-  auto kind = entity.Kind();
-  mx::TypeId id;
-  auto fragment_ = tm.GetOrCreateFragmentIdForType(entity);
-  id.fragment_id = fragment_.Unpack().fragment_id;
-
-  // Offset is set to zero since it will be the first entity in the fragment
-  id.offset = static_cast<mx::EntityOffset>(0);
-  id.kind = mx::FromPasta(kind);
-
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  if (tm.type_ids.emplace(type_key, id).second) {
-    types_to_serialize.emplace_back(entity);  // New type found.
+  if (tm.AddEntityId(entity)) {
+    types_to_serialize.emplace_back(entity); // New type found.
     return true;
   }
-
   return false;
 }
 

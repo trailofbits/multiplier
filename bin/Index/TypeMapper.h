@@ -29,8 +29,10 @@ class TypeMapper final {
   mx::RawEntityId EntityId(const void *type, uint32_t quals=0u) const;
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
 
+  bool AddEntityId(const pasta::Type &entity);
+
   mx::PackedFragmentId
-  GetOrCreateFragmentIdForType(const pasta::Type &type);
+  GetOrCreateFragmentIdForType(const pasta::Type &type) const;
 
 };
 

@@ -24,6 +24,8 @@
 
 #include <multiplier/Database.h>
 
+#include "PASTA.h"
+
 namespace indexer {
 
 namespace {
@@ -66,8 +68,26 @@ TypeMapper::EntityId(const pasta::Type &entity) const {
   }
 }
 
+bool
+TypeMapper::AddEntityId(const pasta::Type &entity) {
+  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
+  if (auto it = type_ids.find(type_key); it == type_ids.end()) {
+    mx::TypeId id;
+    auto kind = entity.Kind();
+    id.kind = mx::FromPasta(kind);
+
+    auto fragment_ = GetOrCreateFragmentIdForType(entity);
+    id.fragment_id = fragment_.Unpack().fragment_id;
+    id.offset = static_cast<mx::EntityOffset>(0);
+
+    (void)type_ids.emplace(type_key, id);
+    return true;
+  }
+  return false;
+}
+
 mx::PackedFragmentId
-TypeMapper::GetOrCreateFragmentIdForType(const pasta::Type &type) {
+TypeMapper::GetOrCreateFragmentIdForType(const pasta::Type &type) const {
   bool is_new_fragment_id;
   auto token_range = pasta::PrintedTokenRange::Create(type);
   auto fragment_id = database.GetOrCreateFragmentIdForHash(

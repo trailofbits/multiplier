@@ -22,6 +22,12 @@ static void TrackRedeclarations(
     const EntityMapper &em, const std::string &mangled_name,
     const pasta::Decl &decl, std::vector<pasta::Decl> redecls) {
 
+  // If the mangled_name is empty, it should not be added to
+  // mangled_name table.
+  if (mangled_name.empty()) {
+    return;
+  }
+
   mx::RawEntityId a_id = em.EntityId(decl);
   mx::VariantId a_vid = mx::EntityId(a_id).Unpack();
   if (!std::holds_alternative<mx::DeclId>(a_vid)) {
