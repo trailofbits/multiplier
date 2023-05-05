@@ -94,28 +94,6 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 // Try to find the `Decl` referenced by a particular `type`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
 
-using RelatedEntityIds = std::unordered_map<const void *, mx::RawEntityId>;
-
-// Find the entity ID of the declaration that is most related to a particular
-// token.
-mx::RawEntityId RelatedEntityId(
-    const EntityMapper &em, const pasta::Token &tok,
-    uint64_t min_tok_index, uint64_t max_tok_index,
-    RelatedEntityIds &related_ids,
-    const RelatedEntityIds &hint_ids);
-
-// Figure out the token from which this token is derived.
-mx::RawEntityId DerivedTokenId(
-    EntityMapper &em, const pasta::FileToken &tok, RelatedEntityIds &);
-
-// Figure out the token from which this token is derived. This may drill down
-// through macro tokens that are elided from the `TokenTree` because of merging
-// of expansions with their argument pre-expansion phase. These two phases are
-// represented as separate expansions in PASTA.
-mx::RawEntityId DerivedTokenId(
-    EntityMapper &em, const pasta::Token &tok,
-    RelatedEntityIds &derived_map);
-
 template <typename T>
 struct EntityBuilder {
   capnp::MallocMessageBuilder message;

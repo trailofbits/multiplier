@@ -28,6 +28,7 @@
 #include "Hash.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
+#include "Provenance.h"
 #include "Util.h"
 
 namespace indexer {
@@ -1242,7 +1243,8 @@ static std::vector<PendingFragment> CreatePendingFragments(
 // the race to assign a fragment ID in this thread of execution.
 static void PersistParsedFragments(
     GlobalIndexingState &context, const pasta::AST &ast,
-    EntityIdMap &entity_ids, std::vector<PendingFragment> pending_fragments) {
+    EntityIdMap &entity_ids, TokenProvenanceCalculator &provenance,
+    std::vector<PendingFragment> pending_fragments) {
 
   pasta::TokenRange tok_range = ast.Tokens();
   NameMangler mangler(ast);
@@ -1257,7 +1259,8 @@ static void PersistParsedFragments(
 
     auto start_time = std::chrono::system_clock::now();
     try {
-      context.PersistFragment(ast, tok_range, mangler, entity_ids, pf);
+      context.PersistFragment(ast, tok_range, mangler, entity_ids,
+                              provenance, pf);
 
     } catch (...) {
       if (!pf.top_level_decls.empty()) {
@@ -1384,9 +1387,11 @@ void IndexCompileJobAction::Run(void) {
       << "Built AST for main source file "
       << ast.MainFile().Path().generic_string();
 
+  TokenProvenanceCalculator provenance;
+
   PersistParsedFiles(*context, ast, entity_ids);
   PersistParsedFragments(
-      *context, ast, entity_ids,
+      *context, ast, entity_ids, provenance,
       CreatePendingFragments(
           *context, entity_ids, ast,
           PartitionEntities(*context, ast)));

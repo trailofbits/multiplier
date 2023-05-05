@@ -33,6 +33,7 @@ class CodeGenerator;
 class GlobalIndexingState;
 class NameMangler;
 class PendingFragment;
+class TokenProvenanceCalculator;
 
 // State that needs to live only as long as there are active indexing jobs
 // underway.
@@ -111,6 +112,7 @@ class GlobalIndexingState {
   // thereof.
   void PersistFragment(const pasta::AST &ast, const pasta::TokenRange &tokens,
                        NameMangler &mangler, EntityIdMap &entity_ids,
+                       TokenProvenanceCalculator &provenance,
                        PendingFragment &fragment);
 };
 
