@@ -508,7 +508,6 @@ static TokenCategory ClassifyMacro(TokenKind kind, MacroId id,
     default:
       break;
   }
-  assert(false);  // We had a macro ID, but didn't associate it with anything.
   return baseline_category;
 }
 
