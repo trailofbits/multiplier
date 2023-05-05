@@ -43,12 +43,132 @@ namespace {
 
 static const std::hash<std::string_view> kHasher;
 
+static bool IsDefinableToken(pasta::TokenKind kind) {
+  auto clang_kind = static_cast<clang::tok::TokenKind>(kind);
+  switch (clang_kind) {
+    default:
+      if (clang::tok::getKeywordSpelling(clang_kind)) {
+        return true;
+      } else {
+        return false;
+      }
+    case clang::tok::identifier:
+    case clang::tok::raw_identifier:
+      return true;
+  }
+}
+
+static bool AcceptOOK(pasta::OverloadedOperatorKind ook,
+                      pasta::TokenKind tk) {
+  switch (tk) {
+    case pasta::TokenKind::kKeywordOperator:
+      return ook != pasta::OverloadedOperatorKind::kNone;
+    case pasta::TokenKind::kLSquare:
+    case pasta::TokenKind::kRSquare:
+      return ook == pasta::OverloadedOperatorKind::kArrayNew ||
+             ook == pasta::OverloadedOperatorKind::kArrayDelete ||
+             ook == pasta::OverloadedOperatorKind::kSubscript;
+    case pasta::TokenKind::kLParenthesis:
+    case pasta::TokenKind::kRParenthesis:
+      return ook == pasta::OverloadedOperatorKind::kCall;
+    case pasta::TokenKind::kKeywordNew:
+      return ook == pasta::OverloadedOperatorKind::kNew ||
+             ook == pasta::OverloadedOperatorKind::kArrayNew;
+    case pasta::TokenKind::kKeywordDelete:
+      return ook == pasta::OverloadedOperatorKind::kDelete ||
+             ook == pasta::OverloadedOperatorKind::kArrayDelete;
+    case pasta::TokenKind::kPlus:
+      return ook == pasta::OverloadedOperatorKind::kPlus;
+    case pasta::TokenKind::kMinus:
+      return ook == pasta::OverloadedOperatorKind::kMinus;
+    case pasta::TokenKind::kStar:
+      return ook == pasta::OverloadedOperatorKind::kStar;
+    case pasta::TokenKind::kSlash:
+      return ook == pasta::OverloadedOperatorKind::kSlash;
+    case pasta::TokenKind::kPercent:
+      return ook == pasta::OverloadedOperatorKind::kPercent;
+    case pasta::TokenKind::kCaret:
+      return ook == pasta::OverloadedOperatorKind::kCaret;
+    case pasta::TokenKind::kAmp:
+      return ook == pasta::OverloadedOperatorKind::kAmp;
+    case pasta::TokenKind::kPipe:
+      return ook == pasta::OverloadedOperatorKind::kPipe;
+    case pasta::TokenKind::kTilde:
+      return ook == pasta::OverloadedOperatorKind::kTilde;
+    case pasta::TokenKind::kExclaim:
+      return ook == pasta::OverloadedOperatorKind::kExclaim;
+    case pasta::TokenKind::kEqual:
+      return ook == pasta::OverloadedOperatorKind::kEqual;
+    case pasta::TokenKind::kLess:
+      return ook == pasta::OverloadedOperatorKind::kLess;
+    case pasta::TokenKind::kGreater:
+      return ook == pasta::OverloadedOperatorKind::kGreater;
+    case pasta::TokenKind::kPlusEqual:
+      return ook == pasta::OverloadedOperatorKind::kPlusEqual;
+    case pasta::TokenKind::kMinusEqual:
+      return ook == pasta::OverloadedOperatorKind::kMinusEqual;
+    case pasta::TokenKind::kStarEqual:
+      return ook == pasta::OverloadedOperatorKind::kStarEqual;
+    case pasta::TokenKind::kSlashEqual:
+      return ook == pasta::OverloadedOperatorKind::kSlashEqual;
+    case pasta::TokenKind::kPercentEqual:
+      return ook == pasta::OverloadedOperatorKind::kPercentEqual;
+    case pasta::TokenKind::kCaretEqual:
+      return ook == pasta::OverloadedOperatorKind::kCaretEqual;
+    case pasta::TokenKind::kAmpEqual:
+      return ook == pasta::OverloadedOperatorKind::kAmpEqual;
+    case pasta::TokenKind::kPipeEqual:
+      return ook == pasta::OverloadedOperatorKind::kPipeEqual;
+    case pasta::TokenKind::kLessLess:
+      return ook == pasta::OverloadedOperatorKind::kLessLess;
+    case pasta::TokenKind::kGreaterGreater:
+      return ook == pasta::OverloadedOperatorKind::kGreaterGreater;
+    case pasta::TokenKind::kLessLessEqual:
+      return ook == pasta::OverloadedOperatorKind::kLessLessEqual;
+    case pasta::TokenKind::kGreaterGreaterEqual:
+      return ook == pasta::OverloadedOperatorKind::kGreaterGreaterEqual;
+    case pasta::TokenKind::kEqualEqual:
+      return ook == pasta::OverloadedOperatorKind::kEqualEqual;
+    case pasta::TokenKind::kExclaimEqual:
+      return ook == pasta::OverloadedOperatorKind::kExclaimEqual;
+    case pasta::TokenKind::kLessEqual:
+      return ook == pasta::OverloadedOperatorKind::kLessEqual;
+    case pasta::TokenKind::kGreaterEqual:
+      return ook == pasta::OverloadedOperatorKind::kGreaterEqual;
+    case pasta::TokenKind::kSpaceship:
+      return ook == pasta::OverloadedOperatorKind::kSpaceship;
+    case pasta::TokenKind::kAmpAmp:
+      return ook == pasta::OverloadedOperatorKind::kAmpAmp;
+    case pasta::TokenKind::kPipePipe:
+      return ook == pasta::OverloadedOperatorKind::kPipePipe;
+    case pasta::TokenKind::kPlusPlus:
+      return ook == pasta::OverloadedOperatorKind::kPlusPlus;
+    case pasta::TokenKind::kMinusMinus:
+      return ook == pasta::OverloadedOperatorKind::kMinusMinus;
+    case pasta::TokenKind::kComma:
+      return ook == pasta::OverloadedOperatorKind::kComma;
+    case pasta::TokenKind::kArrowStar:
+      return ook == pasta::OverloadedOperatorKind::kArrowStar;
+    case pasta::TokenKind::kArrow:
+      return ook == pasta::OverloadedOperatorKind::kArrow;
+    case pasta::TokenKind::kQuestion:
+    case pasta::TokenKind::kColon:
+      return ook == pasta::OverloadedOperatorKind::kConditional;
+    case pasta::TokenKind::kKeywordCoAwait:
+      return ook == pasta::OverloadedOperatorKind::kCoawait;
+    default:
+      return false;
+  }
+}
+
 static const void *VisitStmt(const pasta::Stmt &stmt,
-                             const pasta::Token &token) {
+                             const pasta::Token &token,
+                             unsigned depth) {
   const void *raw_token = token.RawToken();
   if (auto dre = pasta::DeclRefExpr::From(stmt)) {
     if (auto named_decl = pasta::NamedDecl::From(dre->Declaration())) {
-      if (dre->ExpressionToken().RawToken() == raw_token) {
+      if (dre->ExpressionToken().RawToken() == raw_token &&
+          token.Kind() == pasta::TokenKind::kIdentifier) {
         return named_decl->RawDecl();
       }
     }
@@ -57,7 +177,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     if (me->MemberToken().RawToken() == raw_token) {
       return member_decl.RawDecl();
     } else {
-      return VisitStmt(me->Base(), token);
+      return VisitStmt(me->Base(), token, depth);
     }
   } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
     pasta::CXXConstructorDecl constructor_decl = ce->Constructor();
@@ -81,9 +201,32 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
   // Backup.
   } else if (auto call = pasta::CallExpr::From(stmt)) {
-    if (call->ExpressionToken().RawToken() == raw_token) {
-      if (auto called_decl = call->CalleeDeclaration()) {
-        return called_decl->RawDecl();
+    auto called_decl = call->CalleeDeclaration();
+    if (!called_decl) {
+      return nullptr;
+    }
+
+    auto raw_decl = called_decl->RawDecl();
+
+    // TODO(pag): Re-consider this identifier check. This manifested with
+    //
+    //                void (*func)(void);
+    //                (*func)();
+    //
+    //            Here, the issue is that the first `(` was the expression
+    //            token of the call.
+    if (call->ExpressionToken().RawToken() == raw_token &&
+        token.Kind() == pasta::TokenKind::kIdentifier) {
+      return raw_decl;
+    }
+
+    // If the first context for this token is a method call, then see if it's
+    // an overloaded operator.
+    if (!depth) {
+      if (auto meth = pasta::CXXMethodDecl::From(called_decl.value())) {
+        if (AcceptOOK(meth->OverloadedOperator(), token.Kind())) {
+          return raw_decl;
+        }
       }
     }
   }
@@ -205,9 +348,10 @@ static mx::RawEntityId RelatedEntityIdToParsedToken(
     case mx::TokenKind::IDENTIFIER: break;
   }
 
+  unsigned depth = 0u;
   for (auto context = token.Context();
        !related_entity && eid == mx::kInvalidEntityId && context;
-       context = context->Parent()) {
+       ++depth, context = context->Parent()) {
     switch (context->Kind()) {
       case pasta::TokenContextKind::kStmt:
         if (std::optional<pasta::Stmt> stmt =
@@ -226,7 +370,7 @@ static mx::RawEntityId RelatedEntityIdToParsedToken(
                 break;
             }
           } else {
-            related_entity = VisitStmt(stmt.value(), token);
+            related_entity = VisitStmt(stmt.value(), token, depth);
           }
         }
         break;
@@ -291,21 +435,6 @@ static mx::RawEntityId RelatedEntityIdToParsedToken(
   }
 
   return eid;
-}
-
-static bool IsDefinableToken(pasta::TokenKind kind) {
-  auto clang_kind = static_cast<clang::tok::TokenKind>(kind);
-  switch (clang_kind) {
-    default:
-      if (clang::tok::getKeywordSpelling(clang_kind)) {
-        return true;
-      } else {
-        return false;
-      }
-    case clang::tok::identifier:
-    case clang::tok::raw_identifier:
-      return true;
-  }
 }
 
 static std::optional<pasta::IncludeLikeMacroDirective>
