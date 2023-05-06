@@ -94,9 +94,7 @@ static gap::generator<Token> GenerateExpansionTokensFromMacro(Macro macro);
 static gap::generator<Token> GenerateExpansionTokensFromUse(
     MacroOrToken use) {
   if (std::holds_alternative<mx::Token>(use)) {
-    if (auto pt = std::get<Token>(use).parsed_token()) {
-      co_yield pt;
-    }
+    co_yield std::get<Token>(use);
   } else if (std::holds_alternative<Macro>(use)) {
     for (Token pt : GenerateExpansionTokensFromMacro(
                         std::move(std::get<Macro>(use)))) {
