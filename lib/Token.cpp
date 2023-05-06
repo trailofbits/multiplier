@@ -640,7 +640,8 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
   }
 }
 
-static TokenCategory ClassifyStmt(StmtId id, TokenCategory baseline_category) {
+static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
+                                  TokenCategory baseline_category) {
   switch (id.kind) {
     case StmtKind::STRING_LITERAL:
     case StmtKind::INTEGER_LITERAL:
@@ -651,7 +652,11 @@ static TokenCategory ClassifyStmt(StmtId id, TokenCategory baseline_category) {
 
     // E.g. `__func__`.
     case StmtKind::PREDEFINED_EXPR:
-      return TokenCategory::KEYWORD;
+      if (kind == TokenKind::KEYWORD___FUNC__) {
+        return TokenCategory::LITERAL;
+      } else {
+        return TokenCategory::KEYWORD;
+      }
 
     default:
       return baseline_category;
@@ -695,7 +700,7 @@ TokenCategory TokenReader::NthTokenCategory(EntityOffset token_index) const {
                         baseline_category);
 
   } else if (std::holds_alternative<StmtId>(vid)) {
-    return ClassifyStmt(std::get<StmtId>(vid), baseline_category);
+    return ClassifyStmt(std::get<StmtId>(vid), kind, baseline_category);
 
   } else if (std::holds_alternative<FileId>(vid)) {
     return ClassifyFile(kind, baseline_category);

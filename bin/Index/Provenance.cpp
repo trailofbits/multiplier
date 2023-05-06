@@ -199,6 +199,12 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
       return ls->Declaration().RawDecl();
     }
 
+  } else if (auto pde = pasta::PredefinedExpr::From(stmt)) {
+    if (dre->ExpressionToken().RawToken() == raw_token &&
+        token.Kind() == pasta::TokenKind::kIdentifier) {
+      return pde->RawStmt();
+    }
+
   // Backup.
   } else if (auto call = pasta::CallExpr::From(stmt)) {
     auto called_decl = call->CalleeDeclaration();
@@ -1076,18 +1082,27 @@ bool TokenProvenanceCalculator::Push(void) {
   for (; it != it_end; ++it) {
     TokenInfo *tok = *it;
 
-    const auto rel_id = tok->related_entity_id;
-    if (rel_id == mx::kInvalidEntityId) {
-      continue;
-    }
-
     if (!tok->child) {
       continue;  // No children.
     }
 
+    const auto rel_id = tok->related_entity_id;
+    const auto parsed_id = tok->parsed_token_id;
+
     for (TokenInfo *derived_tok : tok->Children(*this)) {
-      if (derived_tok->related_entity_id == mx::kInvalidEntityId) {
+      auto derived_parsed_id = derived_tok->parsed_token_id;
+      auto derived_rel_id = derived_tok->related_entity_id;
+      if (derived_parsed_id == mx::kInvalidEntityId &&
+          derived_rel_id == mx::kInvalidEntityId &&
+          rel_id != mx::kInvalidEntityId) {
         derived_tok->related_entity_id = rel_id;
+        derived_tok->parsed_token_id = parsed_id;
+        changed = true;
+
+      } else if (derived_parsed_id == mx::kInvalidEntityId &&
+                 derived_rel_id == rel_id &&
+                 parsed_id != mx::kInvalidEntityId) {
+        derived_tok->parsed_token_id = parsed_id;
         changed = true;
       }
     }
