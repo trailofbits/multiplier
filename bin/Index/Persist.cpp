@@ -990,7 +990,6 @@ void GlobalIndexingState::PersistFragment(
   // Add the fragment to the database.
   database.AddAsync(
       mx::EntityRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
-  (void)mangler;
 }
 
 }  // namespace indexer

@@ -293,6 +293,7 @@ void SerializeTypes(mx::DatabaseWriter &database, const pasta::Type &entity,
   DispatchSerializeType(em, storage.builder, entity);
   database.AddAsync(
       mx::EntityRecord{eid, GetSerializedData(storage.message)});
+  (void)fragment_index;
 }
 
 }  // namespace indexer
