@@ -694,8 +694,6 @@ static void PersistTokenTree(
   }
 }
 
-}  // namespace
-
 // Find the entity id of `canon_decl` that resides in the current fragment
 // on which the serializer is operating. Token contexts from PASTA store the
 // canonical (typically first) declaration, but we generally want the version
@@ -754,7 +752,7 @@ static mx::RawEntityId IdOfRedeclInFragment(
 // me the SwitchStmt containing this token." Token contexts aren't pure linked
 // lists, though; there are special "alias" nodes that tend to link you further
 // down the lists, and so that takes some special handling.
-void PersistTokenContexts(
+static void PersistTokenContexts(
     EntityMapper &em, const std::vector<pasta::Token> &parsed_tokens,
     mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb) {
 
@@ -911,6 +909,8 @@ void PersistTokenContexts(
   DCHECK_GT(fb.getTokenKinds().size(), 0u);
 }
 
+}  // namespace
+
 // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
 // de-duplication and indexing. It roughly corresponds to a sequence of one-or-
 // more syntactically overlapping "top-level declarations." For us, a top-
@@ -950,7 +950,6 @@ void GlobalIndexingState::PersistFragment(
   BuildPendingFragment(pf, em, tokens);
 
   // Figure out parentage/inheritance between the entities.
-
   LabelParentsInPendingFragment(pf, em);
 
   // Serialize all discovered entities.
