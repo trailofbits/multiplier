@@ -98,9 +98,7 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 // Try to find the `Decl` referenced by a particular `type`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
 
-mx::RawEntityId IdOfRedeclInFragment(
-    const EntityMapper &em, mx::RawEntityId frag_index,
-    pasta::Decl canon_decl);
+bool IsSerializableDecl(const pasta::Decl &decl);
 
 template <typename T>
 struct EntityBuilder {

@@ -228,24 +228,11 @@ void FragmentBuilder::Accept(const pasta::Macro &) {}
 
 
 bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
-  auto kind = entity.Kind();
-  switch (kind) {
-    case pasta::DeclKind::kTranslationUnit:
-    case pasta::DeclKind::kNamespace:
-    case pasta::DeclKind::kExternCContext:
-    case pasta::DeclKind::kLinkageSpec:
-      return false;
-
-    // TODO(pag): Think about this a bit more. It's possible that we end up
-    //            internalizing class templates and partial specializations
-    //            into the fragments using their complete specializations.
-    default:
-      if (entity.IsInvalidDeclaration()) {
-        return false;
-      }
-      break;
+  if (!IsSerializableDecl(entity))  {
+    return false;
   }
 
+  auto kind = entity.Kind();
   mx::DeclId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(decls_to_serialize.size());

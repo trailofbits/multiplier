@@ -191,23 +191,13 @@ mx::RawEntityId EntityMapper::EntityIdOfType(
   return tm.EntityId(type, quals);
 }
 
-void EntityMapper::ResetForFragment(const PendingFragment &pf) {
-  // clear token tree ids
+void EntityMapper::ResetForFragment(void) {
+  // clear token tree ids, parent_decl_ids, and parent_stmt_ids before
+  // processing new pending fragments. Not clearing them will cause issue
+  // with fragment specific token trees and parentage tracking
   token_tree_ids.clear();
-
-  // clear decl & stmt parent ids. It will be used to
-  // track parentage in a fragment.
   parent_decl_ids.clear();
   parent_stmt_ids.clear();
-
-  // Initialize with the pending fragment decl & stmt ids.
-  for (auto &decl : pf.parent_decl_ids) {
-    parent_decl_ids.emplace(decl);
-  }
-
-  for (auto &stmt : pf.parent_stmt_ids) {
-    parent_stmt_ids.emplace(stmt);
-  }
 }
 
 }  // namespace indexer

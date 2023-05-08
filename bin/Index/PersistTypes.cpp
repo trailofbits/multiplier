@@ -38,25 +38,6 @@ extern void SerializeTypes(mx::DatabaseWriter &database,
 
 namespace {
 
-// Checks if the declaration is valid or not. Please
-// refer `BuildPendingFragment.cpp:242` for comments.
-static inline bool IsValidDecl(const pasta::Decl &decl) {
-  auto kind = decl.Kind();
-  switch (kind) {
-    case pasta::DeclKind::kTranslationUnit:
-    case pasta::DeclKind::kNamespace:
-    case pasta::DeclKind::kExternCContext:
-    case pasta::DeclKind::kLinkageSpec:
-      return false;
-    default:
-      if (decl.IsInvalidDeclaration()) {
-        return false;
-      }
-      break;
-  }
-  return true;
-}
-
 // Persist the printed tokens in the fragment builder if not
 // creating Token tree for printed tokens
 static void PersistPrintedTokens(
@@ -104,7 +85,7 @@ static void PersistPrintedTokens(
 
 static void PersistTokenContexts(
     EntityMapper &em, const pasta::PrintedTokenRange &printed_tokens,
-    mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb) {
+    mx::rpc::Fragment::Builder &fb) {
 
   using DeclContextSet = std::unordered_set<pasta::TokenContext>;
   std::map<mx::RawEntityId, DeclContextSet> contexts;
@@ -122,25 +103,18 @@ static void PersistTokenContexts(
         c = std::move(alias_context.value());
       }
 
-      // NOTE(pag): PASTA stored the canonical decl in the decl context, so
-      //            it's not likely to be in the current fragment.
-      if (auto decl = pasta::Decl::From(c)) {
-        const mx::RawEntityId eid = IdOfRedeclInFragment(em, frag_index, *decl);
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
-
 #define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
-    } else if (auto lower_name ## _ = pasta::type_name::From(c)) { \
+    if (auto lower_name ## _ = pasta::type_name::From(c)) { \
       const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
       if (eid != mx::kInvalidEntityId) { \
         contexts[eid].insert(context.value()); \
-      }
+      } \
+      continue; \
+    }
 
       FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)
 #undef ADD_ENTITY_TO_CONTEXT
 
-      }
     }
   }
 
@@ -263,7 +237,7 @@ static void PersistTokenContexts(
 
 
 void PendingFragmentType::Uses(const pasta::Decl &entity) {
-  if (IsValidDecl(entity)) {
+  if (IsSerializableDecl(entity)) {
     decls_in_use.emplace_back(entity);
   }
 }
@@ -380,7 +354,7 @@ void GlobalIndexingState::PersistTypes(const pasta::AST &ast, NameMangler &mangl
     }
 
     PersistPrintedTokens(em, fb, tok_range);
-    PersistTokenContexts(em, tok_range, tf.fragment_index, fb);
+    PersistTokenContexts(em, tok_range, fb);
 
     database.AddAsync(
         mx::EntityRecord{tf.fragment_id.Pack(), GetSerializedData(message)});

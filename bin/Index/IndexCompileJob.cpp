@@ -1261,7 +1261,7 @@ static void PersistParsedFragments(
 
     auto start_time = std::chrono::system_clock::now();
     try {
-      em.ResetForFragment(pf);
+      em.ResetForFragment();
       context.PersistFragment(ast, tok_range, mangler, em, provenance, pf);
       context.PersistTypes(ast, mangler, em, pf);
     } catch (...) {

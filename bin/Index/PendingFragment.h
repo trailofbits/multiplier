@@ -81,10 +81,6 @@ class PendingFragment {
   std::vector<pasta::Decl> top_level_decls;
   std::vector<pasta::Macro> top_level_macros;
 
-  // Entity IDs for parentage tracking.
-  EntityIdMap parent_decl_ids;
-  EntityIdMap parent_stmt_ids;
-
   // Offsets of the serialized version of pseudo entities in this fragment.
   PseudoOffsetMap pseudo_offsets;
 

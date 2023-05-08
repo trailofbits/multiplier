@@ -65,7 +65,7 @@ class EntityMapper final {
 
   mx::RawEntityId EntityIdOfType(const void *type, uint32_t quals=0u) const;
 
-  void ResetForFragment(const PendingFragment &pf);
+  void ResetForFragment(void);
 };
 
 }  // namespace indexer

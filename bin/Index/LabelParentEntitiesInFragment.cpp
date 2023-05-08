@@ -65,11 +65,11 @@ class ParentTrackerVisitor : public EntityVisitor {
     }
 
     if (parent_decl_id != mx::kInvalidEntityId) {
-      fragment.parent_decl_ids.emplace(entity.RawDecl(), parent_decl_id);
+      em.parent_decl_ids.emplace(entity.RawDecl(), parent_decl_id);
     }
 
     if (parent_stmt_id != mx::kInvalidEntityId) {
-      fragment.parent_stmt_ids.emplace(entity.RawDecl(), parent_stmt_id);
+      em.parent_stmt_ids.emplace(entity.RawDecl(), parent_stmt_id);
     }
 
     SaveRestoreEntityId save_parent_decl(parent_decl_id, rid);
@@ -92,11 +92,11 @@ class ParentTrackerVisitor : public EntityVisitor {
     }
 
     if (parent_decl_id != mx::kInvalidEntityId) {
-      fragment.parent_decl_ids.emplace(entity.RawStmt(), parent_decl_id);
+      em.parent_decl_ids.emplace(entity.RawStmt(), parent_decl_id);
     }
 
     if (parent_stmt_id != mx::kInvalidEntityId) {
-      fragment.parent_stmt_ids.emplace(entity.RawStmt(), parent_stmt_id);
+      em.parent_stmt_ids.emplace(entity.RawStmt(), parent_stmt_id);
     }
 
     SaveRestoreEntityId save_parent_stmt(parent_stmt_id, rid);

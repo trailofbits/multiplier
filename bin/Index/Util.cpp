@@ -925,44 +925,22 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
   return std::nullopt;
 }
 
-// Find the entity id of `canon_decl` that resides in the current fragment
-// on which the serializer is operating. Token contexts from PASTA store the
-// canonical (typically first) declaration, but we generally want the version
-// of the declaration that is inside of the fragment itself, so here we go from
-// canonical back to specific.
-//
-// TODO(pag): Eventually, we should change the serialized representation of
-//            token contexts to store full 64-bit entity IDs. Right now, they
-//            store offsets of things in the fragments, hence the actual need
-//            to go canonical->specific in the first place, and why a failure to
-//            do so results in `kInvalidEntityId` instead of just falling back
-//            on the ID of the canonical decl.
-mx::RawEntityId IdOfRedeclInFragment(
-    const EntityMapper &em, mx::RawEntityId frag_index,
-    pasta::Decl canon_decl) {
-
-  mx::RawEntityId ret_id = em.EntityId(canon_decl);
-  for (pasta::Decl redecl : canon_decl.Redeclarations()) {
-    mx::RawEntityId eid = em.EntityId(redecl);
-    if (eid == mx::kInvalidEntityId) {
-      continue;
-    }
-
-    // If we come across a definition, then reference it if we're not able
-    // to reference a redecl that's in the right fragment.
-    if (IsDefinition(redecl)) {
-      ret_id = eid;
-    }
-
-    mx::VariantId vid = mx::EntityId(eid).Unpack();
-    CHECK(std::holds_alternative<mx::DeclId>(vid));
-    mx::DeclId id = std::get<mx::DeclId>(vid);
-    if (id.fragment_id == frag_index) {
-      return eid;
-    }
+// Checks if the declaration is valid and serializable
+bool IsSerializableDecl(const pasta::Decl &decl) {
+  auto kind = decl.Kind();
+  switch (kind) {
+    case pasta::DeclKind::kTranslationUnit:
+    case pasta::DeclKind::kNamespace:
+    case pasta::DeclKind::kExternCContext:
+    case pasta::DeclKind::kLinkageSpec:
+      return false;
+    default:
+      if (decl.IsInvalidDeclaration()) {
+        return false;
+      }
+      break;
   }
-
-  return ret_id;
+  return true;
 }
 
 namespace {
