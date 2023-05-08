@@ -12,15 +12,14 @@
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 
-#include "Hash.h"
 #include "TypeMapper.h"
 #include "Util.h"
 
 namespace indexer {
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
-  if (auto it = fragment.parent_decl_ids.find(entity.RawDecl());
-      it != fragment.parent_decl_ids.end()) {
+  if (auto it = parent_decl_ids.find(entity.RawDecl());
+      it != parent_decl_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -28,8 +27,8 @@ mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
-  if (auto it = fragment.parent_decl_ids.find(entity.RawStmt());
-      it != fragment.parent_decl_ids.end()) {
+  if (auto it = parent_decl_ids.find(entity.RawStmt());
+      it != parent_decl_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -37,8 +36,8 @@ mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
-  if (auto it = fragment.parent_stmt_ids.find(entity.RawDecl());
-      it != fragment.parent_stmt_ids.end()) {
+  if (auto it = parent_stmt_ids.find(entity.RawDecl());
+      it != parent_stmt_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -46,8 +45,8 @@ mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
-  if (auto it = fragment.parent_stmt_ids.find(entity.RawStmt());
-      it != fragment.parent_stmt_ids.end()) {
+  if (auto it = parent_stmt_ids.find(entity.RawStmt());
+      it != parent_stmt_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -190,6 +189,25 @@ mx::RawEntityId EntityMapper::EntityId(
 mx::RawEntityId EntityMapper::EntityIdOfType(
     const void *type, uint32_t quals) const {
   return tm.EntityId(type, quals);
+}
+
+void EntityMapper::ResetForFragment(const PendingFragment &pf) {
+  // clear token tree ids
+  token_tree_ids.clear();
+
+  // clear decl & stmt parent ids. It will be used to
+  // track parentage in a fragment.
+  parent_decl_ids.clear();
+  parent_stmt_ids.clear();
+
+  // Initialize with the pending fragment decl & stmt ids.
+  for (auto &decl : pf.parent_decl_ids) {
+    parent_decl_ids.emplace(decl);
+  }
+
+  for (auto &stmt : pf.parent_stmt_ids) {
+    parent_stmt_ids.emplace(stmt);
+  }
 }
 
 }  // namespace indexer

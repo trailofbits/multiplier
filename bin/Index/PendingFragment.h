@@ -57,13 +57,19 @@ class FileLocationOfFragment {
 // represents a single logical thing.
 class PendingFragment {
  public:
-  inline PendingFragment(mx::PackedFragmentId fragment_id_)
+  inline PendingFragment(mx::PackedFragmentId fragment_id_, EntityMapper &em_)
       : fragment_id(fragment_id_),
-        fragment_index(fragment_id.Unpack().fragment_id) {}
+        fragment_index(fragment_id.Unpack().fragment_id),
+        em(em_){}
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::PackedFragmentId fragment_id;
   mx::RawEntityId fragment_index;
+
+  // Instance of entity mapper that will hold a map of entity ids
+  // and type mapper. Each translation unit will have single instance
+  // of entity mapper.
+  EntityMapper &em;
 
   // Inclusive range of indices into the parsed tokens.
   uint64_t begin_index{0u};

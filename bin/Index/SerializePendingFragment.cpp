@@ -198,7 +198,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 
   // Note: We don't serialize types to the same fragments. They are
   //       serialized as different fragment in the database. This
-  //       will avoid de-duplication of the types in each fragments.
+  //       will avoid duplication of the types in each fragments.
 
   for (const pasta::Attr &entity : pf.attrs_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);

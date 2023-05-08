@@ -10,7 +10,6 @@
 #include "PASTA.h"
 #include "TypeMapper.h"
 #include "Util.h"
-#include "Hash.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ingored "-Wunused-function"
@@ -284,6 +283,23 @@ bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
 
 bool PendingFragment::Add(const pasta::Type &entity, TypeMapper &tm) {
   if (tm.AddEntityId(entity)) {
+
+    // Types are global but we still need to store them in pending fragment
+    // to build it during the iterative process and discover the references
+    // of other decls and statements by the type and logically belongs to the
+    // fragment. It would otherwise be hard to do "outside" pending fragment
+    // build process.
+    //
+    // For example, AdjustedTypes are a big example, where you might have a
+    // function with a body like:
+    //      `int x;`
+    //      `int y[sizeof(x)];`
+    //
+    // The adjusted type here references a sized array type that references
+    // `sizeof(x)`, and we should capture `sizeof(x)` and the reference to x
+    // in this in the fragment, as it can't be properly captured outside / after
+    // the fragment is serialized.
+
     types_to_serialize.emplace_back(entity); // New type found.
     return true;
   }

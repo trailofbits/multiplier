@@ -57,17 +57,6 @@ static inline bool IsValidDecl(const pasta::Decl &decl) {
   return true;
 }
 
-static mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
-  auto kind = mx::FromPasta(entity.Kind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    auto data = entity.Data();
-    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
-}
-
 // Persist the printed tokens in the fragment builder if not
 // creating Token tree for printed tokens
 static void PersistPrintedTokens(
@@ -96,7 +85,7 @@ static void PersistPrintedTokens(
     tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
 
     // No macro token maps to the printed token. Set it to invalid entity id
-    mti2po.set(i, mx::kInvalidEntityId);
+    mti2po.set(i, num_tokens);
     mti2mi.set(i, mx::kInvalidEntityId); // No valid map for printed token to containing token
     dt.set(i, mx::kInvalidEntityId);  // No valid derived token id for printed tokens
     re.set(i, mx::kInvalidEntityId);  // No valid related token id for printed tokens

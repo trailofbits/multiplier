@@ -263,7 +263,7 @@ struct TokenTreeSerializationSchedule {
     // We need to form a new macro id for something we discovered along the way.
     } else {
       mx::MacroId id;
-      id.fragment_id = em.fragment.fragment_index;
+      id.fragment_id = pf.fragment_index;
       id.kind = tt.Kind();
       id.offset = static_cast<unsigned>(pf.macros_to_serialize.size());
       raw_id = mx::EntityId(id).Pack();
@@ -291,7 +291,7 @@ struct TokenTreeSerializationSchedule {
     } else {
       mx::MacroTokenId id;
       id.kind = mx::TokenKind::UNKNOWN;
-      id.fragment_id = em.fragment.fragment_index;
+      id.fragment_id = pf.fragment_index;
       id.offset = static_cast<unsigned>(tokens.size());
 
       const void *raw_pt = nullptr;

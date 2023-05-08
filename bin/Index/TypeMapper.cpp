@@ -45,19 +45,19 @@ static std::string HashType(const pasta::Type &type) {
 } // namespace
 
 
-mx::RawEntityId
-TypeMapper::EntityId(const void *type, uint32_t quals) const {
+mx::RawEntityId TypeMapper::EntityId(const void *type,
+                                     uint32_t quals) const {
   TypeKey type_key(type, quals);
   assert(type_key.first != nullptr);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
     return it->second.Pack();
   } else {
+    assert(false);
     return mx::kInvalidEntityId;
   }
 }
 
-mx::RawEntityId
-TypeMapper::EntityId(const pasta::Type &entity) const {
+mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
   assert(type_key.first != nullptr);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
@@ -68,26 +68,26 @@ TypeMapper::EntityId(const pasta::Type &entity) const {
   }
 }
 
-bool
-TypeMapper::AddEntityId(const pasta::Type &entity) {
+bool TypeMapper::AddEntityId(const pasta::Type &entity) {
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  if (auto it = type_ids.find(type_key); it == type_ids.end()) {
-    mx::TypeId id;
-    auto kind = entity.Kind();
-    id.kind = mx::FromPasta(kind);
-
-    auto fragment_ = GetOrCreateFragmentIdForType(entity);
-    id.fragment_id = fragment_.Unpack().fragment_id;
-    id.offset = static_cast<mx::EntityOffset>(0);
-
-    (void)type_ids.emplace(type_key, id);
-    return true;
+  if (auto it = type_ids.find(type_key); it != type_ids.end()) {
+    return false;
   }
-  return false;
+
+  mx::TypeId id;
+  auto kind = entity.Kind();
+  id.kind = mx::FromPasta(kind);
+
+  auto fragment_ = GetOrCreateFragmentIdForType(entity);
+  id.fragment_id = fragment_.Unpack().fragment_id;
+  id.offset = static_cast<mx::EntityOffset>(0);
+
+  (void)type_ids.emplace(type_key, id);
+  return true;
 }
 
-mx::PackedFragmentId
-TypeMapper::GetOrCreateFragmentIdForType(const pasta::Type &type) const {
+mx::PackedFragmentId TypeMapper::GetOrCreateFragmentIdForType(
+    const pasta::Type &type) const {
   bool is_new_fragment_id;
   auto token_range = pasta::PrintedTokenRange::Create(type);
   auto fragment_id = database.GetOrCreateFragmentIdForHash(

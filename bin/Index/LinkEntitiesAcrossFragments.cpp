@@ -10,7 +10,6 @@
 #include "EntityMapper.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
-#include "TypeFragment.h"
 
 #include <glog/logging.h>
 
@@ -21,12 +20,6 @@ static void TrackRedeclarations(
     mx::DatabaseWriter &database, mx::RawEntityId fragment_index,
     const EntityMapper &em, const std::string &mangled_name,
     const pasta::Decl &decl, std::vector<pasta::Decl> redecls) {
-
-  // If the mangled_name is empty, it should not be added to
-  // mangled_name table.
-  if (mangled_name.empty()) {
-    return;
-  }
 
   mx::RawEntityId a_id = em.EntityId(decl);
   mx::VariantId a_vid = mx::EntityId(a_id).Unpack();
@@ -41,7 +34,11 @@ static void TrackRedeclarations(
     return;
   }
 
-  database.AddAsync(mx::MangledNameRecord{a_id, mangled_name});
+  // If the mangled_name is empty, it should not be added to the table.
+  // It goes around it and add redecls to the redecl record table.
+  if (!mangled_name.empty()) {
+    database.AddAsync(mx::MangledNameRecord{a_id, mangled_name});
+  }
 
   for (const pasta::Decl &redecl : redecls) {
     mx::RawEntityId b_id = em.EntityId(redecl);

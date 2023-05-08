@@ -77,6 +77,9 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity);
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity);
+
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);
 
@@ -94,6 +97,10 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 
 // Try to find the `Decl` referenced by a particular `type`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
+
+mx::RawEntityId IdOfRedeclInFragment(
+    const EntityMapper &em, mx::RawEntityId frag_index,
+    pasta::Decl canon_decl);
 
 template <typename T>
 struct EntityBuilder {

@@ -6,8 +6,6 @@
 
 #include "IndexCompileJob.h"
 
-#include <clang/AST/Type.h>
-
 #include <algorithm>
 #include <capnp/message.h>
 #include <cassert>
@@ -42,8 +40,8 @@ namespace indexer {
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
 extern void LabelEntitiesInFragment(
-    PendingFragment &pf, EntityIdMap &entity_ids,
-    TypeMapper &tm, const pasta::TokenRange &tok_range);
+    PendingFragment &pf, EntityMapper &em,
+    const pasta::TokenRange &tok_range);
 
 namespace {
 
@@ -1112,7 +1110,7 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
 }
 
 static void CreatePendingFragment(
-    mx::DatabaseWriter &database, EntityIdMap &entity_ids, TypeMapper &tm,
+    mx::DatabaseWriter &database, EntityMapper &em,
     const pasta::TokenRange &tok_range, const EntityGroupRange &group_range,
     std::vector<PendingFragment> &pending_fragments) {
 
@@ -1122,7 +1120,7 @@ static void CreatePendingFragment(
 
   // Locate where this fragment is in its file.
   std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
-      entity_ids, entities, tok_range, begin_index, end_index);
+      em.entity_ids, entities, tok_range, begin_index, end_index);
 
   // Don't create token `decls_for_chunk` if the decl is already seen. This
   // means it's already been indexed.
@@ -1158,7 +1156,7 @@ static void CreatePendingFragment(
           (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
           HashFragment(entities, tok_range, begin_index, end_index),
           (end_index - begin_index + 1ul)  /* num_tokens */,
-          is_new_fragment_id  /* mutated by reference */));
+          is_new_fragment_id  /* mutated by reference */), em);
 
   pf.file_location = std::move(floc);
   pf.begin_index = begin_index;
@@ -1192,7 +1190,7 @@ static void CreatePendingFragment(
   // Unfortunately, the labeller needs to be manually written as opposed to
   // auto-generated, as our auto-generation has no concept of which AST
   // methods descend vs. cross the tree (into other fragments).
-  LabelEntitiesInFragment(pf, entity_ids, tm, tok_range);
+  LabelEntitiesInFragment(pf, em, tok_range);
 
   if (!is_new_fragment_id) {
     return;
@@ -1206,8 +1204,8 @@ static void CreatePendingFragment(
 // the redundant declarations that are likely to appear early in ASTs, i.e.
 // in `#include`d headers.
 static std::vector<PendingFragment> CreatePendingFragments(
-    GlobalIndexingState &context, EntityIdMap &entity_ids, TypeMapper &tm,
-    const pasta::AST &ast, std::vector<EntityGroupRange> decl_group_ranges) {
+    GlobalIndexingState &context, EntityMapper &em, const pasta::AST &ast,
+    std::vector<EntityGroupRange> decl_group_ranges) {
 
   ProgressBarWork identification_progress_tracker(
       context.identification_progress);
@@ -1231,7 +1229,7 @@ static std::vector<PendingFragment> CreatePendingFragments(
 
     try {
       const EntityGroupRange &entities_in_fragment = *it;
-      CreatePendingFragment(context.database, entity_ids, tm, tok_range,
+      CreatePendingFragment(context.database, em, tok_range,
                             entities_in_fragment, pending_fragments);
     } catch (...) {
       LOG(ERROR)
@@ -1247,7 +1245,7 @@ static std::vector<PendingFragment> CreatePendingFragments(
 // the race to assign a fragment ID in this thread of execution.
 static void PersistParsedFragments(
     GlobalIndexingState &context, const pasta::AST &ast,
-    EntityIdMap &entity_ids, TypeMapper &tm, TokenProvenanceCalculator &provenance,
+    EntityMapper &em, TokenProvenanceCalculator &provenance,
     std::vector<PendingFragment> pending_fragments) {
 
   pasta::TokenRange tok_range = ast.Tokens();
@@ -1263,7 +1261,7 @@ static void PersistParsedFragments(
 
     auto start_time = std::chrono::system_clock::now();
     try {
-      EntityMapper em(entity_ids, tm, pf);
+      em.ResetForFragment(pf);
       context.PersistFragment(ast, tok_range, mangler, em, provenance, pf);
       context.PersistTypes(ast, mangler, em, pf);
     } catch (...) {
@@ -1384,9 +1382,10 @@ void IndexCompileJobAction::Run(void) {
     return;
   }
 
-  TypeMapper tm{context->database};
-
+  TypeMapper tm(context->database);
   EntityIdMap entity_ids;
+  EntityMapper em(entity_ids, tm);
+
   pasta::AST ast = std::move(maybe_ast.value());
 
   DLOG(INFO)
@@ -1397,9 +1396,9 @@ void IndexCompileJobAction::Run(void) {
 
   PersistParsedFiles(*context, ast, entity_ids);
   PersistParsedFragments(
-      *context, ast, entity_ids, tm, provenance,
+      *context, ast, em, provenance,
       CreatePendingFragments(
-          *context, entity_ids, tm, ast,
+          *context, em, ast,
           PartitionEntities(*context, ast)));
 }
 

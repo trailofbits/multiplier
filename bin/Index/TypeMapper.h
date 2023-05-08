@@ -19,7 +19,7 @@ namespace indexer {
 
 class TypeMapper final {
  public:
-  TypeIdMap type_ids{};
+  TypeIdMap type_ids;
 
   mx::DatabaseWriter &database;
 
