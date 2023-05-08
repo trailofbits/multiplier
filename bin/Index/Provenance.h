@@ -12,6 +12,7 @@
 #include <iosfwd>
 #include <multiplier/Types.h>
 #include <string_view>
+#include <vector>
 #include <unordered_map>
 
 namespace pasta {

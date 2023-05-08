@@ -28,6 +28,7 @@
 #include <llvm/Support/SHA256.h>
 #pragma clang diagnostic pop
 
+#include "PASTA.h"
 #include "Util.h"
 
 //#define D(...) __VA_ARGS__
@@ -157,11 +158,11 @@ std::string HashFragment(
 
   for (uint64_t i = begin_index; i <= end_index; i++) {
     pasta::Token token = toks[i];
-    pasta::TokenKind kind = token.Kind();
+    mx::TokenKind kind = mx::FromPasta(token.Kind());
     llvm::StringRef data(token.Data());
 
-    if (kind == pasta::TokenKind::kRawIdentifier) {
-      kind = pasta::TokenKind::kIdentifier;
+    if (data.empty()) {
+      continue;
     }
 
     // Mix in generic token/structure/context information.
@@ -178,26 +179,31 @@ std::string HashFragment(
       case pasta::TokenRole::kFinalMacroExpansionToken:
         D( std::cerr << "\t2 kind=" << int(kind) << " data="
                      << token.Data() << '\n'; )
-        for (auto context = token.Context(); context;
+
+       for (auto context = token.Context(); context;
              context = context->Parent()) {
           D( std::cerr << "\t\tcontext->kind=" << int(context->Kind()) << '\n'; )
 
           switch (context->Kind()) {
             case pasta::TokenContextKind::kDecl:
               fs.AddInteger(static_cast<uint16_t>(
-                  pasta::Decl::From(*context)->Kind()));
+                  mx::FromPasta(pasta::Decl::From(*context)->Kind())));
               break;
             case pasta::TokenContextKind::kStmt:
               fs.AddInteger(static_cast<uint16_t>(
-                  pasta::Stmt::From(*context)->Kind()));
+                  mx::FromPasta(pasta::Stmt::From(*context)->Kind())));
               break;
             case pasta::TokenContextKind::kType:
               fs.AddInteger(static_cast<uint16_t>(
-                  pasta::Type::From(*context)->Kind()));
+                  mx::FromPasta(pasta::Type::From(*context)->Kind())));
               break;
             case pasta::TokenContextKind::kAttr:
               fs.AddInteger(static_cast<uint16_t>(
-                  pasta::Attr::From(*context)->Kind()));
+                  mx::FromPasta(pasta::Attr::From(*context)->Kind())));
+              break;
+            case pasta::TokenContextKind::kAlias:
+            case pasta::TokenContextKind::kString:
+            case pasta::TokenContextKind::kAST:
               break;
             default:
               fs.AddInteger(static_cast<uint16_t>(context->Kind()));
