@@ -12,13 +12,14 @@
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 
+#include "TypeMapper.h"
 #include "Util.h"
 
 namespace indexer {
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
-  if (auto it = fragment.parent_decl_ids.find(entity.RawDecl());
-      it != fragment.parent_decl_ids.end()) {
+  if (auto it = parent_decl_ids.find(entity.RawDecl());
+      it != parent_decl_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -26,8 +27,8 @@ mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
-  if (auto it = fragment.parent_decl_ids.find(entity.RawStmt());
-      it != fragment.parent_decl_ids.end()) {
+  if (auto it = parent_decl_ids.find(entity.RawStmt());
+      it != parent_decl_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -35,8 +36,8 @@ mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
-  if (auto it = fragment.parent_stmt_ids.find(entity.RawDecl());
-      it != fragment.parent_stmt_ids.end()) {
+  if (auto it = parent_stmt_ids.find(entity.RawDecl());
+      it != parent_stmt_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -44,8 +45,8 @@ mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
-  if (auto it = fragment.parent_stmt_ids.find(entity.RawStmt());
-      it != fragment.parent_stmt_ids.end()) {
+  if (auto it = parent_stmt_ids.find(entity.RawStmt());
+      it != parent_stmt_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
@@ -162,15 +163,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) const {
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  assert(type_key.first != nullptr);
-  if (auto it = fragment.type_ids.find(type_key);
-      it != fragment.type_ids.end()) {
-    return it->second.Pack();
-  } else {
-    assert(false);
-    return mx::kInvalidEntityId;
-  }
+  return tm.EntityId(entity);
 }
 
 mx::RawEntityId EntityMapper::EntityId(
@@ -195,14 +188,16 @@ mx::RawEntityId EntityMapper::EntityId(
 
 mx::RawEntityId EntityMapper::EntityIdOfType(
     const void *type, uint32_t quals) const {
-  TypeKey type_key(type, quals);
-  assert(type_key.first != nullptr);
-  if (auto it = fragment.type_ids.find(type_key);
-      it != fragment.type_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return tm.EntityId(type, quals);
+}
+
+void EntityMapper::ResetForFragment(void) {
+  // clear token tree ids, parent_decl_ids, and parent_stmt_ids before
+  // processing new pending fragments. Not clearing them will cause issue
+  // with fragment specific token trees and parentage tracking
+  token_tree_ids.clear();
+  parent_decl_ids.clear();
+  parent_stmt_ids.clear();
 }
 
 }  // namespace indexer

@@ -17,7 +17,7 @@ namespace indexer {
 namespace {
 
 static void TrackRedeclarations(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
+    mx::DatabaseWriter &database, mx::RawEntityId fragment_index,
     const EntityMapper &em, const std::string &mangled_name,
     const pasta::Decl &decl, std::vector<pasta::Decl> redecls) {
 
@@ -29,12 +29,16 @@ static void TrackRedeclarations(
   }
 
   mx::DeclId decl_id = std::get<mx::DeclId>(a_vid);
-  if (decl_id.fragment_id != pf.fragment_index) {
+  if (decl_id.fragment_id != fragment_index) {
     assert(false);
     return;
   }
 
-  database.AddAsync(mx::MangledNameRecord{a_id, mangled_name});
+  // If the mangled_name is empty, it should not be added to the table.
+  // It goes around it and add redecls to the redecl record table.
+  if (!mangled_name.empty()) {
+    database.AddAsync(mx::MangledNameRecord{a_id, mangled_name});
+  }
 
   for (const pasta::Decl &redecl : redecls) {
     mx::RawEntityId b_id = em.EntityId(redecl);
@@ -71,7 +75,7 @@ void LinkEntitiesAcrossFragments(
     if (auto func = pasta::FunctionDecl::From(decl)) {
       const auto &mangled_name = mangler.Mangle(decl);
       TrackRedeclarations(
-          database, pf, em,
+          database, pf.fragment_index, em,
           (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
           decl, func->Redeclarations());
 
@@ -82,7 +86,7 @@ void LinkEntitiesAcrossFragments(
         case pasta::DeclCategory::kClassMember: {
           const auto &mangled_name = mangler.Mangle(decl);
           TrackRedeclarations(
-              database, pf, em,
+              database, pf.fragment_index, em,
               (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
               decl, var->Redeclarations());
           break;
@@ -92,11 +96,11 @@ void LinkEntitiesAcrossFragments(
       }
 
     } else if (auto tag = pasta::TagDecl::From(decl)) {
-      TrackRedeclarations(database, pf, em, dummy_mangled_name,
+      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
                           decl, tag->Redeclarations());
 
     } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
-      TrackRedeclarations(database, pf, em, dummy_mangled_name,
+      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
                           decl, tpl->Redeclarations());
 
     } else {

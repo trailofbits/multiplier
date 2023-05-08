@@ -6,7 +6,9 @@
 
 #include "PendingFragment.h"
 
+#include "EntityMapper.h"
 #include "PASTA.h"
+#include "TypeMapper.h"
 #include "Util.h"
 
 #pragma GCC diagnostic push
@@ -27,15 +29,12 @@ namespace {
 // ends up being redundant across fragments.
 class FragmentBuilder final {
  public:
-  EntityIdMap &entity_ids;
-  TypeIdMap &type_ids;
+  EntityMapper &em;
   PendingFragment &fragment;
 
-  inline explicit FragmentBuilder(EntityIdMap &entity_ids_,
-                                  TypeIdMap &type_ids_,
+  inline explicit FragmentBuilder(EntityMapper &em_,
                                   PendingFragment &fragment_)
-      : entity_ids(entity_ids_),
-        type_ids(type_ids_),
+      : em(em_),
         fragment(fragment_) {}
 
 #define MX_BEGIN_VISIT_DECL(name) void Visit ## name (const pasta::name &);
@@ -62,19 +61,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::Token &) {}
 
   void MaybeVisitNext(const pasta::Decl &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.Add(entity, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Stmt &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.Add(entity, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Type &entity) {
-    fragment.Add(entity);
+    fragment.Add(entity, em.tm);
   }
 
   void MaybeVisitNext(const pasta::Attr &entity) {
-    fragment.Add(entity, entity_ids);
+    fragment.Add(entity, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Macro &) {}
@@ -82,19 +81,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::File &) {}
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.Add(pseudo, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.Add(pseudo, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::TemplateParameterList &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.Add(pseudo, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Designator &pseudo) {
-    fragment.Add(pseudo, entity_ids);
+    fragment.Add(pseudo, em.entity_ids);
   }
 };
 
@@ -229,24 +228,11 @@ void FragmentBuilder::Accept(const pasta::Macro &) {}
 
 
 bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
-  auto kind = entity.Kind();
-  switch (kind) {
-    case pasta::DeclKind::kTranslationUnit:
-    case pasta::DeclKind::kNamespace:
-    case pasta::DeclKind::kExternCContext:
-    case pasta::DeclKind::kLinkageSpec:
-      return false;
-
-    // TODO(pag): Think about this a bit more. It's possible that we end up
-    //            internalizing class templates and partial specializations
-    //            into the fragments using their complete specializations.
-    default:
-      if (entity.IsInvalidDeclaration()) {
-        return false;
-      }
-      break;
+  if (!IsSerializableDecl(entity))  {
+    return false;
   }
 
+  auto kind = entity.Kind();
   mx::DeclId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(decls_to_serialize.size());
@@ -282,19 +268,28 @@ bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
   return false;
 }
 
-bool PendingFragment::Add(const pasta::Type &entity) {
-  auto kind = entity.Kind();
-  mx::TypeId id;
-  id.fragment_id = fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(types_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
+bool PendingFragment::Add(const pasta::Type &entity, TypeMapper &tm) {
+  if (tm.AddEntityId(entity)) {
 
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  if (type_ids.emplace(type_key, id).second) {
-    types_to_serialize.emplace_back(entity);  // New type found.
+    // Types are global but we still need to store them in pending fragment
+    // to build it during the iterative process and discover the references
+    // of other decls and statements by the type and logically belongs to the
+    // fragment. It would otherwise be hard to do "outside" pending fragment
+    // build process.
+    //
+    // For example, AdjustedTypes are a big example, where you might have a
+    // function with a body like:
+    //      `int x;`
+    //      `int y[sizeof(x)];`
+    //
+    // The adjusted type here references a sized array type that references
+    // `sizeof(x)`, and we should capture `sizeof(x)` and the reference to x
+    // in this in the fragment, as it can't be properly captured outside / after
+    // the fragment is serialized.
+
+    types_to_serialize.emplace_back(entity); // New type found.
     return true;
   }
-
   return false;
 }
 
@@ -372,7 +367,7 @@ bool PendingFragment::Add(const pasta::Designator &entity,
 //
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
 void BuildPendingFragment(
-    PendingFragment &pf, EntityIdMap &entity_ids,
+    PendingFragment &pf, EntityMapper &em,
     const pasta::TokenRange &tokens) {
   size_t prev_num_decls = 0ul;
   size_t prev_num_stmts = 0ul;
@@ -380,7 +375,7 @@ void BuildPendingFragment(
   size_t prev_num_attrs = 0ul;
   size_t prev_num_pseudos = 0ul;
 
-  FragmentBuilder builder(entity_ids, pf.type_ids, pf);
+  FragmentBuilder builder(em, pf);
 
   // Make sure to collect everything reachable from token contexts.
   for (auto i = pf.begin_index; i <= pf.end_index; ++i) {

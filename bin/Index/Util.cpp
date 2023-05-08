@@ -24,6 +24,8 @@
 #include <clang/AST/DeclObjC.h>
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/PrettyPrinter.h>
+// NOTE(pag): We use the UTF-8 functions from the `llvm::json` namespace.
+#include <llvm/Support/JSON.h>
 #pragma clang diagnostic pop
 
 #include <multiplier/AST.h>
@@ -338,6 +340,17 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
   return kind;
 }
 
+// Return the token kind from printed token
+mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
+  auto kind = mx::FromPasta(entity.Kind());
+  if (kind == mx::TokenKind::UNKNOWN) {
+    auto data = entity.Data();
+    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
+      return mx::TokenKind::WHITESPACE;
+    }
+  }
+  return kind;
+}
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
@@ -912,6 +925,24 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
   return std::nullopt;
 }
 
+// Checks if the declaration is valid and serializable
+bool IsSerializableDecl(const pasta::Decl &decl) {
+  auto kind = decl.Kind();
+  switch (kind) {
+    case pasta::DeclKind::kTranslationUnit:
+    case pasta::DeclKind::kNamespace:
+    case pasta::DeclKind::kExternCContext:
+    case pasta::DeclKind::kLinkageSpec:
+      return false;
+    default:
+      if (decl.IsInvalidDeclaration()) {
+        return false;
+      }
+      break;
+  }
+  return true;
+}
+
 namespace {
 
 class StringOutputStream final : public kj::OutputStream {
@@ -947,5 +978,42 @@ std::string GetSerializedData(capnp::MessageBuilder &builder) {
 
   return ret;
 }
+
+// Accumulate the token data, stripping out some unwanted characters in the
+// process.
+void AccumulateUTF8Data(std::string &data, llvm::StringRef utf8_data) {
+  data.reserve(data.size() + utf8_data.size());
+  if (!utf8_data.contains('\r')) {
+    data.insert(data.end(), utf8_data.begin(), utf8_data.end());
+
+  } else {
+    for (char ch : utf8_data) {
+      if (ch != '\r') {
+        data += ch;
+      }
+    }
+  }
+}
+
+// Accumulate the token data, encoded as UTF-8, into `data`.
+template <typename Tok>
+void AccumulateTokenData(std::string &data, const Tok &tok) {
+  llvm::StringRef tok_data = tok.Data();
+  if (llvm::json::isUTF8(tok_data)) {
+    AccumulateUTF8Data(data, tok_data);
+
+  } else {
+    AccumulateUTF8Data(data, llvm::json::fixUTF8(tok_data));
+  }
+}
+
+template void AccumulateTokenData<pasta::FileToken>(
+    std::string &data, const pasta::FileToken &tok);
+
+template void AccumulateTokenData<pasta::Token>(
+    std::string &data, const pasta::Token &tok);
+
+template void AccumulateTokenData<pasta::PrintedToken>(
+    std::string &data, const pasta::PrintedToken &tok);
 
 }  // namespace indexer

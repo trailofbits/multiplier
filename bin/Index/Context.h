@@ -111,9 +111,20 @@ class GlobalIndexingState {
   // and partially so that we can do things like print out fragments, or chunks
   // thereof.
   void PersistFragment(const pasta::AST &ast, const pasta::TokenRange &tokens,
-                       NameMangler &mangler, EntityIdMap &entity_ids,
+                       NameMangler &mangler, EntityMapper &em,
                        TokenProvenanceCalculator &provenance,
                        PendingFragment &fragment);
+
+  // Persist a type fragment into the database. Type fragments are special fragments
+  // that are created to persist the types collected for serialization. Storing types
+  // into a different fragment will help with type de-duplication which is a by product
+  // of inlining the types in each fragment.
+
+  // The pending fragment passed as one of the arguments holds the list of types
+  // that needs to be serialized in a fragment.
+  void PersistTypes(const pasta::AST &ast, NameMangler &mangler, EntityMapper &em,
+                    PendingFragment &fragment);
+
 };
 
 }  // namespace indexer

@@ -25,6 +25,8 @@
 
 namespace indexer {
 
+class TypeMapper;
+
 using Pseudo = std::variant<pasta::TemplateArgument,
                             pasta::CXXBaseSpecifier,
                             pasta::TemplateParameterList,
@@ -55,13 +57,19 @@ class FileLocationOfFragment {
 // represents a single logical thing.
 class PendingFragment {
  public:
-  inline PendingFragment(mx::PackedFragmentId fragment_id_)
+  inline PendingFragment(mx::PackedFragmentId fragment_id_, EntityMapper &em_)
       : fragment_id(fragment_id_),
-        fragment_index(fragment_id.Unpack().fragment_id) {}
+        fragment_index(fragment_id.Unpack().fragment_id),
+        em(em_){}
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::PackedFragmentId fragment_id;
   mx::RawEntityId fragment_index;
+
+  // Instance of entity mapper that will hold a map of entity ids
+  // and type mapper. Each translation unit will have single instance
+  // of entity mapper.
+  EntityMapper &em;
 
   // Inclusive range of indices into the parsed tokens.
   uint64_t begin_index{0u};
@@ -72,17 +80,6 @@ class PendingFragment {
   // Top-level declarations. These are the roots of serialization.
   std::vector<pasta::Decl> top_level_decls;
   std::vector<pasta::Macro> top_level_macros;
-
-  // Entity IDs for parentage tracking.
-  EntityIdMap parent_decl_ids;
-  EntityIdMap parent_stmt_ids;
-
-  // Type IDs for types used inside of this fragment.
-  //
-  // TODO(pag): Types are redundantly represented in/across fragments; no
-  //            de-duplication is done. Investigate smarter fragment-specific
-  //            attribution.
-  TypeIdMap type_ids;
 
   // Offsets of the serialized version of pseudo entities in this fragment.
   PseudoOffsetMap pseudo_offsets;
@@ -110,7 +107,7 @@ class PendingFragment {
 
   bool Add(const pasta::Decl &entity, EntityIdMap &entity_ids);
   bool Add(const pasta::Stmt &entity, EntityIdMap &entity_ids);
-  bool Add(const pasta::Type &entity);
+  bool Add(const pasta::Type &entity, TypeMapper &type_map);
   bool Add(const pasta::Attr &entity, EntityIdMap &entity_ids);
   bool Add(const pasta::TemplateArgument &pseudo, EntityIdMap &entity_ids);
   bool Add(const pasta::CXXBaseSpecifier &pseudo, EntityIdMap &entity_ids);

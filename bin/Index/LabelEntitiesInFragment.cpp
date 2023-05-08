@@ -9,8 +9,10 @@
 #include <multiplier/Entities/MacroKind.h>
 
 #include "Context.h"
+#include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
+#include "TypeMapper.h"
 #include "Util.h"
 #include "Visitor.h"
 
@@ -34,7 +36,7 @@ namespace {
 // entity list.
 class EntityLabeller final : public EntityVisitor {
  public:
-  EntityIdMap &entity_ids;
+  EntityMapper &em;
   PendingFragment &fragment;
 
   std::vector<pasta::Decl> next_decls;
@@ -47,23 +49,22 @@ class EntityLabeller final : public EntityVisitor {
   // or intermediate macro expansion tokens.
   unsigned next_parsed_token_index{0u};
 
-  inline explicit EntityLabeller(EntityIdMap &entity_ids_,
+  inline explicit EntityLabeller(EntityMapper &em_,
                                  PendingFragment &fragment_)
-      : entity_ids(entity_ids_),
-        fragment(fragment_) {}
+      : em(em_), fragment(fragment_) {}
 
   virtual ~EntityLabeller(void) = default;
 
   bool Enter(const pasta::Decl &entity) final {
-    return fragment.Add(entity, entity_ids);
+    return fragment.Add(entity, em.entity_ids);
   }
 
   bool Enter(const pasta::Stmt &entity) final {
-    return fragment.Add(entity, entity_ids);
+    return fragment.Add(entity, em.entity_ids);
   }
 
   bool Enter(const pasta::Type &entity) final {
-    return fragment.Add(entity);
+    return fragment.Add(entity, em.tm);
   }
 
   void Run(void) {
@@ -169,7 +170,7 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
   id.fragment_id = fragment.fragment_index;
   id.kind = TokenKindFromPasta(entity);
 
-  return entity_ids.emplace(entity.RawToken(), id).second;
+  return em.entity_ids.emplace(entity.RawToken(), id).second;
 }
 
 // Create initial macro IDs for all of the top-level macros in the range of
@@ -184,7 +185,7 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   // to `macros_to_serialize`.
   //
   // NOTE(pag): `CountSubstitutions` in Persist.cpp fills in the empty slots.
-  if (entity_ids.emplace(entity.RawMacro(), id).second) {
+  if (em.entity_ids.emplace(entity.RawMacro(), id).second) {
     fragment.macros_to_serialize.emplace_back();
     return true;
 
@@ -200,9 +201,9 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-void LabelEntitiesInFragment(PendingFragment &pf, EntityIdMap &entity_ids,
+void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em,
                              const pasta::TokenRange &tok_range) {
-  EntityLabeller labeller(entity_ids, pf);
+  EntityLabeller labeller(em, pf);
 
   for (uint64_t i = pf.begin_index; i <= pf.end_index; ++i) {
     pasta::Token tok = tok_range[i];

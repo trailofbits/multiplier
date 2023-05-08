@@ -196,21 +196,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
-  for (const pasta::Type &entity : pf.types_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-    auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(is_new_eid(eid));
-#endif
-
-    EntityBuilder<mx::ast::Type> storage;
-    DispatchSerializeType(em, storage.builder, entity);
-
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
+  // Note: We don't serialize types to the same fragments. They are
+  //       serialized as different fragment in the database. This
+  //       will avoid duplication of the types in each fragments.
 
   for (const pasta::Attr &entity : pf.attrs_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
@@ -290,6 +278,22 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
+}
+
+void SerializeTypes(mx::DatabaseWriter &database, const pasta::Type &entity,
+                    const EntityMapper &em, mx::RawEntityId fragment_index) {
+  mx::RawEntityId eid = em.EntityId(entity);
+
+#ifndef NDEBUG
+    auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
+    assert(vid.fragment_id == fragment_index);
+#endif
+
+  EntityBuilder<mx::ast::Type> storage;
+  DispatchSerializeType(em, storage.builder, entity);
+  database.AddAsync(
+      mx::EntityRecord{eid, GetSerializedData(storage.message)});
+  (void)fragment_index;
 }
 
 }  // namespace indexer

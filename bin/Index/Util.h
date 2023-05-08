@@ -25,6 +25,7 @@ class File;
 class FileToken;
 class Macro;
 class MacroToken;
+class PrintedToken;
 class Stmt;
 class Token;
 class Type;
@@ -76,6 +77,9 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity);
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity);
+
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);
 
@@ -94,6 +98,8 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 // Try to find the `Decl` referenced by a particular `type`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
 
+bool IsSerializableDecl(const pasta::Decl &decl);
+
 template <typename T>
 struct EntityBuilder {
   capnp::MallocMessageBuilder message;
@@ -104,5 +110,8 @@ struct EntityBuilder {
 };
 
 std::string GetSerializedData(capnp::MessageBuilder &builder);
+
+template <typename Tok>
+void AccumulateTokenData(std::string &data, const Tok &tok);
 
 }  // namespace indexer
