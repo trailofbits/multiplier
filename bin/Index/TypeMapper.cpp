@@ -86,13 +86,29 @@ bool TypeMapper::AddEntityId(const pasta::Type &entity) {
   return true;
 }
 
+mx::PackedFragmentId TypeMapper::FragmentId(const pasta::Type &type) const {
+  mx::VariantId vid = mx::EntityId(this->EntityId(type)).Unpack();
+  assert(std::holds_alternative<mx::TypeId>(vid));
+  return mx::FragmentId(std::get<mx::TypeId>(vid).fragment_id);
+}
+
+
 mx::PackedFragmentId TypeMapper::GetOrCreateFragmentIdForType(
-    const pasta::Type &type) const {
-  bool is_new_fragment_id;
-  auto token_range = pasta::PrintedTokenRange::Create(type);
-  auto fragment_id = database.GetOrCreateFragmentIdForType(
-      mx::kInvalidEntityId, HashType(type), is_new_fragment_id);
-  return fragment_id;
+    const pasta::Type &entity) const {
+  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
+
+  // Check if the fragment ids are created for the types and added to
+  // the list of type ids. If yes then return that else create the
+  // new one
+  if (auto it = type_ids.find(type_key); it != type_ids.end()) {
+    return mx::FragmentId(it->second.Unpack().fragment_id);
+  }
+
+  bool is_new_fragment_id = true;
+  auto token_range = pasta::PrintedTokenRange::Create(entity);
+  auto fragment_id_ = database.GetOrCreateFragmentIdForType(
+      mx::kInvalidEntityId, HashType(entity), is_new_fragment_id);
+  return fragment_id_;
 }
 
 } // namespace
