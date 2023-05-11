@@ -90,9 +90,8 @@ mx::PackedFragmentId TypeMapper::GetOrCreateFragmentIdForType(
     const pasta::Type &type) const {
   bool is_new_fragment_id;
   auto token_range = pasta::PrintedTokenRange::Create(type);
-  auto fragment_id = database.GetOrCreateFragmentIdForHash(
-      mx::kInvalidEntityId, HashType(type),
-      token_range.size(), is_new_fragment_id);
+  auto fragment_id = database.GetOrCreateFragmentIdForType(
+      mx::kInvalidEntityId, HashType(type), is_new_fragment_id);
   return fragment_id;
 }
 

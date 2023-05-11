@@ -367,6 +367,12 @@ class DatabaseWriter final {
     }
   }
 
+  // Get, or create and return, a fragment ID for the type frgaments hash. It
+  // always gives the new small fragment id either available or created without
+  // connecting to the database.
+  PackedFragmentId GetOrCreateFragmentIdForType(
+      RawEntityId tok_id, std::string hash, bool &is_new);
+
 //  // Flush all outstanding writes to the database.
 //  void Flush(void);
 
