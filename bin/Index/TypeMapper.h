@@ -31,6 +31,9 @@ class TypeMapper final {
 
   bool AddEntityId(const pasta::Type &entity);
 
+  mx::PackedFragmentId FragmentId(const pasta::Type &entity) const;
+
+ private:
   mx::PackedFragmentId
   GetOrCreateFragmentIdForType(const pasta::Type &type) const;
 

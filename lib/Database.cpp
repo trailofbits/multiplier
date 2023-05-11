@@ -1120,6 +1120,39 @@ DatabaseWriter::GetOrCreateLargeFragmentIdForHash(
   return fid;
 }
 
+// This is dummy implementation for getting fragment id for
+// types. It bypasses the database lookup for getting the
+// new fragment id, instead get the next available small fragment id
+// for types
+
+SpecificEntityId<FragmentId>
+DatabaseWriter::GetOrCreateFragmentIdForType(
+    RawEntityId tok_id, std::string hash, bool &is_new) {
+
+  (void)hash;
+  (void)tok_id;
+  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
+  RawEntityId proposed_index = kInvalidEntityId;
+
+  // Try reusing the available small fragment id. if they don't exist
+  // then get the new one through fetch and add operation.
+  // The proposed index here will always be found and it will not go
+  // back to `available_small_fragment_index` again.
+  if (!writer->available_small_fragment_index) {
+    proposed_index = impl->next_small_fragment_index.fetch_add(1u);
+  } else {
+    proposed_index = writer->available_small_fragment_index.value();
+    writer->available_small_fragment_index.reset();
+  }
+
+  RawEntityId found_id = EntityId(FragmentId(proposed_index)).Pack();
+  is_new = true;
+
+  VariantId vid = EntityId(found_id).Unpack();
+  assert(std::holds_alternative<FragmentId>(vid));
+  return std::get<FragmentId>(vid);
+}
+
 void DatabaseWriterImpl::InitRecords(void) {
 #define MX_EXEC_INITS(record) \
   for (const char *stmt : record::kInitStatements) { \

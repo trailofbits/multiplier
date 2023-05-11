@@ -274,7 +274,8 @@ static std::vector<PendingFragmentType> CreateFragments(
 
   for (const pasta::Type &type : types) {
     pasta::PrintedTokenRange tok_range = pasta::PrintedTokenRange::Create(type);
-    PendingFragmentType tf(tm.GetOrCreateFragmentIdForType(type));
+
+    PendingFragmentType tf(tm.FragmentId(type));
 
     tf.top_level_types.emplace_back(type);
     tf.num_top_level_types = 1u;
