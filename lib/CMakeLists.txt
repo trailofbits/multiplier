@@ -40,24 +40,29 @@ if(MX_ENABLE_VAST)
       vast::MLIRLowLevel
       vast::MLIRHighLevel
       MLIRDialect
-      MLIRMLProgramDialect
-      MLIROpenMPDialect
-      MLIRTosaDialect
-  
-      MLIRBufferizationTransformOps
-      MLIRSparseTensorTransforms
-      MLIROpenACCDialect
-      MLIRLLVMIRTransforms
-      MLIRROCDLDialect
-      MLIRAsyncDialect
-      MLIRSCFTransformOps
-      MLIREmitCDialect
-      MLIRNVGPUDialect
-      MLIRShapeDialect
       MLIRAMDGPUDialect
-      MLIRShapeOpsTransforms
-      MLIRLinalgTransformOps
+      MLIRAsyncDialect
+      MLIREmitCDialect
+      MLIRIndexDialect
+      MLIRMLProgramDialect
+      MLIRNVGPUDialect
+      MLIROpenACCDialect
+      MLIROpenMPDialect
+      MLIRROCDLDialect
+      MLIRShapeDialect
       MLIRSPIRVDialect
+      MLIRTosaDialect
+
+      MLIRLLVMIRTransforms
+      MLIRShapeOpsTransforms
+      MLIRSparseTensorTransforms
+      MLIRAffineTransformOps
+      MLIRBufferizationTransformOps
+      MLIRGPUTransformOps
+      MLIRLinalgTransformOps
+      MLIRMemRefTransformOps
+      MLIRSCFTransformOps
+      MLIRVectorTransformOps
       MLIRTensorInferTypeOpInterfaceImpl
   )
 else(MX_ENABLE_VAST)
