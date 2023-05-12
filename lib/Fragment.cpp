@@ -84,7 +84,7 @@ Fragment Fragment::containing(const Macro &entity) {
 }
 
 std::optional<Fragment> Fragment::containing(const Token &entity) {
-  if (auto frag = entity.impl->OwningFragment()) {
+  if (auto frag = entity.impl->NthOwningFragment(entity.offset)) {
     return Fragment(FragmentImplPtr(entity.impl, frag));
   } else {
     return std::nullopt;

@@ -138,7 +138,8 @@ std::optional<std::pair<unsigned, unsigned>> Token::location(
     return std::nullopt;
   }
 
-  const FileImpl *file_ptr = maybe_file_token.impl->OwningFile();
+  const FileImpl *file_ptr = maybe_file_token.impl->NthOwningFile(
+      maybe_file_token.offset);
   if (!file_ptr) {
     return std::nullopt;
   }
@@ -163,7 +164,8 @@ std::optional<std::pair<unsigned, unsigned>> Token::next_location(
     return std::nullopt;
   }
 
-  const FileImpl *file_ptr = maybe_file_token.impl->OwningFile();
+  const FileImpl *file_ptr = maybe_file_token.impl->NthOwningFile(
+      maybe_file_token.offset);
   if (!file_ptr) {
     return std::nullopt;
   }
@@ -192,10 +194,10 @@ std::optional<File> File::containing(const Fragment &fragment) {
 // Return the file containing a specific token.
 std::optional<File> File::containing(const Token &token) {
 
-  if (auto file = token.impl->OwningFile()) {
+  if (auto file = token.impl->NthOwningFile(token.offset)) {
     return File(FileImplPtr(token.impl, file));
 
-  } else if (auto frag = token.impl->OwningFragment()) {
+  } else if (auto frag = token.impl->NthOwningFragment(token.offset)) {
     return File::containing(Fragment(FragmentImplPtr(token.impl, frag)));
 
   } else {

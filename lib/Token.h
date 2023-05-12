@@ -66,6 +66,9 @@ class TokenReader {
   static Ptr ReaderForToken(const Ptr &self, const EntityProviderPtr &ep,
                             EntityId eid);
 
+  virtual const FragmentImpl *NthOwningFragment(EntityOffset) const noexcept;
+  virtual const FileImpl *NthOwningFile(EntityOffset) const noexcept;
+
   virtual const FragmentImpl *OwningFragment(void) const noexcept;
   virtual const FileImpl *OwningFile(void) const noexcept;
 
@@ -169,6 +172,8 @@ class CustomTokenReader final : public TokenReader {
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const TokenReader *) const override;
+
+  // TODO(pag): Add NthOwningFragment and NthOwningFile?
 
   const FragmentImpl *OwningFragment(void) const noexcept override;
 };

@@ -58,6 +58,8 @@ class Fragment {
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class SourceIRImpl;
+  friend class TokenTree;
+  friend class TokenTreeImpl;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
 
