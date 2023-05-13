@@ -28,7 +28,7 @@ std::optional<TokenContext> Token::context(void) const {
     return std::nullopt;
   }
 
-  const FragmentImpl *frag = impl->OwningFragment();
+  const FragmentImpl *frag = impl->NthOwningFragment(offset);
   if (!frag) {
     return std::nullopt;
   }

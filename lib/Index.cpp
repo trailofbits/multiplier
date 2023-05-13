@@ -101,11 +101,17 @@ Index Index::containing(const Designator &entity) {
 }
 
 std::optional<Index> Index::containing(const Token &entity) {
-  if (auto frag = entity.impl->OwningFragment()) {
+  if (auto frag = entity.impl->NthOwningFragment(entity.offset)) {
     return Index(frag->ep);
 
-  } else if (auto file = entity.impl->OwningFile()) {
+  } else if (auto frag2 = entity.impl->OwningFragment()) {
+    return Index(frag2->ep);
+
+  } else if (auto file = entity.impl->NthOwningFile(entity.offset)) {
     return Index(file->ep);
+
+  } else if (auto file2 = entity.impl->OwningFile()) {
+    return Index(file2->ep);
 
   } else {
     return std::nullopt;

@@ -718,6 +718,15 @@ const FileImpl *TokenReader::OwningFile(void) const noexcept {
   return nullptr;
 }
 
+const FragmentImpl *
+TokenReader::NthOwningFragment(EntityOffset) const noexcept {
+  return OwningFragment();
+}
+
+const FileImpl *TokenReader::NthOwningFile(EntityOffset) const noexcept {
+  return OwningFile();
+}
+
 Token TokenReader::TokenFor(const Ptr &self, RawEntityId eid) noexcept {
   if (auto frag = self->OwningFragment()) {
     return frag->ep->TokenFor(frag->ep, self, eid);
@@ -1027,10 +1036,14 @@ gap::generator<Reference> Token::references(void) const & {
   EntityProviderPtr ep;
   if (!impl) {
     co_return;
-  } else if (const FragmentImpl *frag = impl->OwningFragment()) {
+  } else if (const FragmentImpl *frag = impl->NthOwningFragment(offset)) {
     ep = frag->ep;
-  } else if (const FileImpl *file = impl->OwningFile()) {
+  } else if (const FileImpl *file = impl->NthOwningFile(offset)) {
     ep = file->ep;
+  } else if (const FragmentImpl *frag2 = impl->OwningFragment()) {
+    ep = frag2->ep;
+  } else if (const FileImpl *file2 = impl->OwningFile()) {
+    ep = file2->ep;
   } else {
     assert(false);
     co_return;

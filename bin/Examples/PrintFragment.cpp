@@ -32,6 +32,15 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  mx::TokenTree tt = mx::TokenTree::from(mx::File::containing(fragment.value()).value());
+
+  for (mx::Token t : tt.serialize()) {
+    std::cout << t.data();
+  }
+
+  std::cout << '\n';
+  return 0;
+
   // Print our the tokens of this fragment as they appear in the file.
   if (FLAGS_unparsed) {
     RenderFragment(std::cout, *fragment, mx::TokenRange(), "", true);
@@ -62,6 +71,11 @@ extern "C" int main(int argc, char *argv[]) {
     for (mx::Token token : fragment->file_tokens()) {
       std::cout << token.data();
     }
+
+    std::cout << "\n\nFile data from file token range:\n";
+    std::cout << fragment->file_tokens().data();
+
+
 
     std::cout << "\n\nFile data from file token range:\n";
     std::cout << fragment->file_tokens().data();

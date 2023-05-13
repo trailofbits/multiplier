@@ -90,6 +90,8 @@ class File {
   friend class RegexQuery;
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
+  friend class TokenTree;
+  friend class TokenTreeImpl;
   friend class WeggliQuery;
 
 #define MX_FRIEND(type_name, ln, e, c) \
