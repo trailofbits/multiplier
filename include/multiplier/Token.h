@@ -44,7 +44,7 @@ class SimpleToken;  // Defined in Index.h due to `VariantEntity`.
 using CustomToken = std::variant<SimpleToken, Token>;
 
 // A single token, e.g. from a file or from a macro expansion.
-class Token {
+class Token final {
  private:
   friend class EntityProvider;
   friend class File;
@@ -315,38 +315,6 @@ class TokenRange {
 
   // Strip leading and trailing whitespace.
   TokenRange strip_whitespace(void) const noexcept;
-};
-
-class TokenTreeVisitor {
- public:
-  virtual ~TokenTreeVisitor(void) = default;
-
-  // Return `true` if the input substitution should be expanded or not.
-  virtual bool should_expand(const MacroSubstitution &) const;
-
-  // Return `true` if the input `__VA_OPT__` should be expanded or not.
-  virtual bool should_expand(const MacroVAOpt &) const;
-
-  // Choose which fragment to show.
-  virtual Fragment choose(const std::vector<Fragment> &) const;
-};
-
-// A tree of tokens, which can represent the variability of overlapping
-// fragments, macro expansions, etc., allowing one to render the tree down
-// into a singular linear range of tokens.
-class TokenTree {
- private:
-  std::shared_ptr<TokenTreeImpl> impl;
-
-  inline TokenTree(std::shared_ptr<TokenTreeImpl> impl_)
-      : impl(std::move(impl_)) {}
-
- public:
-  static TokenTree from(const File &);
-  static TokenTree from(const Fragment &);
-
-  // Serialize the token tree into a linear range.
-  TokenRange serialize(const TokenTreeVisitor &vis=TokenTreeVisitor()) const;
 };
 
 }  // namespace mx

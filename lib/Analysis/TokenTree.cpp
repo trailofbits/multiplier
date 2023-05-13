@@ -4,6 +4,8 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <multiplier/Analysis/TokenTree.h>
+
 #include <algorithm>
 #include <deque>
 #include <functional>
@@ -17,9 +19,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "File.h"
-#include "Fragment.h"
-#include "Token.h"
+#include "../File.h"
+#include "../Fragment.h"
+#include "../Token.h"
 
 //#define D(...) __VA_ARGS__
 #ifndef D
@@ -1103,6 +1105,12 @@ Fragment TokenTreeVisitor::choose(const std::vector<Fragment> &frags) const {
   return frags.front();
 }
 
+static const std::shared_ptr<TokenTreeImpl> kInvalidTree =
+    std::make_shared<TokenTreeImpl>();
+
+TokenTree::TokenTree(void)
+    : TokenTree(kInvalidTree) {}
+
 TokenTree TokenTree::from(const File &file) {
   auto self = std::make_shared<TokenTreeImpl>();
   auto file_tokens = file.tokens();
@@ -1384,6 +1392,26 @@ TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {
   reader->data_hash = kHasher(reader->data);
 
   return TokenRange(std::move(reader), 0u, num_tokens);
+}
+
+// Return the file containing the token tree.
+std::optional<File> File::containing(const TokenTree &tree) {
+  if (tree.impl->file) {
+    return File(tree.impl->file);
+  } else if (tree.impl->fragment) {
+    return File::containing(Fragment(tree.impl->fragment));
+  } else {
+    return std::nullopt;
+  }
+}
+
+// Return the fragment containing a token tree.
+std::optional<Fragment> Fragment::containing(const TokenTree &tree) {
+  if (tree.impl->fragment) {
+    return Fragment(tree.impl->fragment);
+  } else {
+    return std::nullopt;
+  }
 }
 
 }  // namespace mx

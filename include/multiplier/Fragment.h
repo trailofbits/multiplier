@@ -84,6 +84,9 @@ class Fragment {
   static Fragment containing(const WeggliQueryMatch &);
   static Fragment containing(const RegexQueryMatch &);
 
+  // Return the fragment containing a token tree.
+  static std::optional<Fragment> containing(const TokenTree &);
+
   inline static Fragment containing(const Fragment &fragment) {
     return fragment;
   }

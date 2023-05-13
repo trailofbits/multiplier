@@ -144,6 +144,9 @@ class File {
   // Go through the tokens of the iterator and return the first file found.
   static std::optional<File> containing(const TokenRange &tokens);
 
+  // Return the file containing the token tree.
+  static std::optional<File> containing(const TokenTree &tokens);
+
   inline static constexpr EntityCategory entity_category(void) {
     return EntityCategory::FILE;
   }

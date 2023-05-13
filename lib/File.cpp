@@ -207,6 +207,11 @@ std::optional<File> File::containing(const Token &token) {
 
 // Go through the tokens of the iterator and return the first file found.
 std::optional<File> File::containing(const TokenRange &tokens) {
+  for (Token tok : tokens.file_tokens()) {
+    if (auto file = File::containing(tok)) {
+      return file;
+    }
+  }
   for (Token tok : tokens) {
     if (auto file = File::containing(tok)) {
       return file;
