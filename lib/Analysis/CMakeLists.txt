@@ -9,14 +9,16 @@
 set(source_include_dir "${PROJECT_SOURCE_DIR}/include/multiplier/Analysis")
 
 set(analysis_headers
-  "${source_include_dir}/Taint.h"
   "${source_include_dir}/IRAnalysis.h"
+  "${source_include_dir}/Taint.h"
+  "${source_include_dir}/TokenTree.h"
 )
 
 add_library("mx-analysis" STATIC
   "${analysis_headers}"
-  "Taint.cpp"
   "IRAnalysis.cpp"
+  "Taint.cpp"
+  "TokenTree.cpp"
 )
 
 target_link_libraries("mx-analysis"

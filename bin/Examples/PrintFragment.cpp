@@ -10,6 +10,7 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
+#include <multiplier/Analysis/TokenTree.h>
 
 DEFINE_uint64(fragment_id, 0, "ID of the fragment to print");
 DEFINE_bool(unparsed, false, "Show original source code?");
@@ -32,18 +33,14 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::TokenTree tt = mx::TokenTree::from(mx::File::containing(fragment.value()).value());
-
-  for (mx::Token t : tt.serialize()) {
-    std::cout << t.data();
-  }
-
-  std::cout << '\n';
-  return 0;
-
   // Print our the tokens of this fragment as they appear in the file.
   if (FLAGS_unparsed) {
-    RenderFragment(std::cout, *fragment, mx::TokenRange(), "", true);
+    std::cout << "Unparsed data from token tree:\n";
+
+    mx::TokenTree tt = mx::TokenTree::from(fragment.value());
+    for (mx::Token t : tt.serialize()) {
+      std::cout << t.data();
+    }
 
   // Print out the tokens of this fragment that were actually parsed. These
   // are post-macro expansion tokens, and generally don't include whitespace
