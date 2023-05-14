@@ -130,6 +130,12 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   const EntityOffset num_parsed_tokens;
   const EntityOffset num_tokens;
 
+  // Cached token tree.
+  //
+  // TODO(pag): Add method to entity provider, so we can add it to the GC-based
+  //            cache.
+  TokenTreeImplCache cached_token_tree;
+
   explicit FragmentImpl(EntityProviderPtr ep_, kj::Array<capnp::word> data_,
                         RawEntityId id_);
 

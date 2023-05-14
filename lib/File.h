@@ -93,6 +93,12 @@ class FileImpl final : public EntityImpl<rpc::File> {
   // Number of tokens in this file.
   const unsigned num_tokens;
 
+  // Cached token tree.
+  //
+  // TODO(pag): Add method to entity provider, so we can add it to the GC-based
+  //            cache.
+  TokenTreeImplCache cached_token_tree;
+
   ~FileImpl(void) noexcept;
 
   explicit FileImpl(EntityProviderPtr ep_, kj::Array<capnp::word> data_,

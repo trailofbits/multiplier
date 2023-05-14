@@ -1457,4 +1457,19 @@ TokenRange TokenRange::strip_whitespace(void) const noexcept {
   return ret;
 }
 
+std::shared_ptr<TokenTreeImpl> TokenTreeImplCache::Get(void) const {
+  std::unique_lock<std::mutex> locker(lock);
+  return impl.lock();
+}
+std::shared_ptr<TokenTreeImpl> TokenTreeImplCache::Put(
+    std::shared_ptr<TokenTreeImpl> new_impl) const {
+  std::unique_lock<std::mutex> locker(lock);
+  if (auto old_impl = impl.lock()) {
+    return old_impl;
+  } else {
+    impl = new_impl;
+    return new_impl;
+  }
+}
+
 }  // namespace mx

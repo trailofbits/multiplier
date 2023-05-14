@@ -7,14 +7,8 @@
 #include <multiplier/Analysis/TokenTree.h>
 
 #include <algorithm>
-#include <deque>
 #include <functional>
 #include <iterator>
-#include <multiplier/Entities/DefineMacroDirective.h>
-#include <multiplier/Entities/MacroExpansion.h>
-#include <multiplier/Entities/MacroParameterSubstitution.h>
-#include <multiplier/Entities/MacroSubstitution.h>
-#include <multiplier/Entities/MacroVAOpt.h>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -34,60 +28,7 @@
 namespace mx {
 namespace {
 
-// The index of a token is the index of a specific reader, followed by the
-// offset of the token within that reader.
-using TokenIndex = std::pair<EntityOffset, EntityOffset>;
-
 static const std::hash<std::string> kHasher;
-
-struct ChoiceNode;
-struct SubstitutionNode;
-struct SequenceNode;
-using Node = std::variant<std::monostate, TokenIndex, ChoiceNode *,
-                          SubstitutionNode *, SequenceNode *>;
-
-// A choice among fragments.
-struct ChoiceNode final {
-  std::vector<Fragment> fragments;
-  std::vector<Node> children;
-};
-
-// A choice among the different stages of macro expansion.
-struct SubstitutionNode final {
-  std::variant<MacroSubstitution, MacroVAOpt> macro;
-
-  Node before;
-  Node after;
-
-  inline explicit SubstitutionNode(MacroSubstitution sub_)
-      : macro(std::move(sub_)) {}
-
-  inline explicit SubstitutionNode(MacroVAOpt va_opt_)
-      : macro(std::move(va_opt_)) {}
-};
-
-// A sequence of other nodes.
-struct SequenceNode final {
-  std::vector<Node> children;
-
-  Node Flatten(void) {
-    auto num_children = children.size();
-    if (!num_children) {
-      return {};
-    } else if (num_children == 1u) {
-      return children.front();
-    } else {
-      return this;
-    }
-  }
-};
-
-// Inclusive bounds of something, e.g. the body of a macro.
-struct Bounds {
-  EntityOffset reader_index;
-  EntityOffset begin_index;
-  EntityOffset end_index;
-};
 
 // Return the leftmost use tokens of a macro.
 static Token LeftCornerOfExpansion(const Macro &exp) {
@@ -137,6 +78,51 @@ static std::optional<MacroExpansion> TrailingExpansionInExpansion(
   return ret;
 }
 
+// Tries to figure out if we're in an obscure non-tree trailing macro
+// expansion case. This happens with things like:
+//
+//      #define HEAD TAIL(
+//      #define TAIL(x) x
+//      ...
+//        return HEAD 1);
+//
+// This can be complicated by recursive use of tail-macros, e.g.:
+//
+//      #define HEAD DO_TAIL
+//      #define DO_TAIL TAIL(
+//      #define TAIL(x) x
+//      ...
+//        return HEAD 1);
+static std::optional<MacroExpansion> NonTreeTailExpansion(
+    DefineMacroDirective &def_containing_te_use, MacroExpansion &te) {
+  // Get the right corner of the macro use for the trailing expansion. We want
+  // to identify if the `)` of a function-like macro call isn't from inside
+  // `bounds`.
+  Token rc_use = RightCornerOfUse(te);
+  D( std::cerr << " rc_use " << rc_use.id() << ": " << rc_use.data() << '\n'; )
+  if (!rc_use) {
+    return std::nullopt;
+  }
+
+  // If the right corner of the macro use, which is presumably a `)`, is
+  // NOT directly derived from the right corner of the macro defintion, then
+  // we're not in a simple expansion.
+  Token rc_def = RightCornerOfUse(def_containing_te_use);
+  D( std::cerr << " rc_def " << rc_def.id() << ": " << rc_def.data() << '\n'; )
+  if (rc_use.derived_token().file_token() != rc_def.file_token()) {
+    return te;
+  }
+
+  // Need to check the recursive case.
+  std::optional<MacroExpansion> next_te = TrailingExpansionInExpansion(te);
+  std::optional<DefineMacroDirective> te_def = te.definition();
+  if (!next_te || !te_def) {
+    return std::nullopt;
+  }
+
+  return NonTreeTailExpansion(te_def.value(), next_te.value());
+}
+
 struct BodyTokenForChild {
   // The child from the replacement body of a macro substitution.
   MacroOrToken mt;
@@ -155,7 +141,9 @@ struct BodyTokenForChild {
         is_argument(is_argument_) {}
 };
 
-struct MacroExpansionProcessor {
+}  // namespace
+
+struct TokenTreeImpl::MacroExpansionProcessor {
 
   std::vector<MacroOrToken> body_children;
   std::vector<MacroOrToken> after_children;
@@ -175,15 +163,33 @@ struct MacroExpansionProcessor {
   }
 };
 
-void MacroExpansionProcessor::Init(const MacroExpansion &me,
-                                   const DefineMacroDirective &def) {
+static void FlattenExpansionUses(
+    MacroOrToken mt, std::vector<MacroOrToken> &out) {
+  if (std::holds_alternative<Token>(mt)) {
+    out.emplace_back(std::move(mt));
+  } else if (std::holds_alternative<Macro>(mt)) {
+    Macro m = std::move(std::get<Macro>(mt));
+    if (auto me = MacroExpansion::from(m)) {
+      for (MacroOrToken sub_mt : me->children()) {
+        FlattenExpansionUses(std::move(sub_mt), out);
+      }
+    } else {
+      out.emplace_back(std::move(m));
+    }
+  } else {
+    assert(false);
+  }
+}
+
+void TokenTreeImpl::MacroExpansionProcessor::Init(
+    const MacroExpansion &me, const DefineMacroDirective &def) {
 
   body_children.clear();
   after_children.clear();
   merged_children.clear();
 
   for (MacroOrToken mt : me.replacement_children()) {
-    after_children.emplace_back(std::move(mt));
+    FlattenExpansionUses(std::move(mt), after_children);
   }
 
   for (MacroOrToken mt : me.intermediate_children()) {
@@ -197,7 +203,8 @@ void MacroExpansionProcessor::Init(const MacroExpansion &me,
   }
 }
 
-void MacroExpansionProcessor::InitTrailingNonTree(const MacroExpansion &te) {
+void TokenTreeImpl::MacroExpansionProcessor::InitTrailingNonTree(
+    const MacroExpansion &te) {
   after_children.clear();
   merged_children.clear();
 
@@ -209,7 +216,7 @@ void MacroExpansionProcessor::InitTrailingNonTree(const MacroExpansion &te) {
   std::reverse(body_children.begin(), body_children.end());
 }
 
-bool MacroExpansionProcessor::Run(bool is_non_tree) {
+bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
   size_t i = 0u;
   size_t j = 0u;
 
@@ -270,144 +277,78 @@ bool MacroExpansionProcessor::Run(bool is_non_tree) {
   return i == max_i && j == max_j;
 }
 
-}  // namespace
+// NOTE(pag): This will reset `curr_leaf` if `that == curr_leaf` and
+//            `curr_leaf` is empty.
+template <typename T>
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddToSequence(
+    SequenceNode *seq, T *that) {
+  if (!that) {
+    return seq;
+  }
 
-class TokenTreeImpl {
- public:
-  // If this is a token tree for a file then this is the file. If this is the
-  // token tree for a fragment, then this is the fragment's file, if any.
-  FileImplPtr file;
-
-  // If this is a token tree for a single fragment, then this is the single
-  // fragment itself.
-  FragmentImplPtr fragment;
-
-  // The list of token readers used in this fragment. There is always one
-  // entry in this list. The first entry is always either a file token reader,
-  // or an invalid token reader. This is indexed by a `TokenIndex`.
-  std::vector<TokenReader::Ptr> readers;
-
-  Node root;
-
-  std::deque<ChoiceNode> choices;
-  std::deque<SubstitutionNode> substitutions;
-  std::deque<SequenceNode> sequences;
-
-  // Helper to process macro expansions.
-  std::unique_ptr<MacroExpansionProcessor> mep;
-
-  TokenIndex GetOrCreateIndex(const Token &tok);
-  SequenceNode *AddLeadingTokensInBounds(SequenceNode *seq, const Token &tok,
-                                         const Bounds &bounds);
-  SequenceNode *ExtendWithMacroChild(SequenceNode *seq, const MacroOrToken &mt,
-                                     const Bounds &bounds);
-  SequenceNode *ExtendWithMacroChildren(SequenceNode *seq, const Macro &macro,
-                                        const Bounds &bounds);
-  SequenceNode *ExtendWithMacro(SequenceNode *seq, const Macro &macro,
-                                const Bounds &bounds);
-  SequenceNode *ExtendWithVAOpt(SequenceNode *seq, const MacroVAOpt &macro,
-                                const Bounds &bounds);
-
-  SequenceNode *ExtendWithSubstitution(
-        SequenceNode *seq, const MacroSubstitution &macro,
-        const Bounds &bounds);
-
-  SequenceNode *ExtendWithExpansion(
-      SequenceNode *seq, const MacroExpansion &macro,
-      const Bounds &user_bounds);
-
-  SequenceNode *ExtendWithSimpleExpansion(
-      SequenceNode *seq, const MacroExpansion &macro,
-      const DefineMacroDirective &def, const Bounds &user_bounds,
-      const Bounds &def_bounds);
-
-  SequenceNode *ExtendWithNonTreeExpansion(
-      SequenceNode *seq,
-      const MacroExpansion &me, const Bounds &me_bounds,
-      const DefineMacroDirective &def, const Bounds &def_bounds,
-      const MacroExpansion &te, const Bounds &te_bounds,
-      const MacroExpansion &deepest_te, const Bounds &deepest_te_use_bounds);
-
-//  SequenceNode *MergeAndFormReplacement(
-//      SequenceNode *before, const DefineMacroDirective &def,
-//      std::vector<MacroOrToken> body, std::vector<MacroOrToken> after);
-
-  Node CreateFragmentNode(const Fragment &entity, const Bounds &bounds);
-  Node CreateFileNode(const File &entity);
-
-  Bounds FragmentBounds(const TokenRange &tokens);
-  std::optional<Bounds> MacroBodyBounds(const DefineMacroDirective &def);
-  std::optional<Bounds> TopLevelUseBounds(const Macro &macro);
-
-  // NOTE(pag): This will reset `curr_leaf` if `that == curr_leaf` and
-  //            `curr_leaf` is empty.
-  template <typename T>
-  SequenceNode *AddToSequence(SequenceNode *seq, T *that) {
-    if (!that) {
+  if constexpr (std::is_same_v<SequenceNode, T>) {
+    if (seq == that) {
+      return seq;
+    } else if (!seq) {
+      return that;
+    } else if (seq->children.empty()) {
+      return that;
+    } else if (that->children.empty()) {
+      return seq;
+    } else {
+      seq->children.insert(seq->children.end(), that->children.begin(),
+                           that->children.end());
       return seq;
     }
 
-    if constexpr (std::is_same_v<SequenceNode, T>) {
-      if (seq == that) {
-        return seq;
-      } else if (!seq) {
-        return that;
-      } else if (seq->children.empty()) {
-        return that;
-      } else if (that->children.empty()) {
-        return seq;
-      } else {
-        seq->children.insert(seq->children.end(), that->children.begin(),
-                             that->children.end());
-        return seq;
-      }
-
-    // Try to fold single-item choice nodes.
-    } else if constexpr (std::is_same_v<ChoiceNode, T>) {
-      if (that->children.size() == 1u) {
-        return AddNodeToSequence(seq, that->children.front());
-      }
+  // Try to fold single-item choice nodes.
+  } else if constexpr (std::is_same_v<ChoiceNode, T>) {
+    if (that->children.size() == 1u) {
+      return AddNodeToSequence(seq, that->children.front());
     }
-
-    if (!seq) {
-      seq = &(sequences.emplace_back());
-    }
-
-    seq->children.emplace_back(that);
-    return seq;
   }
 
-
-  SequenceNode *AddTokenToSequence(SequenceNode *seq, const Token &tok) {
-    return AddTokenToSequence(seq, GetOrCreateIndex(tok));
+  if (!seq) {
+    seq = &(sequences.emplace_back());
   }
 
-  SequenceNode *AddTokenToSequence(SequenceNode *seq, TokenIndex ti) {
-    if (!seq) {
-      seq = &(sequences.emplace_back());
-    }
-    seq->children.push_back(ti);
-    return seq;
-  }
+  seq->children.emplace_back(that);
+  return seq;
+}
 
-  SequenceNode *AddNodeToSequence(SequenceNode *seq, const Node &node) {
-    return std::visit<SequenceNode *>(
-        [=] (auto &&arg) -> SequenceNode * {
-          using arg_t = std::decay_t<decltype(arg)>;
-          if constexpr (std::is_pointer_v<arg_t>) {
-            return AddToSequence(seq, arg);
-          } else if constexpr (std::is_same_v<arg_t, TokenIndex>) {
-            return AddTokenToSequence(seq, arg);
-          } else {
-            return seq;
-          }
-        },
-        node);
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddTokenToSequence(
+    SequenceNode *seq, const Token &tok) {
+  return AddTokenToSequence(seq, GetOrCreateIndex(tok));
+}
+
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddTokenToSequence(
+    SequenceNode *seq, TokenIndex ti) {
+  if (!seq) {
+    seq = &(sequences.emplace_back());
   }
-};
+  seq->children.push_back(ti);
+  return seq;
+}
+
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddNodeToSequence(
+    SequenceNode *seq, const Node &node) {
+  return std::visit<SequenceNode *>(
+      [=] (auto &&arg) -> SequenceNode * {
+        using arg_t = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_pointer_v<arg_t>) {
+          return AddToSequence(seq, arg);
+        } else if constexpr (std::is_same_v<arg_t, TokenIndex>) {
+          return AddTokenToSequence(seq, arg);
+        } else {
+          return seq;
+        }
+      },
+      node);
+}
 
 // Find the bounds of a top-level macro use.
-std::optional<Bounds> TokenTreeImpl::TopLevelUseBounds(const Macro &exp) {
+std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::TopLevelUseBounds(
+    const Macro &exp) {
   Bounds ret = {};
   Token last_tok;
   for (Token tok : exp.generate_use_tokens()) {
@@ -438,7 +379,7 @@ std::optional<Bounds> TokenTreeImpl::TopLevelUseBounds(const Macro &exp) {
   return ret;
 }
 
-Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
+TokenTreeImpl::Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
   if (!mep) {
     mep.reset(new MacroExpansionProcessor);
   }
@@ -465,7 +406,7 @@ Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
 }
 
 // Find the bounds of a macro definition body.
-std::optional<Bounds> TokenTreeImpl::MacroBodyBounds(
+std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
     const DefineMacroDirective &def) {
 
   Bounds ret = {};
@@ -521,7 +462,7 @@ std::optional<Bounds> TokenTreeImpl::MacroBodyBounds(
 
 // Get a `TokenIndex` for `tok`. This will save the reader into the token tree
 // if it can't be found, formulating a new token index position for that reader.
-TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
+TokenTreeImpl::TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
   EntityOffset i = 0u;
   for (TokenReader::Ptr &reader : readers) {
     if (reader == tok.impl) {
@@ -557,7 +498,7 @@ static EntityOffset CountInjectable(const TokenReader::Ptr &reader,
 
 // Try to add leading file tokens into `node` that should logically come from
 // before `tok`.
-SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
     SequenceNode *seq, const Token &tok, const Bounds &bounds) {
 
   Token file_tok = tok.file_token();
@@ -581,7 +522,7 @@ SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
   return seq;
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
     SequenceNode *seq, const MacroOrToken &mt, const Bounds &bounds) {
   if (std::holds_alternative<Token>(mt)) {
     const Token &tok = std::get<Token>(mt);
@@ -597,7 +538,7 @@ SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
   }
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithMacroChildren(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacroChildren(
     SequenceNode *seq, const Macro &macro, const Bounds &bounds) {
   for (MacroOrToken mt : macro.children()) {
     seq = ExtendWithMacroChild(seq, mt, bounds);
@@ -605,7 +546,7 @@ SequenceNode *TokenTreeImpl::ExtendWithMacroChildren(
   return seq;
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
     SequenceNode *seq, const MacroExpansion &me,
     const DefineMacroDirective &me_def, const Bounds &user_bounds,
     const Bounds &def_bounds) {
@@ -667,12 +608,11 @@ SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
 // expansion of `HEAD`. This breaks our "meaningfulness" criteria, because
 // these tokens are top-level tokens, and so while they should appear in the
 // use of the expansion, they should also show up in the use itself.
-SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
     SequenceNode *seq,
     const MacroExpansion &me, const Bounds &me_bounds,
     const DefineMacroDirective &def, const Bounds &def_bounds,
-    const MacroExpansion &te, const Bounds &te_bounds,
-    const MacroExpansion &dte, const Bounds &dte_bounds) {
+    const MacroExpansion &dte) {
 
   D( std::cerr << "non-tree " << def.name().data() << "\n"; )
 
@@ -708,9 +648,6 @@ SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
 //  // Collect the trailing macro nodes, including argument nodes, that were
 //  // out-of-order.
   auto failed = true;
-  (void) te;
-  (void) te_bounds;
-  (void) dte_bounds;
 
 //  if (false && mep->Run(true)) {
 //    std::vector<BodyTokenForChild> trailing_nodes;
@@ -800,7 +737,7 @@ SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
 
 // Extend with a macro expansion. The work here is in figuring out whether or
 // not we're in a "non-tree" case.
-SequenceNode *TokenTreeImpl::ExtendWithExpansion(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithExpansion(
     SequenceNode *seq, const MacroExpansion &me,
     const Bounds &user_bounds) {
 
@@ -822,59 +759,17 @@ SequenceNode *TokenTreeImpl::ExtendWithExpansion(
                                      def_bounds.value());
   }
 
-  Bounds dte_use_bounds = def_bounds.value();
-  std::optional<MacroExpansion> dte = te;
-  while (auto nte = TrailingExpansionInExpansion(dte.value())) {
-    D( std::cerr << "-- drilling --\n"; )
-    if (auto nte_def = nte->definition()) {
-      if (auto nte_def_bounds = MacroBodyBounds(nte_def.value())) {
-        D( std::cerr << "-- drilled into " << nte_def->name().data() << "--\n"; )
-        dte = std::move(nte);  // Drill down through nested trailing expansions.
-        dte_use_bounds = nte_def_bounds.value();
-        continue;
-      }
-    }
-    break;
-  }
-
-  // Get the right corner of the macro use for the trailing expansion. We want
-  // to identify if the `)` of a function-like macro call isn't from inside
-  // `bounds`.
-  Token rc = RightCornerOfUse(dte.value());
-  if (!rc) {
-    return ExtendWithSimpleExpansion(seq, me, def.value(), user_bounds,
-                                     def_bounds.value());
-  }
-
-  // If we can't find a file token for the right corner of the use of the
-  // nested expansion, which is presumably `)`, then this is probably a macro
-  // defined through a command-line option. Assume it won't be crazy, and that
-  // PASTA has actually done "rotations" that make it not crazy.
-  Token rc_ft = rc.file_token();
-  if (!rc_ft) {
-    return ExtendWithSimpleExpansion(seq, me, def.value(), user_bounds,
-                                     def_bounds.value());
-  }
-
-  // The right corner is likely the closing parenthesis of a function-like
-  // macro expansion. In the macro-in-tail-position, this can come from the
-  // macro use site. We can detect if it's not coming from the use site
-  // because it'll be from the body of the macro itself.
-  TokenIndex rc_ft_ti = GetOrCreateIndex(rc_ft);
-  if (rc_ft_ti.first == dte_use_bounds.reader_index &&
-      rc_ft_ti.second >= dte_use_bounds.begin_index &&
-      rc_ft_ti.second <= dte_use_bounds.end_index) {
+  auto dte = NonTreeTailExpansion(def.value(), te.value());
+  if (!dte) {
     return ExtendWithSimpleExpansion(seq, me, def.value(), user_bounds,
                                      def_bounds.value());
   }
 
   return ExtendWithNonTreeExpansion(
-      seq, me, user_bounds, def.value(), def_bounds.value(), te.value(),
-      def_bounds.value()  /* bounds of top-level TE are the def bounds */,
-      dte.value(), dte_use_bounds);
+      seq, me, user_bounds, def.value(), def_bounds.value(), dte.value());
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
     SequenceNode *seq, const MacroSubstitution &macro,
     const Bounds &use_bounds) {
   SubstitutionNode *sub = &(substitutions.emplace_back(macro));
@@ -902,7 +797,7 @@ SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
   return AddToSequence(seq, sub);
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithVAOpt(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithVAOpt(
     SequenceNode *seq, const MacroVAOpt &macro, const Bounds &bounds_of_def) {
 
   SubstitutionNode *sub = &(substitutions.emplace_back(macro));
@@ -923,7 +818,7 @@ SequenceNode *TokenTreeImpl::ExtendWithVAOpt(
   return seq;
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithMacro(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacro(
     SequenceNode *seq, const Macro &macro, const Bounds &bounds) {
 
   if (auto ms = MacroSubstitution::from(macro)) {
@@ -944,8 +839,8 @@ SequenceNode *TokenTreeImpl::ExtendWithMacro(
 
 // Create a node for a fragment. If the fragment has file tokens, then the
 // returned node will "expand" out to include the file tokens.
-Node TokenTreeImpl::CreateFragmentNode(const Fragment &entity,
-                                       const Bounds &bounds) {
+TokenTreeImpl::Node TokenTreeImpl::CreateFragmentNode(
+    const Fragment &entity, const Bounds &bounds) {
 
   SequenceNode *seq = nullptr;
 
@@ -1016,7 +911,7 @@ Node TokenTreeImpl::CreateFragmentNode(const Fragment &entity,
 
 // Create a node for a file. If there are overlapping fragments in this file,
 // then this will include them.
-Node TokenTreeImpl::CreateFileNode(const File &entity) {
+TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
   // Collect all overlapping fragments into alternations.
   std::unordered_map<RawEntityId, ChoiceNode *> file_frags;
@@ -1112,16 +1007,27 @@ TokenTree::TokenTree(void)
     : TokenTree(kInvalidTree) {}
 
 TokenTree TokenTree::from(const File &file) {
-  auto self = std::make_shared<TokenTreeImpl>();
+  auto self = file.impl->cached_token_tree.Get();
+  if (self) {
+    return TokenTree(std::move(self));
+  }
+
+  self = std::make_shared<TokenTreeImpl>();
   auto file_tokens = file.tokens();
   self->readers.emplace_back(file_tokens.impl);
   self->root = self->CreateFileNode(file);
   self->mep.reset();
-  return TokenTree(std::move(self));
+
+  return TokenTree(file.impl->cached_token_tree.Put(std::move(self)));
 }
 
 TokenTree TokenTree::from(const Fragment &frag) {
-  auto self = std::make_shared<TokenTreeImpl>();
+  auto self = frag.impl->cached_token_tree.Get();
+  if (self) {
+    return TokenTree(std::move(self));
+  }
+
+  self = std::make_shared<TokenTreeImpl>();
   self->fragment = frag.impl;
 
   if (auto opt_file = File::containing(frag)) {
@@ -1132,10 +1038,11 @@ TokenTree TokenTree::from(const Fragment &frag) {
     self->readers.emplace_back(TokenRange().impl);
   }
 
-  Bounds frag_bounds = self->FragmentBounds(frag.file_tokens());
+  TokenTreeImpl::Bounds frag_bounds = self->FragmentBounds(frag.file_tokens());
   self->root = self->CreateFragmentNode(frag, frag_bounds);
   self->mep.reset();
-  return TokenTree(std::move(self));
+
+  return TokenTree(frag.impl->cached_token_tree.Put(std::move(self)));
 }
 
 namespace {
@@ -1144,7 +1051,7 @@ namespace {
 class TokenTreeReader final : public TokenReader {
  public:
   const std::shared_ptr<TokenTreeImpl> impl;
-  std::vector<TokenIndex> tokens;
+  std::vector<TokenTreeImpl::TokenIndex> tokens;
 
   // Offset of the first byte of data from the Nth token. This has one extra
   // element at the end that contains the size of `data`.
@@ -1318,28 +1225,31 @@ class TokenTreeReader final : public TokenReader {
   }
 };
 
-static void CollectTokens(const Node &node, const TokenTreeVisitor &vis,
-                          std::vector<TokenIndex> &tokens) {
+static void CollectTokens(const TokenTreeImpl::Node &node,
+                          const TokenTreeVisitor &vis,
+                          std::vector<TokenTreeImpl::TokenIndex> &tokens) {
   if (std::holds_alternative<std::monostate>(node)) {
     return;
 
-  } else if (std::holds_alternative<TokenIndex>(node)) {
-    tokens.push_back(std::get<TokenIndex>(node));
+  } else if (std::holds_alternative<TokenTreeImpl::TokenIndex>(node)) {
+    tokens.push_back(std::get<TokenTreeImpl::TokenIndex>(node));
 
-  } else if (std::holds_alternative<ChoiceNode *>(node)) {
-    if (ChoiceNode *choice = std::get<ChoiceNode *>(node)) {
+  } else if (std::holds_alternative<TokenTreeImpl::ChoiceNode *>(node)) {
+    if (TokenTreeImpl::ChoiceNode *choice =
+            std::get<TokenTreeImpl::ChoiceNode *>(node)) {
       PackedFragmentId chosen_frag = vis.choose(choice->fragments).id();
       auto i = 0u;
       for (const Fragment &frag : choice->fragments) {
         if (chosen_frag == frag.id()) {
-          const Node &frag_node = choice->children[i];
+          const TokenTreeImpl::Node &frag_node = choice->children[i];
           CollectTokens(frag_node, vis, tokens);
         }
         ++i;
       }
     }
-  } else if (std::holds_alternative<SubstitutionNode *>(node)) {
-    if (SubstitutionNode *sub = std::get<SubstitutionNode *>(node)) {
+  } else if (std::holds_alternative<TokenTreeImpl::SubstitutionNode *>(node)) {
+    if (TokenTreeImpl::SubstitutionNode *sub =
+            std::get<TokenTreeImpl::SubstitutionNode *>(node)) {
       auto should_expand = false;
       if (std::holds_alternative<MacroSubstitution>(sub->macro)) {
         should_expand = vis.should_expand(
@@ -1355,9 +1265,10 @@ static void CollectTokens(const Node &node, const TokenTreeVisitor &vis,
         CollectTokens(sub->before, vis, tokens);
       }
     }
-  } else if (std::holds_alternative<SequenceNode *>(node)) {
-    if (SequenceNode *seq = std::get<SequenceNode *>(node)) {
-      for (const Node &sub_node : seq->children) {
+  } else if (std::holds_alternative<TokenTreeImpl::SequenceNode *>(node)) {
+    if (TokenTreeImpl::SequenceNode *seq =
+            std::get<TokenTreeImpl::SequenceNode *>(node)) {
+      for (const TokenTreeImpl::Node &sub_node : seq->children) {
         CollectTokens(sub_node, vis, tokens);
       }
     }

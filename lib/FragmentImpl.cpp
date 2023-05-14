@@ -206,8 +206,25 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
       mx::MacroTokenId tid = std::get<mx::MacroTokenId>(vid);
       FragmentId fid(tid.fragment_id);
       if (tid.fragment_id == fragment->fragment_id) {
-        ti = tid.offset;  // Follow to the next one.
+        if (ti != tid.offset) {
 
+          // The serialization in the Indexer's persistence code serializes
+          // all "afters" of macros before all befores. Following a derivation
+          // means going back in time from afters to befores, and so the
+          // indices should be increasing.
+          assert(ti < tid.offset);
+          assert(ti < fragment->num_tokens);
+
+          ti = tid.offset;  // Follow to the next one.
+          continue;
+
+        } else {
+          assert(false);
+          return kInvalidEntityId;
+        }
+
+      // NOTE(pag): We shouldn't actually find ourselves going into another
+      //            fragment.
       } else if (FragmentImplPtr frag =
           fragment->ep->FragmentFor(fragment->ep, fid)) {
         assert(false);
