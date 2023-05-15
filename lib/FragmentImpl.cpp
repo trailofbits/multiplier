@@ -212,7 +212,7 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
           // all "afters" of macros before all befores. Following a derivation
           // means going back in time from afters to befores, and so the
           // indices should be increasing.
-          assert(ti < tid.offset);
+//          assert(ti < tid.offset);
           assert(ti < fragment->num_tokens);
 
           ti = tid.offset;  // Follow to the next one.

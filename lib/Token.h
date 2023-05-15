@@ -262,9 +262,6 @@ class TokenTreeImpl {
   std::deque<SubstitutionNode> substitutions;
   std::deque<SequenceNode> sequences;
 
-  // Helper to process macro expansions.
-  std::unique_ptr<MacroExpansionProcessor> mep;
-
   TokenIndex GetOrCreateIndex(const Token &tok);
   SequenceNode *AddLeadingTokensInBounds(SequenceNode *seq, const Token &tok,
                                          const Bounds &bounds);
@@ -274,9 +271,6 @@ class TokenTreeImpl {
                                         const Bounds &bounds);
   SequenceNode *ExtendWithMacro(SequenceNode *seq, const Macro &macro,
                                 const Bounds &bounds);
-  SequenceNode *ExtendWithVAOpt(SequenceNode *seq, const MacroVAOpt &macro,
-                                const Bounds &bounds);
-
   SequenceNode *ExtendWithSubstitution(
         SequenceNode *seq, const MacroSubstitution &macro,
         const Bounds &bounds);
@@ -295,6 +289,10 @@ class TokenTreeImpl {
       const MacroExpansion &me, const Bounds &me_bounds,
       const DefineMacroDirective &def, const Bounds &def_bounds,
       const MacroExpansion &deepest_te);
+
+  TokenTreeImpl::SequenceNode *ProcessMacroChildren(
+      TokenTreeImpl::SequenceNode *, const Bounds &bounds,
+      std::vector<MacroOrToken> mts, std::vector<Token> fts);
 
   Node CreateFragmentNode(const Fragment &entity, const Bounds &bounds);
   Node CreateFileNode(const File &entity);
