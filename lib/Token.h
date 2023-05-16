@@ -256,6 +256,8 @@ class TokenTreeImpl {
   // or an invalid token reader. This is indexed by a `TokenIndex`.
   std::vector<TokenReader::Ptr> readers;
 
+  int depth{0};
+
   Node root;
 
   std::deque<ChoiceNode> choices;
@@ -263,8 +265,9 @@ class TokenTreeImpl {
   std::deque<SequenceNode> sequences;
 
   TokenIndex GetOrCreateIndex(const Token &tok);
-  SequenceNode *AddLeadingTokensInBounds(SequenceNode *seq, const Token &tok,
-                                         const Bounds &bounds);
+  SequenceNode *AddLeadingTokensInBounds(
+      SequenceNode *seq, const Token &tok, const Bounds &bounds);
+
   SequenceNode *ExtendWithMacroChild(SequenceNode *seq, const MacroOrToken &mt,
                                      const Bounds &bounds);
   SequenceNode *ExtendWithMacroChildren(SequenceNode *seq, const Macro &macro,
