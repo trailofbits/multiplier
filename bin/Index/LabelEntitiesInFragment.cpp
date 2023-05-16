@@ -194,14 +194,18 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 
   // Define directives should go and provide entity ids for their
   // parameters, as they can be referenced by `MacroParameterSubstitution`s.
-  if (id.kind == mx::MacroKind::DEFINE_DIRECTIVE) {
-    if (auto def = pasta::DefineMacroDirective::From(entity)) {
-      for (pasta::Macro param : def->Parameters()) {
-        Label(param);
-      }
-    }
+  if (id.kind != mx::MacroKind::DEFINE_DIRECTIVE) {
+    return true;
   }
 
+  if (auto def = pasta::DefineMacroDirective::From(entity)) {
+    for (pasta::Macro param : def->Parameters()) {
+      Label(param);
+    }
+    return true;
+  }
+
+  assert(false);
   return true;
 }
 

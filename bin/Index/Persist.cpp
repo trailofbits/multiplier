@@ -255,7 +255,6 @@ struct TokenTreeSerializationSchedule {
       CHECK_NE(raw_tt, raw_locator);
       mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(raw_id).Unpack());
       CHECK(id.kind == tt.Kind());
-      CHECK_LT(id.offset, pf.top_level_macros.size());
       CHECK_LT(id.offset, pf.macros_to_serialize.size());
       CHECK(!pf.macros_to_serialize[id.offset].has_value());
       pf.macros_to_serialize[id.offset] = tt;
