@@ -655,7 +655,6 @@ static void PersistTokenTree(
     mx::RawEntityId eid = em.EntityId(raw_tt);
     mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(eid).Unpack());
 
-
     EntityBuilder<mx::ast::Macro> storage;
     CHECK_LT(id.offset, num_macros);
     if (std::optional<pasta::Macro> macro = tt->Macro()) {

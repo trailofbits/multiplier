@@ -96,8 +96,21 @@ static std::optional<bool> EndsWithEmptyVAArgs(
 
   // Not a `...` or a GNU named variadic argument, e.g. `args...`.
   auto param = MacroParameterSubstitution::from(*param_sub);
-  if (!param || !param->parameter().variadic_dots()) {
+  if (!param) {
     return std::nullopt;
+  }
+
+  Token va_args = LeftCornerOfUse(param.value());
+  if (va_args.data() != "__VA_ARGS__") {
+
+    // If it's not `__VA_ARGS__`, then it might be a GNU named variadic
+    // argument.
+    //
+    // TODO(pag): Eventually just use this method. Old indexers had issues
+    //            serializing parameter references.
+    if (!param->parameter().variadic_dots()) {
+      return std::nullopt;
+    }
   }
 
   return !LeftCornerOfExpansion(*param_sub);
