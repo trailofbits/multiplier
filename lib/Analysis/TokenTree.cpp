@@ -1019,11 +1019,25 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
       continue;
     }
 
-    Bounds frag_bounds = FragmentBounds(file_toks);
-    Node frag_node = CreateFragmentNode(frag, frag_bounds);
-
     RawEntityId first_file_tok_id = file_toks.front().id().Pack();
     RawEntityId last_file_tok_id = file_toks.back().id().Pack();
+
+#ifndef NDEBUG
+    VariantId first_file_tok_vid = EntityId(first_file_tok_id).Unpack();
+    VariantId last_file_tok_vid = EntityId(last_file_tok_id).Unpack();
+    assert(std::holds_alternative<FileTokenId>(first_file_tok_vid));
+    assert(std::holds_alternative<FileTokenId>(last_file_tok_vid));
+    assert(std::get<FileTokenId>(first_file_tok_vid).file_id ==
+           std::get<FileTokenId>(last_file_tok_vid).file_id);
+    assert(std::get<FileTokenId>(first_file_tok_vid).offset <=
+           std::get<FileTokenId>(last_file_tok_vid).offset);
+#endif
+
+    Bounds frag_bounds = FragmentBounds(file_toks);
+
+    depth = 0;
+    Node frag_node = CreateFragmentNode(frag, frag_bounds);
+    assert(!depth);
 
     if (auto frag_it = file_frags.find(first_file_tok_id);
         frag_it != file_frags.end()) {
@@ -1051,6 +1065,7 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
   for (Token file_tok : entity.tokens()) {
     RawEntityId file_tok_id = file_tok.id().Pack();
     if (stop_skip_after.has_value()) {
+      assert(!file_frags.count(file_tok_id));
       if (stop_skip_after.value() == file_tok_id) {
         stop_skip_after.reset();
       }
@@ -1062,7 +1077,11 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
       ChoiceNode *frag_node = frag_it->second;
       assert(frag_node != nullptr);
-      stop_skip_after.emplace(frag_end[file_tok_id]);
+
+      RawEntityId end_file_tok_id = frag_end[file_tok_id];
+      if (end_file_tok_id != file_tok_id) {
+        stop_skip_after.emplace(end_file_tok_id);
+      }
       seq = AddToSequence(seq, frag_node);
 
       file_frags.erase(file_tok_id);
