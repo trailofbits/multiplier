@@ -1124,6 +1124,7 @@ TokenTree TokenTree::from(const File &file) {
 
   self = std::make_shared<TokenTreeImpl>();
   auto file_tokens = file.tokens();
+  self->file = file.impl;
   self->readers.emplace_back(file_tokens.impl);
   self->root = self->CreateFileNode(file);
 
@@ -1180,11 +1181,7 @@ class TokenTreeReader final : public TokenReader {
   }
 
   const FileImpl *OwningFile(void) const noexcept override {
-    if (!impl->fragment) {
-      return impl->file.get();
-    } else {
-      return nullptr;
-    }
+    return impl->file.get();
   }
 
   const FragmentImpl *NthOwningFragment(EntityOffset ti) const noexcept override {
