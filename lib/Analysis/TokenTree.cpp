@@ -1492,6 +1492,7 @@ TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {
     const TokenReader::Ptr &tok_reader = impl->readers[ri];
     std::string_view tok_data = tok_reader->NthTokenData(to);
     if (!tok_data.empty()) {
+      reader->data.insert(reader->data.end(), tok_data.begin(), tok_data.end());
     }
 
     reader->token_offset.emplace_back(
