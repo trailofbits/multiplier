@@ -24,6 +24,8 @@ class FragmentImpl;
 class Index;
 class Reference;
 class RegexQueryMatch;
+class TokenRange;
+class TokenTree;
 class WeggliQueryMatch;
 
 #define MX_FORWARD_DECLARE(type_name, ln, e, c) \
@@ -90,6 +92,7 @@ class File {
   friend class RegexQuery;
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
+  friend class TokenRange;
   friend class TokenTree;
   friend class TokenTreeImpl;
   friend class WeggliQuery;

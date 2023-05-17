@@ -71,6 +71,8 @@ class TokenReader {
     return Equals(that.get());
   }
 
+  static EntityProviderPtr EntityProviderFor(const Token &);
+
   static Ptr ReaderForToken(const Ptr &self, const EntityProviderPtr &ep,
                             EntityId eid);
 

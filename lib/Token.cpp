@@ -739,6 +739,20 @@ Token TokenReader::TokenFor(const Ptr &self, RawEntityId eid) noexcept {
   }
 }
 
+EntityProviderPtr TokenReader::EntityProviderFor(const Token &token) {
+  if (auto frag = token.impl->NthOwningFragment(token.offset)) {
+    return frag->ep;
+  } else if (auto file = token.impl->NthOwningFile(token.offset)) {
+    return file->ep;
+  } else if (auto any_frag = token.impl->OwningFragment()) {
+    return any_frag->ep;
+  } else if (auto any_file = token.impl->OwningFile()) {
+    return any_file->ep;
+  } else {
+    return {};
+  }
+}
+
 TokenReader::Ptr TokenReader::ReaderForToken(
     const TokenReader::Ptr &self, const EntityProviderPtr &ep, EntityId eid) {
 
@@ -1033,25 +1047,11 @@ EntityId Token::id(void) const {
 
 // References to this token.
 gap::generator<Reference> Token::references(void) const & {
-  EntityProviderPtr ep;
-  if (!impl) {
-    co_return;
-  } else if (const FragmentImpl *frag = impl->NthOwningFragment(offset)) {
-    ep = frag->ep;
-  } else if (const FileImpl *file = impl->NthOwningFile(offset)) {
-    ep = file->ep;
-  } else if (const FragmentImpl *frag2 = impl->OwningFragment()) {
-    ep = frag2->ep;
-  } else if (const FileImpl *file2 = impl->OwningFile()) {
-    ep = file2->ep;
-  } else {
-    assert(false);
-    co_return;
-  }
-
-  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
-    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
-      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+  if (EntityProviderPtr ep = TokenReader::EntityProviderFor(*this)) {
+    for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
+      if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
+        co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+      }
     }
   }
 }
@@ -1129,6 +1129,20 @@ Token Token::nearest_file_token(void) const {
 // The category of this token. This takes into account any related entities.
 TokenCategory Token::category(void) const {
   return impl->NthTokenCategory(offset);
+}
+
+// The macro that immediately contains this token, if any.
+std::optional<Macro> Token::containing_macro(void) const {
+  if (EntityProviderPtr ep = TokenReader::EntityProviderFor(*this)) {
+    VariantId vid = impl->NthContainingMacroId(offset).Unpack();
+    if (std::holds_alternative<MacroId>(vid)) {
+      if (MacroImplPtr eptr = ep->MacroFor(ep, std::get<MacroId>(vid))) {
+        return Macro(std::move(eptr));
+      }
+      assert(false);
+    }
+  }
+  return std::nullopt;
 }
 
 // Return the ID entity associated with this token.
@@ -1277,68 +1291,12 @@ std::string_view TokenRange::data(void) const & {
 
 namespace {
 
-static Token LogicalFileLocation(Macro macro, RawEntityId prev_entity,
-                                 bool first) {
-
-  auto is_in_expansion = true;
-  while (is_in_expansion) {
-
-    // If `macro` is a substitution, then check that its replacement children
-    // contains `prev_entity`.
-    if (auto sub = MacroSubstitution::from(macro)) {
-      is_in_expansion = false;
-      for (MacroOrToken child : sub->replacement_children()) {
-        if (std::holds_alternative<Macro>(child)) {
-          if (std::get<Macro>(child).id().Pack() == prev_entity) {
-            is_in_expansion = true;
-            break;
-          }
-        } else if (std::holds_alternative<Token>(child)) {
-          if (std::get<Token>(child).id().Pack() == prev_entity) {
-            is_in_expansion = true;
-            break;
-          }
-        }
-      }
-    }
-
-    // Set the current macro to be the previous entity. This macro might be
-    // insdie of another expansion.
-    prev_entity = macro.id().Pack();
-
-    // Go to the parent.
-    if (std::optional<Macro> parent = macro.parent()) {
-      macro = std::move(parent.value());
-    } else {
-      break;
-    }
+// Return the leftmost use tokens of a macro.
+static Token LeftCornerOfUse(const Macro &exp) {
+  for (Token tok : exp.generate_use_tokens()) {
+    return tok;
   }
-
-  // If it's not in an expansion, then we can rely on the token reader to
-  // find the file location.
-  if (!is_in_expansion) {
-    return Token();
-  }
-
-  // If it was in an expansion, then go find the first file token in the range.
-  if (first) {
-    for (Token tok : macro.root().generate_use_tokens()) {
-      if (Token file_tok = tok.file_token()) {
-        return file_tok;
-      }
-    }
-
-    return Token();
-  }
-
-  // If it was in an expansion, then go find the last file token in the range.
-  Token last;
-  for (Token tok : macro.root().generate_use_tokens()) {
-    if (Token file_tok = tok.file_token()) {
-      last = std::move(file_tok);
-    }
-  }
-  return last;
+  return Token();
 }
 
 }  // namespace
@@ -1350,75 +1308,89 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     return ret;
   }
 
-  // It's already a file token range.
-  if (impl->OwningFile()) {
-    return *this;
-  }
+  std::optional<File> last_file;
+  EntityOffset min_offset = std::numeric_limits<EntityOffset>::max();
+  EntityOffset max_offset = 0u;
 
-  // If the tokens in this range don't all belong to the same logical fragment
-  // then there's no chance of them being side-by-side in a file.
-  const FragmentImpl * const frag = impl->OwningFragment();
-  if (!frag) {
-    return TokenRange();
-  }
+  for (Token tok : *this) {
 
-  VariantId begin_vid = impl->NthTokenId(index).Unpack();
-  VariantId end_vid = impl->NthTokenId(num_tokens - 1u).Unpack();
-  assert(!std::holds_alternative<ParsedTokenId>(begin_vid) ==
-         !std::holds_alternative<ParsedTokenId>(end_vid));
+    // If the token is contained inside of a macro, then we need to be careful
+    // because the derivation chain leading back to a file token may lead us to
+    // anywhere or nowhere, but if we ascent the macro graph, then we'll likely
+    // find ourselves within the macro use in the file, which is where we want
+    // to be.
+    if (std::optional<Macro> parent_macro = tok.containing_macro()) {
 
-  // If we're dealing with a parsed token range, then when we convert it to
-  // a file token range, we need to account for the fact that some of the parsed
-  // tokens might be inside of a macro expansion, and so we need to find the
-  // use of the macro expansion.
+      Macro root_macro = parent_macro->root();
+      std::optional<File> root_file = File::containing(root_macro);
+      if (!root_file) {
+        return ret;
+      }
 
-  Token first_tok;
-  Token last_tok;
+      if (!last_file) {
+        last_file = std::move(root_file);
 
-  if (std::holds_alternative<ParsedTokenId>(begin_vid)) {
-    auto macro_tok_id = impl->NthDerivedTokenId(index).Pack();
-    for (Macro macro : Macro::containing(front())) {
-      first_tok = LogicalFileLocation(std::move(macro), macro_tok_id, true);
-      goto have_first_tok;
+      } else if (last_file.value() != root_file.value()) {
+        return ret;
+      }
+
+      if (parent_macro.value() == root_macro) {
+        goto at_top_of_macro;
+      }
+
+      // If we're in a `MacroArgument`, and its a child of of the root macro,
+      // then this is also a top-level token. Similarly, if we're in a
+      // `MacroParameter`, then the parent must be a `DefineMacroDirective`,
+      // which is a top-level thing.
+      if (parent_macro->kind() != MacroKind::ARGUMENT &&
+          parent_macro->kind() != MacroKind::PARAMETER) {
+        tok = LeftCornerOfUse(root_macro);
+        goto at_top_of_macro;
+      }
+
+      std::optional<Macro> exp_or_def = parent_macro->parent();
+      if (!exp_or_def) {
+        assert(false);
+        tok = LeftCornerOfUse(root_macro);
+        goto at_top_of_macro;
+      }
+
+      if (exp_or_def.value() != root_macro) {
+        tok = LeftCornerOfUse(root_macro);
+      }
+
+      goto at_top_of_macro;
+
+    // It's a file token or a parsed token; get a file token from it.
+    } else {
+    at_top_of_macro:
+
+      if (Token file_tok = tok.file_token()) {
+        std::optional<File> tok_file = File::containing(file_tok);
+        if (!last_file) {
+          last_file = std::move(tok_file);
+
+        } else if (last_file.value() != tok_file.value()) {
+          return ret;
+        }
+
+        min_offset = std::min(min_offset, file_tok.offset);
+        max_offset = std::max(max_offset, file_tok.offset);
+
+      // No associated file token.
+      } else {
+        return ret;
+      }
     }
   }
 
-  first_tok = front().file_token();
-
-have_first_tok:
-  if (std::holds_alternative<ParsedTokenId>(end_vid)) {
-    auto macro_tok_id = impl->NthDerivedTokenId(num_tokens - 1u).Pack();
-    for (Macro macro : Macro::containing(back())) {
-      last_tok = LogicalFileLocation(std::move(macro), macro_tok_id, false);
-      goto have_last_tok;
-    }
+  if (!last_file) {
+    return ret;
   }
 
-  last_tok = back().file_token();
-
-have_last_tok:
-
-  const bool has_first = first_tok;
-  const bool has_last = last_tok;
-
-  if (has_first && !has_last) {
-    ret.impl = std::move(first_tok.impl);
-    ret.index = first_tok.offset;
-    ret.num_tokens = first_tok.offset + 1u;
-
-  } else if (!has_first && has_last) {
-    ret.impl = std::move(last_tok.impl);
-    ret.index = last_tok.offset;
-    ret.num_tokens = last_tok.offset + 1u;
-
-  } else if (has_first && has_last &&
-             first_tok.impl->Equals(last_tok.impl) &&
-             first_tok.offset <= last_tok.offset) {
-    ret.impl = std::move(first_tok.impl);
-    ret.index = first_tok.offset;
-    ret.num_tokens = last_tok.offset + 1u;
-  }
-
+  ret.impl = last_file->impl->TokenReader(last_file->impl);
+  ret.index = min_offset;
+  ret.num_tokens = (max_offset - min_offset) + 1u;
   return ret;
 }
 
@@ -1461,6 +1433,7 @@ std::shared_ptr<TokenTreeImpl> TokenTreeImplCache::Get(void) const {
   std::unique_lock<std::mutex> locker(lock);
   return impl.lock();
 }
+
 std::shared_ptr<TokenTreeImpl> TokenTreeImplCache::Put(
     std::shared_ptr<TokenTreeImpl> new_impl) const {
   std::unique_lock<std::mutex> locker(lock);

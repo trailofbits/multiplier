@@ -603,6 +603,48 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
       goto directive_case;
     }
 
+    // If this is a token in `#pragma` directive derived from a `_Pragma` macro,
+    // and if it's not the `#` or the directive name (`pragma`), then link it to
+    // the tokens in the argment to the `_Pragma`.
+    case pasta::MacroKind::kPragmaDirective:
+      if (std::optional<pasta::Macro> pragma_parent = parent->Parent();
+          pragma_parent &&
+          pragma_parent->Kind() == pasta::MacroKind::kExpansion) {
+        auto found_at = 0u;
+        for (pasta::Macro pragma_dir_child : parent->Children()) {
+          if (pragma_dir_child.RawMacro() == self) {
+            break;
+          }
+          ++found_at;
+        }
+        if (found_at < 2u) { // Not after `#` and `pragma`.
+          goto directive_case;
+        }
+        for (pasta::Macro ppc : pragma_parent->Children()) {
+          if (ppc.Kind() != pasta::MacroKind::kArgument) {
+            continue;
+          }
+
+          // Assume first argument to `_Pragma` is a token.
+          if (std::optional<pasta::MacroToken> str_tok = ppc.BeginToken();
+              str_tok &&
+              str_tok->TokenKind() == pasta::TokenKind::kStringLiteral) {
+            if (mx::RawEntityId eid = em.EntityId(str_tok.value());
+                eid != mx::kInvalidEntityId) {
+              return eid;
+            }
+          }
+
+          // Associate the provenance with the argument itself if we failed
+          // to find the token (probably a string) in the argument).
+          if (mx::RawEntityId eid = em.EntityId(ppc);
+              eid != mx::kInvalidEntityId) {
+            return eid;
+          }
+        }
+      }
+      goto directive_case;
+
     // Point the macro directive at the macro itself.
     case pasta::MacroKind::kOtherDirective:
     case pasta::MacroKind::kIfDirective:
@@ -618,7 +660,6 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
     case pasta::MacroKind::kIncludeMacrosDirective:
     case pasta::MacroKind::kImportDirective:
     case pasta::MacroKind::kUndefineDirective:
-    case pasta::MacroKind::kPragmaDirective:
     directive_case: {
       auto &dir =
           reinterpret_cast<pasta::MacroDirective &>(parent.value());

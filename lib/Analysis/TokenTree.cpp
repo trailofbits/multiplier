@@ -187,27 +187,10 @@ static void GenerateVAOptChildrenInto(MacroVAOpt va_opt,
     return;
   }
 
-  int paren_count = 0;
   for (MacroOrToken mt : va_opt.children()) {
-
-    if (std::holds_alternative<Token>(mt)) {
-      TokenKind tk = std::get<Token>(mt).kind();
-      int test_paren_count = paren_count;
-      if (tk == TokenKind::L_PARENTHESIS) {
-        ++paren_count;
-      } else if (tk == TokenKind::R_PARENTHESIS) {
-        --paren_count;
-        test_paren_count = paren_count;
-      }
-
-      if (test_paren_count) {
-        out.emplace_back(std::move(mt));
-      }
-    } else if (paren_count) {
+    if (Macro *m = std::get_if<Macro>(&mt);
+        m && m->kind() == MacroKind::VA_OPT_ARGUMENT) {
       out.emplace_back(std::move(mt));
-
-    } else {
-      assert(false);  // Found a macro thing outside of the parens?
     }
   }
 }
@@ -229,7 +212,10 @@ static void GenerateVAOptChildrenInto(MacroVAOpt va_opt,
 //      ...
 //        return HEAD 1);
 static std::optional<MacroExpansion> NonTreeTailExpansion(
-    DefineMacroDirective &def_containing_te_use, MacroExpansion &te) {
+    const DefineMacroDirective &def_containing_te_use,
+    const MacroExpansion &exp_containing_te_use,
+    const MacroExpansion &te) {
+
   // Get the right corner of the macro use for the trailing expansion. We want
   // to identify if the `)` of a function-like macro call isn't from inside
   // `bounds`.
@@ -239,23 +225,65 @@ static std::optional<MacroExpansion> NonTreeTailExpansion(
     return std::nullopt;
   }
 
-  // If the right corner of the macro use, which is presumably a `)`, is
-  // NOT directly derived from the right corner of the macro defintion, then
-  // we're not in a simple expansion.
-  Token rc_def = RightCornerOfUse(def_containing_te_use);
-  D( std::cerr << " rc_def " << rc_def.id() << ": " << rc_def.data() << '\n'; )
-  if (rc_use.derived_token().file_token() != rc_def.file_token()) {
+  std::optional<MacroExpansion> next_te = TrailingExpansionInExpansion(te);
+
+  if (!next_te) {
+    Token rc_def = RightCornerOfUse(def_containing_te_use);
+    D( std::cerr << " rc_def " << rc_def.id() << ": " << rc_def.data() << '\n'; )
+
+    // If this is the deepest macro expansion, and if the right corner of the
+    // macro use, which is presumably a `)`, is directly derived from the
+    // right corner of the macro definition, then we're in a simple expansion.
+    if (rc_use.file_token() == rc_def.file_token()) {
+      return std::nullopt;
+    }
+
+    // Next, try to figure out if the `)` came from an argument, e.g. in the
+    // case of the `_Pragma`s `)` in `MACRO(_Pragma(...))`.
+    std::optional<Macro> parent = rc_use.derived_token().containing_macro();
+    for (; parent; parent = parent->parent()) {
+      if (parent.value() == exp_containing_te_use) {
+        return std::nullopt;
+      }
+    }
+
     return te;
   }
 
-  // Need to check the recursive case.
-  std::optional<MacroExpansion> next_te = TrailingExpansionInExpansion(te);
+  // We probably have a trailing expansion. One corner case that gets in the
+  // way is `_Pragma`s, which are not subjected to the argument pre-expansion
+  // phase, and so their expansions show up in the `.replacement_children()`,
+  // not in the `MacroArgument`s.
+
+  // If `te` is a trailing expansion that itself contains a trailing expansion
+  // `next_te`, then we can only really do analysis if we can locate elements of
+  // `next_te`s use in the defintion of `te`. If we have no such definition,
+  // then bail out.
   std::optional<DefineMacroDirective> te_def = te.definition();
-  if (!next_te || !te_def) {
+  if (!te_def) {
     return std::nullopt;
   }
 
-  return NonTreeTailExpansion(te_def.value(), next_te.value());
+  D( std::cerr << "Recursing into " << te_def->name().data()
+               << "'s trailing expansion\n"; )
+
+  std::optional<MacroExpansion> nte = NonTreeTailExpansion(
+      te_def.value(), te, next_te.value());
+  if (!nte.has_value()) {
+    return std::nullopt;
+  }
+
+  D( std::cerr << "Found non-tree trailing" << nte->definition()->name().data()
+               << '\n'; )
+
+  // Need to detect the case of a `_Pragma` expansion. We do this by checking if
+  // the nested expansion `)` matches the current expansion `)`.
+  Token nte_rc_use = RightCornerOfUse(nte.value());
+  if (nte_rc_use.derived_token() == rc_use) {
+    return std::nullopt;
+  }
+
+  return nte;
 }
 
 struct BodyTokenForChild {
@@ -636,26 +664,86 @@ TokenTreeImpl::TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
   return TokenIndex(i, tok.offset);
 }
 
+// Get the `TokenIndex` that is the right corner of an existing use.
+static std::optional<TokenTreeImpl::TokenIndex> RightCornerOfUse(
+    const TokenTreeImpl::Node &node) {
+  if (std::holds_alternative<TokenTreeImpl::TokenIndex>(node)) {
+    return std::get<TokenTreeImpl::TokenIndex>(node);
+
+  } else if (std::holds_alternative<TokenTreeImpl::ChoiceNode *>(node)) {
+    return RightCornerOfUse(
+        std::get<TokenTreeImpl::ChoiceNode *>(node)->children.front());
+
+  } else if (std::holds_alternative<TokenTreeImpl::SequenceNode *>(node)) {
+    if (auto seq = std::get<TokenTreeImpl::SequenceNode *>(node);
+        seq && !seq->children.empty()) {
+      return RightCornerOfUse(seq->children.back());
+    }
+  } else if (std::holds_alternative<TokenTreeImpl::SubstitutionNode *>(node)) {
+    if (auto sub = std::get<TokenTreeImpl::SubstitutionNode *>(node)) {
+      return RightCornerOfUse(sub->before);
+    }
+  }
+  return std::nullopt;
+}
+
 // Counts the number of tokens after `begin` and before `end` that we can
 // inject before the token which logically represents `end`.
 static EntityOffset CountInjectable(const TokenReader::Ptr &reader,
-                                    EntityOffset begin, EntityOffset end,
+                                    const TokenTreeImpl::Bounds &bounds,
+                                    TokenTreeImpl::TokenIndex upper_bound,
+                                    TokenTreeImpl::SequenceNode *seq,
                                     int depth) {
+  EntityOffset begin = bounds.begin_index;
+  EntityOffset end = upper_bound.second;
   EntityOffset count = 0u;
-  for (auto i = end - 1u; begin < i; ++count, --i) {
+
+  // If we're at a file level, then allow us to suck in more tokens.
+  if (!depth) {
+    if (auto rc = RightCornerOfUse(seq)) {
+
+      // Allow unbounded whitespace/comment injection, but nothing else.
+      if (rc->first != upper_bound.first) {
+        depth = 1;
+        begin = 0;
+
+      // If the previous thing is from the same reader, then allow injection
+      // from it.
+      } else if (rc->first == upper_bound.first) {
+        begin = rc->second + 1u;
+      }
+
+      // TODO(pag): Have observed issues where `bounds` and `rc`s reader indices
+      //            don't match. This is likely due to subtleties related to the
+      //            how `bounds` is simplistically passed down.
+    }
+
+    // TODO(pag): We know that the reader index for files will always be zero,
+    //            so should be check that here?
+  }
+
+  for (auto i = end - 1u; begin <= i; ++count, --i) {
     switch (reader->NthTokenKind(i)) {
       case TokenKind::WHITESPACE:
       case TokenKind::COMMENT:
       case TokenKind::UNKNOWN:
         if (!reader->NthTokenData(i).empty()) {
+          D( std::cerr << "Injectable (depth=" << depth << "): "
+                       << reader->NthTokenData(i) << '\n'; )
           continue;
         }
         [[clang::fallthrough]];
       default:
         if (depth) {
+          D( std::cerr << "Not injectable (depth=" << depth << "): "
+                       << reader->NthTokenData(i) << '\n'; )
           return count;
+        } else {
+          continue;
         }
-        continue;
+    }
+    if (!i) {
+      break;
     }
   }
   return count;
@@ -679,8 +767,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
 
   // Inject the missing whitespace/comment tokens.
   const TokenReader::Ptr &fti_reader = readers[fti.first];
-  for (auto num = CountInjectable(fti_reader, bounds.begin_index, fti.second,
-                                  depth);
+  for (auto num = CountInjectable(fti_reader, bounds, fti, seq, depth);
        num; --num) {
     seq = AddTokenToSequence(seq, TokenIndex(fti.first, fti.second - num));
   }
@@ -690,6 +777,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
 
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
     SequenceNode *seq, const MacroOrToken &mt, const Bounds &bounds) {
+
   if (std::holds_alternative<Token>(mt)) {
     const Token &tok = std::get<Token>(mt);
     seq = AddLeadingTokensInBounds(seq, tok, bounds);
@@ -730,8 +818,12 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
     return nullptr;
   }
 
+  auto prev_depth = depth;
+  auto next_depth = depth + 1;
+
   SequenceNode *after = nullptr;
   for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
+    depth = next_depth;
     after = AddLeadingTokensInBounds(after, node.definition_token, def_bounds);
     if (node.is_argument) {
       after = ExtendWithMacroChild(after, node.mt, user_bounds);
@@ -746,6 +838,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
     sub->after = after;
   }
 
+  depth = prev_depth;
   return AddToSequence(seq, sub);
 }
 
@@ -754,8 +847,6 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
     std::vector<MacroOrToken> mts, std::vector<Token> fts) {
 
   size_t num_mts = mts.size();
-  int prev_depth = depth;
-  int next_depth = depth + 1;
 
   for (auto i = 0u; i < num_mts; ++i) {
     const MacroOrToken &mt = mts[i];
@@ -764,7 +855,6 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
       const Token &tok = std::get<Token>(mt);
       seq = AddLeadingTokensInBounds(seq, fts[i], bounds);
       seq = AddTokenToSequence(seq, tok);
-      depth = next_depth;
       continue;
     }
 
@@ -778,7 +868,6 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
 
     // Try to get stricter bounds on the macro use.
     if (!lc_ft) {
-      depth = next_depth;
       seq = ExtendWithMacro(seq, m, bounds);
       continue;
     }
@@ -786,7 +875,6 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
     TokenIndex lc_index = GetOrCreateIndex(lc_ft);
     Bounds new_bounds = bounds;
     if (new_bounds.reader_index != lc_index.first) {
-      depth = next_depth;
       seq = ExtendWithMacro(seq, m, bounds);
       continue;
     }
@@ -808,11 +896,9 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
     }
 
     seq = AddLeadingTokensInBounds(seq, lc_ft, bounds);
-    depth = next_depth;
     seq = ExtendWithMacro(seq, m, new_bounds);
   }
 
-  depth = prev_depth;
   return seq;
 }
 
@@ -846,6 +932,9 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
 
   D( std::cerr << "non-tree " << def.name().data() << "\n"; )
 
+  auto prev_depth = depth;
+  auto next_depth = depth + 1;
+
   MacroExpansionProcessor mep;
   mep.Init(me, def);
   if (!mep.Run(true)) {
@@ -857,18 +946,22 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
   SequenceNode *before = ProcessMacroChildren(
       nullptr, me_bounds, std::move(mts), std::move(fts));
 
+  assert(depth == prev_depth);
+
   if (!before) {
     return seq;
   }
 
   SequenceNode *after = nullptr;
   for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
+    depth = next_depth;
     after = AddLeadingTokensInBounds(after, node.definition_token, def_bounds);
     if (node.is_argument) {
       after = ExtendWithMacroChild(after, node.mt, me_bounds);
     } else {
       after = ExtendWithMacroChild(after, node.mt, def_bounds);
     }
+    depth = prev_depth;
   }
 
   std::vector<Token> trailing_toks;
@@ -892,8 +985,10 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
     trailing_toks.emplace_back(std::move(te_tok));
   }
 
-  // TODO(pag): Ideally, we'd be merging in the
+  // TODO(pag): Ideally, we'd be merging in the nodes themselves, not just
+  //            the tokens.
   for (const Token &tok : trailing_toks) {
+    depth = prev_depth;
     before = AddLeadingTokensInBounds(before, tok.file_token(), me_bounds);
     before = AddTokenToSequence(before, tok);
   }
@@ -931,7 +1026,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithExpansion(
                                      def_bounds.value());
   }
 
-  auto dte = NonTreeTailExpansion(def.value(), te.value());
+  auto dte = NonTreeTailExpansion(def.value(), me, te.value());
   if (!dte) {
     return ExtendWithSimpleExpansion(seq, me, def.value(), user_bounds,
                                      def_bounds.value());
@@ -945,6 +1040,9 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
     SequenceNode *seq, const MacroSubstitution &macro,
     const Bounds &use_bounds) {
 
+  auto prev_depth = depth;
+  auto next_depth = depth + 1;
+
   FILL_MACRO_CHILREN(macro.children(), mts, fts)
   SequenceNode *before = ProcessMacroChildren(
       nullptr, use_bounds, std::move(mts), std::move(fts));
@@ -956,8 +1054,6 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
   SubstitutionNode *sub = &(substitutions.emplace_back(macro));
   sub->before = before;
 
-  int prev_depth = depth;
-  int next_depth = depth + 1;
   SequenceNode *after = nullptr;
   for (MacroOrToken mt : macro.replacement_children()) {
     depth = next_depth;
@@ -1396,7 +1492,6 @@ TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {
     const TokenReader::Ptr &tok_reader = impl->readers[ri];
     std::string_view tok_data = tok_reader->NthTokenData(to);
     if (!tok_data.empty()) {
-      reader->data.insert(reader->data.end(), tok_data.begin(), tok_data.end());
     }
 
     reader->token_offset.emplace_back(
