@@ -115,15 +115,16 @@ class GlobalIndexingState {
                        TokenProvenanceCalculator &provenance,
                        PendingFragment &fragment);
 
-  // Persist a type fragment into the database. Type fragments are special fragments
-  // that are created to persist the types collected for serialization. Storing types
-  // into a different fragment will help with type de-duplication which is a by product
-  // of inlining the types in each fragment.
-
+  // Persist a type fragment into the database. Type fragments are special
+  // fragments that are created to persist the types collected for
+  // serialization. Storing types into a different fragment will help with type
+  // de-duplication which is a by product of inlining the types in each
+  // fragment.
+  //
   // The pending fragment passed as one of the arguments holds the list of types
   // that needs to be serialized in a fragment.
-  void PersistTypes(const pasta::AST &ast, NameMangler &mangler, EntityMapper &em,
-                    PendingFragment &fragment);
+  void PersistTypes(const pasta::AST &ast, NameMangler &mangler,
+                    EntityMapper &em, const PendingFragment &fragment);
 
 };
 

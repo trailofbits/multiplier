@@ -280,13 +280,13 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
   }
 }
 
-void SerializeTypes(mx::DatabaseWriter &database, const pasta::Type &entity,
-                    const EntityMapper &em, mx::RawEntityId fragment_index) {
+void SerializeType(mx::DatabaseWriter &database, const pasta::Type &entity,
+                   const EntityMapper &em, mx::RawEntityId fragment_index) {
   mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
-    auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == fragment_index);
+  auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
+  assert(vid.fragment_id == fragment_index);
 #endif
 
   EntityBuilder<mx::ast::Type> storage;

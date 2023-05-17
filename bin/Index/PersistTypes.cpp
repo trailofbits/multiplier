@@ -31,10 +31,10 @@
 
 namespace indexer {
 
-extern void SerializeTypes(mx::DatabaseWriter &database,
-                           const pasta::Type &entity,
-                           const EntityMapper &em,
-                           mx::RawEntityId fragment_index);
+extern void SerializeType(mx::DatabaseWriter &database,
+                          const pasta::Type &entity,
+                          const EntityMapper &em,
+                          mx::RawEntityId fragment_index);
 
 namespace {
 
@@ -254,20 +254,11 @@ void PendingFragmentType::Uses(const pasta::Attr &entity) {
   attrs_in_use.emplace_back(entity);
 }
 
-static void SerializeTypeEntity(
-    mx::DatabaseWriter &database, const pasta::Type &entity,
-    const PendingFragmentType &tf, const EntityMapper &em) {
-  mx::RawEntityId eid = em.EntityId(entity);
-  SerializeTypes(database, entity, em, tf.fragment_index);
-  EntityBuilder<mx::ast::Type> storage;
-  database.AddAsync(
-      mx::EntityRecord{eid, GetSerializedData(storage.message)});
-}
-
 // Create list of fragments for the new types recovered from the
 // pending fragment.
 static std::vector<PendingFragmentType> CreateFragments(
-    TypeMapper &tm, const pasta::AST &ast, std::vector<pasta::Type> types) {
+    TypeMapper &tm, const pasta::AST &ast,
+    const std::vector<pasta::Type> &types) {
 
   std::vector<PendingFragmentType> type_fragments;
   type_fragments.reserve(types.size());
@@ -290,13 +281,13 @@ static std::vector<PendingFragmentType> CreateFragments(
     type_fragments.emplace_back(std::move(tf));
   }
 
-  (void)ast;
+  (void) ast;
   return type_fragments;
 }
 
-
-void GlobalIndexingState::PersistTypes(const pasta::AST &ast, NameMangler &mangler,
-                                       EntityMapper &em, PendingFragment &pf) {
+void GlobalIndexingState::PersistTypes(
+    const pasta::AST &ast, NameMangler &mangler, EntityMapper &em,
+    const PendingFragment &pf) {
 
   // Create fragments from the list of types found in the pending fragments
   auto type_fragments = CreateFragments(em.tm, ast, pf.types_to_serialize);
@@ -322,7 +313,7 @@ void GlobalIndexingState::PersistTypes(const pasta::AST &ast, NameMangler &mangl
     // type in type fragment.
     CHECK_EQ(tf.num_top_level_types, 1u);
 
-    auto &entity = tf.top_level_types[0];
+    const pasta::Type &entity = tf.top_level_types[0];
     auto tok_range = pasta::PrintedTokenRange::Create(entity);
 
     // Identify all of the declarations, statements, types, and pseudo-entities,
@@ -330,7 +321,7 @@ void GlobalIndexingState::PersistTypes(const pasta::AST &ast, NameMangler &mangl
     // BuildFragmentForType(tf, tok_range);
 
     // Serialize the type entity to create an entry for the type in entity table
-    SerializeTypeEntity(database, entity, tf, em);
+    SerializeType(database, entity, em, tf.fragment_index);
 
     // HACK(remove me): Create a map of fragment to file record so that
     //                  fragment appears in the list

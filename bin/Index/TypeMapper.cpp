@@ -82,8 +82,7 @@ bool TypeMapper::AddEntityId(const pasta::Type &entity) {
   id.fragment_id = fragment_.Unpack().fragment_id;
   id.offset = static_cast<mx::EntityOffset>(0);
 
-  (void)type_ids.emplace(type_key, id);
-  return true;
+  return type_ids.emplace(type_key, id).second;
 }
 
 mx::PackedFragmentId TypeMapper::FragmentId(const pasta::Type &type) const {
@@ -91,7 +90,6 @@ mx::PackedFragmentId TypeMapper::FragmentId(const pasta::Type &type) const {
   assert(std::holds_alternative<mx::TypeId>(vid));
   return mx::FragmentId(std::get<mx::TypeId>(vid).fragment_id);
 }
-
 
 mx::PackedFragmentId TypeMapper::GetOrCreateFragmentIdForType(
     const pasta::Type &entity) const {

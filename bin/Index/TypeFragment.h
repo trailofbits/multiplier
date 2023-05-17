@@ -34,7 +34,6 @@ class PendingFragmentType {
   unsigned begin_index{0u};
   unsigned end_index{0u};
 
-
   std::vector<pasta::Decl> decls_in_use;
   std::vector<pasta::Stmt> stmts_in_use;
   std::vector<pasta::Type> types_in_use;
