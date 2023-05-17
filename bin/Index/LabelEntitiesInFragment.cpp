@@ -183,16 +183,30 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 
   // If we added this node (we should have), then add in a `nullopt` reservation
   // to `macros_to_serialize`.
-  //
-  // NOTE(pag): `CountSubstitutions` in Persist.cpp fills in the empty slots.
-  if (em.entity_ids.emplace(entity.RawMacro(), id).second) {
-    fragment.macros_to_serialize.emplace_back();
-    return true;
-
-  } else {
+  if (!em.entity_ids.emplace(entity.RawMacro(), id).second) {
     LOG(FATAL) << "Top-level macro already labelled?";
     return false;
   }
+
+  // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
+  //            fills in the empty slots.
+  fragment.macros_to_serialize.emplace_back();
+
+  // Define directives should go and provide entity ids for their
+  // parameters, as they can be referenced by `MacroParameterSubstitution`s.
+  if (id.kind != mx::MacroKind::DEFINE_DIRECTIVE) {
+    return true;
+  }
+
+  if (auto def = pasta::DefineMacroDirective::From(entity)) {
+    for (pasta::Macro param : def->Parameters()) {
+      Label(param);
+    }
+    return true;
+  }
+
+  assert(false);
+  return true;
 }
 
 }  // namespace

@@ -490,6 +490,14 @@ static void FixupNodeParents(Substitution *sub) {
     }
   }
 
+  for (Substitution::Node &node : sub->body) {
+    if (std::holds_alternative<Substitution *>(node)) {
+      Substitution *child_sub = std::get<Substitution *>(node);
+      assert(child_sub != sub);
+      child_sub->parent = sub;
+    }
+  }
+
   for (Substitution::Node &node : sub->after) {
     if (std::holds_alternative<Substitution *>(node)) {
       Substitution *child_sub = std::get<Substitution *>(node);
@@ -1135,14 +1143,13 @@ Substitution *TokenTreeImpl::MergeArguments(
     FixupNodeParents(new_arg_sub);
 
     new_nodes.emplace_back(new_arg_sub);
-
     sub->before = std::move(new_nodes);
 
   // Use `pre_exp` because the original is simple, and so the pre-expansion
   // is either simple or not, so whatever it is is more desirable.
   } else {
-    sub->before.swap(pre_exp->before);
-    sub->after.swap(pre_exp->after);
+    sub->before = std::move(pre_exp->before);
+    sub->after = std::move(pre_exp->after);
     FixupNodeParents(sub);
   }
 
@@ -1689,6 +1696,8 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
+  assert(sub->kind == mx::MacroKind::EXPANSION ||
+         sub->kind == mx::MacroKind::STRINGIFY);
   arg_sub->parent = sub;
   arg_sub->macro = node;
   nodes.emplace_back(arg_sub);
@@ -1716,6 +1725,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
+  assert(sub->kind == mx::MacroKind::VA_OPT);
   arg_sub->parent = sub;
   arg_sub->macro = node;
   nodes.emplace_back(arg_sub);
@@ -1743,6 +1753,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *arg_sub = CreateSubstitution(mx::FromPasta(node.Kind()));
+  assert(sub->kind == mx::MacroKind::DEFINE_DIRECTIVE);
   arg_sub->parent = sub;
   arg_sub->macro = node;
   nodes.emplace_back(arg_sub);
@@ -1803,6 +1814,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     std::ostream &err) {
 
   Substitution *exp = CreateSubstitution(mx::FromPasta(node.Kind()));
+  assert(exp->kind == mx::MacroKind::EXPANSION);
 
   exp->parent = sub;
   exp->macro = node;
@@ -1908,11 +1920,10 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     }
 
     assert(exp->body.empty());
-    exp->body.swap(pre_exp->body);
-    exp->body.prev = pre_exp->body.prev;
-    exp->body.next = pre_exp->body.next;
-
+    exp->body = std::move(pre_exp->body);
     assert(!PreExpansionOf(exp));
+
+    FixupNodeParents(exp);
   }
 
   exp->after.prev = macro_body_sub->before.prev;
@@ -2743,6 +2754,7 @@ void TokenTree::Dump(std::ostream &os) const {
 }
 
 mx::MacroKind TokenTree::Kind(void) const noexcept {
+  assert(!impl->macro || mx::FromPasta(impl->macro->Kind()) == impl->kind);
   return impl->kind;
 }
 

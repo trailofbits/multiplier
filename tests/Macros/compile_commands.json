@@ -1,147 +1,152 @@
 [
 {
 "file": "APIAvailable.c",
-"command": "clang APIAvailable.c",
+"command": "/usr/bin/cc APIAvailable.c",
 "directory": ""
 },
 {
 "file": "EmptyFunctionMacroWithParams.c",
-"command": "clang EmptyFunctionMacroWithParams.c",
+"command": "/usr/bin/cc EmptyFunctionMacroWithParams.c",
 "directory": ""
 },
 {
 "file": "C99VarArgsTokenPaste.c",
-"command": "clang C99VarArgsTokenPaste.c",
+"command": "/usr/bin/cc C99VarArgsTokenPaste.c",
 "directory": ""
 },
 {
 "file": "ConditionalPragmaMark.c",
-"command": "clang ConditionalPragmaMark.c",
+"command": "/usr/bin/cc ConditionalPragmaMark.c",
 "directory": ""
 },
 {
 "file": "ConditionalWarningMessage.c",
-"command": "clang ConditionalWarningMessage.c",
+"command": "/usr/bin/cc ConditionalWarningMessage.c",
 "directory": ""
 },
 {
 "file": "DefineInMacroUse.c",
-"command": "clang DefineInMacroUse.c",
+"command": "/usr/bin/cc DefineInMacroUse.c",
 "directory": ""
 },
 {
 "file": "DeferredPragmaCancellation.c",
-"command": "clang DeferredPragmaCancellation.c",
+"command": "/usr/bin/cc DeferredPragmaCancellation.c",
 "directory": ""
 },
 {
 "file": "DeferredSequence.c",
-"command": "clang DeferredSequence.c",
+"command": "/usr/bin/cc DeferredSequence.c",
 "directory": ""
 },
 {
 "file": "DeferredTower.c",
-"command": "clang DeferredTower.c",
+"command": "/usr/bin/cc DeferredTower.c",
 "directory": ""
 },
 {
 "file": "DeferredExpansionFromConcatenation.c",
-"command": "clang DeferredExpansionFromConcatenation.c",
+"command": "/usr/bin/cc DeferredExpansionFromConcatenation.c",
 "directory": ""
 },
 {
 "file": "Defined.c",
-"command": "clang Defined.c",
+"command": "/usr/bin/cc Defined.c",
 "directory": ""
 },
 {
 "file": "EmptyDirective.c",
-"command": "clang EmptyDirective.c",
+"command": "/usr/bin/cc EmptyDirective.c",
 "directory": ""
 },
 {
 "file": "EmptyMacro.c",
-"command": "clang EmptyMacro.c",
+"command": "/usr/bin/cc EmptyMacro.c",
 "directory": ""
 },
 {
 "file": "EmptyFunctionMacro.c",
-"command": "clang EmptyFunctionMacro.c",
+"command": "/usr/bin/cc EmptyFunctionMacro.c",
 "directory": ""
 },
 {
 "file": "GNUVarArgsTokenPaste.c",
-"command": "clang GNUVarArgsTokenPaste.c",
+"command": "/usr/bin/cc GNUVarArgsTokenPaste.c",
 "directory": ""
 },
 {
 "file": "HasFeature.c",
-"command": "clang HasFeature.c",
+"command": "/usr/bin/cc HasFeature.c",
 "directory": ""
 },
 {
 "file": "MacroCallAcrossLines.c",
-"command": "clang MacroCallAcrossLines.c",
+"command": "/usr/bin/cc MacroCallAcrossLines.c",
 "directory": ""
 },
 {
 "file": "MultiLineString.c",
-"command": "clang MultiLineString.c",
+"command": "/usr/bin/cc MultiLineString.c",
 "directory": ""
 },
 {
 "file": "NestedConditions.c",
-"command": "clang NestedConditions.c",
+"command": "/usr/bin/cc NestedConditions.c",
 "directory": ""
 },
 {
 "file": "NestedMacroConditions.c",
-"command": "clang NestedMacroConditions.c",
+"command": "/usr/bin/cc NestedMacroConditions.c",
 "directory": ""
 },
 {
 "file": "NonTreeTrailingMacroExpansion.c",
-"command": "clang NonTreeTrailingMacroExpansion.c",
+"command": "/usr/bin/cc NonTreeTrailingMacroExpansion.c",
 "directory": ""
 },
 {
 "file": "ParameterSubstitutions.c",
-"command": "clang ParameterSubstitutions.c",
+"command": "/usr/bin/cc ParameterSubstitutions.c",
 "directory": ""
 },
 {
 "file": "PragmaCancellation.c",
-"command": "clang PragmaCancellation.c",
+"command": "/usr/bin/cc PragmaCancellation.c",
 "directory": ""
 },
 {
 "file": "PragmasAreRetained.c",
-"command": "clang PragmasAreRetained.c",
+"command": "/usr/bin/cc PragmasAreRetained.c",
 "directory": ""
 },
 {
 "file": "TrailingConditionalVariadicMacro.c",
-"command": "clang TrailingConditionalVariadicMacro.c",
+"command": "/usr/bin/cc TrailingConditionalVariadicMacro.c",
 "directory": ""
 },
 {
 "file": "TrailingMacroExpansionFromPaste.c",
-"command": "clang TrailingMacroExpansionFromPaste.c",
+"command": "/usr/bin/cc TrailingMacroExpansionFromPaste.c",
+"directory": ""
+},
+{
+"file": "VAArgsPasteInVAOpt.c",
+"command": "/usr/bin/cc VAArgsPasteInVAOpt.c",
 "directory": ""
 },
 {
 "file": "VariadicCommaConcatenateIdiom.c",
-"command": "clang VariadicCommaConcatenateIdiom.c",
+"command": "/usr/bin/cc VariadicCommaConcatenateIdiom.c",
 "directory": ""
 },
 {
 "file": "VariadicPreExpansionOfComma.c",
-"command": "clang VariadicPreExpansionOfComma.c",
+"command": "/usr/bin/cc VariadicPreExpansionOfComma.c",
 "directory": ""
 },
 {
 "file": "XMacro.c",
-"command": "clang XMacro.c",
+"command": "/usr/bin/cc XMacro.c",
 "directory": ""
 }
 ]

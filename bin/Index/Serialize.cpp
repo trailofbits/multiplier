@@ -8,6 +8,7 @@
 
 #include "Serialize.h"
 
+#include <cassert>
 #include <multiplier/RPC.capnp.h>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
@@ -333,7 +334,9 @@ void SerializeMacroParameterSubstitution(const EntityMapper &es, mx::ast::Macro:
   (void) b;
   (void) e;
   SerializeMacroSubstitution(es, b, e, tt);
-  b.setVal5(es.EntityId(e.Parameter()));
+  auto param_eid = es.EntityId(e.Parameter());
+  assert(param_eid != 0);
+  b.setVal5(param_eid);
   auto t8 = e.ParameterUse();
   b.setVal8(es.EntityId(t8));
 }

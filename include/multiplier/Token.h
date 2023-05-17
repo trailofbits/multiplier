@@ -56,6 +56,7 @@ class Token final {
   friend class TokenContext;
   friend class TokenRangeIterator;
   friend class TokenRange;
+  friend class TokenReader;
   friend class TokenTree;
   friend class TokenTreeImpl;
 
@@ -148,6 +149,9 @@ class Token final {
       return std::nullopt;
     }
   }
+
+  // The macro that immediately contains this token, if any.
+  std::optional<Macro> containing_macro(void) const;
 };
 
 // Forward-only iterator over a sequence of tokens.

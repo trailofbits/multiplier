@@ -16,9 +16,6 @@ class TokenTreeVisitor {
   // Return `true` if the input substitution should be expanded or not.
   virtual bool should_expand(const MacroSubstitution &) const;
 
-  // Return `true` if the input `__VA_OPT__` should be expanded or not.
-  virtual bool should_expand(const MacroVAOpt &) const;
-
   // Choose which fragment to show.
   virtual Fragment choose(const std::vector<Fragment> &) const;
 };

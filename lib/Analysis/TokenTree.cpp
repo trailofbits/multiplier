@@ -7,14 +7,10 @@
 #include <multiplier/Analysis/TokenTree.h>
 
 #include <algorithm>
-#include <deque>
 #include <functional>
 #include <iterator>
-#include <multiplier/Entities/DefineMacroDirective.h>
-#include <multiplier/Entities/MacroExpansion.h>
 #include <multiplier/Entities/MacroParameterSubstitution.h>
-#include <multiplier/Entities/MacroSubstitution.h>
-#include <multiplier/Entities/MacroVAOpt.h>
+#include <multiplier/Entities/MacroParameter.h>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -34,60 +30,19 @@
 namespace mx {
 namespace {
 
-// The index of a token is the index of a specific reader, followed by the
-// offset of the token within that reader.
-using TokenIndex = std::pair<EntityOffset, EntityOffset>;
-
 static const std::hash<std::string> kHasher;
 
-struct ChoiceNode;
-struct SubstitutionNode;
-struct SequenceNode;
-using Node = std::variant<std::monostate, TokenIndex, ChoiceNode *,
-                          SubstitutionNode *, SequenceNode *>;
-
-// A choice among fragments.
-struct ChoiceNode final {
-  std::vector<Fragment> fragments;
-  std::vector<Node> children;
-};
-
-// A choice among the different stages of macro expansion.
-struct SubstitutionNode final {
-  std::variant<MacroSubstitution, MacroVAOpt> macro;
-
-  Node before;
-  Node after;
-
-  inline explicit SubstitutionNode(MacroSubstitution sub_)
-      : macro(std::move(sub_)) {}
-
-  inline explicit SubstitutionNode(MacroVAOpt va_opt_)
-      : macro(std::move(va_opt_)) {}
-};
-
-// A sequence of other nodes.
-struct SequenceNode final {
-  std::vector<Node> children;
-
-  Node Flatten(void) {
-    auto num_children = children.size();
-    if (!num_children) {
-      return {};
-    } else if (num_children == 1u) {
-      return children.front();
-    } else {
-      return this;
-    }
+#define FILL_MACRO_CHILREN(generator, children_name, file_tokens_name) \
+  std::vector<MacroOrToken> children_name; \
+  std::vector<Token> file_tokens_name; \
+  for (MacroOrToken mt : generator) { \
+    if (std::holds_alternative<Token>(mt)) { \
+      file_tokens_name.emplace_back(std::get<Token>(mt).file_token()); \
+    } else { \
+      file_tokens_name.emplace_back(LeftCornerOfUse(std::get<Macro>(mt)).file_token()); \
+    } \
+    children_name.emplace_back(std::move(mt)); \
   }
-};
-
-// Inclusive bounds of something, e.g. the body of a macro.
-struct Bounds {
-  EntityOffset reader_index;
-  EntityOffset begin_index;
-  EntityOffset end_index;
-};
 
 // Return the leftmost use tokens of a macro.
 static Token LeftCornerOfExpansion(const Macro &exp) {
@@ -114,6 +69,53 @@ static Token RightCornerOfUse(const Macro &exp) {
   return ret;
 }
 
+
+// If the `i`th thing of `before` is a `, ## __VA_ARGS__` then return `true`
+// if the `__VA_ARGS__` expands to something, and `false` if it expands to
+// nothing. If it's not a paste of `__VA_ARGS__` then return `std::nullopt`.
+static std::optional<bool> EndsWithEmptyVAArgs(
+    const std::vector<MacroOrToken> &before) {
+  auto num_entries = before.size();
+  if (3u > num_entries) {
+    return std::nullopt;
+  }
+
+  const Token *comma = std::get_if<Token>(&(before[num_entries - 3u]));
+  const Token *hash_hash = std::get_if<Token>(&(before[num_entries - 2u]));
+  const Macro *param_sub = std::get_if<Macro>(&(before[num_entries - 1u]));
+
+  if (!comma || !hash_hash || !param_sub) {
+    return std::nullopt;
+  }
+
+  if (comma->kind() != TokenKind::COMMA ||
+      hash_hash->kind() != TokenKind::HASH_HASH ||
+      param_sub->kind() != MacroKind::PARAMETER_SUBSTITUTION) {
+    return std::nullopt;
+  }
+
+  // Not a `...` or a GNU named variadic argument, e.g. `args...`.
+  auto param = MacroParameterSubstitution::from(*param_sub);
+  if (!param) {
+    return std::nullopt;
+  }
+
+  Token va_args = LeftCornerOfUse(param.value());
+  if (va_args.data() != "__VA_ARGS__") {
+
+    // If it's not `__VA_ARGS__`, then it might be a GNU named variadic
+    // argument.
+    //
+    // TODO(pag): Eventually just use this method. Old indexers had issues
+    //            serializing parameter references.
+    if (!param->parameter().variadic_dots()) {
+      return std::nullopt;
+    }
+  }
+
+  return !LeftCornerOfExpansion(*param_sub);
+}
+
 // Go look for a macro expansion at the end of another macro expansion. This
 // is indicative of a specific corner case with macros, e.g.:
 //
@@ -137,6 +139,153 @@ static std::optional<MacroExpansion> TrailingExpansionInExpansion(
   return ret;
 }
 
+// We want to match the body of a macro, or the intermediate children of a macro
+// with the expansion of a macro. To best do this, we need to match the actual
+// uses of an expansion themselves, and align on those. This does the flattening
+// in a way that maximizes our chances of merging against a macro body or an
+// intermediate macro body.
+static void FlattenExpansionUses(
+    MacroOrToken mt, std::vector<MacroOrToken> &out) {
+  if (std::holds_alternative<Token>(mt)) {
+    out.emplace_back(std::move(mt));
+  } else if (std::holds_alternative<Macro>(mt)) {
+    Macro m = std::move(std::get<Macro>(mt));
+    switch (m.kind()) {
+      case MacroKind::EXPANSION:
+      case MacroKind::CONCATENATE:
+      case MacroKind::SUBSTITUTION:
+      case MacroKind::ARGUMENT:
+        for (MacroOrToken sub_mt : m.children()) {
+          FlattenExpansionUses(std::move(sub_mt), out);
+        }
+        break;
+      default:
+        out.emplace_back(std::move(m));
+        break;
+    }
+  } else {
+    assert(false);
+  }
+}
+
+static std::optional<MacroVAOpt> AsMacroVAOpt(const MacroOrToken &mt) {
+  if (!std::holds_alternative<Macro>(mt)) {
+    return std::nullopt;
+  }
+  return MacroVAOpt::from(std::get<Macro>(mt));
+}
+
+// Conditionally take the `...` of a `__VA_OPT__(...)` and put it into `out`.
+// This will be more likely to match against an expanded macro body.
+//
+// TODO(pag): Think about whitespace prior to the `__VA_OPT__`. Maybe have a
+//            way of "drilling up" to the relevant thing in the logic that
+//            injects whitespace?
+static void GenerateVAOptChildrenInto(MacroVAOpt va_opt,
+                                      std::vector<MacroOrToken> &out) {
+  if (va_opt.contents_are_elided()) {
+    return;
+  }
+
+  for (MacroOrToken mt : va_opt.children()) {
+    if (Macro *m = std::get_if<Macro>(&mt);
+        m && m->kind() == MacroKind::VA_OPT_ARGUMENT) {
+      out.emplace_back(std::move(mt));
+    }
+  }
+}
+
+
+// Tries to figure out if we're in an obscure non-tree trailing macro
+// expansion case. This happens with things like:
+//
+//      #define HEAD TAIL(
+//      #define TAIL(x) x
+//      ...
+//        return HEAD 1);
+//
+// This can be complicated by recursive use of tail-macros, e.g.:
+//
+//      #define HEAD DO_TAIL
+//      #define DO_TAIL TAIL(
+//      #define TAIL(x) x
+//      ...
+//        return HEAD 1);
+static std::optional<MacroExpansion> NonTreeTailExpansion(
+    const DefineMacroDirective &def_containing_te_use,
+    const MacroExpansion &exp_containing_te_use,
+    const MacroExpansion &te) {
+
+  // Get the right corner of the macro use for the trailing expansion. We want
+  // to identify if the `)` of a function-like macro call isn't from inside
+  // `bounds`.
+  Token rc_use = RightCornerOfUse(te);
+  D( std::cerr << " rc_use " << rc_use.id() << ": " << rc_use.data() << '\n'; )
+  if (!rc_use) {
+    return std::nullopt;
+  }
+
+  std::optional<MacroExpansion> next_te = TrailingExpansionInExpansion(te);
+
+  if (!next_te) {
+    Token rc_def = RightCornerOfUse(def_containing_te_use);
+    D( std::cerr << " rc_def " << rc_def.id() << ": " << rc_def.data() << '\n'; )
+
+    // If this is the deepest macro expansion, and if the right corner of the
+    // macro use, which is presumably a `)`, is directly derived from the
+    // right corner of the macro definition, then we're in a simple expansion.
+    if (rc_use.file_token() == rc_def.file_token()) {
+      return std::nullopt;
+    }
+
+    // Next, try to figure out if the `)` came from an argument, e.g. in the
+    // case of the `_Pragma`s `)` in `MACRO(_Pragma(...))`.
+    std::optional<Macro> parent = rc_use.derived_token().containing_macro();
+    for (; parent; parent = parent->parent()) {
+      if (parent.value() == exp_containing_te_use) {
+        return std::nullopt;
+      }
+    }
+
+    return te;
+  }
+
+  // We probably have a trailing expansion. One corner case that gets in the
+  // way is `_Pragma`s, which are not subjected to the argument pre-expansion
+  // phase, and so their expansions show up in the `.replacement_children()`,
+  // not in the `MacroArgument`s.
+
+  // If `te` is a trailing expansion that itself contains a trailing expansion
+  // `next_te`, then we can only really do analysis if we can locate elements of
+  // `next_te`s use in the defintion of `te`. If we have no such definition,
+  // then bail out.
+  std::optional<DefineMacroDirective> te_def = te.definition();
+  if (!te_def) {
+    return std::nullopt;
+  }
+
+  D( std::cerr << "Recursing into " << te_def->name().data()
+               << "'s trailing expansion\n"; )
+
+  std::optional<MacroExpansion> nte = NonTreeTailExpansion(
+      te_def.value(), te, next_te.value());
+  if (!nte.has_value()) {
+    return std::nullopt;
+  }
+
+  D( std::cerr << "Found non-tree trailing" << nte->definition()->name().data()
+               << '\n'; )
+
+  // Need to detect the case of a `_Pragma` expansion. We do this by checking if
+  // the nested expansion `)` matches the current expansion `)`.
+  Token nte_rc_use = RightCornerOfUse(nte.value());
+  if (nte_rc_use.derived_token() == rc_use) {
+    return std::nullopt;
+  }
+
+  return nte;
+}
+
 struct BodyTokenForChild {
   // The child from the replacement body of a macro substitution.
   MacroOrToken mt;
@@ -148,6 +297,8 @@ struct BodyTokenForChild {
   // Tells us if the tokens are from the usage site, i.e. argument tokens.
   bool is_argument;
 
+  BodyTokenForChild(void) = delete;
+
   inline BodyTokenForChild(MacroOrToken mt_, Token definition_token_,
                            bool is_argument_)
       : mt(std::move(mt_)),
@@ -155,39 +306,67 @@ struct BodyTokenForChild {
         is_argument(is_argument_) {}
 };
 
-struct MacroExpansionProcessor {
+}  // namespace
+
+struct TokenTreeImpl::MacroExpansionProcessor {
 
   std::vector<MacroOrToken> body_children;
   std::vector<MacroOrToken> after_children;
   std::vector<BodyTokenForChild> merged_children;
 
-//  // Marker tokens for whitespace injection.
-//  std::vector<Token> tokens_for_whitespace;
-//  std::vector<Bounds> bounds_for_whitespace;
-
   void Init(const MacroExpansion &me, const DefineMacroDirective &def);
   bool Run(bool is_non_tree);
-
-  void InitTrailingNonTree(const MacroExpansion &te);
 
   inline const std::vector<BodyTokenForChild> &ReplacementChildren(void) const {
     return merged_children;
   }
 };
 
-void MacroExpansionProcessor::Init(const MacroExpansion &me,
-                                   const DefineMacroDirective &def) {
+void TokenTreeImpl::MacroExpansionProcessor::Init(
+    const MacroExpansion &me, const DefineMacroDirective &def) {
 
   body_children.clear();
   after_children.clear();
   merged_children.clear();
 
   for (MacroOrToken mt : me.replacement_children()) {
-    after_children.emplace_back(std::move(mt));
+    FlattenExpansionUses(std::move(mt), after_children);
   }
 
   for (MacroOrToken mt : me.intermediate_children()) {
-    body_children.emplace_back(std::move(mt));
+
+    // Expand or eliminate a `__VA_OPT__`.
+    //
+    // TODO(pag): Leading whitespace? Maybe have a new variant that can hold
+    //            on to some token for whitespace purposes, or a new vector
+    //            for leading whitespace.
+    if (std::optional<MacroVAOpt> va_opt = AsMacroVAOpt(mt)) {
+      GenerateVAOptChildrenInto(std::move(va_opt.value()), body_children);
+
+      // NOTE(pag): `__VA_OPT__` can contain `, ## __VA_ARGS__`.
+
+    } else {
+      body_children.emplace_back(std::move(mt));
+    }
+
+    // If the thing has a use of `## , __VA_ARGS__`, then we need to convert
+    // this into `, <stuff>` or nothing.
+    if (auto is_empty = EndsWithEmptyVAArgs(body_children)) {
+      D( std::cerr << "BT(" << (body_children.size() - 3)
+                   << ") has `, ## __VA_ARGS__`\n"; )
+
+      mt = std::move(body_children.back());
+      body_children.pop_back();
+      body_children.pop_back();  // `##`.
+      MacroOrToken comma = std::move(body_children.back());
+      body_children.pop_back();
+
+      if (!is_empty.value()) {
+        body_children.push_back(std::move(comma));
+        FlattenExpansionUses(std::move(mt), body_children);
+      }
+
+    }
   }
 
   if (body_children.empty()) {
@@ -197,19 +376,7 @@ void MacroExpansionProcessor::Init(const MacroExpansion &me,
   }
 }
 
-void MacroExpansionProcessor::InitTrailingNonTree(const MacroExpansion &te) {
-  after_children.clear();
-  merged_children.clear();
-
-  for (MacroOrToken mt : te.children()) {
-    after_children.emplace_back(std::move(mt));
-  }
-
-  std::reverse(after_children.begin(), after_children.end());
-  std::reverse(body_children.begin(), body_children.end());
-}
-
-bool MacroExpansionProcessor::Run(bool is_non_tree) {
+bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
   size_t i = 0u;
   size_t j = 0u;
 
@@ -231,6 +398,7 @@ bool MacroExpansionProcessor::Run(bool is_non_tree) {
     bool is_argument = false;
 
     if (!bt_tok) {
+      assert(std::holds_alternative<Macro>(bt));
       const Macro &bt_macro = std::get<Macro>(bt);
       is_argument = bt_macro.kind() == MacroKind::PARAMETER_SUBSTITUTION;
       bt_lc = LeftCornerOfExpansion(bt_macro);
@@ -238,8 +406,10 @@ bool MacroExpansionProcessor::Run(bool is_non_tree) {
     }
 
     if (!at_tok) {
+      assert(std::holds_alternative<Macro>(at));
       at_lc = LeftCornerOfUse(std::get<Macro>(at));
       at_tok = &at_lc;
+      assert(*at_tok);
     }
 
     assert(bt_tok && at_tok);
@@ -247,7 +417,11 @@ bool MacroExpansionProcessor::Run(bool is_non_tree) {
     D( std::cerr << "BT(" << i << "): " << bt_tok->id() << ' ' << bt_tok->data() << '\n'; )
     D( std::cerr << "AT(" << j << "): " << at_tok->id() << ' ' << at_tok->data() << "\n\n"; )
 
-    if (bt_tok->data() == at_tok->data()) {
+    // A parameter was substituted with nothing.
+    if (!bt_lc) {
+      ++i;
+
+    } else if (bt_tok->data() == at_tok->data()) {
       merged_children.emplace_back(at, bt_tok->file_token(), is_argument);
       ++i;
       ++j;
@@ -259,155 +433,115 @@ bool MacroExpansionProcessor::Run(bool is_non_tree) {
     }
   }
 
+#if D( 1 + ) 0
+  for (auto missing_j = j; missing_j < max_j; ++missing_j) {
+    const MacroOrToken &at = after_children[missing_j];
+    const Token *at_tok = std::get_if<Token>(&at);
+    if (!at_tok) {
+      at_lc = LeftCornerOfExpansion(std::get<Macro>(at));
+      at_tok = &at_lc;
+    }
+    std::cerr << "MISSING_AT(" << missing_j << "): "
+              << at_tok->id() << ' ' << at_tok->data() << "\n";
+  }
+#endif
+
   if (is_non_tree) {
-    return j == max_j;
+    return j == max_j || i == max_i;
   }
 
   for (; j < max_j; ++j) {
     merged_children.emplace_back(after_children[j], Token(), false);
   }
 
+#if D( 1 + ) 0
+  for (auto missing_i = i; missing_i < max_i; ++missing_i) {
+    const MacroOrToken &bt = body_children[missing_i];
+    const Token *bt_tok = std::get_if<Token>(&bt);
+    if (!bt_tok) {
+      bt_lc = LeftCornerOfExpansion(std::get<Macro>(bt));
+      bt_tok = &bt_lc;
+    }
+    std::cerr << "MISSING_BT(" << missing_i << "): "
+              << bt_tok->id() << ' ' << bt_tok->data() << "\n";
+  }
+#endif
+
   return i == max_i && j == max_j;
 }
 
-}  // namespace
+// NOTE(pag): This will reset `curr_leaf` if `that == curr_leaf` and
+//            `curr_leaf` is empty.
+template <typename T>
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddToSequence(
+    SequenceNode *seq, T *that) {
+  if (!that) {
+    return seq;
+  }
 
-class TokenTreeImpl {
- public:
-  // If this is a token tree for a file then this is the file. If this is the
-  // token tree for a fragment, then this is the fragment's file, if any.
-  FileImplPtr file;
-
-  // If this is a token tree for a single fragment, then this is the single
-  // fragment itself.
-  FragmentImplPtr fragment;
-
-  // The list of token readers used in this fragment. There is always one
-  // entry in this list. The first entry is always either a file token reader,
-  // or an invalid token reader. This is indexed by a `TokenIndex`.
-  std::vector<TokenReader::Ptr> readers;
-
-  Node root;
-
-  std::deque<ChoiceNode> choices;
-  std::deque<SubstitutionNode> substitutions;
-  std::deque<SequenceNode> sequences;
-
-  // Helper to process macro expansions.
-  std::unique_ptr<MacroExpansionProcessor> mep;
-
-  TokenIndex GetOrCreateIndex(const Token &tok);
-  SequenceNode *AddLeadingTokensInBounds(SequenceNode *seq, const Token &tok,
-                                         const Bounds &bounds);
-  SequenceNode *ExtendWithMacroChild(SequenceNode *seq, const MacroOrToken &mt,
-                                     const Bounds &bounds);
-  SequenceNode *ExtendWithMacroChildren(SequenceNode *seq, const Macro &macro,
-                                        const Bounds &bounds);
-  SequenceNode *ExtendWithMacro(SequenceNode *seq, const Macro &macro,
-                                const Bounds &bounds);
-  SequenceNode *ExtendWithVAOpt(SequenceNode *seq, const MacroVAOpt &macro,
-                                const Bounds &bounds);
-
-  SequenceNode *ExtendWithSubstitution(
-        SequenceNode *seq, const MacroSubstitution &macro,
-        const Bounds &bounds);
-
-  SequenceNode *ExtendWithExpansion(
-      SequenceNode *seq, const MacroExpansion &macro,
-      const Bounds &user_bounds);
-
-  SequenceNode *ExtendWithSimpleExpansion(
-      SequenceNode *seq, const MacroExpansion &macro,
-      const DefineMacroDirective &def, const Bounds &user_bounds,
-      const Bounds &def_bounds);
-
-  SequenceNode *ExtendWithNonTreeExpansion(
-      SequenceNode *seq,
-      const MacroExpansion &me, const Bounds &me_bounds,
-      const DefineMacroDirective &def, const Bounds &def_bounds,
-      const MacroExpansion &te, const Bounds &te_bounds,
-      const MacroExpansion &deepest_te, const Bounds &deepest_te_use_bounds);
-
-//  SequenceNode *MergeAndFormReplacement(
-//      SequenceNode *before, const DefineMacroDirective &def,
-//      std::vector<MacroOrToken> body, std::vector<MacroOrToken> after);
-
-  Node CreateFragmentNode(const Fragment &entity, const Bounds &bounds);
-  Node CreateFileNode(const File &entity);
-
-  Bounds FragmentBounds(const TokenRange &tokens);
-  std::optional<Bounds> MacroBodyBounds(const DefineMacroDirective &def);
-  std::optional<Bounds> TopLevelUseBounds(const Macro &macro);
-
-  // NOTE(pag): This will reset `curr_leaf` if `that == curr_leaf` and
-  //            `curr_leaf` is empty.
-  template <typename T>
-  SequenceNode *AddToSequence(SequenceNode *seq, T *that) {
-    if (!that) {
+  if constexpr (std::is_same_v<SequenceNode, T>) {
+    if (seq == that) {
+      return seq;
+    } else if (!seq) {
+      return that;
+    } else if (seq->children.empty()) {
+      return that;
+    } else if (that->children.empty()) {
+      return seq;
+    } else {
+      seq->children.insert(seq->children.end(), that->children.begin(),
+                           that->children.end());
       return seq;
     }
 
-    if constexpr (std::is_same_v<SequenceNode, T>) {
-      if (seq == that) {
-        return seq;
-      } else if (!seq) {
-        return that;
-      } else if (seq->children.empty()) {
-        return that;
-      } else if (that->children.empty()) {
-        return seq;
-      } else {
-        seq->children.insert(seq->children.end(), that->children.begin(),
-                             that->children.end());
-        return seq;
-      }
-
-    // Try to fold single-item choice nodes.
-    } else if constexpr (std::is_same_v<ChoiceNode, T>) {
-      if (that->children.size() == 1u) {
-        return AddNodeToSequence(seq, that->children.front());
-      }
+  // Try to fold single-item choice nodes.
+  } else if constexpr (std::is_same_v<ChoiceNode, T>) {
+    if (that->children.size() == 1u) {
+      return AddNodeToSequence(seq, that->children.front());
     }
-
-    if (!seq) {
-      seq = &(sequences.emplace_back());
-    }
-
-    seq->children.emplace_back(that);
-    return seq;
   }
 
-
-  SequenceNode *AddTokenToSequence(SequenceNode *seq, const Token &tok) {
-    return AddTokenToSequence(seq, GetOrCreateIndex(tok));
+  if (!seq) {
+    seq = &(sequences.emplace_back());
   }
 
-  SequenceNode *AddTokenToSequence(SequenceNode *seq, TokenIndex ti) {
-    if (!seq) {
-      seq = &(sequences.emplace_back());
-    }
-    seq->children.push_back(ti);
-    return seq;
-  }
+  seq->children.emplace_back(that);
+  return seq;
+}
 
-  SequenceNode *AddNodeToSequence(SequenceNode *seq, const Node &node) {
-    return std::visit<SequenceNode *>(
-        [=] (auto &&arg) -> SequenceNode * {
-          using arg_t = std::decay_t<decltype(arg)>;
-          if constexpr (std::is_pointer_v<arg_t>) {
-            return AddToSequence(seq, arg);
-          } else if constexpr (std::is_same_v<arg_t, TokenIndex>) {
-            return AddTokenToSequence(seq, arg);
-          } else {
-            return seq;
-          }
-        },
-        node);
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddTokenToSequence(
+    SequenceNode *seq, const Token &tok) {
+  return AddTokenToSequence(seq, GetOrCreateIndex(tok));
+}
+
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddTokenToSequence(
+    SequenceNode *seq, TokenIndex ti) {
+  if (!seq) {
+    seq = &(sequences.emplace_back());
   }
-};
+  seq->children.push_back(ti);
+  return seq;
+}
+
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddNodeToSequence(
+    SequenceNode *seq, const Node &node) {
+  return std::visit<SequenceNode *>(
+      [=] (auto &&arg) -> SequenceNode * {
+        using arg_t = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_pointer_v<arg_t>) {
+          return AddToSequence(seq, arg);
+        } else if constexpr (std::is_same_v<arg_t, TokenIndex>) {
+          return AddTokenToSequence(seq, arg);
+        } else {
+          return seq;
+        }
+      },
+      node);
+}
 
 // Find the bounds of a top-level macro use.
-std::optional<Bounds> TokenTreeImpl::TopLevelUseBounds(const Macro &exp) {
+std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::TopLevelUseBounds(
+    const Macro &exp) {
   Bounds ret = {};
   Token last_tok;
   for (Token tok : exp.generate_use_tokens()) {
@@ -438,11 +572,7 @@ std::optional<Bounds> TokenTreeImpl::TopLevelUseBounds(const Macro &exp) {
   return ret;
 }
 
-Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
-  if (!mep) {
-    mep.reset(new MacroExpansionProcessor);
-  }
-
+TokenTreeImpl::Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
   Bounds ret = {};
   if (!tokens.empty()) {
     auto [ri_begin, ti_begin] = GetOrCreateIndex(tokens.front());
@@ -465,7 +595,7 @@ Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
 }
 
 // Find the bounds of a macro definition body.
-std::optional<Bounds> TokenTreeImpl::MacroBodyBounds(
+std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
     const DefineMacroDirective &def) {
 
   Bounds ret = {};
@@ -521,7 +651,7 @@ std::optional<Bounds> TokenTreeImpl::MacroBodyBounds(
 
 // Get a `TokenIndex` for `tok`. This will save the reader into the token tree
 // if it can't be found, formulating a new token index position for that reader.
-TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
+TokenTreeImpl::TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
   EntityOffset i = 0u;
   for (TokenReader::Ptr &reader : readers) {
     if (reader == tok.impl) {
@@ -534,22 +664,86 @@ TokenIndex TokenTreeImpl::GetOrCreateIndex(const Token &tok) {
   return TokenIndex(i, tok.offset);
 }
 
+// Get the `TokenIndex` that is the right corner of an existing use.
+static std::optional<TokenTreeImpl::TokenIndex> RightCornerOfUse(
+    const TokenTreeImpl::Node &node) {
+  if (std::holds_alternative<TokenTreeImpl::TokenIndex>(node)) {
+    return std::get<TokenTreeImpl::TokenIndex>(node);
+
+  } else if (std::holds_alternative<TokenTreeImpl::ChoiceNode *>(node)) {
+    return RightCornerOfUse(
+        std::get<TokenTreeImpl::ChoiceNode *>(node)->children.front());
+
+  } else if (std::holds_alternative<TokenTreeImpl::SequenceNode *>(node)) {
+    if (auto seq = std::get<TokenTreeImpl::SequenceNode *>(node);
+        seq && !seq->children.empty()) {
+      return RightCornerOfUse(seq->children.back());
+    }
+  } else if (std::holds_alternative<TokenTreeImpl::SubstitutionNode *>(node)) {
+    if (auto sub = std::get<TokenTreeImpl::SubstitutionNode *>(node)) {
+      return RightCornerOfUse(sub->before);
+    }
+  }
+  return std::nullopt;
+}
+
 // Counts the number of tokens after `begin` and before `end` that we can
 // inject before the token which logically represents `end`.
 static EntityOffset CountInjectable(const TokenReader::Ptr &reader,
-                                    EntityOffset begin, EntityOffset end) {
+                                    const TokenTreeImpl::Bounds &bounds,
+                                    TokenTreeImpl::TokenIndex upper_bound,
+                                    TokenTreeImpl::SequenceNode *seq,
+                                    int depth) {
+  EntityOffset begin = bounds.begin_index;
+  EntityOffset end = upper_bound.second;
   EntityOffset count = 0u;
-  for (auto i = end - 1u; begin < i; ++count, --i) {
+
+  // If we're at a file level, then allow us to suck in more tokens.
+  if (!depth) {
+    if (auto rc = RightCornerOfUse(seq)) {
+
+      // Allow unbounded whitespace/comment injection, but nothing else.
+      if (rc->first != upper_bound.first) {
+        depth = 1;
+        begin = 0;
+
+      // If the previous thing is from the same reader, then allow injection
+      // from it.
+      } else if (rc->first == upper_bound.first) {
+        begin = rc->second + 1u;
+      }
+
+      // TODO(pag): Have observed issues where `bounds` and `rc`s reader indices
+      //            don't match. This is likely due to subtleties related to the
+      //            how `bounds` is simplistically passed down.
+    }
+
+    // TODO(pag): We know that the reader index for files will always be zero,
+    //            so should be check that here?
+  }
+
+  for (auto i = end - 1u; begin <= i; ++count, --i) {
     switch (reader->NthTokenKind(i)) {
       case TokenKind::WHITESPACE:
       case TokenKind::COMMENT:
       case TokenKind::UNKNOWN:
         if (!reader->NthTokenData(i).empty()) {
+          D( std::cerr << "Injectable (depth=" << depth << "): "
+                       << reader->NthTokenData(i) << '\n'; )
           continue;
         }
         [[clang::fallthrough]];
       default:
-        return count;
+        if (depth) {
+          D( std::cerr << "Not injectable (depth=" << depth << "): "
+                       << reader->NthTokenData(i) << '\n'; )
+          return count;
+        } else {
+          continue;
+        }
+    }
+    if (!i) {
+      break;
     }
   }
   return count;
@@ -557,7 +751,7 @@ static EntityOffset CountInjectable(const TokenReader::Ptr &reader,
 
 // Try to add leading file tokens into `node` that should logically come from
 // before `tok`.
-SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
     SequenceNode *seq, const Token &tok, const Bounds &bounds) {
 
   Token file_tok = tok.file_token();
@@ -573,7 +767,7 @@ SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
 
   // Inject the missing whitespace/comment tokens.
   const TokenReader::Ptr &fti_reader = readers[fti.first];
-  for (auto num = CountInjectable(fti_reader, bounds.begin_index, fti.second);
+  for (auto num = CountInjectable(fti_reader, bounds, fti, seq, depth);
        num; --num) {
     seq = AddTokenToSequence(seq, TokenIndex(fti.first, fti.second - num));
   }
@@ -581,8 +775,9 @@ SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
   return seq;
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
     SequenceNode *seq, const MacroOrToken &mt, const Bounds &bounds) {
+
   if (std::holds_alternative<Token>(mt)) {
     const Token &tok = std::get<Token>(mt);
     seq = AddLeadingTokensInBounds(seq, tok, bounds);
@@ -597,37 +792,38 @@ SequenceNode *TokenTreeImpl::ExtendWithMacroChild(
   }
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithMacroChildren(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacroChildren(
     SequenceNode *seq, const Macro &macro, const Bounds &bounds) {
-  for (MacroOrToken mt : macro.children()) {
-    seq = ExtendWithMacroChild(seq, mt, bounds);
-  }
-  return seq;
+  FILL_MACRO_CHILREN(macro.children(), mts, fts)
+  return ProcessMacroChildren(seq, bounds, std::move(mts), std::move(fts));
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
     SequenceNode *seq, const MacroExpansion &me,
     const DefineMacroDirective &me_def, const Bounds &user_bounds,
     const Bounds &def_bounds) {
 
-  mep->Init(me, me_def);
-  if (!mep->Run(false)) {
+  MacroExpansionProcessor mep;
+  mep.Init(me, me_def);
+  if (!mep.Run(false)) {
     assert(false);  // Probably a bug.
     return ExtendWithSubstitution(seq, me, user_bounds);
   }
 
-  SubstitutionNode *sub = &(substitutions.emplace_back(me));
-  SequenceNode *before = nullptr;
-  for (MacroOrToken mt : me.children()) {
-    before = ExtendWithMacroChild(before, mt, user_bounds);
-  }
+  FILL_MACRO_CHILREN(me.children(), mts, fts)
+  SequenceNode *before = ProcessMacroChildren(
+      nullptr, user_bounds, std::move(mts), std::move(fts));
 
   if (!before) {
     return nullptr;
   }
 
+  auto prev_depth = depth;
+  auto next_depth = depth + 1;
+
   SequenceNode *after = nullptr;
-  for (const BodyTokenForChild &node : mep->ReplacementChildren()) {
+  for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
+    depth = next_depth;
     after = AddLeadingTokensInBounds(after, node.definition_token, def_bounds);
     if (node.is_argument) {
       after = ExtendWithMacroChild(after, node.mt, user_bounds);
@@ -636,13 +832,74 @@ SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
     }
   }
 
+  SubstitutionNode *sub = &(substitutions.emplace_back(me));
   sub->before = before;
-
   if (after) {
     sub->after = after;
   }
 
+  depth = prev_depth;
   return AddToSequence(seq, sub);
+}
+
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
+    TokenTreeImpl::SequenceNode *seq, const Bounds &bounds,
+    std::vector<MacroOrToken> mts, std::vector<Token> fts) {
+
+  size_t num_mts = mts.size();
+
+  for (auto i = 0u; i < num_mts; ++i) {
+    const MacroOrToken &mt = mts[i];
+
+    if (std::holds_alternative<Token>(mt)) {
+      const Token &tok = std::get<Token>(mt);
+      seq = AddLeadingTokensInBounds(seq, fts[i], bounds);
+      seq = AddTokenToSequence(seq, tok);
+      continue;
+    }
+
+    if (!std::holds_alternative<Macro>(mt)) {
+      assert(false);
+      continue;
+    }
+
+    const Macro &m = std::get<Macro>(mt);
+    const Token &lc_ft = fts[i];
+
+    // Try to get stricter bounds on the macro use.
+    if (!lc_ft) {
+      seq = ExtendWithMacro(seq, m, bounds);
+      continue;
+    }
+
+    TokenIndex lc_index = GetOrCreateIndex(lc_ft);
+    Bounds new_bounds = bounds;
+    if (new_bounds.reader_index != lc_index.first) {
+      seq = ExtendWithMacro(seq, m, bounds);
+      continue;
+    }
+
+    assert(new_bounds.begin_index <= lc_index.second);
+    new_bounds.begin_index = lc_index.second;
+
+    if ((i + 1u) < num_mts) {
+      const Token &rc_ft = fts[i + 1u];
+      if (rc_ft) {
+        TokenIndex rc_index = GetOrCreateIndex(rc_ft);
+        if (new_bounds.reader_index == rc_index.first &&
+            rc_index.second) {
+          assert(new_bounds.begin_index <= rc_index.second);
+          assert(rc_index.second <= new_bounds.end_index);
+          new_bounds.end_index = rc_index.second - 1u;
+        }
+      }
+    }
+
+    seq = AddLeadingTokensInBounds(seq, lc_ft, bounds);
+    seq = ExtendWithMacro(seq, m, new_bounds);
+  }
+
+  return seq;
 }
 
 // Extend with a "non-tree" macro expansion, e.g. something like:
@@ -667,129 +924,76 @@ SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
 // expansion of `HEAD`. This breaks our "meaningfulness" criteria, because
 // these tokens are top-level tokens, and so while they should appear in the
 // use of the expansion, they should also show up in the use itself.
-SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
     SequenceNode *seq,
     const MacroExpansion &me, const Bounds &me_bounds,
     const DefineMacroDirective &def, const Bounds &def_bounds,
-    const MacroExpansion &te, const Bounds &te_bounds,
-    const MacroExpansion &dte, const Bounds &dte_bounds) {
+    const MacroExpansion &dte) {
 
   D( std::cerr << "non-tree " << def.name().data() << "\n"; )
 
-  mep->Init(me, def);
-  if (!mep->Run(true)) {
+  auto prev_depth = depth;
+  auto next_depth = depth + 1;
+
+  MacroExpansionProcessor mep;
+  mep.Init(me, def);
+  if (!mep.Run(true)) {
     assert(false);  // Probably not a bug, just something sketchy/odd.
     return ExtendWithSubstitution(seq, me, me_bounds);
   }
 
-  SubstitutionNode *sub = &(substitutions.emplace_back(me));
-  SequenceNode *before = nullptr;
+  FILL_MACRO_CHILREN(me.children(), mts, fts)
+  SequenceNode *before = ProcessMacroChildren(
+      nullptr, me_bounds, std::move(mts), std::move(fts));
 
-  for (MacroOrToken mt : me.children()) {
-    before = ExtendWithMacroChild(before, mt, me_bounds);
-  }
+  assert(depth == prev_depth);
 
   if (!before) {
     return seq;
   }
 
   SequenceNode *after = nullptr;
-  for (const BodyTokenForChild &node : mep->ReplacementChildren()) {
+  for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
+    depth = next_depth;
     after = AddLeadingTokensInBounds(after, node.definition_token, def_bounds);
     if (node.is_argument) {
       after = ExtendWithMacroChild(after, node.mt, me_bounds);
     } else {
       after = ExtendWithMacroChild(after, node.mt, def_bounds);
     }
+    depth = prev_depth;
   }
 
-  mep->InitTrailingNonTree(dte);
-
-//  // Collect the trailing macro nodes, including argument nodes, that were
-//  // out-of-order.
-  auto failed = true;
-  (void) te;
-  (void) te_bounds;
-  (void) dte_bounds;
-
-//  if (false && mep->Run(true)) {
-//    std::vector<BodyTokenForChild> trailing_nodes;
-//
-//    // NOTE(pag): These are in reverse order, so we start from the end (what
-//    //            we want to find) and work our way back toward the beginning.
-//    //            We stop at the token that belongs to the macro definition.
-//    for (const BodyTokenForChild &node : mep->ReplacementChildren()) {
-//      Token tok = node.definition_token;
-//      if (!node.definition_token && std::holds_alternative<Macro>(node.mt)) {
-//        tok = LeftCornerOfExpansion(std::get<Macro>(node.mt)).file_token();
-//      }
-//
-//      if (tok) {
-//        TokenIndex ti = GetOrCreateIndex(tok);
-//        if (!(ti.first == me_bounds.reader_index &&
-//              ti.second < me_bounds.begin_index &&
-//              ti.second > me_bounds.end_index)) {
-//          break;
-//
-//        } else if (ti.first == te_bounds.reader_index &&
-//                   ti.second >= te_bounds.begin_index &&
-//                   ti.second <= te_bounds.end_index) {
-//          break;
-//
-//        } else if (ti.first == dte_bounds.reader_index &&
-//                   ti.second >= dte_bounds.begin_index &&
-//                   ti.second <= dte_bounds.end_index) {
-//          break;
-//        }
-//
-//        D( std::cerr << "Allowing " << tok.data() << "\n"; )
-//      } else {
-//        D( std::cerr << "Allowing another node\n"; )
-//      }
-//
-//      trailing_nodes.emplace_back(node);
-//    }
-//
-//    std::reverse(trailing_nodes.begin(), trailing_nodes.end());
-//    for (const BodyTokenForChild &node : trailing_nodes) {
-//      failed = false;
-//      before = AddLeadingTokensInBounds(before, node.definition_token,
-//                                        me_bounds);
-//      before = ExtendWithMacroChild(before, node.mt, me_bounds);
-//    }
-//  }
-
-  // If we fail to align things, then collect the trailing tokens that were
-  // out-of-order.
-  if (failed) {
-//    assert(false);
-
-    std::vector<Token> trailing_toks;
-    for (Token te_tok : dte.generate_use_tokens()) {
-      Token te_file_tok = te_tok.file_token();
-      if (!te_file_tok) {
-        trailing_toks.clear();
-        continue;
-      }
-
-      TokenIndex ti = GetOrCreateIndex(te_file_tok);
-      if (ti.first != me_bounds.reader_index ||
-          ti.second < me_bounds.begin_index ||
-          ti.second > me_bounds.end_index) {
-        trailing_toks.clear();
-        continue;
-      }
-
-      trailing_toks.emplace_back(std::move(te_tok));
+  std::vector<Token> trailing_toks;
+  for (Token te_tok : dte.generate_use_tokens()) {
+    Token te_file_tok = te_tok.file_token();
+    if (!te_file_tok) {
+      trailing_toks.clear();
+      continue;
     }
 
-    // TODO(pag): Ideally, we'd be merging in the
-    for (const Token &tok : trailing_toks) {
-      before = AddLeadingTokensInBounds(before, tok.file_token(), me_bounds);
-      before = AddTokenToSequence(before, tok);
+    TokenIndex ti = GetOrCreateIndex(te_file_tok);
+    if (ti.first != me_bounds.reader_index ||
+        ti.second < me_bounds.begin_index ||
+        ti.second > me_bounds.end_index) {
+      trailing_toks.clear();
+      continue;
     }
+
+    D( std::cerr << "Trailing token: " << te_tok.data() << '\n'; )
+
+    trailing_toks.emplace_back(std::move(te_tok));
   }
 
+  // TODO(pag): Ideally, we'd be merging in the nodes themselves, not just
+  //            the tokens.
+  for (const Token &tok : trailing_toks) {
+    depth = prev_depth;
+    before = AddLeadingTokensInBounds(before, tok.file_token(), me_bounds);
+    before = AddTokenToSequence(before, tok);
+  }
+
+  SubstitutionNode *sub = &(substitutions.emplace_back(me));
   sub->before = before;
   if (after) {
     sub->after = after;
@@ -800,7 +1004,7 @@ SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
 
 // Extend with a macro expansion. The work here is in figuring out whether or
 // not we're in a "non-tree" case.
-SequenceNode *TokenTreeImpl::ExtendWithExpansion(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithExpansion(
     SequenceNode *seq, const MacroExpansion &me,
     const Bounds &user_bounds) {
 
@@ -822,77 +1026,39 @@ SequenceNode *TokenTreeImpl::ExtendWithExpansion(
                                      def_bounds.value());
   }
 
-  Bounds dte_use_bounds = def_bounds.value();
-  std::optional<MacroExpansion> dte = te;
-  while (auto nte = TrailingExpansionInExpansion(dte.value())) {
-    D( std::cerr << "-- drilling --\n"; )
-    if (auto nte_def = nte->definition()) {
-      if (auto nte_def_bounds = MacroBodyBounds(nte_def.value())) {
-        D( std::cerr << "-- drilled into " << nte_def->name().data() << "--\n"; )
-        dte = std::move(nte);  // Drill down through nested trailing expansions.
-        dte_use_bounds = nte_def_bounds.value();
-        continue;
-      }
-    }
-    break;
-  }
-
-  // Get the right corner of the macro use for the trailing expansion. We want
-  // to identify if the `)` of a function-like macro call isn't from inside
-  // `bounds`.
-  Token rc = RightCornerOfUse(dte.value());
-  if (!rc) {
-    return ExtendWithSimpleExpansion(seq, me, def.value(), user_bounds,
-                                     def_bounds.value());
-  }
-
-  // If we can't find a file token for the right corner of the use of the
-  // nested expansion, which is presumably `)`, then this is probably a macro
-  // defined through a command-line option. Assume it won't be crazy, and that
-  // PASTA has actually done "rotations" that make it not crazy.
-  Token rc_ft = rc.file_token();
-  if (!rc_ft) {
-    return ExtendWithSimpleExpansion(seq, me, def.value(), user_bounds,
-                                     def_bounds.value());
-  }
-
-  // The right corner is likely the closing parenthesis of a function-like
-  // macro expansion. In the macro-in-tail-position, this can come from the
-  // macro use site. We can detect if it's not coming from the use site
-  // because it'll be from the body of the macro itself.
-  TokenIndex rc_ft_ti = GetOrCreateIndex(rc_ft);
-  if (rc_ft_ti.first == dte_use_bounds.reader_index &&
-      rc_ft_ti.second >= dte_use_bounds.begin_index &&
-      rc_ft_ti.second <= dte_use_bounds.end_index) {
+  auto dte = NonTreeTailExpansion(def.value(), me, te.value());
+  if (!dte) {
     return ExtendWithSimpleExpansion(seq, me, def.value(), user_bounds,
                                      def_bounds.value());
   }
 
   return ExtendWithNonTreeExpansion(
-      seq, me, user_bounds, def.value(), def_bounds.value(), te.value(),
-      def_bounds.value()  /* bounds of top-level TE are the def bounds */,
-      dte.value(), dte_use_bounds);
+      seq, me, user_bounds, def.value(), def_bounds.value(), dte.value());
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
     SequenceNode *seq, const MacroSubstitution &macro,
     const Bounds &use_bounds) {
-  SubstitutionNode *sub = &(substitutions.emplace_back(macro));
-  SequenceNode *before = nullptr;
 
-  for (MacroOrToken mt : macro.children()) {
-    before = ExtendWithMacroChild(before, mt, use_bounds);
-  }
+  auto prev_depth = depth;
+  auto next_depth = depth + 1;
+
+  FILL_MACRO_CHILREN(macro.children(), mts, fts)
+  SequenceNode *before = ProcessMacroChildren(
+      nullptr, use_bounds, std::move(mts), std::move(fts));
 
   if (!before) {
     return seq;
   }
 
+  SubstitutionNode *sub = &(substitutions.emplace_back(macro));
   sub->before = before;
 
   SequenceNode *after = nullptr;
   for (MacroOrToken mt : macro.replacement_children()) {
+    depth = next_depth;
     after = ExtendWithMacroChild(after, mt, use_bounds);
+    depth = prev_depth;
   }
 
   if (after) {
@@ -902,28 +1068,7 @@ SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
   return AddToSequence(seq, sub);
 }
 
-SequenceNode *TokenTreeImpl::ExtendWithVAOpt(
-    SequenceNode *seq, const MacroVAOpt &macro, const Bounds &bounds_of_def) {
-
-  SubstitutionNode *sub = &(substitutions.emplace_back(macro));
-  seq = AddToSequence(seq, sub);
-
-  SequenceNode *sub_before = ExtendWithMacroChildren(nullptr, macro,
-                                                     bounds_of_def);
-  assert(sub_before != nullptr);
-  sub->before = sub_before->Flatten();
-
-  if (macro.contents_are_elided()) {
-    return seq;
-  }
-
-  // TODO(pag): Only keep the arguments of the `__VA_OPT__`.
-  sub->after = sub->before;
-
-  return seq;
-}
-
-SequenceNode *TokenTreeImpl::ExtendWithMacro(
+TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithMacro(
     SequenceNode *seq, const Macro &macro, const Bounds &bounds) {
 
   if (auto ms = MacroSubstitution::from(macro)) {
@@ -932,8 +1077,6 @@ SequenceNode *TokenTreeImpl::ExtendWithMacro(
     } else {
       seq = ExtendWithSubstitution(seq, ms.value(), bounds);
     }
-  } else if (auto vo = MacroVAOpt::from(macro)) {
-    seq = ExtendWithVAOpt(seq, vo.value(), bounds);
 
   } else {
     seq = ExtendWithMacroChildren(seq, macro, bounds);
@@ -944,68 +1087,12 @@ SequenceNode *TokenTreeImpl::ExtendWithMacro(
 
 // Create a node for a fragment. If the fragment has file tokens, then the
 // returned node will "expand" out to include the file tokens.
-Node TokenTreeImpl::CreateFragmentNode(const Fragment &entity,
-                                       const Bounds &bounds) {
+TokenTreeImpl::Node TokenTreeImpl::CreateFragmentNode(
+    const Fragment &entity, const Bounds &bounds) {
 
-  SequenceNode *seq = nullptr;
-
-//  std::vector<MacroOrToken> mts;
-//  for (MacroOrToken mt : entity.preprocessed_code()) {
-//    mts.emplace_back(std::move(mt));
-//  }
-//
-//  size_t num_mts = mts.size();
-//  mts.emplace_back(entity.file_tokens().back());
-//
-//  for (auto i = 0u; i < num_mts; ++i) {
-//    const MacroOrToken &mt = mts[i];
-//
-//    if (std::holds_alternative<Token>(mt)) {
-//      const Token &tok = std::get<Token>(mt);
-//      seq = AddLeadingTokensInBounds(seq, tok, bounds);
-//      seq = AddTokenToSequence(seq, tok);
-//
-//    } else if (std::holds_alternative<Macro>(mt)) {
-//      const Macro &m = std::get<Macro>(mt);
-//      Token first = LeftCornerOfExpansion(m).file_token();
-//      Token next;
-//      if (std::holds_alternative<Macro>(mts[i + 1u])) {
-//        next = LeftCornerOfExpansion(std::get<Macro>(mts[i + 1u]));
-//      } else {
-//        next = std::get<Token>(mts[i + 1u]).file_token();
-//      }
-//
-//      auto first_ti = GetOrCreateIndex(first);
-//      auto next_ti = GetOrCreateIndex(next);
-//      if (first_ti.first == next_ti.first &&
-//          first_ti.first == bounds.reader_index &&
-//          first_ti.second <= next_ti.second && false) {
-//
-//        Bounds exp_bounds;
-//        exp_bounds.reader_index = std::max(bounds.begin_index, first_ti.first);
-//        exp_bounds.begin_index = std::min(bounds.end_index, first_ti.second);
-//        exp_bounds.end_index = next_ti.second;
-//
-//        seq = AddLeadingTokensInBounds(seq, first, bounds);
-//        seq = ExtendWithMacro(seq, m, exp_bounds);
-//
-//      } else {
-//        seq = ExtendWithMacro(seq, m, bounds);
-//      }
-//    }
-//  }
-
-  for (MacroOrToken mt : entity.preprocessed_code()) {
-    if (std::holds_alternative<Token>(mt)) {
-      const Token &tok = std::get<Token>(mt);
-      seq = AddLeadingTokensInBounds(seq, tok, bounds);
-      seq = AddTokenToSequence(seq, tok);
-
-    } else if (std::holds_alternative<Macro>(mt)) {
-      const Macro &m = std::get<Macro>(mt);
-      seq = ExtendWithMacro(seq, m, bounds);
-    }
-  }
+  FILL_MACRO_CHILREN(entity.preprocessed_code(), mts, fts)
+  SequenceNode *seq = ProcessMacroChildren(
+      nullptr, bounds, std::move(mts), std::move(fts));
 
   if (!seq) {
     return {};
@@ -1016,7 +1103,7 @@ Node TokenTreeImpl::CreateFragmentNode(const Fragment &entity,
 
 // Create a node for a file. If there are overlapping fragments in this file,
 // then this will include them.
-Node TokenTreeImpl::CreateFileNode(const File &entity) {
+TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
   // Collect all overlapping fragments into alternations.
   std::unordered_map<RawEntityId, ChoiceNode *> file_frags;
@@ -1028,11 +1115,25 @@ Node TokenTreeImpl::CreateFileNode(const File &entity) {
       continue;
     }
 
-    Bounds frag_bounds = FragmentBounds(file_toks);
-    Node frag_node = CreateFragmentNode(frag, frag_bounds);
-
     RawEntityId first_file_tok_id = file_toks.front().id().Pack();
     RawEntityId last_file_tok_id = file_toks.back().id().Pack();
+
+#ifndef NDEBUG
+    VariantId first_file_tok_vid = EntityId(first_file_tok_id).Unpack();
+    VariantId last_file_tok_vid = EntityId(last_file_tok_id).Unpack();
+    assert(std::holds_alternative<FileTokenId>(first_file_tok_vid));
+    assert(std::holds_alternative<FileTokenId>(last_file_tok_vid));
+    assert(std::get<FileTokenId>(first_file_tok_vid).file_id ==
+           std::get<FileTokenId>(last_file_tok_vid).file_id);
+    assert(std::get<FileTokenId>(first_file_tok_vid).offset <=
+           std::get<FileTokenId>(last_file_tok_vid).offset);
+#endif
+
+    Bounds frag_bounds = FragmentBounds(file_toks);
+
+    depth = 0;
+    Node frag_node = CreateFragmentNode(frag, frag_bounds);
+    assert(!depth);
 
     if (auto frag_it = file_frags.find(first_file_tok_id);
         frag_it != file_frags.end()) {
@@ -1060,6 +1161,7 @@ Node TokenTreeImpl::CreateFileNode(const File &entity) {
   for (Token file_tok : entity.tokens()) {
     RawEntityId file_tok_id = file_tok.id().Pack();
     if (stop_skip_after.has_value()) {
+      assert(!file_frags.count(file_tok_id));
       if (stop_skip_after.value() == file_tok_id) {
         stop_skip_after.reset();
       }
@@ -1071,7 +1173,11 @@ Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
       ChoiceNode *frag_node = frag_it->second;
       assert(frag_node != nullptr);
-      stop_skip_after.emplace(frag_end[file_tok_id]);
+
+      RawEntityId end_file_tok_id = frag_end[file_tok_id];
+      if (end_file_tok_id != file_tok_id) {
+        stop_skip_after.emplace(end_file_tok_id);
+      }
       seq = AddToSequence(seq, frag_node);
 
       file_frags.erase(file_tok_id);
@@ -1095,11 +1201,6 @@ bool TokenTreeVisitor::should_expand(const MacroSubstitution &) const {
   return false;
 }
 
-// Return `true` if the input `__VA_OPT__` should be expanded or not.
-bool TokenTreeVisitor::should_expand(const MacroVAOpt &) const {
-  return false;
-}
-
 // Choose which fragment to show.
 Fragment TokenTreeVisitor::choose(const std::vector<Fragment> &frags) const {
   return frags.front();
@@ -1112,16 +1213,27 @@ TokenTree::TokenTree(void)
     : TokenTree(kInvalidTree) {}
 
 TokenTree TokenTree::from(const File &file) {
-  auto self = std::make_shared<TokenTreeImpl>();
+  auto self = file.impl->cached_token_tree.Get();
+  if (self) {
+    return TokenTree(std::move(self));
+  }
+
+  self = std::make_shared<TokenTreeImpl>();
   auto file_tokens = file.tokens();
+  self->file = file.impl;
   self->readers.emplace_back(file_tokens.impl);
   self->root = self->CreateFileNode(file);
-  self->mep.reset();
-  return TokenTree(std::move(self));
+
+  return TokenTree(file.impl->cached_token_tree.Put(std::move(self)));
 }
 
 TokenTree TokenTree::from(const Fragment &frag) {
-  auto self = std::make_shared<TokenTreeImpl>();
+  auto self = frag.impl->cached_token_tree.Get();
+  if (self) {
+    return TokenTree(std::move(self));
+  }
+
+  self = std::make_shared<TokenTreeImpl>();
   self->fragment = frag.impl;
 
   if (auto opt_file = File::containing(frag)) {
@@ -1132,10 +1244,10 @@ TokenTree TokenTree::from(const Fragment &frag) {
     self->readers.emplace_back(TokenRange().impl);
   }
 
-  Bounds frag_bounds = self->FragmentBounds(frag.file_tokens());
+  TokenTreeImpl::Bounds frag_bounds = self->FragmentBounds(frag.file_tokens());
   self->root = self->CreateFragmentNode(frag, frag_bounds);
-  self->mep.reset();
-  return TokenTree(std::move(self));
+
+  return TokenTree(frag.impl->cached_token_tree.Put(std::move(self)));
 }
 
 namespace {
@@ -1144,7 +1256,7 @@ namespace {
 class TokenTreeReader final : public TokenReader {
  public:
   const std::shared_ptr<TokenTreeImpl> impl;
-  std::vector<TokenIndex> tokens;
+  std::vector<TokenTreeImpl::TokenIndex> tokens;
 
   // Offset of the first byte of data from the Nth token. This has one extra
   // element at the end that contains the size of `data`.
@@ -1165,11 +1277,7 @@ class TokenTreeReader final : public TokenReader {
   }
 
   const FileImpl *OwningFile(void) const noexcept override {
-    if (!impl->fragment) {
-      return impl->file.get();
-    } else {
-      return nullptr;
-    }
+    return impl->file.get();
   }
 
   const FragmentImpl *NthOwningFragment(EntityOffset ti) const noexcept override {
@@ -1318,34 +1426,35 @@ class TokenTreeReader final : public TokenReader {
   }
 };
 
-static void CollectTokens(const Node &node, const TokenTreeVisitor &vis,
-                          std::vector<TokenIndex> &tokens) {
+static void CollectTokens(const TokenTreeImpl::Node &node,
+                          const TokenTreeVisitor &vis,
+                          std::vector<TokenTreeImpl::TokenIndex> &tokens) {
   if (std::holds_alternative<std::monostate>(node)) {
     return;
 
-  } else if (std::holds_alternative<TokenIndex>(node)) {
-    tokens.push_back(std::get<TokenIndex>(node));
+  } else if (std::holds_alternative<TokenTreeImpl::TokenIndex>(node)) {
+    tokens.push_back(std::get<TokenTreeImpl::TokenIndex>(node));
 
-  } else if (std::holds_alternative<ChoiceNode *>(node)) {
-    if (ChoiceNode *choice = std::get<ChoiceNode *>(node)) {
+  } else if (std::holds_alternative<TokenTreeImpl::ChoiceNode *>(node)) {
+    if (TokenTreeImpl::ChoiceNode *choice =
+            std::get<TokenTreeImpl::ChoiceNode *>(node)) {
       PackedFragmentId chosen_frag = vis.choose(choice->fragments).id();
       auto i = 0u;
       for (const Fragment &frag : choice->fragments) {
         if (chosen_frag == frag.id()) {
-          const Node &frag_node = choice->children[i];
+          const TokenTreeImpl::Node &frag_node = choice->children[i];
           CollectTokens(frag_node, vis, tokens);
         }
         ++i;
       }
     }
-  } else if (std::holds_alternative<SubstitutionNode *>(node)) {
-    if (SubstitutionNode *sub = std::get<SubstitutionNode *>(node)) {
+  } else if (std::holds_alternative<TokenTreeImpl::SubstitutionNode *>(node)) {
+    if (TokenTreeImpl::SubstitutionNode *sub =
+            std::get<TokenTreeImpl::SubstitutionNode *>(node)) {
       auto should_expand = false;
       if (std::holds_alternative<MacroSubstitution>(sub->macro)) {
         should_expand = vis.should_expand(
             std::get<MacroSubstitution>(sub->macro));
-      } else if (std::holds_alternative<MacroVAOpt>(sub->macro)) {
-        should_expand = vis.should_expand(std::get<MacroVAOpt>(sub->macro));
       } else {
         assert(false);
       }
@@ -1355,9 +1464,10 @@ static void CollectTokens(const Node &node, const TokenTreeVisitor &vis,
         CollectTokens(sub->before, vis, tokens);
       }
     }
-  } else if (std::holds_alternative<SequenceNode *>(node)) {
-    if (SequenceNode *seq = std::get<SequenceNode *>(node)) {
-      for (const Node &sub_node : seq->children) {
+  } else if (std::holds_alternative<TokenTreeImpl::SequenceNode *>(node)) {
+    if (TokenTreeImpl::SequenceNode *seq =
+            std::get<TokenTreeImpl::SequenceNode *>(node)) {
+      for (const TokenTreeImpl::Node &sub_node : seq->children) {
         CollectTokens(sub_node, vis, tokens);
       }
     }

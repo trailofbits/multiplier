@@ -36,8 +36,8 @@ SpecificEntityId<MacroId> Macro::id(void) const {
 }
 
 gap::generator<Macro> Macro::containing_internal(const Token &token) {
-  auto frag = token.impl->OwningFragment();
-  if (!frag) {
+  EntityProviderPtr ep = TokenReader::EntityProviderFor(token);
+  if (!ep) {
     co_return;
   }
 
@@ -53,8 +53,8 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
   }
 
   MacroId mid = std::get<MacroId>(vid);
-  MacroImplPtr eptr = frag->ep->MacroFor(frag->ep, mid);
-  if (!eptr || mid.fragment_id != frag->fragment_id) {
+  MacroImplPtr eptr = ep->MacroFor(ep, mid);
+  if (!eptr) {
     assert(false);
     co_return;
   }
