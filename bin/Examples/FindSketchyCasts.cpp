@@ -283,7 +283,13 @@ static void FindSketchyArgumentCasts(const mx::CallExpr &call_expr) {
 
     mx::Type source_type =
         cast_expr->sub_expression().type()->canonical_type();
-    std::optional<mx::Type> dest_type = cast_expr->type();
+    std::optional<mx::Type> maybe_dest_type = cast_expr->type();
+
+    if (!maybe_dest_type) {
+      continue;
+    }
+
+    mx::Type dest_type = maybe_dest_type->canonical_type();
 
     // Make sure the source and dest types are builtins.
     std::optional<mx::BuiltinType> source_builtin =
