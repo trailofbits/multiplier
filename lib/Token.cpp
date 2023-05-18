@@ -1390,7 +1390,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
 
   ret.impl = last_file->impl->TokenReader(last_file->impl);
   ret.index = min_offset;
-  ret.num_tokens = (max_offset - min_offset) + 1u;
+  ret.num_tokens = max_offset + 1u;
   return ret;
 }
 

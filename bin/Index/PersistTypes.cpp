@@ -23,10 +23,11 @@
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Printer.h>
 
+#include "EntityMapper.h"
 #include "Hash.h"
 #include "Context.h"
 #include "PASTA.h"
-#include "TypeFragment.h"
+#include "PendingFragment.h"
 #include "TypeMapper.h"
 
 namespace indexer {
@@ -235,125 +236,35 @@ static void PersistTokenContexts(
 
 } // namespace
 
-
-void PendingFragmentType::Uses(const pasta::Decl &entity) {
-  if (IsSerializableDecl(entity)) {
-    decls_in_use.emplace_back(entity);
-  }
-}
-
-void PendingFragmentType::Uses(const pasta::Stmt &entity) {
-  stmts_in_use.emplace_back(entity);
-}
-
-void PendingFragmentType::Uses(const pasta::Type &entity) {
-  types_in_use.emplace_back(entity);
-}
-
-void PendingFragmentType::Uses(const pasta::Attr &entity) {
-  attrs_in_use.emplace_back(entity);
-}
-
-// Create list of fragments for the new types recovered from the
-// pending fragment.
-static std::vector<PendingFragmentType> CreateFragments(
-    TypeMapper &tm, const pasta::AST &ast,
-    const std::vector<pasta::Type> &types) {
-
-  std::vector<PendingFragmentType> type_fragments;
-  type_fragments.reserve(types.size());
-
-  for (const pasta::Type &type : types) {
-    pasta::PrintedTokenRange tok_range = pasta::PrintedTokenRange::Create(type);
-
-    PendingFragmentType tf(tm.FragmentId(type));
-
-    tf.top_level_types.emplace_back(type);
-    tf.num_top_level_types = 1u;
-
-    // Pending fragment of types operates on printed token; The begin
-    // and end indices are updated accordingly
-    tf.file_location = {};
-
-    tf.begin_index = 0u;
-    tf.end_index = static_cast<unsigned>(tok_range.size());
-
-    type_fragments.emplace_back(std::move(tf));
-  }
-
-  (void) ast;
-  return type_fragments;
-}
-
 void GlobalIndexingState::PersistTypes(
     const pasta::AST &ast, NameMangler &mangler, EntityMapper &em,
     const PendingFragment &pf) {
 
-  // Create fragments from the list of types found in the pending fragments
-  auto type_fragments = CreateFragments(em.tm, ast, pf.types_to_serialize);
+  for (const pasta::Type &type : pf.types_to_serialize) {
 
-  // Iterate through the type fragments and build the serialized messages for
-  // the fragments.
-  for (PendingFragmentType &tf : type_fragments) {
+    pasta::PrintedTokenRange tok_range = pasta::PrintedTokenRange::Create(type);
+    mx::PackedFragmentId pfid = em.tm.FragmentId(type);
+    mx::FragmentId fid = pfid.Unpack();
+
+    // Serialize the type entity to create an entry for the type in entity table
+    SerializeType(database, type, em, fid.fragment_id);
+
     capnp::MallocMessageBuilder message;
     mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
     // Set the fragment if for the fragment
-    fb.setId(tf.fragment_id.Pack());
-
-    auto tlds = fb.initTopLevelDeclarations(
-        static_cast<unsigned int>(tf.num_top_level_types));
-
-    for (auto i = 0u; i < tf.num_top_level_types; ++i) {
-      auto &entity = tf.top_level_types[i];
-      tlds.set(i, em.EntityId(entity));
-    }
-
-    // Add a check here to make sure there is only one top-level
-    // type in type fragment.
-    CHECK_EQ(tf.num_top_level_types, 1u);
-
-    const pasta::Type &entity = tf.top_level_types[0];
-    auto tok_range = pasta::PrintedTokenRange::Create(entity);
-
-    // Identify all of the declarations, statements, types, and pseudo-entities,
-    // and build lists of the entities to serialize.
-    // BuildFragmentForType(tf, tok_range);
-
-    // Serialize the type entity to create an entry for the type in entity table
-    SerializeType(database, entity, em, tf.fragment_index);
-
-    // HACK(remove me): Create a map of fragment to file record so that
-    //                  fragment appears in the list
-    // database.AddAsync(
-    //    mx::FragmentFileRecord{tf.fragment_id, pf.file_location->file_id});
-
-
-    // Check if the file location is valid;
-    if (tf.file_location) {
-      fb.setFirstFileTokenId(tf.file_location->first_file_token_id.Pack());
-      fb.setLastFileTokenId(tf.file_location->last_file_token_id.Pack());
-
-      // Associate the fragment with the file.
-      database.AddAsync(
-          mx::FragmentFileRecord{tf.fragment_id, tf.file_location->file_id});
-
-      database.AddAsync(
-          mx::FragmentFileRangeRecord{
-        tf.fragment_id,
-        tf.file_location->first_file_token_id,
-        tf.file_location->last_file_token_id});
-    }
+    fb.setId(pfid.Pack());
+    (void) fb.initTopLevelDeclarations(0);
 
     PersistPrintedTokens(em, fb, tok_range);
     PersistTokenContexts(em, tok_range, fb);
 
     database.AddAsync(
-        mx::EntityRecord{tf.fragment_id.Pack(), GetSerializedData(message)});
+        mx::EntityRecord{pfid.Pack(), GetSerializedData(message)});
   }
-  (void)mangler;
+
+  (void) ast;
+  (void) mangler;
 }
 
-}
-
-
+}  // namespace indexer

@@ -23,8 +23,18 @@ class TypeMapper final {
 
   mx::DatabaseWriter &database;
 
+  bool read_only{false};
+
   inline explicit TypeMapper(mx::DatabaseWriter &database_)
       : database(database_) {}
+
+  inline void EnterReadOnly(void) {
+    read_only = true;
+  }
+
+  inline void ExitReadOnly(void) {
+    read_only = false;
+  }
 
   mx::RawEntityId EntityId(const void *type, uint32_t quals=0u) const;
   mx::RawEntityId EntityId(const pasta::Type &entity) const;

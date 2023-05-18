@@ -19,9 +19,10 @@
 #endif
 
 #include "EntityMapper.h"
+#include "PASTA.h"
 #include "PendingFragment.h"
 #include "Serialize.h"
-#include "PASTA.h"
+#include "TypeMapper.h"
 
 namespace indexer {
 namespace {
@@ -176,7 +177,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #endif
 
     EntityBuilder<mx::ast::Decl> storage;
+    em.tm.EnterReadOnly();
     DispatchSerializeDecl(em, storage.builder, entity);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
@@ -191,7 +194,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #endif
 
     EntityBuilder<mx::ast::Stmt> storage;
+    em.tm.EnterReadOnly();
     DispatchSerializeStmt(em, storage.builder, entity);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
@@ -210,7 +215,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #endif
 
     EntityBuilder<mx::ast::Attr> storage;
+    em.tm.EnterReadOnly();
     DispatchSerializeAttr(em, storage.builder, entity);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
@@ -225,7 +232,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #endif
 
     EntityBuilder<mx::ast::Designator> storage;
+    em.tm.EnterReadOnly();
     SerializeDesignator(em, storage.builder, entity, nullptr);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
@@ -241,7 +250,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #endif
 
     EntityBuilder<mx::ast::CXXBaseSpecifier> storage;
+    em.tm.EnterReadOnly();
     SerializeCXXBaseSpecifier(em, storage.builder, entity, nullptr);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
@@ -257,7 +268,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #endif
 
     EntityBuilder<mx::ast::TemplateArgument> storage;
+    em.tm.EnterReadOnly();
     SerializeTemplateArgument(em, storage.builder, entity, nullptr);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
@@ -274,7 +287,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #endif
 
     EntityBuilder<mx::ast::TemplateParameterList> storage;
+    em.tm.EnterReadOnly();
     SerializeTemplateParameterList(em, storage.builder, entity, nullptr);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
@@ -290,7 +305,9 @@ void SerializeType(mx::DatabaseWriter &database, const pasta::Type &entity,
 #endif
 
   EntityBuilder<mx::ast::Type> storage;
+  em.tm.EnterReadOnly();
   DispatchSerializeType(em, storage.builder, entity);
+  em.tm.ExitReadOnly();
   database.AddAsync(
       mx::EntityRecord{eid, GetSerializedData(storage.message)});
   (void)fragment_index;

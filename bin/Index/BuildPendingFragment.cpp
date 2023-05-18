@@ -203,7 +203,6 @@ void FragmentBuilder::Accept(const pasta::Type &entity) {
   }
 }
 
-
 void FragmentBuilder::Accept(const pasta::Attr &entity) {
   switch (entity.Kind()) {
 #define MX_VISIT_ATTR(type) \

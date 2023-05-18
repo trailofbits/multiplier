@@ -4251,7 +4251,12 @@ void SerializeFunctionType(const EntityMapper &es, mx::ast::Type::Builder b, con
   b.setVal231(e.CmseNSCallAttribute());
   b.setVal232(e.HasRegParm());
   b.setVal233(e.NoReturnAttribute());
-  b.setVal230(es.EntityId(e.ReturnType()));
+
+
+  auto return_type_eid = es.EntityId(e.ReturnType());
+  assert(return_type_eid != 0);
+  b.setVal230(return_type_eid);
+
   b.setVal239(e.IsConst());
   b.setVal240(e.IsRestrict());
   b.setVal241(e.IsVolatile());
@@ -8777,7 +8782,9 @@ void SerializeFunctionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, con
   } else {
     b.setVal139(mx::kInvalidEntityId);
   }
-  b.setVal141(es.EntityId(e.ReturnType()));
+  auto return_type_eid = es.EntityId(e.ReturnType());
+  assert(return_type_eid != 0);
+  b.setVal141(return_type_eid);
   if (auto r142 = e.ReturnTypeSourceRange(); auto rs142 = r142.Size()) {
     b.setVal142(es.EntityId(r142[0]));
     b.setVal143(es.EntityId(r142[rs142 - 1u]));

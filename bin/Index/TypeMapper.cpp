@@ -69,17 +69,21 @@ mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
 }
 
 bool TypeMapper::AddEntityId(const pasta::Type &entity) {
+  assert(!read_only);
+
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
+  assert(type_key.first != nullptr);
+
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
     return false;
   }
 
+  mx::FragmentId fid = GetOrCreateFragmentIdForType(entity).Unpack();
+
   mx::TypeId id;
   auto kind = entity.Kind();
   id.kind = mx::FromPasta(kind);
-
-  auto fragment_ = GetOrCreateFragmentIdForType(entity);
-  id.fragment_id = fragment_.Unpack().fragment_id;
+  id.fragment_id = fid.fragment_id;
   id.offset = static_cast<mx::EntityOffset>(0);
 
   return type_ids.emplace(type_key, id).second;
@@ -94,18 +98,21 @@ mx::PackedFragmentId TypeMapper::FragmentId(const pasta::Type &type) const {
 mx::PackedFragmentId TypeMapper::GetOrCreateFragmentIdForType(
     const pasta::Type &entity) const {
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
+  assert(type_key.first != nullptr);
 
-  // Check if the fragment ids are created for the types and added to
-  // the list of type ids. If yes then return that else create the
+  // Check if the fragment IDs are created for the types and added to
+  // the list of type IDs. If yes then return that else create the
   // new one
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
-    return mx::FragmentId(it->second.Unpack().fragment_id);
+    mx::TypeId prev_id = it->second.Unpack();
+    return mx::FragmentId(prev_id.fragment_id);
   }
 
   bool is_new_fragment_id = true;
   auto token_range = pasta::PrintedTokenRange::Create(entity);
   auto fragment_id_ = database.GetOrCreateFragmentIdForType(
       mx::kInvalidEntityId, HashType(entity), is_new_fragment_id);
+  assert(is_new_fragment_id);
   return fragment_id_;
 }
 

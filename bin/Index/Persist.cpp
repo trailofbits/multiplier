@@ -44,7 +44,6 @@
 #include "PendingFragment.h"
 #include "Provenance.h"
 #include "ProgressBar.h"
-#include "TypeFragment.h"
 #include "Util.h"
 
 namespace capnp {
