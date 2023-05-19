@@ -41,7 +41,7 @@ namespace indexer {
 // new fragments that we want to serialize.
 extern void LabelEntitiesInFragment(
     PendingFragment &pf, EntityMapper &em,
-    const pasta::TokenRange &tok_range);
+    const pasta::TokenRange &tok_range, bool is_new_fragment);
 
 namespace {
 
@@ -1190,7 +1190,7 @@ static void CreatePendingFragment(
   // Unfortunately, the labeller needs to be manually written as opposed to
   // auto-generated, as our auto-generation has no concept of which AST
   // methods descend vs. cross the tree (into other fragments).
-  LabelEntitiesInFragment(pf, em, tok_range);
+  LabelEntitiesInFragment(pf, em, tok_range, is_new_fragment_id);
 
   if (!is_new_fragment_id) {
     return;

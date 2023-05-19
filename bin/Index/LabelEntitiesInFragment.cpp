@@ -39,6 +39,13 @@ class EntityLabeller final : public EntityVisitor {
   EntityMapper &em;
   PendingFragment &fragment;
 
+  // Is this a new fragment? This affects whether or not we keep track of types.
+  // We don't want `PendingFragment` for a pre-existing type to "take ownership"
+  // of a type, only to have that pending fragment "thrown away" later (due to
+  // it being redundant), yet have other fragments in the TU point to type IDs
+  // that logically belong to this type.
+  const bool is_new_fragment{true};
+
   std::vector<pasta::Decl> next_decls;
   std::vector<pasta::Stmt> next_stmts;
   std::vector<pasta::Type> next_types;
@@ -50,8 +57,11 @@ class EntityLabeller final : public EntityVisitor {
   unsigned next_parsed_token_index{0u};
 
   inline explicit EntityLabeller(EntityMapper &em_,
-                                 PendingFragment &fragment_)
-      : em(em_), fragment(fragment_) {}
+                                 PendingFragment &fragment_,
+                                 bool is_new_fragment_)
+      : em(em_),
+        fragment(fragment_),
+        is_new_fragment(is_new_fragment_) {}
 
   virtual ~EntityLabeller(void) = default;
 
@@ -64,7 +74,11 @@ class EntityLabeller final : public EntityVisitor {
   }
 
   bool Enter(const pasta::Type &entity) final {
-    return fragment.Add(entity, em.tm);
+    if (is_new_fragment) {
+      return fragment.Add(entity, em.tm);
+    } else {
+      return false;
+    }
   }
 
   void Run(void) {
@@ -77,6 +91,9 @@ class EntityLabeller final : public EntityVisitor {
       curr_decls.swap(next_decls);
       curr_stmts.swap(next_stmts);
       curr_types.swap(next_types);
+
+      // NOTE(pag): Macros are handled in `Persist.cpp`, because we want to
+      //            merge expansions and argument pre-expansion phases.
 
       next_decls.clear();
       next_stmts.clear();
@@ -152,14 +169,11 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
     case pasta::TokenRole::kInitialMacroUseToken:
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
-//      id.offset = next_parsed_token_index;
       return false;
 
     // Alias whatever the previous ID to be generated is.
     case pasta::TokenRole::kEndOfFileMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
-//      CHECK_LT(0u, next_parsed_token_index);
-//      id.offset = next_parsed_token_index - 1u;
       return false;
 
     case pasta::TokenRole::kInvalid:
@@ -216,8 +230,9 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
 void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em,
-                             const pasta::TokenRange &tok_range) {
-  EntityLabeller labeller(em, pf);
+                             const pasta::TokenRange &tok_range,
+                             bool is_new_fragment) {
+  EntityLabeller labeller(em, pf, is_new_fragment);
 
   for (uint64_t i = pf.begin_index; i <= pf.end_index; ++i) {
     pasta::Token tok = tok_range[i];
