@@ -1335,6 +1335,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
       }
 
       if (parent_macro.value() == root_macro) {
+        tok = LeftCornerOfUse(root_macro);
         goto at_top_of_macro;
       }
 
