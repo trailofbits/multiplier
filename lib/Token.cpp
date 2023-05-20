@@ -324,6 +324,11 @@ static TokenCategory ClassifyToken(TokenKind kind) {
     case TokenKind::KEYWORD___ARRAY_EXTENT:
     case TokenKind::KEYWORD___PRIVATE_EXTERN__:
     case TokenKind::KEYWORD___MODULE_PRIVATE__:
+    case TokenKind::KEYWORD___BUILTIN_PTRAUTH_TYPE_DISCRIMINATOR:
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPE_SIGNATURE:
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPE_SUMMARY:
+    case TokenKind::KEYWORD___BUILTIN_TMO_TYPE_METADATA:
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPES_COMPATIBLE:
     case TokenKind::KEYWORD___DECLSPEC:
     case TokenKind::KEYWORD___CDECL:
     case TokenKind::KEYWORD___STDCALL:
