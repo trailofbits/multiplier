@@ -118,7 +118,7 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   // flag passed to the function is set to false to avoid printing them in
   // `pretty` form. This is because the IR generated in pretty form is not
   // parsable.
-  flags.enableDebugInfo(false);
+  flags.enableDebugInfo(true, false);
 
   mlir::MLIRContext context(impl->registry);
   CodeGeneratorVisitor codegen(ast, &context, em);

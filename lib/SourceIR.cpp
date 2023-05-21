@@ -168,6 +168,8 @@ SourceIRImpl::SourceIRImpl(std::shared_ptr<const FragmentImpl> frag_,
   mod = mlir::parseSourceFile<mlir::ModuleOp>(sm, &mctx);
   if (mod) {
     deserialized_ops = Deserialize(mod.get());
+  } else {
+    std::cerr << "Failed to lower: " << frag->fragment_id << "\n" << mlir << std::endl;
   }
 }
 
