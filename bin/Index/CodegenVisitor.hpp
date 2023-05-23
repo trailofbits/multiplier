@@ -140,10 +140,15 @@ struct FallBackStmtVisitor
   using Builder::set_insertion_point_to_start;
   using Builder::set_insertion_point_to_end;
   using Builder::insertion_guard;
+  using Builder::visit_as_lvalue_type;
 
   template< typename Op, typename... Args >
   auto make(Args &&...args) {
     return this->template create< Op >(std::forward< Args >(args)...);
+  }
+
+  std::string getFunctionDeclName(const clang::FunctionDecl* decl) {
+    return  context().get_mangled_name(decl).name.str();
   }
 
   // NOTE: We only visit first child of the expression to avoid issue with
@@ -227,12 +232,63 @@ struct FallBackStmtVisitor
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
+  vast::Operation* VisitFunctionDeclRefExpr(const clang::DeclRefExpr *expr) {
+    std::stringstream ss;
+    auto decl = clang::cast< clang::FunctionDecl >( expr->getDecl()->getUnderlyingDecl() );
+    auto rtype = visit_as_lvalue_type(expr->getType());
+    auto loc  = meta_location(expr);
+
+    // Get funcion decl name and scope it with the stmt class for the context of
+    // unsupported op
+    ss << expr->getStmtClassName() << "::" << getFunctionDeclName(decl);
+
+    // If there is any child expr, visit them all and add it as operand of
+    // unsupported op.
+    llvm::SmallVector<vast::Value> elements;
+    for (auto it = expr->child_begin(); it != expr->child_end(); ++it) {
+      elements.push_back(visit(*it)->getResult(0));
+    }
+
+    return  make<vast::hl::UnsupportedOp>(loc, rtype, ss.str(), elements);
+  }
+
+  vast::Operation* VisitVarDeclRefExpr(const clang::DeclRefExpr *expr) {
+    std::stringstream ss;
+    auto rtype = visit_as_lvalue_type(expr->getType());
+    auto loc  = meta_location(expr);
+
+    // get embedded string that will be useful for debugging
+    ss << expr->getStmtClassName();
+    ss << "::" <<  expr->getNameInfo().getAsString();
+    if (expr->isNonOdrUse() == clang::NOUR_Unevaluated) {
+      ss << " non-odr-use reference";
+    }
+
+    llvm::SmallVector<vast::Value> elements;
+    return  make<vast::hl::UnsupportedOp>(loc, rtype, ss.str(), elements);
+  }
+
   vast::Operation* VisitDeclRefExpr(const clang::DeclRefExpr *expr) {
-    return VisitChildExpr(expr, expr->getStmtClassName());
+    auto underlying = expr->getDecl()->getUnderlyingDecl();
+
+    if (clang::isa< clang::FunctionDecl >(underlying)) {
+      return VisitFunctionDeclRefExpr(expr);
+    }
+
+    if (auto decl = clang::dyn_cast< clang::VarDecl >(underlying);
+        decl && !decl->isFileVarDecl()) {
+      // Only handles local variables. Don't expect file scope variable
+      // to land here.
+      return VisitVarDeclRefExpr(expr);
+    }
+
+    THROW("Unable to handle DeclRefExpr : {0} {1}",
+          expr->getNameInfo().getAsString(), expr->getNameInfo().getAsString());
+    return nullptr;
   }
 
   vast::Operation* VisitTypeTraitExpr(const clang::TypeTraitExpr *expr) {
-    return VisitChildExpr(expr, expr->getStmtClassName());
+    return VisitOperands(expr, expr->getStmtClassName());
   }
 
   vast::Operation* VisitObjCAvailabilityCheckExpr(const clang::ObjCAvailabilityCheckExpr *expr){
@@ -240,7 +296,15 @@ struct FallBackStmtVisitor
   }
 
   vast::Operation* VisitOffsetOfExpr(const clang::OffsetOfExpr *expr){
-    return VisitChildExpr(expr, expr->getStmtClassName());
+    auto rtype = visit(expr->getType());
+    auto loc = meta_location(expr);
+
+    llvm::SmallVector<vast::Value> elements(expr->getNumExpressions());
+    for (auto i = 0u, n = expr->getNumExpressions(); i < n; ++i) {
+      elements.push_back(visit(expr->getIndexExpr(i))->getResult(0));
+    }
+
+    return  make<vast::hl::UnsupportedOp>(loc, rtype, expr->getStmtClassName(), elements);
   }
 
   vast::Operation* VisitGCCAsmStmt(const clang::GCCAsmStmt *expr){
@@ -257,7 +321,7 @@ struct FallBackStmtVisitor
   }
 
   vast::Operation* VisitGenericSelectionExpr(const clang::GenericSelectionExpr *expr) {
-    return VisitChildExpr(expr, expr->getStmtClassName());
+    return VisitOperands(expr, expr->getStmtClassName());
   }
 
   vast::Operation* VisitChooseExpr(const clang::ChooseExpr *expr) {
@@ -278,14 +342,6 @@ struct FallBackStmtVisitor
     auto target = expr->getTarget();
     auto [region, type] = make_value_yield_region(target);
     return make<vast::hl::UnsupportedExprOp>(loc, expr->getStmtClassName(), type, std::move(region));
-  }
-
-  // Note: vast handles FunctionDeclRefExpr node. However in some cases it may return null if
-  //       FunctionDecl is not available in the top-level declarations. It will fallback to
-  //       the visitor and throw an exception.
-  vast::Operation* VisitFunctionDeclRefExpr(const clang::DeclRefExpr *expr) {
-    THROW("Missing function decl : {0}", expr->getNameInfo().getAsString());
-    return nullptr;
   }
 };
 
