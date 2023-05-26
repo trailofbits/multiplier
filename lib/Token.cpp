@@ -1296,12 +1296,46 @@ std::string_view TokenRange::data(void) const & {
 
 namespace {
 
-// Return the leftmost use tokens of a macro.
-static Token LeftCornerOfUse(const Macro &exp) {
+// Return the leftmost and rightmost use tokens of a macro.
+//
+// NOTE(pag): This won't handle the case of a non-tree tail expansion at the
+//            root, where some of the tokens in the expansion are part of a
+//            sub-expansion's replacement tokens.
+static std::pair<Token, Token> CornersOfUse(const Macro &exp) {
+  Token first_tok;
+  Token last_tok;
   for (Token tok : exp.generate_use_tokens()) {
-    return tok;
+    if (!last_tok) {
+      first_tok = tok;
+    }
+    last_tok = tok;
   }
-  return Token();
+  return std::make_pair<Token, Token>(std::move(first_tok),
+                                      std::move(last_tok));
+}
+
+// If `tok` originates from a root macro argument or parameter, then return
+// that argument/parameter.
+static std::optional<Macro> OriginatingMacroArgumentOrParameter(mx::Token dt) {
+  std::optional<Macro> last_macro;
+  Token last_token;
+  for (; dt; dt = dt.derived_token()) {
+    if (auto cm = dt.containing_macro()) {
+      last_macro = std::move(cm);
+      last_token = dt;
+    }
+  }
+
+  if (!last_macro) {
+    return std::nullopt;
+  }
+
+  if (auto lmk = last_macro->kind();
+      lmk == MacroKind::PARAMETER || lmk == MacroKind::ARGUMENT) {
+    return last_macro;
+  }
+
+  return std::nullopt;
 }
 
 }  // namespace
@@ -1316,6 +1350,24 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
   std::optional<File> last_file;
   EntityOffset min_offset = std::numeric_limits<EntityOffset>::max();
   EntityOffset max_offset = 0u;
+
+  auto widen = [&] (Token file_tok) {
+    if (!file_tok) {
+      return false;
+    }
+
+    std::optional<File> tok_file = File::containing(file_tok);
+    if (!last_file) {
+      last_file = std::move(tok_file);
+
+    } else if (last_file.value() != tok_file.value()) {
+      return false;
+    }
+
+    min_offset = std::min(min_offset, file_tok.offset);
+    max_offset = std::max(max_offset, file_tok.offset);
+    return true;
+  };
 
   for (Token tok : *this) {
 
@@ -1339,54 +1391,29 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
         return ret;
       }
 
-      if (parent_macro.value() == root_macro) {
-        tok = LeftCornerOfUse(root_macro);
-        goto at_top_of_macro;
-      }
-
-      // If we're in a `MacroArgument`, and its a child of of the root macro,
-      // then this is also a top-level token. Similarly, if we're in a
+      // If this token is derived from a top-level token of a `MacroArgument`,
+      // then treat it as a top-level token. Similarly, if we're in a
       // `MacroParameter`, then the parent must be a `DefineMacroDirective`,
       // which is a top-level thing.
-      if (parent_macro->kind() != MacroKind::ARGUMENT &&
-          parent_macro->kind() != MacroKind::PARAMETER) {
-        tok = LeftCornerOfUse(root_macro);
-        goto at_top_of_macro;
-      }
-
-      std::optional<Macro> exp_or_def = parent_macro->parent();
-      if (!exp_or_def) {
-        assert(false);
-        tok = LeftCornerOfUse(root_macro);
-        goto at_top_of_macro;
-      }
-
-      if (exp_or_def.value() != root_macro) {
-        tok = LeftCornerOfUse(root_macro);
-      }
-
-      goto at_top_of_macro;
-
-    // It's a file token or a parsed token; get a file token from it.
-    } else {
-    at_top_of_macro:
-
-      if (Token file_tok = tok.file_token()) {
-        std::optional<File> tok_file = File::containing(file_tok);
-        if (!last_file) {
-          last_file = std::move(tok_file);
-
-        } else if (last_file.value() != tok_file.value()) {
-          return ret;
+      if (auto arg_macro = OriginatingMacroArgumentOrParameter(tok)) {
+        if (auto arg_parent_macro = arg_macro->parent()) {
+          if (arg_parent_macro.value() == root_macro) {
+            root_macro = std::move(arg_macro.value());
+          }
+        } else {
+          assert(false);
         }
+      }
 
-        min_offset = std::min(min_offset, file_tok.offset);
-        max_offset = std::max(max_offset, file_tok.offset);
+      auto [min_tok, max_tok] = CornersOfUse(root_macro);
 
-      // No associated file token.
-      } else {
+      if (!widen(min_tok.file_token()) || !widen(max_tok.file_token())) {
         return ret;
       }
+
+    // If we can't widen for the file token, then we probably have an issue.
+    } else if (!widen(tok.file_token())) {
+      return ret;
     }
   }
 
