@@ -4,8 +4,9 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-
 #include "../Token.h"
+
+#include <iosfwd>
 
 namespace mx {
 
@@ -41,6 +42,9 @@ class TokenTree {
 
   // Serialize the token tree into a linear range.
   TokenRange serialize(const TokenTreeVisitor &vis=TokenTreeVisitor()) const;
+
+  // Dump the token tree into a DOT digraph.
+  void dump(std::ostream &os);
 };
 
 }  // namespace mx

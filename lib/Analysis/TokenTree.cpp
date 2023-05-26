@@ -1476,6 +1476,22 @@ static void CollectTokens(const TokenTreeImpl::Node &node,
   }
 }
 
+static void StreamTokData(std::ostream &os, std::string_view tok) {
+  for (auto ch : tok) {
+    switch (ch) {
+      case '<': os << "&lt;"; break;
+      case '>': os << "&gt;"; break;
+      case '"': os << "&quot;"; break;
+      case '\'': os << "&apos;"; break;
+      case '\r': os << " "; break;
+      case '\n': os << " "; break;
+      case '&': os << "&amp;"; break;
+      case '\\': os << '|'; break;
+      default: os << ch; break;
+    }
+  }
+}
+
 }  // namespace
 
 // Serialize the token tree into a linear range.
@@ -1502,6 +1518,112 @@ TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {
   reader->data_hash = kHasher(reader->data);
 
   return TokenRange(std::move(reader), 0u, num_tokens);
+}
+
+// Dump the token tree into a DOT digraph.
+void TokenTree::dump(std::ostream &os) {
+  os
+      << "digraph {\n"
+      << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
+
+  auto add_link = [] (auto &ss, auto s_id, auto i, auto &node) {
+    if (std::holds_alternative<std::monostate>(node)) {
+      return;
+
+    } else if (std::holds_alternative<TokenTreeImpl::TokenIndex>(node)) {
+      return;
+
+    } else if (std::holds_alternative<TokenTreeImpl::ChoiceNode *>(node)) {
+      if (TokenTreeImpl::ChoiceNode *choice =
+              std::get<TokenTreeImpl::ChoiceNode *>(node)) {
+        auto d_id = reinterpret_cast<uintptr_t>(choice);
+        ss << "n" << s_id << ":c" << i << " -> n" << d_id << ";\n";
+      }
+    } else if (std::holds_alternative<TokenTreeImpl::SubstitutionNode *>(node)) {
+      if (TokenTreeImpl::SubstitutionNode *sub =
+              std::get<TokenTreeImpl::SubstitutionNode *>(node)) {
+        auto d_id = reinterpret_cast<uintptr_t>(sub);
+        ss << "n" << s_id << ":c" << i << " -> n" << d_id << ";\n";
+      }
+    } else if (std::holds_alternative<TokenTreeImpl::SequenceNode *>(node)) {
+      if (TokenTreeImpl::SequenceNode *seq =
+              std::get<TokenTreeImpl::SequenceNode *>(node)) {
+        auto d_id = reinterpret_cast<uintptr_t>(seq);
+        ss << "n" << s_id << ":c" << i << " -> n" << d_id << ";\n";
+      }
+    } else {
+      assert(false);
+    }
+  };
+
+  for (const TokenTreeImpl::SequenceNode &node : impl->sequences) {
+    auto id = reinterpret_cast<uintptr_t>(&node);
+    os << "n" << id
+       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\" bgcolor=\"goldenrod\"><TR>";
+
+    auto i = 0u;
+    for (const TokenTreeImpl::Node &child : node.children) {
+      if (std::holds_alternative<TokenTreeImpl::TokenIndex>(child)) {
+        auto [ri, to] = std::get<TokenTreeImpl::TokenIndex>(child);
+        os << "<TD>";
+        StreamTokData(os, impl->readers[ri]->NthTokenData(to));
+        os << "</TD>";
+      } else {
+        os << "<TD port=\"c" << i << "\"> </TD>";
+        ++i;
+      }
+    }
+    os << "</TR></TABLE>>];\n";
+
+    i = 0u;
+    for (const TokenTreeImpl::Node &child : node.children) {
+      if (!std::holds_alternative<TokenTreeImpl::TokenIndex>(child)) {
+        add_link(os, id, i++, child);
+      }
+    }
+  }
+
+  for (const TokenTreeImpl::ChoiceNode &node : impl->choices) {
+    auto id = reinterpret_cast<uintptr_t>(&node);
+    os << "n" << id
+       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\" bgcolor=\"azure2\"><TR>";
+
+    auto i = 0u;
+    for (const TokenTreeImpl::Node &child : node.children) {
+      os << "<TD port=\"c" << i << "\">" << node.fragments[i].id().Pack() << "</TD>";
+      ++i;
+    }
+    os << "</TR></TABLE>>];\n";
+
+    i = 0u;
+    for (const TokenTreeImpl::Node &child : node.children) {
+      add_link(os, id, i++, child);
+    }
+  }
+
+  for (const TokenTreeImpl::SubstitutionNode &node : impl->substitutions) {
+    auto id = reinterpret_cast<uintptr_t>(&node);
+    EntityId eid;
+    if (std::holds_alternative<MacroSubstitution>(node.macro)) {
+      eid = std::get<MacroSubstitution>(node.macro).id();
+    } else if (std::holds_alternative<MacroVAOpt>(node.macro)) {
+      eid = std::get<MacroVAOpt>(node.macro).id();
+    } else {
+      assert(false);
+    }
+
+    os << "n" << id
+       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\" bgcolor=\"beige\"><TR>"
+       << "<TD colspan=\"2\">" << eid.Pack() << "</TD></TR><TR>"
+       << "<TD port=\"c0\">before</TD>"
+       << "<TD port=\"c1\">after</TD>"
+       << "</TR></TABLE>>];\n";
+
+    add_link(os, id, 0, node.before);
+    add_link(os, id, 1, node.after);
+  }
+
+  os << "}\n";
 }
 
 // Return the file containing the token tree.
