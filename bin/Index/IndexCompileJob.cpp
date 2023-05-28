@@ -1131,6 +1131,10 @@ static void CreatePendingFragment(
   //            identified. Usually this would be a bug in PASTA's
   //            `lib/AST/Bounds.cpp` file, but having a restriction here also
   //            helps the end-to-end debugging process.
+  //
+  // NOTE(pag): Likely, an `assert(false)` in `TrackRedeclarations` in
+  //            `LinkEntitiesAcrossFragments.cpp` needs to be commented out
+  //            when using this debugging technique.
 //  bool found = false;
 //  for (const Entity &entity : entities) {
 //    if (!std::holds_alternative<pasta::Decl>(entity)) {
@@ -1142,7 +1146,7 @@ static void CreatePendingFragment(
 //      continue;
 //    }
 //
-//    if (nd->Name() == "CFFileSecuritySetGroup") {
+//    if (nd->Name() == "sctp_sf_do_9_1_abort") {
 //      found = true;
 //      break;
 //    }

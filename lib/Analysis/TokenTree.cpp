@@ -1590,6 +1590,7 @@ void TokenTree::dump(std::ostream &os) {
 
     auto i = 0u;
     for (const TokenTreeImpl::Node &child : node.children) {
+      (void) child;
       os << "<TD port=\"c" << i << "\">" << node.fragments[i].id().Pack() << "</TD>";
       ++i;
     }

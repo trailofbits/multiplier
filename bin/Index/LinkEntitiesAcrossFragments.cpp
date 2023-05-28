@@ -46,6 +46,10 @@ static void TrackRedeclarations(
       continue;
     }
 
+    // NOTE(pag): This assertion is likely to trigger when debugging the indexer
+    //            by restricting it to indexing a specific entity, i.e. by
+    //            modifying `CreatePendingFragment` in `IndexCompileJob.cpp`.
+    //            It can safely be commented out.
     mx::VariantId b_vid = mx::EntityId(b_id).Unpack();
     if (!std::holds_alternative<mx::DeclId>(b_vid)) {
       assert(false);
