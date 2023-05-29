@@ -522,13 +522,41 @@ extern "C" int main(int argc, char *argv[]) {
     PrintToken(os, file_toks, "pt", 0, tok);
   }
 
+
+  auto rowspan = 1 + int(FLAGS_with_categories) +
+                 int(FLAGS_with_related_entity_ids) +
+                 int(FLAGS_with_token_offsets);
+
+  auto empty = true;
   os << "pt0 [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>"
-     << "<TD bgcolor=\"cornsilk2\">PARSED</TD>";
+     << "<TD bgcolor=\"cornsilk2\" rowspan=\"" << rowspan << "\">PARSED</TD>";
   for (mx::Token tok : parsed_toks) {
     os << "<TD port=\"t" << tok.id().Pack() << "\">" << TokData(tok) << "</TD>";
+    empty = false;
   }
-  if (parsed_toks.empty()) {
+  if (empty) {
     os << "<TD color=\"red\">no parsed tokens</TD>";
+  }
+
+  if (!empty && FLAGS_with_categories) {
+    os << "</TR><TR>";
+    for (mx::Token tok : parsed_toks) {
+      os << "<TD>" << EnumeratorName(tok.category()) << "</TD>";
+    }
+  }
+
+  if (!empty && FLAGS_with_related_entity_ids) {
+    os << "</TR><TR>";
+    for (mx::Token tok : parsed_toks) {
+      os << "<TD>" << tok.related_entity_id().Pack() << "</TD>";
+    }
+  }
+
+  if (!empty && FLAGS_with_token_offsets) {
+    os << "</TR><TR>";
+    for (mx::Token tok : parsed_toks) {
+      os << "<TD>" << TokenOffset(tok) << "</TD>";
+    }
   }
 
   os
