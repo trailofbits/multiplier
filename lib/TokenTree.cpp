@@ -18,7 +18,7 @@
 #include "File.h"
 #include "Fragment.h"
 
-#define D(...) __VA_ARGS__
+//#define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #endif

@@ -450,7 +450,7 @@ static void PersistParsedTokens(
     VisitMacros(pf, em, tlm, macros_to_serialize);
   }
 
-  provenance.Init(em, parsed_tokens);
+  provenance.Init(pf.fragment_index, parsed_tokens);
 
   unsigned num_macros = static_cast<unsigned>(macros_to_serialize.size());
   unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
@@ -485,8 +485,8 @@ static void PersistParsedTokens(
 
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
     tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
-    dt.set(i, provenance.DerivedTokenId(em, tok));
-    re.set(i, provenance.RelatedEntityId(em, tok));
+    dt.set(i, provenance.DerivedTokenId(tok));
+    re.set(i, provenance.RelatedEntityId(tok));
 
     AccumulateTokenData(utf8_fragment_data, tok);
     ++i;
@@ -542,7 +542,7 @@ static void PersistTokenTree(
   TokenTreeSerializationSchedule sched(pf, em);
   sched.Schedule(nodes);
 
-  provenance.Init(em, sched.tokens);
+  provenance.Init(pf.fragment_index, sched.tokens);
 
 //#ifndef NDEBUG
 //  provenance.Dump(std::cerr);
@@ -568,8 +568,8 @@ static void PersistTokenTree(
     std::optional<pasta::Token> pt = tok_node.Token();
     std::optional<pasta::FileToken> ft = tok_node.FileToken();
 
-    dt.set(i, provenance.DerivedTokenId(em, tok_node));
-    re.set(i, provenance.RelatedEntityId(em, tok_node));
+    dt.set(i, provenance.DerivedTokenId(tok_node));
+    re.set(i, provenance.RelatedEntityId(tok_node));
 
     if (pt) {
       AccumulateTokenData(utf8_fragment_data, pt.value());
@@ -590,7 +590,7 @@ static void PersistTokenTree(
     // Associate this token node with a parsed token. Generally this can be
     // a one-to-many mapping, but we try to choose a reasonable one.
     mx::VariantId parsed_vid =
-        mx::EntityId(provenance.ParsedTokenId(em, tok_node)).Unpack();
+        mx::EntityId(provenance.ParsedTokenId(tok_node)).Unpack();
     if (std::holds_alternative<mx::ParsedTokenId>(parsed_vid)) {
       mti2po.set(i, std::get<mx::ParsedTokenId>(parsed_vid).offset);
     } else {

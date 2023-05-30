@@ -130,6 +130,11 @@
 "directory": ""
 },
 {
+"file": "StringifyGNUVarArgs.c",
+"command": "/usr/bin/cc StringifyGNUVarArgs.c",
+"directory": ""
+},
+{
 "file": "TrailingConditionalVariadicMacro.c",
 "command": "/usr/bin/cc TrailingConditionalVariadicMacro.c",
 "directory": ""
