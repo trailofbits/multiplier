@@ -146,8 +146,10 @@ TokenRange Fragment::parsed_tokens(void) const {
 
 // Return the list of top-level declarations in this fragment.
 gap::generator<Decl> Fragment::top_level_declarations(void) const & {
-  auto &ep = impl->ep;
-  for (RawEntityId eid : impl->reader.getTopLevelDeclarations()) {
+  auto ep = impl->ep;
+  auto frag_id = impl->fragment_id;
+  auto tlds = impl->reader.getTopLevelDeclarations();
+  for (RawEntityId eid : tlds) {
     VariantId vid = EntityId(eid).Unpack();
     if (!std::holds_alternative<DeclId>(vid)) {
       assert(false);
@@ -155,7 +157,7 @@ gap::generator<Decl> Fragment::top_level_declarations(void) const & {
     }
 
     DeclId decl_id = std::get<DeclId>(vid);
-    if (decl_id.fragment_id != impl->fragment_id) {
+    if (decl_id.fragment_id != frag_id) {
       assert(false);
       continue;
     }
@@ -172,7 +174,7 @@ gap::generator<Decl> Fragment::top_level_declarations(void) const & {
 
 // Return references to this fragment.
 gap::generator<Reference> Fragment::references(void) const & {
-  const EntityProviderPtr &ep = impl->ep;
+  auto ep = impl->ep;
   for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
       co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
