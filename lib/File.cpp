@@ -26,11 +26,6 @@
 #include "WeggliImpl.h"
 
 namespace mx {
-namespace {
-
-static thread_local RawEntityIdList tIgnoredRedecls;
-
-}  // namespace
 
 FileLocationCache::~FileLocationCache(void) {}
 
@@ -276,6 +271,17 @@ std::optional<File> File::containing(const VariantEntity &entity) {
     return std::nullopt;
   }
 #undef GET_FILE
+}
+
+// Return the file containing the token tree.
+std::optional<File> File::containing(const TokenTree &tree) {
+  if (tree.impl->file) {
+    return File(tree.impl->file);
+  } else if (tree.impl->fragment) {
+    return File::containing(Fragment(tree.impl->fragment));
+  } else {
+    return std::nullopt;
+  }
 }
 
 // Return the ID of this file.
