@@ -100,6 +100,16 @@
 "directory": ""
 },
 {
+"file": "NonTreeCallCallable.c",
+"command": "/usr/bin/cc NonTreeCallCallable.c",
+"directory": ""
+},
+{
+"file": "NonTreeCallCallableCrazy.c",
+"command": "/usr/bin/cc NonTreeCallCallableCrazy.c",
+"directory": ""
+},
+{
 "file": "NonTreeTrailingMacroExpansion.c",
 "command": "/usr/bin/cc NonTreeTrailingMacroExpansion.c",
 "directory": ""
@@ -117,6 +127,11 @@
 {
 "file": "PragmasAreRetained.c",
 "command": "/usr/bin/cc PragmasAreRetained.c",
+"directory": ""
+},
+{
+"file": "StringifyGNUVarArgs.c",
+"command": "/usr/bin/cc StringifyGNUVarArgs.c",
 "directory": ""
 },
 {

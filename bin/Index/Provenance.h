@@ -71,7 +71,8 @@ class TokenProvenanceCalculator {
   };
 
  private:
-
+  const EntityMapper &em;
+  mx::RawEntityId fragment_index{mx::kInvalidEntityId};
   std::deque<TokenInfo> infos;
   std::unordered_map<const void *, TokenInfo *> info_map;
   std::unordered_map<TokenInfo *, std::vector<TokenInfo *>> multiple_children;
@@ -80,37 +81,33 @@ class TokenProvenanceCalculator {
 
   void Clear(void);
   void Sort(void);
-  bool Pull(const EntityMapper &em, const std::vector<TokenTreeNode> &tokens);
+  bool Pull(const std::vector<TokenTreeNode> &tokens);
   bool Pull(void);
   bool Push(void);
   bool TryConnect(TokenInfo *, std::optional<pasta::Token> tok);
   void Connect(TokenInfo *, const pasta::Token &);
 
  public:
-  TokenProvenanceCalculator(void);
+  TokenProvenanceCalculator(const EntityMapper &em);
   ~TokenProvenanceCalculator(void);
 
 #ifndef NDEBUG
   void Dump(std::ostream &os);
 #endif
 
-  void Init(const EntityMapper &em, const std::vector<TokenTreeNode> &tokens);
-  void Init(const EntityMapper &em, const std::vector<pasta::Token> &tokens);
+  void Init(mx::RawEntityId fragment_index_,
+            const std::vector<TokenTreeNode> &tokens);
+  void Init(mx::RawEntityId fragment_index_,
+            const std::vector<pasta::Token> &tokens);
 
-  mx::RawEntityId RelatedEntityId(const EntityMapper &em,
-                                  const pasta::Token &tok);
-  mx::RawEntityId RelatedEntityId(const EntityMapper &em,
-                                  const TokenTreeNode &tok);
+  mx::RawEntityId RelatedEntityId(const pasta::Token &tok);
+  mx::RawEntityId RelatedEntityId(const TokenTreeNode &tok);
 
-  mx::RawEntityId DerivedTokenId(const EntityMapper &em,
-                                 const pasta::Token &tok);
-  mx::RawEntityId DerivedTokenId(const EntityMapper &em,
-                                 const TokenTreeNode &tok);
+  mx::RawEntityId DerivedTokenId(const pasta::Token &tok);
+  mx::RawEntityId DerivedTokenId(const TokenTreeNode &tok);
 
-  mx::RawEntityId ParsedTokenId(const EntityMapper &em,
-                                const pasta::Token &tok);
-  mx::RawEntityId ParsedTokenId(const EntityMapper &em,
-                                const TokenTreeNode &tok);
+  mx::RawEntityId ParsedTokenId(const pasta::Token &tok);
+  mx::RawEntityId ParsedTokenId(const TokenTreeNode &tok);
 };
 
 }  // namespace indexer

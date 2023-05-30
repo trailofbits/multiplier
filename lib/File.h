@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Token.h"
+#include "TokenTree.h"
 
 #include <mutex>
 #include <unordered_map>

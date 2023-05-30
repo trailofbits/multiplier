@@ -105,6 +105,15 @@ std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
 #undef GET_FRAGMENT
 }
 
+// Return the fragment containing a token tree.
+std::optional<Fragment> Fragment::containing(const TokenTree &tree) {
+  if (tree.impl->fragment) {
+    return Fragment(tree.impl->fragment);
+  } else {
+    return std::nullopt;
+  }
+}
+
 // Return the ID of this fragment.
 SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
   return FragmentId(impl->fragment_id);

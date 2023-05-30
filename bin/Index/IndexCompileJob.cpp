@@ -1396,7 +1396,7 @@ void IndexCompileJobAction::Run(void) {
       << "Built AST for main source file "
       << ast.MainFile().Path().generic_string();
 
-  TokenProvenanceCalculator provenance;
+  TokenProvenanceCalculator provenance(em);
 
   PersistParsedFiles(*context, ast, entity_ids);
   PersistParsedFragments(
