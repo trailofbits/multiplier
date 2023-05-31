@@ -473,7 +473,7 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
   // In the good case, we have:
   //
   //     EXP_0
-  //     /   \
+  //     /   \            .
   //   mtok  ...
   //
   // But in the harder cases, we have:
@@ -508,9 +508,10 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
 
   // A definable name must be the first thing inside of the macro.
   pasta::TokenKind tk = mtok.TokenKind();
+  bool is_definable_tk = IsDefinableToken(tk);
   bool is_definable_name = child_index.has_value() &&
                            !child_index.value() &&  // First token.
-                           IsDefinableToken(tk);
+                           is_definable_tk;
 
   switch (parent->Kind()) {
     case pasta::MacroKind::kToken:
@@ -601,7 +602,7 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
     }
 
     case pasta::MacroKind::kDefineDirective: {
-      if (!IsDefinableToken(mtok.TokenKind())) {
+      if (!is_definable_tk) {
         goto directive_case;
       }
 
@@ -628,13 +629,12 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
           matches = p.VariadicDots().has_value();
         }
 
-        if (!matches) {
-          continue;
-        }
-
-        if (mx::RawEntityId eid = em.EntityId(p);
-            eid != mx::kInvalidEntityId) {
-          return eid;
+        if (matches) {
+          if (mx::RawEntityId eid = em.EntityId(p);
+              eid != mx::kInvalidEntityId) {
+            return eid;
+          }
+          assert(false);
         }
       }
 
@@ -979,24 +979,24 @@ static int Score(mx::RawEntityId fragment_index, mx::EntityId eid) {
 
   if (std::holds_alternative<mx::DeclId>(vid)) {
     if (std::get<mx::DeclId>(vid).fragment_id != fragment_index) {
-      score += 10;
+      score += 1;
     }
-    score += 4;
+    score += 40;
 
   } else if (std::holds_alternative<mx::MacroId>(vid)) {
     if (std::get<mx::MacroId>(vid).fragment_id != fragment_index) {
-      score += 10;
+      score += 1;
     }
-    score += 3;
+    score += 30;
 
   } else if (std::holds_alternative<mx::StmtId>(vid)) {
     if (std::get<mx::StmtId>(vid).fragment_id != fragment_index) {
-      score += 10;
+      score += 1;
     }
-    score += 2;
+    score += 20;
 
   } else if (!std::holds_alternative<mx::InvalidId>(vid)) {
-    score += 1;
+    score += 10;
   }
 
   return score;
