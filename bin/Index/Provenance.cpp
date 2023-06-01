@@ -546,7 +546,22 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
     }
 
     case pasta::MacroKind::kStringify:
+      if (mtok.Data() == "#") {
+        if (mx::RawEntityId eid = em.EntityId(parent.value());
+            eid != mx::kInvalidEntityId) {
+          return eid;
+        }
+      }
+      break;
+
     case pasta::MacroKind::kConcatenate:
+      if (mtok.Data() == "##") {
+        if (mx::RawEntityId eid = em.EntityId(parent.value());
+            eid != mx::kInvalidEntityId) {
+          return eid;
+        }
+      }
+      break;
     case pasta::MacroKind::kVAOptArgument:
     case pasta::MacroKind::kArgument:
       break;
