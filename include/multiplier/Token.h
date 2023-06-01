@@ -251,6 +251,9 @@ class TokenRange {
 
   static TokenRange create(std::vector<CustomToken> tokens);
 
+  bool operator==(const TokenRange &that) const noexcept;
+  bool operator!=(const TokenRange &that) const noexcept = default;
+
   inline operator bool(void) const noexcept {
     return !empty();
   }

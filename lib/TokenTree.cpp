@@ -31,6 +31,27 @@ namespace {
 
 static const std::hash<std::string> kHasher;
 
+class SaveRestoreLastSequence final {
+  const TokenTreeImpl::SequenceNode *&last_sequence;
+  const TokenTreeImpl::SequenceNode * const old_val;
+
+ public:
+
+  inline SaveRestoreLastSequence(
+      const TokenTreeImpl::SequenceNode *&last_sequence_,
+      const TokenTreeImpl::SequenceNode *new_val_)
+      : last_sequence(last_sequence_),
+        old_val(last_sequence) {
+    if (new_val_) {
+      last_sequence = new_val_;
+    }
+  }
+
+  inline ~SaveRestoreLastSequence(void) {
+    last_sequence = old_val;
+  }
+};
+
 #define FILL_MACRO_CHILREN(generator, children_name, file_tokens_name) \
   std::vector<MacroOrToken> children_name; \
   std::vector<Token> file_tokens_name; \
@@ -913,6 +934,8 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
     return ExtendWithSubstitution(seq, me, user_bounds, trailing_tokens);
   }
 
+  SaveRestoreLastSequence seq_raii(last_sequence, seq);
+
   FILL_MACRO_CHILREN(me.children(), mts, fts)
   SequenceNode *before = ProcessMacroChildren(
       nullptr, user_bounds, std::move(mts), std::move(fts), trailing_tokens);
@@ -925,6 +948,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
   auto prev_depth = depth;
   auto next_depth = depth + 1;
 
+  last_sequence = &dummy_sequence;
   SequenceNode *after = nullptr;
   for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
     depth = next_depth;
@@ -1050,8 +1074,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
 // these tokens are top-level tokens, and so while they should appear in the
 // use of the expansion, they should also show up in the use itself.
 TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
-    SequenceNode *seq,
-    const MacroExpansion &me, const Bounds &me_bounds,
+    SequenceNode *seq, const MacroExpansion &me, const Bounds &me_bounds,
     const DefineMacroDirective &def, const Bounds &def_bounds,
     const MacroExpansion &dte, const TrailingTokens &prev_trailing_tokens) {
 
@@ -1090,6 +1113,8 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
     return ExtendWithSubstitution(seq, me, me_bounds, trailing_tokens);
   }
 
+  SaveRestoreLastSequence seq_raii(last_sequence, seq);
+
   FILL_MACRO_CHILREN(me.children(), mts, fts)
   SequenceNode *before = ProcessMacroChildren(
       nullptr, me_bounds, std::move(mts), std::move(fts),
@@ -1102,6 +1127,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
   }
 
   SequenceNode *after = nullptr;
+  last_sequence = &dummy_sequence;
   for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
     depth = next_depth;
     after = AddLeadingTokensInBounds(after, node.definition_token, def_bounds);
@@ -1166,6 +1192,8 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
   auto prev_depth = depth;
   auto next_depth = depth + 1;
 
+  SaveRestoreLastSequence seq_raii(last_sequence, seq);
+
   FILL_MACRO_CHILREN(macro.children(), mts, fts)
   SequenceNode *before = ProcessMacroChildren(
       nullptr, use_bounds, std::move(mts), std::move(fts), trailing_tokens);
@@ -1178,6 +1206,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSubstitution(
   sub->before = before;
 
   SequenceNode *after = nullptr;
+  last_sequence = &dummy_sequence;
   for (MacroOrToken mt : macro.replacement_children()) {
     depth = next_depth;
     after = ExtendWithMacroChild(after, mt, use_bounds, dummy_trailing_tokens);
@@ -1392,6 +1421,9 @@ class TokenTreeReader final : public TokenReader {
 
   std::uint64_t data_hash{0u};
 
+  // Capture the sequence of choices made by a token tree visitor.
+  std::vector<RawEntityId> visitor_choices;
+
   virtual ~TokenTreeReader(void) noexcept = default;
 
   inline TokenTreeReader(std::shared_ptr<TokenTreeImpl> impl_)
@@ -1520,7 +1552,8 @@ class TokenTreeReader final : public TokenReader {
     }
 
     // Different data is being shown, easy to count as different.
-    if (data_hash != that->data_hash) {
+    if (data_hash != that->data_hash ||
+        tokens.size() != that->tokens.size()) {
       return false;
     }
 
@@ -1528,31 +1561,21 @@ class TokenTreeReader final : public TokenReader {
 
       // Not configured to look at the same high-level entities.
       if (impl->file != that->impl->file ||
-          impl->fragment != that->impl->fragment) {
+          impl->fragment != that->impl->fragment ||
+          impl->readers.size() != that->impl->readers.size()) {
         return false;
-      }
-
-      // Can't compare the readers.
-      auto num_readers = impl->readers.size();
-      if (num_readers != that->impl->readers.size()) {
-        return false;
-      }
-
-      // Check that all readers match.
-      for (auto i = 0u; i < num_readers; ++i) {
-        if (!impl->readers[i]->Equals(that->impl->readers[i].get())) {
-          return false;
-        }
       }
     }
 
-    // Readers match, make sure the token indices match.
-    return tokens == that->tokens;
+    // Compare the choices made by the two visitors.
+    return tokens.size() == that->tokens.size() &&
+           visitor_choices == that->visitor_choices;
   }
 };
 
 static void CollectTokens(const TokenTreeImpl::Node &node,
                           const TokenTreeVisitor &vis,
+                          std::vector<RawEntityId> &choices,
                           std::vector<TokenTreeImpl::TokenIndex> &tokens) {
   if (std::holds_alternative<std::monostate>(node)) {
     return;
@@ -1564,11 +1587,13 @@ static void CollectTokens(const TokenTreeImpl::Node &node,
     if (TokenTreeImpl::ChoiceNode *choice =
             std::get<TokenTreeImpl::ChoiceNode *>(node)) {
       PackedFragmentId chosen_frag = vis.choose(choice->fragments).id();
+      choices.emplace_back(chosen_frag.Pack());
+
       auto i = 0u;
       for (const Fragment &frag : choice->fragments) {
         if (chosen_frag == frag.id()) {
           const TokenTreeImpl::Node &frag_node = choice->children[i];
-          CollectTokens(frag_node, vis, tokens);
+          CollectTokens(frag_node, vis, choices, tokens);
         }
         ++i;
       }
@@ -1577,23 +1602,29 @@ static void CollectTokens(const TokenTreeImpl::Node &node,
     if (TokenTreeImpl::SubstitutionNode *sub =
             std::get<TokenTreeImpl::SubstitutionNode *>(node)) {
       auto should_expand = false;
+      RawEntityId choice_id = kInvalidEntityId;
       if (std::holds_alternative<MacroSubstitution>(sub->macro)) {
-        should_expand = vis.should_expand(
-            std::get<MacroSubstitution>(sub->macro));
+        const MacroSubstitution &msub = std::get<MacroSubstitution>(sub->macro);
+        should_expand = vis.should_expand(msub);
+        choice_id = msub.id().Pack();
       } else {
         assert(false);
       }
+
       if (should_expand) {
-        CollectTokens(sub->after, vis, tokens);
+        choices.emplace_back(choice_id);
+      }
+      if (should_expand) {
+        CollectTokens(sub->after, vis, choices, tokens);
       } else {
-        CollectTokens(sub->before, vis, tokens);
+        CollectTokens(sub->before, vis, choices, tokens);
       }
     }
   } else if (std::holds_alternative<TokenTreeImpl::SequenceNode *>(node)) {
     if (TokenTreeImpl::SequenceNode *seq =
             std::get<TokenTreeImpl::SequenceNode *>(node)) {
       for (const TokenTreeImpl::Node &sub_node : seq->children) {
-        CollectTokens(sub_node, vis, tokens);
+        CollectTokens(sub_node, vis, choices, tokens);
       }
     }
   } else {
@@ -1619,10 +1650,21 @@ static void StreamTokData(std::ostream &os, std::string_view tok) {
 
 }  // namespace
 
+// Try to get the token tree containing a token range.
+std::optional<TokenTree> TokenTree::from(const TokenRange &range) {
+  if (auto reader = range.impl.get()) {
+    if (auto ttr = dynamic_cast<const TokenTreeReader *>(reader)) {
+      return TokenTree(ttr->impl);
+    }
+  }
+
+  return std::nullopt;
+}
+
 // Serialize the token tree into a linear range.
 TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {
   auto reader = std::make_shared<TokenTreeReader>(impl);
-  CollectTokens(impl->root, vis, reader->tokens);
+  CollectTokens(impl->root, vis, reader->visitor_choices, reader->tokens);
   EntityOffset num_tokens = static_cast<EntityOffset>(reader->tokens.size());
 
   // Copy in the token data.

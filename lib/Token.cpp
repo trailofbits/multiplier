@@ -1193,6 +1193,17 @@ TokenRange TokenRange::create(std::vector<CustomToken> tokens) {
   return TokenRange(std::move(reader), 0u, num_tokens);
 }
 
+bool TokenRange::operator==(const TokenRange &that) const noexcept {
+  if (num_tokens == that.num_tokens && index == that.index) {
+    if (impl && that.impl) {
+      return impl->Equals(that.impl.get());
+    } else {
+      return !impl && !that.impl;
+    }
+  }
+  return false;
+}
+
 // Return the token at index `index`.
 Token TokenRange::operator[](size_t relative_index) const {
   size_t effective_index = (index + relative_index);

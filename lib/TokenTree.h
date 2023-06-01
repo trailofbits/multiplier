@@ -100,6 +100,9 @@ class TokenTreeImpl {
   // Never filled.
   const TrailingTokens dummy_trailing_tokens{};
 
+  const SequenceNode dummy_sequence{};
+  const SequenceNode *last_sequence{&dummy_sequence};
+
   TokenIndex GetOrCreateIndex(const Token &tok);
   SequenceNode *AddLeadingTokensInBounds(
       SequenceNode *seq, const Token &tok, const Bounds &bounds);

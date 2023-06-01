@@ -4,6 +4,8 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#pragma once
+
 #include <iosfwd>
 
 #include "Token.h"
@@ -39,6 +41,9 @@ class TokenTree {
 
   static TokenTree from(const File &);
   static TokenTree from(const Fragment &);
+
+  // Try to get the token tree containing a token range.
+  static std::optional<TokenTree> from(const TokenRange &);
 
   // Serialize the token tree into a linear range.
   TokenRange serialize(const TokenTreeVisitor &vis=TokenTreeVisitor()) const;
