@@ -1289,7 +1289,7 @@ TokenTreeImpl::Bounds TokenTreeImpl::WidenBounds(Bounds ret) {
         continue;
       case TokenKind::WHITESPACE:
         saw_lc = false;
-        for (auto ch : reader->NthTokenData(i - 1u)) {
+        for (auto ch : reader->NthTokenData(i)) {
           if (ch == '\\') {
             saw_lc = true;
           } else if (ch == '\r') {
