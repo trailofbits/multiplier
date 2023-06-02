@@ -859,13 +859,14 @@ static bool SuppressLeadingWhitespace(TokenKind tk) {
 }
 
 static bool ForceLeadingWhitespace(bool prev_is_first, TokenKind prev,
-                                   TokenKind curr) {
+                                   TokenKind curr, bool curr_is_first) {
   auto prev_is_ident_kw = prev == TokenKind::IDENTIFIER || IsKeyword(prev);
   auto curr_is_ident_kw = curr == TokenKind::IDENTIFIER || IsKeyword(curr);
   if (prev_is_ident_kw && curr_is_ident_kw) {
     return true;
   }
   (void) prev_is_first;
+  (void) curr_is_first;
   return false;
 }
 
@@ -2223,8 +2224,14 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
     }
   }
 
+  const bool will_be_first = IsFirst(tk);
   if (!add_leading_ws && !is_include_tok) {
-    add_leading_ws = ForceLeadingWhitespace(is_first, last_tk, tk);
+    add_leading_ws = ForceLeadingWhitespace(is_first, last_tk, tk,
+                                            will_be_first);
+  }
+
+  if (add_leading_ws && is_first && will_be_first) {
+    add_leading_ws = false;  // E.g. `};`.
   }
 
   EntityOffset data_size = static_cast<EntityOffset>(data.size());
@@ -2254,7 +2261,7 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
   } else {
     add_leading_ws = AddTrailingWhitespace(tk);
   }
-  is_first = IsFirst(tk);
+  is_first = will_be_first;
 }
 
 static void CollectTokens(const TokenTreeImpl::Node &node,
