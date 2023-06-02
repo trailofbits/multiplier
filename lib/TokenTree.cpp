@@ -2200,14 +2200,30 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
   const TokenReader::Ptr &tok_reader = impl->readers[ri];
 
   TokenKind tk = tok_reader->NthTokenKind(to);
-  if (last_tk == TokenKind::WHITESPACE && tk == TokenKind::WHITESPACE) {
+  VariantId rel_id = EntityId(tok_reader->NthRelatedEntity(to)).Unpack();
+  bool is_include_tok = std::holds_alternative<FileId>(rel_id);
+  if (std::holds_alternative<MacroId>(rel_id)) {
+    switch (std::get<MacroId>(rel_id).kind) {
+      case MacroKind::INCLUDE_DIRECTIVE:
+      case MacroKind::INCLUDE_NEXT_DIRECTIVE:
+      case MacroKind::INCLUDE_MACROS_DIRECTIVE:
+      case MacroKind::IMPORT_DIRECTIVE:
+        is_include_tok = true;
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (last_tk == TokenKind::WHITESPACE && tk == TokenKind::WHITESPACE &&
+      !is_include_tok) {
     TokenTreeImpl::TokenIndex last_ti = tokens.back();
     if (last_ti.first != ri || (last_ti.second + 1u) != to) {
       return;  // Don't add two whitespaces side-by-side.
     }
   }
 
-  if (!add_leading_ws) {
+  if (!add_leading_ws && !is_include_tok) {
     add_leading_ws = ForceLeadingWhitespace(is_first, last_tk, tk);
   }
 
@@ -2215,7 +2231,7 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
 
   // Force inject whitespace between two tokens.
   if (add_leading_ws || (!is_first && AddLeadingWhitespace(tk))) {
-    if (!SuppressLeadingWhitespace(tk)) {
+    if (!is_include_tok && !SuppressLeadingWhitespace(tk)) {
       tokens.emplace_back(kWhitespaceReaderIndex, 0u);
       data.push_back(' ');
       token_offset.emplace_back(data_size++);
