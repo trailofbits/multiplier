@@ -100,8 +100,8 @@ class TokenTreeImpl {
   // Never filled.
   const TrailingTokens dummy_trailing_tokens{};
 
-  const SequenceNode dummy_sequence{};
-  const SequenceNode *last_sequence{&dummy_sequence};
+  SequenceNode dummy_sequence{};
+  SequenceNode *last_sequence{&dummy_sequence};
 
   TokenIndex GetOrCreateIndex(const Token &tok);
   SequenceNode *AddLeadingTokensInBounds(
@@ -149,6 +149,9 @@ class TokenTreeImpl {
   Bounds FragmentBounds(const TokenRange &tokens);
   std::optional<Bounds> MacroBodyBounds(const DefineMacroDirective &def);
   std::optional<Bounds> TopLevelUseBounds(const Macro &macro);
+
+  // Widen bounds to cover leading/trailing comments.
+  Bounds WidenBounds(Bounds bounds);
 
   // NOTE(pag): This will reset `curr_leaf` if `that == curr_leaf` and
   //            `curr_leaf` is empty.

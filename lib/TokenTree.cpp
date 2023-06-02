@@ -32,14 +32,14 @@ namespace {
 static const std::hash<std::string> kHasher;
 
 class SaveRestoreLastSequence final {
-  const TokenTreeImpl::SequenceNode *&last_sequence;
-  const TokenTreeImpl::SequenceNode * const old_val;
+  TokenTreeImpl::SequenceNode *&last_sequence;
+  TokenTreeImpl::SequenceNode * const old_val;
 
  public:
 
   inline SaveRestoreLastSequence(
-      const TokenTreeImpl::SequenceNode *&last_sequence_,
-      const TokenTreeImpl::SequenceNode *new_val_)
+      TokenTreeImpl::SequenceNode *&last_sequence_,
+      TokenTreeImpl::SequenceNode *new_val_)
       : last_sequence(last_sequence_),
         old_val(last_sequence) {
     if (new_val_) {
@@ -346,7 +346,7 @@ struct BodyTokenForChild {
   Token definition_token;
 
   // Tells us if the tokens are from the usage site, i.e. argument tokens.
-  bool is_argument;
+  bool is_from_macro_use;
 
   BodyTokenForChild(void) = delete;
 
@@ -354,8 +354,520 @@ struct BodyTokenForChild {
                            bool is_argument_)
       : mt(std::move(mt_)),
         definition_token(std::move(definition_token_)),
-        is_argument(is_argument_) {}
+        is_from_macro_use(is_argument_) {}
 };
+
+
+static bool IsKeyword(TokenKind tk) {
+  switch (tk) {
+    case TokenKind::KEYWORD_AUTO:
+    case TokenKind::KEYWORD_BREAK:
+    case TokenKind::KEYWORD_CASE:
+    case TokenKind::KEYWORD_CHARACTER:
+    case TokenKind::KEYWORD_CONST:
+    case TokenKind::KEYWORD_CONTINUE:
+    case TokenKind::KEYWORD_DEFAULT:
+    case TokenKind::KEYWORD_DO:
+    case TokenKind::KEYWORD_DOUBLE:
+    case TokenKind::KEYWORD_ELSE:
+    case TokenKind::KEYWORD_ENUM:
+    case TokenKind::KEYWORD_EXTERN:
+    case TokenKind::KEYWORD_FLOAT:
+    case TokenKind::KEYWORD_FOR:
+    case TokenKind::KEYWORD_GOTO:
+    case TokenKind::KEYWORD_IF:
+    case TokenKind::KEYWORD_INT:
+    case TokenKind::KEYWORD__EXT_INT:
+    case TokenKind::KEYWORD__BIT_INT:
+    case TokenKind::KEYWORD_LONG:
+    case TokenKind::KEYWORD_REGISTER:
+    case TokenKind::KEYWORD_RETURN:
+    case TokenKind::KEYWORD_SHORT:
+    case TokenKind::KEYWORD_SIGNED:
+    case TokenKind::KEYWORD_SIZEOF:
+    case TokenKind::KEYWORD_STATIC:
+    case TokenKind::KEYWORD_STRUCT:
+    case TokenKind::KEYWORD_SWITCH:
+    case TokenKind::KEYWORD_TYPEDEF:
+    case TokenKind::KEYWORD_UNION:
+    case TokenKind::KEYWORD_UNSIGNED:
+    case TokenKind::KEYWORD_VOID:
+    case TokenKind::KEYWORD_VOLATILE:
+    case TokenKind::KEYWORD_WHILE:
+    case TokenKind::KEYWORD__ALIGNAS:
+    case TokenKind::KEYWORD__ALIGNOF:
+    case TokenKind::KEYWORD__ATOMIC:
+    case TokenKind::KEYWORD__BOOLEAN:
+    case TokenKind::KEYWORD__COMPLEX:
+    case TokenKind::KEYWORD__GENERIC:
+    case TokenKind::KEYWORD__IMAGINARY:
+    case TokenKind::KEYWORD__NORETURN:
+    case TokenKind::KEYWORD__STATIC_ASSERT:
+    case TokenKind::KEYWORD__THREAD_LOCAL:
+    case TokenKind::KEYWORD___FUNC__:
+    case TokenKind::KEYWORD___OBJC_YES:
+    case TokenKind::KEYWORD___OBJC_NO:
+    case TokenKind::KEYWORD_ASSEMBLY:
+    case TokenKind::KEYWORD_BOOLEAN:
+    case TokenKind::KEYWORD_CATCH:
+    case TokenKind::KEYWORD_CLASS:
+    case TokenKind::KEYWORD_CONST_CAST:
+    case TokenKind::KEYWORD_DELETE:
+    case TokenKind::KEYWORD_DYNAMIC_CAST:
+    case TokenKind::KEYWORD_EXPLICIT:
+    case TokenKind::KEYWORD_EXPORT:
+    case TokenKind::KEYWORD_FALSE:
+    case TokenKind::KEYWORD_FRIEND:
+    case TokenKind::KEYWORD_MUTABLE:
+    case TokenKind::KEYWORD_NAMESPACE:
+    case TokenKind::KEYWORD_NEW:
+    case TokenKind::KEYWORD_OPERATOR:
+    case TokenKind::KEYWORD_PRIVATE:
+    case TokenKind::KEYWORD_PROTECTED:
+    case TokenKind::KEYWORD_PUBLIC:
+    case TokenKind::KEYWORD_REINTERPRET_CAST:
+    case TokenKind::KEYWORD_STATIC_CAST:
+    case TokenKind::KEYWORD_TEMPLATE:
+    case TokenKind::KEYWORD_THIS:
+    case TokenKind::KEYWORD_THROW:
+    case TokenKind::KEYWORD_TRUE:
+    case TokenKind::KEYWORD_TRY:
+    case TokenKind::KEYWORD_TYPENAME:
+    case TokenKind::KEYWORD_TYPEID:
+    case TokenKind::KEYWORD_USING:
+    case TokenKind::KEYWORD_VIRTUAL:
+    case TokenKind::KEYWORD_WCHAR_T:
+    case TokenKind::KEYWORD_RESTRICT:
+    case TokenKind::KEYWORD_INLINE:
+    case TokenKind::KEYWORD_ALIGNAS:
+    case TokenKind::KEYWORD_ALIGNOF:
+    case TokenKind::KEYWORD_CHAR16_T:
+    case TokenKind::KEYWORD_CHAR32_T:
+    case TokenKind::KEYWORD_CONSTEXPR:
+    case TokenKind::KEYWORD_DECLTYPE:
+    case TokenKind::KEYWORD_NOEXCEPT:
+    case TokenKind::KEYWORD_NULLPTR:
+    case TokenKind::KEYWORD_STATIC_ASSERT:
+    case TokenKind::KEYWORD_THREAD_LOCAL:
+    case TokenKind::KEYWORD_CO_AWAIT:
+    case TokenKind::KEYWORD_CO_RETURN:
+    case TokenKind::KEYWORD_CO_YIELD:
+    case TokenKind::KEYWORD_MODULE:
+    case TokenKind::KEYWORD_IMPORT:
+    case TokenKind::KEYWORD_CONSTEVAL:
+    case TokenKind::KEYWORD_CONSTINIT:
+    case TokenKind::KEYWORD_CONCEPT:
+    case TokenKind::KEYWORD_REQUIRES:
+    case TokenKind::KEYWORD_CHAR8_T:
+    case TokenKind::KEYWORD__FLOAT16:
+    case TokenKind::KEYWORD_TYPEOF:
+    case TokenKind::KEYWORD_TYPEOF_UNQUALIFIED:
+    case TokenKind::KEYWORD__ACCUM:
+    case TokenKind::KEYWORD__FRACT:
+    case TokenKind::KEYWORD__SAT:
+    case TokenKind::KEYWORD__DECIMAL32:
+    case TokenKind::KEYWORD__DECIMAL64:
+    case TokenKind::KEYWORD__DECIMAL128:
+    case TokenKind::KEYWORD___NULL:
+    case TokenKind::KEYWORD___ALIGNOF:
+    case TokenKind::KEYWORD___ATTRIBUTE:
+    case TokenKind::KEYWORD___BUILTIN_CHOOSE_EXPRESSION:
+    case TokenKind::KEYWORD___BUILTIN_OFFSETOF:
+    case TokenKind::KEYWORD___BUILTIN_FILE:
+    case TokenKind::KEYWORD___BUILTIN_FUNCTION:
+    case TokenKind::KEYWORD___BUILTIN_LINE:
+    case TokenKind::KEYWORD___BUILTIN_COLUMN:
+    case TokenKind::KEYWORD___BUILTIN_SOURCE_TOKEN:
+    case TokenKind::KEYWORD___BUILTIN_TYPES_COMPATIBLE_P:
+    case TokenKind::KEYWORD___BUILTIN_VA_ARGUMENT:
+    case TokenKind::KEYWORD___EXTENSION__:
+    case TokenKind::KEYWORD___FLOAT128:
+    case TokenKind::KEYWORD___IBM128:
+    case TokenKind::KEYWORD___IMAG:
+    case TokenKind::KEYWORD___INT128:
+    case TokenKind::KEYWORD___LABEL__:
+    case TokenKind::KEYWORD___REAL:
+    case TokenKind::KEYWORD___THREAD:
+    case TokenKind::KEYWORD___FUNCTION__:
+    case TokenKind::KEYWORD___PRETTYFUNCTION__:
+    case TokenKind::KEYWORD___AUTO_TYPE:
+    case TokenKind::KEYWORD___FUNCDNAME__:
+    case TokenKind::KEYWORD___FUNCSIG__:
+    case TokenKind::KEYWORD_LFUNCTION__:
+    case TokenKind::KEYWORD_LFUNCSIG__:
+    case TokenKind::KEYWORD___IS_INTERFACE_CLASS:
+    case TokenKind::KEYWORD___IS_SEALED:
+    case TokenKind::KEYWORD___IS_DESTRUCTIBLE:
+    case TokenKind::KEYWORD___IS_TRIVIALLY_DESTRUCTIBLE:
+    case TokenKind::KEYWORD___IS_NOTHROW_DESTRUCTIBLE:
+    case TokenKind::KEYWORD___IS_NOTHROW_ASSIGNABLE:
+    case TokenKind::KEYWORD___IS_CONSTRUCTIBLE:
+    case TokenKind::KEYWORD___IS_NOTHROW_CONSTRUCTIBLE:
+    case TokenKind::KEYWORD___IS_ASSIGNABLE:
+    case TokenKind::KEYWORD___HAS_NOTHROW_MOVE_ASSIGN:
+    case TokenKind::KEYWORD___HAS_TRIVIAL_MOVE_ASSIGN:
+    case TokenKind::KEYWORD___HAS_TRIVIAL_MOVE_CONSTRUCTOR:
+    case TokenKind::KEYWORD___HAS_NOTHROW_ASSIGN:
+    case TokenKind::KEYWORD___HAS_NOTHROW_COPY:
+    case TokenKind::KEYWORD___HAS_NOTHROW_CONSTRUCTOR:
+    case TokenKind::KEYWORD___HAS_TRIVIAL_ASSIGN:
+    case TokenKind::KEYWORD___HAS_TRIVIAL_COPY:
+    case TokenKind::KEYWORD___HAS_TRIVIAL_CONSTRUCTOR:
+    case TokenKind::KEYWORD___HAS_TRIVIAL_DESTRUCTOR:
+    case TokenKind::KEYWORD___HAS_VIRTUAL_DESTRUCTOR:
+    case TokenKind::KEYWORD___IS_ABSTRACT:
+    case TokenKind::KEYWORD___IS_AGGREGATE:
+    case TokenKind::KEYWORD___IS_BASE_OF:
+    case TokenKind::KEYWORD___IS_CLASS:
+    case TokenKind::KEYWORD___IS_CONVERTIBLE_TO:
+    case TokenKind::KEYWORD___IS_EMPTY:
+    case TokenKind::KEYWORD___IS_ENUM:
+    case TokenKind::KEYWORD___IS_FINAL:
+    case TokenKind::KEYWORD___IS_LITERAL:
+    case TokenKind::KEYWORD___IS_POD:
+    case TokenKind::KEYWORD___IS_POLYMORPHIC:
+    case TokenKind::KEYWORD___IS_STANDARD_LAYOUT:
+    case TokenKind::KEYWORD___IS_TRIVIAL:
+    case TokenKind::KEYWORD___IS_TRIVIALLY_ASSIGNABLE:
+    case TokenKind::KEYWORD___IS_TRIVIALLY_CONSTRUCTIBLE:
+    case TokenKind::KEYWORD___IS_TRIVIALLY_COPYABLE:
+    case TokenKind::KEYWORD___IS_UNION:
+    case TokenKind::KEYWORD___HAS_UNIQUE_OBJECT_REPRESENTATIONS:
+    case TokenKind::KEYWORD___ADD_LVALUE_REFERENCE:
+    case TokenKind::KEYWORD___ADD_POINTER:
+    case TokenKind::KEYWORD___ADD_RVALUE_REFERENCE:
+    case TokenKind::KEYWORD___DECAY:
+    case TokenKind::KEYWORD___MAKE_SIGNED:
+    case TokenKind::KEYWORD___MAKE_UNSIGNED:
+    case TokenKind::KEYWORD___REMOVE_ALL_EXTENTS:
+    case TokenKind::KEYWORD___REMOVE_CONST:
+    case TokenKind::KEYWORD___REMOVE_CV:
+    case TokenKind::KEYWORD___REMOVE_CVREF:
+    case TokenKind::KEYWORD___REMOVE_EXTENT:
+    case TokenKind::KEYWORD___REMOVE_POINTER:
+    case TokenKind::KEYWORD___REMOVE_REFERENCE_T:
+    case TokenKind::KEYWORD___REMOVE_RESTRICT:
+    case TokenKind::KEYWORD___REMOVE_VOLATILE:
+    case TokenKind::KEYWORD___UNDERLYING_TYPE:
+    case TokenKind::KEYWORD___IS_TRIVIALLY_RELOCATABLE:
+    case TokenKind::KEYWORD___IS_BOUNDED_ARRAY:
+    case TokenKind::KEYWORD___IS_UNBOUNDED_ARRAY:
+    case TokenKind::KEYWORD___IS_NULLPTR:
+    case TokenKind::KEYWORD___IS_SCOPED_ENUM:
+    case TokenKind::KEYWORD___IS_REFERENCEABLE:
+    case TokenKind::KEYWORD___REFERENCE_BINDS_TO_TEMPORARY:
+    case TokenKind::KEYWORD___IS_LVALUE_EXPRESSION:
+    case TokenKind::KEYWORD___IS_RVALUE_EXPRESSION:
+    case TokenKind::KEYWORD___IS_ARITHMETIC:
+    case TokenKind::KEYWORD___IS_FLOATING_POINT:
+    case TokenKind::KEYWORD___IS_INTEGRAL:
+    case TokenKind::KEYWORD___IS_COMPLETE_TYPE:
+    case TokenKind::KEYWORD___IS_VOID:
+    case TokenKind::KEYWORD___IS_ARRAY:
+    case TokenKind::KEYWORD___IS_FUNCTION:
+    case TokenKind::KEYWORD___IS_REFERENCE:
+    case TokenKind::KEYWORD___IS_LVALUE_REFERENCE:
+    case TokenKind::KEYWORD___IS_RVALUE_REFERENCE:
+    case TokenKind::KEYWORD___IS_FUNDAMENTAL:
+    case TokenKind::KEYWORD___IS_OBJECT:
+    case TokenKind::KEYWORD___IS_SCALAR:
+    case TokenKind::KEYWORD___IS_COMPOUND:
+    case TokenKind::KEYWORD___IS_POINTER:
+    case TokenKind::KEYWORD___IS_MEMBER_OBJECT_POINTER:
+    case TokenKind::KEYWORD___IS_MEMBER_FUNCTION_POINTER:
+    case TokenKind::KEYWORD___IS_MEMBER_POINTER:
+    case TokenKind::KEYWORD___IS_CONST:
+    case TokenKind::KEYWORD___IS_VOLATILE:
+    case TokenKind::KEYWORD___IS_SIGNED:
+    case TokenKind::KEYWORD___IS_UNSIGNED:
+    case TokenKind::KEYWORD___IS_SAME:
+    case TokenKind::KEYWORD___IS_CONVERTIBLE:
+    case TokenKind::KEYWORD___ARRAY_RANK:
+    case TokenKind::KEYWORD___ARRAY_EXTENT:
+    case TokenKind::KEYWORD___PRIVATE_EXTERN__:
+    case TokenKind::KEYWORD___MODULE_PRIVATE__:
+    case TokenKind::KEYWORD___BUILTIN_PTRAUTH_TYPE_DISCRIMINATOR:
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPE_SIGNATURE:
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPE_SUMMARY:
+    case TokenKind::KEYWORD___BUILTIN_TMO_TYPE_METADATA:
+    case TokenKind::KEYWORD___BUILTIN_XNU_TYPES_COMPATIBLE:
+    case TokenKind::KEYWORD___DECLSPEC:
+    case TokenKind::KEYWORD___CDECL:
+    case TokenKind::KEYWORD___STDCALL:
+    case TokenKind::KEYWORD___FASTCALL:
+    case TokenKind::KEYWORD___THISCALL:
+    case TokenKind::KEYWORD___REGCALL:
+    case TokenKind::KEYWORD___VECTORCALL:
+    case TokenKind::KEYWORD___FORCEINLINE:
+    case TokenKind::KEYWORD___UNALIGNED:
+    case TokenKind::KEYWORD___SUPER:
+    case TokenKind::KEYWORD___GLOBAL:
+    case TokenKind::KEYWORD___LOCAL:
+    case TokenKind::KEYWORD___CONSTANT:
+    case TokenKind::KEYWORD___PRIVATE:
+    case TokenKind::KEYWORD___GENERIC:
+    case TokenKind::KEYWORD___KERNEL:
+    case TokenKind::KEYWORD___READ_ONLY:
+    case TokenKind::KEYWORD___WRITE_ONLY:
+    case TokenKind::KEYWORD___READ_WRITE:
+    case TokenKind::KEYWORD___BUILTIN_ASTYPE:
+    case TokenKind::KEYWORD_VEC_STEP:
+    case TokenKind::KEYWORD_IMAGE_1D_T:
+    case TokenKind::KEYWORD_IMAGE_1D_ARRAY_T:
+    case TokenKind::KEYWORD_IMAGE_1D_BUFFER_T:
+    case TokenKind::KEYWORD_IMAGE_2D_T:
+    case TokenKind::KEYWORD_IMAGE_2D_ARRAY_T:
+    case TokenKind::KEYWORD_IMAGE_2D_DEPTH_T:
+    case TokenKind::KEYWORD_IMAGE_2D_ARRAY_DEPTH_T:
+    case TokenKind::KEYWORD_IMAGE_2D_MSAA_T:
+    case TokenKind::KEYWORD_IMAGE_2D_ARRAY_MSAA_T:
+    case TokenKind::KEYWORD_IMAGE_2D_MSAA_DEPTH_T:
+    case TokenKind::KEYWORD_IMAGE_2D_ARRAY_MSAA_DEPTH_T:
+    case TokenKind::KEYWORD_IMAGE_3D_T:
+    case TokenKind::KEYWORD_PIPE:
+    case TokenKind::KEYWORD_ADDRSPACE_CAST:
+    case TokenKind::KEYWORD___NOINLINE__:
+    case TokenKind::KEYWORD_CBUFFER:
+    case TokenKind::KEYWORD_TBUFFER:
+    case TokenKind::KEYWORD_GROUPSHARED:
+    case TokenKind::KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN:
+    case TokenKind::KEYWORD___PASCAL:
+    case TokenKind::KEYWORD___VECTOR:
+    case TokenKind::KEYWORD___PIXEL:
+    case TokenKind::KEYWORD___BOOLEAN:
+    case TokenKind::KEYWORD___BF16:
+    case TokenKind::KEYWORD_HALF:
+    case TokenKind::KEYWORD___BRIDGE:
+    case TokenKind::KEYWORD___BRIDGE_TRANSFER:
+    case TokenKind::KEYWORD___BRIDGE_RETAINED:
+    case TokenKind::KEYWORD___BRIDGE_RETAIN:
+    case TokenKind::KEYWORD___COVARIANT:
+    case TokenKind::KEYWORD___CONTRAVARIANT:
+    case TokenKind::KEYWORD___KINDOF:
+    case TokenKind::KEYWORD__NONNULL:
+    case TokenKind::KEYWORD__NULLABLE:
+    case TokenKind::KEYWORD__NULLABLE_RESULT:
+    case TokenKind::KEYWORD__NULL_UNSPECIFIED:
+    case TokenKind::KEYWORD___PTR64:
+    case TokenKind::KEYWORD___PTR32:
+    case TokenKind::KEYWORD___SPTR:
+    case TokenKind::KEYWORD___UPTR:
+    case TokenKind::KEYWORD___W64:
+    case TokenKind::KEYWORD___UUIDOF:
+    case TokenKind::KEYWORD___TRY:
+    case TokenKind::KEYWORD___FINALLY:
+    case TokenKind::KEYWORD___LEAVE:
+    case TokenKind::KEYWORD___INT64:
+    case TokenKind::KEYWORD___IF_EXISTS:
+    case TokenKind::KEYWORD___IF_NOT_EXISTS:
+    case TokenKind::KEYWORD___SINGLE_INHERITANCE:
+    case TokenKind::KEYWORD___MULTIPLE_INHERITANCE:
+    case TokenKind::KEYWORD___VIRTUAL_INHERITANCE:
+    case TokenKind::KEYWORD___INTERFACE:
+    case TokenKind::KEYWORD___BUILTIN_CONVERTVECTOR:
+    case TokenKind::KEYWORD___BUILTIN_BIT_CAST:
+    case TokenKind::KEYWORD___BUILTIN_AVAILABLE:
+    case TokenKind::KEYWORD___BUILTIN_SYCL_UNIQUE_STABLE_NAME:
+    case TokenKind::KEYWORD___UNKNOWN_ANYTYPE:
+    case TokenKind::PP_IF:
+    case TokenKind::PP_IFDEF:
+    case TokenKind::PP_IFNDEF:
+    case TokenKind::PP_ELIF:
+    case TokenKind::PP_ELIFDEF:
+    case TokenKind::PP_ELIFNDEF:
+    case TokenKind::PP_ELSE:
+    case TokenKind::PP_ENDIF:
+    case TokenKind::PP_DEFINED:
+    case TokenKind::PP_INCLUDE:
+    case TokenKind::PP___INCLUDE_MACROS:
+    case TokenKind::PP_DEFINE:
+    case TokenKind::PP_UNDEF:
+    case TokenKind::PP_LINE:
+    case TokenKind::PP_ERROR:
+    case TokenKind::PP_PRAGMA:
+    case TokenKind::PP_IMPORT:
+    case TokenKind::PP_INCLUDE_NEXT:
+    case TokenKind::PP_WARNING:
+    case TokenKind::PP_IDENTIFIER:
+    case TokenKind::PP_SCCS:
+    case TokenKind::PP_ASSERT:
+    case TokenKind::PP_UNASSERT:
+    case TokenKind::PP___PUBLIC_MACRO:
+    case TokenKind::PP___PRIVATE_MACRO:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool AddLeadingWhitespace(TokenKind tk) {
+  switch (tk) {
+    case TokenKind::WHITESPACE:
+      return false;
+//    case TokenKind::NUMERIC_CONSTANT:
+//    case TokenKind::CHARACTER_CONSTANT:
+//    case TokenKind::WIDE_CHARACTER_CONSTANT:
+//    case TokenKind::UTF8_CHARACTER_CONSTANT:
+//    case TokenKind::UTF16_CHARACTER_CONSTANT:
+//    case TokenKind::UTF32_CHARACTER_CONSTANT:
+//    case TokenKind::STRING_LITERAL:
+//    case TokenKind::WIDE_STRING_LITERAL:
+//    case TokenKind::HEADER_NAME:
+//    case TokenKind::UTF8_STRING_LITERAL:
+//    case TokenKind::UTF16_STRING_LITERAL:
+//    case TokenKind::UTF32_STRING_LITERAL:
+
+    case TokenKind::AMP:
+    case TokenKind::AMP_AMP:
+    case TokenKind::AMP_EQUAL:
+    case TokenKind::STAR:
+    case TokenKind::STAR_EQUAL:
+    case TokenKind::PLUS:
+//    case TokenKind::PLUS_PLUS:
+    case TokenKind::PLUS_EQUAL:
+    case TokenKind::MINUS:
+//    case TokenKind::ARROW:
+//    case TokenKind::MINUS_MINUS:
+    case TokenKind::MINUS_EQUAL:
+    case TokenKind::TILDE:
+    case TokenKind::EXCLAIM:
+    case TokenKind::EXCLAIM_EQUAL:
+    case TokenKind::SLASH:
+    case TokenKind::SLASH_EQUAL:
+    case TokenKind::PERCENT:
+    case TokenKind::PERCENT_EQUAL:
+    case TokenKind::LESS:  // TODO(pag): Templates.
+    case TokenKind::LESS_LESS:  // TODO(pag): Templates.
+    case TokenKind::LESS_EQUAL:
+    case TokenKind::LESS_LESS_EQUAL:
+    case TokenKind::SPACESHIP:
+    case TokenKind::GREATER:
+    case TokenKind::GREATER_GREATER:
+    case TokenKind::GREATER_EQUAL:
+    case TokenKind::GREATER_GREATER_EQUAL:
+    case TokenKind::CARET:
+    case TokenKind::CARET_EQUAL:
+    case TokenKind::PIPE:
+    case TokenKind::PIPE_PIPE:
+    case TokenKind::PIPE_EQUAL:
+    case TokenKind::QUESTION:
+//    case TokenKind::COLON:
+//    case TokenKind::SEMI:
+    case TokenKind::EQUAL:
+    case TokenKind::EQUAL_EQUAL:
+//    case TokenKind::COMMA:
+    case TokenKind::LESS_LESS_LESS:
+    case TokenKind::GREATER_GREATER_GREATER:
+    case TokenKind::L_BRACE_TOKEN:
+    case TokenKind::R_BRACE_TOKEN:
+      return true;
+    default:
+      return IsKeyword(tk);
+  }
+}
+
+static bool IsFirst(TokenKind tk) {
+  switch (tk) {
+    case TokenKind::WHITESPACE:
+    case TokenKind::L_PARENTHESIS:
+    case TokenKind::L_SQUARE:
+    case TokenKind::L_BRACE_TOKEN:
+    case TokenKind::R_BRACE_TOKEN:
+    case TokenKind::SEMI:
+    case TokenKind::COMMA:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool AddTrailingWhitespace(TokenKind tk) {
+  switch (tk) {
+    case TokenKind::WHITESPACE:
+      return false;
+    case TokenKind::AMP:
+    case TokenKind::AMP_AMP:
+    case TokenKind::AMP_EQUAL:
+    case TokenKind::STAR:
+    case TokenKind::STAR_EQUAL:
+    case TokenKind::PLUS:
+//    case TokenKind::PLUS_PLUS:
+    case TokenKind::PLUS_EQUAL:
+    case TokenKind::MINUS:
+//    case TokenKind::ARROW:
+//    case TokenKind::MINUS_MINUS:
+    case TokenKind::MINUS_EQUAL:
+//    case TokenKind::TILDE:
+//    case TokenKind::EXCLAIM:
+    case TokenKind::EXCLAIM_EQUAL:
+    case TokenKind::SLASH:
+    case TokenKind::SLASH_EQUAL:
+    case TokenKind::PERCENT:
+    case TokenKind::PERCENT_EQUAL:
+    case TokenKind::LESS:  // TODO(pag): Templates.
+    case TokenKind::LESS_LESS:  // TODO(pag): Templates.
+    case TokenKind::LESS_EQUAL:
+    case TokenKind::LESS_LESS_EQUAL:
+    case TokenKind::SPACESHIP:
+    case TokenKind::GREATER:
+    case TokenKind::GREATER_GREATER:
+    case TokenKind::GREATER_EQUAL:
+    case TokenKind::GREATER_GREATER_EQUAL:
+    case TokenKind::CARET:
+    case TokenKind::CARET_EQUAL:
+    case TokenKind::PIPE:
+    case TokenKind::PIPE_PIPE:
+    case TokenKind::PIPE_EQUAL:
+    case TokenKind::QUESTION:
+    case TokenKind::COLON:
+    case TokenKind::SEMI:
+    case TokenKind::EQUAL:
+    case TokenKind::EQUAL_EQUAL:
+    case TokenKind::COMMA:
+    case TokenKind::LESS_LESS_LESS:
+    case TokenKind::GREATER_GREATER_GREATER:
+    case TokenKind::R_BRACE_TOKEN:
+      return true;
+    default:
+      return IsKeyword(tk);
+  }
+}
+
+static bool AddTrailingWhitespaceAsFirst(TokenKind tk) {
+  switch (tk) {
+    case TokenKind::WHITESPACE:
+    case TokenKind::STAR:
+    case TokenKind::AMP:
+    case TokenKind::PLUS:
+    case TokenKind::MINUS:
+      return false;
+    default:
+      return AddTrailingWhitespace(tk);
+  }
+}
+
+static bool SuppressLeadingWhitespace(TokenKind tk) {
+  switch (tk) {
+    case TokenKind::WHITESPACE:
+    case TokenKind::COMMA:
+    case TokenKind::R_PARENTHESIS:
+    case TokenKind::R_SQUARE:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool ForceLeadingWhitespace(bool prev_is_first, TokenKind prev,
+                                   TokenKind curr) {
+  auto prev_is_ident_kw = prev == TokenKind::IDENTIFIER || IsKeyword(prev);
+  auto curr_is_ident_kw = curr == TokenKind::IDENTIFIER || IsKeyword(curr);
+  if (prev_is_ident_kw && curr_is_ident_kw) {
+    return true;
+  }
+  (void) prev_is_first;
+  return false;
+}
 
 }  // namespace
 
@@ -380,7 +892,10 @@ struct TokenTreeImpl::MacroExpansionProcessor {
   // "view" of what the expanded children should look like.
   std::vector<BodyTokenForChild> merged_children;
 
-  void Init(const MacroExpansion &me, const DefineMacroDirective &def);
+  bool body_has_trailing_comment{false};
+
+  void Init(const MacroExpansion &me, const DefineMacroDirective &def,
+            const Bounds &def_bounds);
   bool Run(bool is_non_tree);
 
   inline const std::vector<BodyTokenForChild> &ReplacementChildren(void) const {
@@ -389,13 +904,15 @@ struct TokenTreeImpl::MacroExpansionProcessor {
 };
 
 void TokenTreeImpl::MacroExpansionProcessor::Init(
-    const MacroExpansion &me, const DefineMacroDirective &def) {
+    const MacroExpansion &me, const DefineMacroDirective &def,
+    const Bounds &def_bounds) {
 
   body_children.clear();
   after_children.clear();
   body_use.clear();
   after_use.clear();
   merged_children.clear();
+  body_has_trailing_comment = false;
 
   for (MacroOrToken mt : me.replacement_children()) {
     FlattenExpansionUses(std::move(mt), 0u, after_children, after_use);
@@ -459,6 +976,17 @@ void TokenTreeImpl::MacroExpansionProcessor::Init(
       body_children.emplace_back(std::move(mt));
     }
   }
+
+  // We may be missing a trailing comment, so try to capture that.
+  if (auto file_of_def = File::containing(def)) {
+    Token last_body_tok = file_of_def->tokens()[def_bounds.end_index];
+    if (last_body_tok.kind() == TokenKind::COMMENT) {
+      D( std::cerr << "Adding trailing macro body comment\n"; )
+      body_use.emplace_back(last_body_tok);
+      body_children.emplace_back(std::move(last_body_tok));
+      body_has_trailing_comment = true;
+    }
+  }
 }
 
 bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
@@ -469,6 +997,7 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
   size_t max_j = after_children.size();
 
   Token bt_lc;
+  Token bt_param_lc;
   Token at_lc;
 
   D( std::cerr << "max_i = " << max_i << "; max_j = " << max_j << '\n'; )
@@ -479,6 +1008,7 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
 
     const Token *bt_tok = std::get_if<Token>(&bt);
     const Token *at_tok = std::get_if<Token>(&at);
+    const Token *bt_def_tok = bt_tok;
 
     bool is_argument = false;
 
@@ -488,7 +1018,9 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
       MacroKind btk = bt_macro.kind();
       is_argument = btk == MacroKind::PARAMETER_SUBSTITUTION;
       bt_lc = LeftCornerOfExpansion(bt_macro);
+      bt_param_lc = LeftCornerOfUse(bt_macro);
       bt_tok = &bt_lc;
+      bt_def_tok = &bt_param_lc;
     }
 
     if (!at_tok) {
@@ -500,12 +1032,13 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
 
     assert(bt_tok && at_tok);
 
-    D( std::cerr << "BT(" << i << "): " << bt_tok->id() << ' ' << bt_tok->data() << '\n'; )
-    D( std::cerr << "AT(" << j << "): " << at_tok->id() << ' ' << at_tok->data() << "\n\n"; )
-
-    if (i == 0 && j == 0 && max_i == 2 && max_j == 1 && bt_tok->data() == "x") {
-      asm volatile ("nop;");
-    }
+    D( std::cerr << "BT(" << i;
+       if (is_argument) {
+         std::cerr << "; PARAM=" << bt_def_tok->data();
+       }
+       std::cerr << "): " << bt_tok->id() << ' ' << bt_tok->data()
+                 << "\nAT(" << j << "): " << at_tok->id() << ' '
+                 << at_tok->data() << "\n\n"; )
 
     // A parameter was substituted with nothing.
     if (!bt_tok || !*bt_tok) {
@@ -515,7 +1048,7 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
       if (auto au = std::move(after_use[j])) {
         assert(au.has_value());
         merged_children.emplace_back(std::move(au.value()),
-                                     bt_tok->file_token(), is_argument);
+                                     bt_def_tok->file_token(), is_argument);
       }
       ++i;
       ++j;
@@ -543,6 +1076,13 @@ bool TokenTreeImpl::MacroExpansionProcessor::Run(bool is_non_tree) {
               << at_tok->id() << ' ' << at_tok->data() << "\n";
   }
 #endif
+
+  // Collect the trailing comment, if we made it there.
+  if (body_has_trailing_comment && (i + 1u) == max_i) {
+    merged_children.emplace_back(
+        std::move(body_children.back()), Token(), false);
+    ++i;
+  }
 
   if (is_non_tree) {
     return j == max_j || i == max_i;
@@ -720,6 +1260,61 @@ TokenTreeImpl::Bounds TokenTreeImpl::FragmentBounds(const TokenRange &tokens) {
   return ret;
 }
 
+// Widen bounds to cover leading/trailing comments.
+TokenTreeImpl::Bounds TokenTreeImpl::WidenBounds(Bounds ret) {
+  auto &reader = readers[ret.reader_index];
+
+  // Try to widen to encompass leading comments.
+  for (auto i = ret.begin_index; i; ) {
+    switch (reader->NthTokenKind(--i)) {
+      case TokenKind::COMMENT:
+        ret.begin_index = i;
+        continue;
+      case TokenKind::WHITESPACE:
+        continue;
+      default:
+        i = 0u;
+        break;
+    }
+  }
+
+  // Try to widen to encompass trailing comments.
+  auto saw_lc = false;
+  auto good = true;
+  for (auto i = ret.end_index; good; ) {
+    switch (reader->NthTokenKind(++i)) {
+      case TokenKind::COMMENT:
+        ret.end_index = i;
+        continue;
+      case TokenKind::WHITESPACE:
+        saw_lc = false;
+        for (auto ch : reader->NthTokenData(i - 1u)) {
+          if (ch == '\\') {
+            saw_lc = true;
+          } else if (ch == '\r') {
+            continue;
+          } else if (ch == '\n') {
+            if (!saw_lc) {
+              good = false;
+              break;
+            } else {
+              saw_lc = false;
+              break;
+            }
+          } else {
+            saw_lc = false;
+          }
+        }
+        continue;
+      default:
+        good = false;
+        continue;
+    }
+  }
+
+  return ret;
+}
+
 // Find the bounds of a macro definition body.
 std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
     const DefineMacroDirective &def) {
@@ -765,8 +1360,7 @@ std::optional<TokenTreeImpl::Bounds> TokenTreeImpl::MacroBodyBounds(
   assert(ti.first == ret.reader_index);
   assert(ti.second >= ret.begin_index);
   ret.end_index = ti.second;
-
-  return ret;
+  return WidenBounds(ret);
 }
 
 // Get a `TokenIndex` for `tok`. This will save the reader into the token tree
@@ -809,38 +1403,39 @@ static std::optional<TokenTreeImpl::TokenIndex> RightCornerOfUse(
 
 // Counts the number of tokens after `begin` and before `end` that we can
 // inject before the token which logically represents `end`.
-static EntityOffset CountInjectable(const TokenReader::Ptr &reader,
-                                    const TokenTreeImpl::Bounds &bounds,
-                                    TokenTreeImpl::TokenIndex upper_bound,
-                                    TokenTreeImpl::SequenceNode *seq,
-                                    int depth) {
+static EntityOffset CountInjectable(
+    const TokenReader::Ptr &reader, const TokenTreeImpl::Bounds &bounds,
+    TokenTreeImpl::TokenIndex upper_bound,
+    TokenTreeImpl::SequenceNode *parent_seq,
+    TokenTreeImpl::SequenceNode *seq, int depth) {
+
   EntityOffset begin = bounds.begin_index;
   EntityOffset end = upper_bound.second;
   EntityOffset count = 0u;
 
+  auto use_seq = depth ? parent_seq : seq;
+
   // If we're at a file level, then allow us to suck in more tokens.
-  if (!depth) {
-    if (auto rc = RightCornerOfUse(seq)) {
+  if (auto rc = RightCornerOfUse(use_seq)) {
 
-      // Allow unbounded whitespace/comment injection, but nothing else.
-      if (rc->first != upper_bound.first) {
-        depth = 1;
-        begin = 0;
+    // Allow unbounded whitespace/comment injection, but nothing else.
+    if (rc->first != upper_bound.first) {
+      depth = 1;
+      begin = 0;
 
-      // If the previous thing is from the same reader, then allow injection
-      // from it.
-      } else if (rc->first == upper_bound.first) {
-        begin = rc->second + 1u;
-      }
-
-      // TODO(pag): Have observed issues where `bounds` and `rc`s reader indices
-      //            don't match. This is likely due to subtleties related to the
-      //            how `bounds` is simplistically passed down.
+    // If the previous thing is from the same reader, then allow injection
+    // from it.
+    } else if (rc->first == upper_bound.first) {
+      begin = rc->second + 1u;
     }
 
-    // TODO(pag): We know that the reader index for files will always be zero,
-    //            so should be check that here?
+    // TODO(pag): Have observed issues where `bounds` and `rc`s reader indices
+    //            don't match. This is likely due to subtleties related to the
+    //            how `bounds` is simplistically passed down.
   }
+
+  // TODO(pag): We know that the reader index for files will always be zero,
+  //            so should be check that here?
 
   for (auto i = end - 1u; begin <= i; ++count, --i) {
     switch (reader->NthTokenKind(i)) {
@@ -848,14 +1443,16 @@ static EntityOffset CountInjectable(const TokenReader::Ptr &reader,
       case TokenKind::COMMENT:
       case TokenKind::UNKNOWN:
         if (!reader->NthTokenData(i).empty()) {
-          D( std::cerr << "Injectable (depth=" << depth << "): "
+          D( std::cerr << "Injectable (begin=" << begin << "; i=" << i
+                       << "; depth=" << depth << "): "
                        << reader->NthTokenData(i) << '\n'; )
           continue;
         }
         [[clang::fallthrough]];
       default:
         if (depth) {
-          D( std::cerr << "Not injectable (depth=" << depth << "): "
+          D( std::cerr << "Not injectable (begin=" << begin << "; i=" << i
+                       << "; depth=" << depth << "): "
                        << reader->NthTokenData(i) << '\n'; )
           return count;
         } else {
@@ -887,7 +1484,8 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::AddLeadingTokensInBounds(
 
   // Inject the missing whitespace/comment tokens.
   const TokenReader::Ptr &fti_reader = readers[fti.first];
-  for (auto num = CountInjectable(fti_reader, bounds, fti, seq, depth);
+  for (auto num = CountInjectable(fti_reader, bounds, fti, last_sequence,
+                                  seq, depth);
        num; --num) {
     seq = AddTokenToSequence(seq, TokenIndex(fti.first, fti.second - num));
   }
@@ -928,7 +1526,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
     const Bounds &def_bounds, const TrailingTokens &trailing_tokens) {
 
   MacroExpansionProcessor mep;
-  mep.Init(me, me_def);
+  mep.Init(me, me_def, def_bounds);
   if (!mep.Run(false)) {
     assert(false);  // Probably a bug.
     return ExtendWithSubstitution(seq, me, user_bounds, trailing_tokens);
@@ -953,7 +1551,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
   for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
     depth = next_depth;
     after = AddLeadingTokensInBounds(after, node.definition_token, def_bounds);
-    if (node.is_argument) {
+    if (node.is_from_macro_use) {
       after = ExtendWithMacroChild(after, node.mt, user_bounds,
                                    dummy_trailing_tokens);
     } else {
@@ -1107,7 +1705,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
   auto next_depth = depth + 1;
 
   MacroExpansionProcessor mep;
-  mep.Init(me, def);
+  mep.Init(me, def, def_bounds);
   if (!mep.Run(true)) {
     assert(false);  // Probably not a bug, just something sketchy/odd.
     return ExtendWithSubstitution(seq, me, me_bounds, trailing_tokens);
@@ -1131,7 +1729,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithNonTreeExpansion(
   for (const BodyTokenForChild &node : mep.ReplacementChildren()) {
     depth = next_depth;
     after = AddLeadingTokensInBounds(after, node.definition_token, def_bounds);
-    if (node.is_argument) {
+    if (node.is_from_macro_use) {
       after = ExtendWithMacroChild(after, node.mt, me_bounds,
                                    dummy_trailing_tokens);
     } else {
@@ -1360,8 +1958,21 @@ Fragment TokenTreeVisitor::choose(const std::vector<Fragment> &frags) const {
   return frags.front();
 }
 
+static std::shared_ptr<TokenReader> CreateWhitespaceReader(void) {
+  auto reader = std::make_shared<CustomTokenReader>(FragmentImplPtr{});
+  reader->Append({TokenKind::WHITESPACE, TokenCategory::WHITESPACE,
+                  " ", NotAnEntity{}});
+  return reader;
+}
+
 static const std::shared_ptr<TokenTreeImpl> kInvalidTree =
     std::make_shared<TokenTreeImpl>();
+
+static const std::shared_ptr<TokenReader> kWhitespceReader =
+    CreateWhitespaceReader();
+
+//static constexpr EntityOffset kFileReaderIndex = 0u;
+static constexpr EntityOffset kWhitespaceReaderIndex = 1u;
 
 TokenTree::TokenTree(void)
     : TokenTree(kInvalidTree) {}
@@ -1376,6 +1987,7 @@ TokenTree TokenTree::from(const File &file) {
   auto file_tokens = file.tokens();
   self->file = file.impl;
   self->readers.emplace_back(file_tokens.impl);
+  self->readers.emplace_back(kWhitespceReader);
   self->root = self->CreateFileNode(file);
 
   return TokenTree(file.impl->cached_token_tree.Put(std::move(self)));
@@ -1397,6 +2009,8 @@ TokenTree TokenTree::from(const Fragment &frag) {
   } else {
     self->readers.emplace_back(TokenRange().impl);
   }
+
+  self->readers.emplace_back(kWhitespceReader);
 
   TokenTreeImpl::Bounds frag_bounds = self->FragmentBounds(frag.file_tokens());
   self->root = self->CreateFragmentNode(frag, frag_bounds);
@@ -1424,10 +2038,17 @@ class TokenTreeReader final : public TokenReader {
   // Capture the sequence of choices made by a token tree visitor.
   std::vector<RawEntityId> visitor_choices;
 
+  // State for whitespace injection.
+  bool add_leading_ws{false};
+  bool is_first{true};
+  TokenKind last_tk{TokenKind::UNKNOWN};
+
   virtual ~TokenTreeReader(void) noexcept = default;
 
   inline TokenTreeReader(std::shared_ptr<TokenTreeImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  void Append(TokenTreeImpl::TokenIndex ti);
 
   const FragmentImpl *OwningFragment(void) const noexcept override {
     return impl->fragment.get();
@@ -1573,27 +2194,73 @@ class TokenTreeReader final : public TokenReader {
   }
 };
 
+void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
+
+  auto [ri, to] = ti;
+  const TokenReader::Ptr &tok_reader = impl->readers[ri];
+
+  TokenKind tk = tok_reader->NthTokenKind(to);
+  if (last_tk == TokenKind::WHITESPACE && tk == TokenKind::WHITESPACE) {
+    TokenTreeImpl::TokenIndex last_ti = tokens.back();
+    if (last_ti.first != ri || (last_ti.second + 1u) != to) {
+      return;  // Don't add two whitespaces side-by-side.
+    }
+  }
+
+  if (!add_leading_ws) {
+    add_leading_ws = ForceLeadingWhitespace(is_first, last_tk, tk);
+  }
+
+  EntityOffset data_size = static_cast<EntityOffset>(data.size());
+
+  // Force inject whitespace between two tokens.
+  if (add_leading_ws || (!is_first && AddLeadingWhitespace(tk))) {
+    if (!SuppressLeadingWhitespace(tk)) {
+      tokens.emplace_back(kWhitespaceReaderIndex, 0u);
+      data.push_back(' ');
+      token_offset.emplace_back(data_size++);
+    }
+  }
+
+  // Copy in the token data.
+  std::string_view tok_data = tok_reader->NthTokenData(to);
+  if (!tok_data.empty()) {
+    data.insert(data.end(), tok_data.begin(), tok_data.end());
+  }
+
+  tokens.emplace_back(ti);
+  token_offset.emplace_back(static_cast<EntityOffset>(data.size()));
+
+  // Update state tracking for whitespace injection.
+  last_tk = tk;
+  if (is_first) {
+    add_leading_ws = AddTrailingWhitespaceAsFirst(tk);
+  } else {
+    add_leading_ws = AddTrailingWhitespace(tk);
+  }
+  is_first = IsFirst(tk);
+}
+
 static void CollectTokens(const TokenTreeImpl::Node &node,
                           const TokenTreeVisitor &vis,
-                          std::vector<RawEntityId> &choices,
-                          std::vector<TokenTreeImpl::TokenIndex> &tokens) {
+                          TokenTreeReader &reader) {
   if (std::holds_alternative<std::monostate>(node)) {
     return;
 
   } else if (std::holds_alternative<TokenTreeImpl::TokenIndex>(node)) {
-    tokens.push_back(std::get<TokenTreeImpl::TokenIndex>(node));
+    reader.Append(std::get<TokenTreeImpl::TokenIndex>(node));
 
   } else if (std::holds_alternative<TokenTreeImpl::ChoiceNode *>(node)) {
     if (TokenTreeImpl::ChoiceNode *choice =
             std::get<TokenTreeImpl::ChoiceNode *>(node)) {
       PackedFragmentId chosen_frag = vis.choose(choice->fragments).id();
-      choices.emplace_back(chosen_frag.Pack());
+      reader.visitor_choices.emplace_back(chosen_frag.Pack());
 
       auto i = 0u;
       for (const Fragment &frag : choice->fragments) {
         if (chosen_frag == frag.id()) {
           const TokenTreeImpl::Node &frag_node = choice->children[i];
-          CollectTokens(frag_node, vis, choices, tokens);
+          CollectTokens(frag_node, vis, reader);
         }
         ++i;
       }
@@ -1612,19 +2279,19 @@ static void CollectTokens(const TokenTreeImpl::Node &node,
       }
 
       if (should_expand) {
-        choices.emplace_back(choice_id);
+        reader.visitor_choices.emplace_back(choice_id);
       }
       if (should_expand) {
-        CollectTokens(sub->after, vis, choices, tokens);
+        CollectTokens(sub->after, vis, reader);
       } else {
-        CollectTokens(sub->before, vis, choices, tokens);
+        CollectTokens(sub->before, vis, reader);
       }
     }
   } else if (std::holds_alternative<TokenTreeImpl::SequenceNode *>(node)) {
     if (TokenTreeImpl::SequenceNode *seq =
             std::get<TokenTreeImpl::SequenceNode *>(node)) {
       for (const TokenTreeImpl::Node &sub_node : seq->children) {
-        CollectTokens(sub_node, vis, choices, tokens);
+        CollectTokens(sub_node, vis, reader);
       }
     }
   } else {
@@ -1664,26 +2331,11 @@ std::optional<TokenTree> TokenTree::from(const TokenRange &range) {
 // Serialize the token tree into a linear range.
 TokenRange TokenTree::serialize(const TokenTreeVisitor &vis) const {
   auto reader = std::make_shared<TokenTreeReader>(impl);
-  CollectTokens(impl->root, vis, reader->visitor_choices, reader->tokens);
+  reader->token_offset.push_back(0u);
+  CollectTokens(impl->root, vis, *reader);
+
   EntityOffset num_tokens = static_cast<EntityOffset>(reader->tokens.size());
-
-  // Copy in the token data.
-  reader->token_offset.reserve(num_tokens + 1u);
-  reader->token_offset.emplace_back(0u);
-  for (EntityOffset ti = 0u; ti < num_tokens; ++ti) {
-    auto [ri, to] = reader->tokens[ti];
-    const TokenReader::Ptr &tok_reader = impl->readers[ri];
-    std::string_view tok_data = tok_reader->NthTokenData(to);
-    if (!tok_data.empty()) {
-      reader->data.insert(reader->data.end(), tok_data.begin(), tok_data.end());
-    }
-
-    reader->token_offset.emplace_back(
-        static_cast<EntityOffset>(reader->data.size()));
-  }
-
   reader->data_hash = kHasher(reader->data);
-
   return TokenRange(std::move(reader), 0u, num_tokens);
 }
 
