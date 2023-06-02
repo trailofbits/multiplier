@@ -111,7 +111,7 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXFoldExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXFoldExpr> e = CXXFoldExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Index &index) {
 }
 
 gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXFoldExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXFoldExpr> CXXFoldExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXFoldExpr> CXXFoldExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXFoldExprDerivedKinds) {
@@ -156,52 +156,52 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const TokenContext &t) {
 }
 
 UnresolvedLookupExpr CXXFoldExpr::callee(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXFoldExpr::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
-}
-
-Expr CXXFoldExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr CXXFoldExpr::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Token CXXFoldExpr::l_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
-BinaryOperatorKind CXXFoldExpr::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
-}
-
-Expr CXXFoldExpr::pattern(void) const {
+Expr CXXFoldExpr::initializer(void) const {
   RawEntityId eid = impl->reader.getVal43();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr CXXFoldExpr::rhs(void) const {
+Expr CXXFoldExpr::lhs(void) const {
   RawEntityId eid = impl->reader.getVal44();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Token CXXFoldExpr::r_paren_token(void) const {
+Token CXXFoldExpr::l_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
+BinaryOperatorKind CXXFoldExpr::operator_(void) const {
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal97());
+}
+
+Expr CXXFoldExpr::pattern(void) const {
+  RawEntityId eid = impl->reader.getVal46();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Expr CXXFoldExpr::rhs(void) const {
+  RawEntityId eid = impl->reader.getVal47();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Token CXXFoldExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+}
+
 bool CXXFoldExpr::is_left_fold(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 bool CXXFoldExpr::is_right_fold(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

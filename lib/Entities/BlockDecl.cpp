@@ -137,7 +137,7 @@ std::optional<BlockDecl> BlockDecl::from(const Decl &parent) {
 }
 
 gap::generator<BlockDecl> BlockDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kBlockDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<BlockDecl> e = BlockDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<BlockDecl> BlockDecl::in(const Index &index) {
 }
 
 gap::generator<BlockDecl> BlockDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kBlockDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<BlockDecl> BlockDecl::in(const Fragment &frag) {
 }
 
 gap::generator<BlockDecl> BlockDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kBlockDeclDerivedKinds) {
@@ -245,7 +245,7 @@ std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -256,7 +256,7 @@ std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
 
 gap::generator<ParmVarDecl> BlockDecl::parameters(void) const & {
   auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d49 = ep->DeclFor(ep, v)) {
@@ -277,7 +277,7 @@ std::optional<ParmVarDecl> BlockDecl::nth_parameter_declaration(unsigned n) cons
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -288,7 +288,7 @@ std::optional<ParmVarDecl> BlockDecl::nth_parameter_declaration(unsigned n) cons
 
 gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const & {
   auto list = impl->reader.getVal50();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d50 = ep->DeclFor(ep, v)) {
@@ -301,7 +301,7 @@ gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const & {
 }
 
 gap::generator<Decl> BlockDecl::declarations_in_context(void) const & {
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   auto list = impl->reader.getVal60();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {

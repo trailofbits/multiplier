@@ -110,7 +110,7 @@ std::optional<LabelStmt> LabelStmt::from(const Stmt &parent) {
 }
 
 gap::generator<LabelStmt> LabelStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kLabelStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<LabelStmt> e = LabelStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<LabelStmt> LabelStmt::in(const Index &index) {
 }
 
 gap::generator<LabelStmt> LabelStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kLabelStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<LabelStmt> LabelStmt::in(const Fragment &frag) {
 }
 
 gap::generator<LabelStmt> LabelStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kLabelStmtDerivedKinds) {
@@ -155,26 +155,26 @@ std::optional<LabelStmt> LabelStmt::from(const TokenContext &t) {
 }
 
 LabelDecl LabelStmt::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token LabelStmt::identifier_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 std::string_view LabelStmt::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal63();
   return std::string_view(data.cStr(), data.size());
 }
 
 Stmt LabelStmt::sub_statement(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal16();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool LabelStmt::is_side_entry(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

@@ -63,7 +63,7 @@ std::optional<ObjCObjectType> ObjCObjectType::from(const Type &parent) {
 }
 
 gap::generator<ObjCObjectType> ObjCObjectType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kObjCObjectTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<ObjCObjectType> e = ObjCObjectType::from(Type(std::move(eptr)))) {
@@ -74,7 +74,7 @@ gap::generator<ObjCObjectType> ObjCObjectType::in(const Index &index) {
 }
 
 gap::generator<ObjCObjectType> ObjCObjectType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (TypeKind k : kObjCObjectTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
@@ -86,7 +86,7 @@ gap::generator<ObjCObjectType> ObjCObjectType::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCObjectType> ObjCObjectType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (TypeKind k : kObjCObjectTypeDerivedKinds) {
@@ -144,7 +144,7 @@ std::optional<Type> ObjCObjectType::nth_type_argument(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TypeFor(ep, v);
   if (!e) {
@@ -155,7 +155,7 @@ std::optional<Type> ObjCObjectType::nth_type_argument(unsigned n) const {
 
 gap::generator<Type> ObjCObjectType::type_arguments(void) const & {
   auto list = impl->reader.getVal234();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d234 = ep->TypeFor(ep, v)) {
@@ -167,7 +167,7 @@ gap::generator<Type> ObjCObjectType::type_arguments(void) const & {
 
 gap::generator<Type> ObjCObjectType::type_arguments_as_written(void) const & {
   auto list = impl->reader.getVal266();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d266 = ep->TypeFor(ep, v)) {

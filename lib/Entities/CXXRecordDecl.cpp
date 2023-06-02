@@ -154,7 +154,7 @@ std::optional<CXXRecordDecl> CXXRecordDecl::from(const Decl &parent) {
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCXXRecordDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<CXXRecordDecl> e = CXXRecordDecl::from(Decl(std::move(eptr)))) {
@@ -165,7 +165,7 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Index &index) {
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCXXRecordDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -177,7 +177,7 @@ gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Fragment &frag) {
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCXXRecordDeclDerivedKinds) {
@@ -214,7 +214,7 @@ std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::bases(void) const {
   auto list = impl->reader.getVal175();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d175 = ep->CXXBaseSpecifierFor(ep, v)) {
@@ -242,7 +242,7 @@ std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) con
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -253,7 +253,7 @@ std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) con
 
 gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const & {
   auto list = impl->reader.getVal183();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d183 = ep->DeclFor(ep, v)) {
@@ -272,7 +272,7 @@ std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
   auto list = impl->reader.getVal184();
   std::vector<FriendDecl> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d184 = ep->DeclFor(ep, v)) {
@@ -391,7 +391,7 @@ std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_pa
   auto list = impl->reader.getVal185();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d185 = ep->DeclFor(ep, v)) {
@@ -1189,7 +1189,7 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
   auto list = impl->reader.getVal313();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d313 = ep->DeclFor(ep, v)) {
@@ -1316,7 +1316,7 @@ std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) 
   auto list = impl->reader.getVal339();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d339 = ep->CXXBaseSpecifierFor(ep, v)) {

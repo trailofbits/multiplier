@@ -114,7 +114,7 @@ std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Stmt &parent)
 }
 
 gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCPropertyRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCPropertyRefExpr> e = ObjCPropertyRefExpr::from(Stmt(std::move(eptr)))) {
@@ -125,7 +125,7 @@ gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const Index &index) 
 }
 
 gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCPropertyRefExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -137,7 +137,7 @@ gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const Fragment &frag
 }
 
 gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCPropertyRefExprDerivedKinds) {
@@ -159,74 +159,74 @@ std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const TokenContext 
 }
 
 Expr ObjCPropertyRefExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ObjCInterfaceDecl ObjCPropertyRefExpr::class_receiver(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCPropertyDecl ObjCPropertyRefExpr::explicit_property(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal43();
   return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_getter(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal44();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_setter(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal45();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCPropertyRefExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 Token ObjCPropertyRefExpr::receiver_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 Type ObjCPropertyRefExpr::receiver_type(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal48();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ObjCPropertyRefExpr::super_receiver_type(void) const {
-  RawEntityId eid = impl->reader.getVal46();
+  RawEntityId eid = impl->reader.getVal49();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ObjCPropertyRefExpr::is_class_receiver(void) const {
-  return impl->reader.getVal89();
-}
-
-bool ObjCPropertyRefExpr::is_explicit_property(void) const {
-  return impl->reader.getVal90();
-}
-
-bool ObjCPropertyRefExpr::is_implicit_property(void) const {
-  return impl->reader.getVal91();
-}
-
-bool ObjCPropertyRefExpr::is_messaging_getter(void) const {
   return impl->reader.getVal92();
 }
 
-bool ObjCPropertyRefExpr::is_messaging_setter(void) const {
+bool ObjCPropertyRefExpr::is_explicit_property(void) const {
   return impl->reader.getVal93();
 }
 
-bool ObjCPropertyRefExpr::is_object_receiver(void) const {
+bool ObjCPropertyRefExpr::is_implicit_property(void) const {
+  return impl->reader.getVal94();
+}
+
+bool ObjCPropertyRefExpr::is_messaging_getter(void) const {
   return impl->reader.getVal95();
 }
 
+bool ObjCPropertyRefExpr::is_messaging_setter(void) const {
+  return impl->reader.getVal96();
+}
+
+bool ObjCPropertyRefExpr::is_object_receiver(void) const {
+  return impl->reader.getVal98();
+}
+
 bool ObjCPropertyRefExpr::is_super_receiver(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal100();
 }
 
 #pragma GCC diagnostic pop

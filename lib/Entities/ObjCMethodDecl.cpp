@@ -141,7 +141,7 @@ std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const Decl &parent) {
 }
 
 gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kObjCMethodDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ObjCMethodDecl> e = ObjCMethodDecl::from(Decl(std::move(eptr)))) {
@@ -152,7 +152,7 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const Index &index) {
 }
 
 gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kObjCMethodDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -164,7 +164,7 @@ gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kObjCMethodDeclDerivedKinds) {
@@ -317,7 +317,7 @@ std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -328,7 +328,7 @@ std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
 
 gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const & {
   auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d49 = ep->DeclFor(ep, v)) {
@@ -349,7 +349,7 @@ std::optional<Token> ObjCMethodDecl::nth_selector_token(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TokenFor(ep, v);
   if (!e) {
@@ -360,7 +360,7 @@ std::optional<Token> ObjCMethodDecl::nth_selector_token(unsigned n) const {
 
 gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const & {
   auto list = impl->reader.getVal50();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
     assert(false);
@@ -377,7 +377,7 @@ gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const & {
 }
 
 gap::generator<Decl> ObjCMethodDecl::declarations_in_context(void) const & {
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   auto list = impl->reader.getVal60();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {

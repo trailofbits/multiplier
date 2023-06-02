@@ -110,7 +110,7 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Stmt &paren
 }
 
 gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kExtVectorElementExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ExtVectorElementExpr> e = ExtVectorElementExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Index &index
 }
 
 gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kExtVectorElementExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const Fragment &fr
 }
 
 gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kExtVectorElementExprDerivedKinds) {
@@ -155,20 +155,20 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const TokenContex
 }
 
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 Token ExtVectorElementExpr::accessor_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Expr ExtVectorElementExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

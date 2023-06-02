@@ -111,7 +111,7 @@ std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const Stmt &parent) {
 }
 
 gap::generator<ObjCStringLiteral> ObjCStringLiteral::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCStringLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCStringLiteral> e = ObjCStringLiteral::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<ObjCStringLiteral> ObjCStringLiteral::in(const Index &index) {
 }
 
 gap::generator<ObjCStringLiteral> ObjCStringLiteral::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCStringLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<ObjCStringLiteral> ObjCStringLiteral::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCStringLiteral> ObjCStringLiteral::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCStringLiteralDerivedKinds) {
@@ -156,11 +156,11 @@ std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const TokenContext &t) 
 }
 
 Token ObjCStringLiteral::at_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 StringLiteral ObjCStringLiteral::string(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

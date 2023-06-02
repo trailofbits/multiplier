@@ -111,7 +111,7 @@ std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXDefaultArgExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXDefaultArgExpr> e = CXXDefaultArgExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::in(const Index &index) {
 }
 
 gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXDefaultArgExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXDefaultArgExprDerivedKinds) {
@@ -156,31 +156,31 @@ std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const TokenContext &t) 
 }
 
 Expr CXXDefaultArgExpr::adjusted_rewritten_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr CXXDefaultArgExpr::expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-ParmVarDecl CXXDefaultArgExpr::parameter(void) const {
-  RawEntityId eid = impl->reader.getVal40();
-  return ParmVarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
-}
-
-Expr CXXDefaultArgExpr::rewritten_expression(void) const {
   RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+Expr CXXDefaultArgExpr::expression(void) const {
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+ParmVarDecl CXXDefaultArgExpr::parameter(void) const {
+  RawEntityId eid = impl->reader.getVal43();
+  return ParmVarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
+}
+
+Expr CXXDefaultArgExpr::rewritten_expression(void) const {
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
 Token CXXDefaultArgExpr::used_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool CXXDefaultArgExpr::has_rewritten_initializer(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

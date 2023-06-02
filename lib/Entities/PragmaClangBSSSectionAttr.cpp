@@ -60,7 +60,7 @@ std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from(const A
 }
 
 gap::generator<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kPragmaClangBSSSectionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<PragmaClangBSSSectionAttr> e = PragmaClangBSSSectionAttr::from(Attr(std::move(eptr)))) {
@@ -71,7 +71,7 @@ gap::generator<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::in(const In
 }
 
 gap::generator<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kPragmaClangBSSSectionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -83,7 +83,7 @@ gap::generator<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::in(const Fr
 }
 
 gap::generator<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kPragmaClangBSSSectionAttrDerivedKinds) {

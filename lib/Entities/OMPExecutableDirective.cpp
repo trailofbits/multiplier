@@ -320,7 +320,7 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &p
 }
 
 gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPExecutableDirective> e = OMPExecutableDirective::from(Stmt(std::move(eptr)))) {
@@ -331,7 +331,7 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Index &i
 }
 
 gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -343,7 +343,7 @@ gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const Fragment
 }
 
 gap::generator<OMPExecutableDirective> OMPExecutableDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPExecutableDirectiveDerivedKinds) {
@@ -365,31 +365,31 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const TokenCo
 }
 
 Stmt OMPExecutableDirective::associated_statement(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CapturedStmt OMPExecutableDirective::innermost_captured_statement(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt OMPExecutableDirective::raw_statement(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt OMPExecutableDirective::structured_block(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal16();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool OMPExecutableDirective::has_associated_statement(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 bool OMPExecutableDirective::is_standalone_directive(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

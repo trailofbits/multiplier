@@ -112,7 +112,7 @@ std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const Stmt 
 }
 
 gap::generator<OMPParallelForDirective> OMPParallelForDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPParallelForDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPParallelForDirective> e = OMPParallelForDirective::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<OMPParallelForDirective> OMPParallelForDirective::in(const Index 
 }
 
 gap::generator<OMPParallelForDirective> OMPParallelForDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPParallelForDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<OMPParallelForDirective> OMPParallelForDirective::in(const Fragme
 }
 
 gap::generator<OMPParallelForDirective> OMPParallelForDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPParallelForDirectiveDerivedKinds) {
@@ -157,12 +157,12 @@ std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const Token
 }
 
 Expr OMPParallelForDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal58();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPParallelForDirective::has_cancel(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal26();
 }
 
 #pragma GCC diagnostic pop

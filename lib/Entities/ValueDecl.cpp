@@ -215,7 +215,7 @@ std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
 }
 
 gap::generator<ValueDecl> ValueDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kValueDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ValueDecl> e = ValueDecl::from(Decl(std::move(eptr)))) {
@@ -226,7 +226,7 @@ gap::generator<ValueDecl> ValueDecl::in(const Index &index) {
 }
 
 gap::generator<ValueDecl> ValueDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kValueDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -238,7 +238,7 @@ gap::generator<ValueDecl> ValueDecl::in(const Fragment &frag) {
 }
 
 gap::generator<ValueDecl> ValueDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kValueDeclDerivedKinds) {

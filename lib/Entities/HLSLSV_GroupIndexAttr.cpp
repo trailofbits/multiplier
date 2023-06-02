@@ -61,7 +61,7 @@ std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const Attr &par
 }
 
 gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kHLSLSV_GroupIndexAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<HLSLSV_GroupIndexAttr> e = HLSLSV_GroupIndexAttr::from(Attr(std::move(eptr)))) {
@@ -72,7 +72,7 @@ gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const Index &ind
 }
 
 gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kHLSLSV_GroupIndexAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -84,7 +84,7 @@ gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const Fragment &
 }
 
 gap::generator<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kHLSLSV_GroupIndexAttrDerivedKinds) {

@@ -485,7 +485,7 @@ std::optional<ValueStmt> ValueStmt::from(const Stmt &parent) {
 }
 
 gap::generator<ValueStmt> ValueStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kValueStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ValueStmt> e = ValueStmt::from(Stmt(std::move(eptr)))) {
@@ -496,7 +496,7 @@ gap::generator<ValueStmt> ValueStmt::in(const Index &index) {
 }
 
 gap::generator<ValueStmt> ValueStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kValueStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -508,7 +508,7 @@ gap::generator<ValueStmt> ValueStmt::in(const Fragment &frag) {
 }
 
 gap::generator<ValueStmt> ValueStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kValueStmtDerivedKinds) {
@@ -531,7 +531,7 @@ std::optional<ValueStmt> ValueStmt::from(const TokenContext &t) {
 
 std::optional<Expr> ValueStmt::expression_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal9();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

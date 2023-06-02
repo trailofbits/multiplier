@@ -109,7 +109,7 @@ std::optional<GotoStmt> GotoStmt::from(const Stmt &parent) {
 }
 
 gap::generator<GotoStmt> GotoStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kGotoStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<GotoStmt> e = GotoStmt::from(Stmt(std::move(eptr)))) {
@@ -120,7 +120,7 @@ gap::generator<GotoStmt> GotoStmt::in(const Index &index) {
 }
 
 gap::generator<GotoStmt> GotoStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kGotoStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -132,7 +132,7 @@ gap::generator<GotoStmt> GotoStmt::in(const Fragment &frag) {
 }
 
 gap::generator<GotoStmt> GotoStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kGotoStmtDerivedKinds) {
@@ -154,16 +154,16 @@ std::optional<GotoStmt> GotoStmt::from(const TokenContext &t) {
 }
 
 Token GotoStmt::goto_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
 }
 
 LabelDecl GotoStmt::label(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token GotoStmt::label_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 #pragma GCC diagnostic pop

@@ -138,7 +138,7 @@ std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const Decl &parent) {
 }
 
 gap::generator<IndirectFieldDecl> IndirectFieldDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kIndirectFieldDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<IndirectFieldDecl> e = IndirectFieldDecl::from(Decl(std::move(eptr)))) {
@@ -149,7 +149,7 @@ gap::generator<IndirectFieldDecl> IndirectFieldDecl::in(const Index &index) {
 }
 
 gap::generator<IndirectFieldDecl> IndirectFieldDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kIndirectFieldDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -161,7 +161,7 @@ gap::generator<IndirectFieldDecl> IndirectFieldDecl::in(const Fragment &frag) {
 }
 
 gap::generator<IndirectFieldDecl> IndirectFieldDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kIndirectFieldDeclDerivedKinds) {
@@ -184,7 +184,7 @@ std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const TokenContext &t) 
 
 gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const & {
   auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d49 = ep->DeclFor(ep, v)) {

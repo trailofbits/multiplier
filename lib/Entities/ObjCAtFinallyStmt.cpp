@@ -108,7 +108,7 @@ std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Stmt &parent) {
 }
 
 gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCAtFinallyStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCAtFinallyStmt> e = ObjCAtFinallyStmt::from(Stmt(std::move(eptr)))) {
@@ -119,7 +119,7 @@ gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const Index &index) {
 }
 
 gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCAtFinallyStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -131,7 +131,7 @@ gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCAtFinallyStmtDerivedKinds) {
@@ -153,11 +153,11 @@ std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const TokenContext &t) 
 }
 
 Token ObjCAtFinallyStmt::at_finally_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
 }
 
 Stmt ObjCAtFinallyStmt::finally_body(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

@@ -112,7 +112,7 @@ std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
 }
 
 gap::generator<SwitchStmt> SwitchStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSwitchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<SwitchStmt> e = SwitchStmt::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<SwitchStmt> SwitchStmt::in(const Index &index) {
 }
 
 gap::generator<SwitchStmt> SwitchStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSwitchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<SwitchStmt> SwitchStmt::in(const Fragment &frag) {
 }
 
 gap::generator<SwitchStmt> SwitchStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSwitchStmtDerivedKinds) {
@@ -157,18 +157,18 @@ std::optional<SwitchStmt> SwitchStmt::from(const TokenContext &t) {
 }
 
 Stmt SwitchStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr SwitchStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<VarDecl> SwitchStmt::condition_variable(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal11();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -181,7 +181,7 @@ std::optional<VarDecl> SwitchStmt::condition_variable(void) const {
 
 std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal13();
+    RawEntityId eid = impl->reader.getVal16();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -194,7 +194,7 @@ std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(voi
 
 std::optional<Stmt> SwitchStmt::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal14();
+    RawEntityId eid = impl->reader.getVal17();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -206,16 +206,16 @@ std::optional<Stmt> SwitchStmt::initializer(void) const {
 }
 
 Token SwitchStmt::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
 }
 
 Token SwitchStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal21());
 }
 
 std::optional<SwitchCase> SwitchStmt::first_switch_case(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal19();
+    RawEntityId eid = impl->reader.getVal22();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -227,19 +227,19 @@ std::optional<SwitchCase> SwitchStmt::first_switch_case(void) const {
 }
 
 Token SwitchStmt::switch_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal23());
 }
 
 bool SwitchStmt::has_initializer_storage(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 bool SwitchStmt::has_variable_storage(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal19();
 }
 
 bool SwitchStmt::is_all_enum_cases_covered(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal26();
 }
 
 #pragma GCC diagnostic pop

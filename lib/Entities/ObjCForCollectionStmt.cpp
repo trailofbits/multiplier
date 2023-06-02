@@ -109,7 +109,7 @@ std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Stmt &par
 }
 
 gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCForCollectionStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCForCollectionStmt> e = ObjCForCollectionStmt::from(Stmt(std::move(eptr)))) {
@@ -120,7 +120,7 @@ gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const Index &ind
 }
 
 gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCForCollectionStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -132,7 +132,7 @@ gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const Fragment &
 }
 
 gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCForCollectionStmtDerivedKinds) {
@@ -154,26 +154,26 @@ std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const TokenCont
 }
 
 Stmt ObjCForCollectionStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr ObjCForCollectionStmt::collection(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt ObjCForCollectionStmt::element(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Token ObjCForCollectionStmt::for_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal16());
 }
 
 Token ObjCForCollectionStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 #pragma GCC diagnostic pop

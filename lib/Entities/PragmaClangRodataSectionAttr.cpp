@@ -60,7 +60,7 @@ std::optional<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::from(c
 }
 
 gap::generator<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kPragmaClangRodataSectionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<PragmaClangRodataSectionAttr> e = PragmaClangRodataSectionAttr::from(Attr(std::move(eptr)))) {
@@ -71,7 +71,7 @@ gap::generator<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::in(co
 }
 
 gap::generator<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kPragmaClangRodataSectionAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -83,7 +83,7 @@ gap::generator<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::in(co
 }
 
 gap::generator<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kPragmaClangRodataSectionAttrDerivedKinds) {

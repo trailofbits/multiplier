@@ -112,7 +112,7 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const Stmt &paren
 }
 
 gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kUnresolvedMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<UnresolvedMemberExpr> e = UnresolvedMemberExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const Index &index
 }
 
 gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kUnresolvedMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const Fragment &fr
 }
 
 gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kUnresolvedMemberExprDerivedKinds) {
@@ -157,33 +157,33 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const TokenContex
 }
 
 Expr UnresolvedMemberExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal46();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type UnresolvedMemberExpr::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal47();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token UnresolvedMemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
 }
 
 Token UnresolvedMemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
 }
 
 bool UnresolvedMemberExpr::has_unresolved_using(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal94();
 }
 
 bool UnresolvedMemberExpr::is_arrow(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal95();
 }
 
 bool UnresolvedMemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal96();
 }
 
 #pragma GCC diagnostic pop

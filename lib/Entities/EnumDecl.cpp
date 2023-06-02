@@ -140,7 +140,7 @@ std::optional<EnumDecl> EnumDecl::from(const Decl &parent) {
 }
 
 gap::generator<EnumDecl> EnumDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<EnumDecl> e = EnumDecl::from(Decl(std::move(eptr)))) {
@@ -151,7 +151,7 @@ gap::generator<EnumDecl> EnumDecl::in(const Index &index) {
 }
 
 gap::generator<EnumDecl> EnumDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kEnumDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -163,7 +163,7 @@ gap::generator<EnumDecl> EnumDecl::in(const Fragment &frag) {
 }
 
 gap::generator<EnumDecl> EnumDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kEnumDeclDerivedKinds) {
@@ -193,7 +193,7 @@ std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -204,7 +204,7 @@ std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
 
 gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
   auto list = impl->reader.getVal60();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d60 = ep->DeclFor(ep, v)) {

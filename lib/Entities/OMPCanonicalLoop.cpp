@@ -110,7 +110,7 @@ std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const Stmt &parent) {
 }
 
 gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPCanonicalLoopDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPCanonicalLoop> e = OMPCanonicalLoop::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::in(const Index &index) {
 }
 
 gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPCanonicalLoopDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::in(const Fragment &frag) {
 }
 
 gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPCanonicalLoopDerivedKinds) {
@@ -155,22 +155,22 @@ std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const TokenContext &t) {
 }
 
 CapturedStmt OMPCanonicalLoop::distance_func(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt OMPCanonicalLoop::loop_statement(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CapturedStmt OMPCanonicalLoop::loop_variable_func(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal14();
   return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 DeclRefExpr OMPCanonicalLoop::loop_variable_reference(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal16();
   return DeclRefExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

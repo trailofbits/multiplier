@@ -136,7 +136,7 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 }
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<LifetimeExtendedTemporaryDecl> e = LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr)))) {
@@ -147,7 +147,7 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(
 }
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -159,7 +159,7 @@ gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(
 }
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kLifetimeExtendedTemporaryDeclDerivedKinds) {
@@ -182,7 +182,7 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 
 gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const & {
   auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d49 = ep->StmtFor(ep, v)) {

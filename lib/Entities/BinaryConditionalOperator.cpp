@@ -112,7 +112,7 @@ std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const S
 }
 
 gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kBinaryConditionalOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<BinaryConditionalOperator> e = BinaryConditionalOperator::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const In
 }
 
 gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kBinaryConditionalOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const Fr
 }
 
 gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kBinaryConditionalOperatorDerivedKinds) {
@@ -157,12 +157,12 @@ std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const T
 }
 
 Expr BinaryConditionalOperator::common(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal46();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 OpaqueValueExpr BinaryConditionalOperator::opaque_value(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal47();
   return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

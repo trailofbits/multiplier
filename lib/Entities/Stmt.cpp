@@ -12,6 +12,8 @@
 #include <multiplier/Entities/File.h>
 #include <multiplier/Entities/Fragment.h>
 #include <multiplier/Entities/Index.h>
+#include <multiplier/Entities/Macro.h>
+#include <multiplier/Entities/MacroArgument.h>
 #include <multiplier/Entities/Reference.h>
 #include <multiplier/Entities/Token.h>
 
@@ -154,7 +156,7 @@ std::optional<Stmt> Stmt::by_id(const Index &index, EntityId eid) {
 }
 
 gap::generator<Stmt> Stmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtImplPtr eptr : ep->StmtsFor(ep)) {
     if (std::optional<Stmt> e = Stmt::from(Stmt(std::move(eptr)))) {
       co_yield std::move(e.value());
@@ -163,7 +165,7 @@ gap::generator<Stmt> Stmt::in(const Index &index) {
 }
 
 gap::generator<Stmt> Stmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
     if (std::optional<Stmt> e = Stmt::from(Stmt(std::move(eptr)))) {
@@ -173,7 +175,7 @@ gap::generator<Stmt> Stmt::in(const Fragment &frag) {
 }
 
 gap::generator<Stmt> Stmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
@@ -185,7 +187,7 @@ gap::generator<Stmt> Stmt::in(const File &file) {
 }
 
 gap::generator<Stmt> Stmt::in(const Index &index, std::span<StmtKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       co_yield Stmt(std::move(eptr));
@@ -194,7 +196,7 @@ gap::generator<Stmt> Stmt::in(const Index &index, std::span<StmtKind> kinds) {
 }
 
 gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<StmtKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -204,7 +206,7 @@ gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<StmtKind> kinds) {
 }
 
 gap::generator<Stmt> Stmt::in(const File &file, std::span<StmtKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kinds) {
@@ -223,18 +225,74 @@ std::optional<Stmt> Stmt::from(const TokenContext &t) {
   return t.as_statement();
 }
 
+std::optional<Macro> Stmt::highest_containing_substitution(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal3();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
+      return Macro(std::move(eptr));
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<MacroArgument> Stmt::lowest_containing_macro_argument(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal4();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
+      return MacroArgument::from(Macro(std::move(eptr)));
+    }
+  }
+  return std::nullopt;
+}
+
+unsigned Stmt::num_covering_macros(void) const {
+  return impl->reader.getVal5().size();
+}
+
+std::optional<Macro> Stmt::nth_covering_macro(unsigned n) const {
+  auto list = impl->reader.getVal5();
+  if (n >= list.size()) {
+    return std::nullopt;
+  }
+  const EntityProviderPtr &ep = impl->ep;
+  auto v = list[n];
+  auto e = ep->MacroFor(ep, v);
+  if (!e) {
+    return std::nullopt;
+  }
+  return Macro(std::move(e));
+}
+
+gap::generator<Macro> Stmt::covering_macros(void) const & {
+  auto list = impl->reader.getVal5();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d5 = ep->MacroFor(ep, v)) {
+      co_yield Macro(std::move(d5));
+    }
+  }
+  co_return;
+}
+
 Stmt Stmt::ignore_containers(void) const {
-  RawEntityId eid = impl->reader.getVal3();
+  RawEntityId eid = impl->reader.getVal6();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<Stmt> Stmt::children(void) const & {
-  auto list = impl->reader.getVal4();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal7();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d4 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d4));
+    if (auto d7 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d7));
     }
   }
   co_return;
@@ -243,15 +301,15 @@ gap::generator<Stmt> Stmt::children(void) const & {
 TokenRange Stmt::tokens(void) const {
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal5(), impl->reader.getVal6());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal8(), impl->reader.getVal9());
 }
 
 StmtKind Stmt::kind(void) const {
-  return static_cast<StmtKind>(impl->reader.getVal7());
+  return static_cast<StmtKind>(impl->reader.getVal10());
 }
 
 Stmt Stmt::strip_label_like_statements(void) const {
-  RawEntityId eid = impl->reader.getVal8();
+  RawEntityId eid = impl->reader.getVal11();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

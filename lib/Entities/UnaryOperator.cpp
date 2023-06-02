@@ -110,7 +110,7 @@ std::optional<UnaryOperator> UnaryOperator::from(const Stmt &parent) {
 }
 
 gap::generator<UnaryOperator> UnaryOperator::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kUnaryOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<UnaryOperator> e = UnaryOperator::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<UnaryOperator> UnaryOperator::in(const Index &index) {
 }
 
 gap::generator<UnaryOperator> UnaryOperator::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kUnaryOperatorDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<UnaryOperator> UnaryOperator::in(const Fragment &frag) {
 }
 
 gap::generator<UnaryOperator> UnaryOperator::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kUnaryOperatorDerivedKinds) {
@@ -155,48 +155,48 @@ std::optional<UnaryOperator> UnaryOperator::from(const TokenContext &t) {
 }
 
 bool UnaryOperator::can_overflow(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 UnaryOperatorKind UnaryOperator::opcode(void) const {
-  return static_cast<UnaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<UnaryOperatorKind>(impl->reader.getVal97());
 }
 
 Token UnaryOperator::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Expr UnaryOperator::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool UnaryOperator::has_stored_fp_features(void) const {
-  return impl->reader.getVal90();
-}
-
-bool UnaryOperator::is_arithmetic_operation(void) const {
-  return impl->reader.getVal91();
-}
-
-bool UnaryOperator::is_decrement_operation(void) const {
-  return impl->reader.getVal92();
-}
-
-bool UnaryOperator::is_increment_decrement_operation(void) const {
   return impl->reader.getVal93();
 }
 
-bool UnaryOperator::is_increment_operation(void) const {
+bool UnaryOperator::is_arithmetic_operation(void) const {
+  return impl->reader.getVal94();
+}
+
+bool UnaryOperator::is_decrement_operation(void) const {
   return impl->reader.getVal95();
 }
 
+bool UnaryOperator::is_increment_decrement_operation(void) const {
+  return impl->reader.getVal96();
+}
+
+bool UnaryOperator::is_increment_operation(void) const {
+  return impl->reader.getVal98();
+}
+
 bool UnaryOperator::is_postfix(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal100();
 }
 
 bool UnaryOperator::is_prefix(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal101();
 }
 
 #pragma GCC diagnostic pop

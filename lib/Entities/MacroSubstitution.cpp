@@ -8,11 +8,14 @@
 
 #include <multiplier/Entities/MacroSubstitution.h>
 
+#include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/MacroConcatenate.h>
 #include <multiplier/Entities/MacroExpansion.h>
 #include <multiplier/Entities/MacroParameterSubstitution.h>
 #include <multiplier/Entities/MacroStringify.h>
+#include <multiplier/Entities/Stmt.h>
+#include <multiplier/Entities/Token.h>
 
 #include "../EntityProvider.h"
 #include "../Macro.h"
@@ -86,7 +89,7 @@ std::optional<MacroSubstitution> MacroSubstitution::from(const Macro &parent) {
 }
 
 gap::generator<MacroSubstitution> MacroSubstitution::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kMacroSubstitutionDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
       if (std::optional<MacroSubstitution> e = MacroSubstitution::from(Macro(std::move(eptr)))) {
@@ -97,7 +100,7 @@ gap::generator<MacroSubstitution> MacroSubstitution::in(const Index &index) {
 }
 
 gap::generator<MacroSubstitution> MacroSubstitution::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kMacroSubstitutionDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
@@ -109,7 +112,7 @@ gap::generator<MacroSubstitution> MacroSubstitution::in(const Fragment &frag) {
 }
 
 gap::generator<MacroSubstitution> MacroSubstitution::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kMacroSubstitutionDerivedKinds) {
@@ -143,6 +146,54 @@ gap::generator<MacroOrToken> MacroSubstitution::replacement_children(void) const
       assert(false);
     }
   }
+}
+
+Token MacroSubstitution::first_fully_substituted_token(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal5();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    return impl->ep->TokenFor(impl->ep, eid);
+  }
+  return Token();
+}
+
+Token MacroSubstitution::last_fully_substituted_token(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal6();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    return impl->ep->TokenFor(impl->ep, eid);
+  }
+  return Token();
+}
+
+std::optional<Stmt> MacroSubstitution::covered_stmt(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal7();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr));
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<Decl> MacroSubstitution::covered_decl(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal8();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return Decl(std::move(eptr));
+    }
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

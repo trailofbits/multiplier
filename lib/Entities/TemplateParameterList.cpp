@@ -97,7 +97,7 @@ std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const 
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -108,7 +108,7 @@ std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const 
 
 gap::generator<NamedDecl> TemplateParameterList::parameters(void) const & {
   auto list = impl->reader.getVal9();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d9 = ep->DeclFor(ep, v)) {

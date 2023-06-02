@@ -110,7 +110,7 @@ std::optional<FixedPointLiteral> FixedPointLiteral::from(const Stmt &parent) {
 }
 
 gap::generator<FixedPointLiteral> FixedPointLiteral::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kFixedPointLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<FixedPointLiteral> e = FixedPointLiteral::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<FixedPointLiteral> FixedPointLiteral::in(const Index &index) {
 }
 
 gap::generator<FixedPointLiteral> FixedPointLiteral::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kFixedPointLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<FixedPointLiteral> FixedPointLiteral::in(const Fragment &frag) {
 }
 
 gap::generator<FixedPointLiteral> FixedPointLiteral::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kFixedPointLiteralDerivedKinds) {
@@ -155,7 +155,7 @@ std::optional<FixedPointLiteral> FixedPointLiteral::from(const TokenContext &t) 
 }
 
 Token FixedPointLiteral::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 #pragma GCC diagnostic pop

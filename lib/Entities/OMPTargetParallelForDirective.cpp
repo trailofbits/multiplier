@@ -112,7 +112,7 @@ std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from
 }
 
 gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPTargetParallelForDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPTargetParallelForDirective> e = OMPTargetParallelForDirective::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::in(
 }
 
 gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPTargetParallelForDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::in(
 }
 
 gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPTargetParallelForDirectiveDerivedKinds) {
@@ -157,12 +157,12 @@ std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from
 }
 
 Expr OMPTargetParallelForDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal58();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPTargetParallelForDirective::has_cancel(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal26();
 }
 
 #pragma GCC diagnostic pop
