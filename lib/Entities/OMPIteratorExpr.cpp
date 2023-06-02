@@ -110,7 +110,7 @@ std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Stmt &parent) {
 }
 
 gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPIteratorExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPIteratorExpr> e = OMPIteratorExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const Index &index) {
 }
 
 gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPIteratorExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const Fragment &frag) {
 }
 
 gap::generator<OMPIteratorExpr> OMPIteratorExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPIteratorExprDerivedKinds) {
@@ -155,15 +155,15 @@ std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const TokenContext &t) {
 }
 
 Token OMPIteratorExpr::iterator_kw_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token OMPIteratorExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token OMPIteratorExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 #pragma GCC diagnostic pop

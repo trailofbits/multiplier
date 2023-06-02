@@ -110,7 +110,7 @@ std::optional<ReturnStmt> ReturnStmt::from(const Stmt &parent) {
 }
 
 gap::generator<ReturnStmt> ReturnStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kReturnStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ReturnStmt> e = ReturnStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ReturnStmt> ReturnStmt::in(const Index &index) {
 }
 
 gap::generator<ReturnStmt> ReturnStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kReturnStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ReturnStmt> ReturnStmt::in(const Fragment &frag) {
 }
 
 gap::generator<ReturnStmt> ReturnStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kReturnStmtDerivedKinds) {
@@ -156,7 +156,7 @@ std::optional<ReturnStmt> ReturnStmt::from(const TokenContext &t) {
 
 std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal9();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -169,7 +169,7 @@ std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const {
 
 std::optional<Expr> ReturnStmt::return_value(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal10();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -181,7 +181,7 @@ std::optional<Expr> ReturnStmt::return_value(void) const {
 }
 
 Token ReturnStmt::return_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 #pragma GCC diagnostic pop

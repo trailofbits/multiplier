@@ -507,6 +507,53 @@ static void FixupNodeParents(Substitution *sub) {
   }
 }
 
+static TokenInfo *LeftCornerOfExp(const Substitution::NodeList &nodes);
+static TokenInfo *LeftCornerOfExp(const Substitution::Node &node) {
+  if (std::holds_alternative<TokenInfo *>(node)) {
+    auto tok = std::get<TokenInfo *>(node);
+    if (tok->category != TokenInfo::kMarkerToken) {
+      return tok;
+    }
+  } else if (auto sub = std::get<Substitution *>(node)) {
+    return LeftCornerOfExp(sub->after);
+  }
+  return nullptr;
+}
+
+TokenInfo *LeftCornerOfExp(const Substitution::NodeList &nodes) {
+  for (const Substitution::Node &node : nodes) {
+    if (auto tok = LeftCornerOfExp(node)) {
+      return tok;
+    }
+  }
+  return nullptr;
+}
+
+static TokenInfo *RightCornerOfExp(const Substitution::NodeList &nodes);
+static TokenInfo *RightCornerOfExp(const Substitution::Node &node) {
+  if (std::holds_alternative<TokenInfo *>(node)) {
+    auto tok = std::get<TokenInfo *>(node);
+    if (tok->category != TokenInfo::kMarkerToken) {
+      return tok;
+    }
+  } else if (auto sub = std::get<Substitution *>(node)) {
+    return RightCornerOfExp(sub->after);
+  }
+  return nullptr;
+}
+
+TokenInfo *RightCornerOfExp(const Substitution::NodeList &nodes) {
+  auto it = nodes.rbegin();
+  auto end = nodes.rend();
+  for (; it != end; ++it) {
+    const Substitution::Node &node = *it;
+    if (auto rc = RightCornerOfExp(node)) {
+      return rc;
+    }
+  }
+  return nullptr;
+}
+
 static TokenInfo *LeftCornerOfUse(const Substitution::NodeList &nodes);
 static TokenInfo *LeftCornerOfUse(const Substitution::Node &node) {
   if (std::holds_alternative<TokenInfo *>(node)) {
@@ -2789,6 +2836,30 @@ TokenTreeNodeRange TokenTree::IntermediateChildren(void) const noexcept {
 TokenTreeNodeRange TokenTree::ReplacementChildren(void) const noexcept {
   std::shared_ptr<const SubstitutionNodeList> ptr(impl, &(impl->after));
   return TokenTreeNodeRange(std::move(ptr));
+}
+
+std::optional<pasta::Token>
+TokenTree::FirstFullySubstitutedToken(void) const noexcept {
+  if (auto lc = LeftCornerOfExp(const_cast<Substitution *>(impl.get()))) {
+    if (lc->parsed_tok) {
+      return lc->parsed_tok;
+    } else if (lc->macro_tok) {
+      return lc->macro_tok->ParsedLocation();
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<pasta::Token>
+TokenTree::LastFullySubstitutedToken(void) const noexcept {
+  if (auto rc = RightCornerOfExp(const_cast<Substitution *>(impl.get()))) {
+    if (rc->parsed_tok) {
+      return rc->parsed_tok;
+    } else if (rc->macro_tok) {
+      return rc->macro_tok->ParsedLocation();
+    }
+  }
+  return std::nullopt;
 }
 
 // Return whether or not this node has intermediate children.

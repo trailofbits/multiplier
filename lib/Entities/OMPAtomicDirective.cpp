@@ -110,7 +110,7 @@ std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const Stmt &parent) {
 }
 
 gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPAtomicDirective> e = OMPAtomicDirective::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Index &index) {
 }
 
 gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Fragment &frag) 
 }
 
 gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
@@ -155,50 +155,50 @@ std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const TokenContext &t
 }
 
 Expr OMPAtomicDirective::condition_expression(void) const {
-  RawEntityId eid = impl->reader.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr OMPAtomicDirective::d(void) const {
   RawEntityId eid = impl->reader.getVal17();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr OMPAtomicDirective::expression(void) const {
-  RawEntityId eid = impl->reader.getVal18();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr OMPAtomicDirective::r(void) const {
-  RawEntityId eid = impl->reader.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr OMPAtomicDirective::update_expression(void) const {
+Expr OMPAtomicDirective::d(void) const {
   RawEntityId eid = impl->reader.getVal20();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr OMPAtomicDirective::v(void) const {
+Expr OMPAtomicDirective::expression(void) const {
   RawEntityId eid = impl->reader.getVal21();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr OMPAtomicDirective::x(void) const {
+Expr OMPAtomicDirective::r(void) const {
   RawEntityId eid = impl->reader.getVal22();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+Expr OMPAtomicDirective::update_expression(void) const {
+  RawEntityId eid = impl->reader.getVal23();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Expr OMPAtomicDirective::v(void) const {
+  RawEntityId eid = impl->reader.getVal24();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Expr OMPAtomicDirective::x(void) const {
+  RawEntityId eid = impl->reader.getVal25();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
 bool OMPAtomicDirective::is_fail_only(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal26();
 }
 
 bool OMPAtomicDirective::is_postfix_update(void) const {
-  return impl->reader.getVal24();
+  return impl->reader.getVal27();
 }
 
 bool OMPAtomicDirective::is_xlhs_in_rhs_part(void) const {
-  return impl->reader.getVal25();
+  return impl->reader.getVal28();
 }
 
 #pragma GCC diagnostic pop

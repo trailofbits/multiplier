@@ -76,7 +76,7 @@ std::optional<DefineMacroDirective> DefineMacroDirective::from(const Macro &pare
 }
 
 gap::generator<DefineMacroDirective> DefineMacroDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kDefineMacroDirectiveDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
       if (std::optional<DefineMacroDirective> e = DefineMacroDirective::from(Macro(std::move(eptr)))) {
@@ -87,7 +87,7 @@ gap::generator<DefineMacroDirective> DefineMacroDirective::in(const Index &index
 }
 
 gap::generator<DefineMacroDirective> DefineMacroDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kDefineMacroDirectiveDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
@@ -99,7 +99,7 @@ gap::generator<DefineMacroDirective> DefineMacroDirective::in(const Fragment &fr
 }
 
 gap::generator<DefineMacroDirective> DefineMacroDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kDefineMacroDirectiveDerivedKinds) {
@@ -122,7 +122,7 @@ std::optional<DefineMacroDirective> DefineMacroDirective::from(const TokenContex
 
 Token DefineMacroDirective::name(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal10();
+    RawEntityId eid = impl->reader.getVal7();
     if (eid == kInvalidEntityId) {
       return Token();
     }
@@ -151,12 +151,12 @@ bool DefineMacroDirective::is_variadic(void) const {
 }
 
 bool DefineMacroDirective::is_function_like(void) const {
-  return impl->reader.getVal11();
+  return impl->reader.getVal12();
 }
 
 gap::generator<MacroOrToken> DefineMacroDirective::parameters(void) const & {
   Index index(impl->ep);
-  auto list = impl->reader.getVal6();
+  auto list = impl->reader.getVal8();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {

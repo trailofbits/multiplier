@@ -110,7 +110,7 @@ std::optional<MSAsmStmt> MSAsmStmt::from(const Stmt &parent) {
 }
 
 gap::generator<MSAsmStmt> MSAsmStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMSAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<MSAsmStmt> e = MSAsmStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<MSAsmStmt> MSAsmStmt::in(const Index &index) {
 }
 
 gap::generator<MSAsmStmt> MSAsmStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMSAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<MSAsmStmt> MSAsmStmt::in(const Fragment &frag) {
 }
 
 gap::generator<MSAsmStmt> MSAsmStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMSAsmStmtDerivedKinds) {
@@ -155,8 +155,8 @@ std::optional<MSAsmStmt> MSAsmStmt::from(const TokenContext &t) {
 }
 
 gap::generator<std::string_view> MSAsmStmt::all_constraints(void) const & {
-  auto list = impl->reader.getVal64();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal67();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -164,15 +164,15 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 unsigned MSAsmStmt::num_all_expressions(void) const {
-  return impl->reader.getVal29().size();
+  return impl->reader.getVal32().size();
 }
 
 std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
-  auto list = impl->reader.getVal29();
+  auto list = impl->reader.getVal32();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -182,12 +182,12 @@ std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
 }
 
 gap::generator<Expr> MSAsmStmt::all_expressions(void) const & {
-  auto list = impl->reader.getVal29();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal32();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d29 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d29)))) {
+    if (auto d32 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d32)))) {
         co_yield std::move(*e);
       }
     }
@@ -196,16 +196,16 @@ gap::generator<Expr> MSAsmStmt::all_expressions(void) const & {
 }
 
 std::string_view MSAsmStmt::assembly_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal65();
+  capnp::Text::Reader data = impl->reader.getVal68();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token MSAsmStmt::l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 bool MSAsmStmt::has_braces(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal26();
 }
 
 #pragma GCC diagnostic pop

@@ -110,7 +110,7 @@ std::optional<CapturedStmt> CapturedStmt::from(const Stmt &parent) {
 }
 
 gap::generator<CapturedStmt> CapturedStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCapturedStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CapturedStmt> e = CapturedStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<CapturedStmt> CapturedStmt::in(const Index &index) {
 }
 
 gap::generator<CapturedStmt> CapturedStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCapturedStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<CapturedStmt> CapturedStmt::in(const Fragment &frag) {
 }
 
 gap::generator<CapturedStmt> CapturedStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCapturedStmtDerivedKinds) {
@@ -155,21 +155,21 @@ std::optional<CapturedStmt> CapturedStmt::from(const TokenContext &t) {
 }
 
 CapturedDecl CapturedStmt::captured_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return CapturedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 RecordDecl CapturedStmt::captured_record_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return RecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 CapturedRegionKind CapturedStmt::captured_region_kind(void) const {
-  return static_cast<CapturedRegionKind>(impl->reader.getVal56());
+  return static_cast<CapturedRegionKind>(impl->reader.getVal59());
 }
 
 Stmt CapturedStmt::captured_statement(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

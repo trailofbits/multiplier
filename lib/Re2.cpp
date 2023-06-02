@@ -94,10 +94,10 @@ RegexQueryImpl::RegexQueryImpl(std::string pattern_)
     : pattern("(" + pattern_ + ")") {}
 
 void RegexQueryImpl::ForEachMatch(
-    std::string_view contents,
+    std::string_view,
     std::function<bool(std::string_view /* match */,
                        unsigned /* begin_offset */,
-                       unsigned /* end_offset */)> cb) {}
+                       unsigned /* end_offset */)>) {}
 
 RegexQuery::RegexQuery(std::string pattern)
     : impl(std::make_shared<RegexQueryImpl>(std::move(pattern))) {}
@@ -105,11 +105,11 @@ RegexQuery::RegexQuery(std::string pattern)
 RegexQuery::~RegexQuery(void) {}
 
 void RegexQuery::for_each_match(
-    std::string_view source,
+    std::string_view,
     std::function<bool(
         std::string_view /* match */,
         unsigned /* begin_offset */,
-        unsigned /* end_offset */)> cb) const {}
+        unsigned /* end_offset */)>) const {}
 
 // Returns the underlying pattern.
 std::string_view RegexQuery::pattern(void) const {

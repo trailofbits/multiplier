@@ -74,7 +74,7 @@ std::optional<MacroArgument> MacroArgument::from(const Macro &parent) {
 }
 
 gap::generator<MacroArgument> MacroArgument::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroKind k : kMacroArgumentDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
       if (std::optional<MacroArgument> e = MacroArgument::from(Macro(std::move(eptr)))) {
@@ -85,7 +85,7 @@ gap::generator<MacroArgument> MacroArgument::in(const Index &index) {
 }
 
 gap::generator<MacroArgument> MacroArgument::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (MacroKind k : kMacroArgumentDerivedKinds) {
     for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
@@ -97,7 +97,7 @@ gap::generator<MacroArgument> MacroArgument::in(const Fragment &frag) {
 }
 
 gap::generator<MacroArgument> MacroArgument::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (MacroKind k : kMacroArgumentDerivedKinds) {
@@ -123,7 +123,7 @@ bool MacroArgument::is_variadic(void) const {
 }
 
 unsigned MacroArgument::index(void) const {
-  return impl->reader.getVal9();
+  return impl->reader.getVal11();
 }
 
 #pragma GCC diagnostic pop

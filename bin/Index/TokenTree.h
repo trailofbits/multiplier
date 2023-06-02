@@ -145,10 +145,27 @@ class TokenTree {
 
   std::optional<pasta::Macro> Macro(void) const noexcept;
 
+  // NOTE(pag): These mirror methods available on various pasta Macro classes.
+  //            The bootstrapper is aware of these, and custom-generates the
+  //            serialization of pasta macros to call these methods instead of
+  //            the corresponding ones on the macro. This is for two reasons:
+  //
+  //                1.  The TokenTree "compresses" the macro graph, merging
+  //                    macro expansions with their argument pre-expansion
+  //                    phases, which appear as additional expansions in the
+  //                    pasta graph.
+  //
+  //                2.  To allow for the serialization of an invented
+  //                    substitution node for `#include` directives embedded
+  //                    inside of fragments with decls/statements, i.e. to
+  //                    handle the common pattern of an `enum` using an x-macro
+  //                    include pattern to define the enumerators.
   std::optional<TokenTree> Parent(void) const noexcept;
   TokenTreeNodeRange Children(void) const noexcept;
   TokenTreeNodeRange IntermediateChildren(void) const noexcept;
   TokenTreeNodeRange ReplacementChildren(void) const noexcept;
+  std::optional<pasta::Token> FirstFullySubstitutedToken(void) const noexcept;
+  std::optional<pasta::Token> LastFullySubstitutedToken(void) const noexcept;
 
   // Return whether or not this node has intermediate children.
   bool HasIntermediateChildren(void) const noexcept;

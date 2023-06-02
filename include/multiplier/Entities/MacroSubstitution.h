@@ -19,6 +19,7 @@ class MacroExpansion;
 class MacroParameterSubstitution;
 class MacroStringify;
 class MacroSubstitution;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroSubstitution : public Macro {
  private:
@@ -55,6 +56,8 @@ class MacroSubstitution : public Macro {
   static std::optional<MacroSubstitution> from(const TokenContext &t);
 
   gap::generator<MacroOrToken> replacement_children(void) const &;
+  Token first_fully_substituted_token(void) const;
+  Token last_fully_substituted_token(void) const;
 };
 
 static_assert(sizeof(MacroSubstitution) == sizeof(Macro));

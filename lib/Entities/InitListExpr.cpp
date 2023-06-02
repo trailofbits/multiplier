@@ -111,7 +111,7 @@ std::optional<InitListExpr> InitListExpr::from(const Stmt &parent) {
 }
 
 gap::generator<InitListExpr> InitListExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kInitListExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<InitListExpr> e = InitListExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<InitListExpr> InitListExpr::in(const Index &index) {
 }
 
 gap::generator<InitListExpr> InitListExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kInitListExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<InitListExpr> InitListExpr::in(const Fragment &frag) {
 }
 
 gap::generator<InitListExpr> InitListExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kInitListExprDerivedKinds) {
@@ -157,7 +157,7 @@ std::optional<InitListExpr> InitListExpr::from(const TokenContext &t) {
 
 std::optional<Expr> InitListExpr::array_filler(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -170,7 +170,7 @@ std::optional<Expr> InitListExpr::array_filler(void) const {
 
 std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,16 +182,16 @@ std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
 }
 
 Token InitListExpr::l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token InitListExpr::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal42();
+    RawEntityId eid = impl->reader.getVal45();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -204,7 +204,7 @@ std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
 
 std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal46();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -216,23 +216,23 @@ std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
 }
 
 bool InitListExpr::had_array_range_designator(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 bool InitListExpr::has_array_filler(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal93();
 }
 
 unsigned InitListExpr::num_initializers(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<Expr> InitListExpr::nth_initializer(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -242,12 +242,12 @@ std::optional<Expr> InitListExpr::nth_initializer(unsigned n) const {
 }
 
 gap::generator<Expr> InitListExpr::initializers(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+    if (auto d18 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d18)))) {
         co_yield std::move(*e);
       }
     }
@@ -256,26 +256,26 @@ gap::generator<Expr> InitListExpr::initializers(void) const & {
 }
 
 bool InitListExpr::is_explicit(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal94();
 }
 
 bool InitListExpr::is_semantic_form(void) const {
-  return impl->reader.getVal92();
-}
-
-bool InitListExpr::is_string_literal_initializer(void) const {
-  return impl->reader.getVal93();
-}
-
-bool InitListExpr::is_syntactic_form(void) const {
   return impl->reader.getVal95();
 }
 
+bool InitListExpr::is_string_literal_initializer(void) const {
+  return impl->reader.getVal96();
+}
+
+bool InitListExpr::is_syntactic_form(void) const {
+  return impl->reader.getVal98();
+}
+
 std::optional<bool> InitListExpr::is_transparent(void) const {
-  if (!impl->reader.getVal98()) {
+  if (!impl->reader.getVal101()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal97());
+    return static_cast<bool>(impl->reader.getVal100());
   }
   return std::nullopt;
 }

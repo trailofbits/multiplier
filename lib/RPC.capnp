@@ -189,3 +189,32 @@ struct Fragment @0xe5f27760091f9a3a {
   # Source IR in text format
   mlir @15 :Text;
 }
+
+struct Type @0xd2d91de1b5fe2e03 {
+  # The unique identifier for this type fragment.
+  id @0 :UInt64;
+  
+  # List of token contexts.
+  typeTokenContexts @1 :List(TokenContext);
+  
+  # List of offsets of token contexts for each of the tokens.
+  #
+  # Indexed by `TypeTokenId::offset`.
+  typeTokenContextOffsets @2 :List(UInt32);
+  
+  # The type token data in text buffer format.
+  tokenData @3 :Text;
+  
+  # Offsets of the beginning of tokens into `tokenData`. There is one extra
+  # element in here than there are tokens, which represents the size of the data.
+  tokenOffsets @4 :List(UInt32);
+  
+  # List of token kinds in this type fragment.
+  tokenKinds @5 :List(UInt16);
+  
+  # The single best related entity ID to the corresponding token. This helps
+  # with improving the speed of syntax highlighting.
+  relatedEntityId @6 :List(UInt64);
+
+  type @7 :AST.Type;
+}

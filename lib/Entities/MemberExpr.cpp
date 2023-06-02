@@ -111,7 +111,7 @@ std::optional<MemberExpr> MemberExpr::from(const Stmt &parent) {
 }
 
 gap::generator<MemberExpr> MemberExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<MemberExpr> e = MemberExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<MemberExpr> MemberExpr::in(const Index &index) {
 }
 
 gap::generator<MemberExpr> MemberExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMemberExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<MemberExpr> MemberExpr::in(const Fragment &frag) {
 }
 
 gap::generator<MemberExpr> MemberExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMemberExprDerivedKinds) {
@@ -156,61 +156,61 @@ std::optional<MemberExpr> MemberExpr::from(const TokenContext &t) {
 }
 
 Expr MemberExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MemberExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 ValueDecl MemberExpr::member_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal43();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token MemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
-}
-
-Token MemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
-}
-
-Token MemberExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
-}
-
-Token MemberExpr::template_keyword_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
+Token MemberExpr::operator_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+}
+
+Token MemberExpr::r_angle_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
+}
+
+Token MemberExpr::template_keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
+}
+
 bool MemberExpr::had_multiple_candidates(void) const {
-  return impl->reader.getVal89();
-}
-
-bool MemberExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal90();
-}
-
-bool MemberExpr::has_qualifier(void) const {
-  return impl->reader.getVal91();
-}
-
-bool MemberExpr::has_template_keyword(void) const {
   return impl->reader.getVal92();
 }
 
-bool MemberExpr::is_arrow(void) const {
+bool MemberExpr::has_explicit_template_arguments(void) const {
   return impl->reader.getVal93();
 }
 
-bool MemberExpr::is_implicit_access(void) const {
+bool MemberExpr::has_qualifier(void) const {
+  return impl->reader.getVal94();
+}
+
+bool MemberExpr::has_template_keyword(void) const {
   return impl->reader.getVal95();
 }
 
+bool MemberExpr::is_arrow(void) const {
+  return impl->reader.getVal96();
+}
+
+bool MemberExpr::is_implicit_access(void) const {
+  return impl->reader.getVal98();
+}
+
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal94());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal97());
 }
 
 #pragma GCC diagnostic pop

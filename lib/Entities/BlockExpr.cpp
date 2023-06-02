@@ -112,7 +112,7 @@ std::optional<BlockExpr> BlockExpr::from(const Stmt &parent) {
 }
 
 gap::generator<BlockExpr> BlockExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kBlockExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<BlockExpr> e = BlockExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<BlockExpr> BlockExpr::in(const Index &index) {
 }
 
 gap::generator<BlockExpr> BlockExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kBlockExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<BlockExpr> BlockExpr::in(const Fragment &frag) {
 }
 
 gap::generator<BlockExpr> BlockExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kBlockExprDerivedKinds) {
@@ -157,21 +157,21 @@ std::optional<BlockExpr> BlockExpr::from(const TokenContext &t) {
 }
 
 BlockDecl BlockExpr::block_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return BlockDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Stmt BlockExpr::body(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Token BlockExpr::caret_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 FunctionProtoType BlockExpr::function_type(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal44();
   return FunctionProtoType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 

@@ -60,7 +60,7 @@ std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const
 }
 
 gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kTemplateSpecializationTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<TemplateSpecializationType> e = TemplateSpecializationType::from(Type(std::move(eptr)))) {
@@ -71,7 +71,7 @@ gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const 
 }
 
 gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (TypeKind k : kTemplateSpecializationTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
@@ -83,7 +83,7 @@ gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const 
 }
 
 gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (TypeKind k : kTemplateSpecializationTypeDerivedKinds) {
@@ -143,7 +143,7 @@ std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argumen
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateArgumentFor(ep, v);
   if (!e) {
@@ -154,7 +154,7 @@ std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argumen
 
 gap::generator<TemplateArgument> TemplateSpecializationType::template_arguments(void) const & {
   auto list = impl->reader.getVal234();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d234 = ep->TemplateArgumentFor(ep, v)) {

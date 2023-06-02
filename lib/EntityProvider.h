@@ -101,6 +101,10 @@ class EntityProvider {
   Token TokenFor(const Ptr &, const std::shared_ptr<const TokenReader> &,
                  RawEntityId id);
 
+  // Get the inclusive token range associated with two entity IDs.
+  TokenRange TokenRangeFor(const Ptr &, EntityId begin_id,
+                           EntityId end_id) const;
+
 #define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
     friend class type_name ## Impl; \
     \
@@ -118,6 +122,7 @@ class EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
@@ -130,6 +135,7 @@ class EntityProvider {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY)
@@ -141,6 +147,7 @@ class EntityProvider {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_DECLARE_ENTITY_LISTERS)

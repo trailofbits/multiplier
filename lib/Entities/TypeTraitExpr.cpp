@@ -111,7 +111,7 @@ std::optional<TypeTraitExpr> TypeTraitExpr::from(const Stmt &parent) {
 }
 
 gap::generator<TypeTraitExpr> TypeTraitExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kTypeTraitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<TypeTraitExpr> e = TypeTraitExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::in(const Index &index) {
 }
 
 gap::generator<TypeTraitExpr> TypeTraitExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kTypeTraitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<TypeTraitExpr> TypeTraitExpr::in(const Fragment &frag) {
 }
 
 gap::generator<TypeTraitExpr> TypeTraitExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kTypeTraitExprDerivedKinds) {
@@ -156,28 +156,28 @@ std::optional<TypeTraitExpr> TypeTraitExpr::from(const TokenContext &t) {
 }
 
 TypeTrait TypeTraitExpr::trait(void) const {
-  return static_cast<TypeTrait>(impl->reader.getVal94());
+  return static_cast<TypeTrait>(impl->reader.getVal97());
 }
 
 std::optional<bool> TypeTraitExpr::value(void) const {
-  if (!impl->reader.getVal90()) {
+  if (!impl->reader.getVal93()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal89());
+    return static_cast<bool>(impl->reader.getVal92());
   }
   return std::nullopt;
 }
 
 unsigned TypeTraitExpr::num_arguments(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<Type> TypeTraitExpr::nth_argument(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TypeFor(ep, v);
   if (!e) {
@@ -187,12 +187,12 @@ std::optional<Type> TypeTraitExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Type> TypeTraitExpr::arguments(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d15));
+    if (auto d18 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d18));
     }
   }
   co_return;

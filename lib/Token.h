@@ -78,9 +78,11 @@ class TokenReader {
 
   virtual const FragmentImpl *NthOwningFragment(EntityOffset) const noexcept;
   virtual const FileImpl *NthOwningFile(EntityOffset) const noexcept;
+  virtual const TypeImpl *NthOwningType(EntityOffset) const noexcept;
 
   virtual const FragmentImpl *OwningFragment(void) const noexcept;
   virtual const FileImpl *OwningFile(void) const noexcept;
+  virtual const TypeImpl *OwningType(void) const noexcept;
 
   static Token TokenFor(const Ptr &self, RawEntityId eid) noexcept;
 };

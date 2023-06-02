@@ -112,7 +112,7 @@ std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXDeleteExpr> CXXDeleteExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXDeleteExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXDeleteExpr> e = CXXDeleteExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<CXXDeleteExpr> CXXDeleteExpr::in(const Index &index) {
 }
 
 gap::generator<CXXDeleteExpr> CXXDeleteExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXDeleteExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<CXXDeleteExpr> CXXDeleteExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXDeleteExpr> CXXDeleteExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXDeleteExprDerivedKinds) {
@@ -157,34 +157,34 @@ std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const TokenContext &t) {
 }
 
 bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 Expr CXXDeleteExpr::argument(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type CXXDeleteExpr::destroyed_type(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 FunctionDecl CXXDeleteExpr::operator_delete(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal43();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool CXXDeleteExpr::is_array_form(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal93();
 }
 
 bool CXXDeleteExpr::is_array_form_as_written(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal94();
 }
 
 bool CXXDeleteExpr::is_global_delete(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal95();
 }
 
 #pragma GCC diagnostic pop

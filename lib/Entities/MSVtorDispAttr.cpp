@@ -60,7 +60,7 @@ std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const Attr &parent) {
 }
 
 gap::generator<MSVtorDispAttr> MSVtorDispAttr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kMSVtorDispAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       if (std::optional<MSVtorDispAttr> e = MSVtorDispAttr::from(Attr(std::move(eptr)))) {
@@ -71,7 +71,7 @@ gap::generator<MSVtorDispAttr> MSVtorDispAttr::in(const Index &index) {
 }
 
 gap::generator<MSVtorDispAttr> MSVtorDispAttr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kMSVtorDispAttrDerivedKinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -83,7 +83,7 @@ gap::generator<MSVtorDispAttr> MSVtorDispAttr::in(const Fragment &frag) {
 }
 
 gap::generator<MSVtorDispAttr> MSVtorDispAttr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kMSVtorDispAttrDerivedKinds) {

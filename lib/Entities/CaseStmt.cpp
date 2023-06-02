@@ -110,7 +110,7 @@ std::optional<CaseStmt> CaseStmt::from(const Stmt &parent) {
 }
 
 gap::generator<CaseStmt> CaseStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCaseStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CaseStmt> e = CaseStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<CaseStmt> CaseStmt::in(const Index &index) {
 }
 
 gap::generator<CaseStmt> CaseStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCaseStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<CaseStmt> CaseStmt::in(const Fragment &frag) {
 }
 
 gap::generator<CaseStmt> CaseStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCaseStmtDerivedKinds) {
@@ -155,25 +155,25 @@ std::optional<CaseStmt> CaseStmt::from(const TokenContext &t) {
 }
 
 bool CaseStmt::case_statement_is_gnu_range(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 Token CaseStmt::case_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
-}
-
-Token CaseStmt::ellipsis_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
+Token CaseStmt::ellipsis_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
+}
+
 Expr CaseStmt::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal21();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> CaseStmt::rhs(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal19();
+    RawEntityId eid = impl->reader.getVal22();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

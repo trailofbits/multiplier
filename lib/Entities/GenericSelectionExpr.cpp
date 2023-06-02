@@ -110,7 +110,7 @@ std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Stmt &paren
 }
 
 gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kGenericSelectionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<GenericSelectionExpr> e = GenericSelectionExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Index &index
 }
 
 gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kGenericSelectionExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const Fragment &fr
 }
 
 gap::generator<GenericSelectionExpr> GenericSelectionExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kGenericSelectionExprDerivedKinds) {
@@ -155,15 +155,15 @@ std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const TokenContex
 }
 
 unsigned GenericSelectionExpr::num_association_expressions(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -173,12 +173,12 @@ std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n)
 }
 
 gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+    if (auto d18 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d18)))) {
         co_yield std::move(*e);
       }
     }
@@ -187,29 +187,29 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const &
 }
 
 Expr GenericSelectionExpr::controlling_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token GenericSelectionExpr::default_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token GenericSelectionExpr::generic_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token GenericSelectionExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Expr GenericSelectionExpr::result_expression(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal45();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool GenericSelectionExpr::is_result_dependent(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

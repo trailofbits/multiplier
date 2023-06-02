@@ -111,7 +111,7 @@ std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from(const Stmt &paren
 }
 
 gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXParenListInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXParenListInitExpr> e = CXXParenListInitExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::in(const Index &index
 }
 
 gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXParenListInitExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::in(const Fragment &fr
 }
 
 gap::generator<CXXParenListInitExpr> CXXParenListInitExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXParenListInitExprDerivedKinds) {
@@ -156,16 +156,16 @@ std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from(const TokenContex
 }
 
 Expr CXXParenListInitExpr::array_filler(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXParenListInitExpr::initializer_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 FieldDecl CXXParenListInitExpr::initialized_field_in_union(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal43();
   return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

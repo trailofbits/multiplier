@@ -111,7 +111,7 @@ std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr
 }
 
 gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSubstNonTypeTemplateParmPackExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<SubstNonTypeTemplateParmPackExpr> e = SubstNonTypeTemplateParmPackExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExp
 }
 
 gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSubstNonTypeTemplateParmPackExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExp
 }
 
 gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSubstNonTypeTemplateParmPackExprDerivedKinds) {
@@ -156,17 +156,17 @@ std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr
 }
 
 Decl SubstNonTypeTemplateParmPackExpr::associated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Decl(impl->ep->DeclFor(impl->ep, eid));
 }
 
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmPackExpr::parameter_pack(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token SubstNonTypeTemplateParmPackExpr::parameter_pack_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 #pragma GCC diagnostic pop

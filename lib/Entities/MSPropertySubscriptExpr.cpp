@@ -110,7 +110,7 @@ std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Stmt 
 }
 
 gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kMSPropertySubscriptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<MSPropertySubscriptExpr> e = MSPropertySubscriptExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const Index 
 }
 
 gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kMSPropertySubscriptExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const Fragme
 }
 
 gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kMSPropertySubscriptExprDerivedKinds) {
@@ -155,17 +155,17 @@ std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Token
 }
 
 Expr MSPropertySubscriptExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr MSPropertySubscriptExpr::index(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MSPropertySubscriptExpr::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 #pragma GCC diagnostic pop

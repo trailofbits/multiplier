@@ -110,7 +110,7 @@ std::optional<OffsetOfExpr> OffsetOfExpr::from(const Stmt &parent) {
 }
 
 gap::generator<OffsetOfExpr> OffsetOfExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOffsetOfExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OffsetOfExpr> e = OffsetOfExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<OffsetOfExpr> OffsetOfExpr::in(const Index &index) {
 }
 
 gap::generator<OffsetOfExpr> OffsetOfExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOffsetOfExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<OffsetOfExpr> OffsetOfExpr::in(const Fragment &frag) {
 }
 
 gap::generator<OffsetOfExpr> OffsetOfExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOffsetOfExprDerivedKinds) {
@@ -155,11 +155,11 @@ std::optional<OffsetOfExpr> OffsetOfExpr::from(const TokenContext &t) {
 }
 
 Token OffsetOfExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token OffsetOfExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 #pragma GCC diagnostic pop

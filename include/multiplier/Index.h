@@ -63,6 +63,7 @@ using VariantEntity = std::variant<
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT)>;
 #undef MX_DECLARE_ENTITY_VARIANT
 
@@ -92,6 +93,7 @@ class Index {
     friend class type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -148,7 +150,7 @@ class Index {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,
-                              MX_DECLARE_GETTER)
+                              MX_DECLARE_GETTER, MX_DECLARE_GETTER)
 #undef MX_DECLARE_GETTER
 
   // Download a fragment based off of an entity ID.
@@ -212,6 +214,7 @@ std::optional<T> Reference::as(void) const noexcept {
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
+                            MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,

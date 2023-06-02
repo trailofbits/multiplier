@@ -30,7 +30,7 @@ VAST_UNRELAX_WARNINGS
 #include <vast/Translation/CodeGen.hpp>
 
 #include "CodegenMetaGenerator.h"
-#include "CodegenVisitor.hpp"
+#include "CodegenVisitor.h"
 
 #endif  // MX_ENABLE_SOURCEIR
 
@@ -42,32 +42,14 @@ VAST_UNRELAX_WARNINGS
 namespace indexer {
 
 #ifdef MX_ENABLE_SOURCEIR
-class CodeGeneratorVisitor {
- public:
 
-  template<typename Derived>
-  using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
-      Derived, vast::cg::DefaultCodeGenVisitorMixin, FallBackVisitor >;
+template<typename Derived>
+using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
+    Derived, vast::cg::DefaultCodeGenVisitorMixin, FallBackVisitor >;
 
-  using Visitor = vast::cg::CodeGenVisitor<VisitorConfig, MetaGenerator>;
-
-  CodeGeneratorVisitor(const pasta::AST &ast, mlir::MLIRContext *mctx, const EntityMapper &em)
-    : meta(ast, mctx, em), codegen(mctx, meta) {}
-
-  void append_to_module(clang::Decl *decl) {
-    codegen.append_to_module(decl);
-  }
-
-  vast::owning_module_ref freeze() {
-    return codegen.freeze();
-  }
-
-  MetaGenerator meta;
-  vast::cg::CodeGenBase<Visitor> codegen;
-};
+using CodeGenVisitor = vast::cg::CodeGenVisitor<VisitorConfig, MetaGenerator>;
 
 #endif
-
 
 class CodeGeneratorImpl {
  public:
@@ -121,7 +103,9 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   flags.enableDebugInfo(true, false);
 
   mlir::MLIRContext context(impl->registry);
-  CodeGeneratorVisitor codegen(ast, &context, em);
+
+  MetaGenerator meta(ast, &context, em);
+  vast::cg::CodeGenBase<CodeGenVisitor> codegen(&context, meta);
 
   try {
     for (const pasta::Decl &decl : decls) {

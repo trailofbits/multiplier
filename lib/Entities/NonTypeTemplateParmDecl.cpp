@@ -139,7 +139,7 @@ std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Decl 
 }
 
 gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<NonTypeTemplateParmDecl> e = NonTypeTemplateParmDecl::from(Decl(std::move(eptr)))) {
@@ -150,7 +150,7 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Index 
 }
 
 gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -162,7 +162,7 @@ gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Fragme
 }
 
 gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
@@ -242,7 +242,7 @@ std::optional<Type> NonTypeTemplateParmDecl::nth_expansion_type(unsigned n) cons
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TypeFor(ep, v);
   if (!e) {
@@ -253,7 +253,7 @@ std::optional<Type> NonTypeTemplateParmDecl::nth_expansion_type(unsigned n) cons
 
 gap::generator<Type> NonTypeTemplateParmDecl::expansion_types(void) const & {
   auto list = impl->reader.getVal50();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d50 = ep->TypeFor(ep, v)) {

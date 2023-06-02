@@ -137,7 +137,7 @@ std::optional<FriendDecl> FriendDecl::from(const Decl &parent) {
 }
 
 gap::generator<FriendDecl> FriendDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kFriendDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<FriendDecl> e = FriendDecl::from(Decl(std::move(eptr)))) {
@@ -148,7 +148,7 @@ gap::generator<FriendDecl> FriendDecl::in(const Index &index) {
 }
 
 gap::generator<FriendDecl> FriendDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kFriendDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -160,7 +160,7 @@ gap::generator<FriendDecl> FriendDecl::in(const Fragment &frag) {
 }
 
 gap::generator<FriendDecl> FriendDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kFriendDeclDerivedKinds) {
@@ -224,7 +224,7 @@ std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parame
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateParameterListFor(ep, v);
   if (!e) {
@@ -235,7 +235,7 @@ std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parame
 
 gap::generator<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const & {
   auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d49 = ep->TemplateParameterListFor(ep, v)) {

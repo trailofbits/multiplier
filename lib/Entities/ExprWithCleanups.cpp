@@ -111,7 +111,7 @@ std::optional<ExprWithCleanups> ExprWithCleanups::from(const Stmt &parent) {
 }
 
 gap::generator<ExprWithCleanups> ExprWithCleanups::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kExprWithCleanupsDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ExprWithCleanups> e = ExprWithCleanups::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<ExprWithCleanups> ExprWithCleanups::in(const Index &index) {
 }
 
 gap::generator<ExprWithCleanups> ExprWithCleanups::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kExprWithCleanupsDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<ExprWithCleanups> ExprWithCleanups::in(const Fragment &frag) {
 }
 
 gap::generator<ExprWithCleanups> ExprWithCleanups::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kExprWithCleanupsDerivedKinds) {
@@ -156,7 +156,7 @@ std::optional<ExprWithCleanups> ExprWithCleanups::from(const TokenContext &t) {
 }
 
 bool ExprWithCleanups::cleanups_have_side_effects(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

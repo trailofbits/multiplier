@@ -40,6 +40,7 @@ class WeggliQueryResultIterator;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
@@ -70,6 +71,7 @@ class Fragment {
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND)
 #undef MX_FRIEND
 
@@ -93,7 +95,6 @@ class Fragment {
 
   static Fragment containing(const Decl &);
   static Fragment containing(const Stmt &);
-  static Fragment containing(const Type &);
   static Fragment containing(const Attr &);
   static Fragment containing(const TemplateArgument &);
   static Fragment containing(const TemplateParameterList &);

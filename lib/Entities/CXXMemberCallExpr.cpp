@@ -114,7 +114,7 @@ std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXMemberCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXMemberCallExpr> e = CXXMemberCallExpr::from(Stmt(std::move(eptr)))) {
@@ -125,7 +125,7 @@ gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const Index &index) {
 }
 
 gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXMemberCallExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -137,7 +137,7 @@ gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXMemberCallExprDerivedKinds) {
@@ -159,13 +159,13 @@ std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const TokenContext &t) 
 }
 
 Expr CXXMemberCallExpr::implicit_object_argument(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal47();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<CXXMethodDecl> CXXMemberCallExpr::method_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal45();
+    RawEntityId eid = impl->reader.getVal48();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -177,12 +177,12 @@ std::optional<CXXMethodDecl> CXXMemberCallExpr::method_declaration(void) const {
 }
 
 Type CXXMemberCallExpr::object_type(void) const {
-  RawEntityId eid = impl->reader.getVal46();
+  RawEntityId eid = impl->reader.getVal49();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 CXXRecordDecl CXXMemberCallExpr::record_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal50();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
