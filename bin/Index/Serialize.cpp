@@ -187,7 +187,7 @@ void SerializeMacro(const EntityMapper &es, mx::ast::Macro::Builder b, const pas
   } else {
     b.setVal0(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   }
-  std::optional<const void *> v1 = nullptr;
+  std::optional<const void *> v1;
   if (tt) {
     auto x1 = tt->Parent();
     if (x1) {
@@ -264,33 +264,29 @@ void SerializeMacroSubstitution(const EntityMapper &es, mx::ast::Macro::Builder 
       ++i4;
     }
   }
-  auto v5 = e.FirstFullySubstitutedToken();
+  std::optional<pasta::Token> v5;
+  if (tt) {
+    v5 = tt->FirstFullySubstitutedToken();
+  } else {
+    v5 = e.FirstFullySubstitutedToken();
+  }
   if (v5) {
     auto id5 = es.EntityId(v5.value());
     b.setVal5(id5);
   } else {
     b.setVal5(mx::kInvalidEntityId);
   }
-  auto v6 = e.LastFullySubstitutedToken();
+  std::optional<pasta::Token> v6;
+  if (tt) {
+    v6 = tt->LastFullySubstitutedToken();
+  } else {
+    v6 = e.LastFullySubstitutedToken();
+  }
   if (v6) {
     auto id6 = es.EntityId(v6.value());
     b.setVal6(id6);
   } else {
     b.setVal6(mx::kInvalidEntityId);
-  }
-  auto v7 = e.CoveredStmt();
-  if (v7) {
-    auto id7 = es.EntityId(v7.value());
-    b.setVal7(id7);
-  } else {
-    b.setVal7(mx::kInvalidEntityId);
-  }
-  auto v8 = e.CoveredDecl();
-  if (v8) {
-    auto id8 = es.EntityId(v8.value());
-    b.setVal8(id8);
-  } else {
-    b.setVal8(mx::kInvalidEntityId);
   }
 }
 
@@ -300,8 +296,8 @@ void SerializeMacroConcatenate(const EntityMapper &es, mx::ast::Macro::Builder b
   (void) b;
   (void) e;
   SerializeMacroSubstitution(es, b, e, tt);
-  auto t9 = e.PastedToken();
-  b.setVal9(es.EntityId(t9));
+  auto t7 = e.PastedToken();
+  b.setVal7(es.EntityId(t7));
 }
 
 void SerializeMacroStringify(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroStringify &e, const TokenTree *tt) {
@@ -310,8 +306,8 @@ void SerializeMacroStringify(const EntityMapper &es, mx::ast::Macro::Builder b, 
   (void) b;
   (void) e;
   SerializeMacroSubstitution(es, b, e, tt);
-  auto t9 = e.StringifiedToken();
-  b.setVal9(es.EntityId(t9));
+  auto t7 = e.StringifiedToken();
+  b.setVal7(es.EntityId(t7));
 }
 
 void SerializeMacroExpansion(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroExpansion &e, const TokenTree *tt) {
@@ -321,36 +317,36 @@ void SerializeMacroExpansion(const EntityMapper &es, mx::ast::Macro::Builder b, 
   (void) e;
   SerializeMacroSubstitution(es, b, e, tt);
   if (tt) {
-    auto v10 = tt->IntermediateChildren();
-    auto sv10 = b.initVal10(static_cast<unsigned>(v10.size()));
-    auto i10 = 0u;
-    for (auto n10 : v10) {
-      sv10.set(i10, es.EntityId(n10.RawNode()));
-      ++i10;
+    auto v8 = tt->IntermediateChildren();
+    auto sv8 = b.initVal8(static_cast<unsigned>(v8.size()));
+    auto i8 = 0u;
+    for (auto n8 : v8) {
+      sv8.set(i8, es.EntityId(n8.RawNode()));
+      ++i8;
     }
   } else {
-    auto v10 = e.IntermediateChildren();
-    auto sv10 = b.initVal10(static_cast<unsigned>(v10.size()));
-    auto i10 = 0u;
-    for (const auto &e10 : v10) {
-      sv10.set(i10, es.EntityId(e10));
-      ++i10;
+    auto v8 = e.IntermediateChildren();
+    auto sv8 = b.initVal8(static_cast<unsigned>(v8.size()));
+    auto i8 = 0u;
+    for (const auto &e8 : v8) {
+      sv8.set(i8, es.EntityId(e8));
+      ++i8;
     }
   }
-  auto v9 = e.Definition();
-  if (v9) {
-    auto id9 = es.EntityId(v9.value());
-    b.setVal9(id9);
+  auto v7 = e.Definition();
+  if (v7) {
+    auto id7 = es.EntityId(v7.value());
+    b.setVal7(id7);
   } else {
-    b.setVal9(mx::kInvalidEntityId);
+    b.setVal7(mx::kInvalidEntityId);
   }
   do {
-    auto v11 = e.Arguments();
-    auto sv11 = b.initVal11(static_cast<unsigned>(v11.size()));
-    auto i11 = 0u;
-    for (const auto &e11 : v11) {
-      sv11.set(i11, es.EntityId(e11));
-      ++i11;
+    auto v9 = e.Arguments();
+    auto sv9 = b.initVal9(static_cast<unsigned>(v9.size()));
+    auto i9 = 0u;
+    for (const auto &e9 : v9) {
+      sv9.set(i9, es.EntityId(e9));
+      ++i9;
     }
   } while (false);
 }
@@ -361,9 +357,9 @@ void SerializeMacroParameterSubstitution(const EntityMapper &es, mx::ast::Macro:
   (void) b;
   (void) e;
   SerializeMacroSubstitution(es, b, e, tt);
-  b.setVal9(es.EntityId(e.Parameter()));
-  auto t12 = e.ParameterUse();
-  b.setVal12(es.EntityId(t12));
+  b.setVal7(es.EntityId(e.Parameter()));
+  auto t10 = e.ParameterUse();
+  b.setVal10(es.EntityId(t10));
 }
 
 void SerializeMacroArgument(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroArgument &e, const TokenTree *tt) {
@@ -373,7 +369,7 @@ void SerializeMacroArgument(const EntityMapper &es, mx::ast::Macro::Builder b, c
   (void) e;
   SerializeMacro(es, b, e, tt);
   b.setVal3(e.IsVariadic());
-  b.setVal13(e.Index());
+  b.setVal11(e.Index());
 }
 
 void SerializeMacroParameter(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroParameter &e, const TokenTree *tt) {
@@ -396,7 +392,7 @@ void SerializeMacroParameter(const EntityMapper &es, mx::ast::Macro::Builder b, 
   } else {
     b.setVal6(mx::kInvalidEntityId);
   }
-  b.setVal13(e.Index());
+  b.setVal11(e.Index());
 }
 
 void SerializeMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroDirective &e, const TokenTree *tt) {
@@ -439,14 +435,14 @@ void SerializeDefineMacroDirective(const EntityMapper &es, mx::ast::Macro::Build
     }
   }
   b.setVal3(e.IsVariadic());
-  b.setVal14(e.IsFunctionLike());
+  b.setVal12(e.IsFunctionLike());
   if (true) {
-    auto v10 = e.Parameters();
-    auto sv10 = b.initVal10(static_cast<unsigned>(v10.size()));
-    auto i10 = 0u;
-    for (const auto &e10 : v10) {
-      sv10.set(i10, es.EntityId(e10));
-      ++i10;
+    auto v8 = e.Parameters();
+    auto sv8 = b.initVal8(static_cast<unsigned>(v8.size()));
+    auto i8 = 0u;
+    for (const auto &e8 : v8) {
+      sv8.set(i8, es.EntityId(e8));
+      ++i8;
     }
   }
 }

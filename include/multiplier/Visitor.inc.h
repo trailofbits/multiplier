@@ -6517,8 +6517,6 @@ MX_BEGIN_VISIT_MACRO(MacroSubstitution)
   MX_VISIT_MACRO_RANGE(MacroSubstitution, replacement_children, 4, NthMacro)
   MX_VISIT_ENTITY(MacroSubstitution, first_fully_substituted_token, 5, MX_APPLY_METHOD, FirstFullySubstitutedToken, Token, NthMacro)
   MX_VISIT_ENTITY(MacroSubstitution, last_fully_substituted_token, 6, MX_APPLY_METHOD, LastFullySubstitutedToken, Token, NthMacro)
-  MX_VISIT_OPTIONAL_ENTITY(MacroSubstitution, covered_stmt, 7, MX_APPLY_METHOD, CoveredStmt, Stmt, NthMacro)
-  MX_VISIT_OPTIONAL_ENTITY(MacroSubstitution, covered_decl, 8, MX_APPLY_METHOD, CoveredDecl, Decl, NthMacro)
   MX_EXIT_VISIT_MacroSubstitution
 MX_END_VISIT_MACRO(MacroSubstitution)
 
@@ -6532,7 +6530,7 @@ MX_END_VISIT_MACRO(MacroSubstitution)
 MX_BEGIN_VISIT_MACRO(MacroConcatenate)
   MX_ENTER_VISIT_MacroConcatenate
   MX_VISIT_BASE(MacroConcatenate, MacroSubstitution)
-  MX_VISIT_ENTITY(MacroConcatenate, pasted_token, 9, MX_APPLY_METHOD, PastedToken, Token, NthMacro)
+  MX_VISIT_ENTITY(MacroConcatenate, pasted_token, 7, MX_APPLY_METHOD, PastedToken, Token, NthMacro)
   MX_EXIT_VISIT_MacroConcatenate
 MX_END_VISIT_MACRO(MacroConcatenate)
 
@@ -6546,7 +6544,7 @@ MX_END_VISIT_MACRO(MacroConcatenate)
 MX_BEGIN_VISIT_MACRO(MacroStringify)
   MX_ENTER_VISIT_MacroStringify
   MX_VISIT_BASE(MacroStringify, MacroSubstitution)
-  MX_VISIT_ENTITY(MacroStringify, stringified_token, 9, MX_APPLY_METHOD, StringifiedToken, Token, NthMacro)
+  MX_VISIT_ENTITY(MacroStringify, stringified_token, 7, MX_APPLY_METHOD, StringifiedToken, Token, NthMacro)
   MX_EXIT_VISIT_MacroStringify
 MX_END_VISIT_MACRO(MacroStringify)
 
@@ -6560,9 +6558,9 @@ MX_END_VISIT_MACRO(MacroStringify)
 MX_BEGIN_VISIT_MACRO(MacroExpansion)
   MX_ENTER_VISIT_MacroExpansion
   MX_VISIT_BASE(MacroExpansion, MacroSubstitution)
-  MX_VISIT_MACRO_RANGE(MacroExpansion, intermediate_children, 10, NthMacro)
-  MX_VISIT_OPTIONAL_ENTITY(MacroExpansion, definition, 9, MX_APPLY_METHOD, Definition, DefineMacroDirective, NthMacro)
-  MX_VISIT_ENTITY_LIST(MacroExpansion, arguments, 11, MX_APPLY_METHOD, Arguments, MacroArgument, NthMacro)
+  MX_VISIT_MACRO_RANGE(MacroExpansion, intermediate_children, 8, NthMacro)
+  MX_VISIT_OPTIONAL_ENTITY(MacroExpansion, definition, 7, MX_APPLY_METHOD, Definition, DefineMacroDirective, NthMacro)
+  MX_VISIT_ENTITY_LIST(MacroExpansion, arguments, 9, MX_APPLY_METHOD, Arguments, MacroArgument, NthMacro)
   MX_EXIT_VISIT_MacroExpansion
 MX_END_VISIT_MACRO(MacroExpansion)
 
@@ -6576,8 +6574,8 @@ MX_END_VISIT_MACRO(MacroExpansion)
 MX_BEGIN_VISIT_MACRO(MacroParameterSubstitution)
   MX_ENTER_VISIT_MacroParameterSubstitution
   MX_VISIT_BASE(MacroParameterSubstitution, MacroSubstitution)
-  MX_VISIT_ENTITY(MacroParameterSubstitution, parameter, 9, MX_APPLY_METHOD, Parameter, MacroParameter, NthMacro)
-  MX_VISIT_ENTITY(MacroParameterSubstitution, parameter_use, 12, MX_APPLY_METHOD, ParameterUse, Token, NthMacro)
+  MX_VISIT_ENTITY(MacroParameterSubstitution, parameter, 7, MX_APPLY_METHOD, Parameter, MacroParameter, NthMacro)
+  MX_VISIT_ENTITY(MacroParameterSubstitution, parameter_use, 10, MX_APPLY_METHOD, ParameterUse, Token, NthMacro)
   MX_EXIT_VISIT_MacroParameterSubstitution
 MX_END_VISIT_MACRO(MacroParameterSubstitution)
 
@@ -6592,7 +6590,7 @@ MX_BEGIN_VISIT_MACRO(MacroArgument)
   MX_ENTER_VISIT_MacroArgument
   MX_VISIT_BASE(MacroArgument, Macro)
   MX_VISIT_BOOL(MacroArgument, is_variadic, 3, MX_APPLY_METHOD, IsVariadic, bool, NthMacro)
-  MX_VISIT_INT(MacroArgument, index, 13, MX_APPLY_METHOD, Index, unsigned, NthMacro)
+  MX_VISIT_INT(MacroArgument, index, 11, MX_APPLY_METHOD, Index, unsigned, NthMacro)
   MX_EXIT_VISIT_MacroArgument
 MX_END_VISIT_MACRO(MacroArgument)
 
@@ -6608,7 +6606,7 @@ MX_BEGIN_VISIT_MACRO(MacroParameter)
   MX_VISIT_BASE(MacroParameter, Macro)
   MX_VISIT_ENTITY(MacroParameter, variadic_dots, 5, MX_APPLY_METHOD, VariadicDots, Token, NthMacro)
   MX_VISIT_ENTITY(MacroParameter, name, 6, MX_APPLY_METHOD, Name, Token, NthMacro)
-  MX_VISIT_INT(MacroParameter, index, 13, MX_APPLY_METHOD, Index, unsigned, NthMacro)
+  MX_VISIT_INT(MacroParameter, index, 11, MX_APPLY_METHOD, Index, unsigned, NthMacro)
   MX_EXIT_VISIT_MacroParameter
 MX_END_VISIT_MACRO(MacroParameter)
 
@@ -6640,8 +6638,8 @@ MX_BEGIN_VISIT_MACRO(DefineMacroDirective)
   MX_VISIT_ENTITY(DefineMacroDirective, name, 7, MX_APPLY_METHOD, Name, Token, NthMacro)
   MX_VISIT_MACRO_RANGE(DefineMacroDirective, body, 4, NthMacro)
   MX_VISIT_BOOL(DefineMacroDirective, is_variadic, 3, MX_APPLY_METHOD, IsVariadic, bool, NthMacro)
-  MX_VISIT_BOOL(DefineMacroDirective, is_function_like, 14, MX_APPLY_METHOD, IsFunctionLike, bool, NthMacro)
-  MX_VISIT_MACRO_RANGE(DefineMacroDirective, parameters, 10, NthMacro)
+  MX_VISIT_BOOL(DefineMacroDirective, is_function_like, 12, MX_APPLY_METHOD, IsFunctionLike, bool, NthMacro)
+  MX_VISIT_MACRO_RANGE(DefineMacroDirective, parameters, 8, NthMacro)
   MX_EXIT_VISIT_DefineMacroDirective
 MX_END_VISIT_MACRO(DefineMacroDirective)
 

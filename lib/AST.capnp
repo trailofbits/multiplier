@@ -784,20 +784,18 @@ struct Attr @0xe5b70746662da9f3{
 
 struct Macro @0xf88157fb8bf2eeff{
   val3 @0 :Bool;
-  val14 @1 :Bool;
+  val12 @1 :Bool;
   val2 @2 :List(UInt64);
   val4 @3 :List(UInt64);
-  val10 @4 :List(UInt64);
-  val11 @5 :List(UInt64);
-  val13 @6 :UInt32;
+  val8 @4 :List(UInt64);
+  val9 @5 :List(UInt64);
+  val11 @6 :UInt32;
   val1 @7 :UInt64;
   val5 @8 :UInt64;
   val6 @9 :UInt64;
   val7 @10 :UInt64;
-  val8 @11 :UInt64;
-  val9 @12 :UInt64;
-  val12 @13 :UInt64;
-  val0 @14 :UInt8;
+  val10 @11 :UInt64;
+  val0 @12 :UInt8;
 }
 
 struct TemplateArgument @0xb5127dad01992f67{

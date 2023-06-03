@@ -142,7 +142,7 @@ Token MacroParameter::name(void) const {
 }
 
 unsigned MacroParameter::index(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal11();
 }
 
 #pragma GCC diagnostic pop

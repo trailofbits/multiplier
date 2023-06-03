@@ -336,6 +336,8 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // ordering the expansion tokens.
   {"Macro", "BeginToken"},
   {"Macro", "EndToken"},
+  {"MacroSubstitution", "CoveredStmt"},
+  {"MacroSubstitution", "CoveredDecl"},
 
   // We'll manually record these in the indexer.
   {"DefineMacroDirective", "Uses"},
@@ -1179,7 +1181,7 @@ void CodeGenerator::RunOnOptional(
   // Take the parent from the `TokenTree` if we have it.
   if (base_name == "Macro" && method_name == "Parent") {
     serialize_cpp_os
-        << "  std::optional<const void *> v" << i << " = nullptr;\n"
+        << "  std::optional<const void *> v" << i << ";\n"
         << "  if (tt) {\n"
         << "    auto x" << i << " = tt->" << method_name << "();\n"
         << "    if (x" << i << ") {\n"
@@ -1190,6 +1192,17 @@ void CodeGenerator::RunOnOptional(
         << "    if (x" << i << ") {\n"
         << "      v" << i << " = x" << i << "->RawMacro();\n"
         << "    }\n"
+        << "  }\n";
+
+  } else if (class_name == "MacroSubstitution" &&
+             (method_name == "FirstFullySubstitutedToken" ||
+              method_name == "LastFullySubstitutedToken")) {
+    serialize_cpp_os
+        << "  std::optional<pasta::Token> v" << i << ";\n"
+        << "  if (tt) {\n"
+        << "    v" << i << " = tt->" << method_name << "();\n"
+        << "  } else {\n"
+        << "    v" << i << " = e." << method_name << "();\n"
         << "  }\n";
 
   } else {

@@ -121,12 +121,12 @@ std::optional<MacroParameterSubstitution> MacroParameterSubstitution::from(const
 }
 
 MacroParameter MacroParameterSubstitution::parameter(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal7();
   return MacroParameter::from(Macro(impl->ep->MacroFor(impl->ep, eid))).value();
 }
 
 Token MacroParameterSubstitution::parameter_use(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 #pragma GCC diagnostic pop

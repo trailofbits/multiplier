@@ -8,13 +8,11 @@
 
 #include <multiplier/Entities/MacroSubstitution.h>
 
-#include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/MacroConcatenate.h>
 #include <multiplier/Entities/MacroExpansion.h>
 #include <multiplier/Entities/MacroParameterSubstitution.h>
 #include <multiplier/Entities/MacroStringify.h>
-#include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
 
 #include "../EntityProvider.h"
@@ -168,32 +166,6 @@ Token MacroSubstitution::last_fully_substituted_token(void) const {
     return impl->ep->TokenFor(impl->ep, eid);
   }
   return Token();
-}
-
-std::optional<Stmt> MacroSubstitution::covered_stmt(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal7();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
-std::optional<Decl> MacroSubstitution::covered_decl(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal8();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return Decl(std::move(eptr));
-    }
-  }
-  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop
