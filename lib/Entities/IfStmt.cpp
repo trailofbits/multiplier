@@ -111,7 +111,7 @@ std::optional<IfStmt> IfStmt::from(const Stmt &parent) {
 }
 
 gap::generator<IfStmt> IfStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kIfStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<IfStmt> e = IfStmt::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<IfStmt> IfStmt::in(const Index &index) {
 }
 
 gap::generator<IfStmt> IfStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kIfStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<IfStmt> IfStmt::in(const Fragment &frag) {
 }
 
 gap::generator<IfStmt> IfStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kIfStmtDerivedKinds) {
@@ -156,13 +156,13 @@ std::optional<IfStmt> IfStmt::from(const TokenContext &t) {
 }
 
 Expr IfStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<VarDecl> IfStmt::condition_variable(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal10();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -175,7 +175,7 @@ std::optional<VarDecl> IfStmt::condition_variable(void) const {
 
 std::optional<DeclStmt> IfStmt::condition_variable_declaration_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal11();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -188,7 +188,7 @@ std::optional<DeclStmt> IfStmt::condition_variable_declaration_statement(void) c
 
 std::optional<Stmt> IfStmt::else_(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal13();
+    RawEntityId eid = impl->reader.getVal16();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -200,16 +200,16 @@ std::optional<Stmt> IfStmt::else_(void) const {
 }
 
 Token IfStmt::else_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 Token IfStmt::if_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
 }
 
 std::optional<Stmt> IfStmt::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal18();
+    RawEntityId eid = impl->reader.getVal21();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -221,12 +221,12 @@ std::optional<Stmt> IfStmt::initializer(void) const {
 }
 
 Token IfStmt::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal19());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal22());
 }
 
 std::optional<Stmt> IfStmt::nondiscarded_case(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal20();
+    RawEntityId eid = impl->reader.getVal23();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -238,48 +238,48 @@ std::optional<Stmt> IfStmt::nondiscarded_case(void) const {
 }
 
 Token IfStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal21());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal24());
 }
 
 IfStatementKind IfStmt::statement_kind(void) const {
-  return static_cast<IfStatementKind>(impl->reader.getVal56());
+  return static_cast<IfStatementKind>(impl->reader.getVal59());
 }
 
 Stmt IfStmt::then(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal25();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool IfStmt::has_else_storage(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 bool IfStmt::has_initializer_storage(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal19();
 }
 
 bool IfStmt::has_variable_storage(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal26();
 }
 
 bool IfStmt::is_consteval(void) const {
-  return impl->reader.getVal24();
+  return impl->reader.getVal27();
 }
 
 bool IfStmt::is_constexpr(void) const {
-  return impl->reader.getVal25();
+  return impl->reader.getVal28();
 }
 
 bool IfStmt::is_negated_consteval(void) const {
-  return impl->reader.getVal57();
+  return impl->reader.getVal60();
 }
 
 bool IfStmt::is_non_negated_consteval(void) const {
-  return impl->reader.getVal58();
+  return impl->reader.getVal61();
 }
 
 bool IfStmt::is_obj_c_availability_check(void) const {
-  return impl->reader.getVal59();
+  return impl->reader.getVal62();
 }
 
 #pragma GCC diagnostic pop

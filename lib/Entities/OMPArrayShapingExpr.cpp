@@ -110,7 +110,7 @@ std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Stmt &parent)
 }
 
 gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPArrayShapingExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPArrayShapingExpr> e = OMPArrayShapingExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::in(const Index &index) 
 }
 
 gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPArrayShapingExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::in(const Fragment &frag
 }
 
 gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPArrayShapingExprDerivedKinds) {
@@ -155,20 +155,20 @@ std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const TokenContext 
 }
 
 Expr OMPArrayShapingExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 unsigned OMPArrayShapingExpr::num_dimensions(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<Expr> OMPArrayShapingExpr::nth_dimension(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -178,12 +178,12 @@ std::optional<Expr> OMPArrayShapingExpr::nth_dimension(unsigned n) const {
 }
 
 gap::generator<Expr> OMPArrayShapingExpr::dimensions(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+    if (auto d18 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d18)))) {
         co_yield std::move(*e);
       }
     }
@@ -192,11 +192,11 @@ gap::generator<Expr> OMPArrayShapingExpr::dimensions(void) const & {
 }
 
 Token OMPArrayShapingExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token OMPArrayShapingExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 #pragma GCC diagnostic pop

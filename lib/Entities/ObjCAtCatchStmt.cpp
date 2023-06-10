@@ -109,7 +109,7 @@ std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const Stmt &parent) {
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCAtCatchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCAtCatchStmt> e = ObjCAtCatchStmt::from(Stmt(std::move(eptr)))) {
@@ -120,7 +120,7 @@ gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::in(const Index &index) {
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCAtCatchStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -132,7 +132,7 @@ gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCAtCatchStmtDerivedKinds) {
@@ -154,25 +154,25 @@ std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const TokenContext &t) {
 }
 
 Token ObjCAtCatchStmt::at_catch_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
 }
 
 Stmt ObjCAtCatchStmt::catch_body(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 VarDecl ObjCAtCatchStmt::catch_parameter_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal14();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCAtCatchStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal16());
 }
 
 bool ObjCAtCatchStmt::has_ellipsis(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

@@ -32,17 +32,308 @@
 
 namespace indexer {
 
-extern void SerializeType(mx::DatabaseWriter &database,
-                          const pasta::Type &entity,
+extern void SerializeType(const pasta::Type &entity,
                           const EntityMapper &em,
-                          mx::RawEntityId fragment_index);
+                          mx::RawEntityId type_index,
+                          mx::ast::Type::Builder builder);
+
+extern bool AcceptOOK(pasta::OverloadedOperatorKind ook,
+                      pasta::TokenKind tk);
 
 namespace {
+
+// This is re-implementation of VisitStmt from Provenance.cpp that will
+// get the related entity ids for the Printed tokens.
+static const void *VisitStmt(const pasta::Stmt &stmt,
+                             const pasta::PrintedToken &token,
+                             unsigned depth) {
+  std::string_view token_data = token.Data();
+  bool is_identifier = ((token.Kind() == pasta::TokenKind::kIdentifier) ||
+                        (token.Kind() == pasta::TokenKind::kRawIdentifier));
+  if (auto dre = pasta::DeclRefExpr::From(stmt)) {
+    if (auto named_decl = pasta::NamedDecl::From(dre->Declaration())) {
+      if (dre->ExpressionToken().Data() == token_data && is_identifier) {
+        return named_decl->RawDecl();
+      }
+    }
+  } else if (auto me = pasta::MemberExpr::From(stmt)) {
+    pasta::ValueDecl member_decl = me->MemberDeclaration();
+    if (me->MemberToken().Data() == token_data) {
+      return member_decl.RawDecl();
+    } else {
+      return VisitStmt(me->Base(), token, depth);
+    }
+  } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
+    pasta::CXXConstructorDecl constructor_decl = ce->Constructor();
+    if (ce->Token().Data() == token_data) {
+      return constructor_decl.RawDecl();
+    }
+  } else if (auto gt = pasta::GotoStmt::From(stmt)) {
+    if (gt->LabelToken().Data() == token_data) {
+      return gt->Label().RawDecl();
+    }
+  } else if (auto di = pasta::DesignatedInitExpr::From(stmt)) {
+    for (pasta::Designator de : di->Designators()) {
+      if (auto f = de.Field(); f && de.FieldToken().Data() == token_data) {
+        return f->RawDecl();
+      }
+    }
+
+  } else if (auto ili = pasta::InitListExpr::From(stmt)) {
+    // TODO: not handled yet
+  } else if (auto ls = pasta::LabelStmt::From(stmt)) {
+    if (ls->IdentifierToken().Data() == token_data) {
+      return ls->Declaration().RawDecl();
+    }
+
+  } else if (auto pde = pasta::PredefinedExpr::From(stmt)) {
+    if (dre->ExpressionToken().Data() == token_data && is_identifier) {
+      return pde->RawStmt();
+    }
+
+  } else if (auto call = pasta::CallExpr::From(stmt)) {
+    auto called_decl = call->CalleeDeclaration();
+    if (!called_decl) {
+      return nullptr;
+    }
+
+    auto raw_decl = called_decl->RawDecl();
+
+    // TODO(pag): Re-consider this identifier check. This manifested with
+    //
+    //                void (*func)(void);
+    //                (*func)();
+    //
+    //            Here, the issue is that the first `(` was the expression
+    //            token of the call.
+    if (call->ExpressionToken().Data() == token_data && is_identifier) {
+      return raw_decl;
+    }
+
+    // If the first context for this token is a method call, then see if it's
+    // an overloaded operator.
+    if (!depth) {
+      if (auto meth = pasta::CXXMethodDecl::From(called_decl.value())) {
+        if (AcceptOOK(meth->OverloadedOperator(), token.Kind())) {
+          return raw_decl;
+        }
+      }
+    }
+  }
+
+  return nullptr;
+}
+
+// This is re-implementation of VisitType from Provenance.cpp that will
+// get the related entity ids for the Printed tokens.
+static const void *VisitType(const pasta::Type &type,
+                             const pasta::PrintedToken &token) {
+  const std::string_view tok_data = token.Data();
+
+  if (auto typedef_type = pasta::TypedefType::From(type)) {
+    auto typedef_decl = typedef_type->Declaration();
+    if (typedef_decl.Name() == tok_data) {
+      return typedef_decl.RawDecl();
+    }
+
+  } else if (auto tag_type = pasta::TagType::From(type)) {
+    auto tag_decl = tag_type->Declaration();
+    if (tag_decl.Name() == tok_data) {
+      return tag_decl.RawDecl();
+    }
+
+  } else if (auto deduced_type = pasta::DeducedType::From(type)) {
+    return VisitType(deduced_type.value(), token);
+
+  } else if (auto unqual_type = type.UnqualifiedType();
+             unqual_type.RawType() != type.RawType()) {
+    return VisitType(unqual_type, token);
+  }
+
+  return nullptr;
+}
+
+// Find the entity ID of the declaration that is most related to a particular
+// printed token.
+static mx::RawEntityId RelatedEntityIdToPrintedToken(
+    const EntityMapper &em, const pasta::PrintedToken &token) {
+
+  std::string_view token_data = token.Data();
+  const void *related_entity = nullptr;
+  mx::RawEntityId eid = mx::kInvalidEntityId;
+  bool is_literal = false;
+
+  switch (mx::FromPasta(token.Kind())) {
+    default:
+      return eid;
+
+    case mx::TokenKind::NUMERIC_CONSTANT:
+    case mx::TokenKind::CHARACTER_CONSTANT:
+    case mx::TokenKind::WIDE_CHARACTER_CONSTANT:
+    case mx::TokenKind::UTF8_CHARACTER_CONSTANT:
+    case mx::TokenKind::UTF16_CHARACTER_CONSTANT:
+    case mx::TokenKind::UTF32_CHARACTER_CONSTANT:
+    case mx::TokenKind::STRING_LITERAL:
+    case mx::TokenKind::WIDE_STRING_LITERAL:
+    case mx::TokenKind::UTF8_STRING_LITERAL:
+    case mx::TokenKind::UTF16_STRING_LITERAL:
+    case mx::TokenKind::UTF32_STRING_LITERAL:
+    case mx::TokenKind::KEYWORD___FUNC__:
+    case mx::TokenKind::KEYWORD___FUNCTION__:
+    case mx::TokenKind::KEYWORD___FUNCDNAME__:
+    case mx::TokenKind::KEYWORD___FUNCSIG__:
+    case mx::TokenKind::KEYWORD_LFUNCTION__:
+    case mx::TokenKind::KEYWORD_LFUNCSIG__:
+      is_literal = true;
+      break;
+
+    case mx::TokenKind::L_SQUARE:
+    case mx::TokenKind::R_SQUARE:
+    case mx::TokenKind::L_PARENTHESIS:
+    case mx::TokenKind::R_PARENTHESIS:
+    case mx::TokenKind::L_BRACE_TOKEN:
+    case mx::TokenKind::R_BRACE_TOKEN:
+    case mx::TokenKind::AMP:
+    case mx::TokenKind::AMP_AMP:
+    case mx::TokenKind::AMP_EQUAL:
+    case mx::TokenKind::STAR:
+    case mx::TokenKind::STAR_EQUAL:
+    case mx::TokenKind::PLUS:
+    case mx::TokenKind::PLUS_PLUS:
+    case mx::TokenKind::PLUS_EQUAL:
+    case mx::TokenKind::MINUS:
+    case mx::TokenKind::ARROW:
+    case mx::TokenKind::MINUS_MINUS:
+    case mx::TokenKind::MINUS_EQUAL:
+    case mx::TokenKind::TILDE:
+    case mx::TokenKind::EXCLAIM:
+    case mx::TokenKind::EXCLAIM_EQUAL:
+    case mx::TokenKind::SLASH:
+    case mx::TokenKind::SLASH_EQUAL:
+    case mx::TokenKind::PERCENT:
+    case mx::TokenKind::PERCENT_EQUAL:
+    case mx::TokenKind::LESS:
+    case mx::TokenKind::LESS_LESS:
+    case mx::TokenKind::LESS_EQUAL:
+    case mx::TokenKind::LESS_LESS_EQUAL:
+    case mx::TokenKind::SPACESHIP:
+    case mx::TokenKind::GREATER:
+    case mx::TokenKind::GREATER_GREATER:
+    case mx::TokenKind::GREATER_EQUAL:
+    case mx::TokenKind::GREATER_GREATER_EQUAL:
+    case mx::TokenKind::CARET:
+    case mx::TokenKind::CARET_EQUAL:
+    case mx::TokenKind::PIPE:
+    case mx::TokenKind::PIPE_PIPE:
+    case mx::TokenKind::PIPE_EQUAL:
+    case mx::TokenKind::EQUAL:
+    case mx::TokenKind::EQUAL_EQUAL:
+    case mx::TokenKind::COMMA:
+    case mx::TokenKind::PERIOD_STAR:
+    case mx::TokenKind::ARROW_STAR:
+    case mx::TokenKind::LESS_LESS_LESS:
+    case mx::TokenKind::GREATER_GREATER_GREATER:
+    case mx::TokenKind::CARETCARET:
+    case mx::TokenKind::KEYWORD_DELETE:
+    case mx::TokenKind::KEYWORD_NEW:
+    case mx::TokenKind::KEYWORD_OPERATOR:
+    case mx::TokenKind::IDENTIFIER: break;
+  }
+
+  unsigned depth = 0u;
+  (void)depth;
+  for (auto context = token.Context();
+       !related_entity && eid == mx::kInvalidEntityId && context;
+       ++depth, context = context->Parent()) {
+    switch (context->Kind()) {
+      case pasta::TokenContextKind::kStmt:
+        if (std::optional<pasta::Stmt> stmt =
+                pasta::Stmt::From(context.value())) {
+          if (is_literal) {
+            switch (stmt->Kind()) {
+              default: break;
+              case pasta::StmtKind::kUserDefinedLiteral:
+              case pasta::StmtKind::kCharacterLiteral:
+              case pasta::StmtKind::kIntegerLiteral:
+              case pasta::StmtKind::kFixedPointLiteral:
+              case pasta::StmtKind::kFloatingLiteral:
+              case pasta::StmtKind::kStringLiteral:
+              case pasta::StmtKind::kPredefinedExpr:
+                related_entity = stmt->RawStmt();
+                break;
+            }
+          } else {
+            related_entity =  VisitStmt(stmt.value(), token, depth);
+          }
+        }
+        break;
+      case pasta::TokenContextKind::kType:
+        if (!is_literal) {
+          if (std::optional<pasta::Type> type =
+              pasta::Type::From(context.value())) {
+            related_entity = VisitType(type.value(), token);
+          }
+        }
+        break;
+      case pasta::TokenContextKind::kDecl:
+        if (!is_literal) {
+          if (std::optional<pasta::Decl> decl =
+                  pasta::Decl::From(context.value())) {
+            if (auto nd = pasta::NamedDecl::From(decl.value());
+                nd && nd->Name() == token.Data()) {
+              related_entity = nd->RawDecl();
+            }
+            if (!related_entity && decl->Token().Data() == token_data) {
+              related_entity = decl->RawDecl();
+            }
+          }
+        }
+        break;
+      case pasta::TokenContextKind::kAttr:
+        if (std::optional<pasta::Attr> attr =
+                pasta::Attr::From(context.value())) {
+          if (attr->Token().Data() == token_data) {
+            eid = em.EntityId(attr.value());
+          } else {
+            for (pasta::Token tok : attr->Tokens()) {
+              if (tok.Data() == token_data) {
+                eid = em.EntityId(attr.value());
+                break;
+              }
+            }
+          }
+        }
+        break;
+      case pasta::TokenContextKind::kDesignator:
+        if (!is_literal) {
+          if (std::optional<pasta::Designator> d =
+                  pasta::Designator::From(context.value())) {
+            if (d->FieldToken().Data() == token_data) {
+              if (auto field = d->Field()) {
+                related_entity = field->RawDecl();
+                break;
+              }
+            }
+          }
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  if (related_entity && eid == mx::kInvalidEntityId) {
+    eid = em.EntityId(related_entity);
+  }
+
+  return eid;
+}
 
 // Persist the printed tokens in the fragment builder if not
 // creating Token tree for printed tokens
 static void PersistPrintedTokens(
-    EntityMapper &em, mx::rpc::Fragment::Builder &fb,
+    EntityMapper &em, mx::rpc::Type::Builder &fb,
     const pasta::PrintedTokenRange &range) {
 
   std::string utf8_fragment_data;
@@ -52,25 +343,15 @@ static void PersistPrintedTokens(
   unsigned num_tokens = num_parsed_tokens;
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
-  auto dt = fb.initDerivedTokenIds(num_tokens);
   auto re = fb.initRelatedEntityId(num_tokens);
-  auto pto2i = fb.initParsedTokenOffsetToIndex(num_parsed_tokens);
-  auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
-  auto mti2mi = fb.initMacroTokenIndexToMacroId(num_tokens);
   auto i = 0u;
 
   // Serialize the tokens.
   while (i < range.size()) {
     const pasta::PrintedToken &tok = range[i];
-    pto2i.set(i, i);  // Map printed token to index
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
     tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
-
-    // No macro token maps to the printed token. Set it to invalid entity id
-    mti2po.set(i, num_tokens);
-    mti2mi.set(i, mx::kInvalidEntityId); // No valid map for printed token to containing token
-    dt.set(i, mx::kInvalidEntityId);  // No valid derived token id for printed tokens
-    re.set(i, mx::kInvalidEntityId);  // No valid related token id for printed tokens
+    re.set(i, RelatedEntityIdToPrintedToken(em, tok));
 
     AccumulateTokenData<pasta::PrintedToken>(utf8_fragment_data, tok);
     ++i;
@@ -86,7 +367,7 @@ static void PersistPrintedTokens(
 
 static void PersistTokenContexts(
     EntityMapper &em, const pasta::PrintedTokenRange &printed_tokens,
-    mx::rpc::Fragment::Builder &fb) {
+    mx::rpc::Type::Builder &fb) {
 
   using DeclContextSet = std::unordered_set<pasta::TokenContext>;
   std::map<mx::RawEntityId, DeclContextSet> contexts;
@@ -187,8 +468,8 @@ static void PersistTokenContexts(
   }
 
   // Allocate as many token contexts as there are parsed tokens.
-  auto tcb_list = fb.initParsedTokenContexts(num_contexts);
-  auto tco_list = fb.initParsedTokenContextOffsets(num_tokens);
+  auto tcb_list = fb.initTypeTokenContexts(num_contexts);
+  auto tco_list = fb.initTypeTokenContextOffsets(num_tokens);
 
   // Finally, serialize the contexts.
   num_tokens = 0u;
@@ -242,25 +523,26 @@ void GlobalIndexingState::PersistTypes(
 
   for (const pasta::Type &type : pf.types_to_serialize) {
 
-    pasta::PrintedTokenRange tok_range = pasta::PrintedTokenRange::Create(type);
-    mx::PackedFragmentId pfid = em.tm.FragmentId(type);
-    mx::FragmentId fid = pfid.Unpack();
+    auto maybe_token_range = em.tm.TypeTokenRange(type);
+    assert(maybe_token_range.has_value());
 
-    // Serialize the type entity to create an entry for the type in entity table
-    SerializeType(database, type, em, fid.fragment_id);
+    mx::PackedTypeId ptid = em.tm.TypeId(type);
+    mx::TypeId tid = ptid.Unpack();
 
     capnp::MallocMessageBuilder message;
-    mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
+    mx::rpc::Type::Builder fb = message.initRoot<mx::rpc::Type>();
 
     // Set the fragment if for the fragment
-    fb.setId(pfid.Pack());
-    (void) fb.initTopLevelDeclarations(0);
+    fb.setId(ptid.Pack());
 
-    PersistPrintedTokens(em, fb, tok_range);
-    PersistTokenContexts(em, tok_range, fb);
+    auto tb = fb.initType();
+    (void)SerializeType(type, em, tid.type_id, tb);
+
+    PersistPrintedTokens(em, fb, maybe_token_range.value());
+    PersistTokenContexts(em, maybe_token_range.value(), fb);
 
     database.AddAsync(
-        mx::EntityRecord{pfid.Pack(), GetSerializedData(message)});
+        mx::EntityRecord{ptid.Pack(), GetSerializedData(message)});
   }
 
   (void) ast;

@@ -61,7 +61,7 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Typ
 }
 
 gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<DependentSizedMatrixType> e = DependentSizedMatrixType::from(Type(std::move(eptr)))) {
@@ -72,7 +72,7 @@ gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Inde
 }
 
 gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
@@ -84,7 +84,7 @@ gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Frag
 }
 
 gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {

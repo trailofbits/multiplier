@@ -295,22 +295,21 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
   }
 }
 
-void SerializeType(mx::DatabaseWriter &database, const pasta::Type &entity,
-                   const EntityMapper &em, mx::RawEntityId fragment_index) {
+void SerializeType(const pasta::Type &entity,
+                   const EntityMapper &em,
+                   mx::RawEntityId type_id,
+                   mx::ast::Type::Builder builder) {
   mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
   auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
-  assert(vid.fragment_id == fragment_index);
+  assert(vid.type_id == type_id);
 #endif
 
-  EntityBuilder<mx::ast::Type> storage;
   em.tm.EnterReadOnly();
-  DispatchSerializeType(em, storage.builder, entity);
+  DispatchSerializeType(em, builder, entity);
   em.tm.ExitReadOnly();
-  database.AddAsync(
-      mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  (void)fragment_index;
+  (void)type_id;
 }
 
 }  // namespace indexer

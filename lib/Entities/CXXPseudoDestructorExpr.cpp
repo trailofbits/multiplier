@@ -111,7 +111,7 @@ std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Stmt 
 }
 
 gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXPseudoDestructorExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXPseudoDestructorExpr> e = CXXPseudoDestructorExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const Index 
 }
 
 gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXPseudoDestructorExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const Fragme
 }
 
 gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXPseudoDestructorExprDerivedKinds) {
@@ -156,30 +156,30 @@ std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Token
 }
 
 Expr CXXPseudoDestructorExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXPseudoDestructorExpr::colon_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Type CXXPseudoDestructorExpr::destroyed_type(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal43();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token CXXPseudoDestructorExpr::destroyed_type_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token CXXPseudoDestructorExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 std::optional<Type> CXXPseudoDestructorExpr::scope_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal46();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -191,15 +191,15 @@ std::optional<Type> CXXPseudoDestructorExpr::scope_type(void) const {
 }
 
 Token CXXPseudoDestructorExpr::tilde_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 bool CXXPseudoDestructorExpr::has_qualifier(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 bool CXXPseudoDestructorExpr::is_arrow(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

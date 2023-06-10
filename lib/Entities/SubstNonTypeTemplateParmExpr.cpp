@@ -112,7 +112,7 @@ std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(c
 }
 
 gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSubstNonTypeTemplateParmExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<SubstNonTypeTemplateParmExpr> e = SubstNonTypeTemplateParmExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::in(co
 }
 
 gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSubstNonTypeTemplateParmExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::in(co
 }
 
 gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSubstNonTypeTemplateParmExprDerivedKinds) {
@@ -157,40 +157,40 @@ std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(c
 }
 
 Decl SubstNonTypeTemplateParmExpr::associated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Decl(impl->ep->DeclFor(impl->ep, eid));
 }
 
 Token SubstNonTypeTemplateParmExpr::name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 std::optional<unsigned> SubstNonTypeTemplateParmExpr::pack_index(void) const {
-  if (!impl->reader.getVal89()) {
+  if (!impl->reader.getVal92()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal105());
+    return static_cast<unsigned>(impl->reader.getVal108());
   }
   return std::nullopt;
 }
 
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmExpr::parameter(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal43();
   return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type SubstNonTypeTemplateParmExpr::parameter_type(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal44();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr SubstNonTypeTemplateParmExpr::replacement(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal45();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

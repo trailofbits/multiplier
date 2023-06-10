@@ -111,7 +111,7 @@ std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const Stmt &par
 }
 
 gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCDictionaryLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCDictionaryLiteral> e = ObjCDictionaryLiteral::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::in(const Index &ind
 }
 
 gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCDictionaryLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::in(const Fragment &
 }
 
 gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCDictionaryLiteralDerivedKinds) {
@@ -156,7 +156,7 @@ std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const TokenCont
 }
 
 ObjCMethodDecl ObjCDictionaryLiteral::dictionary_with_objects_method(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

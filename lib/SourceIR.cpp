@@ -80,6 +80,7 @@ static OperationMap Deserialize(mlir::Operation *scope) {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DEFINE_ENTITY_FUNCTION,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DEFINE_ENTITY_FUNCTION,
                               MX_DEFINE_ENTITY_FUNCTION)
@@ -107,6 +108,7 @@ OperationRange SourceIR::for_entity(const VariantEntity &entity) const {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DEFINE_FOR_ENTRITY,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DEFINE_FOR_ENTRITY,
                               MX_DEFINE_FOR_ENTRITY)
@@ -132,6 +134,7 @@ OperationRange SourceIR::for_entity(const VariantEntity &entity) const {
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_ENTITY_FUNCTION,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_ENTITY_FUNCTION,
                             MX_DEFINE_ENTITY_FUNCTION,
                             MX_DEFINE_ENTITY_FUNCTION,
                             MX_DEFINE_ENTITY_FUNCTION)
@@ -233,6 +236,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_ENTITY_FUNCTION)
 
 #undef MX_DEFINE_ENTITY_FUNCTION
@@ -264,6 +268,7 @@ namespace mx {
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_ENTITY_FUNCTION,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_ENTITY_FUNCTION,
                             MX_DEFINE_ENTITY_FUNCTION)
@@ -297,6 +302,7 @@ VariantEntity SourceIR::entity_for(const MLIROperationPtr &) const {
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_ENTITY_FUNCTION,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_ENTITY_FUNCTION,
                             MX_DEFINE_ENTITY_FUNCTION,
                             MX_DEFINE_ENTITY_FUNCTION,
                             MX_DEFINE_ENTITY_FUNCTION)

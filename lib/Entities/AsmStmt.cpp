@@ -113,7 +113,7 @@ std::optional<AsmStmt> AsmStmt::from(const Stmt &parent) {
 }
 
 gap::generator<AsmStmt> AsmStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<AsmStmt> e = AsmStmt::from(Stmt(std::move(eptr)))) {
@@ -124,7 +124,7 @@ gap::generator<AsmStmt> AsmStmt::in(const Index &index) {
 }
 
 gap::generator<AsmStmt> AsmStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kAsmStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -136,7 +136,7 @@ gap::generator<AsmStmt> AsmStmt::in(const Fragment &frag) {
 }
 
 gap::generator<AsmStmt> AsmStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kAsmStmtDerivedKinds) {
@@ -158,24 +158,24 @@ std::optional<AsmStmt> AsmStmt::from(const TokenContext &t) {
 }
 
 std::string_view AsmStmt::generate_assembly_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal63();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token AsmStmt::assembly_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
 }
 
 unsigned AsmStmt::num_inputs(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<Expr> AsmStmt::nth_input(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -185,12 +185,12 @@ std::optional<Expr> AsmStmt::nth_input(unsigned n) const {
 }
 
 gap::generator<Expr> AsmStmt::inputs(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+    if (auto d18 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d18)))) {
         co_yield std::move(*e);
       }
     }
@@ -199,23 +199,23 @@ gap::generator<Expr> AsmStmt::inputs(void) const & {
 }
 
 bool AsmStmt::is_simple(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 bool AsmStmt::is_volatile(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal19();
 }
 
 unsigned AsmStmt::num_outputs(void) const {
-  return impl->reader.getVal26().size();
+  return impl->reader.getVal29().size();
 }
 
 std::optional<Expr> AsmStmt::nth_output(unsigned n) const {
-  auto list = impl->reader.getVal26();
+  auto list = impl->reader.getVal29();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -225,12 +225,12 @@ std::optional<Expr> AsmStmt::nth_output(unsigned n) const {
 }
 
 gap::generator<Expr> AsmStmt::outputs(void) const & {
-  auto list = impl->reader.getVal26();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal29();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d26 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d26)))) {
+    if (auto d29 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d29)))) {
         co_yield std::move(*e);
       }
     }
@@ -239,8 +239,8 @@ gap::generator<Expr> AsmStmt::outputs(void) const & {
 }
 
 gap::generator<std::string_view> AsmStmt::output_constraints(void) const & {
-  auto list = impl->reader.getVal61();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal64();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -248,15 +248,15 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 unsigned AsmStmt::num_output_expressions(void) const {
-  return impl->reader.getVal27().size();
+  return impl->reader.getVal30().size();
 }
 
 std::optional<Expr> AsmStmt::nth_output_expression(unsigned n) const {
-  auto list = impl->reader.getVal27();
+  auto list = impl->reader.getVal30();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -266,12 +266,12 @@ std::optional<Expr> AsmStmt::nth_output_expression(unsigned n) const {
 }
 
 gap::generator<Expr> AsmStmt::output_expressions(void) const & {
-  auto list = impl->reader.getVal27();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal30();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d27 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d27)))) {
+    if (auto d30 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d30)))) {
         co_yield std::move(*e);
       }
     }
@@ -280,8 +280,8 @@ gap::generator<Expr> AsmStmt::output_expressions(void) const & {
 }
 
 gap::generator<std::string_view> AsmStmt::input_constraints(void) const & {
-  auto list = impl->reader.getVal62();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal65();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -289,15 +289,15 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 unsigned AsmStmt::num_input_expressions(void) const {
-  return impl->reader.getVal28().size();
+  return impl->reader.getVal31().size();
 }
 
 std::optional<Expr> AsmStmt::nth_input_expression(unsigned n) const {
-  auto list = impl->reader.getVal28();
+  auto list = impl->reader.getVal31();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -307,12 +307,12 @@ std::optional<Expr> AsmStmt::nth_input_expression(unsigned n) const {
 }
 
 gap::generator<Expr> AsmStmt::input_expressions(void) const & {
-  auto list = impl->reader.getVal28();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal31();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d28 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d28)))) {
+    if (auto d31 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d31)))) {
         co_yield std::move(*e);
       }
     }
@@ -321,8 +321,8 @@ gap::generator<Expr> AsmStmt::input_expressions(void) const & {
 }
 
 gap::generator<std::string_view> AsmStmt::clobbers(void) const & {
-  auto list = impl->reader.getVal63();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal66();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }

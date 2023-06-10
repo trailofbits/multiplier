@@ -108,7 +108,7 @@ std::optional<DeclStmt> DeclStmt::from(const Stmt &parent) {
 }
 
 gap::generator<DeclStmt> DeclStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDeclStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<DeclStmt> e = DeclStmt::from(Stmt(std::move(eptr)))) {
@@ -119,7 +119,7 @@ gap::generator<DeclStmt> DeclStmt::in(const Index &index) {
 }
 
 gap::generator<DeclStmt> DeclStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDeclStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -131,7 +131,7 @@ gap::generator<DeclStmt> DeclStmt::in(const Fragment &frag) {
 }
 
 gap::generator<DeclStmt> DeclStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDeclStmtDerivedKinds) {
@@ -153,15 +153,15 @@ std::optional<DeclStmt> DeclStmt::from(const TokenContext &t) {
 }
 
 unsigned DeclStmt::num_declarations(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<Decl> DeclStmt::nth_declaration(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -171,12 +171,12 @@ std::optional<Decl> DeclStmt::nth_declaration(unsigned n) const {
 }
 
 gap::generator<Decl> DeclStmt::declarations(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->DeclFor(ep, v)) {
-      co_yield Decl(std::move(d15));
+    if (auto d18 = ep->DeclFor(ep, v)) {
+      co_yield Decl(std::move(d18));
     }
   }
   co_return;
@@ -184,7 +184,7 @@ gap::generator<Decl> DeclStmt::declarations(void) const & {
 
 std::optional<Decl> DeclStmt::single_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal9();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -196,7 +196,7 @@ std::optional<Decl> DeclStmt::single_declaration(void) const {
 }
 
 bool DeclStmt::is_single_declaration(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

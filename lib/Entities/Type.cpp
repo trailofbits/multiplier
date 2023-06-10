@@ -64,7 +64,7 @@ std::optional<Type> Type::by_id(const Index &index, EntityId eid) {
 }
 
 gap::generator<Type> Type::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeImplPtr eptr : ep->TypesFor(ep)) {
     if (std::optional<Type> e = Type::from(Type(std::move(eptr)))) {
       co_yield std::move(e.value());
@@ -73,7 +73,7 @@ gap::generator<Type> Type::in(const Index &index) {
 }
 
 gap::generator<Type> Type::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (TypeImplPtr eptr : ep->TypesFor(ep, frag_id)) {
     if (std::optional<Type> e = Type::from(Type(std::move(eptr)))) {
@@ -83,7 +83,7 @@ gap::generator<Type> Type::in(const Fragment &frag) {
 }
 
 gap::generator<Type> Type::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, frag_id)) {
@@ -95,7 +95,7 @@ gap::generator<Type> Type::in(const File &file) {
 }
 
 gap::generator<Type> Type::in(const Index &index, std::span<TypeKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       co_yield Type(std::move(eptr));
@@ -104,7 +104,7 @@ gap::generator<Type> Type::in(const Index &index, std::span<TypeKind> kinds) {
 }
 
 gap::generator<Type> Type::in(const Fragment &frag, std::span<TypeKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (TypeKind k : kinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
@@ -114,7 +114,7 @@ gap::generator<Type> Type::in(const Fragment &frag, std::span<TypeKind> kinds) {
 }
 
 gap::generator<Type> Type::in(const File &file, std::span<TypeKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (TypeKind k : kinds) {

@@ -112,7 +112,7 @@ std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Stmt &parent) {
 }
 
 gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSizeOfPackExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<SizeOfPackExpr> e = SizeOfPackExpr::from(Stmt(std::move(eptr)))) {
@@ -123,7 +123,7 @@ gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const Index &index) {
 }
 
 gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSizeOfPackExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -135,7 +135,7 @@ gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const Fragment &frag) {
 }
 
 gap::generator<SizeOfPackExpr> SizeOfPackExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSizeOfPackExprDerivedKinds) {
@@ -157,50 +157,50 @@ std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const TokenContext &t) {
 }
 
 Token SizeOfPackExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 NamedDecl SizeOfPackExpr::pack(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<unsigned> SizeOfPackExpr::pack_length(void) const {
-  if (!impl->reader.getVal89()) {
+  if (!impl->reader.getVal92()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal105());
+    return static_cast<unsigned>(impl->reader.getVal108());
   }
   return std::nullopt;
 }
 
 Token SizeOfPackExpr::pack_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(void) const {
-  if (!impl->reader.getVal90()) {
+  if (!impl->reader.getVal93()) {
     return std::nullopt;
   }
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->TemplateArgumentFor(ep, v)) {
-      vec.emplace_back(std::move(d15));
+    if (auto d18 = ep->TemplateArgumentFor(ep, v)) {
+      vec.emplace_back(std::move(d18));
     }
   }
   return vec;
 }
 
 Token SizeOfPackExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool SizeOfPackExpr::is_partially_substituted(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal94();
 }
 
 #pragma GCC diagnostic pop

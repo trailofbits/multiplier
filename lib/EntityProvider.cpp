@@ -9,6 +9,7 @@
 #include "File.h"
 #include "Fragment.h"
 #include "Token.h"
+#include "Type.h"
 
 namespace mx {
 
@@ -64,6 +65,17 @@ Token EntityProvider::TokenFor(const Ptr &self, RawEntityId id) {
     }
 
     return Token(fptr->MacroTokenReader(fptr), tid.offset);
+
+  } else if (std::holds_alternative<TypeTokenId>(vid)) {
+    TypeTokenId ttid = std::get<TypeTokenId>(vid);
+    TypeId tid(ttid);
+    TypeImplPtr tptr = self->TypeFor(self, tid);
+    if (!tptr) {
+      assert(false);
+      return Token();
+    }
+
+    return Token(tptr->TypeTokenReader(tptr), ttid.offset);
 
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(id == kInvalidEntityId);
@@ -153,6 +165,17 @@ Token EntityProvider::TokenFor(
 
     return Token(fptr->MacroTokenReader(fptr), tid.offset);
 
+  } else if (std::holds_alternative<TypeTokenId>(vid)) {
+    TypeTokenId ttid = std::get<TypeTokenId>(vid);
+    TypeId tid(ttid);
+    TypeImplPtr tptr = self->TypeFor(self, tid);
+    if (!tptr) {
+      assert(false);
+      return Token();
+    }
+
+    // fix-me
+    return Token();
   } else if (std::holds_alternative<InvalidId>(vid)) {
     assert(eid == kInvalidEntityId);
     return Token();
@@ -161,6 +184,64 @@ Token EntityProvider::TokenFor(
     assert(false);
     return Token();
   }
+}
+
+// Get the inclusive token range associated with two entity IDs.
+TokenRange EntityProvider::TokenRangeFor(
+    const Ptr &self, EntityId begin_id, EntityId end_id) const {
+  VariantId bvid = EntityId(begin_id).Unpack();
+  VariantId evid = EntityId(begin_id).Unpack();
+
+  if (std::holds_alternative<FileTokenId>(bvid)) {
+    if (!std::holds_alternative<FileTokenId>(evid)) {
+      return TokenRange();
+    }
+
+    auto bfid = std::get<FileTokenId>(bvid);
+    auto efid = std::get<FileTokenId>(evid);
+    if (bfid.file_id != efid.file_id || bfid.offset > efid.offset) {
+      return TokenRange();
+    }
+
+    FileId fid(bfid.file_id);
+    if (FileImplPtr file = self->FileFor(self, fid);
+        file && efid.offset < file->num_tokens) {
+      return TokenRange(file->TokenReader(file), bfid.offset, efid.offset + 1u);
+    }
+
+  } else if (std::holds_alternative<ParsedTokenId>(bvid)) {
+    if (!std::holds_alternative<ParsedTokenId>(evid)) {
+      return TokenRange();
+    }
+
+    auto bfid = std::get<ParsedTokenId>(bvid);
+    FragmentId fid(bfid.fragment_id);
+    auto fragment = self->FragmentFor(self, fid);
+    return fragment->TokenRangeFor(fragment, begin_id, end_id);
+
+  } else if (std::holds_alternative<MacroTokenId>(bvid)) {
+    if (!std::holds_alternative<MacroTokenId>(evid)) {
+      return TokenRange();
+    }
+
+    auto bfid = std::get<MacroTokenId>(bvid);
+    FragmentId fid(bfid.fragment_id);
+    auto fragment = self->FragmentFor(self, fid);
+    return fragment->TokenRangeFor(fragment, begin_id, end_id);
+
+  } else if (std::holds_alternative<TypeTokenId>(bvid)) {
+    if (!std::holds_alternative<TypeTokenId>(evid)) {
+      return TokenRange();
+    }
+
+    auto btid = std::get<TypeTokenId>(bvid);
+    TypeId fid(btid);
+    auto type = self->TypeFor(self, fid);
+    return type->TokenRangeFor(type, begin_id, end_id);
+
+  }
+
+  return TokenRange();
 }
 
 }  // namespace mx

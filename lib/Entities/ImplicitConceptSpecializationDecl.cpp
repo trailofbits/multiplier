@@ -135,7 +135,7 @@ std::optional<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDe
 }
 
 gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kImplicitConceptSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<ImplicitConceptSpecializationDecl> e = ImplicitConceptSpecializationDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationD
 }
 
 gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kImplicitConceptSpecializationDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationD
 }
 
 gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kImplicitConceptSpecializationDeclDerivedKinds) {
@@ -188,7 +188,7 @@ std::optional<TemplateArgument> ImplicitConceptSpecializationDecl::nth_template_
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->TemplateArgumentFor(ep, v);
   if (!e) {
@@ -199,7 +199,7 @@ std::optional<TemplateArgument> ImplicitConceptSpecializationDecl::nth_template_
 
 gap::generator<TemplateArgument> ImplicitConceptSpecializationDecl::template_arguments(void) const & {
   auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d49 = ep->TemplateArgumentFor(ep, v)) {

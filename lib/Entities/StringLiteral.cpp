@@ -110,7 +110,7 @@ std::optional<StringLiteral> StringLiteral::from(const Stmt &parent) {
 }
 
 gap::generator<StringLiteral> StringLiteral::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kStringLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<StringLiteral> e = StringLiteral::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<StringLiteral> StringLiteral::in(const Index &index) {
 }
 
 gap::generator<StringLiteral> StringLiteral::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kStringLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<StringLiteral> StringLiteral::in(const Fragment &frag) {
 }
 
 gap::generator<StringLiteral> StringLiteral::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kStringLiteralDerivedKinds) {
@@ -155,64 +155,64 @@ std::optional<StringLiteral> StringLiteral::from(const TokenContext &t) {
 }
 
 std::optional<bool> StringLiteral::contains_non_ascii(void) const {
-  if (!impl->reader.getVal90()) {
+  if (!impl->reader.getVal93()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal89());
+    return static_cast<bool>(impl->reader.getVal92());
   }
   return std::nullopt;
 }
 
 std::optional<bool> StringLiteral::contains_non_ascii_or_null(void) const {
-  if (!impl->reader.getVal92()) {
+  if (!impl->reader.getVal95()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal91());
+    return static_cast<bool>(impl->reader.getVal94());
   }
   return std::nullopt;
 }
 
 std::string_view StringLiteral::bytes(void) const {
-  capnp::Text::Reader data = impl->reader.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal63();
   return std::string_view(data.cStr(), data.size());
 }
 
 StringLiteralStringKind StringLiteral::string_kind(void) const {
-  return static_cast<StringLiteralStringKind>(impl->reader.getVal94());
+  return static_cast<StringLiteralStringKind>(impl->reader.getVal97());
 }
 
 std::optional<std::string_view> StringLiteral::string(void) const {
-  if (!impl->reader.getVal93()) {
+  if (!impl->reader.getVal96()) {
     return std::nullopt;
   } else {
-    capnp::Text::Reader data = impl->reader.getVal65();
+    capnp::Text::Reader data = impl->reader.getVal68();
     return std::string_view(data.cStr(), data.size());
   }
   return std::nullopt;
 }
 
 bool StringLiteral::is_ordinary(void) const {
-  return impl->reader.getVal95();
-}
-
-bool StringLiteral::is_pascal(void) const {
-  return impl->reader.getVal97();
-}
-
-bool StringLiteral::is_utf16(void) const {
   return impl->reader.getVal98();
 }
 
-bool StringLiteral::is_utf32(void) const {
-  return impl->reader.getVal99();
-}
-
-bool StringLiteral::is_utf8(void) const {
+bool StringLiteral::is_pascal(void) const {
   return impl->reader.getVal100();
 }
 
-bool StringLiteral::is_wide(void) const {
+bool StringLiteral::is_utf16(void) const {
   return impl->reader.getVal101();
+}
+
+bool StringLiteral::is_utf32(void) const {
+  return impl->reader.getVal102();
+}
+
+bool StringLiteral::is_utf8(void) const {
+  return impl->reader.getVal103();
+}
+
+bool StringLiteral::is_wide(void) const {
+  return impl->reader.getVal104();
 }
 
 #pragma GCC diagnostic pop

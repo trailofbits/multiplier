@@ -62,7 +62,7 @@ std::optional<VariableArrayType> VariableArrayType::from(const Type &parent) {
 }
 
 gap::generator<VariableArrayType> VariableArrayType::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (TypeKind k : kVariableArrayTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
       if (std::optional<VariableArrayType> e = VariableArrayType::from(Type(std::move(eptr)))) {
@@ -73,7 +73,7 @@ gap::generator<VariableArrayType> VariableArrayType::in(const Index &index) {
 }
 
 gap::generator<VariableArrayType> VariableArrayType::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (TypeKind k : kVariableArrayTypeDerivedKinds) {
     for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
@@ -85,7 +85,7 @@ gap::generator<VariableArrayType> VariableArrayType::in(const Fragment &frag) {
 }
 
 gap::generator<VariableArrayType> VariableArrayType::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (TypeKind k : kVariableArrayTypeDerivedKinds) {
@@ -112,9 +112,7 @@ Type VariableArrayType::desugar(void) const {
 }
 
 TokenRange VariableArrayType::brackets_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal236(), impl->reader.getVal237());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal236(), impl->reader.getVal237());
 }
 
 Token VariableArrayType::l_bracket_token(void) const {

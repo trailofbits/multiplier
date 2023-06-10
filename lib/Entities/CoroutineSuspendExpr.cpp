@@ -115,7 +115,7 @@ std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Stmt &paren
 }
 
 gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCoroutineSuspendExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CoroutineSuspendExpr> e = CoroutineSuspendExpr::from(Stmt(std::move(eptr)))) {
@@ -126,7 +126,7 @@ gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const Index &index
 }
 
 gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCoroutineSuspendExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -138,7 +138,7 @@ gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const Fragment &fr
 }
 
 gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCoroutineSuspendExprDerivedKinds) {
@@ -160,36 +160,36 @@ std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const TokenContex
 }
 
 Expr CoroutineSuspendExpr::common_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Token CoroutineSuspendExpr::keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
-}
-
-OpaqueValueExpr CoroutineSuspendExpr::opaque_value(void) const {
-  RawEntityId eid = impl->reader.getVal40();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr CoroutineSuspendExpr::operand(void) const {
   RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+Token CoroutineSuspendExpr::keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+}
+
+OpaqueValueExpr CoroutineSuspendExpr::opaque_value(void) const {
+  RawEntityId eid = impl->reader.getVal43();
+  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Expr CoroutineSuspendExpr::operand(void) const {
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
 Expr CoroutineSuspendExpr::ready_expression(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal45();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineSuspendExpr::resume_expression(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal46();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineSuspendExpr::suspend_expression(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal47();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

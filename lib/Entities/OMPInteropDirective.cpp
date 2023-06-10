@@ -109,7 +109,7 @@ std::optional<OMPInteropDirective> OMPInteropDirective::from(const Stmt &parent)
 }
 
 gap::generator<OMPInteropDirective> OMPInteropDirective::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kOMPInteropDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<OMPInteropDirective> e = OMPInteropDirective::from(Stmt(std::move(eptr)))) {
@@ -120,7 +120,7 @@ gap::generator<OMPInteropDirective> OMPInteropDirective::in(const Index &index) 
 }
 
 gap::generator<OMPInteropDirective> OMPInteropDirective::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kOMPInteropDirectiveDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -132,7 +132,7 @@ gap::generator<OMPInteropDirective> OMPInteropDirective::in(const Fragment &frag
 }
 
 gap::generator<OMPInteropDirective> OMPInteropDirective::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kOMPInteropDirectiveDerivedKinds) {

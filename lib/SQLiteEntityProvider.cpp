@@ -91,6 +91,7 @@ class SQLiteEntityProviderImpl {
                               MX_IGNORE_ENTITY_CATEGORY,
                               DECLARE_GETTERS,
                               DECLARE_GETTERS,
+                              DECLARE_GETTERS,
                               DECLARE_GETTERS)
 #undef DECLARE_GETTERS
 
@@ -306,6 +307,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
 
     MX_FOR_EACH_ENTITY_CATEGORY(INIT_GETTERS,
                                 MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
                                 INIT_GETTERS,
                                 INIT_GETTERS,
                                 INIT_GETTERS)
@@ -874,6 +876,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
@@ -970,6 +973,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
                             MX_IGNORE_ENTITY_CATEGORY)
@@ -1023,6 +1027,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
                             MX_DECLARE_ENTITY_LISTERS)

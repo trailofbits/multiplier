@@ -29,6 +29,8 @@ class Decl;
 class File;
 class Fragment;
 class Index;
+class Macro;
+class MacroArgument;
 class Reference;
 class SourceIR;
 class Stmt;
@@ -110,6 +112,11 @@ class Stmt {
 
   static std::optional<Stmt> from(const TokenContext &t);
 
+  std::optional<Macro> highest_containing_substitution(void) const;
+  std::optional<MacroArgument> lowest_containing_macro_argument(void) const;
+  std::optional<Macro> nth_covering_macro(unsigned n) const;
+  unsigned num_covering_macros(void) const;
+  gap::generator<Macro> covering_macros(void) const &;
   Stmt ignore_containers(void) const;
   gap::generator<Stmt> children(void) const &;
   TokenRange tokens(void) const;

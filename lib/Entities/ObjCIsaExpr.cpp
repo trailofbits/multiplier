@@ -110,7 +110,7 @@ std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Stmt &parent) {
 }
 
 gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCIsaExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCIsaExpr> e = ObjCIsaExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const Index &index) {
 }
 
 gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCIsaExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCIsaExpr> ObjCIsaExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCIsaExprDerivedKinds) {
@@ -155,24 +155,24 @@ std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const TokenContext &t) {
 }
 
 Expr ObjCIsaExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCIsaExpr::base_token_end(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token ObjCIsaExpr::isa_member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token ObjCIsaExpr::operation_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool ObjCIsaExpr::is_arrow(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

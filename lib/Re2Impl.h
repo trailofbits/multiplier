@@ -59,7 +59,7 @@ class RegexQueryResultImpl final {
   RegexQueryResultImpl(const RegexQuery &re_, FragmentImplPtr frag_);
 
   bool InitForFragment(FragmentImplPtr frag_);
-  bool InitForFragment(SpecificEntityId<FragmentId> frag_id);
+  bool InitForFragment(PackedFragmentId frag_id);
 
   std::optional<RegexQueryMatch> GetNextMatchInFragment(void);
 

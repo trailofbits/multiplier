@@ -162,6 +162,7 @@ class SourceIR {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_FUNCTION,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_FUNCTION,
                               MX_DECLARE_ENTITY_FUNCTION)
@@ -176,6 +177,7 @@ class SourceIR {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_FUNCTION,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_FUNCTION,
                               MX_DECLARE_ENTITY_FUNCTION,
                               MX_DECLARE_ENTITY_FUNCTION,
                               MX_DECLARE_ENTITY_FUNCTION)

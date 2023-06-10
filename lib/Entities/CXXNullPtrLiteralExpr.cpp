@@ -110,7 +110,7 @@ std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Stmt &par
 }
 
 gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXNullPtrLiteralExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXNullPtrLiteralExpr> e = CXXNullPtrLiteralExpr::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const Index &ind
 }
 
 gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXNullPtrLiteralExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const Fragment &
 }
 
 gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXNullPtrLiteralExprDerivedKinds) {
@@ -155,7 +155,7 @@ std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const TokenCont
 }
 
 Token CXXNullPtrLiteralExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 #pragma GCC diagnostic pop

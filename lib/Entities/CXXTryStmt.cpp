@@ -110,7 +110,7 @@ std::optional<CXXTryStmt> CXXTryStmt::from(const Stmt &parent) {
 }
 
 gap::generator<CXXTryStmt> CXXTryStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXTryStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXTryStmt> e = CXXTryStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<CXXTryStmt> CXXTryStmt::in(const Index &index) {
 }
 
 gap::generator<CXXTryStmt> CXXTryStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXTryStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<CXXTryStmt> CXXTryStmt::in(const Fragment &frag) {
 }
 
 gap::generator<CXXTryStmt> CXXTryStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXTryStmtDerivedKinds) {
@@ -155,24 +155,24 @@ std::optional<CXXTryStmt> CXXTryStmt::from(const TokenContext &t) {
 }
 
 CompoundStmt CXXTryStmt::try_block(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXTryStmt::try_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 unsigned CXXTryStmt::num_handlers(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -182,12 +182,12 @@ std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
 }
 
 gap::generator<CXXCatchStmt> CXXTryStmt::handlers(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = CXXCatchStmt::from(Stmt(std::move(d15)))) {
+    if (auto d18 = ep->StmtFor(ep, v)) {
+      if (auto e = CXXCatchStmt::from(Stmt(std::move(d18)))) {
         co_yield std::move(*e);
       }
     }

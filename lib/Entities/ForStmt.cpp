@@ -111,7 +111,7 @@ std::optional<ForStmt> ForStmt::from(const Stmt &parent) {
 }
 
 gap::generator<ForStmt> ForStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kForStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ForStmt> e = ForStmt::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<ForStmt> ForStmt::in(const Index &index) {
 }
 
 gap::generator<ForStmt> ForStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kForStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<ForStmt> ForStmt::in(const Fragment &frag) {
 }
 
 gap::generator<ForStmt> ForStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kForStmtDerivedKinds) {
@@ -156,13 +156,13 @@ std::optional<ForStmt> ForStmt::from(const TokenContext &t) {
 }
 
 Stmt ForStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 std::optional<Expr> ForStmt::condition(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal10();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -175,7 +175,7 @@ std::optional<Expr> ForStmt::condition(void) const {
 
 std::optional<VarDecl> ForStmt::condition_variable(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal11();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -188,7 +188,7 @@ std::optional<VarDecl> ForStmt::condition_variable(void) const {
 
 std::optional<DeclStmt> ForStmt::condition_variable_declaration_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal13();
+    RawEntityId eid = impl->reader.getVal16();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -200,12 +200,12 @@ std::optional<DeclStmt> ForStmt::condition_variable_declaration_statement(void) 
 }
 
 Token ForStmt::for_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 std::optional<Expr> ForStmt::increment(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal17();
+    RawEntityId eid = impl->reader.getVal20();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -218,7 +218,7 @@ std::optional<Expr> ForStmt::increment(void) const {
 
 std::optional<Stmt> ForStmt::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal18();
+    RawEntityId eid = impl->reader.getVal21();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,11 +230,11 @@ std::optional<Stmt> ForStmt::initializer(void) const {
 }
 
 Token ForStmt::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal19());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal22());
 }
 
 Token ForStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal23());
 }
 
 #pragma GCC diagnostic pop

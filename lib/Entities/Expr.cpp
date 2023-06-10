@@ -481,7 +481,7 @@ std::optional<Expr> Expr::from(const Stmt &parent) {
 }
 
 gap::generator<Expr> Expr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<Expr> e = Expr::from(Stmt(std::move(eptr)))) {
@@ -492,7 +492,7 @@ gap::generator<Expr> Expr::in(const Index &index) {
 }
 
 gap::generator<Expr> Expr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -504,7 +504,7 @@ gap::generator<Expr> Expr::in(const Fragment &frag) {
 }
 
 gap::generator<Expr> Expr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kExprDerivedKinds) {
@@ -526,93 +526,93 @@ std::optional<Expr> Expr::from(const TokenContext &t) {
 }
 
 bool Expr::has_side_effects(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal15();
 }
 
 Expr Expr::ignore_casts(void) const {
-  RawEntityId eid = impl->reader.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr Expr::ignore_conversion_operator_single_step(void) const {
-  RawEntityId eid = impl->reader.getVal11();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr Expr::ignore_implicit_casts(void) const {
   RawEntityId eid = impl->reader.getVal13();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr Expr::ignore_implicit(void) const {
+Expr Expr::ignore_conversion_operator_single_step(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr Expr::ignore_implicit_as_written(void) const {
+Expr Expr::ignore_implicit_casts(void) const {
+  RawEntityId eid = impl->reader.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Expr Expr::ignore_implicit(void) const {
   RawEntityId eid = impl->reader.getVal17();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr Expr::ignore_parenthesis_base_casts(void) const {
-  RawEntityId eid = impl->reader.getVal18();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr Expr::ignore_parenthesis_casts(void) const {
-  RawEntityId eid = impl->reader.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
-Expr Expr::ignore_parenthesis_implicit_casts(void) const {
+Expr Expr::ignore_implicit_as_written(void) const {
   RawEntityId eid = impl->reader.getVal20();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr Expr::ignore_parenthesis_l_value_casts(void) const {
+Expr Expr::ignore_parenthesis_base_casts(void) const {
   RawEntityId eid = impl->reader.getVal21();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Expr Expr::ignore_parenthesis_noop_casts(void) const {
+Expr Expr::ignore_parenthesis_casts(void) const {
   RawEntityId eid = impl->reader.getVal22();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
+Expr Expr::ignore_parenthesis_implicit_casts(void) const {
+  RawEntityId eid = impl->reader.getVal23();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Expr Expr::ignore_parenthesis_l_value_casts(void) const {
+  RawEntityId eid = impl->reader.getVal24();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Expr Expr::ignore_parenthesis_noop_casts(void) const {
+  RawEntityId eid = impl->reader.getVal25();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
 Expr Expr::ignore_parentheses(void) const {
-  RawEntityId eid = impl->reader.getVal30();
+  RawEntityId eid = impl->reader.getVal33();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_unless_spelled_in_source(void) const {
-  RawEntityId eid = impl->reader.getVal31();
+  RawEntityId eid = impl->reader.getVal34();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool Expr::contains_errors(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal19();
 }
 
 bool Expr::contains_unexpanded_parameter_pack(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal26();
 }
 
 Expr Expr::best_dynamic_class_type_expression(void) const {
-  RawEntityId eid = impl->reader.getVal32();
+  RawEntityId eid = impl->reader.getVal35();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ExprDependence Expr::dependence(void) const {
-  return static_cast<ExprDependence>(impl->reader.getVal56());
+  return static_cast<ExprDependence>(impl->reader.getVal59());
 }
 
 Token Expr::expression_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal33());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal36());
 }
 
 std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal34();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -624,12 +624,12 @@ std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
 }
 
 ExprObjectKind Expr::object_kind(void) const {
-  return static_cast<ExprObjectKind>(impl->reader.getVal69());
+  return static_cast<ExprObjectKind>(impl->reader.getVal72());
 }
 
 std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal35();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -642,7 +642,7 @@ std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
 
 std::optional<FieldDecl> Expr::source_bit_field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal36();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -655,7 +655,7 @@ std::optional<FieldDecl> Expr::source_bit_field(void) const {
 
 std::optional<Type> Expr::type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal37();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -667,101 +667,101 @@ std::optional<Type> Expr::type(void) const {
 }
 
 ExprValueKind Expr::value_kind(void) const {
-  return static_cast<ExprValueKind>(impl->reader.getVal70());
+  return static_cast<ExprValueKind>(impl->reader.getVal73());
 }
 
 bool Expr::has_non_trivial_call(void) const {
-  return impl->reader.getVal24();
+  return impl->reader.getVal27();
 }
 
 std::optional<bool> Expr::is_cxx98_integral_constant_expression(void) const {
-  if (!impl->reader.getVal57()) {
+  if (!impl->reader.getVal60()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal25());
+    return static_cast<bool>(impl->reader.getVal28());
   }
   return std::nullopt;
 }
 
 bool Expr::is_default_argument(void) const {
-  return impl->reader.getVal58();
+  return impl->reader.getVal61();
 }
 
 bool Expr::is_gl_value(void) const {
-  return impl->reader.getVal59();
+  return impl->reader.getVal62();
 }
 
 bool Expr::is_implicit_cxx_this(void) const {
-  return impl->reader.getVal71();
+  return impl->reader.getVal74();
 }
 
 bool Expr::is_instantiation_dependent(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal75();
 }
 
 std::optional<bool> Expr::is_integer_constant_expression(void) const {
-  if (!impl->reader.getVal74()) {
+  if (!impl->reader.getVal77()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal73());
+    return static_cast<bool>(impl->reader.getVal76());
   }
   return std::nullopt;
 }
 
 bool Expr::is_known_to_have_boolean_value(void) const {
-  return impl->reader.getVal75();
-}
-
-bool Expr::is_l_value(void) const {
-  return impl->reader.getVal76();
-}
-
-bool Expr::is_objcgc_candidate(void) const {
-  return impl->reader.getVal77();
-}
-
-bool Expr::is_obj_c_self_expression(void) const {
   return impl->reader.getVal78();
 }
 
-bool Expr::is_ordinary_or_bit_field_object(void) const {
+bool Expr::is_l_value(void) const {
   return impl->reader.getVal79();
 }
 
-bool Expr::is_pr_value(void) const {
+bool Expr::is_objcgc_candidate(void) const {
   return impl->reader.getVal80();
 }
 
-bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
+bool Expr::is_obj_c_self_expression(void) const {
   return impl->reader.getVal81();
 }
 
-bool Expr::is_type_dependent(void) const {
+bool Expr::is_ordinary_or_bit_field_object(void) const {
   return impl->reader.getVal82();
 }
 
-bool Expr::is_value_dependent(void) const {
+bool Expr::is_pr_value(void) const {
   return impl->reader.getVal83();
 }
 
-bool Expr::is_x_value(void) const {
+bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
   return impl->reader.getVal84();
 }
 
-bool Expr::refers_to_bit_field(void) const {
+bool Expr::is_type_dependent(void) const {
   return impl->reader.getVal85();
 }
 
-bool Expr::refers_to_global_register_variable(void) const {
+bool Expr::is_value_dependent(void) const {
   return impl->reader.getVal86();
 }
 
-bool Expr::refers_to_matrix_element(void) const {
+bool Expr::is_x_value(void) const {
   return impl->reader.getVal87();
 }
 
-bool Expr::refers_to_vector_element(void) const {
+bool Expr::refers_to_bit_field(void) const {
   return impl->reader.getVal88();
+}
+
+bool Expr::refers_to_global_register_variable(void) const {
+  return impl->reader.getVal89();
+}
+
+bool Expr::refers_to_matrix_element(void) const {
+  return impl->reader.getVal90();
+}
+
+bool Expr::refers_to_vector_element(void) const {
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

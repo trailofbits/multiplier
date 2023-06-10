@@ -111,7 +111,7 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Stmt &parent) {
 }
 
 gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kCXXTypeidExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<CXXTypeidExpr> e = CXXTypeidExpr::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Index &index) {
 }
 
 gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kCXXTypeidExprDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Fragment &frag) {
 }
 
 gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kCXXTypeidExprDerivedKinds) {
@@ -157,7 +157,7 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const TokenContext &t) {
 
 std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -169,30 +169,30 @@ std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
 }
 
 Type CXXTypeidExpr::type_operand(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal42();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXTypeidExpr::type_operand_source_info(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal43();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<bool> CXXTypeidExpr::is_most_derived(void) const {
-  if (!impl->reader.getVal90()) {
+  if (!impl->reader.getVal93()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal89());
+    return static_cast<bool>(impl->reader.getVal92());
   }
   return std::nullopt;
 }
 
 bool CXXTypeidExpr::is_potentially_evaluated(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal94();
 }
 
 bool CXXTypeidExpr::is_type_operand(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal95();
 }
 
 #pragma GCC diagnostic pop

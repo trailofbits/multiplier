@@ -109,7 +109,7 @@ std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const Stmt &parent) {
 }
 
 gap::generator<SEHFinallyStmt> SEHFinallyStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kSEHFinallyStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<SEHFinallyStmt> e = SEHFinallyStmt::from(Stmt(std::move(eptr)))) {
@@ -120,7 +120,7 @@ gap::generator<SEHFinallyStmt> SEHFinallyStmt::in(const Index &index) {
 }
 
 gap::generator<SEHFinallyStmt> SEHFinallyStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kSEHFinallyStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -132,7 +132,7 @@ gap::generator<SEHFinallyStmt> SEHFinallyStmt::in(const Fragment &frag) {
 }
 
 gap::generator<SEHFinallyStmt> SEHFinallyStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kSEHFinallyStmtDerivedKinds) {
@@ -154,12 +154,12 @@ std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const TokenContext &t) {
 }
 
 CompoundStmt SEHFinallyStmt::block(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token SEHFinallyStmt::finally_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

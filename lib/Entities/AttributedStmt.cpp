@@ -110,7 +110,7 @@ std::optional<AttributedStmt> AttributedStmt::from(const Stmt &parent) {
 }
 
 gap::generator<AttributedStmt> AttributedStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kAttributedStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<AttributedStmt> e = AttributedStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<AttributedStmt> AttributedStmt::in(const Index &index) {
 }
 
 gap::generator<AttributedStmt> AttributedStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kAttributedStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<AttributedStmt> AttributedStmt::in(const Fragment &frag) {
 }
 
 gap::generator<AttributedStmt> AttributedStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kAttributedStmtDerivedKinds) {
@@ -155,19 +155,19 @@ std::optional<AttributedStmt> AttributedStmt::from(const TokenContext &t) {
 }
 
 Token AttributedStmt::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 unsigned AttributedStmt::num_attributes(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->AttrFor(ep, v);
   if (!e) {
@@ -177,19 +177,19 @@ std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
 }
 
 gap::generator<Attr> AttributedStmt::attributes(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->AttrFor(ep, v)) {
-      co_yield Attr(std::move(d15));
+    if (auto d18 = ep->AttrFor(ep, v)) {
+      co_yield Attr(std::move(d18));
     }
   }
   co_return;
 }
 
 Stmt AttributedStmt::sub_statement(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

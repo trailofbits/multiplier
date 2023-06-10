@@ -111,7 +111,7 @@ std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Stmt &parent) {
 }
 
 gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCArrayLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCArrayLiteral> e = ObjCArrayLiteral::from(Stmt(std::move(eptr)))) {
@@ -122,7 +122,7 @@ gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const Index &index) {
 }
 
 gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCArrayLiteralDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -134,7 +134,7 @@ gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCArrayLiteralDerivedKinds) {
@@ -156,20 +156,20 @@ std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const TokenContext &t) {
 }
 
 ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal41();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 unsigned ObjCArrayLiteral::num_elements(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -179,12 +179,12 @@ std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
 }
 
 gap::generator<Expr> ObjCArrayLiteral::elements(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d15)))) {
+    if (auto d18 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d18)))) {
         co_yield std::move(*e);
       }
     }

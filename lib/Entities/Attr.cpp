@@ -63,7 +63,7 @@ std::optional<Attr> Attr::by_id(const Index &index, EntityId eid) {
 }
 
 gap::generator<Attr> Attr::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrImplPtr eptr : ep->AttrsFor(ep)) {
     if (std::optional<Attr> e = Attr::from(Attr(std::move(eptr)))) {
       co_yield std::move(e.value());
@@ -72,7 +72,7 @@ gap::generator<Attr> Attr::in(const Index &index) {
 }
 
 gap::generator<Attr> Attr::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrImplPtr eptr : ep->AttrsFor(ep, frag_id)) {
     if (std::optional<Attr> e = Attr::from(Attr(std::move(eptr)))) {
@@ -82,7 +82,7 @@ gap::generator<Attr> Attr::in(const Fragment &frag) {
 }
 
 gap::generator<Attr> Attr::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, frag_id)) {
@@ -94,7 +94,7 @@ gap::generator<Attr> Attr::in(const File &file) {
 }
 
 gap::generator<Attr> Attr::in(const Index &index, std::span<AttrKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (AttrKind k : kinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
       co_yield Attr(std::move(eptr));
@@ -103,7 +103,7 @@ gap::generator<Attr> Attr::in(const Index &index, std::span<AttrKind> kinds) {
 }
 
 gap::generator<Attr> Attr::in(const Fragment &frag, std::span<AttrKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (AttrKind k : kinds) {
     for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
@@ -113,7 +113,7 @@ gap::generator<Attr> Attr::in(const Fragment &frag, std::span<AttrKind> kinds) {
 }
 
 gap::generator<Attr> Attr::in(const File &file, std::span<AttrKind> kinds) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (AttrKind k : kinds) {
@@ -157,9 +157,7 @@ AttrKind Attr::kind(void) const {
 }
 
 TokenRange Attr::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal6(), impl->reader.getVal7());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal6(), impl->reader.getVal7());
 }
 
 #pragma GCC diagnostic pop

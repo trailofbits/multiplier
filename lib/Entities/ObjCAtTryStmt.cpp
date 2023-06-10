@@ -110,7 +110,7 @@ std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const Stmt &parent) {
 }
 
 gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kObjCAtTryStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<ObjCAtTryStmt> e = ObjCAtTryStmt::from(Stmt(std::move(eptr)))) {
@@ -121,7 +121,7 @@ gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::in(const Index &index) {
 }
 
 gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kObjCAtTryStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -133,7 +133,7 @@ gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::in(const Fragment &frag) {
 }
 
 gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kObjCAtTryStmtDerivedKinds) {
@@ -155,29 +155,29 @@ std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const TokenContext &t) {
 }
 
 Token ObjCAtTryStmt::at_try_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
 }
 
 ObjCAtFinallyStmt ObjCAtTryStmt::finally_statement(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return ObjCAtFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt ObjCAtTryStmt::try_body(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 unsigned ObjCAtTryStmt::num_catch_statements(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal18().size();
 }
 
 std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal18();
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->StmtFor(ep, v);
   if (!e) {
@@ -187,12 +187,12 @@ std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) co
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const & {
-  auto list = impl->reader.getVal15();
-  EntityProvider::Ptr ep = impl->ep;
+  auto list = impl->reader.getVal18();
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = ObjCAtCatchStmt::from(Stmt(std::move(d15)))) {
+    if (auto d18 = ep->StmtFor(ep, v)) {
+      if (auto e = ObjCAtCatchStmt::from(Stmt(std::move(d18)))) {
         co_yield std::move(*e);
       }
     }

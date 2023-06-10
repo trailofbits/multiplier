@@ -17,6 +17,7 @@
 #include <variant>
 #include <zdict.h>
 #include <zstd.h>
+#include <iostream>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -383,6 +384,12 @@ class DatabaseWriterImpl {
   // bit for token offset bits.
   std::atomic<RawEntityId> next_big_fragment_index;
 
+  // The next type ID that can be assigned. This represents an upper bound on
+  // the total number of type IDs.
+  std::atomic<RawEntityId> next_small_type_index;
+
+  std::atomic<RawEntityId> next_big_type_index;
+
   // Entity-specific compression dictionaries.
   DictionaryContext dictionary_context;
   std::array<DictionaryCompressor, kNumEntityCategories> entity_dictionaries;
@@ -616,7 +623,9 @@ void DatabaseWriterImpl::ExitMetadata(void) {
   update_meta_stmt.BindValues(
       next_file_index.load(),
       next_small_fragment_index.load(),
-      next_big_fragment_index.load());
+      next_big_fragment_index.load(),
+      next_small_type_index.load(),
+      next_big_type_index.load());
   update_meta_stmt.Execute();
 }
 
@@ -666,11 +675,12 @@ void DatabaseWriterImpl::InitMetadata(void) {
   sqlite::Statement set_meta_stmt = db.Prepare(
       R"(INSERT OR IGNORE INTO metadata 
          (rowid, next_file_index, next_small_fragment_index,
-          next_big_fragment_index)
-         VALUES (1, 1, ?1, 1))");
+          next_big_fragment_index, next_small_type_index, 
+          next_big_type_index) VALUES (1, 1, ?1, 1, ?2, 1))");
 
   set_meta_stmt.BindValues(
-      mx::kMaxBigFragmentId  /* next_small_fragment_index */);
+      mx::kMaxBigFragmentId  /* next_small_fragment_index */,
+      mx::kMaxBigTypeId /* next_small_type_index */);
   set_meta_stmt.Execute();
 
   add_version.BindValues(1u);
@@ -684,18 +694,25 @@ void DatabaseWriterImpl::InitMetadata(void) {
   RawEntityId file_id = kInvalidEntityId;
   RawEntityId small_id = kInvalidEntityId;
   RawEntityId big_id = kInvalidEntityId;
+  RawEntityId small_type_id = kInvalidEntityId;
+  RawEntityId big_type_id = kInvalidEntityId;
 
   if (get_ids.ExecuteStep()) {
-    get_ids.Row().Columns(file_id, small_id, big_id);
+    get_ids.Row().Columns(file_id, small_id, big_id, small_type_id, big_type_id);
 
     assert(1u <= file_id);
     assert(mx::kMaxBigFragmentId <= small_id);
     assert(1u <= big_id);
     assert(big_id < mx::kMaxBigFragmentId);
+    assert(mx::kMaxBigTypeId <= small_type_id);
+    assert(1u <= big_type_id);
+    assert(big_type_id < mx::kMaxBigTypeId);
 
     next_file_index.store(file_id);
     next_small_fragment_index.store(small_id);
     next_big_fragment_index.store(big_id);
+    next_small_type_index.store(small_type_id);
+    next_big_type_index.store(big_type_id);
 
   // TODO(pag): Throw an exception?
   } else {
@@ -879,7 +896,8 @@ DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
           R"(INSERT INTO version (action) VALUES (?1))")),
       get_ids(db.Prepare(
           R"(SELECT next_file_index, next_small_fragment_index, 
-                    next_big_fragment_index
+                    next_big_fragment_index, next_small_type_index,
+                    next_big_type_index
              FROM metadata
              WHERE rowid = 1
              LIMIT 1)")),
@@ -887,7 +905,9 @@ DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
           R"(UPDATE metadata
              SET next_file_index = ?1,
                  next_small_fragment_index = ?2,
-                 next_big_fragment_index = ?3
+                 next_big_fragment_index = ?3,
+                 next_small_type_index = ?4,
+                 next_big_type_index = ?5
              WHERE rowid = 1)")),
       thread_state(
           [this] (unsigned) -> WriterThreadState * {
@@ -1125,32 +1145,41 @@ DatabaseWriter::GetOrCreateLargeFragmentIdForHash(
 // new fragment id, instead get the next available small fragment id
 // for types
 
-SpecificEntityId<FragmentId>
-DatabaseWriter::GetOrCreateFragmentIdForType(
-    RawEntityId tok_id, std::string hash, bool &is_new) {
+SpecificEntityId<TypeId>
+DatabaseWriter::GetOrCreateSmallTypeIdForHash(
+    RawEntityId type_id, mx::TypeKind type_kind, std::string hash, bool &is_new) {
 
   (void)hash;
-  (void)tok_id;
+  (void)type_id;
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = kInvalidEntityId;
+  RawEntityId proposed_index = impl->next_small_type_index.fetch_add(1u);
+  assert(proposed_index >= kMaxBigTypeId);
 
-  // Try reusing the available small fragment id. if they don't exist
-  // then get the new one through fetch and add operation.
-  // The proposed index here will always be found and it will not go
-  // back to `available_small_fragment_index` again.
-  if (!writer->available_small_fragment_index) {
-    proposed_index = impl->next_small_fragment_index.fetch_add(1u);
-  } else {
-    proposed_index = writer->available_small_fragment_index.value();
-    writer->available_small_fragment_index.reset();
-  }
-
-  RawEntityId found_id = EntityId(FragmentId(proposed_index)).Pack();
+  RawEntityId found_id = EntityId(TypeId(proposed_index, type_kind)).Pack();
   is_new = true;
 
   VariantId vid = EntityId(found_id).Unpack();
-  assert(std::holds_alternative<FragmentId>(vid));
-  return std::get<FragmentId>(vid);
+  assert(std::holds_alternative<TypeId>(vid));
+  return std::get<TypeId>(vid);
+}
+
+
+SpecificEntityId<TypeId>
+DatabaseWriter::GetOrCreateBigTypeIdForHash(
+    RawEntityId type_id, mx::TypeKind type_kind, std::string hash, bool &is_new) {
+
+  (void)hash;
+  (void)type_id;
+  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
+  RawEntityId proposed_index = impl->next_big_type_index.fetch_add(1u);
+  assert(proposed_index < kMaxBigTypeId);
+
+  RawEntityId found_id = EntityId(TypeId(proposed_index, type_kind)).Pack();
+  is_new = true;
+
+  VariantId vid = EntityId(found_id).Unpack();
+  assert(std::holds_alternative<TypeId>(vid));
+  return std::get<TypeId>(vid);
 }
 
 void DatabaseWriterImpl::InitRecords(void) {

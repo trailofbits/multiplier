@@ -48,11 +48,6 @@ Fragment Fragment::containing(const Stmt &entity) {
       entity.impl->ep, entity.impl->fragment_id));
 }
 
-Fragment Fragment::containing(const Type &entity) {
-  return Fragment(entity.impl->ep->FragmentFor(
-      entity.impl->ep, entity.impl->fragment_id));
-}
-
 Fragment Fragment::containing(const Attr &entity) {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id.Pack()));
@@ -98,7 +93,7 @@ std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
 
   if (false) {
     MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY, GET_FRAGMENT,
-                                GET_FRAGMENT, GET_FRAGMENT, GET_FRAGMENT)
+                                GET_FRAGMENT, GET_FRAGMENT, GET_FRAGMENT, GET_FRAGMENT)
   } else {
     return std::nullopt;
   }

@@ -44,6 +44,7 @@ class CachingEntityProvider final : public EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE,
+                              DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE)
 #undef DECLARE_ENTITY_CACHE
 
@@ -115,6 +116,7 @@ class CachingEntityProvider final : public EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
@@ -127,6 +129,7 @@ class CachingEntityProvider final : public EntityProvider {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY)
@@ -138,6 +141,7 @@ class CachingEntityProvider final : public EntityProvider {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_DECLARE_ENTITY_LISTERS)

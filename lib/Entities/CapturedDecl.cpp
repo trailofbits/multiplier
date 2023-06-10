@@ -135,7 +135,7 @@ std::optional<CapturedDecl> CapturedDecl::from(const Decl &parent) {
 }
 
 gap::generator<CapturedDecl> CapturedDecl::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (DeclKind k : kCapturedDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
       if (std::optional<CapturedDecl> e = CapturedDecl::from(Decl(std::move(eptr)))) {
@@ -146,7 +146,7 @@ gap::generator<CapturedDecl> CapturedDecl::in(const Index &index) {
 }
 
 gap::generator<CapturedDecl> CapturedDecl::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (DeclKind k : kCapturedDeclDerivedKinds) {
     for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
@@ -158,7 +158,7 @@ gap::generator<CapturedDecl> CapturedDecl::in(const Fragment &frag) {
 }
 
 gap::generator<CapturedDecl> CapturedDecl::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (DeclKind k : kCapturedDeclDerivedKinds) {
@@ -197,7 +197,7 @@ std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
   if (n >= list.size()) {
     return std::nullopt;
   }
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto v = list[n];
   auto e = ep->DeclFor(ep, v);
   if (!e) {
@@ -208,7 +208,7 @@ std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
 
 gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const & {
   auto list = impl->reader.getVal49();
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d49 = ep->DeclFor(ep, v)) {
@@ -221,7 +221,7 @@ gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const & {
 }
 
 gap::generator<Decl> CapturedDecl::declarations_in_context(void) const & {
-  EntityProvider::Ptr ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   auto list = impl->reader.getVal50();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {

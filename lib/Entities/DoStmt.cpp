@@ -109,7 +109,7 @@ std::optional<DoStmt> DoStmt::from(const Stmt &parent) {
 }
 
 gap::generator<DoStmt> DoStmt::in(const Index &index) {
-  const EntityProvider::Ptr ep = entity_provider_of(index);
+  const EntityProviderPtr ep = entity_provider_of(index);
   for (StmtKind k : kDoStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
       if (std::optional<DoStmt> e = DoStmt::from(Stmt(std::move(eptr)))) {
@@ -120,7 +120,7 @@ gap::generator<DoStmt> DoStmt::in(const Index &index) {
 }
 
 gap::generator<DoStmt> DoStmt::in(const Fragment &frag) {
-  const EntityProvider::Ptr ep = entity_provider_of(frag);
+  const EntityProviderPtr ep = entity_provider_of(frag);
   PackedFragmentId frag_id = frag.id();
   for (StmtKind k : kDoStmtDerivedKinds) {
     for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
@@ -132,7 +132,7 @@ gap::generator<DoStmt> DoStmt::in(const Fragment &frag) {
 }
 
 gap::generator<DoStmt> DoStmt::in(const File &file) {
-  const EntityProvider::Ptr ep = entity_provider_of(file);
+  const EntityProviderPtr ep = entity_provider_of(file);
   PackedFileId file_id = file.id();
   for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
     for (StmtKind k : kDoStmtDerivedKinds) {
@@ -154,25 +154,25 @@ std::optional<DoStmt> DoStmt::from(const TokenContext &t) {
 }
 
 Stmt DoStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal12();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr DoStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal13();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token DoStmt::do_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 Token DoStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal16());
 }
 
 Token DoStmt::while_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 #pragma GCC diagnostic pop
