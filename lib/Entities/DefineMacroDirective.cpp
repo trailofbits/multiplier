@@ -151,12 +151,12 @@ bool DefineMacroDirective::is_variadic(void) const {
 }
 
 bool DefineMacroDirective::is_function_like(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal13();
 }
 
 gap::generator<MacroOrToken> DefineMacroDirective::parameters(void) const & {
   Index index(impl->ep);
-  auto list = impl->reader.getVal8();
+  auto list = impl->reader.getVal9();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {

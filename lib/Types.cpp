@@ -306,12 +306,12 @@ EntityId::EntityId(TypeTokenId id) {
       packed.small_type.is_big = 0u;
       packed.small_type.type_id = (id.type_id - kMaxBigTypeId);
       packed.small_type.type_kind = static_cast<uint64_t>(id.type_kind);
-      packed.small_type.kind = static_cast<uint64_t>(id.kind);
+      packed.small_type.token_kind = static_cast<uint64_t>(id.kind);
       packed.small_type.token_offset = id.offset;
     } else {
       packed.big_type.is_big = 1u;
       packed.big_type.type_id = id.type_id;
-      packed.big_type.kind = static_cast<uint64_t>(id.type_kind);
+      packed.big_type.type_kind = static_cast<uint64_t>(id.type_kind);
       packed.big_type.token_kind = static_cast<uint64_t>(id.kind);
       packed.big_type.token_offset = id.offset;
     }

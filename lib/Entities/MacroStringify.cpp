@@ -120,7 +120,7 @@ std::optional<MacroStringify> MacroStringify::from(const TokenContext &t) {
 }
 
 Token MacroStringify::stringified_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal7());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal8());
 }
 
 #pragma GCC diagnostic pop

@@ -120,7 +120,7 @@ std::optional<MacroConcatenate> MacroConcatenate::from(const TokenContext &t) {
 }
 
 Token MacroConcatenate::pasted_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal7());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal8());
 }
 
 #pragma GCC diagnostic pop

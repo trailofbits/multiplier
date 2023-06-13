@@ -123,7 +123,7 @@ bool MacroArgument::is_variadic(void) const {
 }
 
 unsigned MacroArgument::index(void) const {
-  return impl->reader.getVal11();
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop
