@@ -6,8 +6,6 @@
 
 #include "Type.h"
 
-#include <iostream>
-
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -203,7 +201,6 @@ TokenRange TypeImpl::TokenRangeFor(
     }
   }
 
-  std::cerr << "Invalid Token range" << std::endl;
   return TokenRange();
 }
 
@@ -242,7 +239,6 @@ gap::generator<Reference> Type::references(void) const & {
 
 // TokenRange for the type
 TokenRange Type::tokens(void) const {
-  std::cerr << impl->Data() << std::endl;
   return impl->TokenRangeFor(impl, impl->BeginToken(), impl->EndToken());
 }
 
