@@ -6,6 +6,8 @@
 
 #include "Type.h"
 
+#include <iostream>
+
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -191,7 +193,7 @@ TokenRange TypeImpl::TokenRangeFor(
     TypeId tid(btid);
 
     // It's a token inside of the current type.
-    if (btid.type_id == self->type_id) {
+    if (btid.type_id == self->type_id.Unpack().type_id) {
       if (etid.offset < num_type_tokens) {
         return TokenRange(self->TypeTokenReader(self), btid.offset, etid.offset + 1u);
       }
@@ -201,9 +203,27 @@ TokenRange TypeImpl::TokenRangeFor(
     }
   }
 
+  std::cerr << "Invalid Token range" << std::endl;
   return TokenRange();
 }
 
+SpecificEntityId<TypeTokenId> TypeImpl::BeginToken(void) const {
+  TypeTokenId id;
+  id.type_id = type_id.Unpack().type_id;
+  id.type_kind = type_id.Unpack().kind;
+  id.kind = static_cast<TokenKind>(frag_reader.getTokenKinds()[0]);
+  id.offset = static_cast<EntityOffset>(0);
+  return id;
+}
+
+SpecificEntityId<TypeTokenId> TypeImpl::EndToken(void) const {
+  TypeTokenId id;
+  id.type_id = type_id.Unpack().type_id;
+  id.type_kind = type_id.Unpack().kind;
+  id.kind = static_cast<TokenKind>(frag_reader.getTokenKinds()[num_type_tokens - 1]);
+  id.offset = static_cast<EntityOffset>(num_type_tokens - 1);
+  return id;
+}
 
 SpecificEntityId<TypeId> Type::id(void) const {
   auto type_id = impl->type_id.Unpack().type_id;
@@ -218,6 +238,21 @@ gap::generator<Reference> Type::references(void) const & {
       co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
     }
   }
+}
+
+// TokenRange for the type
+TokenRange Type::tokens(void) const {
+  std::cerr << impl->Data() << std::endl;
+  return impl->TokenRangeFor(impl, impl->BeginToken(), impl->EndToken());
+}
+
+// TokenRange for the type
+Token Type::token(void) const {
+  auto maybe_token = impl->TokenFor(impl, id(), true);
+  if (maybe_token.has_value()) {
+    return maybe_token.value();
+  }
+  return Token();
 }
 
 }  // namespace mx

@@ -168,6 +168,17 @@ Token MacroSubstitution::last_fully_substituted_token(void) const {
   return Token();
 }
 
+Token MacroSubstitution::name_or_operator(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal7();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    return impl->ep->TokenFor(impl->ep, eid);
+  }
+  return Token();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

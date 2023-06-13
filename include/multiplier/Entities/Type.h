@@ -36,6 +36,7 @@ class Index;
 class Reference;
 class SourceIR;
 class Token;
+class TokenRange;
 class Type;
 class TypeImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -76,6 +77,9 @@ class Type {
 
   PackedTypeId id(void) const;
   gap::generator<Reference> references(void) const &;
+
+  TokenRange tokens(void) const;
+  Token token(void) const;
 
  public:
   static gap::generator<Type> in(const Fragment &frag, std::span<TypeKind> kinds);

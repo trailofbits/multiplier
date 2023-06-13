@@ -105,6 +105,9 @@ class TypeImpl {
   TokenRange TokenRangeFor(const TypeImplPtr &, EntityId begin_id,
                            EntityId end_id) const;
 
+  SpecificEntityId<TypeTokenId> BeginToken(void) const;
+  SpecificEntityId<TypeTokenId> EndToken(void) const;
+
 };
 
 }  // namespace mx
