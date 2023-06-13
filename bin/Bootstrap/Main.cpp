@@ -2372,11 +2372,9 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("end_token");  // Disable this.
 
     } else if (class_name == "Type") {
-      forward_decls.insert("Token");
       forward_decls.insert("TokenRange");
       class_os
-          << "  TokenRange tokens(void) const;\n"
-          << "  Token token(void) const;\n\n"
+          << "  TokenRange tokens(void) const;\n\n"
           << " public:\n";
 
       seen_methods->emplace("uses");  // Manual.

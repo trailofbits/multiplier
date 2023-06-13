@@ -79,7 +79,6 @@ class Type {
   gap::generator<Reference> references(void) const &;
 
   TokenRange tokens(void) const;
-  Token token(void) const;
 
  public:
   static gap::generator<Type> in(const Fragment &frag, std::span<TypeKind> kinds);

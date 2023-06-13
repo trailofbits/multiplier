@@ -242,13 +242,4 @@ TokenRange Type::tokens(void) const {
   return impl->TokenRangeFor(impl, impl->BeginToken(), impl->EndToken());
 }
 
-// TokenRange for the type
-Token Type::token(void) const {
-  auto maybe_token = impl->TokenFor(impl, id(), true);
-  if (maybe_token.has_value()) {
-    return maybe_token.value();
-  }
-  return Token();
-}
-
 }  // namespace mx
