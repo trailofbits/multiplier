@@ -309,7 +309,9 @@ void SerializeType(const pasta::Type &entity,
   em.tm.EnterReadOnly();
   DispatchSerializeType(em, builder, entity);
   em.tm.ExitReadOnly();
-  (void)type_id;
+
+  (void) eid;
+  (void) type_id;
 }
 
 }  // namespace indexer

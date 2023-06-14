@@ -288,7 +288,12 @@ void SerializeMacroSubstitution(const EntityMapper &es, mx::ast::Macro::Builder 
   } else {
     b.setVal6(mx::kInvalidEntityId);
   }
-  auto v7 = e.NameOrOperator();
+  std::optional<pasta::MacroToken> v7;
+  if (tt) {
+    v7 = tt->NameOrOperator();
+  } else {
+    v7 = e.NameOrOperator();
+  }
   if (v7) {
     auto id7 = es.EntityId(v7.value());
     b.setVal7(id7);
