@@ -226,9 +226,7 @@ Type ObjCMethodDecl::return_type(void) const {
 }
 
 TokenRange ObjCMethodDecl::return_type_source_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal66(), impl->reader.getVal76());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal66(), impl->reader.getVal76());
 }
 
 Token ObjCMethodDecl::selector_start_token(void) const {

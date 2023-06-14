@@ -35,6 +35,7 @@ class TokenRange;
 class TokenReader;
 class TokenTree;
 class TokenTreeImpl;
+class TypeImpl;
 class WeggliQuery;
 class WeggliQueryResultIterator;
 
@@ -59,6 +60,7 @@ class Token final {
   friend class TokenReader;
   friend class TokenTree;
   friend class TokenTreeImpl;
+  friend class TypeImpl;
 
   TokenImplPtr impl;
   EntityOffset offset;
@@ -217,6 +219,7 @@ class TokenRangeIterator {
 // A range of tokens.
 class TokenRange {
  protected:
+  friend class EntityProvider;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
@@ -227,6 +230,7 @@ class TokenRange {
   friend class WeggliQueryResultImpl;
   friend class TokenTree;
   friend class TokenTreeImpl;
+  friend class TypeImpl;
 
   std::shared_ptr<const TokenReader> impl;
   EntityOffset index;

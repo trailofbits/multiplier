@@ -171,9 +171,7 @@ std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const TokenContext &t) {
 }
 
 TokenRange CXXNamedCastExpr::angle_brackets(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal46(), impl->reader.getVal47());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
 }
 
 std::string_view CXXNamedCastExpr::cast_name(void) const {

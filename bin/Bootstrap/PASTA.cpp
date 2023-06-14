@@ -2095,7 +2095,9 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("end_token");  // Disable this.
 
     } else if (class_name == "Type") {
+      forward_decls.insert("TokenRange");
       class_os
+          << "  TokenRange tokens(void) const;\n\n"
           << " public:\n";
 
       seen_methods->emplace("uses");  // Manual.
@@ -2865,9 +2867,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "TokenRange " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto &ep = impl->ep;\n"
-            << "  auto fragment = ep->FragmentFor(ep, impl->fragment_id);\n"
-            << "  return fragment->TokenRangeFor(fragment, impl->reader."
+            << "  return impl->ep->TokenRangeFor(impl->ep, impl->reader."
             << begin_getter_name << "(), impl->reader."
             << end_getter_name << "());\n"
             << "}\n\n";

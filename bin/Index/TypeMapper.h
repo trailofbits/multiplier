@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <pasta/AST/Printer.h>
+#include <pasta/AST/Type.h>
+
 #include <multiplier/Types.h>
 
 #include "Entity.h"
@@ -18,6 +21,11 @@ class DatabaseWriter;
 namespace indexer {
 
 class TypeMapper final {
+ private:
+  using TypeTokenRangeMap = std::map<TypeKey, pasta::PrintedTokenRange>;
+
+  TypeTokenRangeMap types_token_range;
+
  public:
   TypeIdMap type_ids;
 
@@ -41,11 +49,17 @@ class TypeMapper final {
 
   bool AddEntityId(const pasta::Type &entity);
 
-  mx::PackedFragmentId FragmentId(const pasta::Type &entity) const;
+  mx::PackedTypeId TypeId(const pasta::Type &entity) const;
+
+  std::optional<pasta::PrintedTokenRange>
+  TypeTokenRange(const pasta::Type &entity) const;
 
  private:
-  mx::PackedFragmentId
-  GetOrCreateFragmentIdForType(const pasta::Type &type) const;
+  mx::PackedTypeId
+  GetOrCreateFragmentIdForType(
+      const pasta::Type &type,
+      const pasta::PrintedTokenRange &token_range,
+      bool &is_new_type_id) const;
 
 };
 

@@ -187,9 +187,7 @@ gap::generator<Designator> DesignatedInitExpr::designators(void) const & {
 }
 
 TokenRange DesignatedInitExpr::designators_source_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal41(), impl->reader.getVal42());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal41(), impl->reader.getVal42());
 }
 
 Token DesignatedInitExpr::equal_or_colon_token(void) const {

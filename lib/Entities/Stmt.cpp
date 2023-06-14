@@ -299,9 +299,7 @@ gap::generator<Stmt> Stmt::children(void) const & {
 }
 
 TokenRange Stmt::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal8(), impl->reader.getVal9());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal8(), impl->reader.getVal9());
 }
 
 StmtKind Stmt::kind(void) const {

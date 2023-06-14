@@ -157,9 +157,7 @@ AttrKind Attr::kind(void) const {
 }
 
 TokenRange Attr::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal6(), impl->reader.getVal7());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal6(), impl->reader.getVal7());
 }
 
 #pragma GCC diagnostic pop

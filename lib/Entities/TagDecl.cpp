@@ -197,9 +197,7 @@ std::optional<TagDecl> TagDecl::from(const TokenContext &t) {
 }
 
 TokenRange TagDecl::brace_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal55(), impl->reader.getVal56());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal55(), impl->reader.getVal56());
 }
 
 Token TagDecl::first_inner_token(void) const {

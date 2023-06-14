@@ -199,9 +199,7 @@ std::optional<Expr> ParmVarDecl::default_argument(void) const {
 }
 
 TokenRange ParmVarDecl::default_argument_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal127(), impl->reader.getVal128());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal127(), impl->reader.getVal128());
 }
 
 DeclObjCDeclQualifier ParmVarDecl::obj_c_decl_qualifier(void) const {

@@ -243,9 +243,7 @@ std::optional<Type> EnumDecl::integer_type(void) const {
 }
 
 TokenRange EnumDecl::integer_type_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal79(), impl->reader.getVal80());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal79(), impl->reader.getVal80());
 }
 
 std::optional<unsigned> EnumDecl::odr_hash(void) const {

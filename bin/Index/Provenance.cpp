@@ -39,6 +39,9 @@
 #include "Util.h"
 
 namespace indexer {
+
+bool AcceptOOK(pasta::OverloadedOperatorKind ook, pasta::TokenKind tk);
+
 namespace {
 
 static const std::hash<std::string_view> kHasher;
@@ -55,109 +58,6 @@ static bool IsDefinableToken(pasta::TokenKind kind) {
     case clang::tok::identifier:
     case clang::tok::raw_identifier:
       return true;
-  }
-}
-
-static bool AcceptOOK(pasta::OverloadedOperatorKind ook,
-                      pasta::TokenKind tk) {
-  switch (tk) {
-    case pasta::TokenKind::kKeywordOperator:
-      return ook != pasta::OverloadedOperatorKind::kNone;
-    case pasta::TokenKind::kLSquare:
-    case pasta::TokenKind::kRSquare:
-      return ook == pasta::OverloadedOperatorKind::kArrayNew ||
-             ook == pasta::OverloadedOperatorKind::kArrayDelete ||
-             ook == pasta::OverloadedOperatorKind::kSubscript;
-    case pasta::TokenKind::kLParenthesis:
-    case pasta::TokenKind::kRParenthesis:
-      return ook == pasta::OverloadedOperatorKind::kCall;
-    case pasta::TokenKind::kKeywordNew:
-      return ook == pasta::OverloadedOperatorKind::kNew ||
-             ook == pasta::OverloadedOperatorKind::kArrayNew;
-    case pasta::TokenKind::kKeywordDelete:
-      return ook == pasta::OverloadedOperatorKind::kDelete ||
-             ook == pasta::OverloadedOperatorKind::kArrayDelete;
-    case pasta::TokenKind::kPlus:
-      return ook == pasta::OverloadedOperatorKind::kPlus;
-    case pasta::TokenKind::kMinus:
-      return ook == pasta::OverloadedOperatorKind::kMinus;
-    case pasta::TokenKind::kStar:
-      return ook == pasta::OverloadedOperatorKind::kStar;
-    case pasta::TokenKind::kSlash:
-      return ook == pasta::OverloadedOperatorKind::kSlash;
-    case pasta::TokenKind::kPercent:
-      return ook == pasta::OverloadedOperatorKind::kPercent;
-    case pasta::TokenKind::kCaret:
-      return ook == pasta::OverloadedOperatorKind::kCaret;
-    case pasta::TokenKind::kAmp:
-      return ook == pasta::OverloadedOperatorKind::kAmp;
-    case pasta::TokenKind::kPipe:
-      return ook == pasta::OverloadedOperatorKind::kPipe;
-    case pasta::TokenKind::kTilde:
-      return ook == pasta::OverloadedOperatorKind::kTilde;
-    case pasta::TokenKind::kExclaim:
-      return ook == pasta::OverloadedOperatorKind::kExclaim;
-    case pasta::TokenKind::kEqual:
-      return ook == pasta::OverloadedOperatorKind::kEqual;
-    case pasta::TokenKind::kLess:
-      return ook == pasta::OverloadedOperatorKind::kLess;
-    case pasta::TokenKind::kGreater:
-      return ook == pasta::OverloadedOperatorKind::kGreater;
-    case pasta::TokenKind::kPlusEqual:
-      return ook == pasta::OverloadedOperatorKind::kPlusEqual;
-    case pasta::TokenKind::kMinusEqual:
-      return ook == pasta::OverloadedOperatorKind::kMinusEqual;
-    case pasta::TokenKind::kStarEqual:
-      return ook == pasta::OverloadedOperatorKind::kStarEqual;
-    case pasta::TokenKind::kSlashEqual:
-      return ook == pasta::OverloadedOperatorKind::kSlashEqual;
-    case pasta::TokenKind::kPercentEqual:
-      return ook == pasta::OverloadedOperatorKind::kPercentEqual;
-    case pasta::TokenKind::kCaretEqual:
-      return ook == pasta::OverloadedOperatorKind::kCaretEqual;
-    case pasta::TokenKind::kAmpEqual:
-      return ook == pasta::OverloadedOperatorKind::kAmpEqual;
-    case pasta::TokenKind::kPipeEqual:
-      return ook == pasta::OverloadedOperatorKind::kPipeEqual;
-    case pasta::TokenKind::kLessLess:
-      return ook == pasta::OverloadedOperatorKind::kLessLess;
-    case pasta::TokenKind::kGreaterGreater:
-      return ook == pasta::OverloadedOperatorKind::kGreaterGreater;
-    case pasta::TokenKind::kLessLessEqual:
-      return ook == pasta::OverloadedOperatorKind::kLessLessEqual;
-    case pasta::TokenKind::kGreaterGreaterEqual:
-      return ook == pasta::OverloadedOperatorKind::kGreaterGreaterEqual;
-    case pasta::TokenKind::kEqualEqual:
-      return ook == pasta::OverloadedOperatorKind::kEqualEqual;
-    case pasta::TokenKind::kExclaimEqual:
-      return ook == pasta::OverloadedOperatorKind::kExclaimEqual;
-    case pasta::TokenKind::kLessEqual:
-      return ook == pasta::OverloadedOperatorKind::kLessEqual;
-    case pasta::TokenKind::kGreaterEqual:
-      return ook == pasta::OverloadedOperatorKind::kGreaterEqual;
-    case pasta::TokenKind::kSpaceship:
-      return ook == pasta::OverloadedOperatorKind::kSpaceship;
-    case pasta::TokenKind::kAmpAmp:
-      return ook == pasta::OverloadedOperatorKind::kAmpAmp;
-    case pasta::TokenKind::kPipePipe:
-      return ook == pasta::OverloadedOperatorKind::kPipePipe;
-    case pasta::TokenKind::kPlusPlus:
-      return ook == pasta::OverloadedOperatorKind::kPlusPlus;
-    case pasta::TokenKind::kMinusMinus:
-      return ook == pasta::OverloadedOperatorKind::kMinusMinus;
-    case pasta::TokenKind::kComma:
-      return ook == pasta::OverloadedOperatorKind::kComma;
-    case pasta::TokenKind::kArrowStar:
-      return ook == pasta::OverloadedOperatorKind::kArrowStar;
-    case pasta::TokenKind::kArrow:
-      return ook == pasta::OverloadedOperatorKind::kArrow;
-    case pasta::TokenKind::kQuestion:
-    case pasta::TokenKind::kColon:
-      return ook == pasta::OverloadedOperatorKind::kConditional;
-    case pasta::TokenKind::kKeywordCoAwait:
-      return ook == pasta::OverloadedOperatorKind::kCoawait;
-    default:
-      return false;
   }
 }
 
@@ -752,6 +652,108 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
 }
 
 }  // namespace
+
+bool AcceptOOK(pasta::OverloadedOperatorKind ook, pasta::TokenKind tk) {
+  switch (tk) {
+    case pasta::TokenKind::kKeywordOperator:
+      return ook != pasta::OverloadedOperatorKind::kNone;
+    case pasta::TokenKind::kLSquare:
+    case pasta::TokenKind::kRSquare:
+      return ook == pasta::OverloadedOperatorKind::kArrayNew ||
+             ook == pasta::OverloadedOperatorKind::kArrayDelete ||
+             ook == pasta::OverloadedOperatorKind::kSubscript;
+    case pasta::TokenKind::kLParenthesis:
+    case pasta::TokenKind::kRParenthesis:
+      return ook == pasta::OverloadedOperatorKind::kCall;
+    case pasta::TokenKind::kKeywordNew:
+      return ook == pasta::OverloadedOperatorKind::kNew ||
+             ook == pasta::OverloadedOperatorKind::kArrayNew;
+    case pasta::TokenKind::kKeywordDelete:
+      return ook == pasta::OverloadedOperatorKind::kDelete ||
+             ook == pasta::OverloadedOperatorKind::kArrayDelete;
+    case pasta::TokenKind::kPlus:
+      return ook == pasta::OverloadedOperatorKind::kPlus;
+    case pasta::TokenKind::kMinus:
+      return ook == pasta::OverloadedOperatorKind::kMinus;
+    case pasta::TokenKind::kStar:
+      return ook == pasta::OverloadedOperatorKind::kStar;
+    case pasta::TokenKind::kSlash:
+      return ook == pasta::OverloadedOperatorKind::kSlash;
+    case pasta::TokenKind::kPercent:
+      return ook == pasta::OverloadedOperatorKind::kPercent;
+    case pasta::TokenKind::kCaret:
+      return ook == pasta::OverloadedOperatorKind::kCaret;
+    case pasta::TokenKind::kAmp:
+      return ook == pasta::OverloadedOperatorKind::kAmp;
+    case pasta::TokenKind::kPipe:
+      return ook == pasta::OverloadedOperatorKind::kPipe;
+    case pasta::TokenKind::kTilde:
+      return ook == pasta::OverloadedOperatorKind::kTilde;
+    case pasta::TokenKind::kExclaim:
+      return ook == pasta::OverloadedOperatorKind::kExclaim;
+    case pasta::TokenKind::kEqual:
+      return ook == pasta::OverloadedOperatorKind::kEqual;
+    case pasta::TokenKind::kLess:
+      return ook == pasta::OverloadedOperatorKind::kLess;
+    case pasta::TokenKind::kGreater:
+      return ook == pasta::OverloadedOperatorKind::kGreater;
+    case pasta::TokenKind::kPlusEqual:
+      return ook == pasta::OverloadedOperatorKind::kPlusEqual;
+    case pasta::TokenKind::kMinusEqual:
+      return ook == pasta::OverloadedOperatorKind::kMinusEqual;
+    case pasta::TokenKind::kStarEqual:
+      return ook == pasta::OverloadedOperatorKind::kStarEqual;
+    case pasta::TokenKind::kSlashEqual:
+      return ook == pasta::OverloadedOperatorKind::kSlashEqual;
+    case pasta::TokenKind::kPercentEqual:
+      return ook == pasta::OverloadedOperatorKind::kPercentEqual;
+    case pasta::TokenKind::kCaretEqual:
+      return ook == pasta::OverloadedOperatorKind::kCaretEqual;
+    case pasta::TokenKind::kAmpEqual:
+      return ook == pasta::OverloadedOperatorKind::kAmpEqual;
+    case pasta::TokenKind::kPipeEqual:
+      return ook == pasta::OverloadedOperatorKind::kPipeEqual;
+    case pasta::TokenKind::kLessLess:
+      return ook == pasta::OverloadedOperatorKind::kLessLess;
+    case pasta::TokenKind::kGreaterGreater:
+      return ook == pasta::OverloadedOperatorKind::kGreaterGreater;
+    case pasta::TokenKind::kLessLessEqual:
+      return ook == pasta::OverloadedOperatorKind::kLessLessEqual;
+    case pasta::TokenKind::kGreaterGreaterEqual:
+      return ook == pasta::OverloadedOperatorKind::kGreaterGreaterEqual;
+    case pasta::TokenKind::kEqualEqual:
+      return ook == pasta::OverloadedOperatorKind::kEqualEqual;
+    case pasta::TokenKind::kExclaimEqual:
+      return ook == pasta::OverloadedOperatorKind::kExclaimEqual;
+    case pasta::TokenKind::kLessEqual:
+      return ook == pasta::OverloadedOperatorKind::kLessEqual;
+    case pasta::TokenKind::kGreaterEqual:
+      return ook == pasta::OverloadedOperatorKind::kGreaterEqual;
+    case pasta::TokenKind::kSpaceship:
+      return ook == pasta::OverloadedOperatorKind::kSpaceship;
+    case pasta::TokenKind::kAmpAmp:
+      return ook == pasta::OverloadedOperatorKind::kAmpAmp;
+    case pasta::TokenKind::kPipePipe:
+      return ook == pasta::OverloadedOperatorKind::kPipePipe;
+    case pasta::TokenKind::kPlusPlus:
+      return ook == pasta::OverloadedOperatorKind::kPlusPlus;
+    case pasta::TokenKind::kMinusMinus:
+      return ook == pasta::OverloadedOperatorKind::kMinusMinus;
+    case pasta::TokenKind::kComma:
+      return ook == pasta::OverloadedOperatorKind::kComma;
+    case pasta::TokenKind::kArrowStar:
+      return ook == pasta::OverloadedOperatorKind::kArrowStar;
+    case pasta::TokenKind::kArrow:
+      return ook == pasta::OverloadedOperatorKind::kArrow;
+    case pasta::TokenKind::kQuestion:
+    case pasta::TokenKind::kColon:
+      return ook == pasta::OverloadedOperatorKind::kConditional;
+    case pasta::TokenKind::kKeywordCoAwait:
+      return ook == pasta::OverloadedOperatorKind::kCoawait;
+    default:
+      return false;
+  }
+}
 
 unsigned TokenProvenanceCalculator::TokenInfo::Depth(
     TokenProvenanceCalculator &self) {

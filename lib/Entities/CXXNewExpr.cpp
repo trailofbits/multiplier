@@ -194,9 +194,7 @@ std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal44(), impl->reader.getVal45());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal44(), impl->reader.getVal45());
 }
 
 CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
@@ -227,9 +225,13 @@ FunctionDecl CXXNewExpr::operator_new(void) const {
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
+<<<<<<< HEAD
   auto &ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   return fragment->TokenRangeFor(fragment, impl->reader.getVal49(), impl->reader.getVal50());
+=======
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal49(), impl->reader.getVal50());
+>>>>>>> main
 }
 
 bool CXXNewExpr::has_initializer(void) const {

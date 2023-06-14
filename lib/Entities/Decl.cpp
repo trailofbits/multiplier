@@ -448,9 +448,7 @@ Token Decl::token(void) const {
 }
 
 TokenRange Decl::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal45(), impl->reader.getVal46());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal45(), impl->reader.getVal46());
 }
 
 #pragma GCC diagnostic pop

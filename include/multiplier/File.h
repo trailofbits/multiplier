@@ -35,6 +35,7 @@ class WeggliQueryMatch;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
@@ -104,6 +105,7 @@ class File {
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND)
 #undef MX_FRIEND
 
@@ -129,6 +131,7 @@ class File {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING)

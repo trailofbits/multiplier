@@ -230,9 +230,7 @@ gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const &
 }
 
 TokenRange LambdaExpr::introducer_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal46(), impl->reader.getVal47());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
 }
 
 CXXRecordDecl LambdaExpr::lambda_class(void) const {

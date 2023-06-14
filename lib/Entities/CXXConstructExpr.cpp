@@ -205,9 +205,7 @@ Token CXXConstructExpr::token(void) const {
 }
 
 TokenRange CXXConstructExpr::parenthesis_or_brace_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal43(), impl->reader.getVal44());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal43(), impl->reader.getVal44());
 }
 
 bool CXXConstructExpr::had_multiple_candidates(void) const {

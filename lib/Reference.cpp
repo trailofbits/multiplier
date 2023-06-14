@@ -40,7 +40,7 @@ std::pair<OpaqueImplPtr, EntityCategory> ReferencedEntity(
               EntityCategory::enum_name}; \
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
-                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
+                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER
 
@@ -180,6 +180,7 @@ VariantEntity Reference::as_variant(void) const noexcept {
                                 DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
+                                DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER)
 #undef DEFINE_REF_GETTER
   }
@@ -223,6 +224,7 @@ std::optional<Token> Reference::as_token(void) const noexcept {
 
 MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER)

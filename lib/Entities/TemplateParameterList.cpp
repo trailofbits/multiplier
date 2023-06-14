@@ -83,9 +83,7 @@ Token TemplateParameterList::right_angle_token(void) const {
 }
 
 TokenRange TemplateParameterList::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal7(), impl->reader.getVal8());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal7(), impl->reader.getVal8());
 }
 
 unsigned TemplateParameterList::num_parameters(void) const {

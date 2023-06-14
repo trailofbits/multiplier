@@ -31,10 +31,10 @@ enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
 #define MX_IGNORE_ENTITY_CATEGORY(type_name, lower_name, enum_name, category)
-#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, frag_, frag_offset_, pseudo_) \
+#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, type_, frag_, frag_offset_, pseudo_) \
     frag_offset_(Decl, declaration, DECLARATION, 1) \
     frag_offset_(Stmt, statement, STATEMENT, 2) \
-    frag_offset_(Type, type, TYPE, 3) \
+    type_(Type, type, TYPE, 3) \
     frag_offset_(Attr, attribute, ATTRIBUTE, 4) \
     frag_offset_(Macro, macro, MACRO, 5) \
     frag_(Fragment, fragment, FRAGMENT, 6) \
@@ -53,6 +53,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CLASS,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
+                            MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS)
 #undef MX_DECLARE_ENTITY_CLASS
 
@@ -62,6 +63,7 @@ enum class EntityCategory {
   NOT_AN_ENTITY,
 #define MX_DECLARE_ENTITY_CATEGORY_ENUM(type, lower, enum_, val) enum_ = val,
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CATEGORY_ENUM,
+                              MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
@@ -85,12 +87,25 @@ static constexpr uint64_t kNumTokensInBigFragment =
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;
 
+static constexpr unsigned kBigTypeIdNumBits = 26u;
+static constexpr RawEntityId kMaxBigTypeId = 1ull << kBigTypeIdNumBits;
+
+static constexpr unsigned kBigTypeOffsetNumBits = 18u;
+static constexpr RawEntityId kNumTokensInBigType = 1ull << kBigTypeOffsetNumBits;
+
+static constexpr unsigned kTypeIdNumBits = 36u;
+static constexpr RawEntityId kMaxTypeId = 1ull << kTypeIdNumBits;
+
+static constexpr unsigned kTypeOffsetNumBits = 8u;
+static constexpr RawEntityId kNumMinTokensInBigType = 1ull << kTypeOffsetNumBits;
+
+
 class EntityId;
 
 struct AttrId;
 struct DeclId;
 struct StmtId;
-struct TypeId;
+struct TypeTokenId;
 struct FileTokenId;
 struct MacroTokenId;
 struct ParsedTokenId;
@@ -108,6 +123,7 @@ using SignedEntityOffset = int32_t;
 inline static constexpr unsigned NumEnumerators(EntityCategory) {
 #define MX_COUNT_ENTITY_CATEGORIES(...) + 1u
   return 1 MX_FOR_EACH_ENTITY_CATEGORY(MX_COUNT_ENTITY_CATEGORIES,
+                                       MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
@@ -162,17 +178,34 @@ struct StmtId {
   auto operator<=>(const StmtId &) const noexcept = default;
 };
 
-// Identifies a serialized version of a `clang::Type`, `clang::QualType`, or
-// `pasta::Type` inside of a `Fragment`.
+// Identifies a serialized type
 struct TypeId {
-  RawEntityId fragment_id;
+  RawEntityId type_id;
   TypeKind kind;
 
-  // Offset of where this statement is stored inside of
-  // `rpc::Fragment::types`.
+  auto operator<=>(const TypeId &) const noexcept = default;
+
+  inline /* implicit */ TypeId(RawEntityId type_id_, TypeKind kind_)
+      : type_id(type_id_), kind(kind_) {}
+
+  inline /* implicit */ TypeId(const TypeTokenId &id);
+};
+
+// Identifies a serialized tokens of a `clang::Type`, `clang::QualType`, or
+// `pasta::Type`
+struct TypeTokenId {
+  RawEntityId type_id;
+
+  // Type kind
+  TypeKind type_kind;
+
+  // Token kind
+  TokenKind kind;
+
+  // Offset of where this token is stored inside of
   EntityOffset offset;
 
-  auto operator<=>(const TypeId &) const noexcept = default;
+  auto operator<=>(const TypeTokenId &) const noexcept = default;
 };
 
 // Identifies a serialized version of a `clang::Attr` or `pasta::Attr` inside
@@ -301,8 +334,6 @@ struct FragmentId {
       : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const StmtId &id_)
       : fragment_id(id_.fragment_id) {}
-  inline /* implicit */ FragmentId(const TypeId &id_)
-      : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const AttrId &id_)
       : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const ParsedTokenId &id_)
@@ -326,6 +357,9 @@ struct FragmentId {
 inline FileId::FileId(const FileTokenId &id_)
     : file_id(id_.file_id) {}
 
+inline TypeId::TypeId(const TypeTokenId &id_)
+    : type_id(id_.type_id), kind(id_.type_kind) {}
+
 // A tag type representing an invalid entity id.
 using InvalidId = std::monostate;
 
@@ -341,8 +375,9 @@ using VariantId = std::variant<
                                 MX_IGNORE_ENTITY_CATEGORY,
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
+                                MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT)
-    ParsedTokenId, MacroTokenId, FileTokenId>;
+    ParsedTokenId, MacroTokenId, FileTokenId, TypeTokenId>;
 #undef MX_ENTITY_ID_VARIANT
 
 template <typename T>
@@ -367,6 +402,7 @@ class EntityId final {
   /* implicit */ EntityId(DeclId id);
   /* implicit */ EntityId(StmtId id);
   /* implicit */ EntityId(TypeId id);
+  /* implicit */ EntityId(TypeTokenId id);
   /* implicit */ EntityId(AttrId id);
   /* implicit */ EntityId(ParsedTokenId id);
   /* implicit */ EntityId(MacroTokenId id);
@@ -396,6 +432,12 @@ class EntityId final {
   }
 
   inline EntityId &operator=(TypeId id) {
+    EntityId self(id);
+    opaque = self.opaque;
+    return *this;
+  }
+
+  inline EntityId &operator=(TypeTokenId id) {
     EntityId self(id);
     opaque = self.opaque;
     return *this;
@@ -530,6 +572,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_MAP_ENTITY_TYPE,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,
+                            MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE)
 #undef MX_MAP_ENTITY_TYPE
 
@@ -565,6 +608,20 @@ template <>
 struct less<mx::FragmentId> {
   inline bool operator()(mx::FragmentId a, mx::FragmentId b) const noexcept {
     return a.fragment_id < b.fragment_id;
+  }
+};
+
+template <>
+struct hash<mx::TypeId> {
+  inline bool operator()(mx::TypeId id) const noexcept {
+    return id.type_id;
+  }
+};
+
+template <>
+struct less<mx::TypeId> {
+  inline bool operator()(mx::TypeId a, mx::TypeId b) const noexcept {
+    return a.type_id < b.type_id;
   }
 };
 

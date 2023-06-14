@@ -112,9 +112,7 @@ Type VariableArrayType::desugar(void) const {
 }
 
 TokenRange VariableArrayType::brackets_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal236(), impl->reader.getVal237());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal236(), impl->reader.getVal237());
 }
 
 Token VariableArrayType::l_bracket_token(void) const {

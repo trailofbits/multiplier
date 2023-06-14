@@ -19,6 +19,8 @@ std::optional<EntityOffset> FragmentOffsetFromEntityId(RawEntityId id);
 // Returns the fragment ID corresponding with a fragment-specific entity ID.
 std::optional<PackedFragmentId> FragmentIdFromEntityId(RawEntityId id);
 
+std::optional<PackedTypeId> TypeIdFromEntityId(RawEntityId id);
+
 // Returns the kind of an entity as an undifferentiated integer.
 int KindFromEntityId(RawEntityId id);
 

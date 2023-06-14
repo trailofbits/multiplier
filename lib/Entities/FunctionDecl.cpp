@@ -258,9 +258,7 @@ Token FunctionDecl::ellipsis_token(void) const {
 }
 
 TokenRange FunctionDecl::exception_spec_source_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal84(), impl->reader.getVal89());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal84(), impl->reader.getVal89());
 }
 
 ExceptionSpecificationType FunctionDecl::exception_spec_type(void) const {
@@ -315,9 +313,7 @@ OverloadedOperatorKind FunctionDecl::overloaded_operator(void) const {
 }
 
 TokenRange FunctionDecl::parameters_source_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal128(), impl->reader.getVal130());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal128(), impl->reader.getVal130());
 }
 
 Token FunctionDecl::point_of_instantiation(void) const {
@@ -343,9 +339,7 @@ Type FunctionDecl::return_type(void) const {
 }
 
 TokenRange FunctionDecl::return_type_source_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal142(), impl->reader.getVal143());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal142(), impl->reader.getVal143());
 }
 
 StorageClass FunctionDecl::storage_class(void) const {

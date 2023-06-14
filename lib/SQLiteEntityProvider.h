@@ -97,6 +97,7 @@ class SQLiteEntityProvider final : public EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
@@ -109,6 +110,7 @@ class SQLiteEntityProvider final : public EntityProvider {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY)
@@ -120,6 +122,7 @@ class SQLiteEntityProvider final : public EntityProvider {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_DECLARE_ENTITY_LISTERS)

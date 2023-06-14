@@ -233,9 +233,7 @@ ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {
 }
 
 TokenRange ObjCMessageExpr::receiver_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal48(), impl->reader.getVal49());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal48(), impl->reader.getVal49());
 }
 
 Type ObjCMessageExpr::receiver_type(void) const {

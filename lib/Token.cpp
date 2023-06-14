@@ -25,6 +25,7 @@
 #include "File.h"
 #include "Fragment.h"
 #include "Reference.h"
+#include "Type.h"
 
 namespace mx {
 
@@ -723,6 +724,10 @@ const FileImpl *TokenReader::OwningFile(void) const noexcept {
   return nullptr;
 }
 
+const TypeImpl *TokenReader::OwningType(void) const noexcept {
+  return nullptr;
+}
+
 const FragmentImpl *
 TokenReader::NthOwningFragment(EntityOffset) const noexcept {
   return OwningFragment();
@@ -730,6 +735,10 @@ TokenReader::NthOwningFragment(EntityOffset) const noexcept {
 
 const FileImpl *TokenReader::NthOwningFile(EntityOffset) const noexcept {
   return OwningFile();
+}
+
+const TypeImpl *TokenReader::NthOwningType(EntityOffset) const noexcept {
+  return OwningType();
 }
 
 Token TokenReader::TokenFor(const Ptr &self, RawEntityId eid) noexcept {
@@ -808,6 +817,21 @@ TokenReader::Ptr TokenReader::ReaderForToken(
 
     if (frag && tid.offset < frag->num_tokens) {
       return frag->MacroTokenReader(frag);
+    }
+  } else if (std::holds_alternative<TypeTokenId>(vid)) {
+    TypeTokenId ttid = std::get<TypeTokenId>(vid);
+    TypeId tid(ttid);
+
+    TypeImplPtr type;
+    if (auto self_type = self->OwningType();
+        self_type && self_type->type_id == tid.type_id) {
+      type = TypeImplPtr(self, self_type);
+    } else {
+      type = ep->TypeFor(ep, tid);
+    }
+
+    if (type && ttid.offset < type->num_type_tokens) {
+      return type->TypeTokenReader(type);
     }
   }
 

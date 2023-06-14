@@ -33,6 +33,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
+                            MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY)
 #undef MX_FORWARD_DECLARE_ENTITY
 
@@ -283,6 +284,7 @@ class TokenContext {
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_FORWARD_DECLARE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
                             MX_FORWARD_DECLARE_GETTER)

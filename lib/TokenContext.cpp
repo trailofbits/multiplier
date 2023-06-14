@@ -91,6 +91,7 @@ std::optional<TokenContext> Token::context(void) const {
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER)

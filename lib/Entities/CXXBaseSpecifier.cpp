@@ -45,9 +45,7 @@ std::optional<CXXBaseSpecifier> CXXBaseSpecifier::from(const TokenContext &t) {
 }
 
 TokenRange CXXBaseSpecifier::tokens(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal0(), impl->reader.getVal1());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal0(), impl->reader.getVal1());
 }
 
 Token CXXBaseSpecifier::base_type_token(void) const {

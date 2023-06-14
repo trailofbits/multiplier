@@ -260,9 +260,7 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const
 }
 
 TokenRange ObjCContainerDecl::at_end_range(void) const {
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal54(), impl->reader.getVal55());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal54(), impl->reader.getVal55());
 }
 
 Token ObjCContainerDecl::at_start_token(void) const {
