@@ -928,6 +928,31 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
   return false;
 }
 
+// Count the number of parsed tokens in some macro range.
+static unsigned NumParsedTokens(const pasta::Macro &macro,
+                                const pasta::TokenRange &tokens) {
+  std::optional<pasta::MacroToken> bt = macro.BeginToken();
+  if (!bt) {
+    return 0u;
+  }
+
+  std::optional<pasta::MacroToken> et = macro.EndToken();
+  if (!et) {
+    return 0u;
+  }
+
+  uint64_t bi = bt->ParsedLocation().Index();
+  uint64_t ei = et->ParsedLocation().Index();
+  unsigned count = 0u;
+  for (uint64_t i = bi; i < ei; ++i) {
+    if (IsParsedToken(tokens[i])) {
+      ++count;
+    }
+  }
+
+  return count;
+}
+
 // Try to accumulate the nearby top-level declarations whose token ranges
 // overlap with `decl` into `decls_for_chunk`. For example, this process
 // will accumulate three `VarDecl`s into `decls_for_chunk` in the following
@@ -942,6 +967,7 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
 static std::vector<EntityGroupRange> PartitionEntities(
     GlobalIndexingState &context, const pasta::AST &ast) {
 
+  pasta::TokenRange tokens = ast.Tokens();
   std::string main_file_path = ast.MainFile().Path().generic_string();
 
   ProgressBarWork partitioning_progress_tracker(context.partitioning_progress);
@@ -955,6 +981,8 @@ static std::vector<EntityGroupRange> PartitionEntities(
     const EntityRange &entity_range = entity_ranges[i];
     uint64_t begin_index = std::get<kBeginIndex>(entity_range);
     uint64_t end_index = std::get<kEndIndex>(entity_range);
+    Entity prev_entity;
+    uint64_t prev_end_index = end_index;
 
     for (; i < max_i; ++i) {
 
@@ -963,8 +991,24 @@ static std::vector<EntityGroupRange> PartitionEntities(
       uint64_t next_begin = std::get<kBeginIndex>(next_entity_range);
       uint64_t next_end = std::get<kEndIndex>(next_entity_range);
 
+      // We have to deal with one corner case, observed in cURL:
+      //
+      //    CURL_EXTERN CURLcode curl_easy_pause(...);
+      //
+      // Here, depending on the configuration, the macro `CURL_EXTERN` either
+      // expands to a `__declspec` or attribute, and is thus part of the
+      // function declaration, or it expands to nothing, and so looks disjoint
+      // from the function declaration. We want to make it logically part of
+      // the declaration, fusing the two.
+      if (std::holds_alternative<pasta::Macro>(prev_entity) &&
+          std::holds_alternative<pasta::Decl>(next_entity) &&
+          (prev_end_index + 1u) == next_begin &&
+          (std::get<pasta::Macro>(prev_entity).Kind() ==
+              pasta::MacroKind::kExpansion) &&
+          !NumParsedTokens(std::get<pasta::Macro>(prev_entity), tokens)) {
+
       // Doesn't close over.
-      if (next_begin > end_index) {
+      } else if (next_begin > end_index) {
         break;
       }
 
@@ -976,6 +1020,9 @@ static std::vector<EntityGroupRange> PartitionEntities(
       begin_index = std::min(begin_index, next_begin);
       end_index = std::max(end_index, next_end);
       entities_for_group.push_back(next_entity);
+
+      prev_entity = next_entity;
+      prev_end_index = next_end;
     }
 
     CHECK(!entities_for_group.empty());

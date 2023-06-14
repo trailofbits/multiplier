@@ -1891,6 +1891,19 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
     if (auto frag_it = file_frags.find(first_file_tok_id);
         frag_it != file_frags.end()) {
 
+      // TODO(pag): Eventually, this could manifest in the following way,
+      //            assuming the same code is built with and without `CONFIG`
+      //            defined.
+      //
+      //    struct X {
+      //      ...
+      //    #ifdef CONFIG
+      //      ...
+      //    };
+      //    #else
+      //      ...
+      //    };
+      //    #endif
       assert(last_file_tok_id == frag_end[first_file_tok_id]);
 
       ChoiceNode *alt = frag_it->second;
