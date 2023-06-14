@@ -6,34 +6,44 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-set(exe_name "mx-bootstrap")
+set(exe_name "mx-bootstrap-pasta")
 
-add_executable("${exe_name}"
-  Main.cpp
-  "${PROJECT_SOURCE_DIR}/bin/Index/Entity.h"
+add_library("mx-bootstrap" STATIC
+  "Bootstrap.cpp"
+  "Bootstrap.h"
 )
 
-set_target_properties("${exe_name}"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX)
-
-target_link_libraries("${exe_name}"
-  PRIVATE
+target_link_libraries("mx-bootstrap"
+  PUBLIC
     pasta::pasta
 )
 
-
-target_compile_features("${exe_name}"
+target_compile_features("mx-bootstrap"
   PUBLIC
     cxx_std_20
 )
+
+set_target_properties("mx-bootstrap"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX)
 
 # `mx-bootstrap` works by running PASTA on itself. To be successful at this, it
 # needs to know the actual include directories of Multiplier and its
 # dependencies. We pass those in at the first two arguments.
 set(install_include_dir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
 list(GET LLVM_INCLUDE_DIRS 0 dependencies_include_dir)
+
+if (FALSE)
+add_executable("mx-bootstrap-pasta"
+  "PASTA.cpp"
+  "${PROJECT_SOURCE_DIR}/bin/Index/Entity.h"
+)
+
+target_link_libraries("mx-bootstrap-pasta"
+  PRIVATE
+    "mx-bootstrap"
+)
 
 set(generated_files
   "${MX_BOOTSTRAP_LIB_AST_CAPNP}"
@@ -46,15 +56,15 @@ set(generated_files
   "${MX_BOOTSTRAP_INDEX_PASTA_H}"
 )
 
-# Run `mx-bootstrap` to auto-generate the files.
+# Run `mx-bootstrap-pasta` to auto-generate the files.
 add_custom_command(
   TARGET
-    "${exe_name}"
+    "mx-bootstrap-pasta"
   POST_BUILD
   BYPRODUCTS
     ${generated_files}
   COMMAND
-    "${exe_name}"
+    "mx-bootstrap-pasta"
     "${install_include_dir}"
     "${dependencies_include_dir}"
     "${LLVM_INCLUDE_DIR}"
@@ -62,3 +72,63 @@ add_custom_command(
   COMMENT
     "Bootstrapping Multiplier"
 )
+endif()
+
+if(MX_ENABLE_VAST)
+  add_executable("mx-bootstrap-vast"
+    "VAST.cpp"
+    "${PROJECT_SOURCE_DIR}/bin/Index/Entity.h"
+  )
+  
+  target_link_libraries("mx-bootstrap-vast"
+    PRIVATE
+      "mx-bootstrap"
+      
+      vast::vast
+      vast::MLIRCore
+      vast::MLIRMeta
+      vast::MLIRLowLevel
+      vast::MLIRHighLevel
+      MLIRDialect
+      MLIRAMDGPUDialect
+      MLIRAsyncDialect
+      MLIREmitCDialect
+      MLIRIndexDialect
+      MLIRMLProgramDialect
+      MLIRNVGPUDialect
+      MLIROpenACCDialect
+      MLIROpenMPDialect
+      MLIRROCDLDialect
+      MLIRShapeDialect
+      MLIRSPIRVDialect
+      MLIRTosaDialect
+
+      MLIRLLVMIRTransforms
+      MLIRShapeOpsTransforms
+      MLIRSparseTensorTransforms
+      MLIRAffineTransformOps
+      MLIRBufferizationTransformOps
+      MLIRGPUTransformOps
+      MLIRLinalgTransformOps
+      MLIRMemRefTransformOps
+      MLIRSCFTransformOps
+      MLIRVectorTransformOps
+      MLIRTensorInferTypeOpInterfaceImpl
+  )
+
+  # Run `mx-bootstrap-vast` to auto-generate the files.
+  add_custom_command(
+    TARGET
+      "mx-bootstrap-vast"
+    POST_BUILD
+    BYPRODUCTS
+      ${generated_files}
+    COMMAND
+      "mx-bootstrap-vast"
+      "${install_include_dir}"
+      "${dependencies_include_dir}"
+      "${LLVM_INCLUDE_DIR}"
+    COMMENT
+      "Bootstrapping Multiplier"
+  )
+endif()

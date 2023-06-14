@@ -32,6 +32,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "Bootstrap.h"
+
 #include "../Index/Entity.h"
 
 #define IGNORE(name)
@@ -400,285 +402,6 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 };
-
-struct ClassHierarchy {
-  const pasta::CXXRecordDecl record;
-  ClassHierarchy *base{nullptr};
-  std::vector<ClassHierarchy *> derived;
-
-  inline ClassHierarchy(pasta::CXXRecordDecl record_)
-      : record(std::move(record_)) {}
-};
-
-struct AnyEntityStorage {
- public:
-  std::unordered_map<std::string, std::vector<unsigned>> max_method_count;
-  unsigned next_id{0};
-};
-
-struct SpecificEntityStorage {
- public:
-  AnyEntityStorage &root;
-  std::unordered_map<std::string, unsigned> method_count;
-
-  SpecificEntityStorage(AnyEntityStorage &root_)
-      : root(root_) {}
-
-  SpecificEntityStorage(const SpecificEntityStorage &parent)
-      : root(parent.root),
-        method_count(parent.method_count) {}
-
-  unsigned AddMethod(std::string capnp_type) {
-    auto &count = method_count[capnp_type];
-    auto &max_count = root.max_method_count[capnp_type];
-
-    if ((count + 1u) > max_count.size()) {
-      max_count.push_back(root.next_id++);
-    }
-    return max_count[count++];
-  }
-};
-
-static std::string SnakeCaseToAPICase(std::string name) {
-  if (name == "operator" || name == "namespace" || name == "struct" ||
-      name == "class" || name == "if" || name == "else" || name == "default") {
-    name.push_back('_');
-  }
-  return name;
-}
-
-static void BuildHierarchy(
-    std::vector<std::unique_ptr<ClassHierarchy>> &alloc,
-    const std::vector<pasta::CXXRecordDecl> &classes,
-    std::vector<ClassHierarchy *> &roots_out) {
-
-  std::unordered_map<pasta::CXXRecordDecl, ClassHierarchy *> hmap;
-
-  for (auto progress = true; progress; ) {
-    progress = false;
-    for (const pasta::CXXRecordDecl &cls : classes) {
-      ClassHierarchy *&h = hmap[cls];
-      if (h) {
-        continue;
-      }
-
-      auto bases = cls.Bases();
-      if (!bases || bases->empty()) {
-       h = new ClassHierarchy(cls);
-       alloc.emplace_back(h);
-       roots_out.push_back(h);
-       progress = true;
-
-      } else {
-        for (pasta::CXXBaseSpecifier parent : *bases) {
-          if (auto base = parent.BaseType().AsCXXRecordDeclaration()) {
-            if (auto base_h = hmap[*base]) {
-              h = new ClassHierarchy(cls);
-              alloc.emplace_back(h);
-              h->base = base_h;
-              base_h->derived.push_back(h);
-              progress = true;
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-static std::string Capitalize(std::string name) {
-  name[0] = static_cast<char>(std::toupper(name[0]));
-  return name;
-}
-
-// Convert a `CapitalCase` name into a `snake_case` name.
-static std::string CapitalCaseToSnakeCase(std::string_view name) {
-  std::stringstream ss;
-
-  auto i = 0u;
-  auto added_sep = false;
-  auto last_was_uc = false;
-  auto skip = false;
-  for (auto c : name) {
-    if (skip) {
-      skip = false;
-      ++i;
-      continue;
-    }
-    if ('_' == c) {
-      if (last_was_uc || !i) {
-        ss << '_';
-      } else {
-        ss << "__";
-      }
-      added_sep = true;
-      last_was_uc = true;
-
-    } else if (std::isupper(c)) {
-      if (!added_sep && i && (i + 1u) < name.size()) {
-        if (std::islower(name[i + 1u])) {
-          ss << '_';
-          added_sep = true;
-        }
-      }
-      ss << static_cast<char>(std::tolower(c));
-      added_sep = false;
-      last_was_uc = false;
-
-    } else if (std::isdigit(c)) {
-
-      // Special case `1d`, `2d`, and `3d`.
-      if (!added_sep && (i + 2u) < name.size() &&
-          (c == '1' || c == '2' || c == '3') &&
-           name[i + 1u] == 'd' &&
-           std::isupper(name[i + 2u])) {
-        ss << '_' << c << 'd' << '_';
-        skip = true; // Skip the `d`.
-        added_sep = true;
-
-      } else {
-        ss << c;
-        if (!added_sep && (i + 1u) < name.size()) {
-          if (!std::isdigit(name[i + 1u]) && !std::islower(name[i + 1u])) {
-            ss << '_';
-            added_sep = true;
-          }
-        }
-      }
-      last_was_uc = false;
-
-    } else {
-      ss << c;
-
-      if (!added_sep && (i + 1u) < name.size()) {
-        if (std::isupper(name[i + 1u])) {
-          ss << '_';
-          added_sep = true;
-        }
-      }
-      last_was_uc = false;
-    }
-    ++i;
-  }
-  auto res = ss.str();
-
-  // If it's ending with three underscores, then make it end with two
-  // underscores. This is a dumb hack to deal with some special keywords/
-  // token kinds that show up in PASTA.
-  if (auto s = res.size(); s > 3u) {
-    if (res[s - 1u] == '_' && res[s - 2u] == '_' && res[s - 3u] == '_') {
-      res.pop_back();
-    }
-  }
-
-  return res;
-}
-
-// Convert a `snake_case` name into a `camelCase` name.
-static std::string SnakeCaseToCamelCase(std::string_view name) {
-  std::stringstream ss;
-  auto uc = 0;
-  auto cs = false;
-  auto i = 0u;
-  for (auto c : name) {
-    ++i;
-    if ('_' == c) {
-      ++uc;
-
-    } else if (!uc) {
-      ss << c;
-      cs = true;
-
-    // Underscore used to separate two things, e.g. `foo_bar`.
-    } else if (uc == 1) {
-      if (!cs) {  // Leading underscore, e.g. `_foo`.
-        ss << "uc";
-
-      } else if (i == name.size()) { // Trailing underscore.
-        ss << "Uc";
-      }
-      ss << static_cast<char>(std::toupper(c));
-      uc = 0;
-      cs = true;
-
-    // Multiple `_`s inside of something else, e.g. `kw___attribute`.
-    } else if (cs) {
-      --uc;  // The first is a separator, drop it.
-      while (uc--) {
-        ss << "Uc";
-        cs = true;
-      }
-      ss << static_cast<char>(std::toupper(c));
-      uc = 0;
-      cs = true;
-
-    // Multiple leading underscore, e.g. `__attribute`.
-    } else {
-      if (!cs) {
-        ss << "uc";
-        --uc;
-        cs = true;
-      }
-      while (uc--) {
-        ss << "Uc";
-      }
-      ss << static_cast<char>(std::toupper(c));
-      uc = 0;
-      cs = true;
-    }
-  }
-  return ss.str();
-}
-
-static std::string SnakeCaseToEnumCase(std::string_view name) {
-  if (name == "mig_server_routine") {
-    return "MIG_SERVER_ROUTINE_";
-  } else if (name == "null") {
-    return "NULL_";
-  } else if (name == "domain") {
-    return "DOMAIN_";
-  }
-
-  std::stringstream ss;
-  for (auto c : name) {
-    ss << static_cast<char>(std::toupper(c));
-  }
-  return ss.str();
-}
-
-static const char *CxxIntType(pasta::Type type) {
-  auto t = type;
-  if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
-    switch (bt->Kind()) {
-      case pasta::BuiltinTypeKind::kBoolean: return "bool";
-      case pasta::BuiltinTypeKind::kCharacterS: return "char";  // `char`.
-      case pasta::BuiltinTypeKind::kCharacterU: return "char";  // `char`.
-      case pasta::BuiltinTypeKind::kSChar: return "signed char";  // `signed char`.
-      case pasta::BuiltinTypeKind::kUChar: return "unsigned char";  // `unsigned char`.
-      case pasta::BuiltinTypeKind::kShort: return "short";
-      case pasta::BuiltinTypeKind::kUShort: return "unsigned short";
-      case pasta::BuiltinTypeKind::kInt: return "int";
-      case pasta::BuiltinTypeKind::kUInt: return "unsigned";
-      case pasta::BuiltinTypeKind::kLong: return "long";
-      case pasta::BuiltinTypeKind::kULong: return "unsigned long";
-      case pasta::BuiltinTypeKind::kLongLong: return "long long";
-      case pasta::BuiltinTypeKind::kULongLong: return "unsigned long long";
-      default: break;
-    }
-  } else if (type.IsTypedefNameType()) {
-    return CxxIntType(type.DesugaredType());
-  }
-  return nullptr;
-}
-
-static const char *CxxIntType(std::optional<pasta::Type> type) {
-  if (type) {
-    return CxxIntType(std::move(type.value()));
-  } else {
-    return nullptr;
-  }
-}
 
 static const char *SchemaIntType(pasta::Type type) {
   auto t = type;
@@ -4087,7 +3810,7 @@ void CodeGenerator::RunOnClasses(void) {
 
   // Make class hierarchies.
 #define BUILD_HIERARCHY(name, lower_name) \
-    BuildHierarchy(alloc, lower_name ## s, roots);
+    ClassHierarchy::Build(alloc, lower_name ## s, roots);
 
   FOR_EACH_ENTITY_CATEGORY(BUILD_HIERARCHY)
 #undef BUILD_HIERARCHY
@@ -4153,7 +3876,7 @@ int main(int argc, char *argv[]) {
   if (12 != argc) {
     std::cerr
         << "Usage: " << argv[0]
-        << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_AST_CAPNP LIB_ENTITIES_DIR"
+        << " PASTA_INCLUDE_PATH DEPENDENCIES_INC_PATH LLVM_INCLUDE_PATH LIB_AST_CAPNP LIB_ENTITIES_DIR"
         << " INCLUDE_ENTITIES_DIR SERIALIZE_H SERIALIZE_CPP VISITOR_INC USE_INC "
         << " PASTA_CPP PASTA_H"
         << std::endl;

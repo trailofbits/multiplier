@@ -57,8 +57,8 @@ static TokenCategory ClassifyToken(TokenKind kind) {
     case TokenKind::R_SQUARE:
     case TokenKind::L_PARENTHESIS:
     case TokenKind::R_PARENTHESIS:
-    case TokenKind::L_BRACE_TOKEN:
-    case TokenKind::R_BRACE_TOKEN:
+    case TokenKind::L_BRACE:
+    case TokenKind::R_BRACE:
     case TokenKind::PERIOD:
     case TokenKind::ELLIPSIS:
     case TokenKind::AMP:

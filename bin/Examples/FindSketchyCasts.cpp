@@ -77,7 +77,7 @@ static const std::map<CastBehavior, std::string> kOuts {
 };
 
 // Should we skip a result, e.g. froma `sizeof(blah)`.
-static bool IsIgnorableCallArgument(const mx::Expr expr) {
+static bool IsIgnorableCallArgument(const mx::Expr &expr) {
   if (auto lit = mx::IntegerLiteral::from(expr)) {
     return !lit->token().data().starts_with('-');
 

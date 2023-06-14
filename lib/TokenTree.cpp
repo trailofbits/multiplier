@@ -758,8 +758,8 @@ static bool AddLeadingWhitespace(TokenKind tk) {
 //    case TokenKind::COMMA:
     case TokenKind::LESS_LESS_LESS:
     case TokenKind::GREATER_GREATER_GREATER:
-    case TokenKind::L_BRACE_TOKEN:
-    case TokenKind::R_BRACE_TOKEN:
+    case TokenKind::L_BRACE:
+    case TokenKind::R_BRACE:
       return true;
     default:
       return IsKeyword(tk);
@@ -771,8 +771,8 @@ static bool IsFirst(TokenKind tk) {
     case TokenKind::WHITESPACE:
     case TokenKind::L_PARENTHESIS:
     case TokenKind::L_SQUARE:
-    case TokenKind::L_BRACE_TOKEN:
-    case TokenKind::R_BRACE_TOKEN:
+    case TokenKind::L_BRACE:
+    case TokenKind::R_BRACE:
     case TokenKind::SEMI:
     case TokenKind::COMMA:
       return true;
@@ -826,7 +826,7 @@ static bool AddTrailingWhitespace(TokenKind tk) {
     case TokenKind::COMMA:
     case TokenKind::LESS_LESS_LESS:
     case TokenKind::GREATER_GREATER_GREATER:
-    case TokenKind::R_BRACE_TOKEN:
+    case TokenKind::R_BRACE:
       return true;
     default:
       return IsKeyword(tk);
