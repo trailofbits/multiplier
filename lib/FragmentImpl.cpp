@@ -22,6 +22,7 @@ FragmentImpl::FragmentImpl(EntityProviderPtr ep_,
       fragment_id(EntityId(id_).Extract<FragmentId>()->fragment_id),
       parsed_token_reader(this),
       macro_token_reader(this),
+      token_context_reader(this),
       num_parsed_tokens(reader.getParsedTokenContextOffsets().size()),
       num_tokens(reader.getTokenKinds().size()) {
 
@@ -58,6 +59,13 @@ TokenReader::Ptr FragmentImpl::ParsedTokenReader(
 TokenReader::Ptr FragmentImpl::MacroTokenReader(
     const FragmentImplPtr &self) const {
   return TokenReader::Ptr(self, &macro_token_reader);
+}
+
+// Return a reader for the parsed tokens in the fragment. This doesn't
+// include all tokens, i.e. macro use tokens, comments, etc.
+std::shared_ptr<const class TokenContextReader>
+FragmentImpl::TokenContextReader(const FragmentImplPtr &self) const {
+  return TokenContextReader::Ptr(self, &token_context_reader);;
 }
 
 // Return the number of tokens in the fragment.

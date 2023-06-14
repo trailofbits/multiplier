@@ -46,22 +46,18 @@ static std::string HashType(const pasta::Type &type) {
 mx::RawEntityId TypeMapper::EntityId(const void *type,
                                      uint32_t quals) const {
   TypeKey type_key(type, quals);
-  assert(type_key.first != nullptr);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
     return it->second.Pack();
   } else {
-    assert(false);
     return mx::kInvalidEntityId;
   }
 }
 
 mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  assert(type_key.first != nullptr);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
     return it->second.Pack();
   } else {
-    assert(false);
     return mx::kInvalidEntityId;
   }
 }

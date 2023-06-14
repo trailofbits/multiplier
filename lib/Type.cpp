@@ -6,6 +6,8 @@
 
 #include "Type.h"
 
+#include <iostream>
+
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -115,7 +117,9 @@ TypeImpl::TypeImpl(std::shared_ptr<EntityProvider> ep_,
                    kj::Array<capnp::word> data_,
                    RawEntityId id_)
     : data(kj::mv(data_)), message(data, kOptions),
-      type_token_reader(this), ep(std::move(ep_)),
+      type_token_reader(this),
+      token_context_reader(this),
+      ep(std::move(ep_)),
       frag_reader(message.getRoot<rpc::Type>()),
       reader(frag_reader.getType()),
       type_id(TypeIdFromEntityId(id_).value()),
@@ -130,6 +134,11 @@ TypeImpl::TypeImpl(std::shared_ptr<EntityProvider> ep_,
 // Return a reader for the type tokens associated with the type
 TokenReader::Ptr TypeImpl::TypeTokenReader(const TypeImplPtr &self) const {
   return TokenReader::Ptr(self, &type_token_reader);
+}
+
+std::shared_ptr<const class TokenContextReader>
+TypeImpl::TokenContextReader(const TypeImplPtr &self) const {
+  return TokenContextReader::Ptr(self, &token_context_reader);
 }
 
 std::string_view TypeImpl::Data(void) const & noexcept {

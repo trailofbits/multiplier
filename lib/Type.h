@@ -11,6 +11,7 @@
 
 #include "Entity.h"
 #include "Token.h"
+#include "TokenContext.h"
 
 namespace mx {
 
@@ -74,6 +75,7 @@ class TypeImpl {
 
   // Type token reader
   const ReadTypeTokens type_token_reader;
+  const TypeTokenContextReader token_context_reader;
  public:
   // Needed for us to be able to look up entities related to other types
   // or fragments.
@@ -94,6 +96,9 @@ class TypeImpl {
 
   std::shared_ptr<const class TokenReader>
   TypeTokenReader(const TypeImplPtr &) const;
+
+  std::shared_ptr<const class TokenContextReader>
+  TokenContextReader(const TypeImplPtr &) const;
 
   std::string_view Data(void) const & noexcept;
 

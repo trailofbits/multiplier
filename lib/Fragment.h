@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "TokenContext.h"
 #include "TokenTree.h"
 
 namespace mx {
@@ -119,10 +120,12 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
  private:
   friend class ReadParsedTokensFromFragment;
   friend class ReadMacroTokensFromFragment;
+  friend class FragmentTokenContextReader;
 
   // Token readers for this fragment.
   const ReadParsedTokensFromFragment parsed_token_reader;
   const ReadMacroTokensFromFragment macro_token_reader;
+  const FragmentTokenContextReader token_context_reader;
 
  public:
 
@@ -153,6 +156,9 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   // include all tokens, i.e. macro use tokens, comments, etc.
   std::shared_ptr<const class TokenReader>
   ParsedTokenReader(const FragmentImplPtr &) const;
+
+  std::shared_ptr<const class TokenContextReader>
+  TokenContextReader(const FragmentImplPtr &) const;
 
   std::string_view Data(void) const & noexcept;
 

@@ -192,6 +192,7 @@ add_library("mx-api" STATIC
   "ThreadLocal.cpp"
   "ThreadLocal.h"
   "TokenContext.cpp"
+  "TokenContext.h"
   "Token.cpp"
   "Token.h"
   "TokenTree.cpp"
