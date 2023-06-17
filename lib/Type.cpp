@@ -6,8 +6,6 @@
 
 #include "Type.h"
 
-#include <iostream>
-
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -136,9 +134,9 @@ TokenReader::Ptr TypeImpl::TypeTokenReader(const TypeImplPtr &self) const {
   return TokenReader::Ptr(self, &type_token_reader);
 }
 
-std::shared_ptr<const class TokenContextReader>
-TypeImpl::TokenContextReader(const TypeImplPtr &self) const {
-  return TokenContextReader::Ptr(self, &token_context_reader);
+TokenContextReader::Ptr
+TypeImpl::TokenContextReader(const TokenImplPtr &ptr) const {
+  return TokenContextReader::Ptr(ptr, &token_context_reader);
 }
 
 std::string_view TypeImpl::Data(void) const & noexcept {

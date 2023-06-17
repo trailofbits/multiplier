@@ -63,9 +63,9 @@ TokenReader::Ptr FragmentImpl::MacroTokenReader(
 
 // Return a reader for the parsed tokens in the fragment. This doesn't
 // include all tokens, i.e. macro use tokens, comments, etc.
-std::shared_ptr<const class TokenContextReader>
-FragmentImpl::TokenContextReader(const FragmentImplPtr &self) const {
-  return TokenContextReader::Ptr(self, &token_context_reader);;
+TokenContextReader::Ptr
+FragmentImpl::TokenContextReader(const TokenReader::Ptr &ptr) const {
+  return TokenContextReader::Ptr(ptr, &token_context_reader);
 }
 
 // Return the number of tokens in the fragment.

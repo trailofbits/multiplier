@@ -101,100 +101,48 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
 
 // Return the context node that identifies how this token relates to the AST.
 //
-// NOTE(pag): This only works with parsed tokens, and not all parsed tokens
+// NOTE(pag): This works parsed and type tokens, and not all tokens
 //            are guaranteed to have a context.
 std::optional<TokenContext> Token::context(void) const {
   if (!impl) {
     return std::nullopt;
   }
 
-  if (std::holds_alternative<ParsedTokenId>(id().Unpack())) {
-    const FragmentImpl *frag = impl->NthOwningFragment(offset);
-    if (!frag) {
-      return std::nullopt;
-    }
-
-    // Only parsed tokens have token contexts.
-    if (offset >= frag->num_parsed_tokens) {
-      return std::nullopt;
-    }
-
-    std::shared_ptr<const FragmentImpl> frag_ptr(impl, frag);
-    auto reader = frag->TokenContextReader(frag_ptr);
-
-    auto tagged_offset = reader->TokenContextOffsets(offset);
-    if (!tagged_offset.has_value()) {
-      assert(false);
-      return std::nullopt;
-    }
-
-    unsigned untagged_offset = tagged_offset.value() >> 1u;
-    auto tc = reader->TokenContexts(untagged_offset);
-    if (!tc.has_value()) {
-      assert(false);
-      return std::nullopt;
-    }
-
-    // NOTE(pag): +1 to skip `kInvalid`.
-    TokenContext ret(std::move(reader));
-    ret.entity_id = tc->getEntityId();
-    ret.offset = untagged_offset;
-
-    assert(ret.entity_id != kInvalidEntityId);
-
-    if (auto parent_index = tc->getParentIndex()) {
-      ret.parent_offset = parent_index >> 1u;
-    }
-
-    if (auto alias_index = tc->getAliasIndex()) {
-      ret.alias_offset = alias_index >> 1u;
-    }
-
-    return ret;
-  } else if (std::holds_alternative<TypeTokenId>(id().Unpack())) {
-    const TypeImpl *type = impl->NthOwningType(offset);
-    if (!type) {
-      return std::nullopt;
-    }
-
-    if (offset >= type->num_type_tokens) {
-      return std::nullopt;
-    }
-
-    std::shared_ptr<const TypeImpl> type_ptr(impl, type);
-    auto reader = type->TokenContextReader(type_ptr);
-
-    auto tagged_offset = reader->TokenContextOffsets(offset);
-    if (!tagged_offset.has_value()) {
-      assert(false);
-      return std::nullopt;
-    }
-
-    unsigned untagged_offset = tagged_offset.value() >> 1u;
-    auto tc = reader->TokenContexts(untagged_offset);
-    if (!tc.has_value()) {
-      assert(false);
-      return std::nullopt;
-    }
-
-    TokenContext ret(std::move(reader));
-    ret.entity_id = tc->getEntityId();
-    ret.offset = untagged_offset;
-
-    assert(ret.entity_id != kInvalidEntityId);
-
-    if (auto parent_index = tc->getParentIndex()) {
-      ret.parent_offset = parent_index >> 1u;
-    }
-
-    if (auto alias_index = tc->getAliasIndex()) {
-      ret.alias_offset = alias_index >> 1u;
-    }
-
-    return ret;
+  auto reader = impl->TokenContextReaderFor(impl, offset, id());
+  if (!reader) {
+    assert(false);
+    return std::nullopt;
   }
 
-  return std::nullopt;
+  auto tagged_offset = reader->TokenContextOffsets(offset);
+  if (!tagged_offset.has_value()) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  unsigned untagged_offset = tagged_offset.value() >> 1u;
+  auto tc = reader->TokenContexts(untagged_offset);
+  if (!tc.has_value()) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  // NOTE(pag): +1 to skip `kInvalid`.
+  TokenContext ret(std::move(reader));
+  ret.entity_id = tc->getEntityId();
+  ret.offset = untagged_offset;
+
+  assert(ret.entity_id != kInvalidEntityId);
+
+  if (auto parent_index = tc->getParentIndex()) {
+    ret.parent_offset = parent_index >> 1u;
+  }
+
+  if (auto alias_index = tc->getAliasIndex()) {
+    ret.alias_offset = alias_index >> 1u;
+  }
+
+  return ret;
 }
 
 #define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \

@@ -365,11 +365,10 @@ static void PersistPrintedTokens(
 // of the checks here are redundant for printed token. Move to the specialized
 // implementation for printed tokens
 
-static void PersistTokenContexts(const pasta::AST &ast,
+static void PersistTokenContexts(
     EntityMapper &em, const pasta::PrintedTokenRange &printed_tokens,
     mx::rpc::Type::Builder &fb) {
 
-  (void)ast;
   using DeclContextSet = std::unordered_set<pasta::TokenContext>;
   std::map<mx::RawEntityId, DeclContextSet> contexts;
 
@@ -389,7 +388,6 @@ static void PersistTokenContexts(const pasta::AST &ast,
       switch(c.Kind()) {
         case pasta::TokenContextKind::kInvalid:
         case pasta::TokenContextKind::kAST:
-        case pasta::TokenContextKind::kAlias:
           assert(false); // don't expect these context kind
           break;
         case pasta::TokenContextKind::kDecl:
@@ -407,6 +405,9 @@ static void PersistTokenContexts(const pasta::AST &ast,
           }
           break;
         }
+        /* It is possible for context to be of Alias kind. We don't get entity id
+         *  in that case. */
+        case pasta::TokenContextKind::kAlias:
         case pasta::TokenContextKind::kString:
           break;
       }
@@ -552,7 +553,7 @@ void GlobalIndexingState::PersistTypes(
     (void)SerializeType(type, em, tid.type_id, tb);
 
     PersistPrintedTokens(em, fb, maybe_token_range.value());
-    PersistTokenContexts(ast, em, maybe_token_range.value(), fb);
+    PersistTokenContexts(em, maybe_token_range.value(), fb);
 
     database.AddAsync(
         mx::EntityRecord{ptid.Pack(), GetSerializedData(message)});

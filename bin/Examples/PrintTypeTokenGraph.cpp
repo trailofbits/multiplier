@@ -135,7 +135,6 @@ extern "C" int main(int argc, char *argv[]) {
 
   os << "}\n";
 
-
   return EXIT_SUCCESS;
 
 }

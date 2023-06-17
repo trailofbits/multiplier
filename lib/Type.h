@@ -58,6 +58,7 @@ class ReadTypeTokens final : public TokenReader {
   bool Equals(const class TokenReader *that) const final;
 
   const TypeImpl *OwningType(void) const noexcept final;
+
 };
 
 // Interface for accessing type.
@@ -94,11 +95,11 @@ class TypeImpl {
 
   virtual ~TypeImpl(void) = default;
 
-  std::shared_ptr<const class TokenReader>
+  TokenReader::Ptr
   TypeTokenReader(const TypeImplPtr &) const;
 
-  std::shared_ptr<const class TokenContextReader>
-  TokenContextReader(const TypeImplPtr &) const;
+  TokenContextReader::Ptr
+  TokenContextReader(const TokenImplPtr &) const;
 
   std::string_view Data(void) const & noexcept;
 
