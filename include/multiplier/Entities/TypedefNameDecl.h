@@ -65,6 +65,7 @@ class TypedefNameDecl : public TypeDecl {
   static std::optional<TypedefNameDecl> from(const TokenContext &t);
 
   std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const;
+  Type type(void) const;
   Type underlying_type(void) const;
   bool is_moded(void) const;
   bool is_transparent_tag(void) const;

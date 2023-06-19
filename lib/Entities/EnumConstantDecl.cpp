@@ -183,7 +183,7 @@ std::optional<EnumConstantDecl> EnumConstantDecl::from(const TokenContext &t) {
 
 std::optional<Expr> EnumConstantDecl::initializer_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal56();
+    RawEntityId eid = impl->reader.getVal59();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

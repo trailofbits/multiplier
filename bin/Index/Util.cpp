@@ -481,12 +481,16 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Decl decl) {
       co_yield ref;
     }
   } else if (auto field = pasta::FieldDecl::From(decl)) {
-    for (auto ref : DeclReferencesFrom(field->Type())) {
-      co_yield ref;
+    if(auto field_type = field->Type()) {
+      for (auto ref : DeclReferencesFrom(field_type.value())) {
+        co_yield ref;
+      }
     }
   } else if (auto var = pasta::VarDecl::From(decl)) {
-    for (auto ref : DeclReferencesFrom(var->Type())) {
-      co_yield ref;
+    if(auto var_type = var->Type()) {
+      for (auto ref : DeclReferencesFrom(var_type.value())) {
+        co_yield ref;
+      }
     }
   } else if (auto enum_ = pasta::EnumDecl::From(decl)) {
     if (auto base_type = enum_->IntegerType()) {

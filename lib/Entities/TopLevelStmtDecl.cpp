@@ -179,7 +179,7 @@ std::optional<TopLevelStmtDecl> TopLevelStmtDecl::from(const TokenContext &t) {
 }
 
 Stmt TopLevelStmtDecl::statement(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal50();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

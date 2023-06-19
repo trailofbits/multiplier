@@ -181,7 +181,7 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const TokenContext &t) {
 
 gap::generator<Decl> NamespaceDecl::declarations_in_context(void) const & {
   EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal52();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);
