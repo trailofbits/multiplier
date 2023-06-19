@@ -166,6 +166,7 @@ class TokenTree {
   TokenTreeNodeRange ReplacementChildren(void) const noexcept;
   std::optional<pasta::Token> FirstFullySubstitutedToken(void) const noexcept;
   std::optional<pasta::Token> LastFullySubstitutedToken(void) const noexcept;
+  std::optional<pasta::MacroToken> NameOrOperator(void) const noexcept;
 
   // Return whether or not this node has intermediate children.
   bool HasIntermediateChildren(void) const noexcept;

@@ -35,7 +35,7 @@ enum class TokenKind : unsigned short;
 }  // namespace mx
 namespace indexer {
 
-using Entity = std::variant<pasta::Decl, pasta::Macro>;
+using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
 struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
 struct FileIdMap final : public std::unordered_map<const void *, mx::SpecificEntityId<mx::FileId>> {};
 struct FileHashMap final : public std::unordered_map<pasta::File, std::string> {};

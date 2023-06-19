@@ -928,6 +928,17 @@ void CodeGenerator::RunOnOptional(
         << "    v" << i << " = e." << method_name << "();\n"
         << "  }\n";
 
+  } else if (class_name == "MacroSubstitution" &&
+             method_name == "NameOrOperator") {
+    serialize_cpp_os
+        << "  std::optional<pasta::MacroToken> v" << i << ";\n"
+        << "  if (tt) {\n"
+        << "    v" << i << " = tt->" << method_name << "();\n"
+        << "  } else {\n"
+        << "    v" << i << " = e." << method_name << "();\n"
+        << "  }\n";
+
+
   } else {
     serialize_cpp_os
         << "  auto v" << i << " = e." << method_name << "();\n";

@@ -21,7 +21,7 @@ class TokenRange;
 }  // namespace pasta
 namespace indexer {
 
-using Entity = std::variant<pasta::Decl, pasta::Macro>;
+using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
 
 // Compute a SHA256 hash of some data from a file.
 std::string HashFile(std::string_view data);

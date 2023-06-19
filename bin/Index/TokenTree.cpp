@@ -2862,6 +2862,15 @@ TokenTree::LastFullySubstitutedToken(void) const noexcept {
   return std::nullopt;
 }
 
+std::optional<pasta::MacroToken> TokenTree::NameOrOperator(void) const noexcept {
+  if (impl->macro) {
+    if (auto sub = pasta::MacroSubstitution::From(impl->macro.value())) {
+      return sub->NameOrOperator();
+    }
+  }
+  return std::nullopt;
+}
+
 // Return whether or not this node has intermediate children.
 bool TokenTree::HasIntermediateChildren(void) const noexcept {
   return Kind() == mx::MacroKind::EXPANSION;
