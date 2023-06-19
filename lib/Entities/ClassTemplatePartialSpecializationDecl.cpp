@@ -187,27 +187,27 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 }
 
 Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
-  RawEntityId eid = impl->reader.getVal142();
+  RawEntityId eid = impl->reader.getVal145();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
-  RawEntityId eid = impl->reader.getVal143();
+  RawEntityId eid = impl->reader.getVal146();
   return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
-  RawEntityId eid = impl->reader.getVal144();
+  RawEntityId eid = impl->reader.getVal147();
   return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal163();
+  RawEntityId eid = impl->reader.getVal166();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal346();
+  return impl->reader.getVal349();
 }
 
 #pragma GCC diagnostic pop

@@ -181,28 +181,28 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 }
 
 gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const & {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal52();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d49));
+    if (auto d52 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d52));
     }
   }
   co_return;
 }
 
 ValueDecl LifetimeExtendedTemporaryDecl::extending_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal50();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
-  return static_cast<StorageDuration>(impl->reader.getVal63());
+  return static_cast<StorageDuration>(impl->reader.getVal66());
 }
 
 Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
-  RawEntityId eid = impl->reader.getVal54();
+  RawEntityId eid = impl->reader.getVal57();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
