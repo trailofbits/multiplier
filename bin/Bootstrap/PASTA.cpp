@@ -1955,11 +1955,12 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "Index")
         << FriendOf(class_os, class_name, "Macro")
         << FriendOf(class_os, class_name, "Reference")
-        << FriendOf(class_os, class_name, "SourceIR")
         << FriendOf(class_os, class_name, "Stmt")
         << FriendOf(class_os, class_name, "TokenContext")
         << FriendOf(class_os, class_name, "Type")
         << FriendOf(class_os, class_name, class_name + "Impl")
+        << "  friend class ir::Operation;\n"
+        << "  friend class ir::Value;\n\n"
         << "  std::shared_ptr<const " << class_name << "Impl> impl;\n";
 
     if (class_name == base_name) {
@@ -2014,7 +2015,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     forward_decls.insert("Reference");
-    forward_decls.insert("SourceIR");
 
     class_os
         << "  constexpr inline static EntityCategory static_category(void) {\n"
@@ -3306,6 +3306,11 @@ MethodListPtr CodeGenerator::RunOnClass(
     os << "class " << fwd << ";\n";
   }
   os
+      << "namespace mx {\n"
+      << "namespace ir {\n"
+      << "class Operation;\n"
+      << "class Value;\n"
+      << "}  // namespace ir\n\n"
       << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
       << class_os.str()
       << late_class_os.str()
@@ -3621,8 +3626,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "}  // namespace pasta\n"
       << "namespace indexer {\n";
   lib_pasta_h_os
-      << "}  // namespace pasta\n"
-      << "namespace mx {\n";
+      << "}  // namespace pasta\n";
 
   std::vector<std::string> class_names;
 
@@ -3652,8 +3656,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     for (const std::string &other_name : forward_decls) {
       if (other_name == "TokenRange") {
         needs_fragment = true;
-      } else if (name != other_name && !other_name.ends_with("Impl") &&
-          other_name != "SourceIR") {
+      } else if (name != other_name && !other_name.ends_with("Impl")) {
         fs
             << "#include <multiplier/Entities/" << other_name << ".h>\n";
       }

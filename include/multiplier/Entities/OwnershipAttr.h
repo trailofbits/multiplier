@@ -19,6 +19,12 @@ class Attr;
 class InheritableAttr;
 class OwnershipAttr;
 class Token;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OwnershipAttr : public InheritableAttr {
  private:

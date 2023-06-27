@@ -32,11 +32,16 @@ class Index;
 class Macro;
 class MacroArgument;
 class Reference;
-class SourceIR;
 class Stmt;
 class StmtImpl;
 class Token;
 class TokenRange;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Stmt {
  protected:
@@ -48,10 +53,12 @@ class Stmt {
   friend class Index;
   friend class Macro;
   friend class Reference;
-  friend class SourceIR;
   friend class TokenContext;
   friend class Type;
   friend class StmtImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const StmtImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);

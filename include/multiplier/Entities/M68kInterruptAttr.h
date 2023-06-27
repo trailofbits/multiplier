@@ -17,6 +17,12 @@ class Attr;
 class InheritableAttr;
 class M68kInterruptAttr;
 class Token;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class M68kInterruptAttr : public InheritableAttr {
  private:

@@ -17,6 +17,12 @@ class Attr;
 class ObjCKindOfAttr;
 class Token;
 class TypeAttr;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCKindOfAttr : public TypeAttr {
  private:

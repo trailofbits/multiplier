@@ -30,11 +30,16 @@ class File;
 class Fragment;
 class NamedDecl;
 class Reference;
-class SourceIR;
 class TemplateParameterList;
 class TemplateParameterListImpl;
 class Token;
 class TokenRange;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
  protected:
@@ -46,11 +51,13 @@ class TemplateParameterList {
   friend class Index;
   friend class Macro;
   friend class Reference;
-  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
   friend class TemplateParameterListImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const TemplateParameterListImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);

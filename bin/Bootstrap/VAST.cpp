@@ -40,6 +40,7 @@
 #include <pasta/Util/Init.h>
 
 #include <cctype>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -122,9 +123,10 @@ class CodeGenerator {
   CodeGenerator(char *argv[]);
   void RunOnTranslationUnit(pasta::TranslationUnitDecl tu);
 
-  void RunOnOps(std::ostream &hpp, std::ostream &cpp);
-  void RunOnTypes(std::ostream &hpp, std::ostream &cpp);
-  void RunOnAttrs(std::ostream &hpp, std::ostream &cpp);
+  void Summarize(void);
+  void RunOnOps(void);
+  void RunOnTypes(void);
+  void RunOnAttrs(void);
 };
 
 static std::string MethodName(const std::string &name) {
@@ -197,6 +199,9 @@ static std::string TokensToString(const pasta::PrintedTokenRange &toks) {
 
 struct Dialect {
   std::string_view name;
+  std::filesystem::path our_dir_name;
+  std::string_view our_ns_name;
+
   std::string_view ns_key;
   std::string_view root_ns;
   std::string_view ns;
@@ -206,14 +211,14 @@ struct Dialect {
 };
 
 static Dialect gDialects[] = {
-  {"Builtin", "mlir", "", "mlir", {}, {}, {}},
-  {"LLVMIR", "mlir::LLVM", "mlir", "LLVM", {}, {}, {}},
-  {"SCF", "mlir::scf", "mlir", "scf", {}, {}, {}},
-  {"MemRef", "mlir::memref", "mlir", "memref", {}, {}, {}},
-  {"LowLevel", "vast::ll", "vast", "ll", {}, {}, {}},
-  {"HighLevel", "vast::hl", "vast", "hl", {}, {}, {}},
-  {"Core", "vast::core", "vast", "core", {}, {}, {}},
-  {"Meta", "vast::meta", "vast", "meta", {}, {}, {}},
+  {"Builtin", "MLIR/Builtin", "builtin", "mlir", "", "mlir", {}, {}, {}},
+  {"LLVMIR", "MLIR/LLVM", "llvm", "mlir::LLVM", "mlir", "LLVM", {}, {}, {}},
+  {"SCF", "MLIR/SCF", "scf", "mlir::scf", "mlir", "scf", {}, {}, {}},
+  {"MemRef", "MLIR/MemRef", "memref", "mlir::memref", "mlir", "memref", {}, {}, {}},
+  {"LowLevel", "VAST/LL", "ll", "vast::ll", "vast", "ll", {}, {}, {}},
+  {"HighLevel", "VAST/HL", "hl", "vast::hl", "vast", "hl", {}, {}, {}},
+  {"Core", "VAST/Core", "core", "vast::core", "vast", "core", {}, {}, {}},
+  {"Meta", "VAST/Meta", "meta", "vast::meta", "vast", "meta", {}, {}, {}},
 };
 
 static std::unordered_map<std::string, std::string_view> gReturnType{
@@ -252,7 +257,37 @@ static std::unordered_map<std::string, std::string_view> gReturnType{
   {"::std::optional<int64_t>", "std::optional<int64_t>"},
 };
 
-void CodeGenerator::RunOnOps(std::ostream &hpp, std::ostream &cpp) {
+void CodeGenerator::Summarize(void) {
+  for (Dialect &dialect : gDialects) {
+
+    for (Op &op : ops) {
+      if (op.root_ns == dialect.root_ns && op.ns == dialect.ns) {
+        dialect.ops.push_back(&op);
+      }
+    }
+    for (Type &type : types) {
+      if (type.root_ns == dialect.root_ns && type.ns == dialect.ns) {
+        dialect.types.push_back(&type);
+      }
+    }
+    for (Attr &attr : attrs) {
+      if (attr.root_ns == dialect.root_ns && attr.ns == dialect.ns) {
+        dialect.attrs.push_back(&attr);
+      }
+    }
+  }
+}
+
+void CodeGenerator::RunOnOps(void) {
+  // "/Users/pag/Code/multiplier/bin/Bootstrap/VAST.cpp"
+  std::filesystem::path file = __FILE__;
+  std::filesystem::path mx_root = file.parent_path().parent_path().parent_path();
+  std::filesystem::path mx_inc = mx_root / "include" / "multiplier";
+  std::filesystem::path mx_lib = mx_root / "lib";
+
+  std::ofstream hpp(mx_inc / "IR" / "OperationKind.h");
+  std::ofstream cpp(mx_lib / "IR" / "Operation.h");  // In lib.
+
   hpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
       << "// All rights reserved.\n"
@@ -261,181 +296,166 @@ void CodeGenerator::RunOnOps(std::ostream &hpp, std::ostream &cpp) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
-      << "#include <cstdint>\n"
-      << "#include <gap/core/generator.hpp>\n"
-      << "#include <optional>\n"
-      << "#include <memory>\n"
-      << "#include <string_view>\n\n";
-
-  // Forward declare a whole bunch of stuff.
-  for (Dialect &dialect : gDialects) {
-    hpp << "namespace " << dialect.ns_key << " {\n";
-    if (dialect.ns_key == "mlir") {
-      hpp << "class Attribute;\n"
-          << "class Operation;\n"
-          << "class Value;\n"
-          << "class ValueImpl;\n"
-          << "class BlockArgument;\n"
-          << "class OpResult;\n";
-    }
-
-    for (Op &op : ops) {
-      if (op.root_ns == dialect.root_ns && op.ns == dialect.ns) {
-        dialect.ops.push_back(&op);
-        hpp << "class " << op.name << ";\n";
-      }
-    }
-    for (Type &type : types) {
-      if (type.root_ns == dialect.root_ns && type.ns == dialect.ns) {
-        dialect.types.push_back(&type);
-        hpp << "class " << type.name << ";\n";
-      }
-    }
-    for (Attr &attr : attrs) {
-      if (attr.root_ns == dialect.root_ns && attr.ns == dialect.ns) {
-        dialect.attrs.push_back(&attr);
-        hpp << "class " << attr.name << ";\n";
-      }
-    }
-    hpp << "}  // namespace " << dialect.ns_key << '\n';
-  }
-
-  hpp
-      << "namespace mx {\n"
-      << "class SourceIRImpl;\n"
-      << "}\n"
       << "namespace mx::ir {\n\n"
       << "enum class OperationKind : unsigned {\n"
       << "  UNKNOWN,\n";
 
+  auto num_ops = 0u;
   for (Dialect &dialect : gDialects) {
     for (Op *op : dialect.ops) {
       hpp << "  " << OpNameToEnumCase(op->op_name) << ",\n";
+      ++num_ops;
     }
   }
 
-  hpp << "};\n\n"
-      << "class Attribute;\n"
-      << "class Operation;\n"
-      << "class Block;\n"
-      << "class BlockArgument;\n"
-      << "class Region;\n"
-      << "class Type;\n\n"
-      << "// The result of an operation, or an argument to a block. Values can\n"
-      << "// have an arbitrary number of users.\n"
-      << "class Value {\n"
-      << " private:\n"
-      << "  friend class Operation;\n"
-      << "  friend class Block;\n"
-      << "  friend class BlockArgument;\n\n"
-      << "  std::shared_ptr<const SourceIRImpl> module_;\n"
-      << "  mlir::ValueImpl *value_;\n"
-      << " public:\n"
-      << "  inline Value(std::shared_ptr<const SourceIRImpl> module,\n"
-      << "               mlir::ValueImpl *value)\n"
-      << "      : module_(std::move(module)),\n"
-      << "        value_(value) {}\n\n"
-      << "  std::optional<Operation> as_result(void) const noexcept;\n"
-      << "  std::optional<BlockArgument> as_argument(void) const noexcept;\n"
-      << "  Type type(void) const noexcept;\n"
+  hpp
       << "};\n\n"
-      << "// A region is owned by an operation (not all operations own regions)\n"
-      << "// and contain one or more blocks.\n"
-      << "class Region {\n"
-      << " private:\n"
-      << "  friend class Operation;\n"
-      << "  friend class Block;\n"
-      << "  friend class BlockArgument;\n\n"
-      << "  std::shared_ptr<const SourceIRImpl> module_;\n"
-      << "  mlir::ValueImpl *value_;\n"
-      << " public:\n"
-      << "  inline Value(std::shared_ptr<const SourceIRImpl> module,\n"
-      << "               mlir::ValueImpl *value)\n"
-      << "      : module_(std::move(module)),\n"
-      << "        value_(value) {}\n\n"
-      << "  static Region containing(const Block &);\n"
-      << "  gap::generator<Block> blocks(void) const & noexcept;\n"
-      << "};\n\n"
-      << "// An operation is like an 'instruction', but can contain arbitrary\n"
-      << "// complexity in the form or one or more regions, each of which can\n"
-      << "// embed their own control-flow graphs of blocks containing operations.\n"
-      << "class Operation {\n"
-      << " private:\n"
-      << "  friend class SourceIR;\n"
-      << "  friend class SourceIRImpl;\n\n"
-      << "  Operation(void) = delete;\n\n"
-      << " protected:\n"
-      << "  std::shared_ptr<const SourceIRImpl> module_;\n"
-      << "  OperationKind kind_;\n"
-      << "  union {\n"
-      << "    mlir::Operation *unknown;\n";
+      << "}  // namespace mx::ir\n";
+
+  cpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n";
+
+  auto sep = "#define MX_IR_FOR_EACH_MLIR_OP(";
+
+  for (Dialect &dialect : gDialects) {
+    cpp << sep << '_' << dialect.our_ns_name;
+    sep = ", ";
+  }
+
+  cpp << ")";
 
   for (Dialect &dialect : gDialects) {
     for (Op *op : dialect.ops) {
-      hpp << "    " << dialect.ns_key << "::" << op->name << " *"
-          << OpNameToSnakeCase(op->op_name) << ";\n";
+      cpp << " \\\n   _" << dialect.our_ns_name << "(" << op->op_name << ", OperationKind::"
+          << OpNameToEnumCase(op->op_name) << ", " << dialect.ns_key << "::"
+          << op->name << ")";
     }
   }
 
-  hpp << "  } op_;\n\n"
-      << " public:\n"
-      << "  static OperationKind op_kind(mlir::Operation *);\n"
-      << "  static OperationKind op_kind(std::string_view);\n\n"
-      << "  inline Operation(std::shared_ptr<const SourceIRImpl> module,\n"
-      << "                   mlir::Operation *opaque)\n"
-      << "      : module_(std::move(module)),\n"
-      << "        kind_(op_kind(opaque)) {\n"
-      << "    op_.unknown = opaque;\n"
-      << "  }\n\n"
-      << "  std::string_view op_name(void) const noexcept;\n"
-      << "  inline OperationKind op_kind(void) const noexcept {\n"
-      << "    return kind_;\n"
-      << "  }\n"
-      << "  inline std::shared_ptr<mlir::Operation> raw_op(void) const noexcept {\n"
-      << "    return std::shared_ptr<mlir::Operation>(module_, op_.unknown);\n"
-      << "  }\n"
-      << "  inline static std::optional<Operation> producing(const Value &val) {\n"
-      << "    return val.as_result();\n"
-      << "  }\n"
-      << "  static Operation containing(const Region &);\n"
-      << "  static Operation containing(const Block &);\n"
-      << "};\n\n";
-
-  std::string_view builtin = "builtin";
+  cpp
+      << "\n\n"
+      << "#define MX_IR_NUM_MLIR_OPS " << num_ops << "\n\n";
 
   for (Dialect &dialect : gDialects) {
     if (dialect.ops.empty()) {
       continue;
     }
 
-    std::string_view ns_name = dialect.root_ns.empty() ? builtin : dialect.ns;
+    hpp.close();
+    hpp.open(mx_inc / "IR" / dialect.our_dir_name / "Operation.h");
+
+    cpp.close();
+    cpp.open(mx_lib / "IR" / dialect.our_dir_name / "Operation.cpp");
 
     hpp
-        << "namespace " << ns_name << " {\n"
+        << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+        << "// All rights reserved.\n"
+        << "//\n"
+        << "// This source code is licensed in accordance with the terms specified in\n"
+        << "// the LICENSE file found in the root directory of this source tree.\n\n"
+        << "// Auto-generated file; do not modify!\n\n"
+        << "#pragma once\n\n"
+        << "#include \"../../Operation.h\"\n\n"
+        << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
         << "class Operation : public ::mx::ir::Operation {\n"
         << " public:\n"
         << "  static std::optional<Operation> from(const ::mx::ir::Operation &);\n"
         << "};\n"
-        << "static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));\n\n";
+        << "static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));\n\n"
+        << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
+
+    cpp
+        << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+        << "// All rights reserved.\n"
+        << "//\n"
+        << "// This source code is licensed in accordance with the terms specified in\n"
+        << "// the LICENSE file found in the root directory of this source tree.\n\n"
+        << "// Auto-generated file; do not modify!\n\n"
+        << "#include <multiplier/IR/" << dialect.our_dir_name.generic_string()
+        << "/Operation.h>\n\n"
+        << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
+        << "std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {\n"
+        << "  switch (that.kind()) {\n"
+        << "    default: return std::nullopt;\n";
 
     for (Op *op : dialect.ops) {
-      std::string snake_name = OpNameToSnakeCase(op->op_name);
+      std::string enum_name = OpNameToEnumCase(op->op_name);
+      cpp << "    case mx::ir::OperationKind::" << enum_name << ":\n";
+    }
 
-      hpp << "class " << op->name << " final : public Operation {\n"
+    cpp
+        << "      return reinterpret_cast<const Operation &>(that);\n"
+        << "  }\n"
+        << "}\n\n"
+        << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
+
+
+    for (Op *op : dialect.ops) {
+      hpp.close();
+      hpp.open(mx_inc / "IR" / dialect.our_dir_name / (op->name + ".h"));
+
+      cpp.close();
+      cpp.open(mx_lib / "IR" / dialect.our_dir_name / (op->name + ".cpp"));
+
+      std::string snake_name = OpNameToSnakeCase(op->op_name);
+      std::string enum_name = OpNameToEnumCase(op->op_name);
+
+      hpp
+          << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+          << "// All rights reserved.\n"
+          << "//\n"
+          << "// This source code is licensed in accordance with the terms specified in\n"
+          << "// the LICENSE file found in the root directory of this source tree.\n\n"
+          << "// Auto-generated file; do not modify!\n\n"
+          << "#pragma once\n\n"
+          << "#include \"Operation.h\"\n\n"
+          << "namespace " << dialect.ns_key << " {\n"
+          << "class " << op->name << ";\n"
+          << "}  // namespace " << dialect.ns_key << "\n"
+          << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
+          << "class " << op->name << " final : public Operation {\n"
           << " public:\n"
-          << "  static std::optional<" << op->name << "> from(const ::mx::ir::Operation &);\n"
-          << "  inline static std::optional<" << op->name << "> producing(const ::mx::ir::Value &val) {\n"
-          << "    if (auto op = val.as_result()) {\n"
-          << "      return from(op.value());\n"
-          << "    }\n"
-          << "    return std::nullopt;\n"
-          << "  }\n"
-          << "  inline static OperationKind static_op_kind(void) {\n"
-          << "    return OperationKind::" << OpNameToEnumCase(op->op_name)
+          << "  inline static OperationKind static_kind(void) {\n"
+          << "    return OperationKind::" << enum_name
           << ";\n"
-          << "  }\n"
+          << "  }\n\n"
+          << "  static std::optional<" << op->name << "> from(const ::mx::ir::Operation &that);\n"
+          << "  static std::optional<" << op->name << "> producing(const ::mx::ir::Value &val);\n\n"
           << "  " << dialect.ns_key
-          << "::" << op->name << " raw_op(void) const noexcept;\n";
+          << "::" << op->name << " underlying_op(void) const noexcept;\n\n"
+          << "  // Imported methods:\n";
+
+      cpp
+          << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+          << "// All rights reserved.\n"
+          << "//\n"
+          << "// This source code is licensed in accordance with the terms specified in\n"
+          << "// the LICENSE file found in the root directory of this source tree.\n\n"
+          << "// Auto-generated file; do not modify!\n\n"
+          << "#include <multiplier/IR/" << dialect.our_dir_name.generic_string()
+          << "/" << op->name << ".h>\n"
+          << "#include <multiplier/IR/Value.h>\n\n"
+          << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
+          << "std::optional<" << op->name << "> " << op->name
+          << "::from(const ::mx::ir::Operation &that) {\n"
+          << "  if (that.kind() == OperationKind::" << enum_name << ") {\n"
+          << "    return reinterpret_cast<const " << op->name << " &>(that);\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n"
+          << "std::optional<" << op->name << "> " << op->name
+          << "::producing(const ::mx::ir::Value &that) {\n"
+          << "  if (auto op = ::mx::ir::Operation::producing(that)) {\n"
+          << "    return from(op.value());\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n";
 
       for (const pasta::CXXMethodDecl &meth : op->methods) {
         std::string meth_name = meth.Name();
@@ -455,21 +475,143 @@ void CodeGenerator::RunOnOps(std::ostream &hpp, std::ostream &cpp) {
 
       hpp
           << "};\n"
-          << "static_assert(sizeof(" << op->name << ") == sizeof(Operation));\n\n";
-    }
+          << "static_assert(sizeof(" << op->name << ") == sizeof(Operation));\n\n"
+          << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
 
-    hpp << "}  // namespace " << ns_name << "\n";
+      cpp
+          << "}  // namespace mx::ir::" << dialect.our_ns_name << "\n";
+    }
+  }
+}
+
+void CodeGenerator::RunOnTypes(void) {
+  // "/Users/pag/Code/multiplier/bin/Bootstrap/VAST.cpp"
+  std::filesystem::path file = __FILE__;
+  std::filesystem::path mx_root = file.parent_path().parent_path().parent_path();
+  std::filesystem::path mx_inc = mx_root / "include" / "multiplier";
+  std::filesystem::path mx_lib = mx_root / "lib";
+
+  std::ofstream hpp(mx_inc / "IR" / "TypeKind.h");
+  std::ofstream cpp(mx_lib / "IR" / "Type.h");  // In lib.
+
+  hpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n"
+      << "namespace mx::ir {\n\n"
+      << "enum class TypeKind : unsigned {\n"
+      << "  UNKNOWN,\n";
+
+  auto num_types = 0u;
+  for (Dialect &dialect : gDialects) {
+    for (Type *type : dialect.types) {
+      hpp << "  " << OpNameToEnumCase(type->name) << ",\n";
+      ++num_types;
+    }
   }
 
-  hpp << "}  // namespace mx::ir\n";
+  hpp
+      << "};\n\n"
+      << "}  // namespace mx::ir\n";
+
+  cpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n";
+
+  auto sep = "#define MX_IR_FOR_EACH_MLIR_TYPE(";
+
+  for (Dialect &dialect : gDialects) {
+    cpp << sep << '_' << dialect.our_ns_name;
+    sep = ", ";
+  }
+
+  cpp << ")";
+
+  for (Dialect &dialect : gDialects) {
+    for (Type *type : dialect.types) {
+      cpp << " \\\n   _" << dialect.our_ns_name << "(" << type->name << ", TypeKind::"
+          << OpNameToEnumCase(type->name) << ", " << dialect.ns_key << "::"
+          << type->name << ")";
+    }
+  }
+
+  cpp
+      << "\n\n"
+      << "#define MX_IR_NUM_MLIR_TYPES " << num_types << "\n\n";
 }
 
-void CodeGenerator::RunOnTypes(std::ostream &hpp, std::ostream &cpp) {
+void CodeGenerator::RunOnAttrs(void) {
+  // "/Users/pag/Code/multiplier/bin/Bootstrap/VAST.cpp"
+  std::filesystem::path file = __FILE__;
+  std::filesystem::path mx_root = file.parent_path().parent_path().parent_path();
+  std::filesystem::path mx_inc = mx_root / "include" / "multiplier";
+  std::filesystem::path mx_lib = mx_root / "lib";
 
-}
+  std::ofstream hpp(mx_inc / "IR" / "AttributeKind.h");
+  std::ofstream cpp(mx_lib / "IR" / "Attribute.h");  // In lib.
 
-void CodeGenerator::RunOnAttrs(std::ostream &hpp, std::ostream &cpp) {
+  hpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n"
+      << "namespace mx::ir {\n\n"
+      << "enum class AttributeKind : unsigned {\n"
+      << "  UNKNOWN,\n";
 
+  auto num_attrs = 0u;
+  for (Dialect &dialect : gDialects) {
+    for (Attr *attr : dialect.attrs) {
+      hpp << "  " << OpNameToEnumCase(attr->name) << ",\n";
+      ++num_attrs;
+    }
+  }
+
+  hpp
+      << "};\n\n"
+      << "}  // namespace mx::ir\n";
+
+  cpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n";
+
+  auto sep = "#define MX_IR_FOR_EACH_MLIR_ATTRIBUTE(";
+
+  for (Dialect &dialect : gDialects) {
+    cpp << sep << '_' << dialect.our_ns_name;
+    sep = ", ";
+  }
+
+  cpp << ")";
+
+  for (Dialect &dialect : gDialects) {
+    for (Attr *attr : dialect.attrs) {
+      cpp << " \\\n   _" << dialect.our_ns_name << "(" << attr->name << ", AttributeKind::"
+          << OpNameToEnumCase(attr->name) << ", " << dialect.ns_key << "::"
+          << attr->name << ")";
+    }
+  }
+
+  cpp
+      << "\n\n"
+      << "#define MX_IR_NUM_MLIR_ATTRIBUTES " << num_attrs << "\n\n";
 }
 
 void CodeGenerator::RunOnOpClass(const std::string &root_ns, const std::string &ns,
@@ -813,12 +955,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::ofstream hpp("/tmp/test.h");
-  std::ofstream cpp("/tmp/test.cpp");
-
-  cg.RunOnOps(hpp, cpp);
-  cg.RunOnTypes(hpp, cpp);
-  cg.RunOnAttrs(hpp, cpp);
+  cg.Summarize();
+  cg.RunOnOps();
+  cg.RunOnTypes();
+  cg.RunOnAttrs();
 
   return EXIT_SUCCESS;
 }

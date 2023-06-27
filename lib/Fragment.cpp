@@ -23,10 +23,17 @@
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
-#include "SourceIR.h"
 #include "WeggliImpl.h"
 
+#ifdef MX_ENABLE_SOURCEIR
+# include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
+# include "IR/SourceIR.h"
+#endif
+
 namespace mx {
+namespace ir {
+class SourceIRImpl;
+}  // namespace ir
 
 // Return the fragment containing a query match.
 Fragment Fragment::containing(const WeggliQueryMatch &match) {
@@ -261,17 +268,18 @@ gap::generator<RegexQueryMatch> Fragment::query(
   }
 }
 
-std::optional<SourceIR> Fragment::ir(void) const noexcept {
 #ifdef MX_ENABLE_SOURCEIR
+std::optional<ir::builtin::ModuleOp> Fragment::ir(void) const noexcept {
   if (auto mlir = impl->SourceIR(); !mlir.empty()) {
-    auto ir_obj = std::make_shared<const SourceIRImpl>(impl, mlir);
+    auto ir_obj = std::make_shared<const ir::SourceIRImpl>(impl, mlir);
     if (!ir_obj->mod.get()) {
       return std::nullopt;
     }
-    return SourceIR(std::move(ir_obj));
+    mlir::ModuleOp *ptr = ir_obj->mod.get();
+    return ir::builtin::ModuleOp(std::move(ir_obj));
   }
-#endif
   return std::nullopt;
 }
+#endif
 
 }  // namespace mx

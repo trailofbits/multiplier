@@ -225,13 +225,7 @@ FunctionDecl CXXNewExpr::operator_new(void) const {
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
-<<<<<<< HEAD
-  auto &ep = impl->ep;
-  auto fragment = ep->FragmentFor(ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, impl->reader.getVal49(), impl->reader.getVal50());
-=======
   return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal49(), impl->reader.getVal50());
->>>>>>> main
 }
 
 bool CXXNewExpr::has_initializer(void) const {

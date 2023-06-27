@@ -17,6 +17,12 @@ class Attr;
 class InheritableAttr;
 class Token;
 class X86ForceAlignArgPointerAttr;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class X86ForceAlignArgPointerAttr : public InheritableAttr {
  private:

@@ -21,6 +21,12 @@ class Stmt;
 class TemplateArgument;
 class Token;
 class ValueStmt;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConceptSpecializationExpr : public Expr {
  private:

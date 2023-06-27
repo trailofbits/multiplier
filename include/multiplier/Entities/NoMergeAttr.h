@@ -18,6 +18,12 @@ class DeclOrStmtAttr;
 class InheritableAttr;
 class NoMergeAttr;
 class Token;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NoMergeAttr : public DeclOrStmtAttr {
  private:

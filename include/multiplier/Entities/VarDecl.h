@@ -35,6 +35,12 @@ class VarDecl;
 class VarTemplateDecl;
 class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarDecl : public DeclaratorDecl {
  private:

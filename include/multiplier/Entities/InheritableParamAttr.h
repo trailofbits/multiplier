@@ -30,6 +30,12 @@ class SwiftErrorResultAttr;
 class SwiftIndirectResultAttr;
 class Token;
 class UseHandleAttr;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InheritableParamAttr : public InheritableAttr {
  private:

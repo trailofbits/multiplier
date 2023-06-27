@@ -18,56 +18,11 @@ capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file
 file(GLOB entity_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}/*.h")
 file(GLOB entity_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}/*.cpp")
 
-add_library("mx-mlir" INTERFACE)
-set_target_properties("mx-mlir"
-  PROPERTIES
-    LINKER_LANGUAGE
-      CXX
-    VISIBILITY_INLINES_HIDDEN
-      YES
-    CXX_VISIBILITY_PRESET
-      hidden
-    POSITION_INDEPENDENT_CODE
-      YES
-)
-
 if(MX_ENABLE_VAST)
-  target_link_libraries("mx-mlir"
-    INTERFACE
-      vast::vast
-      vast::MLIRCore
-      vast::MLIRMeta
-      vast::MLIRLowLevel
-      vast::MLIRHighLevel
-      MLIRDialect
-      MLIRAMDGPUDialect
-      MLIRAsyncDialect
-      MLIREmitCDialect
-      MLIRIndexDialect
-      MLIRMLProgramDialect
-      MLIRNVGPUDialect
-      MLIROpenACCDialect
-      MLIROpenMPDialect
-      MLIRROCDLDialect
-      MLIRShapeDialect
-      MLIRSPIRVDialect
-      MLIRTosaDialect
+  add_subdirectory("IR")
+else()
 
-      MLIRLLVMIRTransforms
-      MLIRShapeOpsTransforms
-      MLIRSparseTensorTransforms
-      MLIRAffineTransformOps
-      MLIRBufferizationTransformOps
-      MLIRGPUTransformOps
-      MLIRLinalgTransformOps
-      MLIRMemRefTransformOps
-      MLIRSCFTransformOps
-      MLIRVectorTransformOps
-      MLIRTensorInferTypeOpInterfaceImpl
-  )
-else(MX_ENABLE_VAST)
-  target_link_libraries("mx-mlir" INTERFACE)
-endif(MX_ENABLE_VAST)
+endif()
 
 add_library("mx-entities" INTERFACE)
 set_target_properties("mx-entities"
@@ -138,7 +93,6 @@ set(api_headers
   "${source_include_dir}/Token.h"
   "${source_include_dir}/TokenTree.h"
   "${source_include_dir}/Types.h"
-  "${source_include_dir}/SourceIR.h"
   "${source_include_dir}/Weggli.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
@@ -185,8 +139,6 @@ add_library("mx-api" STATIC
   "SQLiteStore.h"
   "Stmt.h"
   "Stmt.cpp"
-  "SourceIR.cpp"
-  "SourceIR.h"
   "TemplateArgument.h"
   "TemplateParameterList.h"
   "ThreadLocal.cpp"
@@ -223,22 +175,11 @@ target_link_libraries("mx-api"
     "std::coroutines"
     "gap::gap-settings"
     $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
+    $<$<BOOL:${MX_ENABLE_VAST}>:mx-mlir>
   PRIVATE
     "CapnProto::capnp-rpc"
     $<BUILD_INTERFACE:concurrentqueue>
 )
-
-if(MX_ENABLE_VAST)
-  target_link_libraries("mx-api"
-    PUBLIC
-      "mx-mlir"
-  )
-  
-  target_compile_definitions("mx-api"
-    PRIVATE
-      "MX_ENABLE_SOURCEIR"
-  )
-endif(MX_ENABLE_VAST)
 
 if(MX_ENABLE_RE2)
   target_link_libraries("mx-api"
@@ -310,7 +251,6 @@ if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "mx-api"
-      "mx-mlir"
     EXPORT
       "${PROJECT_NAME}Targets"
     RUNTIME

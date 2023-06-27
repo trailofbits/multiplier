@@ -21,6 +21,12 @@ class IncompleteArrayType;
 class Token;
 class Type;
 class VariableArrayType;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ArrayType : public Type {
  private:

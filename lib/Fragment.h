@@ -9,9 +9,11 @@
 #include "TokenTree.h"
 
 namespace mx {
+namespace ir {
+class SourceIRImpl;
+}  // namespace ir
 
 class FileImpl;
-class SourceIRImpl;
 
 using FragmentIdList = std::vector<PackedFragmentId>;
 

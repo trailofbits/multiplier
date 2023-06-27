@@ -17,6 +17,12 @@ class Index;
 class Token;
 class Type;
 class UnaryTransformType;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnaryTransformType : public Type {
  private:

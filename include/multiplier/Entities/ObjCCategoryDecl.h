@@ -24,6 +24,12 @@ class ObjCProtocolDecl;
 class Stmt;
 class Token;
 class TokenRange;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCCategoryDecl : public ObjCContainerDecl {
  private:

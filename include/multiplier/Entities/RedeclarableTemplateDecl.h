@@ -23,6 +23,12 @@ class TemplateDecl;
 class Token;
 class TypeAliasTemplateDecl;
 class VarTemplateDecl;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class RedeclarableTemplateDecl : public TemplateDecl {
  private:

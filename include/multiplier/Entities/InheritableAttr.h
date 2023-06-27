@@ -323,6 +323,12 @@ class X86ForceAlignArgPointerAttr;
 class XRayInstrumentAttr;
 class XRayLogArgsAttr;
 class ZeroCallUsedRegsAttr;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InheritableAttr : public Attr {
  private:

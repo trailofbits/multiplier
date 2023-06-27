@@ -17,6 +17,12 @@ class IncludeLikeMacroDirective;
 class IncludeMacrosMacroDirective;
 class Macro;
 class MacroDirective;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class IncludeMacrosMacroDirective : public IncludeLikeMacroDirective {
  private:

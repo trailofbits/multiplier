@@ -20,6 +20,12 @@ class OMPLoopDirective;
 class OMPParallelForSimdDirective;
 class Stmt;
 class Token;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPParallelForSimdDirective : public OMPLoopDirective {
  private:

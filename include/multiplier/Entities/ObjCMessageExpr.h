@@ -25,6 +25,12 @@ class Token;
 class TokenRange;
 class Type;
 class ValueStmt;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCMessageExpr : public Expr {
  private:

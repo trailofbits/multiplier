@@ -18,6 +18,12 @@ class Attr;
 class InheritableAttr;
 class Token;
 class TypeVisibilityAttr;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeVisibilityAttr : public InheritableAttr {
  private:

@@ -18,6 +18,12 @@ class InheritableAttr;
 class MSGuidDecl;
 class Token;
 class UuidAttr;
+namespace mx {
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UuidAttr : public InheritableAttr {
  private:
