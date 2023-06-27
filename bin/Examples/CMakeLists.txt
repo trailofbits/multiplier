@@ -73,6 +73,7 @@ define_example("mx-find-sketchy-strchr" "FindSketchyStrchr.cpp")
 define_example("mx-find-symbol" "FindSymbol.cpp")
 define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
+define_example("mx-print-type-token-graph" "PrintTypeTokenGraph.cpp")
 
 target_compile_definitions("mx-dump-json"
   PRIVATE

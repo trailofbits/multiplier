@@ -21,6 +21,8 @@ namespace mx {
 class FragmentImpl;
 class FileImpl;
 
+using TokenContextReaderPtr = std::shared_ptr<const TokenContextReader>;
+
 class TokenReader {
  public:
   using Ptr = std::shared_ptr<const TokenReader>;
@@ -84,6 +86,9 @@ class TokenReader {
   virtual const FileImpl *OwningFile(void) const noexcept;
   virtual const TypeImpl *OwningType(void) const noexcept;
 
+  virtual TokenContextReaderPtr TokenContextReaderFor(
+      const Ptr &self, EntityOffset offset, EntityId eid) const noexcept;
+
   static Token TokenFor(const Ptr &self, RawEntityId eid) noexcept;
 };
 
@@ -122,6 +127,7 @@ class InvalidTokenReader final : public TokenReader {
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const TokenReader *) const override;
+
 };
 
 // Used for custom token ranges.
