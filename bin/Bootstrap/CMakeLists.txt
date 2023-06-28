@@ -34,7 +34,7 @@ set_target_properties("mx-bootstrap"
 set(install_include_dir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
 list(GET LLVM_INCLUDE_DIRS 0 dependencies_include_dir)
 
-if (TRUE)
+if (FALSE)
 add_executable("mx-bootstrap-pasta"
   "PASTA.cpp"
   "${PROJECT_SOURCE_DIR}/bin/Index/Entity.h"

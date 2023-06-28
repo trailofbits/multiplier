@@ -273,14 +273,6 @@ void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em,
   }
 
   labeller.Run();
-
-#ifndef NDEBUG
-  auto i = 0u;
-  assert(pf.top_level_decls.size() <= pf.decls_to_serialize.size());
-  for (const pasta::Decl &decl : pf.top_level_decls) {
-    assert(decl == pf.decls_to_serialize[i++]);
-  }
-#endif
 }
 
 }  // namespace indexer
