@@ -127,6 +127,8 @@ using TokenIdListBuilder =
 void GlobalIndexingState::PersistFile(
     mx::SpecificEntityId<mx::FileId> file_id, const pasta::File &file) {
 
+  ProgressBarWork progress_tracker(file_progress);
+
   std::filesystem::path file_path = file.Path();
   auto maybe_file_data = file.Data();
   LOG_IF(FATAL, !maybe_file_data.Succeeded())
@@ -935,7 +937,8 @@ void GlobalIndexingState::PersistFragment(
     NameMangler &mangler, EntityMapper &em,
     TokenProvenanceCalculator &provenance, PendingFragment &pf) {
 
-  const mx::SpecificEntityId<mx::FragmentId> fragment_id = pf.fragment_id;
+  ProgressBarWork fragment_progress_tracker(fragment_progress);
+
   const uint64_t begin_index = pf.begin_index;
   const uint64_t end_index = pf.end_index;
 
@@ -976,9 +979,14 @@ void GlobalIndexingState::PersistFragment(
 
   // Generate source IR before saving the fragments to the persistent
   // storage.
-  fb.setMlir(codegen.GenerateSourceIRFromTLDs(
-      ast, fragment_id.Pack(), em, pf.top_level_decls,
-      pf.num_top_level_declarations));
+  if (!pf.decls_to_serialize.empty()) {
+    ProgressBarWork sourceir_progress_tracker(sourceir_progress);
+    std::string mlir = codegen.GenerateSourceIRFromTLDs(ast, em, pf);
+    if (!mlir.empty()) {
+      ProgressBarWork success_progress_tracker(sourceir_success_progress);
+      fb.setMlir(mlir);
+    }
+  }
 
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
   for (auto i = 0u; i < pf.num_top_level_declarations; ++i) {

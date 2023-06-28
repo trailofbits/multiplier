@@ -536,6 +536,7 @@ void GlobalIndexingState::PersistTypes(
     const PendingFragment &pf) {
 
   for (const pasta::Type &type : pf.types_to_serialize) {
+    ProgressBarWork type_progress_tracker(type_progress);
 
     auto maybe_token_range = em.tm.TypeTokenRange(type);
     assert(maybe_token_range.has_value());

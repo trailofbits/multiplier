@@ -21,6 +21,9 @@ VAST_UNRELAX_WARNINGS
 
 #include <glog/logging.h>
 
+#include <pasta/AST/AST.h>
+#include <pasta/AST/Decl.h>
+
 #include <vast/Util/Common.hpp>
 #include <vast/Translation/CodeGenContext.hpp>
 #include <vast/Translation/CodeGenVisitor.hpp>
@@ -29,11 +32,10 @@ VAST_UNRELAX_WARNINGS
 
 #include "CodegenMetaGenerator.h"
 #include "CodegenVisitor.h"
-
-#include <pasta/AST/Decl.h>
-
 #include "Context.h"
 #include "EntityMapper.h"
+#include "PendingFragment.h"
+#include "Util.h"
 
 namespace indexer {
 
@@ -66,14 +68,10 @@ void CodeGenerator::Disable(void) {
 CodeGenerator::~CodeGenerator(void) {}
 
 std::string CodeGenerator::GenerateSourceIRFromTLDs(
-    const pasta::AST &ast,
-    mx::RawEntityId fragment_id,
-    const EntityMapper &em,
-    const std::vector<pasta::Decl> &decls,
-    unsigned num_decls) {
+    const pasta::AST &ast, const EntityMapper &em, const PendingFragment &pf) {
 
   std::string ret;
-  if (impl->disabled || decls.empty()) {
+  if (impl->disabled || pf.decls_to_serialize.empty()) {
     return ret;
   }
 
@@ -91,7 +89,7 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   vast::cg::CodeGenBase<CodeGenVisitor> codegen(&context, meta);
 
   try {
-    for (const pasta::Decl &decl : decls) {
+    for (const pasta::Decl &decl : pf.top_level_decls) {
       codegen.append_to_module(const_cast<clang::Decl *>(decl.RawDecl()));
     }
   } catch (std::exception &e) {

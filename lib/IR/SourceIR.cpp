@@ -102,7 +102,6 @@ MLIRInitializer::MLIRInitializer(int)
       op_name_to_kind(MX_IR_NUM_MLIR_OPS),
       op_type_to_kind(MX_IR_NUM_MLIR_OPS) {
 
-  context.appendDialectRegistry(registry);
   context.loadAllAvailableDialects();
   context.enableMultithreading();
 

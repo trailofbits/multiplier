@@ -478,6 +478,8 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
 // Build the compilers for the commands, then build the commands.
 void BuildCommandAction::Run(void) {
 
+  ProgressBarWork progress_tracker(ctx->eval_command_progress);
+
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(
           command.vec, command.working_dir);
@@ -552,6 +554,7 @@ Importer::Importer(std::filesystem::path cwd_,
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
 
+  ProgressBarWork progress_tracker(d->ctx->command_progress);
   auto wrapped_tool = o.getString("wrapped_tool");
   auto cwd = o.getString("cwd");
   auto args = o.getArray("args");
@@ -630,6 +633,9 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
 
 bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
                                          const EnvVariableMap &envp) {
+
+  ProgressBarWork progress_tracker(d->ctx->command_progress);
+
   auto cwd = o.getString("directory");
   auto file = o.getString("file");
   if (!cwd || !file) {

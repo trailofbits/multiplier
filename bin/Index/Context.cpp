@@ -33,30 +33,39 @@ GlobalIndexingState::GlobalIndexingState(mx::DatabaseWriter &database_,
 GlobalIndexingState::~GlobalIndexingState(void) {}
 
 void GlobalIndexingState::InitializeProgressBars(void) {
-  if (command_progress) {
+  if (ast_progress) {
     return;
   }
 
   std::chrono::seconds report_freq = std::chrono::seconds(1);
-  command_progress.reset(new ProgressBar("1) Command interpretation",
-                                         report_freq));
-  ast_progress.reset(new ProgressBar("2) Parsing / AST building",
-                                     report_freq));
-  file_progress.reset(new ProgressBar("3) File serialization",
-                                      report_freq));
-  partitioning_progress.reset(new ProgressBar("4) Fragment partitioning",
-                                              report_freq));
-  identification_progress.reset(new ProgressBar("5) Fragment identification",
-                                                report_freq));
-  serialization_progress.reset(new ProgressBar("6) Fragment serialization",
-                                               report_freq));
 
-  command_progress->SetNumWorkers(num_workers);
-  ast_progress->SetNumWorkers(num_workers);
-  file_progress->SetNumWorkers(num_workers);
-  partitioning_progress->SetNumWorkers(num_workers);
-  identification_progress->SetNumWorkers(num_workers);
-  serialization_progress->SetNumWorkers(num_workers);
+  command_progress.reset(new ProgressBar("Commands",
+                                         report_freq));
+
+  eval_command_progress.reset(new ProgressBar("Evaluated commands",
+                                              report_freq));
+
+  ast_progress.reset(new ProgressBar("Parsing",
+                                     report_freq));
+
+  file_progress.reset(new ProgressBar("File serialization",
+                                      report_freq));
+
+  partitioning_progress.reset(new ProgressBar("Fragment partitioning",
+                                              report_freq));
+
+  identification_progress.reset(new ProgressBar("Fragment identification",
+                                                report_freq));
+
+  fragment_progress.reset(new ProgressBar("Fragment serialization",
+                                          report_freq));
+
+  type_progress.reset(new ProgressBar("Type serialization",
+                                      report_freq));
+
+  sourceir_progress.reset(new ProgressBar("SourceIR", report_freq));
+  sourceir_success_progress.reset(new ProgressBar("Successful SourceIR",
+                                                  report_freq));
 }
 
 }  // namespace indexer

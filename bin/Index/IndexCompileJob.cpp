@@ -1328,8 +1328,6 @@ static void PersistParsedFragments(
       << " has " << pending_fragments.size() << " unique fragments";
 
   for (PendingFragment &pf : pending_fragments) {
-    ProgressBarWork fragment_progress_tracker(context.serialization_progress);
-
     auto start_time = std::chrono::system_clock::now();
     try {
       em.ResetForFragment();
@@ -1403,7 +1401,6 @@ static void MaybePersistParsedFile(
 static void PersistParsedFiles(
     GlobalIndexingState &context, const pasta::AST &ast,
     EntityIdMap &entity_ids) {
-  ProgressBarWork progress_tracker(context.file_progress);
   auto parsed_files = ast.ParsedFiles();
   for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
        it != end; ++it) {
