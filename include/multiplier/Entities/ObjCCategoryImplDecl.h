@@ -21,7 +21,6 @@ class ObjCContainerDecl;
 class ObjCImplDecl;
 class Stmt;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

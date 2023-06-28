@@ -15,7 +15,6 @@ class EntityProvider;
 class Index;
 class Macro;
 class MacroArgument;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

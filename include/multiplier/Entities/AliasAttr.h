@@ -16,7 +16,6 @@ class Index;
 class AliasAttr;
 class Attr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

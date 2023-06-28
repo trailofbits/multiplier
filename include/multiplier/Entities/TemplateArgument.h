@@ -34,7 +34,6 @@ class TemplateArgumentImpl;
 class Token;
 class Type;
 class ValueDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

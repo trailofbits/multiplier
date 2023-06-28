@@ -38,7 +38,6 @@ class Token;
 class TokenRange;
 class Type;
 class TypeImpl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

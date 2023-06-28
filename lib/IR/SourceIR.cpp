@@ -10,13 +10,13 @@
 #include <iostream>
 #include <unordered_map>
 
-//#include <multiplier/Entities/Attr.h>
-//#include <multiplier/Entities/Decl.h>
-//#include <multiplier/Entities/Designator.h>
-//#include <multiplier/Entities/Macro.h>
-//#include <multiplier/Entities/PseudoKind.h>
-//#include <multiplier/Entities/Stmt.h>
-//#include <multiplier/Entities/Type.h>
+#include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/Decl.h>
+#include <multiplier/Entities/Designator.h>
+#include <multiplier/Entities/Macro.h>
+#include <multiplier/Entities/PseudoKind.h>
+#include <multiplier/Entities/Stmt.h>
+#include <multiplier/Entities/Type.h>
 #include <multiplier/IR/Operation.h>
 
 #include <llvm/ADT/DenseMap.h>
@@ -47,7 +47,6 @@
 #include <vast/Dialect/Meta/MetaTypes.hpp>
 #include <vast/Translation/CodeGenContext.hpp>
 #include <vast/Translation/CodeGenBuilder.hpp>
-
 
 #include "../Fragment.h"
 #include "Operation.h"

@@ -17,7 +17,6 @@ class Attr;
 class Expr;
 class OMPReferencedVarAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

@@ -16,7 +16,6 @@ class Index;
 class Macro;
 class MacroParameter;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

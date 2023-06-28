@@ -323,7 +323,6 @@ class X86ForceAlignArgPointerAttr;
 class XRayInstrumentAttr;
 class XRayLogArgsAttr;
 class ZeroCallUsedRegsAttr;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

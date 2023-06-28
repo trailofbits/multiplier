@@ -19,7 +19,6 @@ class InheritableParamAttr;
 class ParameterABIAttr;
 class SwiftIndirectResultAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

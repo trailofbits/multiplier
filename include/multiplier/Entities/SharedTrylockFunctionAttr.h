@@ -18,7 +18,6 @@ class Expr;
 class InheritableAttr;
 class SharedTrylockFunctionAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

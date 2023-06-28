@@ -18,10 +18,6 @@
 
 #include "Operation.h"
 
-#include <multiplier/IR/Operand.h>
-
-#include "SourceIR.h"
-
 namespace mx::ir {
 
 std::string_view Operation::kind_name(void) const noexcept {
@@ -81,11 +77,11 @@ unsigned Operation::num_results(void) const noexcept {
 
 std::optional<Result> Operation::nth_result(unsigned i) const noexcept {
   if (i < op_->getNumResults()) {
-    mlir::OpResult res = op_->getResult(i);
     return Result(module_,
                   reinterpret_cast<mlir::detail::OpResultImpl *>(
-                      res.getAsOpaquePointer()));
+                      mlir::OpResult(op_->getResult(i)).getAsOpaquePointer()));
   }
+  return std::nullopt;
 }
 
 gap::generator<Result> Operation::results(void) const & noexcept {

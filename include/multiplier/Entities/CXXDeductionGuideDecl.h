@@ -23,7 +23,6 @@ class Stmt;
 class TemplateDecl;
 class Token;
 class ValueDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

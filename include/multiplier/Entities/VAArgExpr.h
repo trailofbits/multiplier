@@ -20,7 +20,6 @@ class Token;
 class Type;
 class VAArgExpr;
 class ValueStmt;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

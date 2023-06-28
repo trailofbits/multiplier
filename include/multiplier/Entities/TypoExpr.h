@@ -19,7 +19,6 @@ class Stmt;
 class Token;
 class TypoExpr;
 class ValueStmt;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

@@ -37,7 +37,6 @@ class TemplateParameterList;
 class Token;
 class Type;
 class TypeDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

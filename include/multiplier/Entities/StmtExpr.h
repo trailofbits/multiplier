@@ -20,7 +20,6 @@ class Stmt;
 class StmtExpr;
 class Token;
 class ValueStmt;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

@@ -17,7 +17,6 @@ class Attr;
 class InheritableAttr;
 class Token;
 class X86ForceAlignArgPointerAttr;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

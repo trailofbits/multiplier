@@ -76,6 +76,7 @@ class Block final {
 class Argument final : public Value {
  private:
   friend class Block;
+  friend class Region;
   friend class Value;
 
   inline Argument(std::shared_ptr<const SourceIRImpl> module,

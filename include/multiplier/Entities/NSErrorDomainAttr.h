@@ -18,7 +18,6 @@ class InheritableAttr;
 class NSErrorDomainAttr;
 class Token;
 class VarDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

@@ -21,7 +21,6 @@ class Stmt;
 class Token;
 class TypeDecl;
 class TypedefNameDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

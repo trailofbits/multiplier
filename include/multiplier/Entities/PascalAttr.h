@@ -17,7 +17,6 @@ class Attr;
 class InheritableAttr;
 class PascalAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

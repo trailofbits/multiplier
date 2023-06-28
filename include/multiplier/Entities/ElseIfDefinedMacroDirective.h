@@ -17,7 +17,6 @@ class ConditionalMacroDirective;
 class ElseIfDefinedMacroDirective;
 class Macro;
 class MacroDirective;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

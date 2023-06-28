@@ -20,7 +20,6 @@ class InheritableAttr;
 class NoInlineAttr;
 class NoMergeAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

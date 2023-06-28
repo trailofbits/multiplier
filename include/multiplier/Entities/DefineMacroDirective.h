@@ -17,7 +17,6 @@ class DefineMacroDirective;
 class Macro;
 class MacroDirective;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

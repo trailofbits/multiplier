@@ -17,7 +17,6 @@ class Index;
 class BuiltinType;
 class Token;
 class Type;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

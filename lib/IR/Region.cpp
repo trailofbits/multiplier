@@ -66,7 +66,7 @@ unsigned Region::num_entry_block_arguments(void) const noexcept {
 
 std::optional<Argument>
 Region::nth_entry_block_argument(unsigned i) const noexcept {
-  if (auto &args = region_->front().getArguments(); i < args.size()) {
+  if (auto args = region_->front().getArguments(); i < args.size()) {
     return Argument(
         module_,
         reinterpret_cast<mlir::detail::BlockArgumentImpl *>(
@@ -78,7 +78,7 @@ Region::nth_entry_block_argument(unsigned i) const noexcept {
 gap::generator<Argument>
 Region::entry_block_arguments(void) const & noexcept {
   for (mlir::BlockArgument arg : region_->front().getArguments()) {
-    co_yield BlockArgument(
+    co_yield Argument(
         module_,
         reinterpret_cast<mlir::detail::BlockArgumentImpl *>(
             arg.getAsOpaquePointer()));

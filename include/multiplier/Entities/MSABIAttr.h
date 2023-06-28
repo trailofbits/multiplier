@@ -17,7 +17,6 @@ class Attr;
 class InheritableAttr;
 class MSABIAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

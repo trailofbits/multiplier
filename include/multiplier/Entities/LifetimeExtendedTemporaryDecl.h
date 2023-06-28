@@ -20,7 +20,6 @@ class LifetimeExtendedTemporaryDecl;
 class Stmt;
 class Token;
 class ValueDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

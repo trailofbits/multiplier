@@ -18,7 +18,6 @@ class Expr;
 class GuardedByAttr;
 class InheritableAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

@@ -16,7 +16,6 @@ class Index;
 class MacroQualifiedType;
 class Token;
 class Type;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

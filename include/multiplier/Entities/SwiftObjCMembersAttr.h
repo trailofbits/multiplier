@@ -16,7 +16,6 @@ class Index;
 class Attr;
 class SwiftObjCMembersAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

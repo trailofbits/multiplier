@@ -17,7 +17,6 @@ class AlignValueAttr;
 class Attr;
 class Expr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

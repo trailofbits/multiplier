@@ -26,7 +26,6 @@ class TemplateTemplateParmDecl;
 class Token;
 class TypeAliasTemplateDecl;
 class VarTemplateDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

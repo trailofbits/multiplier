@@ -18,7 +18,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class Token;
 class UseHandleAttr;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

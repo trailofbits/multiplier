@@ -20,7 +20,6 @@ class OMPRequiresDecl;
 class OMPThreadPrivateDecl;
 class Stmt;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

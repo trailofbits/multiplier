@@ -22,7 +22,6 @@ class Token;
 class UnresolvedLookupExpr;
 class UnresolvedMemberExpr;
 class ValueStmt;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

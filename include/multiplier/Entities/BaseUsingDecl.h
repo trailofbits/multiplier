@@ -21,7 +21,6 @@ class Token;
 class UsingDecl;
 class UsingEnumDecl;
 class UsingShadowDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

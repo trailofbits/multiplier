@@ -19,7 +19,6 @@ class StaticAssertDecl;
 class Stmt;
 class StringLiteral;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

@@ -21,7 +21,6 @@ class OMPLoopDirective;
 class OMPTargetTeamsDistributeParallelForDirective;
 class Stmt;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

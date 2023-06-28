@@ -18,7 +18,6 @@ class NamedDecl;
 class Stmt;
 class Token;
 class UsingPackDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

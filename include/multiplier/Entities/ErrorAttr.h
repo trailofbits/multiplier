@@ -18,7 +18,6 @@ class Attr;
 class ErrorAttr;
 class InheritableAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

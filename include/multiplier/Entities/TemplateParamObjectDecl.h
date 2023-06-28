@@ -19,7 +19,6 @@ class Stmt;
 class TemplateParamObjectDecl;
 class Token;
 class ValueDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

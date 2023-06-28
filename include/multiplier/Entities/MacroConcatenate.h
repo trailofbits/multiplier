@@ -16,7 +16,6 @@ class Index;
 class Macro;
 class MacroConcatenate;
 class MacroSubstitution;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

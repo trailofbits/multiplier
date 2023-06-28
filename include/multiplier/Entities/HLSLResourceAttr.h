@@ -19,7 +19,6 @@ class Attr;
 class HLSLResourceAttr;
 class InheritableAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

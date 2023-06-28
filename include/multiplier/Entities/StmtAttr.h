@@ -22,7 +22,6 @@ class StmtAttr;
 class SuppressAttr;
 class Token;
 class UnlikelyAttr;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

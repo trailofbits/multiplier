@@ -21,7 +21,6 @@ class SubstNonTypeTemplateParmExpr;
 class Token;
 class Type;
 class ValueStmt;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

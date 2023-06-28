@@ -19,7 +19,6 @@ class Expr;
 class ObjCAtSynchronizedStmt;
 class Stmt;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

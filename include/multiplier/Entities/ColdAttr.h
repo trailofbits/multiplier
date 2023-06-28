@@ -17,7 +17,6 @@ class Attr;
 class ColdAttr;
 class InheritableAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

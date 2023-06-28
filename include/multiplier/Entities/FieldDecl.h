@@ -25,7 +25,6 @@ class Stmt;
 class Token;
 class ValueDecl;
 class VariableArrayType;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

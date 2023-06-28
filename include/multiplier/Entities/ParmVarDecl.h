@@ -25,7 +25,6 @@ class TokenRange;
 class Type;
 class ValueDecl;
 class VarDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

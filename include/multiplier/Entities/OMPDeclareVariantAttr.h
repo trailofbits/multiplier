@@ -18,7 +18,6 @@ class Expr;
 class InheritableAttr;
 class OMPDeclareVariantAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

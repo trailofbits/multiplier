@@ -16,7 +16,6 @@ class Index;
 class Attr;
 class RenderScriptKernelAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

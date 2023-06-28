@@ -20,7 +20,6 @@ class OMPLoopBasedDirective;
 class OMPLoopDirective;
 class Stmt;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

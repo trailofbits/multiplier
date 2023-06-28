@@ -20,7 +20,6 @@ class Stmt;
 class TemplateParameterList;
 class Token;
 class Type;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

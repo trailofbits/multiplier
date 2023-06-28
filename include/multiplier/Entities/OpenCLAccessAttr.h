@@ -17,7 +17,6 @@ class Index;
 class Attr;
 class OpenCLAccessAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

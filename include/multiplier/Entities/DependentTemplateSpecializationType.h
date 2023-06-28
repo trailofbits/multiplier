@@ -18,7 +18,6 @@ class TemplateArgument;
 class Token;
 class Type;
 class TypeWithKeyword;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

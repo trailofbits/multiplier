@@ -20,7 +20,6 @@ class Stmt;
 class Token;
 class UnaryOperator;
 class ValueStmt;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

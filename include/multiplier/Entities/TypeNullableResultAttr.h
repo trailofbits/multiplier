@@ -17,7 +17,6 @@ class Attr;
 class Token;
 class TypeAttr;
 class TypeNullableResultAttr;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

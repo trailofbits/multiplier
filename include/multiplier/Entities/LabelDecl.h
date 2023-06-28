@@ -19,7 +19,6 @@ class LabelStmt;
 class NamedDecl;
 class Stmt;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

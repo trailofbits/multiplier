@@ -10,7 +10,6 @@
 #include <mlir/IR/Operation.h>
 #include <mlir/IR/OperationSupport.h>
 #include <mlir/IR/Value.h>
-#include <multiplier/IR/Operand.h>
 #include <multiplier/IR/Operation.h>
 #include <multiplier/IR/Type.h>
 

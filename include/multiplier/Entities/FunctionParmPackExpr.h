@@ -20,7 +20,6 @@ class Stmt;
 class Token;
 class ValueStmt;
 class VarDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

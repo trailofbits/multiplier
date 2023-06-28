@@ -20,7 +20,6 @@ class OMPLoopDirective;
 class OMPTargetParallelForSimdDirective;
 class Stmt;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

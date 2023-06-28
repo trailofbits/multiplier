@@ -16,7 +16,6 @@ class Index;
 class Macro;
 class MacroDirective;
 class OtherMacroDirective;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

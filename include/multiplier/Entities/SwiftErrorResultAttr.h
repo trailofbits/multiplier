@@ -19,7 +19,6 @@ class InheritableParamAttr;
 class ParameterABIAttr;
 class SwiftErrorResultAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

@@ -19,7 +19,6 @@ class Stmt;
 class Token;
 class UnresolvedUsingValueDecl;
 class ValueDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

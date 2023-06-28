@@ -18,7 +18,6 @@ class Macro;
 class MacroArgument;
 class MacroExpansion;
 class MacroSubstitution;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

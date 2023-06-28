@@ -16,7 +16,6 @@ class Index;
 class Attr;
 class ObjCClassStubAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

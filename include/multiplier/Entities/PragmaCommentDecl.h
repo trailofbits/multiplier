@@ -18,7 +18,6 @@ class Decl;
 class PragmaCommentDecl;
 class Stmt;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

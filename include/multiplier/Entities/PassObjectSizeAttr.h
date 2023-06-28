@@ -19,7 +19,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class PassObjectSizeAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

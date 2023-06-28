@@ -50,13 +50,13 @@ class SourceIRImpl {
   std::unordered_map<ir::OperationKind, std::vector<mlir::Operation *>>
       operations;
 
-  std::unordered_map<DeclKind, std::vector<mlir::Operation *>>
+  std::unordered_map<::mx::DeclKind, std::vector<mlir::Operation *>>
       declarations;
 
-  std::unordered_map<StmtKind, std::vector<mlir::Operation *>>
+  std::unordered_map<::mx::StmtKind, std::vector<mlir::Operation *>>
       statements;
 
-  std::unordered_map<TypeKind, std::vector<mlir::Operation *>>
+  std::unordered_map<::mx::TypeKind, std::vector<mlir::Operation *>>
       types;
 
   std::unordered_map<RawEntityId, std::vector<mlir::Operation *>>

@@ -33,7 +33,6 @@ class MacroImpl;
 class Reference;
 class Token;
 class TokenRange;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

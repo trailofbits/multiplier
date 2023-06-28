@@ -20,7 +20,6 @@ class RedeclarableTemplateDecl;
 class Stmt;
 class TemplateDecl;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

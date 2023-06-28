@@ -32,7 +32,6 @@ class OtherMacroDirective;
 class PragmaMacroDirective;
 class Token;
 class UndefineMacroDirective;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

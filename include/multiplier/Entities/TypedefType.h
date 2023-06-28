@@ -17,7 +17,6 @@ class Token;
 class Type;
 class TypedefNameDecl;
 class TypedefType;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

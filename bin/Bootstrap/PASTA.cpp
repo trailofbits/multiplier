@@ -3306,7 +3306,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     os << "class " << fwd << ";\n";
   }
   os
-      << "namespace mx {\n"
       << "namespace ir {\n"
       << "class Operation;\n"
       << "class Value;\n"

@@ -21,7 +21,6 @@ class TypeAliasDecl;
 class TypeAliasTemplateDecl;
 class TypeDecl;
 class TypedefNameDecl;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

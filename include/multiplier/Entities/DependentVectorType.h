@@ -18,7 +18,6 @@ class DependentVectorType;
 class Expr;
 class Token;
 class Type;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

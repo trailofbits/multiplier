@@ -19,7 +19,6 @@ class HLSLSV_DispatchThreadIDAttr;
 class HLSLSV_GroupIndexAttr;
 class InheritableAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

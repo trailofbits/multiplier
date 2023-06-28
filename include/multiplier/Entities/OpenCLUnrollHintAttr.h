@@ -17,7 +17,6 @@ class Attr;
 class OpenCLUnrollHintAttr;
 class StmtAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

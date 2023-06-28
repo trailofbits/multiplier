@@ -16,7 +16,6 @@ class Index;
 class Macro;
 class MacroStringify;
 class MacroSubstitution;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

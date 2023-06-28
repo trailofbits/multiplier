@@ -19,7 +19,6 @@ class Token;
 class TokenRange;
 class Type;
 class VariableArrayType;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

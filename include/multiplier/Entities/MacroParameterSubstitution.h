@@ -17,7 +17,6 @@ class Macro;
 class MacroParameter;
 class MacroParameterSubstitution;
 class MacroSubstitution;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

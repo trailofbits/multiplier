@@ -18,7 +18,6 @@ class InheritableAttr;
 class Token;
 class Type;
 class VecTypeHintAttr;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

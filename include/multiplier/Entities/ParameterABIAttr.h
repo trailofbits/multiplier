@@ -23,7 +23,6 @@ class SwiftContextAttr;
 class SwiftErrorResultAttr;
 class SwiftIndirectResultAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

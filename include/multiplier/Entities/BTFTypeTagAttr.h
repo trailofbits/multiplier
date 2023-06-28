@@ -17,7 +17,6 @@ class Attr;
 class BTFTypeTagAttr;
 class Token;
 class TypeAttr;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

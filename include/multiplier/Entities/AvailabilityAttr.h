@@ -17,7 +17,6 @@ class Attr;
 class AvailabilityAttr;
 class InheritableAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

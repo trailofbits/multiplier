@@ -24,7 +24,6 @@ class IfMacroDirective;
 class IfNotDefinedMacroDirective;
 class Macro;
 class MacroDirective;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

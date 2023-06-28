@@ -18,7 +18,6 @@ class Attr;
 class InheritableAttr;
 class Token;
 class TypeVisibilityAttr;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

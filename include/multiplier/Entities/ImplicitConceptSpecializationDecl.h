@@ -18,7 +18,6 @@ class ImplicitConceptSpecializationDecl;
 class Stmt;
 class TemplateArgument;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

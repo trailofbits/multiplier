@@ -17,7 +17,6 @@ class Attr;
 class InheritableAttr;
 class OSReturnsRetainedOnNonZeroAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;

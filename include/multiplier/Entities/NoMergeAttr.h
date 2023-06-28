@@ -18,7 +18,6 @@ class DeclOrStmtAttr;
 class InheritableAttr;
 class NoMergeAttr;
 class Token;
-namespace mx {
 namespace ir {
 class Operation;
 class Value;
