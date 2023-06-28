@@ -51,11 +51,6 @@ target_include_directories("mx-mlir"
     "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-target_compile_definitions("mx-mlir"
-  PUBLIC
-    "MX_ENABLE_SOURCEIR"
-)
-
 set_target_properties("mx-mlir"
   PROPERTIES
     LINKER_LANGUAGE
@@ -70,11 +65,18 @@ set_target_properties("mx-mlir"
 
 target_link_libraries("mx-mlir"
   PUBLIC
-    vast::vast
-    vast::MLIRCore
-    vast::MLIRMeta
-    vast::MLIRLowLevel
-    vast::MLIRHighLevel
+
+    "gap::gap"
+    "gap::gap-core"
+    "std::coroutines"
+    "gap::gap-settings"
+    
+    "vast::vast"
+    "vast::MLIRCore"
+    "vast::MLIRMeta"
+    "vast::MLIRLowLevel"
+    "vast::MLIRHighLevel"
+
     MLIRDialect
     MLIRAMDGPUDialect
     MLIRAsyncDialect

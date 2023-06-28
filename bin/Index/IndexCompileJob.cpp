@@ -170,6 +170,20 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 };
 
+// Determines whether or not a TLD is likely to have to go into a child
+// fragment. This happens when the TLD is a forward declaration, e.g. of a
+// struct.
+static bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kRecord:
+    case pasta::DeclKind::kCXXRecord:
+    case pasta::DeclKind::kEnum:
+      return !IsDefinition(decl);
+    default:
+      return false;
+  }
+}
+
 // Find all top-level declarations.
 static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
 
@@ -1227,6 +1241,12 @@ static void CreatePendingFragment(
           << "TODO: Unsupported top-level entity kind";
     }
   }
+
+  // Partition the top-level declarations so that ones that definitely won't
+  // need to go in a nested fragment show up first. This acts as a minor
+  // mitigation to #396 (https://github.com/trailofbits/multiplier/issues/396).
+  std::partition(pf.top_level_decls.begin(), pf.top_level_decls.end(),
+                 ShouldGoInNestedFragment);
 
   CHECK_NE((pf.num_top_level_declarations + pf.num_top_level_macros), 0u);
 

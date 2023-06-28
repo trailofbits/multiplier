@@ -13,22 +13,19 @@
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Type.h>
+#include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
 
 #include "Attr.h"
 #include "Pseudo.h"
 #include "Decl.h"
 #include "File.h"
+#include "IR/SourceIR.h"
 #include "Macro.h"
 #include "Reference.h"
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
 #include "WeggliImpl.h"
-
-#ifdef MX_ENABLE_SOURCEIR
-# include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
-# include "IR/SourceIR.h"
-#endif
 
 namespace mx {
 namespace ir {
@@ -268,7 +265,6 @@ gap::generator<RegexQueryMatch> Fragment::query(
   }
 }
 
-#ifdef MX_ENABLE_SOURCEIR
 std::optional<ir::builtin::ModuleOp> Fragment::ir(void) const noexcept {
   if (auto mlir = impl->SourceIR(); !mlir.empty()) {
     auto ir_obj = std::make_shared<const ir::SourceIRImpl>(
@@ -280,6 +276,5 @@ std::optional<ir::builtin::ModuleOp> Fragment::ir(void) const noexcept {
   }
   return std::nullopt;
 }
-#endif
 
 }  // namespace mx

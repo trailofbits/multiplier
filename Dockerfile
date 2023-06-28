@@ -60,6 +60,24 @@ RUN git clone --depth 1 https://github.com/trailofbits/weggli-native /work/src/w
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
     && cmake --build '/work/build/weggli-native' --target install
 
+# Build and install VAST
+RUN git clone --depth 1 https://github.com/trailofbits/vast /work/src/vast \
+    && cmake \
+        -S '/work/src/vast' \
+        -B '/work/build/vast' \
+        -G Ninja \
+        -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+        -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER="$(which clang-15)" \
+        -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
+        -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+        -DVAST_ENABLE_GAP_SUBMODULE=FALSE \
+        -DVAST_WARNINGS_AS_ERRORS=FALSE \
+        -DVAST_INSTALL=ON \
+        -DENABLE_TESTING=OFF \
+    && cmake --build '/work/build/vast' --target install
+
 # Build and install pasta
 RUN git clone --depth 1 https://github.com/trailofbits/pasta /work/src/pasta \
     && cmake \
@@ -91,7 +109,6 @@ RUN cmake \
     -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
     -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
     -DMX_ENABLE_BOOTSTRAP=OFF \
-    -DMX_ENABLE_VAST=OFF \
     -DMX_ENABLE_WEGGLI=ON \
     -DMX_ENABLE_INSTALL=ON
 

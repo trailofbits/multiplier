@@ -74,61 +74,59 @@ add_custom_command(
 )
 endif()
 
-if(MX_ENABLE_VAST)
-  add_executable("mx-bootstrap-vast"
-    "VAST.cpp"
-    "${PROJECT_SOURCE_DIR}/bin/Index/Entity.h"
-  )
-  
-  target_link_libraries("mx-bootstrap-vast"
-    PRIVATE
-      "mx-bootstrap"
-      
-      vast::vast
-      vast::MLIRCore
-      vast::MLIRMeta
-      vast::MLIRLowLevel
-      vast::MLIRHighLevel
-      MLIRDialect
-      MLIRAMDGPUDialect
-      MLIRAsyncDialect
-      MLIREmitCDialect
-      MLIRIndexDialect
-      MLIRMLProgramDialect
-      MLIRNVGPUDialect
-      MLIROpenACCDialect
-      MLIROpenMPDialect
-      MLIRROCDLDialect
-      MLIRShapeDialect
-      MLIRSPIRVDialect
-      MLIRTosaDialect
+add_executable("mx-bootstrap-vast"
+  "VAST.cpp"
+  "${PROJECT_SOURCE_DIR}/bin/Index/Entity.h"
+)
 
-      MLIRLLVMIRTransforms
-      MLIRShapeOpsTransforms
-      MLIRSparseTensorTransforms
-      MLIRAffineTransformOps
-      MLIRBufferizationTransformOps
-      MLIRGPUTransformOps
-      MLIRLinalgTransformOps
-      MLIRMemRefTransformOps
-      MLIRSCFTransformOps
-      MLIRVectorTransformOps
-      MLIRTensorInferTypeOpInterfaceImpl
-  )
+target_link_libraries("mx-bootstrap-vast"
+  PRIVATE
+    "mx-bootstrap"
+    
+    vast::vast
+    vast::MLIRCore
+    vast::MLIRMeta
+    vast::MLIRLowLevel
+    vast::MLIRHighLevel
+    MLIRDialect
+    MLIRAMDGPUDialect
+    MLIRAsyncDialect
+    MLIREmitCDialect
+    MLIRIndexDialect
+    MLIRMLProgramDialect
+    MLIRNVGPUDialect
+    MLIROpenACCDialect
+    MLIROpenMPDialect
+    MLIRROCDLDialect
+    MLIRShapeDialect
+    MLIRSPIRVDialect
+    MLIRTosaDialect
 
-  # Run `mx-bootstrap-vast` to auto-generate the files.
-  add_custom_command(
-    TARGET
-      "mx-bootstrap-vast"
-    POST_BUILD
-    BYPRODUCTS
-      ${generated_files}
-    COMMAND
-      "mx-bootstrap-vast"
-      "${install_include_dir}"
-      "${dependencies_include_dir}"
-      "${LLVM_INCLUDE_DIR}"
-    COMMENT
-      "Bootstrapping Multiplier"
-  )
-endif()
+    MLIRLLVMIRTransforms
+    MLIRShapeOpsTransforms
+    MLIRSparseTensorTransforms
+    MLIRAffineTransformOps
+    MLIRBufferizationTransformOps
+    MLIRGPUTransformOps
+    MLIRLinalgTransformOps
+    MLIRMemRefTransformOps
+    MLIRSCFTransformOps
+    MLIRVectorTransformOps
+    MLIRTensorInferTypeOpInterfaceImpl
+)
+
+# Run `mx-bootstrap-vast` to auto-generate the files.
+add_custom_command(
+  TARGET
+    "mx-bootstrap-vast"
+  POST_BUILD
+  BYPRODUCTS
+    ${generated_files}
+  COMMAND
+    "mx-bootstrap-vast"
+    "${install_include_dir}"
+    "${dependencies_include_dir}"
+    "${LLVM_INCLUDE_DIR}"
+  COMMENT
+    "Bootstrapping Multiplier"
+)

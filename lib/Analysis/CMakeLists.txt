@@ -22,7 +22,6 @@ add_library("mx-analysis" STATIC
 target_link_libraries("mx-analysis"
   PUBLIC
     "mx-api"
-    "mx-mlir"
 )
 
 target_compile_options("mx-analysis"
@@ -58,13 +57,6 @@ set_target_properties("mx-analysis"
     INTERFACE_COMPILE_FEATURES
       cxx_std_20
 )
-
-if(MX_ENABLE_VAST)
-  target_compile_definitions("mx-analysis"
-    PRIVATE
-      "MX_ENABLE_SOURCEIR"
-  )
-endif(MX_ENABLE_VAST)
 
 if(MX_ENABLE_INSTALL)
   install(

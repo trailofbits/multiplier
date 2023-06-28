@@ -18,11 +18,7 @@ capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file
 file(GLOB entity_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}/*.h")
 file(GLOB entity_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}/*.cpp")
 
-if(MX_ENABLE_VAST)
-  add_subdirectory("IR")
-else()
-
-endif()
+add_subdirectory("IR")
 
 add_library("mx-entities" INTERFACE)
 set_target_properties("mx-entities"
@@ -171,12 +167,8 @@ add_dependencies("mx-api"
 target_link_libraries("mx-api"
   PUBLIC
     "mx-sqlite"
-    "gap::gap"
-    "gap::gap-core"
-    "std::coroutines"
-    "gap::gap-settings"
+    "mx-mlir"
     $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
-    $<$<BOOL:${MX_ENABLE_VAST}>:mx-mlir>
   PRIVATE
     "CapnProto::capnp-rpc"
     $<BUILD_INTERFACE:concurrentqueue>

@@ -145,10 +145,8 @@ class Fragment {
   // Run a regular expression search over this fragment.
   gap::generator<RegexQueryMatch> query(const RegexQuery &query) const &;
 
-#ifdef MX_ENABLE_SOURCEIR
   // Returns source IR for the fragment.
   std::optional<ir::builtin::ModuleOp> ir(void) const noexcept;
-#endif
 };
 
 }  // namespace mx

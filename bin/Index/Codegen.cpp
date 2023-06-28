@@ -6,8 +6,6 @@
 
 #include "Codegen.h"
 
-#ifdef MX_ENABLE_SOURCEIR
-
 #include <vast/Util/Warnings.hpp>
 
 VAST_RELAX_WARNINGS
@@ -32,8 +30,6 @@ VAST_UNRELAX_WARNINGS
 #include "CodegenMetaGenerator.h"
 #include "CodegenVisitor.h"
 
-#endif  // MX_ENABLE_SOURCEIR
-
 #include <pasta/AST/Decl.h>
 
 #include "Context.h"
@@ -41,21 +37,16 @@ VAST_UNRELAX_WARNINGS
 
 namespace indexer {
 
-#ifdef MX_ENABLE_SOURCEIR
-
 template<typename Derived>
 using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
     Derived, vast::cg::DefaultCodeGenVisitorMixin, FallBackVisitor >;
 
 using CodeGenVisitor = vast::cg::CodeGenVisitor<VisitorConfig, MetaGenerator>;
 
-#endif
-
 class CodeGeneratorImpl {
  public:
   bool disabled{false};
 
-#ifdef MX_ENABLE_SOURCEIR
   mlir::DialectRegistry registry;
 
   CodeGeneratorImpl(void) {
@@ -63,7 +54,6 @@ class CodeGeneratorImpl {
                     vast::meta::MetaDialect,
                     vast::core::CoreDialect>();
   }
-#endif  // MX_ENABLE_SOURCEIR
 };
 
 CodeGenerator::CodeGenerator(void)
@@ -82,14 +72,7 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
     const std::vector<pasta::Decl> &decls,
     unsigned num_decls) {
 
-  (void) ast;
-  (void) fragment_id;
-  (void) em;
-  (void) decls;
-  (void) num_decls;
-
   std::string ret;
-#ifdef MX_ENABLE_SOURCEIR
   if (impl->disabled || decls.empty()) {
     return ret;
   }
@@ -119,7 +102,6 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   auto mod = codegen.freeze();
   llvm::raw_string_ostream os(ret);
   mod->print(os, flags);
-#endif
 
   return ret;
 }
