@@ -3625,7 +3625,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "}  // namespace pasta\n"
       << "namespace indexer {\n";
   lib_pasta_h_os
-      << "}  // namespace pasta\n";
+      << "}  // namespace pasta\n"
+      << "namespace mx {\n";
 
   std::vector<std::string> class_names;
 

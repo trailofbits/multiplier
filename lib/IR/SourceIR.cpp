@@ -193,7 +193,12 @@ SourceIRImpl::SourceIRImpl(PackedFragmentId frag_id_, EntityProviderPtr ep_,
 SourceIRImpl::~SourceIRImpl(void) {}
 
 mlir::Operation *SourceIRImpl::scope(void) const {
-  return mod.get();
+  if (mod) {
+    return reinterpret_cast<mlir::Operation *>(
+        const_cast<void *>(mod.get().getAsOpaquePointer()));
+  } else {
+    return nullptr;
+  }
 }
 
 //const OperationRange::OpVec *

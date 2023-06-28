@@ -271,12 +271,12 @@ gap::generator<RegexQueryMatch> Fragment::query(
 #ifdef MX_ENABLE_SOURCEIR
 std::optional<ir::builtin::ModuleOp> Fragment::ir(void) const noexcept {
   if (auto mlir = impl->SourceIR(); !mlir.empty()) {
-    auto ir_obj = std::make_shared<const ir::SourceIRImpl>(impl, mlir);
-    if (!ir_obj->mod.get()) {
-      return std::nullopt;
+    auto ir_obj = std::make_shared<const ir::SourceIRImpl>(
+        id(), impl->ep, mlir);
+    if (mlir::Operation *ptr = ir_obj->scope()) {
+      ir::Operation op(std::move(ir_obj), ptr);
+      return ir::builtin::ModuleOp::from(op);
     }
-    mlir::ModuleOp *ptr = ir_obj->mod.get();
-    return ir::builtin::ModuleOp(std::move(ir_obj));
   }
   return std::nullopt;
 }

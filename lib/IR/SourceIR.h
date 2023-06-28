@@ -41,6 +41,7 @@ enum class TypeKind : unsigned;
 class SourceIRImpl {
  private:
   friend class Fragment;
+  friend class FragmentImpl;
 
   const PackedFragmentId frag_id;
   const EntityProviderPtr ep;

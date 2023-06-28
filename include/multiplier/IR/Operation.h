@@ -22,12 +22,12 @@ namespace detail {
 class OpResultImpl;
 }  // namespace detail
 }  // namespace mlir
-namespace mx::ir {
-
+namespace mx {
+class Fragment;
+namespace ir {
 class Attribute;
 class Block;
 class Argument;
-class Fragment;
 class Label;
 class Region;
 class Result;
@@ -42,13 +42,14 @@ class Operation {
  private:
   friend class Attribute;
   friend class Block;
-  friend class Fragment;
   friend class Label;
   friend class Operand;
   friend class Region;
   friend class Result;
   friend class SourceIRImpl;
   friend class Value;
+
+  friend class ::mx::Fragment;
 
   Operation(void) = delete;
 
@@ -166,4 +167,5 @@ class Operand {
   Value value(void) const noexcept;
 };
 
-}  // namespace mx::ir
+}  // namespace ir
+}  // namespace mx

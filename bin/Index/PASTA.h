@@ -577,6 +577,7 @@ enum class TargetLanguage : unsigned;
 enum class PseudoKind : unsigned char;
 enum class TokenCategory : unsigned char;
 }  // namespace pasta
+namespace mx {
 enum class DeclKind : unsigned char;
 DeclKind FromPasta(pasta::DeclKind pasta_val);
 
