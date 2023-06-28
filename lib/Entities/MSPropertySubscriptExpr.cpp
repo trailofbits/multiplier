@@ -155,17 +155,17 @@ std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Token
 }
 
 Expr MSPropertySubscriptExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr MSPropertySubscriptExpr::index(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MSPropertySubscriptExpr::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 #pragma GCC diagnostic pop

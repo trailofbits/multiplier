@@ -155,11 +155,11 @@ std::optional<PackExpansionExpr> PackExpansionExpr::from(const TokenContext &t) 
 }
 
 Token PackExpansionExpr::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr PackExpansionExpr::pattern(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

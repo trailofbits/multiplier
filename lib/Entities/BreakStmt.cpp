@@ -153,7 +153,7 @@ std::optional<BreakStmt> BreakStmt::from(const TokenContext &t) {
 }
 
 Token BreakStmt::break_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 #pragma GCC diagnostic pop

@@ -156,16 +156,16 @@ std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const TokenContext &t
 }
 
 Expr UserDefinedLiteral::cooked_literal(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal45();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const {
-  return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal99());
+  return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal97());
 }
 
 Token UserDefinedLiteral::ud_suffix_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 #pragma GCC diagnostic pop

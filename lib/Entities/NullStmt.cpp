@@ -153,11 +153,11 @@ std::optional<NullStmt> NullStmt::from(const TokenContext &t) {
 }
 
 Token NullStmt::semi_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 bool NullStmt::has_leading_empty_macro(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal13();
 }
 
 #pragma GCC diagnostic pop

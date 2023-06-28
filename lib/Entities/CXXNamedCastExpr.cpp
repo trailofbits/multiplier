@@ -171,20 +171,20 @@ std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const TokenContext &t) {
 }
 
 TokenRange CXXNamedCastExpr::angle_brackets(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal44(), impl->reader.getVal45());
 }
 
 std::string_view CXXNamedCastExpr::cast_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal68();
+  capnp::Text::Reader data = impl->reader.getVal66();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token CXXNamedCastExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 Token CXXNamedCastExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 #pragma GCC diagnostic pop

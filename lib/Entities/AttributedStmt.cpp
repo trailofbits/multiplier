@@ -155,15 +155,15 @@ std::optional<AttributedStmt> AttributedStmt::from(const TokenContext &t) {
 }
 
 Token AttributedStmt::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 unsigned AttributedStmt::num_attributes(void) const {
-  return impl->reader.getVal18().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -177,19 +177,19 @@ std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
 }
 
 gap::generator<Attr> AttributedStmt::attributes(void) const & {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d18 = ep->AttrFor(ep, v)) {
-      co_yield Attr(std::move(d18));
+    if (auto d16 = ep->AttrFor(ep, v)) {
+      co_yield Attr(std::move(d16));
     }
   }
   co_return;
 }
 
 Stmt AttributedStmt::sub_statement(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal12();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

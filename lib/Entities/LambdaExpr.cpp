@@ -162,31 +162,31 @@ std::optional<LambdaExpr> LambdaExpr::from(const TokenContext &t) {
 }
 
 Stmt LambdaExpr::body(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CXXMethodDecl LambdaExpr::call_operator(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal40();
   return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const {
-  return static_cast<LambdaCaptureDefault>(impl->reader.getVal97());
+  return static_cast<LambdaCaptureDefault>(impl->reader.getVal95());
 }
 
 Token LambdaExpr::capture_default_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 CompoundStmt LambdaExpr::compound_statement_body(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal42();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal45();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -198,11 +198,11 @@ std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) co
 }
 
 unsigned LambdaExpr::num_explicit_template_parameters(void) const {
-  return impl->reader.getVal18().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n) const {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -216,12 +216,12 @@ std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n)
 }
 
 gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const & {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d18 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d18)))) {
+    if (auto d16 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from(Decl(std::move(d16)))) {
         co_yield std::move(*e);
       }
     }
@@ -230,17 +230,17 @@ gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const &
 }
 
 TokenRange LambdaExpr::introducer_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal44(), impl->reader.getVal45());
 }
 
 CXXRecordDecl LambdaExpr::lambda_class(void) const {
-  RawEntityId eid = impl->reader.getVal48();
+  RawEntityId eid = impl->reader.getVal46();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal49();
+    RawEntityId eid = impl->reader.getVal47();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -253,7 +253,7 @@ std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) c
 
 std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal50();
+    RawEntityId eid = impl->reader.getVal48();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -265,19 +265,19 @@ std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
 }
 
 bool LambdaExpr::has_explicit_parameters(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool LambdaExpr::has_explicit_result_type(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool LambdaExpr::is_generic_lambda(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal92();
 }
 
 bool LambdaExpr::is_mutable(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

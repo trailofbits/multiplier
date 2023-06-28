@@ -157,33 +157,33 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const TokenContex
 }
 
 Expr UnresolvedMemberExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal46();
+  RawEntityId eid = impl->reader.getVal44();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type UnresolvedMemberExpr::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal45();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token UnresolvedMemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 Token UnresolvedMemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 bool UnresolvedMemberExpr::has_unresolved_using(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal92();
 }
 
 bool UnresolvedMemberExpr::is_arrow(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool UnresolvedMemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal94();
 }
 
 #pragma GCC diagnostic pop

@@ -155,7 +155,7 @@ std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const TokenCo
 }
 
 Token CXXScalarValueInitExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 #pragma GCC diagnostic pop

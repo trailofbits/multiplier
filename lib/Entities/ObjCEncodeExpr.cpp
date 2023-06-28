@@ -156,16 +156,16 @@ std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const TokenContext &t) {
 }
 
 Token ObjCEncodeExpr::at_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Type ObjCEncodeExpr::encoded_type(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal40();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token ObjCEncodeExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 #pragma GCC diagnostic pop

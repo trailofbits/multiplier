@@ -155,7 +155,7 @@ std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const TokenContext &t) {
 }
 
 Expr ImaginaryLiteral::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

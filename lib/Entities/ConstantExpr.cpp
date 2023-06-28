@@ -156,15 +156,15 @@ std::optional<ConstantExpr> ConstantExpr::from(const TokenContext &t) {
 }
 
 ConstantExprResultStorageKind ConstantExpr::result_storage_kind(void) const {
-  return static_cast<ConstantExprResultStorageKind>(impl->reader.getVal97());
+  return static_cast<ConstantExprResultStorageKind>(impl->reader.getVal95());
 }
 
 bool ConstantExpr::has_ap_value_result(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool ConstantExpr::is_immediate_invocation(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

@@ -155,16 +155,16 @@ std::optional<SEHExceptStmt> SEHExceptStmt::from(const TokenContext &t) {
 }
 
 CompoundStmt SEHExceptStmt::block(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal10();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token SEHExceptStmt::except_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 Expr SEHExceptStmt::filter_expression(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal12();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

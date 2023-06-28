@@ -154,12 +154,12 @@ std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const TokenContext &t) {
 }
 
 CompoundStmt SEHFinallyStmt::block(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal10();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token SEHFinallyStmt::finally_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 #pragma GCC diagnostic pop

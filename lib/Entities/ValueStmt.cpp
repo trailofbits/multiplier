@@ -531,7 +531,7 @@ std::optional<ValueStmt> ValueStmt::from(const TokenContext &t) {
 
 std::optional<Expr> ValueStmt::expression_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal12();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

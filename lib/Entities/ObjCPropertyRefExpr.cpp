@@ -159,74 +159,74 @@ std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const TokenContext 
 }
 
 Expr ObjCPropertyRefExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ObjCInterfaceDecl ObjCPropertyRefExpr::class_receiver(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal40();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCPropertyDecl ObjCPropertyRefExpr::explicit_property(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal41();
   return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_getter(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal42();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_setter(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal43();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCPropertyRefExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token ObjCPropertyRefExpr::receiver_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 Type ObjCPropertyRefExpr::receiver_type(void) const {
-  RawEntityId eid = impl->reader.getVal48();
+  RawEntityId eid = impl->reader.getVal46();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ObjCPropertyRefExpr::super_receiver_type(void) const {
-  RawEntityId eid = impl->reader.getVal49();
+  RawEntityId eid = impl->reader.getVal47();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ObjCPropertyRefExpr::is_class_receiver(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool ObjCPropertyRefExpr::is_explicit_property(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool ObjCPropertyRefExpr::is_implicit_property(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal92();
 }
 
 bool ObjCPropertyRefExpr::is_messaging_getter(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool ObjCPropertyRefExpr::is_messaging_setter(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal94();
 }
 
 bool ObjCPropertyRefExpr::is_object_receiver(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal96();
 }
 
 bool ObjCPropertyRefExpr::is_super_receiver(void) const {
-  return impl->reader.getVal100();
+  return impl->reader.getVal98();
 }
 
 #pragma GCC diagnostic pop

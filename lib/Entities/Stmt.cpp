@@ -12,8 +12,7 @@
 #include <multiplier/Entities/File.h>
 #include <multiplier/Entities/Fragment.h>
 #include <multiplier/Entities/Index.h>
-#include <multiplier/Entities/Macro.h>
-#include <multiplier/Entities/MacroArgument.h>
+#include <multiplier/Entities/MacroSubstitution.h>
 #include <multiplier/Entities/Reference.h>
 #include <multiplier/Entities/Token.h>
 
@@ -225,38 +224,12 @@ std::optional<Stmt> Stmt::from(const TokenContext &t) {
   return t.as_statement();
 }
 
-std::optional<Macro> Stmt::highest_containing_substitution(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal3();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
-      return Macro(std::move(eptr));
-    }
-  }
-  return std::nullopt;
+unsigned Stmt::num_aligned_substitutions(void) const {
+  return impl->reader.getVal3().size();
 }
 
-std::optional<MacroArgument> Stmt::lowest_containing_macro_argument(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal4();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
-      return MacroArgument::from(Macro(std::move(eptr)));
-    }
-  }
-  return std::nullopt;
-}
-
-unsigned Stmt::num_covering_macros(void) const {
-  return impl->reader.getVal5().size();
-}
-
-std::optional<Macro> Stmt::nth_covering_macro(unsigned n) const {
-  auto list = impl->reader.getVal5();
+std::optional<MacroSubstitution> Stmt::nth_aligned_substitution(unsigned n) const {
+  auto list = impl->reader.getVal3();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -266,48 +239,50 @@ std::optional<Macro> Stmt::nth_covering_macro(unsigned n) const {
   if (!e) {
     return std::nullopt;
   }
-  return Macro(std::move(e));
+  return MacroSubstitution::from(Macro(std::move(e)));
 }
 
-gap::generator<Macro> Stmt::covering_macros(void) const & {
-  auto list = impl->reader.getVal5();
+gap::generator<MacroSubstitution> Stmt::aligned_substitutions(void) const & {
+  auto list = impl->reader.getVal3();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d5 = ep->MacroFor(ep, v)) {
-      co_yield Macro(std::move(d5));
+    if (auto d3 = ep->MacroFor(ep, v)) {
+      if (auto e = MacroSubstitution::from(Macro(std::move(d3)))) {
+        co_yield std::move(*e);
+      }
     }
   }
   co_return;
 }
 
 Stmt Stmt::ignore_containers(void) const {
-  RawEntityId eid = impl->reader.getVal6();
+  RawEntityId eid = impl->reader.getVal4();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<Stmt> Stmt::children(void) const & {
-  auto list = impl->reader.getVal7();
+  auto list = impl->reader.getVal5();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d7 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d7));
+    if (auto d5 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d5));
     }
   }
   co_return;
 }
 
 TokenRange Stmt::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal8(), impl->reader.getVal9());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal6(), impl->reader.getVal7());
 }
 
 StmtKind Stmt::kind(void) const {
-  return static_cast<StmtKind>(impl->reader.getVal10());
+  return static_cast<StmtKind>(impl->reader.getVal8());
 }
 
 Stmt Stmt::strip_label_like_statements(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

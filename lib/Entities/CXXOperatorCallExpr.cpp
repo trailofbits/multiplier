@@ -156,23 +156,23 @@ std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const TokenContext 
 }
 
 OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const {
-  return static_cast<OverloadedOperatorKind>(impl->reader.getVal99());
+  return static_cast<OverloadedOperatorKind>(impl->reader.getVal97());
 }
 
 Token CXXOperatorCallExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool CXXOperatorCallExpr::is_assignment_operation(void) const {
-  return impl->reader.getVal100();
+  return impl->reader.getVal98();
 }
 
 bool CXXOperatorCallExpr::is_comparison_operation(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal99();
 }
 
 bool CXXOperatorCallExpr::is_infix_binary_operation(void) const {
-  return impl->reader.getVal102();
+  return impl->reader.getVal100();
 }
 
 #pragma GCC diagnostic pop

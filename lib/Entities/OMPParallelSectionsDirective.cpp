@@ -155,12 +155,12 @@ std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(c
 }
 
 Expr OMPParallelSectionsDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal17();
+  RawEntityId eid = impl->reader.getVal15();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPParallelSectionsDirective::has_cancel(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

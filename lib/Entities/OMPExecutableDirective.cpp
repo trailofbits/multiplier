@@ -365,31 +365,31 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const TokenCo
 }
 
 Stmt OMPExecutableDirective::associated_statement(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal10();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CapturedStmt OMPExecutableDirective::innermost_captured_statement(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal11();
   return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt OMPExecutableDirective::raw_statement(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal12();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt OMPExecutableDirective::structured_block(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool OMPExecutableDirective::has_associated_statement(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal13();
 }
 
 bool OMPExecutableDirective::is_standalone_directive(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal17();
 }
 
 #pragma GCC diagnostic pop

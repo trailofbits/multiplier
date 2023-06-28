@@ -156,21 +156,21 @@ std::optional<PredefinedExpr> PredefinedExpr::from(const TokenContext &t) {
 }
 
 StringLiteral PredefinedExpr::function_name(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const {
-  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal97());
+  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal95());
 }
 
 std::string_view PredefinedExpr::identifier_kind_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal63();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token PredefinedExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 #pragma GCC diagnostic pop

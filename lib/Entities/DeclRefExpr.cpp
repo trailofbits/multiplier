@@ -157,53 +157,53 @@ std::optional<DeclRefExpr> DeclRefExpr::from(const TokenContext &t) {
 }
 
 ValueDecl DeclRefExpr::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 NamedDecl DeclRefExpr::found_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal40();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token DeclRefExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token DeclRefExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token DeclRefExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 bool DeclRefExpr::had_multiple_candidates(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool DeclRefExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool DeclRefExpr::has_qualifier(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal92();
 }
 
 bool DeclRefExpr::has_template_keyword_and_arguments_info(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool DeclRefExpr::has_template_keyword(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal94();
 }
 
 NonOdrUseReason DeclRefExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal97());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal95());
 }
 
 bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal96();
 }
 
 #pragma GCC diagnostic pop

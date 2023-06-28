@@ -155,7 +155,7 @@ std::optional<GNUNullExpr> GNUNullExpr::from(const TokenContext &t) {
 }
 
 Token GNUNullExpr::token_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 #pragma GCC diagnostic pop

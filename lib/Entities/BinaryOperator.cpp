@@ -158,82 +158,82 @@ std::optional<BinaryOperator> BinaryOperator::from(const TokenContext &t) {
 }
 
 Expr BinaryOperator::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 BinaryOperatorKind BinaryOperator::opcode(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal97());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal95());
 }
 
 std::string_view BinaryOperator::opcode_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal63();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token BinaryOperator::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Expr BinaryOperator::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool BinaryOperator::has_stored_fp_features(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool BinaryOperator::is_additive_operation(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool BinaryOperator::is_assignment_operation(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal92();
 }
 
 bool BinaryOperator::is_bitwise_operation(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool BinaryOperator::is_comma_operation(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal94();
 }
 
 bool BinaryOperator::is_comparison_operation(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal96();
 }
 
 bool BinaryOperator::is_compound_assignment_operation(void) const {
-  return impl->reader.getVal100();
+  return impl->reader.getVal98();
 }
 
 bool BinaryOperator::is_equality_operation(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal99();
 }
 
 bool BinaryOperator::is_logical_operation(void) const {
-  return impl->reader.getVal102();
+  return impl->reader.getVal100();
 }
 
 bool BinaryOperator::is_multiplicative_operation(void) const {
-  return impl->reader.getVal103();
+  return impl->reader.getVal101();
 }
 
 bool BinaryOperator::is_pointer_memory_operation(void) const {
-  return impl->reader.getVal104();
+  return impl->reader.getVal102();
 }
 
 bool BinaryOperator::is_relational_operation(void) const {
-  return impl->reader.getVal105();
+  return impl->reader.getVal103();
 }
 
 bool BinaryOperator::is_shift_assign_operation(void) const {
-  return impl->reader.getVal106();
+  return impl->reader.getVal104();
 }
 
 bool BinaryOperator::is_shift_operation(void) const {
-  return impl->reader.getVal107();
+  return impl->reader.getVal105();
 }
 
 #pragma GCC diagnostic pop

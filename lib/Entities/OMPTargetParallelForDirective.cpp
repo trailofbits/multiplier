@@ -157,12 +157,12 @@ std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from
 }
 
 Expr OMPTargetParallelForDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPTargetParallelForDirective::has_cancel(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

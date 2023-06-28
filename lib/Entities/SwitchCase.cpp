@@ -157,16 +157,16 @@ std::optional<SwitchCase> SwitchCase::from(const TokenContext &t) {
 }
 
 Token SwitchCase::colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 Token SwitchCase::keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 std::optional<SwitchCase> SwitchCase::next_switch_case(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal14();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -178,7 +178,7 @@ std::optional<SwitchCase> SwitchCase::next_switch_case(void) const {
 }
 
 Stmt SwitchCase::sub_statement(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

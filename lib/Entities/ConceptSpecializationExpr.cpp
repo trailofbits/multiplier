@@ -157,16 +157,16 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const T
 }
 
 ImplicitConceptSpecializationDecl ConceptSpecializationExpr::specialization_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal39();
   return ImplicitConceptSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 unsigned ConceptSpecializationExpr::num_template_arguments(void) const {
-  return impl->reader.getVal18().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -180,19 +180,19 @@ std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument
 }
 
 gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const & {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d18 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d18));
+    if (auto d16 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d16));
     }
   }
   co_return;
 }
 
 bool ConceptSpecializationExpr::is_satisfied(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

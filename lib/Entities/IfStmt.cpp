@@ -156,13 +156,13 @@ std::optional<IfStmt> IfStmt::from(const TokenContext &t) {
 }
 
 Expr IfStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal10();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<VarDecl> IfStmt::condition_variable(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal13();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -175,7 +175,7 @@ std::optional<VarDecl> IfStmt::condition_variable(void) const {
 
 std::optional<DeclStmt> IfStmt::condition_variable_declaration_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal14();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -188,7 +188,7 @@ std::optional<DeclStmt> IfStmt::condition_variable_declaration_statement(void) c
 
 std::optional<Stmt> IfStmt::else_(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal16();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -200,14 +200,31 @@ std::optional<Stmt> IfStmt::else_(void) const {
 }
 
 Token IfStmt::else_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal15());
 }
 
 Token IfStmt::if_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
 std::optional<Stmt> IfStmt::initializer(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal19();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr));
+    }
+  }
+  return std::nullopt;
+}
+
+Token IfStmt::l_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
+}
+
+std::optional<Stmt> IfStmt::nondiscarded_case(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal21();
     if (eid == kInvalidEntityId) {
@@ -220,66 +237,49 @@ std::optional<Stmt> IfStmt::initializer(void) const {
   return std::nullopt;
 }
 
-Token IfStmt::l_paren_token(void) const {
+Token IfStmt::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal22());
 }
 
-std::optional<Stmt> IfStmt::nondiscarded_case(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal23();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
-Token IfStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal24());
-}
-
 IfStatementKind IfStmt::statement_kind(void) const {
-  return static_cast<IfStatementKind>(impl->reader.getVal59());
+  return static_cast<IfStatementKind>(impl->reader.getVal57());
 }
 
 Stmt IfStmt::then(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal23();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool IfStmt::has_else_storage(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal13();
 }
 
 bool IfStmt::has_initializer_storage(void) const {
-  return impl->reader.getVal19();
+  return impl->reader.getVal17();
 }
 
 bool IfStmt::has_variable_storage(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal24();
 }
 
 bool IfStmt::is_consteval(void) const {
-  return impl->reader.getVal27();
+  return impl->reader.getVal25();
 }
 
 bool IfStmt::is_constexpr(void) const {
-  return impl->reader.getVal28();
+  return impl->reader.getVal26();
 }
 
 bool IfStmt::is_negated_consteval(void) const {
-  return impl->reader.getVal60();
+  return impl->reader.getVal58();
 }
 
 bool IfStmt::is_non_negated_consteval(void) const {
-  return impl->reader.getVal61();
+  return impl->reader.getVal59();
 }
 
 bool IfStmt::is_obj_c_availability_check(void) const {
-  return impl->reader.getVal62();
+  return impl->reader.getVal60();
 }
 
 #pragma GCC diagnostic pop

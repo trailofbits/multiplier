@@ -156,7 +156,7 @@ std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirec
 }
 
 bool OMPParallelMasterTaskLoopDirective::has_cancel(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop
