@@ -51,11 +51,8 @@ void GlobalIndexingState::InitializeProgressBars(void) {
   file_progress.reset(new ProgressBar("File serialization",
                                       report_freq));
 
-  partitioning_progress.reset(new ProgressBar("Fragment partitioning",
+  partitioning_progress.reset(new ProgressBar("AST partitioning",
                                               report_freq));
-
-  identification_progress.reset(new ProgressBar("Fragment identification",
-                                                report_freq));
 
   fragment_progress.reset(new ProgressBar("Fragment serialization",
                                           report_freq));

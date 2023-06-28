@@ -52,9 +52,6 @@ class GlobalIndexingState {
   // Tracks progress in partitioning an AST into fragments.
   std::unique_ptr<ProgressBar> partitioning_progress;
 
-  // Tracks progress in identifying fragments with IDs.
-  std::unique_ptr<ProgressBar> identification_progress;
-
   // Tracks progress in serializing fragments.
   std::unique_ptr<ProgressBar> fragment_progress;
 

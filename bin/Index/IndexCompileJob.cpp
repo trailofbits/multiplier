@@ -1278,9 +1278,6 @@ static std::vector<PendingFragment> CreatePendingFragments(
     GlobalIndexingState &context, EntityMapper &em, const pasta::AST &ast,
     std::vector<EntityGroupRange> decl_group_ranges) {
 
-  ProgressBarWork identification_progress_tracker(
-      context.identification_progress);
-
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
 
