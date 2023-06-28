@@ -8,7 +8,8 @@
 
 #pragma once
 
-namespace mx::ir {
+namespace mx {
+namespace ir {
 
 enum class OperationKind : unsigned {
   UNKNOWN,
@@ -395,4 +396,16 @@ enum class OperationKind : unsigned {
   CORE_SELECT,
 };
 
-}  // namespace mx::ir
+}  // namespace ir
+
+inline static const char *EnumerationName(ir::OperationKind) {
+  return "OperationKind";
+}
+
+inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
+  return 381;
+}
+
+const char *EnumeratorName(ir::OperationKind);
+
+}  // namespace mx

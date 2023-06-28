@@ -8,8 +8,8 @@
 
 #pragma once
 
-namespace mx::ir {
-
+namespace mx {
+namespace ir {
 enum class AttributeKind : unsigned {
   UNKNOWN,
   CCONVATTR,
@@ -41,4 +41,16 @@ enum class AttributeKind : unsigned {
   IDENTIFIERATTR,
 };
 
-}  // namespace mx::ir
+}  // namespace ir
+
+inline static const char *EnumerationName(ir::AttributeKind) {
+  return "AttributeKind";
+}
+
+inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {
+  return 27;
+}
+
+const char *EnumeratorName(ir::AttributeKind);
+
+}  // namespace mx

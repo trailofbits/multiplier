@@ -4,13 +4,15 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/SourceIR.h>
-
 #include <cstdlib>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
 #include <sstream>
+
+#include <multiplier/Index.h>
+#include <multiplier/Fragment.h>
+#include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
 
 DECLARE_bool(help);
 DECLARE_string(db);
@@ -32,14 +34,14 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   mx::Index index(mx::Index::from_database(FLAGS_db));
-  auto fragment = index.fragment(FLAGS_fragment_id);
+  std::optional<mx::Fragment> fragment = index.fragment(FLAGS_fragment_id);
   if (!fragment) {
     std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
     return EXIT_FAILURE;
   }
 
-  if (auto mlir = fragment->ir(); mlir) {
-    mlir->print(std::cout);
+  if (std::optional<mx::ir::builtin::ModuleOp> mlir = fragment->ir()) {
+    std::cout << mlir->kind_name();
   }
 
   return EXIT_SUCCESS;

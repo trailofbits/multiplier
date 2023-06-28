@@ -86,6 +86,6 @@ target_link_libraries("mx-dump-json"
     LLVMCore LLVMSupport
 )
 
-#  define_example("mx-print-sourceir" "PrintSourceIR.cpp")
+define_example("mx-print-sourceir" "PrintSourceIR.cpp")
 #  define_example("mx-dump-sourceir" "DumpSourceIR.cpp")
 #  define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")

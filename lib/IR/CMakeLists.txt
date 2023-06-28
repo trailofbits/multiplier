@@ -23,21 +23,26 @@ add_library("mx-mlir" STATIC
   ${vast_dialect_sources}
   
   "${ir_source_include_dir}/Attribute.h"
+  "${ir_source_include_dir}/AttributeKind.h"
   "${ir_source_include_dir}/Block.h"
   "${ir_source_include_dir}/Operation.h"
   "${ir_source_include_dir}/OperationKind.h"
   "${ir_source_include_dir}/Region.h"
   "${ir_source_include_dir}/Type.h"
+  "${ir_source_include_dir}/TypeKind.h"
   "${ir_source_include_dir}/Value.h"
   
   "Attribute.h"
+  "AttributeKind.cpp"
   "Block.cpp"
   "Operation.cpp"
+  "OperationKind.cpp"
   "Operation.h"
   "Region.cpp"
   "SourceIR.cpp"
   "SourceIR.h"
   "Type.h"
+  "TypeKind.cpp"
   "Value.cpp"
 )
 

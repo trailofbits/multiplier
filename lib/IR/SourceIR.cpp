@@ -98,9 +98,12 @@ class MLIRInitializer {
 MLIRInitializer::MLIRInitializer(int)
     : registry(),
       registry_initializer(registry),
-      context(registry, mlir::MLIRContext::Threading::ENABLED),
+      context(registry, mlir::MLIRContext::Threading::DISABLED),
       op_name_to_kind(MX_IR_NUM_MLIR_OPS),
       op_type_to_kind(MX_IR_NUM_MLIR_OPS) {
+
+  context.appendDialectRegistry(registry);
+  context.enableMultithreading();
 
   // Map all operation types.
 #define MAP_OP_NAME(name, kind, type) \

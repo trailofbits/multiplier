@@ -296,7 +296,8 @@ void CodeGenerator::RunOnOps(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
-      << "namespace mx::ir {\n\n"
+      << "namespace mx {\n"
+      << "namespace ir {\n\n"
       << "enum class OperationKind : unsigned {\n"
       << "  UNKNOWN,\n";
 
@@ -307,10 +308,17 @@ void CodeGenerator::RunOnOps(void) {
       ++num_ops;
     }
   }
-
   hpp
       << "};\n\n"
-      << "}  // namespace mx::ir\n";
+      << "}  // namespace ir\n\n"
+      << "inline static const char *EnumerationName(ir::OperationKind) {\n"
+      << "  return \"OperationKind\";\n"
+      << "}\n\n"
+      << "inline static constexpr unsigned NumEnumerators(ir::OperationKind) {\n"
+      << "  return " << num_ops << ";\n"
+      << "}\n\n"
+      << "const char *EnumeratorName(ir::OperationKind);\n\n"
+      << "}  // namespace mx\n";
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
@@ -341,6 +349,32 @@ void CodeGenerator::RunOnOps(void) {
   cpp
       << "\n\n"
       << "#define MX_IR_NUM_MLIR_OPS " << num_ops << "\n\n";
+
+  cpp.close();
+  cpp.open(mx_lib / "IR" / "OperationKind.cpp");  // In lib.
+  cpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#include <multiplier/IR/OperationKind.h>\n\n"
+      << "namespace mx {\n\n"
+      << "const char *EnumeratorName(ir::OperationKind kind) {\n"
+      << "  switch (kind) {\n"
+      << "    default: return \"UNKNOWN\";\n";
+
+  for (Dialect &dialect : gDialects) {
+    for (Op *op : dialect.ops) {
+      std::string ec = OpNameToEnumCase(op->op_name);
+      cpp << "    case ir::OperationKind::" << ec << ": return \"" << ec << "\";\n";
+    }
+  }
+
+  cpp << "  }\n"
+      << "}\n\n"
+      << "}  // namespace mx\n";
 
   for (Dialect &dialect : gDialects) {
     if (dialect.ops.empty()) {
@@ -502,7 +536,8 @@ void CodeGenerator::RunOnTypes(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
-      << "namespace mx::ir {\n\n"
+      << "namespace mx {\n"
+      << "namespace ir {\n\n"
       << "enum class TypeKind : unsigned {\n"
       << "  UNKNOWN,\n";
 
@@ -516,7 +551,15 @@ void CodeGenerator::RunOnTypes(void) {
 
   hpp
       << "};\n\n"
-      << "}  // namespace mx::ir\n";
+      << "}  // namespace ir\n\n"
+      << "inline static const char *EnumerationName(ir::TypeKind) {\n"
+      << "  return \"TypeKind\";\n"
+      << "}\n\n"
+      << "inline static constexpr unsigned NumEnumerators(ir::TypeKind) {\n"
+      << "  return " << num_types << ";\n"
+      << "}\n\n"
+      << "const char *EnumeratorName(ir::TypeKind);\n\n"
+      << "}  // namespace mx\n";
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
@@ -547,6 +590,32 @@ void CodeGenerator::RunOnTypes(void) {
   cpp
       << "\n\n"
       << "#define MX_IR_NUM_MLIR_TYPES " << num_types << "\n\n";
+
+  cpp.close();
+  cpp.open(mx_lib / "IR" / "TypeKind.cpp");  // In lib.
+  cpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#include <multiplier/IR/TypeKind.h>\n\n"
+      << "namespace mx {\n\n"
+      << "const char *EnumeratorName(ir::TypeKind kind) {\n"
+      << "  switch (kind) {\n"
+      << "    default: return \"UNKNOWN\";\n";
+
+  for (Dialect &dialect : gDialects) {
+    for (Type *type : dialect.types) {
+      std::string ec = OpNameToEnumCase(type->name);
+      cpp << "    case ir::TypeKind::" << ec << ": return \"" << ec << "\";\n";
+    }
+  }
+
+  cpp << "  }\n"
+      << "}\n\n"
+      << "}  // namespace mx\n";
 }
 
 void CodeGenerator::RunOnAttrs(void) {
@@ -567,7 +636,8 @@ void CodeGenerator::RunOnAttrs(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
-      << "namespace mx::ir {\n\n"
+      << "namespace mx {\n"
+      << "namespace ir {\n"
       << "enum class AttributeKind : unsigned {\n"
       << "  UNKNOWN,\n";
 
@@ -581,7 +651,15 @@ void CodeGenerator::RunOnAttrs(void) {
 
   hpp
       << "};\n\n"
-      << "}  // namespace mx::ir\n";
+      << "}  // namespace ir\n\n"
+      << "inline static const char *EnumerationName(ir::AttributeKind) {\n"
+      << "  return \"AttributeKind\";\n"
+      << "}\n\n"
+      << "inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {\n"
+      << "  return " << num_attrs << ";\n"
+      << "}\n\n"
+      << "const char *EnumeratorName(ir::AttributeKind);\n\n"
+      << "}  // namespace mx\n";
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
@@ -612,6 +690,32 @@ void CodeGenerator::RunOnAttrs(void) {
   cpp
       << "\n\n"
       << "#define MX_IR_NUM_MLIR_ATTRIBUTES " << num_attrs << "\n\n";
+
+  cpp.close();
+  cpp.open(mx_lib / "IR" / "AttributeKind.cpp");  // In lib.
+  cpp
+      << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#include <multiplier/IR/AttributeKind.h>\n\n"
+      << "namespace mx {\n\n"
+      << "const char *EnumeratorName(ir::AttributeKind kind) {\n"
+      << "  switch (kind) {\n"
+      << "    default: return \"UNKNOWN\";\n";
+
+  for (Dialect &dialect : gDialects) {
+    for (Attr *attr : dialect.attrs) {
+      std::string ec = OpNameToEnumCase(attr->name);
+      cpp << "    case ir::AttributeKind::" << ec << ": return \"" << ec << "\";\n";
+    }
+  }
+
+  cpp << "  }\n"
+      << "}\n\n"
+      << "}  // namespace mx\n";
 }
 
 void CodeGenerator::RunOnOpClass(const std::string &root_ns, const std::string &ns,

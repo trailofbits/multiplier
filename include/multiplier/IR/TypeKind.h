@@ -8,7 +8,8 @@
 
 #pragma once
 
-namespace mx::ir {
+namespace mx {
+namespace ir {
 
 enum class TypeKind : unsigned {
   UNKNOWN,
@@ -52,4 +53,16 @@ enum class TypeKind : unsigned {
   VOIDTYPE,
 };
 
-}  // namespace mx::ir
+}  // namespace ir
+
+inline static const char *EnumerationName(ir::TypeKind) {
+  return "TypeKind";
+}
+
+inline static constexpr unsigned NumEnumerators(ir::TypeKind) {
+  return 38;
+}
+
+const char *EnumeratorName(ir::TypeKind);
+
+}  // namespace mx
