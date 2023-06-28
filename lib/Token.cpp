@@ -753,6 +753,32 @@ Token TokenReader::TokenFor(const Ptr &self, RawEntityId eid) noexcept {
   }
 }
 
+TokenContextReaderPtr TokenReader::TokenContextReaderFor(
+    const Ptr &self, EntityOffset offset, EntityId eid) const noexcept {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<ParsedTokenId>(vid)) {
+    if (auto frag = self->NthOwningFragment(offset)) {
+
+      if (offset >= frag->num_parsed_tokens) {
+        return nullptr;
+      }
+
+      return frag->TokenContextReader(self);
+    }
+  } else if (std::holds_alternative<TypeTokenId>(vid)) {
+    if (auto type = self->NthOwningType(offset)) {
+
+      if (offset >= type->num_type_tokens) {
+        return nullptr;
+      }
+
+      return type->TokenContextReader(self);
+    }
+  }
+
+  return nullptr;
+}
+
 EntityProviderPtr TokenReader::EntityProviderFor(const Token &token) {
   if (auto frag = token.impl->NthOwningFragment(token.offset)) {
     return frag->ep;

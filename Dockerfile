@@ -15,7 +15,9 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         cmake gpg zip unzip tar git pkg-config \
         ninja-build clang-tidy cppcheck ccache build-essential \
-        doctest-dev clang-15 \
+        doctest-dev clang-15 python3.10 python3.10-dev \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
+    && python3 -m pip install nanobind \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /work
@@ -74,6 +76,7 @@ RUN git clone --depth 1 https://github.com/trailofbits/pasta /work/src/pasta \
         -DPASTA_BOOTSTRAP_TYPES=OFF \
         -DPASTA_ENABLE_TESTING=OFF \
         -DPASTA_ENABLE_INSTALL=ON \
+        -DCMAKE_CXX_FLAGS=-w \
     && cmake --build '/work/build/pasta' --target install
 
 COPY . /work/src/multiplier

@@ -138,6 +138,7 @@ class Decl {
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   std::optional<ExternalSourceSymbolAttr> external_source_symbol_attribute(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
+  std::optional<unsigned> max_alignment(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
   std::optional<Decl> non_closure_context(void) const;
   bool has_attributes(void) const;
@@ -151,7 +152,7 @@ class Decl {
   bool is_implicit(void) const;
   bool is_in_anonymous_namespace(void) const;
   bool is_in_export_declaration_context(void) const;
-  bool is_in_local_scope_for_instantiation(void) const;
+  std::optional<bool> is_in_local_scope_for_instantiation(void) const;
   bool is_in_std_namespace(void) const;
   bool is_invalid_declaration(void) const;
   bool is_invisible_outside_the_owning_module(void) const;

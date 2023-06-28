@@ -185,16 +185,16 @@ std::optional<CXXConversionDecl> CXXConversionDecl::from(const TokenContext &t) 
 }
 
 Type CXXConversionDecl::conversion_type(void) const {
-  RawEntityId eid = impl->reader.getVal176();
+  RawEntityId eid = impl->reader.getVal179();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool CXXConversionDecl::is_explicit(void) const {
-  return impl->reader.getVal178();
+  return impl->reader.getVal181();
 }
 
 bool CXXConversionDecl::is_lambda_to_block_pointer_conversion(void) const {
-  return impl->reader.getVal179();
+  return impl->reader.getVal182();
 }
 
 #pragma GCC diagnostic pop

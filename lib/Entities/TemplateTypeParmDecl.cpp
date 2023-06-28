@@ -182,12 +182,12 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const TokenContex
 }
 
 bool TemplateTypeParmDecl::default_argument_was_inherited(void) const {
-  return impl->reader.getVal72();
+  return impl->reader.getVal75();
 }
 
 std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal55();
+    RawEntityId eid = impl->reader.getVal58();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -200,7 +200,7 @@ std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
 
 std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal56();
+    RawEntityId eid = impl->reader.getVal59();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -212,27 +212,27 @@ std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
 }
 
 Token TemplateTypeParmDecl::default_argument_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
 }
 
 bool TemplateTypeParmDecl::has_default_argument(void) const {
-  return impl->reader.getVal73();
+  return impl->reader.getVal76();
 }
 
 bool TemplateTypeParmDecl::has_type_constraint(void) const {
-  return impl->reader.getVal74();
+  return impl->reader.getVal77();
 }
 
 bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal78();
 }
 
 bool TemplateTypeParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal95();
 }
 
 bool TemplateTypeParmDecl::was_declared_with_typename(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal96();
 }
 
 #pragma GCC diagnostic pop

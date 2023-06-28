@@ -385,18 +385,32 @@ static void PersistTokenContexts(
         c = std::move(alias_context.value());
       }
 
-#define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
-    if (auto lower_name ## _ = pasta::type_name::From(c)) { \
-      const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
-      if (eid != mx::kInvalidEntityId) { \
-        contexts[eid].insert(context.value()); \
-      } \
-      continue; \
-    }
-
-      FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)
-#undef ADD_ENTITY_TO_CONTEXT
-
+      switch(c.Kind()) {
+        case pasta::TokenContextKind::kInvalid:
+        case pasta::TokenContextKind::kAST:
+          assert(false); // don't expect these context kind
+          break;
+        case pasta::TokenContextKind::kDecl:
+        case pasta::TokenContextKind::kStmt:
+        case pasta::TokenContextKind::kType:
+        case pasta::TokenContextKind::kAttr:
+        case pasta::TokenContextKind::kDesignator:
+        case pasta::TokenContextKind::kTemplateArgument:
+        case pasta::TokenContextKind::kTemplateParameterList:
+        case pasta::TokenContextKind::kCXXBaseSpecifier:
+        case pasta::TokenContextKind::kTypeConstraint: {
+          const mx::RawEntityId eid = em.EntityId(c.Data());
+          if (eid != mx::kInvalidEntityId) {
+            contexts[eid].insert(context.value());
+          }
+          break;
+        }
+        /* It is possible for context to be of Alias kind. We don't get entity id
+         *  in that case. */
+        case pasta::TokenContextKind::kAlias:
+        case pasta::TokenContextKind::kString:
+          break;
+      }
     }
   }
 

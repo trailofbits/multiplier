@@ -366,67 +366,67 @@ std::optional<NamedDecl> NamedDecl::from(const TokenContext &t) {
 }
 
 Linkage NamedDecl::formal_linkage(void) const {
-  return static_cast<Linkage>(impl->reader.getVal63());
+  return static_cast<Linkage>(impl->reader.getVal66());
 }
 
 std::string_view NamedDecl::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal64();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCStringFormatFamily> NamedDecl::obj_cf_string_formatting_family(void) const {
-  if (!impl->reader.getVal48()) {
+  if (!impl->reader.getVal51()) {
     return std::nullopt;
   } else {
-    return static_cast<ObjCStringFormatFamily>(impl->reader.getVal67());
+    return static_cast<ObjCStringFormatFamily>(impl->reader.getVal70());
   }
   return std::nullopt;
 }
 
 std::string_view NamedDecl::qualified_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal62();
+  capnp::Text::Reader data = impl->reader.getVal65();
   return std::string_view(data.cStr(), data.size());
 }
 
 NamedDecl NamedDecl::underlying_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal50();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Visibility NamedDecl::visibility(void) const {
-  return static_cast<Visibility>(impl->reader.getVal68());
+  return static_cast<Visibility>(impl->reader.getVal71());
 }
 
 bool NamedDecl::has_external_formal_linkage(void) const {
-  return impl->reader.getVal51();
+  return impl->reader.getVal54();
 }
 
 bool NamedDecl::has_linkage(void) const {
-  return impl->reader.getVal52();
+  return impl->reader.getVal55();
 }
 
 bool NamedDecl::has_linkage_been_computed(void) const {
-  return impl->reader.getVal53();
+  return impl->reader.getVal56();
 }
 
 bool NamedDecl::is_cxx_class_member(void) const {
-  return impl->reader.getVal57();
+  return impl->reader.getVal60();
 }
 
 bool NamedDecl::is_cxx_instance_member(void) const {
-  return impl->reader.getVal58();
+  return impl->reader.getVal61();
 }
 
 bool NamedDecl::is_externally_declarable(void) const {
-  return impl->reader.getVal59();
+  return impl->reader.getVal62();
 }
 
 bool NamedDecl::is_externally_visible(void) const {
-  return impl->reader.getVal69();
+  return impl->reader.getVal72();
 }
 
 bool NamedDecl::is_linkage_valid(void) const {
-  return impl->reader.getVal70();
+  return impl->reader.getVal73();
 }
 
 #pragma GCC diagnostic pop

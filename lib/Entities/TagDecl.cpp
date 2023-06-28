@@ -197,24 +197,24 @@ std::optional<TagDecl> TagDecl::from(const TokenContext &t) {
 }
 
 TokenRange TagDecl::brace_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal55(), impl->reader.getVal56());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal58(), impl->reader.getVal59());
 }
 
 Token TagDecl::first_inner_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal64());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
 }
 
 Token TagDecl::first_outer_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal65());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
 }
 
 TagTypeKind TagDecl::tag_kind(void) const {
-  return static_cast<TagTypeKind>(impl->reader.getVal78());
+  return static_cast<TagTypeKind>(impl->reader.getVal81());
 }
 
 std::optional<TypedefNameDecl> TagDecl::typedef_name_for_anonymous_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal66();
+    RawEntityId eid = impl->reader.getVal69();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -226,71 +226,71 @@ std::optional<TypedefNameDecl> TagDecl::typedef_name_for_anonymous_declaration(v
 }
 
 bool TagDecl::has_name_for_linkage(void) const {
-  return impl->reader.getVal72();
-}
-
-bool TagDecl::is_being_defined(void) const {
-  return impl->reader.getVal73();
-}
-
-bool TagDecl::is_class(void) const {
-  return impl->reader.getVal74();
-}
-
-bool TagDecl::is_complete_definition(void) const {
   return impl->reader.getVal75();
 }
 
+bool TagDecl::is_being_defined(void) const {
+  return impl->reader.getVal76();
+}
+
+bool TagDecl::is_class(void) const {
+  return impl->reader.getVal77();
+}
+
+bool TagDecl::is_complete_definition(void) const {
+  return impl->reader.getVal78();
+}
+
 bool TagDecl::is_complete_definition_required(void) const {
-  return impl->reader.getVal92();
-}
-
-bool TagDecl::is_dependent_type(void) const {
-  return impl->reader.getVal93();
-}
-
-bool TagDecl::is_embedded_in_declarator(void) const {
-  return impl->reader.getVal94();
-}
-
-bool TagDecl::is_enum(void) const {
   return impl->reader.getVal95();
 }
 
-bool TagDecl::is_free_standing(void) const {
+bool TagDecl::is_dependent_type(void) const {
   return impl->reader.getVal96();
 }
 
-bool TagDecl::is_interface(void) const {
+bool TagDecl::is_embedded_in_declarator(void) const {
   return impl->reader.getVal97();
 }
 
-bool TagDecl::is_struct(void) const {
+bool TagDecl::is_enum(void) const {
   return impl->reader.getVal98();
 }
 
-bool TagDecl::is_this_declaration_a_definition(void) const {
+bool TagDecl::is_free_standing(void) const {
   return impl->reader.getVal99();
 }
 
-bool TagDecl::is_this_declaration_a_demoted_definition(void) const {
+bool TagDecl::is_interface(void) const {
   return impl->reader.getVal100();
 }
 
-bool TagDecl::is_union(void) const {
+bool TagDecl::is_struct(void) const {
   return impl->reader.getVal101();
 }
 
-bool TagDecl::may_have_out_of_date_definition(void) const {
+bool TagDecl::is_this_declaration_a_definition(void) const {
   return impl->reader.getVal102();
 }
 
+bool TagDecl::is_this_declaration_a_demoted_definition(void) const {
+  return impl->reader.getVal103();
+}
+
+bool TagDecl::is_union(void) const {
+  return impl->reader.getVal104();
+}
+
+bool TagDecl::may_have_out_of_date_definition(void) const {
+  return impl->reader.getVal105();
+}
+
 unsigned TagDecl::num_template_parameter_lists(void) const {
-  return impl->reader.getVal49().size();
+  return impl->reader.getVal52().size();
 }
 
 std::optional<TemplateParameterList> TagDecl::nth_template_parameter_list(unsigned n) const {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal52();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -304,12 +304,12 @@ std::optional<TemplateParameterList> TagDecl::nth_template_parameter_list(unsign
 }
 
 gap::generator<TemplateParameterList> TagDecl::template_parameter_lists(void) const & {
-  auto list = impl->reader.getVal49();
+  auto list = impl->reader.getVal52();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d49 = ep->TemplateParameterListFor(ep, v)) {
-      co_yield TemplateParameterList(std::move(d49));
+    if (auto d52 = ep->TemplateParameterListFor(ep, v)) {
+      co_yield TemplateParameterList(std::move(d52));
     }
   }
   co_return;
@@ -317,7 +317,7 @@ gap::generator<TemplateParameterList> TagDecl::template_parameter_lists(void) co
 
 gap::generator<Decl> TagDecl::declarations_in_context(void) const & {
   EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal50();
+  auto list = impl->reader.getVal53();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

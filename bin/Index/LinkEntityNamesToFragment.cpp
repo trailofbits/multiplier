@@ -113,7 +113,12 @@ static std::string ContextualSymbolName(const pasta::DeclContext &dc) {
 }
 
 std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
-  auto prefix = ContextualSymbolName(decl.DeclarationContext());
+  std::string prefix;
+  if (auto decl_context = decl.DeclarationContext()) {
+    prefix = ContextualSymbolName(decl_context.value());
+  }
+
+  // prefix may be empty here if DeclarationContext has no value
   auto name = SymbolName(decl);
   if (name.empty()) {
     return prefix;

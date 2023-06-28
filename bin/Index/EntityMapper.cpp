@@ -61,6 +61,9 @@ mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
              it2 != token_tree_ids.end()) {
     return it2->second.Pack();
 
+  } else if (auto eid = tm.EntityId(entity); eid != mx::kInvalidEntityId) {
+    return eid;
+
   } else {
     return mx::kInvalidEntityId;
   }
