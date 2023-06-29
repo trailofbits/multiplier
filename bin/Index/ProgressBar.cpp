@@ -113,6 +113,13 @@ struct ProgressBar::Impl {
   Impl(const char *label_, std::chrono::seconds report_freq_);
   ~Impl(void);
 
+  void Report(void) {
+    const auto max_step = step.load();
+    const auto curr = static_cast<uint32_t>(max_step);
+    const auto max = static_cast<uint32_t>(max_step >> 32UL);
+    Report(curr, max, *line.second, next_line_data);
+  }
+
   void Report(uint32_t curr, uint32_t max, std::string &line,
               std::string &next_line);
 
@@ -121,6 +128,8 @@ struct ProgressBar::Impl {
 
   std::atomic<uint64_t> step;
   std::atomic<bool> done;
+  std::string next_line_data;
+  std::pair<size_t, std::string *> line;
   std::thread progress_reporter_thread;
 };
 
@@ -129,22 +138,14 @@ ProgressBar::Impl::Impl(const char *label_, std::chrono::seconds report_freq_)
       report_frequency(report_freq_),
       step(0),
       done(false),
+      next_line_data(1024ull, '\0'),
+      line(AllocateLine()),
       progress_reporter_thread(
           [this] (void) {
-            auto [line_index, line_ptr] = AllocateLine();
-            std::string next_line(1024ull, '\0');
-
-            uint32_t curr = 0;
-            uint32_t max = 0;
             while (!done.load()) {
-              const auto max_step = step.load();
-              curr = static_cast<uint32_t>(max_step);
-              max = static_cast<uint32_t>(max_step >> 32UL);
-              this->Report(curr, max, *line_ptr, next_line);
+              Report();
               std::this_thread::sleep_for(report_frequency);
             }
-
-            FreeLine(line_index);
           }) {}
 
 ProgressBar::Impl::~Impl(void) {
@@ -153,6 +154,11 @@ ProgressBar::Impl::~Impl(void) {
   if (progress_reporter_thread.joinable()) {
     progress_reporter_thread.join();
   }
+
+  Report();
+
+  // NOTE(pag): We'll let it leak.
+  // FreeLine(line.first);
 }
 
 void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
