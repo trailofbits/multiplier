@@ -23,7 +23,7 @@ class GetGlobalOp final : public Operation {
   static std::optional<GetGlobalOp> from(const ::mx::ir::Operation &that);
   static std::optional<GetGlobalOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::GetGlobalOp underlying_op(void) const noexcept;
+  ::mlir::memref::GetGlobalOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> result(void) const;

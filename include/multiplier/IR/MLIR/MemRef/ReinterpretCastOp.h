@@ -23,18 +23,18 @@ class ReinterpretCastOp final : public Operation {
   static std::optional<ReinterpretCastOp> from(const ::mx::ir::Operation &that);
   static std::optional<ReinterpretCastOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::ReinterpretCastOp underlying_op(void) const noexcept;
+  ::mlir::memref::ReinterpretCastOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value source(void) const;
-  //::mlir::Operation::operand_range offsets(void) const;
-  //::mlir::Operation::operand_range sizes(void) const;
-  //::mlir::Operation::operand_range strides(void) const;
+  //::mlir::mlir::Operation::operand_range offsets(void) const;
+  //::mlir::mlir::Operation::operand_range sizes(void) const;
+  //::mlir::mlir::Operation::operand_range strides(void) const;
   //::mlir::TypedValue<::mlir::MemRefType> result(void) const;
   //::llvm::ArrayRef<int64_t> static_offsets(void) const;
   //::llvm::ArrayRef<int64_t> static_sizes(void) const;
   //::llvm::ArrayRef<int64_t> static_strides(void) const;
-  //::mlir::Operation::operand_range dynamic_sizes(void) const;
+  //::mlir::mlir::Operation::operand_range dynamic_sizes(void) const;
   //MemRefType type(void) const;
   //Value view_source(void) const;
   //unsignedint result_rank(void) const;

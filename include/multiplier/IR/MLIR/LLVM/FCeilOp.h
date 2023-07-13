@@ -23,7 +23,7 @@ class FCeilOp final : public Operation {
   static std::optional<FCeilOp> from(const ::mx::ir::Operation &that);
   static std::optional<FCeilOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FCeilOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FCeilOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

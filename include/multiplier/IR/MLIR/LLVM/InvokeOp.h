@@ -23,18 +23,18 @@ class InvokeOp final : public Operation {
   static std::optional<InvokeOp> from(const ::mx::ir::Operation &that);
   static std::optional<InvokeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::InvokeOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::InvokeOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range callee_operands(void) const;
-  //::mlir::Operation::operand_range normal_dest_operands(void) const;
-  //::mlir::Operation::operand_range unwind_dest_operands(void) const;
+  //::mlir::mlir::Operation::operand_range callee_operands(void) const;
+  //::mlir::mlir::Operation::operand_range normal_dest_operands(void) const;
+  //::mlir::mlir::Operation::operand_range unwind_dest_operands(void) const;
   //::mlir::Block* normal_dest(void) const;
   //::mlir::Block* unwind_dest(void) const;
   std::optional<std::string_view> callee(void) const;
   //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  //::mlir::Operation::operand_range arg_operands(void) const;
+  //::mlir::mlir::Operation::operand_range arg_operands(void) const;
 };
 static_assert(sizeof(InvokeOp) == sizeof(Operation));
 

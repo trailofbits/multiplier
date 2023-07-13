@@ -12,7 +12,6 @@
 #include <multiplier/Entities/File.h>
 #include <multiplier/Entities/Fragment.h>
 #include <multiplier/Entities/Index.h>
-#include <multiplier/Entities/MacroSubstitution.h>
 #include <multiplier/Entities/Reference.h>
 #include <multiplier/Entities/Token.h>
 
@@ -224,65 +223,33 @@ std::optional<Stmt> Stmt::from(const TokenContext &t) {
   return t.as_statement();
 }
 
-unsigned Stmt::num_aligned_substitutions(void) const {
-  return impl->reader.getVal3().size();
-}
-
-std::optional<MacroSubstitution> Stmt::nth_aligned_substitution(unsigned n) const {
-  auto list = impl->reader.getVal3();
-  if (n >= list.size()) {
-    return std::nullopt;
-  }
-  const EntityProviderPtr &ep = impl->ep;
-  auto v = list[n];
-  auto e = ep->MacroFor(ep, v);
-  if (!e) {
-    return std::nullopt;
-  }
-  return MacroSubstitution::from(Macro(std::move(e)));
-}
-
-gap::generator<MacroSubstitution> Stmt::aligned_substitutions(void) const & {
-  auto list = impl->reader.getVal3();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d3 = ep->MacroFor(ep, v)) {
-      if (auto e = MacroSubstitution::from(Macro(std::move(d3)))) {
-        co_yield std::move(*e);
-      }
-    }
-  }
-  co_return;
-}
-
 Stmt Stmt::ignore_containers(void) const {
-  RawEntityId eid = impl->reader.getVal4();
+  RawEntityId eid = impl->reader.getVal3();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<Stmt> Stmt::children(void) const & {
-  auto list = impl->reader.getVal5();
+  auto list = impl->reader.getVal4();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d5 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d5));
+    if (auto d4 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d4));
     }
   }
   co_return;
 }
 
 TokenRange Stmt::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal6(), impl->reader.getVal7());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal5(), impl->reader.getVal6());
 }
 
 StmtKind Stmt::kind(void) const {
-  return static_cast<StmtKind>(impl->reader.getVal8());
+  return static_cast<StmtKind>(impl->reader.getVal7());
 }
 
 Stmt Stmt::strip_label_like_statements(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal8();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

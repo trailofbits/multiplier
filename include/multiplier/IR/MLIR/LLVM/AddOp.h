@@ -23,7 +23,7 @@ class AddOp final : public Operation {
   static std::optional<AddOp> from(const ::mx::ir::Operation &that);
   static std::optional<AddOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::AddOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::AddOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

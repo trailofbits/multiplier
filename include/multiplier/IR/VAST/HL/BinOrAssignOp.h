@@ -23,7 +23,7 @@ class BinOrAssignOp final : public Operation {
   static std::optional<BinOrAssignOp> from(const ::mx::ir::Operation &that);
   static std::optional<BinOrAssignOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::BinOrAssignOp underlying_op(void) const noexcept;
+  ::vast::hl::BinOrAssignOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

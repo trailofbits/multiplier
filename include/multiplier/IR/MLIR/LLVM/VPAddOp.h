@@ -23,7 +23,7 @@ class VPAddOp final : public Operation {
   static std::optional<VPAddOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPAddOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPAddOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPAddOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

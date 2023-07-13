@@ -23,7 +23,7 @@ class ImplicitCastOp final : public Operation {
   static std::optional<ImplicitCastOp> from(const ::mx::ir::Operation &that);
   static std::optional<ImplicitCastOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::ImplicitCastOp underlying_op(void) const noexcept;
+  ::vast::hl::ImplicitCastOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;

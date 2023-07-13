@@ -23,7 +23,7 @@ class ContinueOp final : public Operation {
   static std::optional<ContinueOp> from(const ::mx::ir::Operation &that);
   static std::optional<ContinueOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::ContinueOp underlying_op(void) const noexcept;
+  ::vast::hl::ContinueOp underlying_op(void) const noexcept;
 
   // Imported methods:
 };

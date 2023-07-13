@@ -23,7 +23,7 @@ class DivSOp final : public Operation {
   static std::optional<DivSOp> from(const ::mx::ir::Operation &that);
   static std::optional<DivSOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::DivSOp underlying_op(void) const noexcept;
+  ::vast::hl::DivSOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

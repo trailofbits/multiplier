@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/Core/LazyOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/Core/CoreOps.hpp>
+
 namespace mx::ir::core {
 std::optional<LazyOp> LazyOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::CORE_LAZY_OP) {
@@ -22,6 +27,10 @@ std::optional<LazyOp> LazyOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::core::LazyOp LazyOp::underlying_op(void) const noexcept {
+  return ::vast::core::LazyOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::core

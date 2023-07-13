@@ -23,10 +23,10 @@ class InitListExpr final : public Operation {
   static std::optional<InitListExpr> from(const ::mx::ir::Operation &that);
   static std::optional<InitListExpr> producing(const ::mx::ir::Value &val);
 
-  vast::hl::InitListExpr underlying_op(void) const noexcept;
+  ::vast::hl::InitListExpr underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range elements(void) const;
+  //::mlir::mlir::Operation::operand_range elements(void) const;
 };
 static_assert(sizeof(InitListExpr) == sizeof(Operation));
 

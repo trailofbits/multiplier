@@ -23,7 +23,7 @@ class SubOp final : public Operation {
   static std::optional<SubOp> from(const ::mx::ir::Operation &that);
   static std::optional<SubOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::SubOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::SubOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

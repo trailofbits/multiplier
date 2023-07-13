@@ -23,7 +23,7 @@ class ValueYieldOp final : public Operation {
   static std::optional<ValueYieldOp> from(const ::mx::ir::Operation &that);
   static std::optional<ValueYieldOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::ValueYieldOp underlying_op(void) const noexcept;
+  ::vast::hl::ValueYieldOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value result(void) const;

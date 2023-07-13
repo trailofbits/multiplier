@@ -23,7 +23,7 @@ class MulIAssignOp final : public Operation {
   static std::optional<MulIAssignOp> from(const ::mx::ir::Operation &that);
   static std::optional<MulIAssignOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::MulIAssignOp underlying_op(void) const noexcept;
+  ::vast::hl::MulIAssignOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

@@ -23,7 +23,7 @@ class masked_scatter final : public Operation {
   static std::optional<masked_scatter> from(const ::mx::ir::Operation &that);
   static std::optional<masked_scatter> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::masked_scatter underlying_op(void) const noexcept;
+  ::mlir::LLVM::masked_scatter underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;

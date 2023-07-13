@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/VPReduceFMinOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<VPReduceFMinOp> VPReduceFMinOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_VP_REDUCE_FMIN) {
@@ -22,6 +27,10 @@ std::optional<VPReduceFMinOp> VPReduceFMinOp::producing(const ::mx::ir::Value &t
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::VPReduceFMinOp VPReduceFMinOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::VPReduceFMinOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

@@ -23,7 +23,7 @@ class FuncOp final : public Operation {
   static std::optional<FuncOp> from(const ::mx::ir::Operation &that);
   static std::optional<FuncOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::FuncOp underlying_op(void) const noexcept;
+  ::vast::hl::FuncOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body(void) const;

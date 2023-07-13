@@ -23,7 +23,7 @@ class ExtractAlignedPointerAsIndexOp final : public Operation {
   static std::optional<ExtractAlignedPointerAsIndexOp> from(const ::mx::ir::Operation &that);
   static std::optional<ExtractAlignedPointerAsIndexOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::ExtractAlignedPointerAsIndexOp underlying_op(void) const noexcept;
+  ::mlir::memref::ExtractAlignedPointerAsIndexOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> source(void) const;

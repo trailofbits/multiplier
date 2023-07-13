@@ -23,10 +23,10 @@ class UnsupportedOp final : public Operation {
   static std::optional<UnsupportedOp> from(const ::mx::ir::Operation &that);
   static std::optional<UnsupportedOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::UnsupportedOp underlying_op(void) const noexcept;
+  ::vast::hl::UnsupportedOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range elements(void) const;
+  //::mlir::mlir::Operation::operand_range elements(void) const;
   ::mx::ir::Value result(void) const;
   std::string_view name(void) const;
 };

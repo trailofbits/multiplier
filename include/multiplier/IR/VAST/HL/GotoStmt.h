@@ -23,7 +23,7 @@ class GotoStmt final : public Operation {
   static std::optional<GotoStmt> from(const ::mx::ir::Operation &that);
   static std::optional<GotoStmt> producing(const ::mx::ir::Value &val);
 
-  vast::hl::GotoStmt underlying_op(void) const noexcept;
+  ::vast::hl::GotoStmt underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::vast::hl::LabelType> label(void) const;

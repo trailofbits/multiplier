@@ -23,7 +23,7 @@ class PowIOp final : public Operation {
   static std::optional<PowIOp> from(const ::mx::ir::Operation &that);
   static std::optional<PowIOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::PowIOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::PowIOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value val(void) const;

@@ -23,7 +23,7 @@ class AliasScopeMetadataOp final : public Operation {
   static std::optional<AliasScopeMetadataOp> from(const ::mx::ir::Operation &that);
   static std::optional<AliasScopeMetadataOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::AliasScopeMetadataOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::AliasScopeMetadataOp underlying_op(void) const noexcept;
 
   // Imported methods:
   std::string_view sym_name(void) const;

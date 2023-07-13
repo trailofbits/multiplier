@@ -29,7 +29,6 @@ class Decl;
 class File;
 class Fragment;
 class Index;
-class MacroSubstitution;
 class Reference;
 class Stmt;
 class StmtImpl;
@@ -117,9 +116,6 @@ class Stmt {
 
   static std::optional<Stmt> from(const TokenContext &t);
 
-  std::optional<MacroSubstitution> nth_aligned_substitution(unsigned n) const;
-  unsigned num_aligned_substitutions(void) const;
-  gap::generator<MacroSubstitution> aligned_substitutions(void) const &;
   Stmt ignore_containers(void) const;
   gap::generator<Stmt> children(void) const &;
   TokenRange tokens(void) const;

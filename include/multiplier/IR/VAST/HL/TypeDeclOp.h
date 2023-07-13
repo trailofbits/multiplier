@@ -23,7 +23,7 @@ class TypeDeclOp final : public Operation {
   static std::optional<TypeDeclOp> from(const ::mx::ir::Operation &that);
   static std::optional<TypeDeclOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::TypeDeclOp underlying_op(void) const noexcept;
+  ::vast::hl::TypeDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
   std::string_view name(void) const;

@@ -23,7 +23,7 @@ class PredefinedExpr final : public Operation {
   static std::optional<PredefinedExpr> from(const ::mx::ir::Operation &that);
   static std::optional<PredefinedExpr> producing(const ::mx::ir::Value &val);
 
-  vast::hl::PredefinedExpr underlying_op(void) const noexcept;
+  ::vast::hl::PredefinedExpr underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;

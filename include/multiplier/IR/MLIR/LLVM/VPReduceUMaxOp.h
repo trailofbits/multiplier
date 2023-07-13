@@ -23,7 +23,7 @@ class VPReduceUMaxOp final : public Operation {
   static std::optional<VPReduceUMaxOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPReduceUMaxOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPReduceUMaxOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPReduceUMaxOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;

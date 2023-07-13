@@ -23,10 +23,10 @@ class InlineAsmOp final : public Operation {
   static std::optional<InlineAsmOp> from(const ::mx::ir::Operation &that);
   static std::optional<InlineAsmOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::InlineAsmOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::InlineAsmOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range operands(void) const;
+  //::mlir::mlir::Operation::operand_range operands(void) const;
   ::mx::ir::Value res(void) const;
   std::string_view asm_string(void) const;
   std::string_view constraints(void) const;

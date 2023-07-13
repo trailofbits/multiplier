@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/vector_reduce_or.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<vector_reduce_or> vector_reduce_or::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_VECTOR_REDUCE_OR) {
@@ -22,6 +27,10 @@ std::optional<vector_reduce_or> vector_reduce_or::producing(const ::mx::ir::Valu
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::vector_reduce_or vector_reduce_or::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::vector_reduce_or(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

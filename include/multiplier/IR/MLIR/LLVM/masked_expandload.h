@@ -23,7 +23,7 @@ class masked_expandload final : public Operation {
   static std::optional<masked_expandload> from(const ::mx::ir::Operation &that);
   static std::optional<masked_expandload> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::masked_expandload underlying_op(void) const noexcept;
+  ::mlir::LLVM::masked_expandload underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value res(void) const;

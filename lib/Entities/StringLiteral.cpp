@@ -155,64 +155,64 @@ std::optional<StringLiteral> StringLiteral::from(const TokenContext &t) {
 }
 
 std::optional<bool> StringLiteral::contains_non_ascii(void) const {
-  if (!impl->reader.getVal91()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal90());
+    return static_cast<bool>(impl->reader.getVal89());
   }
   return std::nullopt;
 }
 
 std::optional<bool> StringLiteral::contains_non_ascii_or_null(void) const {
-  if (!impl->reader.getVal93()) {
+  if (!impl->reader.getVal92()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal92());
+    return static_cast<bool>(impl->reader.getVal91());
   }
   return std::nullopt;
 }
 
 std::string_view StringLiteral::bytes(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 
 StringLiteralStringKind StringLiteral::string_kind(void) const {
-  return static_cast<StringLiteralStringKind>(impl->reader.getVal95());
+  return static_cast<StringLiteralStringKind>(impl->reader.getVal94());
 }
 
 std::optional<std::string_view> StringLiteral::string(void) const {
-  if (!impl->reader.getVal94()) {
+  if (!impl->reader.getVal93()) {
     return std::nullopt;
   } else {
-    capnp::Text::Reader data = impl->reader.getVal66();
+    capnp::Text::Reader data = impl->reader.getVal65();
     return std::string_view(data.cStr(), data.size());
   }
   return std::nullopt;
 }
 
 bool StringLiteral::is_ordinary(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal95();
 }
 
 bool StringLiteral::is_pascal(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal97();
 }
 
 bool StringLiteral::is_utf16(void) const {
-  return impl->reader.getVal99();
+  return impl->reader.getVal98();
 }
 
 bool StringLiteral::is_utf32(void) const {
-  return impl->reader.getVal100();
+  return impl->reader.getVal99();
 }
 
 bool StringLiteral::is_utf8(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal100();
 }
 
 bool StringLiteral::is_wide(void) const {
-  return impl->reader.getVal102();
+  return impl->reader.getVal101();
 }
 
 #pragma GCC diagnostic pop

@@ -23,7 +23,7 @@ class IsFPClass final : public Operation {
   static std::optional<IsFPClass> from(const ::mx::ir::Operation &that);
   static std::optional<IsFPClass> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::IsFPClass underlying_op(void) const noexcept;
+  ::mlir::LLVM::IsFPClass underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

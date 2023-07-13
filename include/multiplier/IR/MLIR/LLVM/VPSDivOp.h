@@ -23,7 +23,7 @@ class VPSDivOp final : public Operation {
   static std::optional<VPSDivOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPSDivOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPSDivOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPSDivOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

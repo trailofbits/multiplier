@@ -23,7 +23,7 @@ class URemOp final : public Operation {
   static std::optional<URemOp> from(const ::mx::ir::Operation &that);
   static std::optional<URemOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::URemOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::URemOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

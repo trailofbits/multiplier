@@ -23,12 +23,12 @@ class ViewOp final : public Operation {
   static std::optional<ViewOp> from(const ::mx::ir::Operation &that);
   static std::optional<ViewOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::ViewOp underlying_op(void) const noexcept;
+  ::mlir::memref::ViewOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
   //::mlir::TypedValue<::mlir::IndexType> byte_shift(void) const;
-  //::mlir::Operation::operand_range sizes(void) const;
+  //::mlir::mlir::Operation::operand_range sizes(void) const;
   ::mx::ir::Value view_source(void) const;
   //MemRefType type(void) const;
   //operand_range dynamic_sizes(void) const;

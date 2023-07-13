@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/LL/StructGEPOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/LowLevel/LowLevelOps.hpp>
+
 namespace mx::ir::ll {
 std::optional<StructGEPOp> StructGEPOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LL_GEP) {
@@ -22,6 +27,10 @@ std::optional<StructGEPOp> StructGEPOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::ll::StructGEPOp StructGEPOp::underlying_op(void) const noexcept {
+  return ::vast::ll::StructGEPOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::ll

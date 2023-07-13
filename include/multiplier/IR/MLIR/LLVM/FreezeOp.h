@@ -23,7 +23,7 @@ class FreezeOp final : public Operation {
   static std::optional<FreezeOp> from(const ::mx::ir::Operation &that);
   static std::optional<FreezeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FreezeOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FreezeOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value val(void) const;

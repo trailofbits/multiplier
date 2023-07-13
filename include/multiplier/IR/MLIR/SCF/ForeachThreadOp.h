@@ -23,18 +23,18 @@ class ForeachThreadOp final : public Operation {
   static std::optional<ForeachThreadOp> from(const ::mx::ir::Operation &that);
   static std::optional<ForeachThreadOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::ForeachThreadOp underlying_op(void) const noexcept;
+  ::mlir::scf::ForeachThreadOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range num_threads(void) const;
-  //::mlir::Operation::operand_range outputs(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::operand_range num_threads(void) const;
+  //::mlir::mlir::Operation::operand_range outputs(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   ::mx::ir::Region region(void) const;
   //::std::optional<::mlir::ArrayAttr> mapping(void) const;
   uint64_t rank(void) const;
   //ArrayRef<BlockArgument> output_block_arguments(void) const;
   //::mlir::ValueRange thread_indices(void) const;
-  //::mlir::Block::BlockArgListType region_out_args(void) const;
+  //::mlir::mlir::Block::BlockArgListType region_out_args(void) const;
   //PerformConcurrentlyOp terminator(void) const;
 };
 static_assert(sizeof(ForeachThreadOp) == sizeof(Operation));

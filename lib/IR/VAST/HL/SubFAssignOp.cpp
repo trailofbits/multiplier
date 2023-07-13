@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/SubFAssignOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<SubFAssignOp> SubFAssignOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_ASSIGN_FSUB) {
@@ -22,6 +27,10 @@ std::optional<SubFAssignOp> SubFAssignOp::producing(const ::mx::ir::Value &that)
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::SubFAssignOp SubFAssignOp::underlying_op(void) const noexcept {
+  return ::vast::hl::SubFAssignOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

@@ -23,7 +23,7 @@ class RoundEvenOp final : public Operation {
   static std::optional<RoundEvenOp> from(const ::mx::ir::Operation &that);
   static std::optional<RoundEvenOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::RoundEvenOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::RoundEvenOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

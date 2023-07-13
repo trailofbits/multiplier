@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/FieldDeclOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<FieldDeclOp> FieldDeclOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_FIELD) {
@@ -22,6 +27,10 @@ std::optional<FieldDeclOp> FieldDeclOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::FieldDeclOp FieldDeclOp::underlying_op(void) const noexcept {
+  return ::vast::hl::FieldDeclOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

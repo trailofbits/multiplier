@@ -23,7 +23,7 @@ class DeallocOp final : public Operation {
   static std::optional<DeallocOp> from(const ::mx::ir::Operation &that);
   static std::optional<DeallocOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::DeallocOp underlying_op(void) const noexcept;
+  ::mlir::memref::DeallocOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value memref(void) const;

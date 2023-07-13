@@ -9,6 +9,12 @@
 #include <multiplier/IR/MLIR/SCF/ForeachThreadOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/MemRef/IR/MemRef.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+
 namespace mx::ir::scf {
 std::optional<ForeachThreadOp> ForeachThreadOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::SCF_FOREACH_THREAD) {
@@ -22,6 +28,10 @@ std::optional<ForeachThreadOp> ForeachThreadOp::producing(const ::mx::ir::Value 
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::scf::ForeachThreadOp ForeachThreadOp::underlying_op(void) const noexcept {
+  return ::mlir::scf::ForeachThreadOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::scf

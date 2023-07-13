@@ -23,7 +23,7 @@ class FuncRefOp final : public Operation {
   static std::optional<FuncRefOp> from(const ::mx::ir::Operation &that);
   static std::optional<FuncRefOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::FuncRefOp underlying_op(void) const noexcept;
+  ::vast::hl::FuncRefOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value result(void) const;

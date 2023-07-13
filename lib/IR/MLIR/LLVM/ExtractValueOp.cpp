@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/ExtractValueOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<ExtractValueOp> ExtractValueOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_EXTRACTVALUE) {
@@ -22,6 +27,10 @@ std::optional<ExtractValueOp> ExtractValueOp::producing(const ::mx::ir::Value &t
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::ExtractValueOp ExtractValueOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::ExtractValueOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

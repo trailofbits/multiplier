@@ -23,7 +23,7 @@ class RemUOp final : public Operation {
   static std::optional<RemUOp> from(const ::mx::ir::Operation &that);
   static std::optional<RemUOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::RemUOp underlying_op(void) const noexcept;
+  ::vast::hl::RemUOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

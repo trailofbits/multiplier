@@ -23,7 +23,7 @@ class ModuleOp final : public Operation {
   static std::optional<ModuleOp> from(const ::mx::ir::Operation &that);
   static std::optional<ModuleOp> producing(const ::mx::ir::Value &val);
 
-  mlir::ModuleOp underlying_op(void) const noexcept;
+  ::mlir::ModuleOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body_region(void) const;

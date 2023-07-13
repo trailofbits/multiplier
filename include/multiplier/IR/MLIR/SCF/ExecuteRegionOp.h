@@ -23,7 +23,7 @@ class ExecuteRegionOp final : public Operation {
   static std::optional<ExecuteRegionOp> from(const ::mx::ir::Operation &that);
   static std::optional<ExecuteRegionOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::ExecuteRegionOp underlying_op(void) const noexcept;
+  ::mlir::scf::ExecuteRegionOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region region(void) const;

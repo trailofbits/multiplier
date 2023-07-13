@@ -23,7 +23,7 @@ class CopyOp final : public Operation {
   static std::optional<CopyOp> from(const ::mx::ir::Operation &that);
   static std::optional<CopyOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::CopyOp underlying_op(void) const noexcept;
+  ::mlir::memref::CopyOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value source(void) const;

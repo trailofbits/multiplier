@@ -23,7 +23,7 @@ class VPSRemOp final : public Operation {
   static std::optional<VPSRemOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPSRemOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPSRemOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPSRemOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

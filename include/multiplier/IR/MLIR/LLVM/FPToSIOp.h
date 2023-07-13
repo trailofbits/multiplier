@@ -23,7 +23,7 @@ class FPToSIOp final : public Operation {
   static std::optional<FPToSIOp> from(const ::mx::ir::Operation &that);
   static std::optional<FPToSIOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FPToSIOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FPToSIOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

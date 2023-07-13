@@ -23,10 +23,10 @@ class Br final : public Operation {
   static std::optional<Br> from(const ::mx::ir::Operation &that);
   static std::optional<Br> producing(const ::mx::ir::Value &val);
 
-  vast::ll::Br underlying_op(void) const noexcept;
+  ::vast::ll::Br underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range operands(void) const;
+  //::mlir::mlir::Operation::operand_range operands(void) const;
   //::mlir::Block* dest(void) const;
 };
 static_assert(sizeof(Br) == sizeof(Operation));

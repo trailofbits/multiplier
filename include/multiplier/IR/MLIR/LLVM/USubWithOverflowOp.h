@@ -23,7 +23,7 @@ class USubWithOverflowOp final : public Operation {
   static std::optional<USubWithOverflowOp> from(const ::mx::ir::Operation &that);
   static std::optional<USubWithOverflowOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::USubWithOverflowOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::USubWithOverflowOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value res(void) const;

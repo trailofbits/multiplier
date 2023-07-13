@@ -23,7 +23,7 @@ class FFloorOp final : public Operation {
   static std::optional<FFloorOp> from(const ::mx::ir::Operation &that);
   static std::optional<FFloorOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FFloorOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FFloorOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

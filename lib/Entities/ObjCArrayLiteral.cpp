@@ -156,16 +156,16 @@ std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const TokenContext &t) {
 }
 
 ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 unsigned ObjCArrayLiteral::num_elements(void) const {
-  return impl->reader.getVal16().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -179,12 +179,12 @@ std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
 }
 
 gap::generator<Expr> ObjCArrayLiteral::elements(void) const & {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d16 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d16)))) {
+    if (auto d15 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }

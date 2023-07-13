@@ -23,7 +23,7 @@ class LLVMFuncOp final : public Operation {
   static std::optional<LLVMFuncOp> from(const ::mx::ir::Operation &that);
   static std::optional<LLVMFuncOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::LLVMFuncOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::LLVMFuncOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body(void) const;

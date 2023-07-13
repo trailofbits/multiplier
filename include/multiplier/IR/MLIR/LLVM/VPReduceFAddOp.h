@@ -23,7 +23,7 @@ class VPReduceFAddOp final : public Operation {
   static std::optional<VPReduceFAddOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPReduceFAddOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPReduceFAddOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPReduceFAddOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::FloatType> satrt_value(void) const;

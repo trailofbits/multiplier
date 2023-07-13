@@ -23,19 +23,19 @@ class SubViewOp final : public Operation {
   static std::optional<SubViewOp> from(const ::mx::ir::Operation &that);
   static std::optional<SubViewOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::SubViewOp underlying_op(void) const noexcept;
+  ::mlir::memref::SubViewOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
-  //::mlir::Operation::operand_range offsets(void) const;
-  //::mlir::Operation::operand_range sizes(void) const;
-  //::mlir::Operation::operand_range strides(void) const;
+  //::mlir::mlir::Operation::operand_range offsets(void) const;
+  //::mlir::mlir::Operation::operand_range sizes(void) const;
+  //::mlir::mlir::Operation::operand_range strides(void) const;
   //::mlir::TypedValue<::mlir::MemRefType> result(void) const;
   //::llvm::ArrayRef<int64_t> static_offsets(void) const;
   //::llvm::ArrayRef<int64_t> static_sizes(void) const;
   //::llvm::ArrayRef<int64_t> static_strides(void) const;
   ::mx::ir::Value view_source(void) const;
-  //::mlir::Operation::operand_range dynamic_sizes(void) const;
+  //::mlir::mlir::Operation::operand_range dynamic_sizes(void) const;
   //MemRefType source_type(void) const;
   //MemRefType type(void) const;
   //std::array<unsignedint,3> array_attr_max_ranks(void) const;

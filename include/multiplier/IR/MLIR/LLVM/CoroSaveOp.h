@@ -23,7 +23,7 @@ class CoroSaveOp final : public Operation {
   static std::optional<CoroSaveOp> from(const ::mx::ir::Operation &that);
   static std::optional<CoroSaveOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::CoroSaveOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::CoroSaveOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value handle(void) const;

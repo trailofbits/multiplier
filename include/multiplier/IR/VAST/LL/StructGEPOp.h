@@ -23,7 +23,7 @@ class StructGEPOp final : public Operation {
   static std::optional<StructGEPOp> from(const ::mx::ir::Operation &that);
   static std::optional<StructGEPOp> producing(const ::mx::ir::Value &val);
 
-  vast::ll::StructGEPOp underlying_op(void) const noexcept;
+  ::vast::ll::StructGEPOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value record(void) const;

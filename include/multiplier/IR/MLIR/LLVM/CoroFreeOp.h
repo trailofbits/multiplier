@@ -23,7 +23,7 @@ class CoroFreeOp final : public Operation {
   static std::optional<CoroFreeOp> from(const ::mx::ir::Operation &that);
   static std::optional<CoroFreeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::CoroFreeOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::CoroFreeOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value id(void) const;

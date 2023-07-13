@@ -23,7 +23,7 @@ class CopySignOp final : public Operation {
   static std::optional<CopySignOp> from(const ::mx::ir::Operation &that);
   static std::optional<CopySignOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::CopySignOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::CopySignOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value a(void) const;

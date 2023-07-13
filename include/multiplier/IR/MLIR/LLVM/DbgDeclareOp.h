@@ -23,7 +23,7 @@ class DbgDeclareOp final : public Operation {
   static std::optional<DbgDeclareOp> from(const ::mx::ir::Operation &that);
   static std::optional<DbgDeclareOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::DbgDeclareOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::DbgDeclareOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> addr(void) const;

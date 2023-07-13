@@ -155,24 +155,24 @@ std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const TokenContext &t) {
 }
 
 Expr ObjCIsaExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCIsaExpr::base_token_end(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token ObjCIsaExpr::isa_member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token ObjCIsaExpr::operation_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool ObjCIsaExpr::is_arrow(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

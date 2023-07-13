@@ -9,6 +9,7 @@
 #include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
+#include <type_traits>
 #include <utility>
 
 namespace mlir {
@@ -62,6 +63,17 @@ class Value {
 
   // Generate the uses of this value.
   gap::generator<Operand> uses(void) const & noexcept;
+};
+
+// A value with a specific type.
+template <typename T>
+class TypedValue : public Value {
+ public:
+  static_assert(std::is_base_of_v<Type, T>);
+
+  inline T type(void) const noexcept {
+    return reinterpret_cast<const T &>(Value::type());
+  }
 };
 
 }  // namespace mx::ir

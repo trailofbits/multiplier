@@ -23,7 +23,7 @@ class RecordMemberOp final : public Operation {
   static std::optional<RecordMemberOp> from(const ::mx::ir::Operation &that);
   static std::optional<RecordMemberOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::RecordMemberOp underlying_op(void) const noexcept;
+  ::vast::hl::RecordMemberOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value record(void) const;

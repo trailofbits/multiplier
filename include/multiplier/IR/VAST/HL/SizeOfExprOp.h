@@ -23,7 +23,7 @@ class SizeOfExprOp final : public Operation {
   static std::optional<SizeOfExprOp> from(const ::mx::ir::Operation &that);
   static std::optional<SizeOfExprOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::SizeOfExprOp underlying_op(void) const noexcept;
+  ::vast::hl::SizeOfExprOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value result(void) const;

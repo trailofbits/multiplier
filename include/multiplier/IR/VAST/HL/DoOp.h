@@ -23,7 +23,7 @@ class DoOp final : public Operation {
   static std::optional<DoOp> from(const ::mx::ir::Operation &that);
   static std::optional<DoOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::DoOp underlying_op(void) const noexcept;
+  ::vast::hl::DoOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body_region(void) const;

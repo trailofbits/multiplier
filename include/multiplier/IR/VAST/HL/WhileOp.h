@@ -23,7 +23,7 @@ class WhileOp final : public Operation {
   static std::optional<WhileOp> from(const ::mx::ir::Operation &that);
   static std::optional<WhileOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::WhileOp underlying_op(void) const noexcept;
+  ::vast::hl::WhileOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region cond_region(void) const;

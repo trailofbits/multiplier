@@ -23,7 +23,7 @@ class CoroResumeOp final : public Operation {
   static std::optional<CoroResumeOp> from(const ::mx::ir::Operation &that);
   static std::optional<CoroResumeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::CoroResumeOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::CoroResumeOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value handle(void) const;

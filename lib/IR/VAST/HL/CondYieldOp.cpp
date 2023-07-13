@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/CondYieldOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<CondYieldOp> CondYieldOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_COND_YIELD) {
@@ -22,6 +27,10 @@ std::optional<CondYieldOp> CondYieldOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::CondYieldOp CondYieldOp::underlying_op(void) const noexcept {
+  return ::vast::hl::CondYieldOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

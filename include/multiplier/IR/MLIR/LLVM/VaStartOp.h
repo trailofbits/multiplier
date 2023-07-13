@@ -23,7 +23,7 @@ class VaStartOp final : public Operation {
   static std::optional<VaStartOp> from(const ::mx::ir::Operation &that);
   static std::optional<VaStartOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VaStartOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VaStartOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg_list(void) const;

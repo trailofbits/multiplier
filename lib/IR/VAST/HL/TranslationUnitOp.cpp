@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/TranslationUnitOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<TranslationUnitOp> TranslationUnitOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_TRANSLATION_UNIT) {
@@ -22,6 +27,10 @@ std::optional<TranslationUnitOp> TranslationUnitOp::producing(const ::mx::ir::Va
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::TranslationUnitOp TranslationUnitOp::underlying_op(void) const noexcept {
+  return ::vast::hl::TranslationUnitOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

@@ -157,16 +157,16 @@ std::optional<RequiresExpr> RequiresExpr::from(const TokenContext &t) {
 }
 
 RequiresExprBodyDecl RequiresExpr::body(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 unsigned RequiresExpr::num_local_parameters(void) const {
-  return impl->reader.getVal16().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -180,12 +180,12 @@ std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
 }
 
 gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d16 = ep->DeclFor(ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(std::move(d16)))) {
+    if (auto d15 = ep->DeclFor(ep, v)) {
+      if (auto e = ParmVarDecl::from(Decl(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }
@@ -194,15 +194,15 @@ gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
 }
 
 Token RequiresExpr::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token RequiresExpr::requires_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 bool RequiresExpr::is_satisfied(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

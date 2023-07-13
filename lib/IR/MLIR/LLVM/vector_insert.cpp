@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/vector_insert.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<vector_insert> vector_insert::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_VECTOR_INSERT) {
@@ -22,6 +27,10 @@ std::optional<vector_insert> vector_insert::producing(const ::mx::ir::Value &tha
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::vector_insert vector_insert::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::vector_insert(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::builtin {
 std::optional<ModuleOp> ModuleOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::BUILTIN_MODULE) {
@@ -22,6 +27,10 @@ std::optional<ModuleOp> ModuleOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::ModuleOp ModuleOp::underlying_op(void) const noexcept {
+  return ::mlir::ModuleOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::builtin

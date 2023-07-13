@@ -23,7 +23,7 @@ class TypeDefOp final : public Operation {
   static std::optional<TypeDefOp> from(const ::mx::ir::Operation &that);
   static std::optional<TypeDefOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::TypeDefOp underlying_op(void) const noexcept;
+  ::vast::hl::TypeDefOp underlying_op(void) const noexcept;
 
   // Imported methods:
   std::string_view name(void) const;

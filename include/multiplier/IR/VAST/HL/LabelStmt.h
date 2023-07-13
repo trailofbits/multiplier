@@ -23,7 +23,7 @@ class LabelStmt final : public Operation {
   static std::optional<LabelStmt> from(const ::mx::ir::Operation &that);
   static std::optional<LabelStmt> producing(const ::mx::ir::Value &val);
 
-  vast::hl::LabelStmt underlying_op(void) const noexcept;
+  ::vast::hl::LabelStmt underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::vast::hl::LabelType> label(void) const;

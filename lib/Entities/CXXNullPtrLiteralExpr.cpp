@@ -155,7 +155,7 @@ std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const TokenCont
 }
 
 Token CXXNullPtrLiteralExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 #pragma GCC diagnostic pop

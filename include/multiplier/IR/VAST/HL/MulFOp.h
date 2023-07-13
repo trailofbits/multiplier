@@ -23,7 +23,7 @@ class MulFOp final : public Operation {
   static std::optional<MulFOp> from(const ::mx::ir::Operation &that);
   static std::optional<MulFOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::MulFOp underlying_op(void) const noexcept;
+  ::vast::hl::MulFOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

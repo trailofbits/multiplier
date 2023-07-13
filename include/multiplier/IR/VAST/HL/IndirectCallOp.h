@@ -23,12 +23,12 @@ class IndirectCallOp final : public Operation {
   static std::optional<IndirectCallOp> from(const ::mx::ir::Operation &that);
   static std::optional<IndirectCallOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::IndirectCallOp underlying_op(void) const noexcept;
+  ::vast::hl::IndirectCallOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value callee(void) const;
-  //::mlir::Operation::operand_range arg_operands(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::operand_range arg_operands(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
 };
 static_assert(sizeof(IndirectCallOp) == sizeof(Operation));

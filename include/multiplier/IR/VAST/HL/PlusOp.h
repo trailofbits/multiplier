@@ -23,7 +23,7 @@ class PlusOp final : public Operation {
   static std::optional<PlusOp> from(const ::mx::ir::Operation &that);
   static std::optional<PlusOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::PlusOp underlying_op(void) const noexcept;
+  ::vast::hl::PlusOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

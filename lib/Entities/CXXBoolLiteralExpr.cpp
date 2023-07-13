@@ -155,11 +155,11 @@ std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const TokenContext &t
 }
 
 Token CXXBoolLiteralExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CXXBoolLiteralExpr::value(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

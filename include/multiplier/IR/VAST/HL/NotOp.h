@@ -23,7 +23,7 @@ class NotOp final : public Operation {
   static std::optional<NotOp> from(const ::mx::ir::Operation &that);
   static std::optional<NotOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::NotOp underlying_op(void) const noexcept;
+  ::vast::hl::NotOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

@@ -23,7 +23,7 @@ class PerformConcurrentlyOp final : public Operation {
   static std::optional<PerformConcurrentlyOp> from(const ::mx::ir::Operation &that);
   static std::optional<PerformConcurrentlyOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::PerformConcurrentlyOp underlying_op(void) const noexcept;
+  ::mlir::scf::PerformConcurrentlyOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region region(void) const;

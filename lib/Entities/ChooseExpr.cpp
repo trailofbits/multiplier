@@ -155,39 +155,39 @@ std::optional<ChooseExpr> ChooseExpr::from(const TokenContext &t) {
 }
 
 Token ChooseExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr ChooseExpr::chosen_sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::condition(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ChooseExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 bool ChooseExpr::is_condition_dependent(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool ChooseExpr::is_condition_true(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

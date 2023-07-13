@@ -23,7 +23,7 @@ class LabelDeclOp final : public Operation {
   static std::optional<LabelDeclOp> from(const ::mx::ir::Operation &that);
   static std::optional<LabelDeclOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::LabelDeclOp underlying_op(void) const noexcept;
+  ::vast::hl::LabelDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::vast::hl::LabelType> result(void) const;

@@ -9,6 +9,7 @@
 
 namespace mlir {
 class MLIRContext;
+class TypeStorage;
 }  // namespace mlir
 namespace mx::ir {
 
@@ -28,13 +29,12 @@ class Type final {
   friend class Argument;
   friend class Value;
 
-  std::shared_ptr<mlir::MLIRContext> context_;
-  const void *value_;
+  mlir::MLIRContext *context_;
+  const mlir::TypeStorage *type_;
 
-  inline Type(std::shared_ptr<mlir::MLIRContext> context,
-              const void *value)
+  inline Type(mlir::MLIRContext *context, const mlir::TypeStorage *type)
       : context_(std::move(context)),
-        value_(value) {}
+        type_(type) {}
 
  public:
 

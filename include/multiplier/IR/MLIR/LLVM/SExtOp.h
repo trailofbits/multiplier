@@ -23,7 +23,7 @@ class SExtOp final : public Operation {
   static std::optional<SExtOp> from(const ::mx::ir::Operation &that);
   static std::optional<SExtOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::SExtOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::SExtOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

@@ -157,50 +157,50 @@ std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const TokenContext &t) {
 }
 
 Token SizeOfPackExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 NamedDecl SizeOfPackExpr::pack(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<unsigned> SizeOfPackExpr::pack_length(void) const {
-  if (!impl->reader.getVal90()) {
+  if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal106());
+    return static_cast<unsigned>(impl->reader.getVal105());
   }
   return std::nullopt;
 }
 
 Token SizeOfPackExpr::pack_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(void) const {
-  if (!impl->reader.getVal91()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   }
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d16 = ep->TemplateArgumentFor(ep, v)) {
-      vec.emplace_back(std::move(d16));
+    if (auto d15 = ep->TemplateArgumentFor(ep, v)) {
+      vec.emplace_back(std::move(d15));
     }
   }
   return vec;
 }
 
 Token SizeOfPackExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool SizeOfPackExpr::is_partially_substituted(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

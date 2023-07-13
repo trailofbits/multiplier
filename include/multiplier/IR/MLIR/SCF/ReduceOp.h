@@ -23,7 +23,7 @@ class ReduceOp final : public Operation {
   static std::optional<ReduceOp> from(const ::mx::ir::Operation &that);
   static std::optional<ReduceOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::ReduceOp underlying_op(void) const noexcept;
+  ::mlir::scf::ReduceOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value operand(void) const;

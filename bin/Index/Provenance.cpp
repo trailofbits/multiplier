@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <functional>
 #include <iostream>
+#include <multiplier/Entities/StmtKind.h>
 #include <multiplier/Entities/TokenKind.h>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
@@ -1008,8 +1009,21 @@ static int Score(mx::RawEntityId fragment_index, mx::EntityId eid) {
 
   } else if (std::holds_alternative<mx::StmtId>(vid)) {
     if (std::get<mx::StmtId>(vid).fragment_id != fragment_index) {
-      score += 1;
+      score += 2;
     }
+
+    // Often times, e.g. with `assert`-like macros, the input will be
+    // stringified, and we'd rather associate input tokens (especially
+    // punctuation) with teh statements themselves rather than the string
+    // literal.
+    switch (std::get<mx::StmtId>(vid).kind) {
+      case mx::StmtKind::STRING_LITERAL:
+        break;
+      default:
+        score += 1;
+        break;
+    }
+
     score += 20;
 
   } else if (!std::holds_alternative<mx::InvalidId>(vid)) {

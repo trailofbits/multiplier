@@ -23,11 +23,11 @@ class ConditionOp final : public Operation {
   static std::optional<ConditionOp> from(const ::mx::ir::Operation &that);
   static std::optional<ConditionOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::ConditionOp underlying_op(void) const noexcept;
+  ::mlir::scf::ConditionOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> condition(void) const;
-  //::mlir::Operation::operand_range args(void) const;
+  //::mlir::mlir::Operation::operand_range args(void) const;
 };
 static_assert(sizeof(ConditionOp) == sizeof(Operation));
 

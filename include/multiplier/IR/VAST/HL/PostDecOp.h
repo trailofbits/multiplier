@@ -23,7 +23,7 @@ class PostDecOp final : public Operation {
   static std::optional<PostDecOp> from(const ::mx::ir::Operation &that);
   static std::optional<PostDecOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::PostDecOp underlying_op(void) const noexcept;
+  ::vast::hl::PostDecOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

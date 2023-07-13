@@ -23,7 +23,7 @@ class UMinOp final : public Operation {
   static std::optional<UMinOp> from(const ::mx::ir::Operation &that);
   static std::optional<UMinOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::UMinOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::UMinOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value a(void) const;

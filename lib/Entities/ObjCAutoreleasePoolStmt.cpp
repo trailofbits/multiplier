@@ -153,11 +153,11 @@ std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Token
 }
 
 Token ObjCAutoreleasePoolStmt::at_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Stmt ObjCAutoreleasePoolStmt::sub_statement(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal10();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

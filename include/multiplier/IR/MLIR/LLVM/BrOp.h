@@ -23,10 +23,10 @@ class BrOp final : public Operation {
   static std::optional<BrOp> from(const ::mx::ir::Operation &that);
   static std::optional<BrOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::BrOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::BrOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range dest_operands(void) const;
+  //::mlir::mlir::Operation::operand_range dest_operands(void) const;
   //::mlir::Block* dest(void) const;
 };
 static_assert(sizeof(BrOp) == sizeof(Operation));

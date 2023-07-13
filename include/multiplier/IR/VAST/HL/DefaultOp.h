@@ -23,7 +23,7 @@ class DefaultOp final : public Operation {
   static std::optional<DefaultOp> from(const ::mx::ir::Operation &that);
   static std::optional<DefaultOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::DefaultOp underlying_op(void) const noexcept;
+  ::vast::hl::DefaultOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body(void) const;

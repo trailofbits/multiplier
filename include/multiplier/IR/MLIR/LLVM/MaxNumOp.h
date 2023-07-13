@@ -23,7 +23,7 @@ class MaxNumOp final : public Operation {
   static std::optional<MaxNumOp> from(const ::mx::ir::Operation &that);
   static std::optional<MaxNumOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::MaxNumOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::MaxNumOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value a(void) const;

@@ -23,7 +23,7 @@ class VPFmaOp final : public Operation {
   static std::optional<VPFmaOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPFmaOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPFmaOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPFmaOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value op1(void) const;

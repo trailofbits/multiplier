@@ -23,7 +23,7 @@ class VPReduceMulOp final : public Operation {
   static std::optional<VPReduceMulOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPReduceMulOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPReduceMulOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPReduceMulOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> satrt_value(void) const;

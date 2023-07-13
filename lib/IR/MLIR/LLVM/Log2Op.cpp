@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/Log2Op.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<Log2Op> Log2Op::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_LOG2) {
@@ -22,6 +27,10 @@ std::optional<Log2Op> Log2Op::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::Log2Op Log2Op::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::Log2Op(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

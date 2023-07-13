@@ -23,7 +23,7 @@ class vector_reduce_xor final : public Operation {
   static std::optional<vector_reduce_xor> from(const ::mx::ir::Operation &that);
   static std::optional<vector_reduce_xor> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::vector_reduce_xor underlying_op(void) const noexcept;
+  ::mlir::LLVM::vector_reduce_xor underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value res(void) const;

@@ -23,7 +23,7 @@ class VPSExtOp final : public Operation {
   static std::optional<VPSExtOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPSExtOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPSExtOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPSExtOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

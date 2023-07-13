@@ -9,6 +9,12 @@
 #include <multiplier/IR/MLIR/MemRef/AssumeAlignmentOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <mlir/Dialect/MemRef/IR/MemRef.h>
+
 namespace mx::ir::memref {
 std::optional<AssumeAlignmentOp> AssumeAlignmentOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::MEMREF_ASSUME_ALIGNMENT) {
@@ -22,6 +28,10 @@ std::optional<AssumeAlignmentOp> AssumeAlignmentOp::producing(const ::mx::ir::Va
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::memref::AssumeAlignmentOp AssumeAlignmentOp::underlying_op(void) const noexcept {
+  return ::mlir::memref::AssumeAlignmentOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::memref

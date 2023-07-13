@@ -23,7 +23,7 @@ class BinShlOp final : public Operation {
   static std::optional<BinShlOp> from(const ::mx::ir::Operation &that);
   static std::optional<BinShlOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::BinShlOp underlying_op(void) const noexcept;
+  ::vast::hl::BinShlOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

@@ -23,7 +23,7 @@ class AlignOfExprOp final : public Operation {
   static std::optional<AlignOfExprOp> from(const ::mx::ir::Operation &that);
   static std::optional<AlignOfExprOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::AlignOfExprOp underlying_op(void) const noexcept;
+  ::vast::hl::AlignOfExprOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value result(void) const;

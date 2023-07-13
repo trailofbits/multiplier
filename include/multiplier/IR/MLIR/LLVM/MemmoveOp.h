@@ -23,7 +23,7 @@ class MemmoveOp final : public Operation {
   static std::optional<MemmoveOp> from(const ::mx::ir::Operation &that);
   static std::optional<MemmoveOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::MemmoveOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::MemmoveOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> dst(void) const;

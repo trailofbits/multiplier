@@ -23,7 +23,7 @@ class VaCopyOp final : public Operation {
   static std::optional<VaCopyOp> from(const ::mx::ir::Operation &that);
   static std::optional<VaCopyOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VaCopyOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VaCopyOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value dest_list(void) const;

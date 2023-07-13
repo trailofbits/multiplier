@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/CopySignOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<CopySignOp> CopySignOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_COPYSIGN) {
@@ -22,6 +27,10 @@ std::optional<CopySignOp> CopySignOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::CopySignOp CopySignOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::CopySignOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

@@ -155,12 +155,12 @@ std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const TokenContex
 }
 
 Expr OMPSectionsDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal15();
+  RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPSectionsDirective::has_cancel(void) const {
-  return impl->reader.getVal24();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

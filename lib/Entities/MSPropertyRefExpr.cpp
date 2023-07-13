@@ -156,25 +156,25 @@ std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const TokenContext &t) 
 }
 
 Expr MSPropertyRefExpr::base_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MSPropertyRefExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 MSPropertyDecl MSPropertyRefExpr::property_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return MSPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool MSPropertyRefExpr::is_arrow(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool MSPropertyRefExpr::is_implicit_access(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

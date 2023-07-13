@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/UnreachableOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<UnreachableOp> UnreachableOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_UNREACHABLE) {
@@ -22,6 +27,10 @@ std::optional<UnreachableOp> UnreachableOp::producing(const ::mx::ir::Value &tha
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::UnreachableOp UnreachableOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::UnreachableOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

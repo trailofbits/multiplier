@@ -23,7 +23,7 @@ class SubIAssignOp final : public Operation {
   static std::optional<SubIAssignOp> from(const ::mx::ir::Operation &that);
   static std::optional<SubIAssignOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::SubIAssignOp underlying_op(void) const noexcept;
+  ::vast::hl::SubIAssignOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

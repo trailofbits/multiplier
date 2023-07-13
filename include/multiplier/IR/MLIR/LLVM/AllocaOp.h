@@ -23,7 +23,7 @@ class AllocaOp final : public Operation {
   static std::optional<AllocaOp> from(const ::mx::ir::Operation &that);
   static std::optional<AllocaOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::AllocaOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::AllocaOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> array_size(void) const;

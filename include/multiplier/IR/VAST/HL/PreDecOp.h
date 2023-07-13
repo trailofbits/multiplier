@@ -23,7 +23,7 @@ class PreDecOp final : public Operation {
   static std::optional<PreDecOp> from(const ::mx::ir::Operation &that);
   static std::optional<PreDecOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::PreDecOp underlying_op(void) const noexcept;
+  ::vast::hl::PreDecOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

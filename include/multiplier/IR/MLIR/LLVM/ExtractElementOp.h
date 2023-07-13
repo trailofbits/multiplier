@@ -23,7 +23,7 @@ class ExtractElementOp final : public Operation {
   static std::optional<ExtractElementOp> from(const ::mx::ir::Operation &that);
   static std::optional<ExtractElementOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::ExtractElementOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::ExtractElementOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value vector(void) const;

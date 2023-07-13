@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/LabelDeclOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<LabelDeclOp> LabelDeclOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_LABEL_DECL) {
@@ -22,6 +27,10 @@ std::optional<LabelDeclOp> LabelDeclOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::LabelDeclOp LabelDeclOp::underlying_op(void) const noexcept {
+  return ::vast::hl::LabelDeclOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

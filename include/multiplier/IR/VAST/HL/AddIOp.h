@@ -23,7 +23,7 @@ class AddIOp final : public Operation {
   static std::optional<AddIOp> from(const ::mx::ir::Operation &that);
   static std::optional<AddIOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::AddIOp underlying_op(void) const noexcept;
+  ::vast::hl::AddIOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

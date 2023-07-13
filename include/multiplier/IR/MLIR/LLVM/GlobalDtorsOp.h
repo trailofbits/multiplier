@@ -23,7 +23,7 @@ class GlobalDtorsOp final : public Operation {
   static std::optional<GlobalDtorsOp> from(const ::mx::ir::Operation &that);
   static std::optional<GlobalDtorsOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::GlobalDtorsOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::GlobalDtorsOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::ArrayAttr dtors(void) const;

@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/TBAATagOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<TBAATagOp> TBAATagOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_TBAA_TAG) {
@@ -22,6 +27,10 @@ std::optional<TBAATagOp> TBAATagOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::TBAATagOp TBAATagOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::TBAATagOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

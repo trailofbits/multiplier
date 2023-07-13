@@ -154,26 +154,26 @@ std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const TokenCont
 }
 
 Stmt ObjCForCollectionStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr ObjCForCollectionStmt::collection(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal10();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt ObjCForCollectionStmt::element(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal11();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Token ObjCForCollectionStmt::for_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 Token ObjCForCollectionStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal15());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 #pragma GCC diagnostic pop

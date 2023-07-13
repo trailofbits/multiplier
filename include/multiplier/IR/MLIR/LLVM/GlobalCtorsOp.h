@@ -23,7 +23,7 @@ class GlobalCtorsOp final : public Operation {
   static std::optional<GlobalCtorsOp> from(const ::mx::ir::Operation &that);
   static std::optional<GlobalCtorsOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::GlobalCtorsOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::GlobalCtorsOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::ArrayAttr ctors(void) const;

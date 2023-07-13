@@ -158,7 +158,7 @@ std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(con
 
 std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -170,13 +170,13 @@ std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
 }
 
 Type CXXDependentScopeMemberExpr::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_scope(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal41();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -188,39 +188,39 @@ std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_s
 }
 
 Token CXXDependentScopeMemberExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token CXXDependentScopeMemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token CXXDependentScopeMemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token CXXDependentScopeMemberExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token CXXDependentScopeMemberExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool CXXDependentScopeMemberExpr::has_template_keyword(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXDependentScopeMemberExpr::is_arrow(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool CXXDependentScopeMemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

@@ -23,7 +23,7 @@ class VPUIToFPOp final : public Operation {
   static std::optional<VPUIToFPOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPUIToFPOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPUIToFPOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPUIToFPOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

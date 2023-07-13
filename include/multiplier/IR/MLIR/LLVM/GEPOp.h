@@ -23,11 +23,11 @@ class GEPOp final : public Operation {
   static std::optional<GEPOp> from(const ::mx::ir::Operation &that);
   static std::optional<GEPOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::GEPOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::GEPOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value base(void) const;
-  //::mlir::Operation::operand_range dynamic_indices(void) const;
+  //::mlir::mlir::Operation::operand_range dynamic_indices(void) const;
   ::mx::ir::Value res(void) const;
   //::llvm::ArrayRef<int32_t> raw_constant_indices(void) const;
   //::std::optional<::mlir::Type> elem_type(void) const;

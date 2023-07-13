@@ -23,7 +23,7 @@ class LNotOp final : public Operation {
   static std::optional<LNotOp> from(const ::mx::ir::Operation &that);
   static std::optional<LNotOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::LNotOp underlying_op(void) const noexcept;
+  ::vast::hl::LNotOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

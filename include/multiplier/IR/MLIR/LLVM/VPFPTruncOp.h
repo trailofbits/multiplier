@@ -23,7 +23,7 @@ class VPFPTruncOp final : public Operation {
   static std::optional<VPFPTruncOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPFPTruncOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPFPTruncOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPFPTruncOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

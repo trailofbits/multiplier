@@ -153,11 +153,11 @@ std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const TokenContext &t) 
 }
 
 Token ObjCAtFinallyStmt::at_finally_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Stmt ObjCAtFinallyStmt::finally_body(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal10();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

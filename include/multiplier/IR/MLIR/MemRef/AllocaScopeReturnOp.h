@@ -23,10 +23,10 @@ class AllocaScopeReturnOp final : public Operation {
   static std::optional<AllocaScopeReturnOp> from(const ::mx::ir::Operation &that);
   static std::optional<AllocaScopeReturnOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::AllocaScopeReturnOp underlying_op(void) const noexcept;
+  ::mlir::memref::AllocaScopeReturnOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range results(void) const;
+  //::mlir::mlir::Operation::operand_range results(void) const;
 };
 static_assert(sizeof(AllocaScopeReturnOp) == sizeof(Operation));
 

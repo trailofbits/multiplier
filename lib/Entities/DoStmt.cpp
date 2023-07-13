@@ -154,25 +154,25 @@ std::optional<DoStmt> DoStmt::from(const TokenContext &t) {
 }
 
 Stmt DoStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr DoStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal10();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token DoStmt::do_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 Token DoStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 Token DoStmt::while_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal15());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 #pragma GCC diagnostic pop

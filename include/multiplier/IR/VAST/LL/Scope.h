@@ -23,7 +23,7 @@ class Scope final : public Operation {
   static std::optional<Scope> from(const ::mx::ir::Operation &that);
   static std::optional<Scope> producing(const ::mx::ir::Value &val);
 
-  vast::ll::Scope underlying_op(void) const noexcept;
+  ::vast::ll::Scope underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body(void) const;

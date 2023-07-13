@@ -154,7 +154,7 @@ std::optional<OMPTaskDirective> OMPTaskDirective::from(const TokenContext &t) {
 }
 
 bool OMPTaskDirective::has_cancel(void) const {
-  return impl->reader.getVal24();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

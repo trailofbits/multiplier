@@ -159,12 +159,12 @@ std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::fr
 }
 
 Stmt OMPLoopTransformationDirective::pre_initializers(void) const {
-  RawEntityId eid = impl->reader.getVal15();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt OMPLoopTransformationDirective::transformed_statement(void) const {
-  RawEntityId eid = impl->reader.getVal18();
+  RawEntityId eid = impl->reader.getVal17();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

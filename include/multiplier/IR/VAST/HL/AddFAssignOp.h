@@ -23,7 +23,7 @@ class AddFAssignOp final : public Operation {
   static std::optional<AddFAssignOp> from(const ::mx::ir::Operation &that);
   static std::optional<AddFAssignOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::AddFAssignOp underlying_op(void) const noexcept;
+  ::vast::hl::AddFAssignOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

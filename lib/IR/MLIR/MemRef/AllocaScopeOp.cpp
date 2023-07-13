@@ -9,6 +9,12 @@
 #include <multiplier/IR/MLIR/MemRef/AllocaScopeOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <mlir/Dialect/MemRef/IR/MemRef.h>
+
 namespace mx::ir::memref {
 std::optional<AllocaScopeOp> AllocaScopeOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::MEMREF_ALLOCA_SCOPE) {
@@ -22,6 +28,10 @@ std::optional<AllocaScopeOp> AllocaScopeOp::producing(const ::mx::ir::Value &tha
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::memref::AllocaScopeOp AllocaScopeOp::underlying_op(void) const noexcept {
+  return ::mlir::memref::AllocaScopeOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::memref

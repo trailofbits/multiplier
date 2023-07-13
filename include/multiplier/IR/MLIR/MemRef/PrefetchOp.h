@@ -23,11 +23,11 @@ class PrefetchOp final : public Operation {
   static std::optional<PrefetchOp> from(const ::mx::ir::Operation &that);
   static std::optional<PrefetchOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::PrefetchOp underlying_op(void) const noexcept;
+  ::mlir::memref::PrefetchOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  //::mlir::mlir::Operation::operand_range indices(void) const;
   bool is_write(void) const;
   uint32_t locality_hint(void) const;
   bool is_data_cache(void) const;

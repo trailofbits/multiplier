@@ -23,7 +23,7 @@ class ScopeRet final : public Operation {
   static std::optional<ScopeRet> from(const ::mx::ir::Operation &that);
   static std::optional<ScopeRet> producing(const ::mx::ir::Value &val);
 
-  vast::ll::ScopeRet underlying_op(void) const noexcept;
+  ::vast::ll::ScopeRet underlying_op(void) const noexcept;
 
   // Imported methods:
 };

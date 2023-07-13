@@ -23,7 +23,7 @@ class FRemOp final : public Operation {
   static std::optional<FRemOp> from(const ::mx::ir::Operation &that);
   static std::optional<FRemOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FRemOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FRemOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

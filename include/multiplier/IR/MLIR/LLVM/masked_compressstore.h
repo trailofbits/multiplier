@@ -23,7 +23,7 @@ class masked_compressstore final : public Operation {
   static std::optional<masked_compressstore> from(const ::mx::ir::Operation &that);
   static std::optional<masked_compressstore> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::masked_compressstore underlying_op(void) const noexcept;
+  ::mlir::LLVM::masked_compressstore underlying_op(void) const noexcept;
 
   // Imported methods:
 };

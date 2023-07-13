@@ -23,7 +23,7 @@ class FMAOp final : public Operation {
   static std::optional<FMAOp> from(const ::mx::ir::Operation &that);
   static std::optional<FMAOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FMAOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FMAOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value a(void) const;

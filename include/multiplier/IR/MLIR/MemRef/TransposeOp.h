@@ -23,7 +23,7 @@ class TransposeOp final : public Operation {
   static std::optional<TransposeOp> from(const ::mx::ir::Operation &that);
   static std::optional<TransposeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::TransposeOp underlying_op(void) const noexcept;
+  ::mlir::memref::TransposeOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> in(void) const;

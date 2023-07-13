@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/VPURemOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<VPURemOp> VPURemOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_VP_UREM) {
@@ -22,6 +27,10 @@ std::optional<VPURemOp> VPURemOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::VPURemOp VPURemOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::VPURemOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

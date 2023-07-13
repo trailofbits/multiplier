@@ -155,16 +155,16 @@ std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const TokenContext 
 }
 
 Expr CompoundLiteralExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CompoundLiteralExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool CompoundLiteralExpr::is_file_scope(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

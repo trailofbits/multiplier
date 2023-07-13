@@ -23,11 +23,11 @@ class CallIntrinsicOp final : public Operation {
   static std::optional<CallIntrinsicOp> from(const ::mx::ir::Operation &that);
   static std::optional<CallIntrinsicOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::CallIntrinsicOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::CallIntrinsicOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range args(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::operand_range args(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   std::string_view intrin(void) const;
 };
 static_assert(sizeof(CallIntrinsicOp) == sizeof(Operation));

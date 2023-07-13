@@ -23,7 +23,7 @@ class EnumDeclOp final : public Operation {
   static std::optional<EnumDeclOp> from(const ::mx::ir::Operation &that);
   static std::optional<EnumDeclOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::EnumDeclOp underlying_op(void) const noexcept;
+  ::vast::hl::EnumDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region constants(void) const;

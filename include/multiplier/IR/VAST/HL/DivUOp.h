@@ -23,7 +23,7 @@ class DivUOp final : public Operation {
   static std::optional<DivUOp> from(const ::mx::ir::Operation &that);
   static std::optional<DivUOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::DivUOp underlying_op(void) const noexcept;
+  ::vast::hl::DivUOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

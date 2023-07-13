@@ -23,11 +23,11 @@ class GenericAtomicRMWOp final : public Operation {
   static std::optional<GenericAtomicRMWOp> from(const ::mx::ir::Operation &that);
   static std::optional<GenericAtomicRMWOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::GenericAtomicRMWOp underlying_op(void) const noexcept;
+  ::mlir::memref::GenericAtomicRMWOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  //::mlir::mlir::Operation::operand_range indices(void) const;
   ::mx::ir::Value result(void) const;
   ::mx::ir::Region atomic_body(void) const;
   //Region& body(void) const;

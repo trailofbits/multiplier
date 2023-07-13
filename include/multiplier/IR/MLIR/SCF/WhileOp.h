@@ -23,17 +23,17 @@ class WhileOp final : public Operation {
   static std::optional<WhileOp> from(const ::mx::ir::Operation &that);
   static std::optional<WhileOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::WhileOp underlying_op(void) const noexcept;
+  ::mlir::scf::WhileOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range inits(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::operand_range inits(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   ::mx::ir::Region before(void) const;
   ::mx::ir::Region after(void) const;
   //ConditionOp condition_op(void) const;
   //YieldOp yield_op(void) const;
-  //Block::BlockArgListType before_arguments(void) const;
-  //Block::BlockArgListType after_arguments(void) const;
+  //mlir::Block::BlockArgListType before_arguments(void) const;
+  //mlir::Block::BlockArgListType after_arguments(void) const;
 };
 static_assert(sizeof(WhileOp) == sizeof(Operation));
 

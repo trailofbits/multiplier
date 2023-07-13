@@ -154,25 +154,25 @@ std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const TokenContext &t) {
 }
 
 Token ObjCAtCatchStmt::at_catch_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Stmt ObjCAtCatchStmt::catch_body(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal10();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 VarDecl ObjCAtCatchStmt::catch_parameter_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal11();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCAtCatchStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 bool ObjCAtCatchStmt::has_ellipsis(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

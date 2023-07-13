@@ -157,12 +157,12 @@ std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const TokenCo
 }
 
 Type CompoundAssignOperator::computation_lhs_type(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal41();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CompoundAssignOperator::computation_result_type(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal42();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

@@ -23,11 +23,11 @@ class UnrealizedConversionCastOp final : public Operation {
   static std::optional<UnrealizedConversionCastOp> from(const ::mx::ir::Operation &that);
   static std::optional<UnrealizedConversionCastOp> producing(const ::mx::ir::Value &val);
 
-  mlir::UnrealizedConversionCastOp underlying_op(void) const noexcept;
+  ::mlir::UnrealizedConversionCastOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range inputs(void) const;
-  //::mlir::Operation::result_range outputs(void) const;
+  //::mlir::mlir::Operation::operand_range inputs(void) const;
+  //::mlir::mlir::Operation::result_range outputs(void) const;
 };
 static_assert(sizeof(UnrealizedConversionCastOp) == sizeof(Operation));
 

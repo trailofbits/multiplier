@@ -23,7 +23,7 @@ class IfOp final : public Operation {
   static std::optional<IfOp> from(const ::mx::ir::Operation &that);
   static std::optional<IfOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::IfOp underlying_op(void) const noexcept;
+  ::vast::hl::IfOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region cond_region(void) const;

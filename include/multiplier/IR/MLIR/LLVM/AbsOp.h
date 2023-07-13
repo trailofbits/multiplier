@@ -23,7 +23,7 @@ class AbsOp final : public Operation {
   static std::optional<AbsOp> from(const ::mx::ir::Operation &that);
   static std::optional<AbsOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::AbsOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::AbsOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

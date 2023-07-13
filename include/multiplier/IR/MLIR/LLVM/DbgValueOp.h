@@ -23,7 +23,7 @@ class DbgValueOp final : public Operation {
   static std::optional<DbgValueOp> from(const ::mx::ir::Operation &that);
   static std::optional<DbgValueOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::DbgValueOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::DbgValueOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;

@@ -23,7 +23,7 @@ class vector_reduce_umax final : public Operation {
   static std::optional<vector_reduce_umax> from(const ::mx::ir::Operation &that);
   static std::optional<vector_reduce_umax> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::vector_reduce_umax underlying_op(void) const noexcept;
+  ::mlir::LLVM::vector_reduce_umax underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value res(void) const;

@@ -23,7 +23,7 @@ class vector_extract final : public Operation {
   static std::optional<vector_extract> from(const ::mx::ir::Operation &that);
   static std::optional<vector_extract> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::vector_extract underlying_op(void) const noexcept;
+  ::mlir::LLVM::vector_extract underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value srcvec(void) const;

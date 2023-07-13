@@ -23,7 +23,7 @@ class PreIncOp final : public Operation {
   static std::optional<PreIncOp> from(const ::mx::ir::Operation &that);
   static std::optional<PreIncOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::PreIncOp underlying_op(void) const noexcept;
+  ::vast::hl::PreIncOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

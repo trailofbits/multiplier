@@ -23,7 +23,7 @@ class ICmpOp final : public Operation {
   static std::optional<ICmpOp> from(const ::mx::ir::Operation &that);
   static std::optional<ICmpOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::ICmpOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::ICmpOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

@@ -23,10 +23,10 @@ class YieldOp final : public Operation {
   static std::optional<YieldOp> from(const ::mx::ir::Operation &that);
   static std::optional<YieldOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::YieldOp underlying_op(void) const noexcept;
+  ::mlir::scf::YieldOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range results(void) const;
+  //::mlir::mlir::Operation::operand_range results(void) const;
 };
 static_assert(sizeof(YieldOp) == sizeof(Operation));
 

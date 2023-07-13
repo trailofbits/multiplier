@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/RecordMemberOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<RecordMemberOp> RecordMemberOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_MEMBER) {
@@ -22,6 +27,10 @@ std::optional<RecordMemberOp> RecordMemberOp::producing(const ::mx::ir::Value &t
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::RecordMemberOp RecordMemberOp::underlying_op(void) const noexcept {
+  return ::vast::hl::RecordMemberOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

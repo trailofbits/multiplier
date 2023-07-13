@@ -23,7 +23,7 @@ class ReturnOp final : public Operation {
   static std::optional<ReturnOp> from(const ::mx::ir::Operation &that);
   static std::optional<ReturnOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::ReturnOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::ReturnOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

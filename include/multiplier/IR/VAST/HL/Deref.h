@@ -23,7 +23,7 @@ class Deref final : public Operation {
   static std::optional<Deref> from(const ::mx::ir::Operation &that);
   static std::optional<Deref> producing(const ::mx::ir::Value &val);
 
-  vast::hl::Deref underlying_op(void) const noexcept;
+  ::vast::hl::Deref underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value addr(void) const;

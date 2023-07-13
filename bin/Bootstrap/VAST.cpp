@@ -9,6 +9,7 @@
 #include <mlir/IR/BuiltinOps.h>
 #include <mlir/IR/BuiltinTypes.h>
 #include <mlir/IR/BuiltinAttributes.h>
+#include <mlir/IR/SymbolTable.h>
 #include <mlir/Dialect/SCF/IR/SCF.h>
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
@@ -43,6 +44,8 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -95,6 +98,9 @@ class CodeGenerator {
   std::vector<Type> types;
   std::vector<Attr> attrs;
 
+  std::map<std::string, std::string> included_by;
+  std::map<std::string, std::map<uint64_t, std::string>> include_paths;
+
   void RunOnOpClass(const std::string &root_ns, const std::string &ns,
                     const pasta::CXXRecordDecl &cls,
                     std::vector<pasta::CXXMethodDecl> methods,
@@ -119,9 +125,13 @@ class CodeGenerator {
   void RunOnNamespace(const pasta::NamespaceDecl &root_ns,
                       pasta::NamespaceDecl ns);
 
+  void FillIncludePathsFor(const pasta::CXXRecordDecl &cls);
+  void RunOnTranslationUnit(pasta::TranslationUnitDecl tu);
+  void FindIncludePaths(pasta::MacroRange macros, pasta::File main_file);
+  std::string TopIncludePath(std::string path);
  public:
   CodeGenerator(char *argv[]);
-  void RunOnTranslationUnit(pasta::TranslationUnitDecl tu);
+  void RunOnAST(pasta::AST ast);
 
   void Summarize(void);
   void RunOnOps(void);
@@ -138,6 +148,160 @@ static std::string MethodName(const std::string &name) {
 
   return CapitalCaseToSnakeCase(capital_name);
 }
+
+static std::optional<pasta::Decl> GetDefinition(const pasta::NamedDecl &decl) {
+  if (auto r = pasta::RecordDecl::From(decl)) {
+    if (auto d = r->Definition()) {
+      return d.value();
+    }
+    return decl;
+  } else if (auto f = pasta::FunctionDecl::From(decl)) {
+    if (auto d = f->Definition()) {
+      return d.value();
+    }
+    return decl;
+  } else if (pasta::TypedefNameDecl::From(decl)) {
+    return decl;
+  }
+
+  return std::nullopt;
+}
+
+//// MLIR's TableGen produces `.h.inc` files, and often the `.h` actually includes
+//// the `.h
+//static std::filesystem::path FixupPath(std::filesystem::path p) {
+//  if (p.extension() != ".inc") {
+//    return p;
+//  }
+//
+//  std::filesystem::path np = p;
+//  np = np.replace_extension();
+//
+//  if (np.extension() == ".h" && std::filesystem::exists(np)) {
+//    return np;
+//  }
+//
+//  return p;
+//}
+
+// Calculate a relative path given an absolute path. We want relative paths
+// located inside of Clang, LLVM, MLIR, or VAST.
+static std::string RelativePath(std::filesystem::path file_path) {
+  std::filesystem::path path;
+  int seen_include = 0;
+  for (auto part : file_path) {
+    if (seen_include == 1) {
+      if (part != "mlir" && part != "clang" && part != "llvm" && part != "vast") {
+        return {};
+      }
+      path = part;
+      ++seen_include;
+    } else if (seen_include) {
+      path /= part;
+    } else if (part == "include") {
+      seen_include = 1;
+    }
+  }
+
+  if (seen_include < 2) {
+    return {};
+  }
+
+  return path.generic_string();
+//  return FixupPath(path).generic_string();
+}
+
+static std::string IncludePathFor(const pasta::NamedDecl &cls_) {
+  auto def = GetDefinition(cls_);
+  if (!def) {
+    return {};
+  }
+
+  pasta::Decl cls = std::move(def.value());
+  for (pasta::Token tok : cls.Tokens()) {
+    std::optional<pasta::FileToken> ftok = tok.FileLocation();
+    if (!ftok) {
+      continue;
+    }
+
+    return RelativePath(pasta::File::Containing(ftok.value()).Path());
+  }
+
+  return {};
+}
+
+void CodeGenerator::FillIncludePathsFor(const pasta::CXXRecordDecl &cls) {
+
+  std::set<std::string> seen;
+
+  std::string cls_path = IncludePathFor(cls);
+  if (cls_path.empty()) {
+    return;
+  }
+
+  std::map<uint64_t, std::string> &ordered_paths
+      = include_paths[cls_path];
+
+  cls_path = TopIncludePath(cls_path);
+  seen.insert(cls_path);
+
+  ordered_paths.emplace(cls.Token().Index(), cls_path);
+
+  std::cout << cls.Name() << '\n';
+
+  for (pasta::Token tok : cls.Tokens()) {
+    for (std::optional<pasta::TokenContext> tc = tok.Context();
+         tc; tc = tc->Parent()) {
+      std::optional<pasta::Decl> tcd = pasta::Decl::From(tc.value());
+      if (!tcd) {
+        continue;
+      }
+
+      std::optional<pasta::NamedDecl> rd = pasta::NamedDecl::From(tcd.value());
+      if (!rd) {
+        std::cerr << "  skipping: " << tcd->KindName() << " " << tok.Data() << '\n';
+        continue;
+      }
+
+      std::string rd_path = TopIncludePath(IncludePathFor(rd.value()));
+      std::cout << "  " << rd->Name() << " " << rd_path << '\n';
+      if (!rd_path.empty() && seen.emplace(rd_path).second) {
+        ordered_paths.emplace(rd->Token().Index(), rd_path);
+      }
+    }
+  }
+
+  std::cerr << '\n';
+}
+
+//static std::string ClassNameToOpName(std::string name) {
+//  if (name.ends_with("Op")) {
+//    return name;
+//  } else if (name == "vscale") {
+//    return "VScaleOp";
+//  } else if (name.starts_with("masked_") || name.starts_with("vector_")) {
+//    auto uc = true;
+//    std::string ret;
+//    for (char ch : name) {
+//      if (ch == '_') {
+//        uc = true;
+//        continue;
+//      } else if (uc) {
+//        uc = false;
+//        ret.push_back(static_cast<char>(std::toupper(ch)));
+//      } else {
+//        ret.push_back(ch);
+//      }
+//    }
+//    ret.push_back('O');
+//    ret.push_back('p');
+//    return ret;
+//  } else {
+//    name.push_back('O');
+//    name.push_back('p');
+//    return name;
+//  }
+//}
 
 static std::string OpNameToEnumCase(std::string_view name) {
   std::string ret;
@@ -212,6 +376,7 @@ struct Dialect {
 
 static Dialect gDialects[] = {
   {"Builtin", "MLIR/Builtin", "builtin", "mlir", "", "mlir", {}, {}, {}},
+  {"DLTI", "MLIR/DLTI", "dlti", "mlir", "", "mlir", {}, {}, {}},
   {"LLVMIR", "MLIR/LLVM", "llvm", "mlir::LLVM", "mlir", "LLVM", {}, {}, {}},
   {"SCF", "MLIR/SCF", "scf", "mlir::scf", "mlir", "scf", {}, {}, {}},
   {"MemRef", "MLIR/MemRef", "memref", "mlir::memref", "mlir", "memref", {}, {}, {}},
@@ -274,6 +439,18 @@ void CodeGenerator::Summarize(void) {
       if (attr.root_ns == dialect.root_ns && attr.ns == dialect.ns) {
         dialect.attrs.push_back(&attr);
       }
+    }
+  }
+
+  for (Dialect &dialect : gDialects) {
+    for (Op *op : dialect.ops) {
+      FillIncludePathsFor(op->cls);
+    }
+    for (Type *ty : dialect.types) {
+      FillIncludePathsFor(ty->cls);
+    }
+    for (Attr *attr : dialect.attrs) {
+      FillIncludePathsFor(attr->cls);
     }
   }
 }
@@ -461,7 +638,7 @@ void CodeGenerator::RunOnOps(void) {
           << "  }\n\n"
           << "  static std::optional<" << op->name << "> from(const ::mx::ir::Operation &that);\n"
           << "  static std::optional<" << op->name << "> producing(const ::mx::ir::Value &val);\n\n"
-          << "  " << dialect.ns_key
+          << "  ::" << dialect.ns_key
           << "::" << op->name << " underlying_op(void) const noexcept;\n\n"
           << "  // Imported methods:\n";
 
@@ -474,7 +651,17 @@ void CodeGenerator::RunOnOps(void) {
           << "// Auto-generated file; do not modify!\n\n"
           << "#include <multiplier/IR/" << dialect.our_dir_name.generic_string()
           << "/" << op->name << ".h>\n"
-          << "#include <multiplier/IR/Value.h>\n\n"
+          << "#include <multiplier/IR/Value.h>\n\n";
+
+      std::set<std::string> seen;
+      for (const auto &[id, path] : include_paths[IncludePathFor(op->cls)]) {
+        if (seen.emplace(path).second) {
+          cpp << "#include <" << path << ">\n";
+        }
+      }
+
+      cpp
+          << "\n"
           << "namespace mx::ir::" << dialect.our_ns_name << " {\n"
           << "std::optional<" << op->name << "> " << op->name
           << "::from(const ::mx::ir::Operation &that) {\n"
@@ -489,6 +676,10 @@ void CodeGenerator::RunOnOps(void) {
           << "    return from(op.value());\n"
           << "  }\n"
           << "  return std::nullopt;\n"
+          << "}\n\n"
+          << "::" << dialect.ns_key << "::" << op->name
+          << " " << op->name << "::underlying_op(void) const noexcept {\n"
+          << "  return ::" << dialect.ns_key << "::" << op->name << "(this->Operation::op_);\n"
           << "}\n\n";
 
       for (const pasta::CXXMethodDecl &meth : op->methods) {
@@ -938,6 +1129,59 @@ void CodeGenerator::RunOnNamespace(const pasta::NamespaceDecl &root_ns,
   RunOnClasses(root_ns_name, ns_name, std::move(classes));
 }
 
+std::string CodeGenerator::TopIncludePath(std::string path) {
+  for (auto end = included_by.end(); ;) {
+    auto it = included_by.find(path);
+    if (it == end) {
+      break;
+    } else {
+      path = it->second;
+    }
+  }
+  return path;
+}
+
+void CodeGenerator::FindIncludePaths(pasta::MacroRange macros,
+                                     pasta::File main_file) {
+  for (pasta::Macro m : macros) {
+    auto inc = pasta::IncludeMacroDirective::From(m);
+    if (!inc) {
+      continue;
+    }
+
+    auto dest_file = inc->IncludedFile();
+    if (!dest_file) {
+      continue;
+    }
+
+    auto bt = inc->BeginToken();
+    if (!bt) {
+      continue;
+    }
+
+    auto fbt = bt->FileLocation();
+    if (!fbt) {
+      continue;
+    }
+
+    auto src_file = pasta::File::Containing(fbt.value());
+    if (src_file == main_file) {
+      continue;
+    }
+
+    auto dest_path = RelativePath(dest_file->Path());
+    auto src_path = RelativePath(src_file.Path());
+    if (!dest_path.empty() && !src_path.empty()) {
+      included_by.emplace(dest_path, src_path);
+    }
+  }
+}
+
+void CodeGenerator::RunOnAST(pasta::AST ast) {
+  FindIncludePaths(ast.Macros(), ast.MainFile());
+  RunOnTranslationUnit(ast.TranslationUnit());
+}
+
 void CodeGenerator::RunOnTranslationUnit(pasta::TranslationUnitDecl tu) {
 
   std::vector<pasta::CXXRecordDecl> classes;
@@ -1055,7 +1299,7 @@ int main(int argc, char *argv[]) {
       std::cerr << maybe_ast.TakeError() << std::endl;
       return EXIT_FAILURE;
     } else {
-      cg.RunOnTranslationUnit(maybe_ast.TakeValue().TranslationUnit());
+      cg.RunOnAST(maybe_ast.TakeValue());
     }
   }
 

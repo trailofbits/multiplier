@@ -23,7 +23,7 @@ class BitReverseOp final : public Operation {
   static std::optional<BitReverseOp> from(const ::mx::ir::Operation &that);
   static std::optional<BitReverseOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::BitReverseOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::BitReverseOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

@@ -23,7 +23,7 @@ class SkipStmt final : public Operation {
   static std::optional<SkipStmt> from(const ::mx::ir::Operation &that);
   static std::optional<SkipStmt> producing(const ::mx::ir::Value &val);
 
-  vast::hl::SkipStmt underlying_op(void) const noexcept;
+  ::vast::hl::SkipStmt underlying_op(void) const noexcept;
 
   // Imported methods:
 };

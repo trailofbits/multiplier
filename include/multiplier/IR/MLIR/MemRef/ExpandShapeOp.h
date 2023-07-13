@@ -23,7 +23,7 @@ class ExpandShapeOp final : public Operation {
   static std::optional<ExpandShapeOp> from(const ::mx::ir::Operation &that);
   static std::optional<ExpandShapeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::ExpandShapeOp underlying_op(void) const noexcept;
+  ::mlir::memref::ExpandShapeOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> src(void) const;

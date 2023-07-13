@@ -553,13 +553,16 @@ Importer::Importer(std::filesystem::path cwd_,
             std::move(cwd_), fm, std::move(ctx))) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
-
   ProgressBarWork progress_tracker(d->ctx->command_progress);
   auto wrapped_tool = o.getString("wrapped_tool");
   auto cwd = o.getString("cwd");
-  auto args = o.getArray("args");
+  auto args = o.getArray("canonicalized_args");
   auto lang = o.getString("lang");  // `C`, `Cxx`, `Unknown`.
   auto env = o.getObject("env");
+
+  if (!args) {
+    args = o.getArray("args");
+  }
 
   if (!wrapped_tool || !cwd || !args || args->empty() || !env) {
     return false;
@@ -569,6 +572,7 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   args_vec.emplace_back(wrapped_tool->str());
 
   auto bundle = false;
+
   for (llvm::json::Value &arg : *args) {
     if (auto arg_str = arg.getAsString()) {
       if (arg_str->equals("-bundle")) {

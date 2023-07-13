@@ -23,12 +23,12 @@ class CondBrOp final : public Operation {
   static std::optional<CondBrOp> from(const ::mx::ir::Operation &that);
   static std::optional<CondBrOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::CondBrOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::CondBrOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> condition(void) const;
-  //::mlir::Operation::operand_range true_dest_operands(void) const;
-  //::mlir::Operation::operand_range false_dest_operands(void) const;
+  //::mlir::mlir::Operation::operand_range true_dest_operands(void) const;
+  //::mlir::mlir::Operation::operand_range false_dest_operands(void) const;
   //::mlir::Block* true_dest(void) const;
   //::mlir::Block* false_dest(void) const;
   //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;

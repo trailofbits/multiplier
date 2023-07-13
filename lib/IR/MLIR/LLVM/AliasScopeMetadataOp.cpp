@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/AliasScopeMetadataOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<AliasScopeMetadataOp> AliasScopeMetadataOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_ALIAS_SCOPE) {
@@ -22,6 +27,10 @@ std::optional<AliasScopeMetadataOp> AliasScopeMetadataOp::producing(const ::mx::
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::AliasScopeMetadataOp AliasScopeMetadataOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::AliasScopeMetadataOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

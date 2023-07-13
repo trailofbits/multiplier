@@ -23,7 +23,7 @@ class CountTrailingZerosOp final : public Operation {
   static std::optional<CountTrailingZerosOp> from(const ::mx::ir::Operation &that);
   static std::optional<CountTrailingZerosOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::CountTrailingZerosOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::CountTrailingZerosOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

@@ -23,7 +23,7 @@ class AShrOp final : public Operation {
   static std::optional<AShrOp> from(const ::mx::ir::Operation &that);
   static std::optional<AShrOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::AShrOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::AShrOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

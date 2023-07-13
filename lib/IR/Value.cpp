@@ -15,6 +15,14 @@
 
 namespace mx::ir {
 
+Type Value::type(void) const noexcept {
+  mlir::Value val = mlir::Value::getFromOpaquePointer(impl_.opaque);
+  return Type(
+      val.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          val.getType().getAsOpaquePointer()));
+}
+
 // Generate the uses of this value.
 gap::generator<Operand> Value::uses(void) const & noexcept {
   for (mlir::OpOperand &use : mlir::Value(impl_.value).getUses()) {

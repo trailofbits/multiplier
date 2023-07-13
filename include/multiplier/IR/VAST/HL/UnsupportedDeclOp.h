@@ -23,10 +23,10 @@ class UnsupportedDeclOp final : public Operation {
   static std::optional<UnsupportedDeclOp> from(const ::mx::ir::Operation &that);
   static std::optional<UnsupportedDeclOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::UnsupportedDeclOp underlying_op(void) const noexcept;
+  ::vast::hl::UnsupportedDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range elements(void) const;
+  //::mlir::mlir::Operation::operand_range elements(void) const;
   std::string_view name(void) const;
 };
 static_assert(sizeof(UnsupportedDeclOp) == sizeof(Operation));

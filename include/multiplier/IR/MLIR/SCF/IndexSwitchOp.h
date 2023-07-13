@@ -23,11 +23,11 @@ class IndexSwitchOp final : public Operation {
   static std::optional<IndexSwitchOp> from(const ::mx::ir::Operation &that);
   static std::optional<IndexSwitchOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::IndexSwitchOp underlying_op(void) const noexcept;
+  ::mlir::scf::IndexSwitchOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IndexType> arg(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   ::mx::ir::Region default_region(void) const;
   //::mlir::MutableArrayRef<::mlir::Region> case_regions(void) const;
   //::llvm::ArrayRef<int64_t> cases(void) const;

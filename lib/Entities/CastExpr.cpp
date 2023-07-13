@@ -185,17 +185,17 @@ std::optional<CastExpr> CastExpr::from(const TokenContext &t) {
 }
 
 CastKind CastExpr::cast_kind(void) const {
-  return static_cast<CastKind>(impl->reader.getVal95());
+  return static_cast<CastKind>(impl->reader.getVal94());
 }
 
 std::string_view CastExpr::cast_kind_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NamedDecl> CastExpr::conversion_function(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -207,18 +207,18 @@ std::optional<NamedDecl> CastExpr::conversion_function(void) const {
 }
 
 Expr CastExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CastExpr::sub_expression_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<FieldDecl> CastExpr::target_union_field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal42();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,7 +230,7 @@ std::optional<FieldDecl> CastExpr::target_union_field(void) const {
 }
 
 bool CastExpr::has_stored_fp_features(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

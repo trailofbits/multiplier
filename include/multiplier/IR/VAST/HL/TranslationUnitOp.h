@@ -23,7 +23,7 @@ class TranslationUnitOp final : public Operation {
   static std::optional<TranslationUnitOp> from(const ::mx::ir::Operation &that);
   static std::optional<TranslationUnitOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::TranslationUnitOp underlying_op(void) const noexcept;
+  ::vast::hl::TranslationUnitOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body(void) const;

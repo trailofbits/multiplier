@@ -23,7 +23,7 @@ class vector_reduce_smin final : public Operation {
   static std::optional<vector_reduce_smin> from(const ::mx::ir::Operation &that);
   static std::optional<vector_reduce_smin> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::vector_reduce_smin underlying_op(void) const noexcept;
+  ::mlir::LLVM::vector_reduce_smin underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value res(void) const;

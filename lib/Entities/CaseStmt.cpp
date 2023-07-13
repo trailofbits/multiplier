@@ -155,25 +155,25 @@ std::optional<CaseStmt> CaseStmt::from(const TokenContext &t) {
 }
 
 bool CaseStmt::case_statement_is_gnu_range(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal12();
 }
 
 Token CaseStmt::case_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal15());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 Token CaseStmt::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 Expr CaseStmt::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal18();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> CaseStmt::rhs(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal20();
+    RawEntityId eid = impl->reader.getVal19();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

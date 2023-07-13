@@ -399,6 +399,10 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"QualifiedType", "LocalCVRQualifiers"},
   {"QualifiedType", "LocalFastQualifiers"},
 
+  // These have bad time complexity.
+  {"Decl", "AlignedSubstitutions"},
+  {"Stmt", "AlignedSubstitutions"},
+
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 };

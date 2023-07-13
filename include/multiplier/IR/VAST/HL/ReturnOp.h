@@ -23,10 +23,10 @@ class ReturnOp final : public Operation {
   static std::optional<ReturnOp> from(const ::mx::ir::Operation &that);
   static std::optional<ReturnOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::ReturnOp underlying_op(void) const noexcept;
+  ::vast::hl::ReturnOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range result(void) const;
+  //::mlir::mlir::Operation::operand_range result(void) const;
 };
 static_assert(sizeof(ReturnOp) == sizeof(Operation));
 

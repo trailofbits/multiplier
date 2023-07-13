@@ -23,7 +23,7 @@ class SubIOp final : public Operation {
   static std::optional<SubIOp> from(const ::mx::ir::Operation &that);
   static std::optional<SubIOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::SubIOp underlying_op(void) const noexcept;
+  ::vast::hl::SubIOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

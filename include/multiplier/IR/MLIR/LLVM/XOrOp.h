@@ -23,7 +23,7 @@ class XOrOp final : public Operation {
   static std::optional<XOrOp> from(const ::mx::ir::Operation &that);
   static std::optional<XOrOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::XOrOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::XOrOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

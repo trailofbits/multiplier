@@ -155,11 +155,11 @@ std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const TokenContext &t) 
 }
 
 Token ShuffleVectorExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token ShuffleVectorExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 #pragma GCC diagnostic pop

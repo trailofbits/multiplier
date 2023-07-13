@@ -23,7 +23,7 @@ class LogOp final : public Operation {
   static std::optional<LogOp> from(const ::mx::ir::Operation &that);
   static std::optional<LogOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::LogOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::LogOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

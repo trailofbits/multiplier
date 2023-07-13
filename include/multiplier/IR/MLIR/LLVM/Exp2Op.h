@@ -23,7 +23,7 @@ class Exp2Op final : public Operation {
   static std::optional<Exp2Op> from(const ::mx::ir::Operation &that);
   static std::optional<Exp2Op> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::Exp2Op underlying_op(void) const noexcept;
+  ::mlir::LLVM::Exp2Op underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

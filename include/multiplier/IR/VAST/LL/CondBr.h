@@ -23,12 +23,12 @@ class CondBr final : public Operation {
   static std::optional<CondBr> from(const ::mx::ir::Operation &that);
   static std::optional<CondBr> producing(const ::mx::ir::Value &val);
 
-  vast::ll::CondBr underlying_op(void) const noexcept;
+  ::vast::ll::CondBr underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value cond(void) const;
-  //::mlir::Operation::operand_range true_operands(void) const;
-  //::mlir::Operation::operand_range false_operands(void) const;
+  //::mlir::mlir::Operation::operand_range true_operands(void) const;
+  //::mlir::mlir::Operation::operand_range false_operands(void) const;
   //::mlir::Block* true_dest(void) const;
   //::mlir::Block* false_dest(void) const;
 };

@@ -156,21 +156,21 @@ std::optional<AtomicExpr> AtomicExpr::from(const TokenContext &t) {
 }
 
 Token AtomicExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const {
-  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal95());
+  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal94());
 }
 
 Expr AtomicExpr::order(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> AtomicExpr::order_fail(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal41();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,17 +182,17 @@ std::optional<Expr> AtomicExpr::order_fail(void) const {
 }
 
 Expr AtomicExpr::pointer(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token AtomicExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 std::optional<Expr> AtomicExpr::scope(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal44();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -205,7 +205,7 @@ std::optional<Expr> AtomicExpr::scope(void) const {
 
 std::optional<Expr> AtomicExpr::value1(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal45();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -218,7 +218,7 @@ std::optional<Expr> AtomicExpr::value1(void) const {
 
 std::optional<Expr> AtomicExpr::value2(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal46();
+    RawEntityId eid = impl->reader.getVal45();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,13 +230,13 @@ std::optional<Expr> AtomicExpr::value2(void) const {
 }
 
 Type AtomicExpr::value_type(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal46();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> AtomicExpr::weak(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal48();
+    RawEntityId eid = impl->reader.getVal47();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -248,23 +248,23 @@ std::optional<Expr> AtomicExpr::weak(void) const {
 }
 
 bool AtomicExpr::is_cmp_x_chg(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool AtomicExpr::is_open_cl(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool AtomicExpr::is_volatile(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
 }
 
 unsigned AtomicExpr::num_sub_expressions(void) const {
-  return impl->reader.getVal16().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -278,12 +278,12 @@ std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
 }
 
 gap::generator<Expr> AtomicExpr::sub_expressions(void) const & {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d16 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d16)))) {
+    if (auto d15 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }

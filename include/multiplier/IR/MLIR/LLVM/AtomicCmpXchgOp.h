@@ -23,7 +23,7 @@ class AtomicCmpXchgOp final : public Operation {
   static std::optional<AtomicCmpXchgOp> from(const ::mx::ir::Operation &that);
   static std::optional<AtomicCmpXchgOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::AtomicCmpXchgOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::AtomicCmpXchgOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;

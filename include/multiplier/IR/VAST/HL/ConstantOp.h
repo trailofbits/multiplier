@@ -23,7 +23,7 @@ class ConstantOp final : public Operation {
   static std::optional<ConstantOp> from(const ::mx::ir::Operation &that);
   static std::optional<ConstantOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::ConstantOp underlying_op(void) const noexcept;
+  ::vast::hl::ConstantOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value result(void) const;

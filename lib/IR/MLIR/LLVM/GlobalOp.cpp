@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/GlobalOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<GlobalOp> GlobalOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_MLIR_GLOBAL) {
@@ -22,6 +27,10 @@ std::optional<GlobalOp> GlobalOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::GlobalOp GlobalOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::GlobalOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

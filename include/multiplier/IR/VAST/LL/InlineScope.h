@@ -23,7 +23,7 @@ class InlineScope final : public Operation {
   static std::optional<InlineScope> from(const ::mx::ir::Operation &that);
   static std::optional<InlineScope> producing(const ::mx::ir::Value &val);
 
-  vast::ll::InlineScope underlying_op(void) const noexcept;
+  ::vast::ll::InlineScope underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body(void) const;

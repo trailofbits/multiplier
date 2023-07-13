@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/MatrixMultiplyOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<MatrixMultiplyOp> MatrixMultiplyOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_MATRIX_MULTIPLY) {
@@ -22,6 +27,10 @@ std::optional<MatrixMultiplyOp> MatrixMultiplyOp::producing(const ::mx::ir::Valu
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::MatrixMultiplyOp MatrixMultiplyOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::MatrixMultiplyOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

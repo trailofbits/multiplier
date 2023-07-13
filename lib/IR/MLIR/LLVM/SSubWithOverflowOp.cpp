@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/SSubWithOverflowOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<SSubWithOverflowOp> SSubWithOverflowOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_SSUB_WITH_OVERFLOW) {
@@ -22,6 +27,10 @@ std::optional<SSubWithOverflowOp> SSubWithOverflowOp::producing(const ::mx::ir::
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::SSubWithOverflowOp SSubWithOverflowOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::SSubWithOverflowOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

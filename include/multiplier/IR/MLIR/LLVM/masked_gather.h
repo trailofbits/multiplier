@@ -23,12 +23,12 @@ class masked_gather final : public Operation {
   static std::optional<masked_gather> from(const ::mx::ir::Operation &that);
   static std::optional<masked_gather> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::masked_gather underlying_op(void) const noexcept;
+  ::mlir::LLVM::masked_gather underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value ptrs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::Operation::operand_range pass_thru(void) const;
+  //::mlir::mlir::Operation::operand_range pass_thru(void) const;
   ::mx::ir::Value res(void) const;
   uint32_t alignment(void) const;
 };

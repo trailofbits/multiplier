@@ -23,7 +23,7 @@ class RemFOp final : public Operation {
   static std::optional<RemFOp> from(const ::mx::ir::Operation &that);
   static std::optional<RemFOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::RemFOp underlying_op(void) const noexcept;
+  ::vast::hl::RemFOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

@@ -23,7 +23,7 @@ class FMulAddOp final : public Operation {
   static std::optional<FMulAddOp> from(const ::mx::ir::Operation &that);
   static std::optional<FMulAddOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FMulAddOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FMulAddOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value a(void) const;

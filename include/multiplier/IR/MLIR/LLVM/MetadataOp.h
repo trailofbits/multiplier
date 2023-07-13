@@ -23,7 +23,7 @@ class MetadataOp final : public Operation {
   static std::optional<MetadataOp> from(const ::mx::ir::Operation &that);
   static std::optional<MetadataOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::MetadataOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::MetadataOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body(void) const;

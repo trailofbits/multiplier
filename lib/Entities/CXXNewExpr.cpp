@@ -159,17 +159,17 @@ std::optional<CXXNewExpr> CXXNewExpr::from(const TokenContext &t) {
 }
 
 bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 Type CXXNewExpr::allocated_type(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> CXXNewExpr::array_size(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,7 +182,7 @@ std::optional<Expr> CXXNewExpr::array_size(void) const {
 
 std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal41();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -194,16 +194,16 @@ std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal42(), impl->reader.getVal43());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal41(), impl->reader.getVal42());
 }
 
 CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
-  return static_cast<CXXNewExprInitializationStyle>(impl->reader.getVal95());
+  return static_cast<CXXNewExprInitializationStyle>(impl->reader.getVal94());
 }
 
 std::optional<Expr> CXXNewExpr::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal44();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -215,45 +215,45 @@ std::optional<Expr> CXXNewExpr::initializer(void) const {
 }
 
 FunctionDecl CXXNewExpr::operator_delete(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal44();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 FunctionDecl CXXNewExpr::operator_new(void) const {
-  RawEntityId eid = impl->reader.getVal46();
+  RawEntityId eid = impl->reader.getVal45();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal47(), impl->reader.getVal48());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
 }
 
 bool CXXNewExpr::has_initializer(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXNewExpr::is_array(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool CXXNewExpr::is_global_new(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool CXXNewExpr::is_parenthesis_type_id(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool CXXNewExpr::pass_alignment(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal95();
 }
 
 unsigned CXXNewExpr::num_placement_arguments(void) const {
-  return impl->reader.getVal16().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -267,12 +267,12 @@ std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
 }
 
 gap::generator<Expr> CXXNewExpr::placement_arguments(void) const & {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d16 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d16)))) {
+    if (auto d15 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }
@@ -281,7 +281,7 @@ gap::generator<Expr> CXXNewExpr::placement_arguments(void) const & {
 }
 
 bool CXXNewExpr::should_null_check_allocation(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal97();
 }
 
 #pragma GCC diagnostic pop

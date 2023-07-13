@@ -23,7 +23,7 @@ class MatrixTransposeOp final : public Operation {
   static std::optional<MatrixTransposeOp> from(const ::mx::ir::Operation &that);
   static std::optional<MatrixTransposeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::MatrixTransposeOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::MatrixTransposeOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value matrix(void) const;

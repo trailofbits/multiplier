@@ -23,11 +23,11 @@ class AllocOp final : public Operation {
   static std::optional<AllocOp> from(const ::mx::ir::Operation &that);
   static std::optional<AllocOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::AllocOp underlying_op(void) const noexcept;
+  ::mlir::memref::AllocOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range dynamic_sizes(void) const;
-  //::mlir::Operation::operand_range symbol_operands(void) const;
+  //::mlir::mlir::Operation::operand_range dynamic_sizes(void) const;
+  //::mlir::mlir::Operation::operand_range symbol_operands(void) const;
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
   //::std::optional<uint64_t> alignment(void) const;
   //StringRef alignment_attr_str_name(void) const;

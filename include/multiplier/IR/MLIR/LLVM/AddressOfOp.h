@@ -23,7 +23,7 @@ class AddressOfOp final : public Operation {
   static std::optional<AddressOfOp> from(const ::mx::ir::Operation &that);
   static std::optional<AddressOfOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::AddressOfOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::AddressOfOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> res(void) const;

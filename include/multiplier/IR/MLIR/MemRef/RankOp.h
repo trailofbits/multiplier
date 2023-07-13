@@ -23,7 +23,7 @@ class RankOp final : public Operation {
   static std::optional<RankOp> from(const ::mx::ir::Operation &that);
   static std::optional<RankOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::RankOp underlying_op(void) const noexcept;
+  ::mlir::memref::RankOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value memref(void) const;

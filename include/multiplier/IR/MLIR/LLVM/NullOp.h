@@ -23,7 +23,7 @@ class NullOp final : public Operation {
   static std::optional<NullOp> from(const ::mx::ir::Operation &that);
   static std::optional<NullOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::NullOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::NullOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> res(void) const;

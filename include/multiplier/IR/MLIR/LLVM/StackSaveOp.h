@@ -23,7 +23,7 @@ class StackSaveOp final : public Operation {
   static std::optional<StackSaveOp> from(const ::mx::ir::Operation &that);
   static std::optional<StackSaveOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::StackSaveOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::StackSaveOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value res(void) const;

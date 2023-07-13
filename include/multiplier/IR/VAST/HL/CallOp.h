@@ -23,11 +23,11 @@ class CallOp final : public Operation {
   static std::optional<CallOp> from(const ::mx::ir::Operation &that);
   static std::optional<CallOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::CallOp underlying_op(void) const noexcept;
+  ::vast::hl::CallOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range arg_operands(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::operand_range arg_operands(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   std::string_view callee(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
 };

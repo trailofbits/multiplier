@@ -23,7 +23,7 @@ class CaseOp final : public Operation {
   static std::optional<CaseOp> from(const ::mx::ir::Operation &that);
   static std::optional<CaseOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::CaseOp underlying_op(void) const noexcept;
+  ::vast::hl::CaseOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region lhs(void) const;

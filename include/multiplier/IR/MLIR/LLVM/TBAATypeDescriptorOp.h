@@ -23,7 +23,7 @@ class TBAATypeDescriptorOp final : public Operation {
   static std::optional<TBAATypeDescriptorOp> from(const ::mx::ir::Operation &that);
   static std::optional<TBAATypeDescriptorOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::TBAATypeDescriptorOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::TBAATypeDescriptorOp underlying_op(void) const noexcept;
 
   // Imported methods:
   std::string_view sym_name(void) const;

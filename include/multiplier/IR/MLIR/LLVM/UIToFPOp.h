@@ -23,7 +23,7 @@ class UIToFPOp final : public Operation {
   static std::optional<UIToFPOp> from(const ::mx::ir::Operation &that);
   static std::optional<UIToFPOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::UIToFPOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::UIToFPOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

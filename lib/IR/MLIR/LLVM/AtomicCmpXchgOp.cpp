@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/AtomicCmpXchgOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<AtomicCmpXchgOp> AtomicCmpXchgOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_CMPXCHG) {
@@ -22,6 +27,10 @@ std::optional<AtomicCmpXchgOp> AtomicCmpXchgOp::producing(const ::mx::ir::Value 
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::AtomicCmpXchgOp AtomicCmpXchgOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::AtomicCmpXchgOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

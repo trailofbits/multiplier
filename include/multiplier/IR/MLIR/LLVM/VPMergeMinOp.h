@@ -23,7 +23,7 @@ class VPMergeMinOp final : public Operation {
   static std::optional<VPMergeMinOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPMergeMinOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPMergeMinOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPMergeMinOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value cond(void) const;

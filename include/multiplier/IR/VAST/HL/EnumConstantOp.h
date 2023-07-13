@@ -23,7 +23,7 @@ class EnumConstantOp final : public Operation {
   static std::optional<EnumConstantOp> from(const ::mx::ir::Operation &that);
   static std::optional<EnumConstantOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::EnumConstantOp underlying_op(void) const noexcept;
+  ::vast::hl::EnumConstantOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region init(void) const;

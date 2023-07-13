@@ -23,7 +23,7 @@ class VPFMulOp final : public Operation {
   static std::optional<VPFMulOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPFMulOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPFMulOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPFMulOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

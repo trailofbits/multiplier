@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/GlobalCtorsOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<GlobalCtorsOp> GlobalCtorsOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_MLIR_GLOBAL_CTORS) {
@@ -22,6 +27,10 @@ std::optional<GlobalCtorsOp> GlobalCtorsOp::producing(const ::mx::ir::Value &tha
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::GlobalCtorsOp GlobalCtorsOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::GlobalCtorsOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

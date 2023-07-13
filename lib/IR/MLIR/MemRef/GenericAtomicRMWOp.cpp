@@ -9,6 +9,12 @@
 #include <multiplier/IR/MLIR/MemRef/GenericAtomicRMWOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <mlir/Dialect/MemRef/IR/MemRef.h>
+
 namespace mx::ir::memref {
 std::optional<GenericAtomicRMWOp> GenericAtomicRMWOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::MEMREF_GENERIC_ATOMIC_RMW) {
@@ -22,6 +28,10 @@ std::optional<GenericAtomicRMWOp> GenericAtomicRMWOp::producing(const ::mx::ir::
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::memref::GenericAtomicRMWOp GenericAtomicRMWOp::underlying_op(void) const noexcept {
+  return ::mlir::memref::GenericAtomicRMWOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::memref

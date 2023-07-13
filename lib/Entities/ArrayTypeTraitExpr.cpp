@@ -156,17 +156,17 @@ std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const TokenContext &t
 }
 
 Expr ArrayTypeTraitExpr::dimension_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type ArrayTypeTraitExpr::queried_type(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const {
-  return static_cast<ArrayTypeTrait>(impl->reader.getVal95());
+  return static_cast<ArrayTypeTrait>(impl->reader.getVal94());
 }
 
 #pragma GCC diagnostic pop

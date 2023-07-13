@@ -23,7 +23,7 @@ class CStyleCastOp final : public Operation {
   static std::optional<CStyleCastOp> from(const ::mx::ir::Operation &that);
   static std::optional<CStyleCastOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::CStyleCastOp underlying_op(void) const noexcept;
+  ::vast::hl::CStyleCastOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;

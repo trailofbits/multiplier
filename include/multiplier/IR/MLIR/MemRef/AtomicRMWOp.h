@@ -23,12 +23,12 @@ class AtomicRMWOp final : public Operation {
   static std::optional<AtomicRMWOp> from(const ::mx::ir::Operation &that);
   static std::optional<AtomicRMWOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::AtomicRMWOp underlying_op(void) const noexcept;
+  ::mlir::memref::AtomicRMWOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  //::mlir::mlir::Operation::operand_range indices(void) const;
   ::mx::ir::Value result(void) const;
   //::mlir::arith::AtomicRMWKind kind(void) const;
   //MemRefType mem_ref_type(void) const;

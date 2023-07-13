@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/BuiltinBitCastOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<BuiltinBitCastOp> BuiltinBitCastOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_BUILTIN_BITCAST) {
@@ -22,6 +27,10 @@ std::optional<BuiltinBitCastOp> BuiltinBitCastOp::producing(const ::mx::ir::Valu
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::BuiltinBitCastOp BuiltinBitCastOp::underlying_op(void) const noexcept {
+  return ::vast::hl::BuiltinBitCastOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

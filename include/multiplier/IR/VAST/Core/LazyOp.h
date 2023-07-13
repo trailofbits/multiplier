@@ -23,7 +23,7 @@ class LazyOp final : public Operation {
   static std::optional<LazyOp> from(const ::mx::ir::Operation &that);
   static std::optional<LazyOp> producing(const ::mx::ir::Value &val);
 
-  vast::core::LazyOp underlying_op(void) const noexcept;
+  ::vast::core::LazyOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value result(void) const;

@@ -23,7 +23,7 @@ class VPStoreOp final : public Operation {
   static std::optional<VPStoreOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPStoreOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPStoreOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPStoreOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value val(void) const;

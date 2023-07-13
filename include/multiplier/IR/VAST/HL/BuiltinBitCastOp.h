@@ -23,7 +23,7 @@ class BuiltinBitCastOp final : public Operation {
   static std::optional<BuiltinBitCastOp> from(const ::mx::ir::Operation &that);
   static std::optional<BuiltinBitCastOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::BuiltinBitCastOp underlying_op(void) const noexcept;
+  ::vast::hl::BuiltinBitCastOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;

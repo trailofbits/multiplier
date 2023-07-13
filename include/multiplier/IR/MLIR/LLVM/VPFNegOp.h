@@ -23,7 +23,7 @@ class VPFNegOp final : public Operation {
   static std::optional<VPFNegOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPFNegOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPFNegOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPFNegOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value op(void) const;

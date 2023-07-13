@@ -23,7 +23,7 @@ class UnionDeclOp final : public Operation {
   static std::optional<UnionDeclOp> from(const ::mx::ir::Operation &that);
   static std::optional<UnionDeclOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::UnionDeclOp underlying_op(void) const noexcept;
+  ::vast::hl::UnionDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region fields(void) const;

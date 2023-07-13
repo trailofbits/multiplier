@@ -9,6 +9,12 @@
 #include <multiplier/IR/MLIR/SCF/PerformConcurrentlyOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/MemRef/IR/MemRef.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+
 namespace mx::ir::scf {
 std::optional<PerformConcurrentlyOp> PerformConcurrentlyOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::SCF_FOREACH_THREAD_PERFORM_CONCURRENTLY) {
@@ -22,6 +28,10 @@ std::optional<PerformConcurrentlyOp> PerformConcurrentlyOp::producing(const ::mx
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::scf::PerformConcurrentlyOp PerformConcurrentlyOp::underlying_op(void) const noexcept {
+  return ::mlir::scf::PerformConcurrentlyOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::scf

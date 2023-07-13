@@ -23,7 +23,7 @@ class CallOp final : public Operation {
   static std::optional<CallOp> from(const ::mx::ir::Operation &that);
   static std::optional<CallOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::CallOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::CallOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value result(void) const;
@@ -31,7 +31,7 @@ class CallOp final : public Operation {
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
   //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  //::mlir::Operation::operand_range arg_operands(void) const;
+  //::mlir::mlir::Operation::operand_range arg_operands(void) const;
 };
 static_assert(sizeof(CallOp) == sizeof(Operation));
 

@@ -23,7 +23,7 @@ class MinusOp final : public Operation {
   static std::optional<MinusOp> from(const ::mx::ir::Operation &that);
   static std::optional<MinusOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::MinusOp underlying_op(void) const noexcept;
+  ::vast::hl::MinusOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value arg(void) const;

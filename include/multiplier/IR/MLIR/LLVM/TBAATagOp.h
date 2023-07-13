@@ -23,7 +23,7 @@ class TBAATagOp final : public Operation {
   static std::optional<TBAATagOp> from(const ::mx::ir::Operation &that);
   static std::optional<TBAATagOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::TBAATagOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::TBAATagOp underlying_op(void) const noexcept;
 
   // Imported methods:
   std::string_view sym_name(void) const;

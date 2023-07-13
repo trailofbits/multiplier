@@ -23,7 +23,7 @@ class ExprOp final : public Operation {
   static std::optional<ExprOp> from(const ::mx::ir::Operation &that);
   static std::optional<ExprOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::ExprOp underlying_op(void) const noexcept;
+  ::vast::hl::ExprOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value result(void) const;

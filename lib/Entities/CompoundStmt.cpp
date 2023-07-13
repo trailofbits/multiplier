@@ -153,16 +153,16 @@ std::optional<CompoundStmt> CompoundStmt::from(const TokenContext &t) {
 }
 
 Token CompoundStmt::left_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Token CompoundStmt::right_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 std::optional<Stmt> CompoundStmt::statement_expression_result(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal12();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -174,7 +174,7 @@ std::optional<Stmt> CompoundStmt::statement_expression_result(void) const {
 }
 
 bool CompoundStmt::has_stored_fp_features(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

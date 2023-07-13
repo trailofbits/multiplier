@@ -156,11 +156,11 @@ std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const
 }
 
 unsigned CXXUnresolvedConstructExpr::num_arguments(void) const {
-  return impl->reader.getVal16().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -174,12 +174,12 @@ std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const & {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d16 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d16)))) {
+    if (auto d15 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }
@@ -188,20 +188,20 @@ gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const & {
 }
 
 Token CXXUnresolvedConstructExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token CXXUnresolvedConstructExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Type CXXUnresolvedConstructExpr::type_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool CXXUnresolvedConstructExpr::is_list_initialization(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

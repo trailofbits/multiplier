@@ -23,11 +23,11 @@ class IfOp final : public Operation {
   static std::optional<IfOp> from(const ::mx::ir::Operation &that);
   static std::optional<IfOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::IfOp underlying_op(void) const noexcept;
+  ::mlir::scf::IfOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> condition(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   ::mx::ir::Region then_region(void) const;
   ::mx::ir::Region else_region(void) const;
   //Block* then_block(void) const;

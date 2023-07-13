@@ -23,7 +23,7 @@ class VPFSubOp final : public Operation {
   static std::optional<VPFSubOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPFSubOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPFSubOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPFSubOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

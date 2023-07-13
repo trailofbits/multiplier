@@ -23,7 +23,7 @@ class GlobalOp final : public Operation {
   static std::optional<GlobalOp> from(const ::mx::ir::Operation &that);
   static std::optional<GlobalOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::GlobalOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::GlobalOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region initializer(void) const;

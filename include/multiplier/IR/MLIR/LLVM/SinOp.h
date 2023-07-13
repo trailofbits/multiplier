@@ -23,7 +23,7 @@ class SinOp final : public Operation {
   static std::optional<SinOp> from(const ::mx::ir::Operation &that);
   static std::optional<SinOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::SinOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::SinOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

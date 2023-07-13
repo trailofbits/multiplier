@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/ScopeOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<ScopeOp> ScopeOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_SCOPE) {
@@ -22,6 +27,10 @@ std::optional<ScopeOp> ScopeOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::ScopeOp ScopeOp::underlying_op(void) const noexcept {
+  return ::vast::hl::ScopeOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

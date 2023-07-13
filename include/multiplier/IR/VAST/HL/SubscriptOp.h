@@ -23,7 +23,7 @@ class SubscriptOp final : public Operation {
   static std::optional<SubscriptOp> from(const ::mx::ir::Operation &that);
   static std::optional<SubscriptOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::SubscriptOp underlying_op(void) const noexcept;
+  ::vast::hl::SubscriptOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value array(void) const;

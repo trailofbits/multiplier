@@ -23,14 +23,14 @@ class ParallelOp final : public Operation {
   static std::optional<ParallelOp> from(const ::mx::ir::Operation &that);
   static std::optional<ParallelOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::ParallelOp underlying_op(void) const noexcept;
+  ::mlir::scf::ParallelOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range lower_bound(void) const;
-  //::mlir::Operation::operand_range upper_bound(void) const;
-  //::mlir::Operation::operand_range step(void) const;
-  //::mlir::Operation::operand_range init_vals(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::operand_range lower_bound(void) const;
+  //::mlir::mlir::Operation::operand_range upper_bound(void) const;
+  //::mlir::mlir::Operation::operand_range step(void) const;
+  //::mlir::mlir::Operation::operand_range init_vals(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   ::mx::ir::Region region(void) const;
   ::mx::ir::Region loop_body(void) const;
   //ValueRange induction_vars(void) const;

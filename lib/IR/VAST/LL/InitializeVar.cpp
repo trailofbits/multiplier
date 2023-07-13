@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/LL/InitializeVar.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/LowLevel/LowLevelOps.hpp>
+
 namespace mx::ir::ll {
 std::optional<InitializeVar> InitializeVar::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LL_INITIALIZE) {
@@ -22,6 +27,10 @@ std::optional<InitializeVar> InitializeVar::producing(const ::mx::ir::Value &tha
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::ll::InitializeVar InitializeVar::underlying_op(void) const noexcept {
+  return ::vast::ll::InitializeVar(this->Operation::op_);
 }
 
 }  // namespace mx::ir::ll

@@ -23,7 +23,7 @@ class MinimumOp final : public Operation {
   static std::optional<MinimumOp> from(const ::mx::ir::Operation &that);
   static std::optional<MinimumOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::MinimumOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::MinimumOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value a(void) const;

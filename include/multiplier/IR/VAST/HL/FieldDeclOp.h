@@ -23,7 +23,7 @@ class FieldDeclOp final : public Operation {
   static std::optional<FieldDeclOp> from(const ::mx::ir::Operation &that);
   static std::optional<FieldDeclOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::FieldDeclOp underlying_op(void) const noexcept;
+  ::vast::hl::FieldDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
   std::string_view name(void) const;

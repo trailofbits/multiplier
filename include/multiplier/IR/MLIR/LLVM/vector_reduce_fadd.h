@@ -23,7 +23,7 @@ class vector_reduce_fadd final : public Operation {
   static std::optional<vector_reduce_fadd> from(const ::mx::ir::Operation &that);
   static std::optional<vector_reduce_fadd> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::vector_reduce_fadd underlying_op(void) const noexcept;
+  ::mlir::LLVM::vector_reduce_fadd underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::FloatType> start_value(void) const;

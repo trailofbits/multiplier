@@ -23,7 +23,7 @@ class UDivOp final : public Operation {
   static std::optional<UDivOp> from(const ::mx::ir::Operation &that);
   static std::optional<UDivOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::UDivOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::UDivOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

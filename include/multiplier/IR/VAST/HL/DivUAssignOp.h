@@ -23,7 +23,7 @@ class DivUAssignOp final : public Operation {
   static std::optional<DivUAssignOp> from(const ::mx::ir::Operation &that);
   static std::optional<DivUAssignOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::DivUAssignOp underlying_op(void) const noexcept;
+  ::vast::hl::DivUAssignOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

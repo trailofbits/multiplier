@@ -23,7 +23,7 @@ class BinComma final : public Operation {
   static std::optional<BinComma> from(const ::mx::ir::Operation &that);
   static std::optional<BinComma> producing(const ::mx::ir::Value &val);
 
-  vast::hl::BinComma underlying_op(void) const noexcept;
+  ::vast::hl::BinComma underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

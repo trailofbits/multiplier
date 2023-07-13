@@ -23,7 +23,7 @@ class VPSelectMinOp final : public Operation {
   static std::optional<VPSelectMinOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPSelectMinOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPSelectMinOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPSelectMinOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value cond(void) const;

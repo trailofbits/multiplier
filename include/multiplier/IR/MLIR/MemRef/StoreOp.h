@@ -23,12 +23,12 @@ class StoreOp final : public Operation {
   static std::optional<StoreOp> from(const ::mx::ir::Operation &that);
   static std::optional<StoreOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::StoreOp underlying_op(void) const noexcept;
+  ::mlir::memref::StoreOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  //::mlir::mlir::Operation::operand_range indices(void) const;
   //Value value_to_store(void) const;
   //Value mem_ref(void) const;
   //MemRefType mem_ref_type(void) const;

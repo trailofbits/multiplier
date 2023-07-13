@@ -155,25 +155,25 @@ std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const TokenContext &t) {
 }
 
 Token ObjCAtTryStmt::at_try_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 ObjCAtFinallyStmt ObjCAtTryStmt::finally_statement(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal10();
   return ObjCAtFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt ObjCAtTryStmt::try_body(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal11();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 unsigned ObjCAtTryStmt::num_catch_statements(void) const {
-  return impl->reader.getVal16().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) const {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -187,12 +187,12 @@ std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) co
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const & {
-  auto list = impl->reader.getVal16();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d16 = ep->StmtFor(ep, v)) {
-      if (auto e = ObjCAtCatchStmt::from(Stmt(std::move(d16)))) {
+    if (auto d15 = ep->StmtFor(ep, v)) {
+      if (auto e = ObjCAtCatchStmt::from(Stmt(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }

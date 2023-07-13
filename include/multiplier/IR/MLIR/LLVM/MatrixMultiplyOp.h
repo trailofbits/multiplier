@@ -23,7 +23,7 @@ class MatrixMultiplyOp final : public Operation {
   static std::optional<MatrixMultiplyOp> from(const ::mx::ir::Operation &that);
   static std::optional<MatrixMultiplyOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::MatrixMultiplyOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::MatrixMultiplyOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

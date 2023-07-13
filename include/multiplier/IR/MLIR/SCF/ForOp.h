@@ -23,14 +23,14 @@ class ForOp final : public Operation {
   static std::optional<ForOp> from(const ::mx::ir::Operation &that);
   static std::optional<ForOp> producing(const ::mx::ir::Value &val);
 
-  mlir::scf::ForOp underlying_op(void) const noexcept;
+  ::mlir::scf::ForOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IndexType> lower_bound(void) const;
   //::mlir::TypedValue<::mlir::IndexType> upper_bound(void) const;
   //::mlir::TypedValue<::mlir::IndexType> step(void) const;
-  //::mlir::Operation::operand_range init_args(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::operand_range init_args(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
   ::mx::ir::Region region(void) const;
   ::mx::ir::Region loop_body(void) const;
   std::optional<::mx::ir::Value> single_induction_var(void) const;
@@ -38,8 +38,8 @@ class ForOp final : public Operation {
   //::std::optional<::mlir::OpFoldResult> single_step(void) const;
   //::std::optional<::mlir::OpFoldResult> single_upper_bound(void) const;
   //Value induction_var(void) const;
-  //Block::BlockArgListType region_iter_args(void) const;
-  //Operation::operand_range iter_operands(void) const;
+  //mlir::Block::BlockArgListType region_iter_args(void) const;
+  //mlir::Operation::operand_range iter_operands(void) const;
   //MutableArrayRef<OpOperand> iter_op_operands(void) const;
   //unsignedint num_induction_vars(void) const;
   //unsignedint num_region_iter_args(void) const;

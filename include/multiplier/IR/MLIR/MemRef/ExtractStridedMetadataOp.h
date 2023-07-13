@@ -23,14 +23,14 @@ class ExtractStridedMetadataOp final : public Operation {
   static std::optional<ExtractStridedMetadataOp> from(const ::mx::ir::Operation &that);
   static std::optional<ExtractStridedMetadataOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::ExtractStridedMetadataOp underlying_op(void) const noexcept;
+  ::mlir::memref::ExtractStridedMetadataOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
   ::mx::ir::Value base_buffer(void) const;
   //::mlir::TypedValue<::mlir::IndexType> offset(void) const;
-  //::mlir::Operation::result_range sizes(void) const;
-  //::mlir::Operation::result_range strides(void) const;
+  //::mlir::mlir::Operation::result_range sizes(void) const;
+  //::mlir::mlir::Operation::result_range strides(void) const;
   //SmallVector<OpFoldResult> constified_mixed_sizes(void) const;
   //SmallVector<OpFoldResult> constified_mixed_strides(void) const;
   //OpFoldResult constified_mixed_offset(void) const;

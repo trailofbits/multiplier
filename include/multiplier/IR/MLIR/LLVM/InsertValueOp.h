@@ -23,7 +23,7 @@ class InsertValueOp final : public Operation {
   static std::optional<InsertValueOp> from(const ::mx::ir::Operation &that);
   static std::optional<InsertValueOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::InsertValueOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::InsertValueOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value container(void) const;

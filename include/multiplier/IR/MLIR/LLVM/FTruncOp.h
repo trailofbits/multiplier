@@ -23,7 +23,7 @@ class FTruncOp final : public Operation {
   static std::optional<FTruncOp> from(const ::mx::ir::Operation &that);
   static std::optional<FTruncOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FTruncOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FTruncOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value in(void) const;

@@ -23,10 +23,10 @@ class DmaStartOp final : public Operation {
   static std::optional<DmaStartOp> from(const ::mx::ir::Operation &that);
   static std::optional<DmaStartOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::DmaStartOp underlying_op(void) const noexcept;
+  ::mlir::memref::DmaStartOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range operands(void) const;
+  //::mlir::mlir::Operation::operand_range operands(void) const;
   //Value src_mem_ref(void) const;
   //unsignedint src_mem_ref_rank(void) const;
   //operand_range src_indices(void) const;

@@ -155,20 +155,20 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const TokenContex
 }
 
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal89();
 }
 
 Token ExtVectorElementExpr::accessor_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr ExtVectorElementExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

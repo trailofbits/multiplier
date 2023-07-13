@@ -23,11 +23,11 @@ class SwitchOp final : public Operation {
   static std::optional<SwitchOp> from(const ::mx::ir::Operation &that);
   static std::optional<SwitchOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::SwitchOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::SwitchOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> value(void) const;
-  //::mlir::Operation::operand_range default_operands(void) const;
+  //::mlir::mlir::Operation::operand_range default_operands(void) const;
   //::mlir::OperandRangeRange case_operands(void) const;
   //::mlir::Block* default_destination(void) const;
   //::mlir::SuccessorRange case_destinations(void) const;

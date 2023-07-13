@@ -23,7 +23,7 @@ class FCmpOp final : public Operation {
   static std::optional<FCmpOp> from(const ::mx::ir::Operation &that);
   static std::optional<FCmpOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FCmpOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FCmpOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

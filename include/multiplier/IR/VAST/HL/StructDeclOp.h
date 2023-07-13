@@ -23,7 +23,7 @@ class StructDeclOp final : public Operation {
   static std::optional<StructDeclOp> from(const ::mx::ir::Operation &that);
   static std::optional<StructDeclOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::StructDeclOp underlying_op(void) const noexcept;
+  ::vast::hl::StructDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region fields(void) const;

@@ -23,7 +23,7 @@ class DivFOp final : public Operation {
   static std::optional<DivFOp> from(const ::mx::ir::Operation &that);
   static std::optional<DivFOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::DivFOp underlying_op(void) const noexcept;
+  ::vast::hl::DivFOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

@@ -23,7 +23,7 @@ class MaskedStoreOp final : public Operation {
   static std::optional<MaskedStoreOp> from(const ::mx::ir::Operation &that);
   static std::optional<MaskedStoreOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::MaskedStoreOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::MaskedStoreOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;

@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/UnsupportedDeclOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<UnsupportedDeclOp> UnsupportedDeclOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_UNSUPPORTEDDECL) {
@@ -22,6 +27,10 @@ std::optional<UnsupportedDeclOp> UnsupportedDeclOp::producing(const ::mx::ir::Va
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::UnsupportedDeclOp UnsupportedDeclOp::underlying_op(void) const noexcept {
+  return ::vast::hl::UnsupportedDeclOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

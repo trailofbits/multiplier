@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/PredefinedExpr.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<PredefinedExpr> PredefinedExpr::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_PREDEFINED_EXPR) {
@@ -22,6 +27,10 @@ std::optional<PredefinedExpr> PredefinedExpr::producing(const ::mx::ir::Value &t
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::PredefinedExpr PredefinedExpr::underlying_op(void) const noexcept {
+  return ::vast::hl::PredefinedExpr(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

@@ -23,7 +23,7 @@ class UndefOp final : public Operation {
   static std::optional<UndefOp> from(const ::mx::ir::Operation &that);
   static std::optional<UndefOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::UndefOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::UndefOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value res(void) const;

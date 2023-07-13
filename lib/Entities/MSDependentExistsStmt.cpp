@@ -154,20 +154,20 @@ std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const TokenCont
 }
 
 Token MSDependentExistsStmt::keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 CompoundStmt MSDependentExistsStmt::sub_statement(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal10();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool MSDependentExistsStmt::is_if_exists(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal12();
 }
 
 bool MSDependentExistsStmt::is_if_not_exists(void) const {
-  return impl->reader.getVal17();
+  return impl->reader.getVal16();
 }
 
 #pragma GCC diagnostic pop

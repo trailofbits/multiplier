@@ -23,7 +23,7 @@ class RemSOp final : public Operation {
   static std::optional<RemSOp> from(const ::mx::ir::Operation &that);
   static std::optional<RemSOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::RemSOp underlying_op(void) const noexcept;
+  ::vast::hl::RemSOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

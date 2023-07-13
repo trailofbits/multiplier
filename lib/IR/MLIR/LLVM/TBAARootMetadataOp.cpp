@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/TBAARootMetadataOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<TBAARootMetadataOp> TBAARootMetadataOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_TBAA_ROOT) {
@@ -22,6 +27,10 @@ std::optional<TBAARootMetadataOp> TBAARootMetadataOp::producing(const ::mx::ir::
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::TBAARootMetadataOp TBAARootMetadataOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::TBAARootMetadataOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm

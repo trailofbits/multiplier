@@ -23,7 +23,7 @@ class ReshapeOp final : public Operation {
   static std::optional<ReshapeOp> from(const ::mx::ir::Operation &that);
   static std::optional<ReshapeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::ReshapeOp underlying_op(void) const noexcept;
+  ::mlir::memref::ReshapeOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value source(void) const;

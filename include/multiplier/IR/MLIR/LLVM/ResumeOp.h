@@ -23,7 +23,7 @@ class ResumeOp final : public Operation {
   static std::optional<ResumeOp> from(const ::mx::ir::Operation &that);
   static std::optional<ResumeOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::ResumeOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::ResumeOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value value(void) const;

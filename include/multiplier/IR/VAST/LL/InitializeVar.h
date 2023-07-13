@@ -23,11 +23,11 @@ class InitializeVar final : public Operation {
   static std::optional<InitializeVar> from(const ::mx::ir::Operation &that);
   static std::optional<InitializeVar> producing(const ::mx::ir::Value &val);
 
-  vast::ll::InitializeVar underlying_op(void) const noexcept;
+  ::vast::ll::InitializeVar underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value var(void) const;
-  //::mlir::Operation::operand_range elements(void) const;
+  //::mlir::mlir::Operation::operand_range elements(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(InitializeVar) == sizeof(Operation));

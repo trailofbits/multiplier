@@ -23,7 +23,7 @@ class VPZExtOp final : public Operation {
   static std::optional<VPZExtOp> from(const ::mx::ir::Operation &that);
   static std::optional<VPZExtOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::VPZExtOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::VPZExtOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value src(void) const;

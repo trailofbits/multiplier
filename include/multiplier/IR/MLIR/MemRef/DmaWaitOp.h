@@ -23,11 +23,11 @@ class DmaWaitOp final : public Operation {
   static std::optional<DmaWaitOp> from(const ::mx::ir::Operation &that);
   static std::optional<DmaWaitOp> producing(const ::mx::ir::Value &val);
 
-  mlir::memref::DmaWaitOp underlying_op(void) const noexcept;
+  ::mlir::memref::DmaWaitOp underlying_op(void) const noexcept;
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> tag_mem_ref(void) const;
-  //::mlir::Operation::operand_range tag_indices(void) const;
+  //::mlir::mlir::Operation::operand_range tag_indices(void) const;
   //::mlir::TypedValue<::mlir::IndexType> num_elements(void) const;
   //unsignedint tag_mem_ref_rank(void) const;
 };

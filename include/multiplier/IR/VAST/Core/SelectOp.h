@@ -23,13 +23,13 @@ class SelectOp final : public Operation {
   static std::optional<SelectOp> from(const ::mx::ir::Operation &that);
   static std::optional<SelectOp> producing(const ::mx::ir::Value &val);
 
-  vast::core::SelectOp underlying_op(void) const noexcept;
+  ::vast::core::SelectOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value cond(void) const;
   ::mx::ir::Value then_region(void) const;
   ::mx::ir::Value else_region(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  //::mlir::mlir::Operation::result_range results(void) const;
 };
 static_assert(sizeof(SelectOp) == sizeof(Operation));
 

@@ -23,7 +23,7 @@ class SwitchOp final : public Operation {
   static std::optional<SwitchOp> from(const ::mx::ir::Operation &that);
   static std::optional<SwitchOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::SwitchOp underlying_op(void) const noexcept;
+  ::vast::hl::SwitchOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region cond_region(void) const;

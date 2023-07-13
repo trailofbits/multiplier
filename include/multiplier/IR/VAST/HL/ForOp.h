@@ -23,7 +23,7 @@ class ForOp final : public Operation {
   static std::optional<ForOp> from(const ::mx::ir::Operation &that);
   static std::optional<ForOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::ForOp underlying_op(void) const noexcept;
+  ::vast::hl::ForOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region cond_region(void) const;

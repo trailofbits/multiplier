@@ -9,6 +9,11 @@
 #include <multiplier/IR/VAST/HL/BinAndAssignOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+
 namespace mx::ir::hl {
 std::optional<BinAndAssignOp> BinAndAssignOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_ASSIGN_BIN_AND) {
@@ -22,6 +27,10 @@ std::optional<BinAndAssignOp> BinAndAssignOp::producing(const ::mx::ir::Value &t
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::vast::hl::BinAndAssignOp BinAndAssignOp::underlying_op(void) const noexcept {
+  return ::vast::hl::BinAndAssignOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::hl

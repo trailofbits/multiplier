@@ -23,7 +23,7 @@ class FDivOp final : public Operation {
   static std::optional<FDivOp> from(const ::mx::ir::Operation &that);
   static std::optional<FDivOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::FDivOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::FDivOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value lhs(void) const;

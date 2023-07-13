@@ -23,7 +23,7 @@ class AccessGroupMetadataOp final : public Operation {
   static std::optional<AccessGroupMetadataOp> from(const ::mx::ir::Operation &that);
   static std::optional<AccessGroupMetadataOp> producing(const ::mx::ir::Value &val);
 
-  mlir::LLVM::AccessGroupMetadataOp underlying_op(void) const noexcept;
+  ::mlir::LLVM::AccessGroupMetadataOp underlying_op(void) const noexcept;
 
   // Imported methods:
   std::string_view sym_name(void) const;

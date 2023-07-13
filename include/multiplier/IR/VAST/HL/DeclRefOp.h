@@ -23,7 +23,7 @@ class DeclRefOp final : public Operation {
   static std::optional<DeclRefOp> from(const ::mx::ir::Operation &that);
   static std::optional<DeclRefOp> producing(const ::mx::ir::Value &val);
 
-  vast::hl::DeclRefOp underlying_op(void) const noexcept;
+  ::vast::hl::DeclRefOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Value decl(void) const;

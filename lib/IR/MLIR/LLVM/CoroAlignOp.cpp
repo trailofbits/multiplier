@@ -9,6 +9,11 @@
 #include <multiplier/IR/MLIR/LLVM/CoroAlignOp.h>
 #include <multiplier/IR/Value.h>
 
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+
 namespace mx::ir::llvm {
 std::optional<CoroAlignOp> CoroAlignOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_INTR_CORO_ALIGN) {
@@ -22,6 +27,10 @@ std::optional<CoroAlignOp> CoroAlignOp::producing(const ::mx::ir::Value &that) {
     return from(op.value());
   }
   return std::nullopt;
+}
+
+::mlir::LLVM::CoroAlignOp CoroAlignOp::underlying_op(void) const noexcept {
+  return ::mlir::LLVM::CoroAlignOp(this->Operation::op_);
 }
 
 }  // namespace mx::ir::llvm
