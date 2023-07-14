@@ -26,7 +26,7 @@ class DmaStartOp final : public Operation {
   ::mlir::memref::DmaStartOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range operands(void) const;
+  gap::generator<::mx::ir::Operand> operands(void) const;
   //Value src_mem_ref(void) const;
   //unsignedint src_mem_ref_rank(void) const;
   //operand_range src_indices(void) const;

@@ -26,8 +26,8 @@ class UnrealizedConversionCastOp final : public Operation {
   ::mlir::UnrealizedConversionCastOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range inputs(void) const;
-  //::mlir::mlir::Operation::result_range outputs(void) const;
+  gap::generator<::mx::ir::Operand> inputs(void) const;
+  gap::generator<::mx::ir::Result> outputs(void) const;
 };
 static_assert(sizeof(UnrealizedConversionCastOp) == sizeof(Operation));
 

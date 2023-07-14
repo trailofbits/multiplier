@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/AllocaScopeReturnOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,13 @@ std::optional<AllocaScopeReturnOp> AllocaScopeReturnOp::producing(const ::mx::ir
 
 ::mlir::memref::AllocaScopeReturnOp AllocaScopeReturnOp::underlying_op(void) const noexcept {
   return ::mlir::memref::AllocaScopeReturnOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> AllocaScopeReturnOp::results(void) const {
+  auto range = underlying_op().getResults();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::memref

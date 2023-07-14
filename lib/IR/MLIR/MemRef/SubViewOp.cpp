@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/SubViewOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,39 @@ std::optional<SubViewOp> SubViewOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::SubViewOp SubViewOp::underlying_op(void) const noexcept {
   return ::mlir::memref::SubViewOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> SubViewOp::offsets(void) const {
+  auto range = underlying_op().getOffsets();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> SubViewOp::sizes(void) const {
+  auto range = underlying_op().getSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> SubViewOp::strides(void) const {
+  auto range = underlying_op().getStrides();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+::mx::ir::Value SubViewOp::view_source(void) const {
+  auto val = underlying_op().getViewSource();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Operand> SubViewOp::dynamic_sizes(void) const {
+  auto range = underlying_op().getDynamicSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::memref

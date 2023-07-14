@@ -27,7 +27,7 @@ class DmaWaitOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> tag_mem_ref(void) const;
-  //::mlir::mlir::Operation::operand_range tag_indices(void) const;
+  gap::generator<::mx::ir::Operand> tag_indices(void) const;
   //::mlir::TypedValue<::mlir::IndexType> num_elements(void) const;
   //unsignedint tag_mem_ref_rank(void) const;
 };

@@ -27,7 +27,7 @@ class SizeOfTypeOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value result(void) const;
-  ::mx::ir::Type arg(void) const;
+  //::mlir::Type arg(void) const;
 };
 static_assert(sizeof(SizeOfTypeOp) == sizeof(Operation));
 

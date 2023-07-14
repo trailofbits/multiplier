@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/TBAATagOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,43 @@ std::optional<TBAATagOp> TBAATagOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::TBAATagOp TBAATagOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::TBAATagOp(this->Operation::op_);
+}
+
+std::string_view TBAATagOp::sym_name(void) const {
+  auto val = underlying_op().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::string_view TBAATagOp::base_type(void) const {
+  auto val = underlying_op().getBaseType();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::string_view TBAATagOp::access_type(void) const {
+  auto val = underlying_op().getAccessType();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+uint64_t TBAATagOp::offset(void) const {
+  auto val = underlying_op().getOffset();
+  return val;
+}
+
+bool TBAATagOp::constant(void) const {
+  auto val = underlying_op().getConstant();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

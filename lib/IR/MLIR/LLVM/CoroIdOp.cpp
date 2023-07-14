@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/CoroIdOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,26 @@ std::optional<CoroIdOp> CoroIdOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::CoroIdOp CoroIdOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::CoroIdOp(this->Operation::op_);
+}
+
+::mx::ir::Value CoroIdOp::promise(void) const {
+  auto val = underlying_op().getPromise();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value CoroIdOp::coroaddr(void) const {
+  auto val = underlying_op().getCoroaddr();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value CoroIdOp::fnaddrs(void) const {
+  auto val = underlying_op().getFnaddrs();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value CoroIdOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

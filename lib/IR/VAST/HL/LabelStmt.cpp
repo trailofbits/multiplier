@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/LabelStmt.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,11 @@ std::optional<LabelStmt> LabelStmt::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::LabelStmt LabelStmt::underlying_op(void) const noexcept {
   return ::vast::hl::LabelStmt(this->Operation::op_);
+}
+
+::mx::ir::Region LabelStmt::substmt(void) const {
+  auto &val = underlying_op().getSubstmt();
+  return ::mx::ir::Region(module_, val);
 }
 
 }  // namespace mx::ir::hl

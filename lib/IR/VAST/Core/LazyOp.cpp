@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/Core/LazyOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,16 @@ std::optional<LazyOp> LazyOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::core::LazyOp LazyOp::underlying_op(void) const noexcept {
   return ::vast::core::LazyOp(this->Operation::op_);
+}
+
+::mx::ir::Value LazyOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region LazyOp::lazy(void) const {
+  auto &val = underlying_op().getLazy();
+  return ::mx::ir::Region(module_, val);
 }
 
 }  // namespace mx::ir::core

@@ -27,7 +27,7 @@ class PrefetchOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::mlir::mlir::Operation::operand_range indices(void) const;
+  gap::generator<::mx::ir::Operand> indices(void) const;
   bool is_write(void) const;
   uint32_t locality_hint(void) const;
   bool is_data_cache(void) const;

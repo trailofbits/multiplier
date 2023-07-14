@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/TBAATypeDescriptorOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,28 @@ std::optional<TBAATypeDescriptorOp> TBAATypeDescriptorOp::producing(const ::mx::
 
 ::mlir::LLVM::TBAATypeDescriptorOp TBAATypeDescriptorOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::TBAATypeDescriptorOp(this->Operation::op_);
+}
+
+std::string_view TBAATypeDescriptorOp::sym_name(void) const {
+  auto val = underlying_op().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> TBAATypeDescriptorOp::identity(void) const {
+  auto opt_val = underlying_op().getIdentity();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::llvm

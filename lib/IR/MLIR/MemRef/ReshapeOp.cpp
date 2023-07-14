@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/ReshapeOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,16 @@ std::optional<ReshapeOp> ReshapeOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::ReshapeOp ReshapeOp::underlying_op(void) const noexcept {
   return ::mlir::memref::ReshapeOp(this->Operation::op_);
+}
+
+::mx::ir::Value ReshapeOp::source(void) const {
+  auto val = underlying_op().getSource();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value ReshapeOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::memref

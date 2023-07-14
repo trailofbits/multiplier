@@ -26,12 +26,12 @@ class ForeachThreadOp final : public Operation {
   ::mlir::scf::ForeachThreadOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range num_threads(void) const;
-  //::mlir::mlir::Operation::operand_range outputs(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Operand> num_threads(void) const;
+  gap::generator<::mx::ir::Operand> outputs(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   ::mx::ir::Region region(void) const;
   //::std::optional<::mlir::ArrayAttr> mapping(void) const;
-  uint64_t rank(void) const;
+  int64_t rank(void) const;
   //ArrayRef<BlockArgument> output_block_arguments(void) const;
   //::mlir::ValueRange thread_indices(void) const;
   //::mlir::mlir::Block::BlockArgListType region_out_args(void) const;

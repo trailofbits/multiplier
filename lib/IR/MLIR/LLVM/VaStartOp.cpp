@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/VaStartOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,11 @@ std::optional<VaStartOp> VaStartOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::VaStartOp VaStartOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::VaStartOp(this->Operation::op_);
+}
+
+::mx::ir::Value VaStartOp::arg_list(void) const {
+  auto val = underlying_op().getArgList();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

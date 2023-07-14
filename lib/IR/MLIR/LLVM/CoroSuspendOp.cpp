@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/CoroSuspendOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,16 @@ std::optional<CoroSuspendOp> CoroSuspendOp::producing(const ::mx::ir::Value &tha
 
 ::mlir::LLVM::CoroSuspendOp CoroSuspendOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::CoroSuspendOp(this->Operation::op_);
+}
+
+::mx::ir::Value CoroSuspendOp::save(void) const {
+  auto val = underlying_op().getSave();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value CoroSuspendOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

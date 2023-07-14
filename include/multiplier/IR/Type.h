@@ -32,11 +32,10 @@ class Type final {
   mlir::MLIRContext *context_;
   const mlir::TypeStorage *type_;
 
-  inline Type(mlir::MLIRContext *context, const mlir::TypeStorage *type)
-      : context_(std::move(context)),
-        type_(type) {}
-
  public:
+  inline Type(mlir::MLIRContext *context, const void *type)
+      : context_(std::move(context)),
+        type_(reinterpret_cast<const mlir::TypeStorage *>(type)) {}
 
   TypeKind kind(void) const noexcept;
 };

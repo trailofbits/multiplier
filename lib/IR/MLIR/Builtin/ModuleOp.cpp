@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,64 @@ std::optional<ModuleOp> ModuleOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::ModuleOp ModuleOp::underlying_op(void) const noexcept {
   return ::mlir::ModuleOp(this->Operation::op_);
+}
+
+::mx::ir::Region ModuleOp::body_region(void) const {
+  auto &val = underlying_op().getBodyRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<std::string_view> ModuleOp::sym_name(void) const {
+  auto opt_val = underlying_op().getSymName();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> ModuleOp::sym_visibility(void) const {
+  auto opt_val = underlying_op().getSymVisibility();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> ModuleOp::name(void) const {
+  auto opt_val = underlying_op().getName();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+bool ModuleOp::is_optional_symbol(void) const {
+  auto val = underlying_op().isOptionalSymbol();
+  return val;
+}
+
+std::string_view ModuleOp::default_dialect(void) const {
+  auto val = underlying_op().getDefaultDialect();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::builtin

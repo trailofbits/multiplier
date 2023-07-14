@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/Log2Op.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,16 @@ std::optional<Log2Op> Log2Op::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::Log2Op Log2Op::underlying_op(void) const noexcept {
   return ::mlir::LLVM::Log2Op(this->Operation::op_);
+}
+
+::mx::ir::Value Log2Op::in(void) const {
+  auto val = underlying_op().getIn();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value Log2Op::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

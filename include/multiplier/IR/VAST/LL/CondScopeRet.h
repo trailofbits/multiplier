@@ -27,7 +27,7 @@ class CondScopeRet final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value cond(void) const;
-  //::mlir::mlir::Operation::operand_range dest_operands(void) const;
+  gap::generator<::mx::ir::Operand> dest_operands(void) const;
   //::mlir::Block* dest(void) const;
 };
 static_assert(sizeof(CondScopeRet) == sizeof(Operation));

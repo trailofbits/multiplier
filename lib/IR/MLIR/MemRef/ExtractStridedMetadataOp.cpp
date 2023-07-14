@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/ExtractStridedMetadataOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,25 @@ std::optional<ExtractStridedMetadataOp> ExtractStridedMetadataOp::producing(cons
 
 ::mlir::memref::ExtractStridedMetadataOp ExtractStridedMetadataOp::underlying_op(void) const noexcept {
   return ::mlir::memref::ExtractStridedMetadataOp(this->Operation::op_);
+}
+
+::mx::ir::Value ExtractStridedMetadataOp::base_buffer(void) const {
+  auto val = underlying_op().getBaseBuffer();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Result> ExtractStridedMetadataOp::sizes(void) const {
+  auto range = underlying_op().getSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Result> ExtractStridedMetadataOp::strides(void) const {
+  auto range = underlying_op().getStrides();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::memref

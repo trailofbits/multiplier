@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/VPSelectMinOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,26 @@ std::optional<VPSelectMinOp> VPSelectMinOp::producing(const ::mx::ir::Value &tha
 
 ::mlir::LLVM::VPSelectMinOp VPSelectMinOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::VPSelectMinOp(this->Operation::op_);
+}
+
+::mx::ir::Value VPSelectMinOp::cond(void) const {
+  auto val = underlying_op().getCond();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPSelectMinOp::true_val(void) const {
+  auto val = underlying_op().getTrueVal();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPSelectMinOp::false_val(void) const {
+  auto val = underlying_op().getFalseVal();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPSelectMinOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

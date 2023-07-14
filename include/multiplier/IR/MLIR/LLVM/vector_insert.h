@@ -29,9 +29,9 @@ class vector_insert final : public Operation {
   ::mx::ir::Value srcvec(void) const;
   ::mx::ir::Value dstvec(void) const;
   ::mx::ir::Value res(void) const;
-  //uint64_t pos(void) const;
-  //uint64_t src_vector_bit_width(void) const;
-  //uint64_t dst_vector_bit_width(void) const;
+  uint64_t pos(void) const;
+  uint64_t src_vector_bit_width(void) const;
+  uint64_t dst_vector_bit_width(void) const;
 };
 static_assert(sizeof(vector_insert) == sizeof(Operation));
 

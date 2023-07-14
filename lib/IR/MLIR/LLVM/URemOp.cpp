@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/URemOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,21 @@ std::optional<URemOp> URemOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::URemOp URemOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::URemOp(this->Operation::op_);
+}
+
+::mx::ir::Value URemOp::lhs(void) const {
+  auto val = underlying_op().getLhs();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value URemOp::rhs(void) const {
+  auto val = underlying_op().getRhs();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value URemOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

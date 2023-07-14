@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/GenericAtomicRMWOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,23 @@ std::optional<GenericAtomicRMWOp> GenericAtomicRMWOp::producing(const ::mx::ir::
 
 ::mlir::memref::GenericAtomicRMWOp GenericAtomicRMWOp::underlying_op(void) const noexcept {
   return ::mlir::memref::GenericAtomicRMWOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> GenericAtomicRMWOp::indices(void) const {
+  auto range = underlying_op().getIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+::mx::ir::Value GenericAtomicRMWOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region GenericAtomicRMWOp::atomic_body(void) const {
+  auto &val = underlying_op().getAtomicBody();
+  return ::mx::ir::Region(module_, val);
 }
 
 }  // namespace mx::ir::memref

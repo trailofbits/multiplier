@@ -26,7 +26,7 @@ class YieldOp final : public Operation {
   ::mlir::scf::YieldOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range results(void) const;
+  gap::generator<::mx::ir::Operand> results(void) const;
 };
 static_assert(sizeof(YieldOp) == sizeof(Operation));
 

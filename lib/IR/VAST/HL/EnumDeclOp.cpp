@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/EnumDeclOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,20 @@ std::optional<EnumDeclOp> EnumDeclOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::EnumDeclOp EnumDeclOp::underlying_op(void) const noexcept {
   return ::vast::hl::EnumDeclOp(this->Operation::op_);
+}
+
+::mx::ir::Region EnumDeclOp::constants(void) const {
+  auto &val = underlying_op().getConstants();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::string_view EnumDeclOp::name(void) const {
+  auto val = underlying_op().getName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::hl

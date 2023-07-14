@@ -26,8 +26,8 @@ class CallIntrinsicOp final : public Operation {
   ::mlir::LLVM::CallIntrinsicOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range args(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Operand> args(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   std::string_view intrin(void) const;
 };
 static_assert(sizeof(CallIntrinsicOp) == sizeof(Operation));

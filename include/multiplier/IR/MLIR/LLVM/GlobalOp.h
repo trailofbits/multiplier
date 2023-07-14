@@ -27,13 +27,13 @@ class GlobalOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Region initializer(void) const;
-  ::mx::ir::Type global_type(void) const;
+  //::mlir::Type global_type(void) const;
   bool constant(void) const;
   std::string_view sym_name(void) const;
   //::mlir::LLVM::Linkage linkage(void) const;
   bool dso_local(void) const;
   bool thread_local__(void) const;
-  std::optional<::mx::ir::Attribute> value(void) const;
+  //::std::optional<::mlir::Attribute> value(void) const;
   //::std::optional<uint64_t> alignment(void) const;
   uint32_t addr_space(void) const;
   //::std::optional<::mlir::LLVM::UnnamedAddr> unnamed_addr(void) const;

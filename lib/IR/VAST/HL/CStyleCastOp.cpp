@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/CStyleCastOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,16 @@ std::optional<CStyleCastOp> CStyleCastOp::producing(const ::mx::ir::Value &that)
 
 ::vast::hl::CStyleCastOp CStyleCastOp::underlying_op(void) const noexcept {
   return ::vast::hl::CStyleCastOp(this->Operation::op_);
+}
+
+::mx::ir::Value CStyleCastOp::value(void) const {
+  auto val = underlying_op().getValue();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value CStyleCastOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::hl

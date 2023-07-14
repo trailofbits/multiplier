@@ -29,7 +29,7 @@ class GlobalOp final : public Operation {
   std::string_view sym_name(void) const;
   std::optional<std::string_view> sym_visibility(void) const;
   //::mlir::MemRefType type(void) const;
-  std::optional<::mx::ir::Attribute> initial_value(void) const;
+  //::std::optional<::mlir::Attribute> initial_value(void) const;
   bool constant(void) const;
   //::std::optional<uint64_t> alignment(void) const;
   bool is_external(void) const;

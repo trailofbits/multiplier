@@ -41,6 +41,11 @@ class Attribute final {
         kind_(classify(attr)) {}
 
  public:
+  inline Attribute(std::shared_ptr<const SourceIRImpl> module,
+                   void *attr)
+      : Attribute(std::move(module),
+                  reinterpret_cast<mlir::detail::AttributeStorage *>(attr)) {}
+
   static AttributeKind classify(mlir::detail::AttributeStorage *attr);
 
   inline AttributeKind kind(void) const noexcept {

@@ -27,7 +27,7 @@ class IfOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> condition(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   ::mx::ir::Region then_region(void) const;
   ::mx::ir::Region else_region(void) const;
   //Block* then_block(void) const;

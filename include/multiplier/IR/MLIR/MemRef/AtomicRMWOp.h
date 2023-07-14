@@ -28,7 +28,7 @@ class AtomicRMWOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::mlir::mlir::Operation::operand_range indices(void) const;
+  gap::generator<::mx::ir::Operand> indices(void) const;
   ::mx::ir::Value result(void) const;
   //::mlir::arith::AtomicRMWKind kind(void) const;
   //MemRefType mem_ref_type(void) const;

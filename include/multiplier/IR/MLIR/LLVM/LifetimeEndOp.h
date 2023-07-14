@@ -27,7 +27,7 @@ class LifetimeEndOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::LLVM::LLVMPointerType> ptr(void) const;
-  //uint64_t size(void) const;
+  uint64_t size(void) const;
 };
 static_assert(sizeof(LifetimeEndOp) == sizeof(Operation));
 

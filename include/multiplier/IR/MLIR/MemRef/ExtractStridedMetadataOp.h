@@ -29,8 +29,8 @@ class ExtractStridedMetadataOp final : public Operation {
   //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
   ::mx::ir::Value base_buffer(void) const;
   //::mlir::TypedValue<::mlir::IndexType> offset(void) const;
-  //::mlir::mlir::Operation::result_range sizes(void) const;
-  //::mlir::mlir::Operation::result_range strides(void) const;
+  gap::generator<::mx::ir::Result> sizes(void) const;
+  gap::generator<::mx::ir::Result> strides(void) const;
   //SmallVector<OpFoldResult> constified_mixed_sizes(void) const;
   //SmallVector<OpFoldResult> constified_mixed_strides(void) const;
   //OpFoldResult constified_mixed_offset(void) const;

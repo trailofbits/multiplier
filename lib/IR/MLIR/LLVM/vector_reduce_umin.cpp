@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/vector_reduce_umin.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,11 @@ std::optional<vector_reduce_umin> vector_reduce_umin::producing(const ::mx::ir::
 
 ::mlir::LLVM::vector_reduce_umin vector_reduce_umin::underlying_op(void) const noexcept {
   return ::mlir::LLVM::vector_reduce_umin(this->Operation::op_);
+}
+
+::mx::ir::Value vector_reduce_umin::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

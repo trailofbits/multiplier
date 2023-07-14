@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/BitReverseOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,16 @@ std::optional<BitReverseOp> BitReverseOp::producing(const ::mx::ir::Value &that)
 
 ::mlir::LLVM::BitReverseOp BitReverseOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::BitReverseOp(this->Operation::op_);
+}
+
+::mx::ir::Value BitReverseOp::in(void) const {
+  auto val = underlying_op().getIn();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value BitReverseOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

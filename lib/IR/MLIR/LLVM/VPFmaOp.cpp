@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/VPFmaOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,31 @@ std::optional<VPFmaOp> VPFmaOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::VPFmaOp VPFmaOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::VPFmaOp(this->Operation::op_);
+}
+
+::mx::ir::Value VPFmaOp::op1(void) const {
+  auto val = underlying_op().getOp1();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPFmaOp::op2(void) const {
+  auto val = underlying_op().getOp2();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPFmaOp::op3(void) const {
+  auto val = underlying_op().getOp3();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPFmaOp::mask(void) const {
+  auto val = underlying_op().getMask();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPFmaOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

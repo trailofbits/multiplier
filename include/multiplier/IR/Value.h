@@ -53,11 +53,11 @@ class Value {
 
   } impl_;
 
+ public:
+
   inline Value(std::shared_ptr<const SourceIRImpl> module, void *value)
       : module_(std::move(module)),
         impl_(value) {}
-
- public:
 
   Type type(void) const noexcept;
 

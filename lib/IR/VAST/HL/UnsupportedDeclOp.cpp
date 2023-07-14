@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/UnsupportedDeclOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,22 @@ std::optional<UnsupportedDeclOp> UnsupportedDeclOp::producing(const ::mx::ir::Va
 
 ::vast::hl::UnsupportedDeclOp UnsupportedDeclOp::underlying_op(void) const noexcept {
   return ::vast::hl::UnsupportedDeclOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> UnsupportedDeclOp::elements(void) const {
+  auto range = underlying_op().getElements();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+std::string_view UnsupportedDeclOp::name(void) const {
+  auto val = underlying_op().getName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::hl

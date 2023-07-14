@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/IndirectCallOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,25 @@ std::optional<IndirectCallOp> IndirectCallOp::producing(const ::mx::ir::Value &t
 
 ::vast::hl::IndirectCallOp IndirectCallOp::underlying_op(void) const noexcept {
   return ::vast::hl::IndirectCallOp(this->Operation::op_);
+}
+
+::mx::ir::Value IndirectCallOp::callee(void) const {
+  auto val = underlying_op().getCallee();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Operand> IndirectCallOp::arg_operands(void) const {
+  auto range = underlying_op().getArgOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Result> IndirectCallOp::results(void) const {
+  auto range = underlying_op().getResults();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::hl

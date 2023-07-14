@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/SCF/ParallelOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,51 @@ std::optional<ParallelOp> ParallelOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::scf::ParallelOp ParallelOp::underlying_op(void) const noexcept {
   return ::mlir::scf::ParallelOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> ParallelOp::lower_bound(void) const {
+  auto range = underlying_op().getLowerBound();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> ParallelOp::upper_bound(void) const {
+  auto range = underlying_op().getUpperBound();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> ParallelOp::step(void) const {
+  auto range = underlying_op().getStep();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> ParallelOp::init_vals(void) const {
+  auto range = underlying_op().getInitVals();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Result> ParallelOp::results(void) const {
+  auto range = underlying_op().getResults();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
+}
+
+::mx::ir::Region ParallelOp::region(void) const {
+  auto &val = underlying_op().getRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region ParallelOp::loop_body(void) const {
+  auto &val = underlying_op().getLoopBody();
+  return ::mx::ir::Region(module_, val);
 }
 
 }  // namespace mx::ir::scf

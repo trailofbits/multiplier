@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/LifetimeStartOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,11 @@ std::optional<LifetimeStartOp> LifetimeStartOp::producing(const ::mx::ir::Value 
 
 ::mlir::LLVM::LifetimeStartOp LifetimeStartOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::LifetimeStartOp(this->Operation::op_);
+}
+
+uint64_t LifetimeStartOp::size(void) const {
+  auto val = underlying_op().getSize();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

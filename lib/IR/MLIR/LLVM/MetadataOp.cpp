@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/MetadataOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,20 @@ std::optional<MetadataOp> MetadataOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::MetadataOp MetadataOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::MetadataOp(this->Operation::op_);
+}
+
+::mx::ir::Region MetadataOp::body(void) const {
+  auto &val = underlying_op().getBody();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::string_view MetadataOp::sym_name(void) const {
+  auto val = underlying_op().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::llvm

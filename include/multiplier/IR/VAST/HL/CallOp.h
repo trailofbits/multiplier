@@ -26,8 +26,8 @@ class CallOp final : public Operation {
   ::vast::hl::CallOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range arg_operands(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Operand> arg_operands(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   std::string_view callee(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
 };

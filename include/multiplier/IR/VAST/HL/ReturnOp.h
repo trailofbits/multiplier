@@ -26,7 +26,7 @@ class ReturnOp final : public Operation {
   ::vast::hl::ReturnOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range result(void) const;
+  gap::generator<::mx::ir::Operand> result(void) const;
 };
 static_assert(sizeof(ReturnOp) == sizeof(Operation));
 

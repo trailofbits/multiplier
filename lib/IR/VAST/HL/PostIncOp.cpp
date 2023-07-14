@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/PostIncOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,16 @@ std::optional<PostIncOp> PostIncOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::PostIncOp PostIncOp::underlying_op(void) const noexcept {
   return ::vast::hl::PostIncOp(this->Operation::op_);
+}
+
+::mx::ir::Value PostIncOp::arg(void) const {
+  auto val = underlying_op().getArg();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value PostIncOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::hl

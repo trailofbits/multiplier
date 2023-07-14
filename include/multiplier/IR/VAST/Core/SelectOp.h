@@ -29,7 +29,7 @@ class SelectOp final : public Operation {
   ::mx::ir::Value cond(void) const;
   ::mx::ir::Value then_region(void) const;
   ::mx::ir::Value else_region(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
 };
 static_assert(sizeof(SelectOp) == sizeof(Operation));
 

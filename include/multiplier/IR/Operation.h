@@ -58,13 +58,22 @@ class Operation {
   OperationKind kind_;
   mlir::Operation *op_;
 
+ public:
+
   inline Operation(std::shared_ptr<const SourceIRImpl> module,
                    mlir::Operation *opaque)
       : module_(std::move(module)),
         kind_(classify(opaque)),
         op_(opaque) {}
 
- public:
+  inline Operation(std::shared_ptr<const SourceIRImpl> module, void *opaque)
+      : Operation(std::move(module),
+                  reinterpret_cast<mlir::Operation *>(opaque)) {}
+
+  inline mlir::Operation *underlying_op(void) const noexcept {
+    return op_;
+  }
+
   // Classify an MLIR operation, by raw pointer or by operation name.
   static OperationKind classify(mlir::Operation *);
   static OperationKind classify(std::string_view);
@@ -118,11 +127,13 @@ class Result final : public Value {
   friend class Value;
   friend class Operation;
 
-  inline Result(std::shared_ptr<const SourceIRImpl> module,
-                mlir::detail::OpResultImpl *res)
-      : Value(std::move(module), res) {}
-
  public:
+
+  inline Result(std::shared_ptr<const SourceIRImpl> module,
+                void *res)
+      : Value(std::move(module),
+              reinterpret_cast<mlir::detail::OpResultImpl *>(res)) {}
+
   // If an operation has only one result, then return it.
   static std::optional<Result> of(const Operation &);
 
@@ -131,6 +142,9 @@ class Result final : public Value {
 
   // Return the operation producing this result.
   Operation operation(void) const noexcept;
+
+  // Index of this result in its operation's result list.
+  unsigned index(void) const noexcept;
 };
 
 static_assert(sizeof(Result) == sizeof(Value));
@@ -150,12 +164,12 @@ class Operand {
   std::shared_ptr<const SourceIRImpl> module_;
   mlir::OpOperand *op_;
 
-  inline Operand(std::shared_ptr<const SourceIRImpl> module,
-                 mlir::OpOperand *op)
-      : module_(std::move(module)),
-        op_(op) {}
-
  public:
+
+  inline Operand(std::shared_ptr<const SourceIRImpl> module, void *op)
+      : module_(std::move(module)),
+        op_(reinterpret_cast<mlir::OpOperand *>(op)) {}
+
   // The operation containing this operand.
   Operation operation(void) const noexcept;
 

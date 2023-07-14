@@ -28,7 +28,7 @@ class ViewOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> source(void) const;
   //::mlir::TypedValue<::mlir::IndexType> byte_shift(void) const;
-  //::mlir::mlir::Operation::operand_range sizes(void) const;
+  gap::generator<::mx::ir::Operand> sizes(void) const;
   ::mx::ir::Value view_source(void) const;
   //MemRefType type(void) const;
   //operand_range dynamic_sizes(void) const;

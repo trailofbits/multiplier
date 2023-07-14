@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/LL/CondBr.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,25 @@ std::optional<CondBr> CondBr::producing(const ::mx::ir::Value &that) {
 
 ::vast::ll::CondBr CondBr::underlying_op(void) const noexcept {
   return ::vast::ll::CondBr(this->Operation::op_);
+}
+
+::mx::ir::Value CondBr::cond(void) const {
+  auto val = underlying_op().getCond();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Operand> CondBr::true_operands(void) const {
+  auto range = underlying_op().getTrueOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> CondBr::false_operands(void) const {
+  auto range = underlying_op().getFalseOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::ll

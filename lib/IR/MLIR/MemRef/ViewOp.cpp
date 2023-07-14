@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/ViewOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,18 @@ std::optional<ViewOp> ViewOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::ViewOp ViewOp::underlying_op(void) const noexcept {
   return ::mlir::memref::ViewOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> ViewOp::sizes(void) const {
+  auto range = underlying_op().getSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+::mx::ir::Value ViewOp::view_source(void) const {
+  auto val = underlying_op().getViewSource();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::memref

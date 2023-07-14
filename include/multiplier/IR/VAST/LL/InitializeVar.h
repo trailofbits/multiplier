@@ -27,7 +27,7 @@ class InitializeVar final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value var(void) const;
-  //::mlir::mlir::Operation::operand_range elements(void) const;
+  gap::generator<::mx::ir::Operand> elements(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(InitializeVar) == sizeof(Operation));

@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/vector_insert.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,36 @@ std::optional<vector_insert> vector_insert::producing(const ::mx::ir::Value &tha
 
 ::mlir::LLVM::vector_insert vector_insert::underlying_op(void) const noexcept {
   return ::mlir::LLVM::vector_insert(this->Operation::op_);
+}
+
+::mx::ir::Value vector_insert::srcvec(void) const {
+  auto val = underlying_op().getSrcvec();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value vector_insert::dstvec(void) const {
+  auto val = underlying_op().getDstvec();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value vector_insert::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+uint64_t vector_insert::pos(void) const {
+  auto val = underlying_op().getPos();
+  return val;
+}
+
+uint64_t vector_insert::src_vector_bit_width(void) const {
+  auto val = underlying_op().getSrcVectorBitWidth();
+  return val;
+}
+
+uint64_t vector_insert::dst_vector_bit_width(void) const {
+  auto val = underlying_op().getDstVectorBitWidth();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

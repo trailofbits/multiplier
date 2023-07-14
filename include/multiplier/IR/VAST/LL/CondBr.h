@@ -27,8 +27,8 @@ class CondBr final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value cond(void) const;
-  //::mlir::mlir::Operation::operand_range true_operands(void) const;
-  //::mlir::mlir::Operation::operand_range false_operands(void) const;
+  gap::generator<::mx::ir::Operand> true_operands(void) const;
+  gap::generator<::mx::ir::Operand> false_operands(void) const;
   //::mlir::Block* true_dest(void) const;
   //::mlir::Block* false_dest(void) const;
 };

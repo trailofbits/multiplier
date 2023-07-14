@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/Builtin/UnrealizedConversionCastOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,20 @@ std::optional<UnrealizedConversionCastOp> UnrealizedConversionCastOp::producing(
 
 ::mlir::UnrealizedConversionCastOp UnrealizedConversionCastOp::underlying_op(void) const noexcept {
   return ::mlir::UnrealizedConversionCastOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> UnrealizedConversionCastOp::inputs(void) const {
+  auto range = underlying_op().getInputs();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Result> UnrealizedConversionCastOp::outputs(void) const {
+  auto range = underlying_op().getOutputs();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::builtin

@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/CallOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,31 @@ std::optional<CallOp> CallOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::CallOp CallOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::CallOp(this->Operation::op_);
+}
+
+::mx::ir::Value CallOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<std::string_view> CallOp::callee(void) const {
+  auto opt_val = underlying_op().getCallee();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+gap::generator<::mx::ir::Operand> CallOp::arg_operands(void) const {
+  auto range = underlying_op().getArgOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::llvm

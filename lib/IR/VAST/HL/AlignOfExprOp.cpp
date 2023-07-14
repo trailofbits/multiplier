@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/AlignOfExprOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,16 @@ std::optional<AlignOfExprOp> AlignOfExprOp::producing(const ::mx::ir::Value &tha
 
 ::vast::hl::AlignOfExprOp AlignOfExprOp::underlying_op(void) const noexcept {
   return ::vast::hl::AlignOfExprOp(this->Operation::op_);
+}
+
+::mx::ir::Value AlignOfExprOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region AlignOfExprOp::expr(void) const {
+  auto &val = underlying_op().getExpr();
+  return ::mx::ir::Region(module_, val);
 }
 
 }  // namespace mx::ir::hl

@@ -27,8 +27,8 @@ class FieldDeclOp final : public Operation {
 
   // Imported methods:
   std::string_view name(void) const;
-  ::mx::ir::Type type(void) const;
-  std::optional<uint32_t> bits(void) const;
+  //::mlir::Type type(void) const;
+  //::std::optional<uint32_t> bits(void) const;
 };
 static_assert(sizeof(FieldDeclOp) == sizeof(Operation));
 

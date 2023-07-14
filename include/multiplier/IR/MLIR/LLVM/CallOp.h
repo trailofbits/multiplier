@@ -31,7 +31,7 @@ class CallOp final : public Operation {
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
   //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  //::mlir::mlir::Operation::operand_range arg_operands(void) const;
+  gap::generator<::mx::ir::Operand> arg_operands(void) const;
 };
 static_assert(sizeof(CallOp) == sizeof(Operation));
 

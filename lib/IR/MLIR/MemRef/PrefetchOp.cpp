@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/PrefetchOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,28 @@ std::optional<PrefetchOp> PrefetchOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::PrefetchOp PrefetchOp::underlying_op(void) const noexcept {
   return ::mlir::memref::PrefetchOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> PrefetchOp::indices(void) const {
+  auto range = underlying_op().getIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+bool PrefetchOp::is_write(void) const {
+  auto val = underlying_op().getIsWrite();
+  return val;
+}
+
+uint32_t PrefetchOp::locality_hint(void) const {
+  auto val = underlying_op().getLocalityHint();
+  return val;
+}
+
+bool PrefetchOp::is_data_cache(void) const {
+  auto val = underlying_op().getIsDataCache();
+  return val;
 }
 
 }  // namespace mx::ir::memref

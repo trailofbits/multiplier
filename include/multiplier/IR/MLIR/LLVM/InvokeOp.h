@@ -26,15 +26,15 @@ class InvokeOp final : public Operation {
   ::mlir::LLVM::InvokeOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range callee_operands(void) const;
-  //::mlir::mlir::Operation::operand_range normal_dest_operands(void) const;
-  //::mlir::mlir::Operation::operand_range unwind_dest_operands(void) const;
+  gap::generator<::mx::ir::Operand> callee_operands(void) const;
+  gap::generator<::mx::ir::Operand> normal_dest_operands(void) const;
+  gap::generator<::mx::ir::Operand> unwind_dest_operands(void) const;
   //::mlir::Block* normal_dest(void) const;
   //::mlir::Block* unwind_dest(void) const;
   std::optional<std::string_view> callee(void) const;
   //::std::optional<::mlir::ElementsAttr> branch_weights(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  //::mlir::mlir::Operation::operand_range arg_operands(void) const;
+  gap::generator<::mx::ir::Operand> arg_operands(void) const;
 };
 static_assert(sizeof(InvokeOp) == sizeof(Operation));
 

@@ -29,7 +29,7 @@ class TBAATagOp final : public Operation {
   std::string_view sym_name(void) const;
   std::string_view base_type(void) const;
   std::string_view access_type(void) const;
-  //uint64_t offset(void) const;
+  uint64_t offset(void) const;
   bool constant(void) const;
 };
 static_assert(sizeof(TBAATagOp) == sizeof(Operation));

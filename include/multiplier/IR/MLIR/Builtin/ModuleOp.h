@@ -29,7 +29,7 @@ class ModuleOp final : public Operation {
   ::mx::ir::Region body_region(void) const;
   std::optional<std::string_view> sym_name(void) const;
   std::optional<std::string_view> sym_visibility(void) const;
-  //std::optional<StringRef> name(void) const;
+  std::optional<std::string_view> name(void) const;
   bool is_optional_symbol(void) const;
   //DataLayoutSpecInterface data_layout_spec(void) const;
   std::string_view default_dialect(void) const;

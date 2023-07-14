@@ -26,7 +26,7 @@ class AllocaScopeOp final : public Operation {
   ::mlir::memref::AllocaScopeOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   ::mx::ir::Region body_region(void) const;
 };
 static_assert(sizeof(AllocaScopeOp) == sizeof(Operation));

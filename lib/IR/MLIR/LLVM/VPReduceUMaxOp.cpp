@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/VPReduceUMaxOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,21 @@ std::optional<VPReduceUMaxOp> VPReduceUMaxOp::producing(const ::mx::ir::Value &t
 
 ::mlir::LLVM::VPReduceUMaxOp VPReduceUMaxOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::VPReduceUMaxOp(this->Operation::op_);
+}
+
+::mx::ir::Value VPReduceUMaxOp::val(void) const {
+  auto val = underlying_op().getVal();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPReduceUMaxOp::mask(void) const {
+  auto val = underlying_op().getMask();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPReduceUMaxOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

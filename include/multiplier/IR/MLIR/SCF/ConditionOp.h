@@ -27,7 +27,7 @@ class ConditionOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> condition(void) const;
-  //::mlir::mlir::Operation::operand_range args(void) const;
+  gap::generator<::mx::ir::Operand> args(void) const;
 };
 static_assert(sizeof(ConditionOp) == sizeof(Operation));
 

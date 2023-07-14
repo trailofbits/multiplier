@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/vector_reduce_fadd.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,21 @@ std::optional<vector_reduce_fadd> vector_reduce_fadd::producing(const ::mx::ir::
 
 ::mlir::LLVM::vector_reduce_fadd vector_reduce_fadd::underlying_op(void) const noexcept {
   return ::mlir::LLVM::vector_reduce_fadd(this->Operation::op_);
+}
+
+::mx::ir::Value vector_reduce_fadd::input(void) const {
+  auto val = underlying_op().getInput();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value vector_reduce_fadd::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+bool vector_reduce_fadd::reassoc(void) const {
+  auto val = underlying_op().getReassoc();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

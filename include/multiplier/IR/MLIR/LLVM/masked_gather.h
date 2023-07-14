@@ -28,7 +28,7 @@ class masked_gather final : public Operation {
   // Imported methods:
   ::mx::ir::Value ptrs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::mlir::Operation::operand_range pass_thru(void) const;
+  gap::generator<::mx::ir::Operand> pass_thru(void) const;
   ::mx::ir::Value res(void) const;
   uint32_t alignment(void) const;
 };

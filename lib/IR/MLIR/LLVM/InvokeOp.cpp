@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/InvokeOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,47 @@ std::optional<InvokeOp> InvokeOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::InvokeOp InvokeOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::InvokeOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> InvokeOp::callee_operands(void) const {
+  auto range = underlying_op().getCalleeOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> InvokeOp::normal_dest_operands(void) const {
+  auto range = underlying_op().getNormalDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> InvokeOp::unwind_dest_operands(void) const {
+  auto range = underlying_op().getUnwindDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+std::optional<std::string_view> InvokeOp::callee(void) const {
+  auto opt_val = underlying_op().getCallee();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+gap::generator<::mx::ir::Operand> InvokeOp::arg_operands(void) const {
+  auto range = underlying_op().getArgOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::llvm

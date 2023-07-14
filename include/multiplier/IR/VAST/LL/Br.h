@@ -26,7 +26,7 @@ class Br final : public Operation {
   ::vast::ll::Br underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range operands(void) const;
+  gap::generator<::mx::ir::Operand> operands(void) const;
   //::mlir::Block* dest(void) const;
 };
 static_assert(sizeof(Br) == sizeof(Operation));

@@ -34,12 +34,15 @@ class Block final {
   std::shared_ptr<const SourceIRImpl> module_;
   mlir::Block *block_;
 
+ public:
   inline Block(std::shared_ptr<const SourceIRImpl> module,
                mlir::Block *block)
       : module_(std::move(module)),
         block_(block) {}
 
- public:
+  inline Block(std::shared_ptr<const SourceIRImpl> module,
+               mlir::Block &block)
+      : Block(std::move(module), &block) {}
 
   // Return the block containing a given argument.
   static Block containing(const Argument &);

@@ -27,7 +27,7 @@ class TypeDefOp final : public Operation {
 
   // Imported methods:
   std::string_view name(void) const;
-  ::mx::ir::Type type(void) const;
+  //::mlir::Type type(void) const;
 };
 static_assert(sizeof(TypeDefOp) == sizeof(Operation));
 

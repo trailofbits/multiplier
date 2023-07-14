@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/SMinOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,21 @@ std::optional<SMinOp> SMinOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::SMinOp SMinOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::SMinOp(this->Operation::op_);
+}
+
+::mx::ir::Value SMinOp::a(void) const {
+  auto val = underlying_op().getA();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value SMinOp::b(void) const {
+  auto val = underlying_op().getB();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value SMinOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

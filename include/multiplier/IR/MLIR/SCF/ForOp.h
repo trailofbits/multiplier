@@ -29,11 +29,11 @@ class ForOp final : public Operation {
   //::mlir::TypedValue<::mlir::IndexType> lower_bound(void) const;
   //::mlir::TypedValue<::mlir::IndexType> upper_bound(void) const;
   //::mlir::TypedValue<::mlir::IndexType> step(void) const;
-  //::mlir::mlir::Operation::operand_range init_args(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Operand> init_args(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   ::mx::ir::Region region(void) const;
   ::mx::ir::Region loop_body(void) const;
-  std::optional<::mx::ir::Value> single_induction_var(void) const;
+  //::std::optional<::mlir::Value> single_induction_var(void) const;
   //::std::optional<::mlir::OpFoldResult> single_lower_bound(void) const;
   //::std::optional<::mlir::OpFoldResult> single_step(void) const;
   //::std::optional<::mlir::OpFoldResult> single_upper_bound(void) const;

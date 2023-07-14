@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/MaskedStoreOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,21 @@ std::optional<MaskedStoreOp> MaskedStoreOp::producing(const ::mx::ir::Value &tha
 
 ::mlir::LLVM::MaskedStoreOp MaskedStoreOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::MaskedStoreOp(this->Operation::op_);
+}
+
+::mx::ir::Value MaskedStoreOp::value(void) const {
+  auto val = underlying_op().getValue();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value MaskedStoreOp::mask(void) const {
+  auto val = underlying_op().getMask();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+uint32_t MaskedStoreOp::alignment(void) const {
+  auto val = underlying_op().getAlignment();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

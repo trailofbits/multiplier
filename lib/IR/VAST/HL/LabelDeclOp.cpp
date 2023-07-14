@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/LabelDeclOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,15 @@ std::optional<LabelDeclOp> LabelDeclOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::LabelDeclOp LabelDeclOp::underlying_op(void) const noexcept {
   return ::vast::hl::LabelDeclOp(this->Operation::op_);
+}
+
+std::string_view LabelDeclOp::name(void) const {
+  auto val = underlying_op().getName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::hl

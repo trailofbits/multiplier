@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/AssumeAlignmentOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,11 @@ std::optional<AssumeAlignmentOp> AssumeAlignmentOp::producing(const ::mx::ir::Va
 
 ::mlir::memref::AssumeAlignmentOp AssumeAlignmentOp::underlying_op(void) const noexcept {
   return ::mlir::memref::AssumeAlignmentOp(this->Operation::op_);
+}
+
+uint32_t AssumeAlignmentOp::alignment(void) const {
+  auto val = underlying_op().getAlignment();
+  return val;
 }
 
 }  // namespace mx::ir::memref

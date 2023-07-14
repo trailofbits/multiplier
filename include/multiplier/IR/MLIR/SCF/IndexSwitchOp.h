@@ -27,7 +27,7 @@ class IndexSwitchOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IndexType> arg(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   ::mx::ir::Region default_region(void) const;
   //::mlir::MutableArrayRef<::mlir::Region> case_regions(void) const;
   //::llvm::ArrayRef<int64_t> cases(void) const;

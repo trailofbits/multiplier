@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/ExtractElementOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,16 @@ std::optional<ExtractElementOp> ExtractElementOp::producing(const ::mx::ir::Valu
 
 ::mlir::LLVM::ExtractElementOp ExtractElementOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::ExtractElementOp(this->Operation::op_);
+}
+
+::mx::ir::Value ExtractElementOp::vector(void) const {
+  auto val = underlying_op().getVector();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value ExtractElementOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

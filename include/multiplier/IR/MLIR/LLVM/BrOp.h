@@ -26,7 +26,7 @@ class BrOp final : public Operation {
   ::mlir::LLVM::BrOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range dest_operands(void) const;
+  gap::generator<::mx::ir::Operand> dest_operands(void) const;
   //::mlir::Block* dest(void) const;
 };
 static_assert(sizeof(BrOp) == sizeof(Operation));

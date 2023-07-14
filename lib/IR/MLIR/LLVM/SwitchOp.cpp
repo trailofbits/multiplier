@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/SwitchOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,13 @@ std::optional<SwitchOp> SwitchOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::SwitchOp SwitchOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::SwitchOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> SwitchOp::default_operands(void) const {
+  auto range = underlying_op().getDefaultOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::llvm

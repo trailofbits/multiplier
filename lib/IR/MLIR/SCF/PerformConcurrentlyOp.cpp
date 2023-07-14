@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/SCF/PerformConcurrentlyOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,11 @@ std::optional<PerformConcurrentlyOp> PerformConcurrentlyOp::producing(const ::mx
 
 ::mlir::scf::PerformConcurrentlyOp PerformConcurrentlyOp::underlying_op(void) const noexcept {
   return ::mlir::scf::PerformConcurrentlyOp(this->Operation::op_);
+}
+
+::mx::ir::Region PerformConcurrentlyOp::region(void) const {
+  auto &val = underlying_op().getRegion();
+  return ::mx::ir::Region(module_, val);
 }
 
 }  // namespace mx::ir::scf

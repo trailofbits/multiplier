@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/GlobalOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,43 @@ std::optional<GlobalOp> GlobalOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::GlobalOp GlobalOp::underlying_op(void) const noexcept {
   return ::mlir::memref::GlobalOp(this->Operation::op_);
+}
+
+std::string_view GlobalOp::sym_name(void) const {
+  auto val = underlying_op().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> GlobalOp::sym_visibility(void) const {
+  auto opt_val = underlying_op().getSymVisibility();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+bool GlobalOp::constant(void) const {
+  auto val = underlying_op().getConstant();
+  return val;
+}
+
+bool GlobalOp::is_external(void) const {
+  auto val = underlying_op().isExternal();
+  return val;
+}
+
+bool GlobalOp::is_uninitialized(void) const {
+  auto val = underlying_op().isUninitialized();
+  return val;
 }
 
 }  // namespace mx::ir::memref

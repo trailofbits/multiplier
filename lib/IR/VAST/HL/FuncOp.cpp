@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/FuncOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,38 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::hl::FuncOp FuncOp::underlying_op(void) const noexcept {
   return ::vast::hl::FuncOp(this->Operation::op_);
+}
+
+::mx::ir::Region FuncOp::body(void) const {
+  auto &val = underlying_op().getBody();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::string_view FuncOp::sym_name(void) const {
+  auto val = underlying_op().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> FuncOp::sym_visibility(void) const {
+  auto opt_val = underlying_op().getSymVisibility();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+bool FuncOp::is_declaration(void) const {
+  auto val = underlying_op().isDeclaration();
+  return val;
 }
 
 }  // namespace mx::ir::hl

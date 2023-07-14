@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/DbgValueOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,11 @@ std::optional<DbgValueOp> DbgValueOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::DbgValueOp DbgValueOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::DbgValueOp(this->Operation::op_);
+}
+
+::mx::ir::Value DbgValueOp::value(void) const {
+  auto val = underlying_op().getValue();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

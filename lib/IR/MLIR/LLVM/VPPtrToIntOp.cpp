@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/VPPtrToIntOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,21 @@ std::optional<VPPtrToIntOp> VPPtrToIntOp::producing(const ::mx::ir::Value &that)
 
 ::mlir::LLVM::VPPtrToIntOp VPPtrToIntOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::VPPtrToIntOp(this->Operation::op_);
+}
+
+::mx::ir::Value VPPtrToIntOp::src(void) const {
+  auto val = underlying_op().getSrc();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPPtrToIntOp::mask(void) const {
+  auto val = underlying_op().getMask();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPPtrToIntOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

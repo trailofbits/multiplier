@@ -27,8 +27,8 @@ class IndirectCallOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value callee(void) const;
-  //::mlir::mlir::Operation::operand_range arg_operands(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Operand> arg_operands(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
 };
 static_assert(sizeof(IndirectCallOp) == sizeof(Operation));

@@ -26,7 +26,7 @@ class UnsupportedDeclOp final : public Operation {
   ::vast::hl::UnsupportedDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range elements(void) const;
+  gap::generator<::mx::ir::Operand> elements(void) const;
   std::string_view name(void) const;
 };
 static_assert(sizeof(UnsupportedDeclOp) == sizeof(Operation));

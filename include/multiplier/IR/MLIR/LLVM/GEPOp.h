@@ -27,7 +27,7 @@ class GEPOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value base(void) const;
-  //::mlir::mlir::Operation::operand_range dynamic_indices(void) const;
+  gap::generator<::mx::ir::Operand> dynamic_indices(void) const;
   ::mx::ir::Value res(void) const;
   //::llvm::ArrayRef<int32_t> raw_constant_indices(void) const;
   //::std::optional<::mlir::Type> elem_type(void) const;

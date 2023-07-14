@@ -27,7 +27,7 @@ class ConstantOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value res(void) const;
-  ::mx::ir::Attribute value(void) const;
+  //::mlir::Attribute value(void) const;
 };
 static_assert(sizeof(ConstantOp) == sizeof(Operation));
 

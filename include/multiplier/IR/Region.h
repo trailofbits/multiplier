@@ -34,12 +34,16 @@ class Region final {
   std::shared_ptr<const SourceIRImpl> module_;
   mlir::Region *region_;
 
+ public:
+
   inline Region(std::shared_ptr<const SourceIRImpl> module,
                 mlir::Region *region)
       : module_(std::move(module)),
         region_(region) {}
 
- public:
+  inline Region(std::shared_ptr<const SourceIRImpl> module,
+                mlir::Region &region)
+      : Region(std::move(module), &region) {}
 
   static Region containing(const Block &);
 

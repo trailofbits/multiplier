@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/GetGlobalOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,15 @@ std::optional<GetGlobalOp> GetGlobalOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::GetGlobalOp GetGlobalOp::underlying_op(void) const noexcept {
   return ::mlir::memref::GetGlobalOp(this->Operation::op_);
+}
+
+std::string_view GetGlobalOp::name(void) const {
+  auto val = underlying_op().getName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::memref

@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/masked_scatter.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,26 @@ std::optional<masked_scatter> masked_scatter::producing(const ::mx::ir::Value &t
 
 ::mlir::LLVM::masked_scatter masked_scatter::underlying_op(void) const noexcept {
   return ::mlir::LLVM::masked_scatter(this->Operation::op_);
+}
+
+::mx::ir::Value masked_scatter::value(void) const {
+  auto val = underlying_op().getValue();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value masked_scatter::ptrs(void) const {
+  auto val = underlying_op().getPtrs();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value masked_scatter::mask(void) const {
+  auto val = underlying_op().getMask();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+uint32_t masked_scatter::alignment(void) const {
+  auto val = underlying_op().getAlignment();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

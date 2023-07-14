@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/UnsupportedExprOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,25 @@ std::optional<UnsupportedExprOp> UnsupportedExprOp::producing(const ::mx::ir::Va
 
 ::vast::hl::UnsupportedExprOp UnsupportedExprOp::underlying_op(void) const noexcept {
   return ::vast::hl::UnsupportedExprOp(this->Operation::op_);
+}
+
+::mx::ir::Value UnsupportedExprOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region UnsupportedExprOp::subexpr(void) const {
+  auto &val = underlying_op().getSubexpr();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::string_view UnsupportedExprOp::name(void) const {
+  auto val = underlying_op().getName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::hl

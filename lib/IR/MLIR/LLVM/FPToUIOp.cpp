@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/FPToUIOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,16 @@ std::optional<FPToUIOp> FPToUIOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::FPToUIOp FPToUIOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::FPToUIOp(this->Operation::op_);
+}
+
+::mx::ir::Value FPToUIOp::arg(void) const {
+  auto val = underlying_op().getArg();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value FPToUIOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

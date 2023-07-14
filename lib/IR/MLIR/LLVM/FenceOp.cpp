@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/FenceOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,15 @@ std::optional<FenceOp> FenceOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::FenceOp FenceOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::FenceOp(this->Operation::op_);
+}
+
+std::string_view FenceOp::syncscope(void) const {
+  auto val = underlying_op().getSyncscope();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::llvm

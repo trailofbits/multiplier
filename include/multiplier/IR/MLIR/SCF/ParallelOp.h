@@ -26,11 +26,11 @@ class ParallelOp final : public Operation {
   ::mlir::scf::ParallelOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range lower_bound(void) const;
-  //::mlir::mlir::Operation::operand_range upper_bound(void) const;
-  //::mlir::mlir::Operation::operand_range step(void) const;
-  //::mlir::mlir::Operation::operand_range init_vals(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Operand> lower_bound(void) const;
+  gap::generator<::mx::ir::Operand> upper_bound(void) const;
+  gap::generator<::mx::ir::Operand> step(void) const;
+  gap::generator<::mx::ir::Operand> init_vals(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   ::mx::ir::Region region(void) const;
   ::mx::ir::Region loop_body(void) const;
   //ValueRange induction_vars(void) const;

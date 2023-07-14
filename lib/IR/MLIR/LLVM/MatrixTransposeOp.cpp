@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/MatrixTransposeOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,26 @@ std::optional<MatrixTransposeOp> MatrixTransposeOp::producing(const ::mx::ir::Va
 
 ::mlir::LLVM::MatrixTransposeOp MatrixTransposeOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::MatrixTransposeOp(this->Operation::op_);
+}
+
+::mx::ir::Value MatrixTransposeOp::matrix(void) const {
+  auto val = underlying_op().getMatrix();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value MatrixTransposeOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+uint32_t MatrixTransposeOp::rows(void) const {
+  auto val = underlying_op().getRows();
+  return val;
+}
+
+uint32_t MatrixTransposeOp::columns(void) const {
+  auto val = underlying_op().getColumns();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

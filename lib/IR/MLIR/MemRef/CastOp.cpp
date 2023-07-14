@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/CastOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,16 @@ std::optional<CastOp> CastOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::CastOp CastOp::underlying_op(void) const noexcept {
   return ::mlir::memref::CastOp(this->Operation::op_);
+}
+
+::mx::ir::Value CastOp::source(void) const {
+  auto val = underlying_op().getSource();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value CastOp::dest(void) const {
+  auto val = underlying_op().getDest();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::memref

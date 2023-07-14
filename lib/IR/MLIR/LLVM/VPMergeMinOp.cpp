@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/VPMergeMinOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,26 @@ std::optional<VPMergeMinOp> VPMergeMinOp::producing(const ::mx::ir::Value &that)
 
 ::mlir::LLVM::VPMergeMinOp VPMergeMinOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::VPMergeMinOp(this->Operation::op_);
+}
+
+::mx::ir::Value VPMergeMinOp::cond(void) const {
+  auto val = underlying_op().getCond();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPMergeMinOp::true_val(void) const {
+  auto val = underlying_op().getTrueVal();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPMergeMinOp::false_val(void) const {
+  auto val = underlying_op().getFalseVal();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value VPMergeMinOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

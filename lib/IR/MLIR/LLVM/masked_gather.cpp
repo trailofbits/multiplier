@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/masked_gather.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,33 @@ std::optional<masked_gather> masked_gather::producing(const ::mx::ir::Value &tha
 
 ::mlir::LLVM::masked_gather masked_gather::underlying_op(void) const noexcept {
   return ::mlir::LLVM::masked_gather(this->Operation::op_);
+}
+
+::mx::ir::Value masked_gather::ptrs(void) const {
+  auto val = underlying_op().getPtrs();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value masked_gather::mask(void) const {
+  auto val = underlying_op().getMask();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Operand> masked_gather::pass_thru(void) const {
+  auto range = underlying_op().getPassThru();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+::mx::ir::Value masked_gather::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+uint32_t masked_gather::alignment(void) const {
+  auto val = underlying_op().getAlignment();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

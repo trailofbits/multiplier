@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/CondBrOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,20 @@ std::optional<CondBrOp> CondBrOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::CondBrOp CondBrOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::CondBrOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> CondBrOp::true_dest_operands(void) const {
+  auto range = underlying_op().getTrueDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> CondBrOp::false_dest_operands(void) const {
+  auto range = underlying_op().getFalseDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::llvm

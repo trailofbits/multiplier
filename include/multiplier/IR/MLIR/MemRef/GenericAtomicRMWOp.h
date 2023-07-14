@@ -27,7 +27,7 @@ class GenericAtomicRMWOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::MemRefType> memref(void) const;
-  //::mlir::mlir::Operation::operand_range indices(void) const;
+  gap::generator<::mx::ir::Operand> indices(void) const;
   ::mx::ir::Value result(void) const;
   ::mx::ir::Region atomic_body(void) const;
   //Region& body(void) const;

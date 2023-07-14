@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/Core/SelectOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,28 @@ std::optional<SelectOp> SelectOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::core::SelectOp SelectOp::underlying_op(void) const noexcept {
   return ::vast::core::SelectOp(this->Operation::op_);
+}
+
+::mx::ir::Value SelectOp::cond(void) const {
+  auto val = underlying_op().getCond();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value SelectOp::then_region(void) const {
+  auto val = underlying_op().getThenRegion();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value SelectOp::else_region(void) const {
+  auto val = underlying_op().getElseRegion();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Result> SelectOp::results(void) const {
+  auto range = underlying_op().getResults();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::core

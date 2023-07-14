@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/TBAARootMetadataOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,24 @@ std::optional<TBAARootMetadataOp> TBAARootMetadataOp::producing(const ::mx::ir::
 
 ::mlir::LLVM::TBAARootMetadataOp TBAARootMetadataOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::TBAARootMetadataOp(this->Operation::op_);
+}
+
+std::string_view TBAARootMetadataOp::sym_name(void) const {
+  auto val = underlying_op().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::string_view TBAARootMetadataOp::identity(void) const {
+  auto val = underlying_op().getIdentity();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::llvm

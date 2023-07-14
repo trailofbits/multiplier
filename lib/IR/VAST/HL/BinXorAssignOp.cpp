@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/HL/BinXorAssignOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,21 @@ std::optional<BinXorAssignOp> BinXorAssignOp::producing(const ::mx::ir::Value &t
 
 ::vast::hl::BinXorAssignOp BinXorAssignOp::underlying_op(void) const noexcept {
   return ::vast::hl::BinXorAssignOp(this->Operation::op_);
+}
+
+::mx::ir::Value BinXorAssignOp::src(void) const {
+  auto val = underlying_op().getSrc();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value BinXorAssignOp::dst(void) const {
+  auto val = underlying_op().getDst();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value BinXorAssignOp::result(void) const {
+  auto val = underlying_op().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::hl

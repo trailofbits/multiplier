@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/DmaStartOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,28 @@ std::optional<DmaStartOp> DmaStartOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::DmaStartOp DmaStartOp::underlying_op(void) const noexcept {
   return ::mlir::memref::DmaStartOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> DmaStartOp::operands(void) const {
+  auto range = underlying_op().getOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+bool DmaStartOp::is_dest_memory_space_faster(void) const {
+  auto val = underlying_op().isDestMemorySpaceFaster();
+  return val;
+}
+
+bool DmaStartOp::is_src_memory_space_faster(void) const {
+  auto val = underlying_op().isSrcMemorySpaceFaster();
+  return val;
+}
+
+bool DmaStartOp::is_strided(void) const {
+  auto val = underlying_op().isStrided();
+  return val;
 }
 
 }  // namespace mx::ir::memref

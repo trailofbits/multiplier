@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/SCF/WhileOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,30 @@ std::optional<WhileOp> WhileOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::scf::WhileOp WhileOp::underlying_op(void) const noexcept {
   return ::mlir::scf::WhileOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> WhileOp::inits(void) const {
+  auto range = underlying_op().getInits();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Result> WhileOp::results(void) const {
+  auto range = underlying_op().getResults();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
+}
+
+::mx::ir::Region WhileOp::before(void) const {
+  auto &val = underlying_op().getBefore();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region WhileOp::after(void) const {
+  auto &val = underlying_op().getAfter();
+  return ::mx::ir::Region(module_, val);
 }
 
 }  // namespace mx::ir::scf

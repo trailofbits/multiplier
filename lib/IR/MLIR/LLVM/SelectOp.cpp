@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/SelectOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,26 @@ std::optional<SelectOp> SelectOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::SelectOp SelectOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::SelectOp(this->Operation::op_);
+}
+
+::mx::ir::Value SelectOp::condition(void) const {
+  auto val = underlying_op().getCondition();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value SelectOp::true_value(void) const {
+  auto val = underlying_op().getTrueValue();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value SelectOp::false_value(void) const {
+  auto val = underlying_op().getFalseValue();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value SelectOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

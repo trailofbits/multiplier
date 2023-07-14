@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/VAST/LL/StructGEPOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
@@ -31,6 +34,30 @@ std::optional<StructGEPOp> StructGEPOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::ll::StructGEPOp StructGEPOp::underlying_op(void) const noexcept {
   return ::vast::ll::StructGEPOp(this->Operation::op_);
+}
+
+::mx::ir::Value StructGEPOp::record(void) const {
+  auto val = underlying_op().getRecord();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value StructGEPOp::element(void) const {
+  auto val = underlying_op().getElement();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+uint32_t StructGEPOp::idx(void) const {
+  auto val = underlying_op().getIdx();
+  return val;
+}
+
+std::string_view StructGEPOp::name(void) const {
+  auto val = underlying_op().getName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 }  // namespace mx::ir::ll

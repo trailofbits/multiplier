@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/MemRef/DmaWaitOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -32,6 +35,13 @@ std::optional<DmaWaitOp> DmaWaitOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::DmaWaitOp DmaWaitOp::underlying_op(void) const noexcept {
   return ::mlir::memref::DmaWaitOp(this->Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> DmaWaitOp::tag_indices(void) const {
+  auto range = underlying_op().getTagIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::memref

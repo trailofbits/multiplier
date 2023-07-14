@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/CoroFreeOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,21 @@ std::optional<CoroFreeOp> CoroFreeOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::CoroFreeOp CoroFreeOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::CoroFreeOp(this->Operation::op_);
+}
+
+::mx::ir::Value CoroFreeOp::id(void) const {
+  auto val = underlying_op().getId();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value CoroFreeOp::handle(void) const {
+  auto val = underlying_op().getHandle();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value CoroFreeOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

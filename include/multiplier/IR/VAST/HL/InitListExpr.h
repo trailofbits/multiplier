@@ -26,7 +26,7 @@ class InitListExpr final : public Operation {
   ::vast::hl::InitListExpr underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range elements(void) const;
+  gap::generator<::mx::ir::Operand> elements(void) const;
 };
 static_assert(sizeof(InitListExpr) == sizeof(Operation));
 

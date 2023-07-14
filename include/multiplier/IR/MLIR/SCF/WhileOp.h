@@ -26,8 +26,8 @@ class WhileOp final : public Operation {
   ::mlir::scf::WhileOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range inits(void) const;
-  //::mlir::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Operand> inits(void) const;
+  gap::generator<::mx::ir::Result> results(void) const;
   ::mx::ir::Region before(void) const;
   ::mx::ir::Region after(void) const;
   //ConditionOp condition_op(void) const;

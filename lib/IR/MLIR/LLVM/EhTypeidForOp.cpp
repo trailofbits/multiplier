@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/EhTypeidForOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,16 @@ std::optional<EhTypeidForOp> EhTypeidForOp::producing(const ::mx::ir::Value &tha
 
 ::mlir::LLVM::EhTypeidForOp EhTypeidForOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::EhTypeidForOp(this->Operation::op_);
+}
+
+::mx::ir::Value EhTypeidForOp::type_info(void) const {
+  auto val = underlying_op().getTypeInfo();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value EhTypeidForOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

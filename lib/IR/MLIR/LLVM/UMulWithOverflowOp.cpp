@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/UMulWithOverflowOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,11 @@ std::optional<UMulWithOverflowOp> UMulWithOverflowOp::producing(const ::mx::ir::
 
 ::mlir::LLVM::UMulWithOverflowOp UMulWithOverflowOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::UMulWithOverflowOp(this->Operation::op_);
+}
+
+::mx::ir::Value UMulWithOverflowOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 }  // namespace mx::ir::llvm

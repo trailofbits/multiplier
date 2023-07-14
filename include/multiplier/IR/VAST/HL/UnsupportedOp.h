@@ -26,7 +26,7 @@ class UnsupportedOp final : public Operation {
   ::vast::hl::UnsupportedOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range elements(void) const;
+  gap::generator<::mx::ir::Operand> elements(void) const;
   ::mx::ir::Value result(void) const;
   std::string_view name(void) const;
 };

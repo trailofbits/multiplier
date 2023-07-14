@@ -27,7 +27,7 @@ class SwitchOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::mlir::IntegerType> value(void) const;
-  //::mlir::mlir::Operation::operand_range default_operands(void) const;
+  gap::generator<::mx::ir::Operand> default_operands(void) const;
   //::mlir::OperandRangeRange case_operands(void) const;
   //::mlir::Block* default_destination(void) const;
   //::mlir::SuccessorRange case_destinations(void) const;

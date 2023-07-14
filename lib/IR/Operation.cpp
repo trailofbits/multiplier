@@ -158,6 +158,16 @@ std::optional<Result> Result::from(const Value &val) {
   return std::nullopt;
 }
 
+// Return the operation producing this result.
+Operation Result::operation(void) const noexcept {
+  return Operation(module_, mlir::OpResult(impl_.result).getDefiningOp());
+}
+
+// Index of this result in its operation's result list.
+unsigned Result::index(void) const noexcept {
+  return mlir::OpResult(impl_.result).getResultNumber();
+}
+
 // The operation containing this operand.
 Operation Operand::operation(void) const noexcept {
   return Operation(module_, op_->getOwner());

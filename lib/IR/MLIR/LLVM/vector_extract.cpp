@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/vector_extract.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,31 @@ std::optional<vector_extract> vector_extract::producing(const ::mx::ir::Value &t
 
 ::mlir::LLVM::vector_extract vector_extract::underlying_op(void) const noexcept {
   return ::mlir::LLVM::vector_extract(this->Operation::op_);
+}
+
+::mx::ir::Value vector_extract::srcvec(void) const {
+  auto val = underlying_op().getSrcvec();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value vector_extract::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+uint64_t vector_extract::pos(void) const {
+  auto val = underlying_op().getPos();
+  return val;
+}
+
+uint64_t vector_extract::src_vector_bit_width(void) const {
+  auto val = underlying_op().getSrcVectorBitWidth();
+  return val;
+}
+
+uint64_t vector_extract::res_vector_bit_width(void) const {
+  auto val = underlying_op().getResVectorBitWidth();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

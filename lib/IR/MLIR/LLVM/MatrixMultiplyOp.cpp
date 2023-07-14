@@ -7,7 +7,10 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/IR/MLIR/LLVM/MatrixMultiplyOp.h>
-#include <multiplier/IR/Value.h>
+#include <multiplier/IR/Attribute.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Region.h>
+#include <multiplier/IR/Type.h>
 
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +34,36 @@ std::optional<MatrixMultiplyOp> MatrixMultiplyOp::producing(const ::mx::ir::Valu
 
 ::mlir::LLVM::MatrixMultiplyOp MatrixMultiplyOp::underlying_op(void) const noexcept {
   return ::mlir::LLVM::MatrixMultiplyOp(this->Operation::op_);
+}
+
+::mx::ir::Value MatrixMultiplyOp::lhs(void) const {
+  auto val = underlying_op().getLhs();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value MatrixMultiplyOp::rhs(void) const {
+  auto val = underlying_op().getRhs();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value MatrixMultiplyOp::res(void) const {
+  auto val = underlying_op().getRes();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+uint32_t MatrixMultiplyOp::lhs_rows(void) const {
+  auto val = underlying_op().getLhsRows();
+  return val;
+}
+
+uint32_t MatrixMultiplyOp::lhs_columns(void) const {
+  auto val = underlying_op().getLhsColumns();
+  return val;
+}
+
+uint32_t MatrixMultiplyOp::rhs_columns(void) const {
+  auto val = underlying_op().getRhsColumns();
+  return val;
 }
 
 }  // namespace mx::ir::llvm

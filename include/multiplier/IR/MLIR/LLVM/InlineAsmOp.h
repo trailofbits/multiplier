@@ -26,7 +26,7 @@ class InlineAsmOp final : public Operation {
   ::mlir::LLVM::InlineAsmOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::mlir::Operation::operand_range operands(void) const;
+  gap::generator<::mx::ir::Operand> operands(void) const;
   ::mx::ir::Value res(void) const;
   std::string_view asm_string(void) const;
   std::string_view constraints(void) const;
