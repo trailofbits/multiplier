@@ -15,7 +15,7 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         cmake gpg zip unzip tar git pkg-config \
         ninja-build clang-tidy cppcheck ccache build-essential \
-        doctest-dev clang-15 lld-15 python3.10 python3.10-dev \
+        doctest-dev clang-15 ld.lld-15 python3.10 python3.10-dev \
     && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
     && python3 -m pip install nanobind \
     && apt-get clean \
@@ -40,9 +40,9 @@ RUN git clone --depth 1 https://github.com/lifting-bits/gap.git /work/src/gap \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
         -DCMAKE_C_COMPILER="$(which clang-15)" \
         -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
-        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
-        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
-        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
+        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
         -DVCPKG_ROOT="${VCPKG_ROOT}" \
         -DVCPKG_MANIFEST_MODE=OFF \
         -DGAP_WARNINGS_AS_ERRORS=OFF \
@@ -70,9 +70,9 @@ RUN git clone --depth 1 https://github.com/trailofbits/vast /work/src/vast \
         -B '/work/build/vast' \
         -G Ninja \
         -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
-        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
-        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
-        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
+        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER="$(which clang-15)" \
         -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
@@ -92,9 +92,9 @@ RUN git clone --depth 1 https://github.com/trailofbits/pasta /work/src/pasta \
         -B '/work/build/pasta' \
         -G Ninja \
         -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
-        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
-        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
-        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
+        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER="$(which clang-15)" \
         -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
@@ -114,9 +114,9 @@ RUN cmake \
     -B '/work/build/multiplier' \
     -G Ninja \
     -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
-    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
-    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
-    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which lld-15)" \
+    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER="$(which clang-15)" \
     -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
