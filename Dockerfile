@@ -15,7 +15,7 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         cmake gpg zip unzip tar git pkg-config \
         ninja-build clang-tidy cppcheck ccache build-essential \
-        doctest-dev clang-15 ld.lld-15 python3.10 python3.10-dev \
+        doctest-dev clang-15 lld-15 python3.10 python3.10-dev \
     && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
     && python3 -m pip install nanobind \
     && apt-get clean \
