@@ -10,7 +10,6 @@
 
 set(MX_ENABLE_WEGGLI @MX_ENABLE_WEGGLI@)
 set(MX_ENABLE_RE2 @MX_ENABLE_RE2@)
-set(MX_ENABLE_VAST @MX_ENABLE_VAST@)
 
 if(NOT TARGET @PROJECT_NAME@::mx-api)
   if(NOT TARGET Threads::Threads)
@@ -37,7 +36,7 @@ if(NOT TARGET @PROJECT_NAME@::mx-api)
     find_package(gap CONFIG REQUIRED)
   endif()
   
-  if (MX_ENABLE_VAST AND NOT TARGET vast::vast)
+  if (NOT TARGET vast::vast)
     find_package(Z3 CONFIG REQUIRED)
     find_package(LLVM CONFIG REQUIRED)
     find_package(MLIR CONFIG REQUIRED)

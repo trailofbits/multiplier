@@ -157,7 +157,7 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const TokenContext &t) {
 
 std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal41();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -169,30 +169,30 @@ std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
 }
 
 Type CXXTypeidExpr::type_operand(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXTypeidExpr::type_operand_source_info(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal40();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<bool> CXXTypeidExpr::is_most_derived(void) const {
-  if (!impl->reader.getVal93()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal92());
+    return static_cast<bool>(impl->reader.getVal89());
   }
   return std::nullopt;
 }
 
 bool CXXTypeidExpr::is_potentially_evaluated(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal91();
 }
 
 bool CXXTypeidExpr::is_type_operand(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal92();
 }
 
 #pragma GCC diagnostic pop

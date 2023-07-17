@@ -191,8 +191,8 @@ static mx::RawEntityId RelatedEntityIdToPrintedToken(
     case mx::TokenKind::R_SQUARE:
     case mx::TokenKind::L_PARENTHESIS:
     case mx::TokenKind::R_PARENTHESIS:
-    case mx::TokenKind::L_BRACE_TOKEN:
-    case mx::TokenKind::R_BRACE_TOKEN:
+    case mx::TokenKind::L_BRACE:
+    case mx::TokenKind::R_BRACE:
     case mx::TokenKind::AMP:
     case mx::TokenKind::AMP_AMP:
     case mx::TokenKind::AMP_EQUAL:
@@ -536,6 +536,7 @@ void GlobalIndexingState::PersistTypes(
     const PendingFragment &pf) {
 
   for (const pasta::Type &type : pf.types_to_serialize) {
+    ProgressBarWork type_progress_tracker(type_progress);
 
     auto maybe_token_range = em.tm.TypeTokenRange(type);
     assert(maybe_token_range.has_value());

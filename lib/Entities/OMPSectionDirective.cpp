@@ -154,7 +154,7 @@ std::optional<OMPSectionDirective> OMPSectionDirective::from(const TokenContext 
 }
 
 bool OMPSectionDirective::has_cancel(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

@@ -108,13 +108,13 @@ std::optional<TokenContext> Token::context(void) const {
     return std::nullopt;
   }
 
-  auto reader = impl->TokenContextReaderFor(impl, offset, id());
+  TokenContextReaderPtr reader =
+      impl->TokenContextReaderFor(impl, offset, id());
   if (!reader) {
-    assert(false);
     return std::nullopt;
   }
 
-  auto tagged_offset = reader->TokenContextOffsets(offset);
+  std::optional<unsigned> tagged_offset = reader->TokenContextOffsets(offset);
   if (!tagged_offset.has_value()) {
     assert(false);
     return std::nullopt;

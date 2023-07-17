@@ -19,6 +19,11 @@ class Attr;
 class HLSLResourceAttr;
 class InheritableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class HLSLResourceAttr : public InheritableAttr {
  private:

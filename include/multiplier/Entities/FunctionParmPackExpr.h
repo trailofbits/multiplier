@@ -20,6 +20,11 @@ class Stmt;
 class Token;
 class ValueStmt;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FunctionParmPackExpr : public Expr {
  private:

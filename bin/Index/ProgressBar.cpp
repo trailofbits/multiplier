@@ -113,6 +113,13 @@ struct ProgressBar::Impl {
   Impl(const char *label_, std::chrono::seconds report_freq_);
   ~Impl(void);
 
+  void Report(void) {
+    const auto max_step = step.load();
+    const auto curr = static_cast<uint32_t>(max_step);
+    const auto max = static_cast<uint32_t>(max_step >> 32UL);
+    Report(curr, max, *line.second, next_line_data);
+  }
+
   void Report(uint32_t curr, uint32_t max, std::string &line,
               std::string &next_line);
 
@@ -121,10 +128,8 @@ struct ProgressBar::Impl {
 
   std::atomic<uint64_t> step;
   std::atomic<bool> done;
-  std::atomic<uint64_t> sum_of_elapsed_time_ms_squared;
-  std::atomic<uint64_t> sum_of_elapsed_time_ms;
-  unsigned num_workers;
-  Semaphore has_work_sem;
+  std::string next_line_data;
+  std::pair<size_t, std::string *> line;
   std::thread progress_reporter_thread;
 };
 
@@ -133,43 +138,27 @@ ProgressBar::Impl::Impl(const char *label_, std::chrono::seconds report_freq_)
       report_frequency(report_freq_),
       step(0),
       done(false),
-      sum_of_elapsed_time_ms_squared(0),
-      sum_of_elapsed_time_ms(0),
-      num_workers(1),
-      has_work_sem(),
+      next_line_data(1024ull, '\0'),
+      line(AllocateLine()),
       progress_reporter_thread(
           [this] (void) {
-            auto [line_index, line_ptr] = AllocateLine();
-            std::string next_line(1024ull, '\0');
-
-            uint32_t curr = 0;
-            uint32_t max = 0;
-            while (1) {
-              has_work_sem.wait();
-              for (; ; std::this_thread::sleep_for (report_frequency)) {
-                if (done.load()) {
-                  FreeLine(line_index);
-                  return;
-                }
-                const auto max_step = step.load();
-                curr = static_cast<uint32_t>(max_step);
-                max = static_cast<uint32_t>(max_step >> 32UL);
-                Report(curr, max, *line_ptr, next_line);
-                if (curr >= max) {
-                  break;
-                }
-              }
+            while (!done.load()) {
+              Report();
+              std::this_thread::sleep_for(report_frequency);
             }
           }) {}
 
 ProgressBar::Impl::~Impl(void) {
   done.store(true);
-  step.store(0);
-  has_work_sem.signal(1);
 
   if (progress_reporter_thread.joinable()) {
     progress_reporter_thread.join();
   }
+
+  Report();
+
+  // NOTE(pag): We'll let it leak.
+  // FreeLine(line.first);
 }
 
 void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
@@ -177,6 +166,7 @@ void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
   if (!max) {
     return;
   }
+
   const auto steps_done = static_cast<double>(curr);
   const auto steps_total = static_cast<double>(max);
   const auto percentage = std::min<double>(1.0, steps_done / steps_total);
@@ -214,33 +204,14 @@ ProgressBar::ProgressBar(const char *label_, std::chrono::seconds report_freq_)
 
 ProgressBar::~ProgressBar(void) {}
 
-void ProgressBar::Advance(std::chrono::duration<double> elapsed_time) const {
-  d->step.fetch_add(1);
-
-  const auto elapsed_time_ms =
-      std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time)
-          .count();
-  if (0 < elapsed_time_ms) {
-    d->sum_of_elapsed_time_ms.fetch_add(static_cast<uint64_t>(elapsed_time_ms));
-
-    const auto elapsed_time_ms_squared = std::pow(
-        static_cast<double>(elapsed_time_ms), 2);
-    d->sum_of_elapsed_time_ms_squared.fetch_add(
-        static_cast<uint64_t>(elapsed_time_ms_squared));
-  }
+void ProgressBar::Advance(void) const {
+  d->step.fetch_add(1ULL);
 }
 
 void ProgressBar::AddWork(uint64_t num_steps) const {
-  const auto prev = d->step.fetch_add(num_steps << 32ULL);
-  const auto prev_curr = static_cast<uint32_t>(prev);
-  const auto prev_max = static_cast<uint32_t>(prev >> 32ULL);
-  if (prev_curr >= prev_max) {
-    d->has_work_sem.signal(1);
-  }
+  auto old_val = d->step.fetch_add(num_steps << 32ULL);
+  (void) old_val;
+  (void) old_val;
 }
-
-void ProgressBar::SetNumWorkers(unsigned num_workers) const {
-  d->num_workers = num_workers;
-};
 
 }  // namespace indexer

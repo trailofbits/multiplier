@@ -6897,8 +6897,8 @@ TokenKind FromPasta(pasta::TokenKind e) {
     case 20: return TokenKind::R_SQUARE;
     case 21: return TokenKind::L_PARENTHESIS;
     case 22: return TokenKind::R_PARENTHESIS;
-    case 23: return TokenKind::L_BRACE_TOKEN;
-    case 24: return TokenKind::R_BRACE_TOKEN;
+    case 23: return TokenKind::L_BRACE;
+    case 24: return TokenKind::R_BRACE;
     case 25: return TokenKind::PERIOD;
     case 26: return TokenKind::ELLIPSIS;
     case 27: return TokenKind::AMP;

@@ -20,6 +20,11 @@ class ForStmt;
 class Stmt;
 class Token;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ForStmt : public Stmt {
  private:

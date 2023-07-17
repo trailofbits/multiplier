@@ -156,13 +156,13 @@ std::optional<ForStmt> ForStmt::from(const TokenContext &t) {
 }
 
 Stmt ForStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 std::optional<Expr> ForStmt::condition(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal13();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -175,7 +175,7 @@ std::optional<Expr> ForStmt::condition(void) const {
 
 std::optional<VarDecl> ForStmt::condition_variable(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal14();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -188,7 +188,7 @@ std::optional<VarDecl> ForStmt::condition_variable(void) const {
 
 std::optional<DeclStmt> ForStmt::condition_variable_declaration_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal16();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -200,12 +200,12 @@ std::optional<DeclStmt> ForStmt::condition_variable_declaration_statement(void) 
 }
 
 Token ForStmt::for_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 std::optional<Expr> ForStmt::increment(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal20();
+    RawEntityId eid = impl->reader.getVal17();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -218,7 +218,7 @@ std::optional<Expr> ForStmt::increment(void) const {
 
 std::optional<Stmt> ForStmt::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal21();
+    RawEntityId eid = impl->reader.getVal18();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,11 +230,11 @@ std::optional<Stmt> ForStmt::initializer(void) const {
 }
 
 Token ForStmt::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal22());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal19());
 }
 
 Token ForStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal23());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
 }
 
 #pragma GCC diagnostic pop

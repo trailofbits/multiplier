@@ -19,4 +19,3 @@ option(MX_ENABLE_BOOTSTRAP "Set to ON to enable re-bootstrapping of some auto-ge
 option(MX_ENABLE_INSTALL "Set to ON to enable the install target" ON)
 option(MX_ENABLE_WEGGLI "Set to OFF to disable Weggli integration" ON)
 option(MX_ENABLE_RE2 "Set to OFF to disable RE2 integration" ON)
-option(MX_ENABLE_VAST "Set to OFF to disable VAST SourceIR generation" ON)

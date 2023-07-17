@@ -29,14 +29,16 @@ class Decl;
 class File;
 class Fragment;
 class Index;
-class Macro;
-class MacroArgument;
 class Reference;
-class SourceIR;
 class Stmt;
 class StmtImpl;
 class Token;
 class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Stmt {
  protected:
@@ -48,10 +50,12 @@ class Stmt {
   friend class Index;
   friend class Macro;
   friend class Reference;
-  friend class SourceIR;
   friend class TokenContext;
   friend class Type;
   friend class StmtImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const StmtImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
@@ -112,11 +116,6 @@ class Stmt {
 
   static std::optional<Stmt> from(const TokenContext &t);
 
-  std::optional<Macro> highest_containing_substitution(void) const;
-  std::optional<MacroArgument> lowest_containing_macro_argument(void) const;
-  std::optional<Macro> nth_covering_macro(unsigned n) const;
-  unsigned num_covering_macros(void) const;
-  gap::generator<Macro> covering_macros(void) const &;
   Stmt ignore_containers(void) const;
   gap::generator<Stmt> children(void) const &;
   TokenRange tokens(void) const;

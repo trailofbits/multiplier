@@ -19,6 +19,11 @@ class Stmt;
 class Token;
 class UnresolvedUsingValueDecl;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnresolvedUsingValueDecl : public ValueDecl {
  private:

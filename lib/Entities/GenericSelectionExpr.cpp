@@ -155,11 +155,11 @@ std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const TokenContex
 }
 
 unsigned GenericSelectionExpr::num_association_expressions(void) const {
-  return impl->reader.getVal18().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n) const {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -173,12 +173,12 @@ std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n)
 }
 
 gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const & {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d18 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d18)))) {
+    if (auto d15 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }
@@ -187,29 +187,29 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const &
 }
 
 Expr GenericSelectionExpr::controlling_expression(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token GenericSelectionExpr::default_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token GenericSelectionExpr::generic_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token GenericSelectionExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Expr GenericSelectionExpr::result_expression(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool GenericSelectionExpr::is_result_dependent(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

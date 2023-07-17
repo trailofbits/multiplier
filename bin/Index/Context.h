@@ -40,9 +40,11 @@ class TokenProvenanceCalculator;
 class GlobalIndexingState {
  public:
 
-  // Tracks progress in parsing compile commands and turning them into compile
-  // jobs.
+  // Tracks progress in evaluating compile commands.
   std::unique_ptr<ProgressBar> command_progress;
+
+  // Tracks progress in evaluating compile commands.
+  std::unique_ptr<ProgressBar> eval_command_progress;
 
   // Tracks progress in running compile jobs to produce ASTs.
   std::unique_ptr<ProgressBar> ast_progress;
@@ -50,14 +52,20 @@ class GlobalIndexingState {
   // Tracks progress in partitioning an AST into fragments.
   std::unique_ptr<ProgressBar> partitioning_progress;
 
-  // Tracks progress in identifying fragments with IDs.
-  std::unique_ptr<ProgressBar> identification_progress;
-
   // Tracks progress in serializing fragments.
-  std::unique_ptr<ProgressBar> serialization_progress;
+  std::unique_ptr<ProgressBar> fragment_progress;
+
+  // Tracks progress in serializing types.
+  std::unique_ptr<ProgressBar> type_progress;
 
   // Tracks progress in saving tokenized files.
   std::unique_ptr<ProgressBar> file_progress;
+
+  // Number of fragments for which we are attempting to generate source ir.
+  std::unique_ptr<ProgressBar> sourceir_progress;
+
+  // Number of fragments for which we successfully generated source ir.
+  std::unique_ptr<ProgressBar> sourceir_success_progress;
 
   const unsigned num_workers;
 

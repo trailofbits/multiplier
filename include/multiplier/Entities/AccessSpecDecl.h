@@ -17,6 +17,11 @@ class AccessSpecDecl;
 class Decl;
 class Stmt;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AccessSpecDecl : public Decl {
  private:

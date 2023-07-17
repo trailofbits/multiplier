@@ -155,7 +155,7 @@ std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const
 }
 
 Expr OMPParallelMasterDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal17();
+  RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

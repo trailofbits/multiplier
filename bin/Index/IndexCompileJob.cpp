@@ -170,6 +170,20 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 };
 
+// Determines whether or not a TLD is likely to have to go into a child
+// fragment. This happens when the TLD is a forward declaration, e.g. of a
+// struct.
+static bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kRecord:
+    case pasta::DeclKind::kCXXRecord:
+    case pasta::DeclKind::kEnum:
+      return !IsDefinition(decl);
+    default:
+      return false;
+  }
+}
+
 // Find all top-level declarations.
 static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
 
@@ -1228,6 +1242,12 @@ static void CreatePendingFragment(
     }
   }
 
+  // Partition the top-level declarations so that ones that definitely won't
+  // need to go in a nested fragment show up first. This acts as a minor
+  // mitigation to #396 (https://github.com/trailofbits/multiplier/issues/396).
+  std::partition(pf.top_level_decls.begin(), pf.top_level_decls.end(),
+                 ShouldGoInNestedFragment);
+
   CHECK_NE((pf.num_top_level_declarations + pf.num_top_level_macros), 0u);
 
   // We always need to label the entities inside of a fragment, regardless of
@@ -1257,9 +1277,6 @@ static void CreatePendingFragment(
 static std::vector<PendingFragment> CreatePendingFragments(
     GlobalIndexingState &context, EntityMapper &em, const pasta::AST &ast,
     std::vector<EntityGroupRange> decl_group_ranges) {
-
-  ProgressBarWork identification_progress_tracker(
-      context.identification_progress);
 
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
@@ -1308,8 +1325,6 @@ static void PersistParsedFragments(
       << " has " << pending_fragments.size() << " unique fragments";
 
   for (PendingFragment &pf : pending_fragments) {
-    ProgressBarWork fragment_progress_tracker(context.serialization_progress);
-
     auto start_time = std::chrono::system_clock::now();
     try {
       em.ResetForFragment();
@@ -1383,7 +1398,6 @@ static void MaybePersistParsedFile(
 static void PersistParsedFiles(
     GlobalIndexingState &context, const pasta::AST &ast,
     EntityIdMap &entity_ids) {
-  ProgressBarWork progress_tracker(context.file_progress);
   auto parsed_files = ast.ParsedFiles();
   for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
        it != end; ++it) {

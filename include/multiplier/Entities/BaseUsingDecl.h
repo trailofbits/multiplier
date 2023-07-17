@@ -21,6 +21,11 @@ class Token;
 class UsingDecl;
 class UsingEnumDecl;
 class UsingShadowDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BaseUsingDecl : public NamedDecl {
  private:

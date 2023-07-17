@@ -15,7 +15,7 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         cmake gpg zip unzip tar git pkg-config \
         ninja-build clang-tidy cppcheck ccache build-essential \
-        doctest-dev clang-15 python3.10 python3.10-dev \
+        doctest-dev clang-15 lld-15 python3.10 python3.10-dev \
     && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
     && python3 -m pip install nanobind \
     && apt-get clean \
@@ -40,6 +40,9 @@ RUN git clone --depth 1 https://github.com/lifting-bits/gap.git /work/src/gap \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
         -DCMAKE_C_COMPILER="$(which clang-15)" \
         -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
+        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
         -DVCPKG_ROOT="${VCPKG_ROOT}" \
         -DVCPKG_MANIFEST_MODE=OFF \
         -DGAP_WARNINGS_AS_ERRORS=OFF \
@@ -60,6 +63,28 @@ RUN git clone --depth 1 https://github.com/trailofbits/weggli-native /work/src/w
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
     && cmake --build '/work/build/weggli-native' --target install
 
+# Build and install VAST
+RUN git clone --depth 1 https://github.com/trailofbits/vast --branch vspell-future /work/src/vast \
+    && cmake \
+        -S '/work/src/vast' \
+        -B '/work/build/vast' \
+        -G Ninja \
+        -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER="$(which clang-15)" \
+        -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
+        -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+        -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+        -DLLVM_ENABLE_LLD:BOOL=TRUE \
+        -DVAST_ENABLE_GAP_SUBMODULE=FALSE \
+        -DVAST_WARNINGS_AS_ERRORS=FALSE \
+        -DVAST_INSTALL=ON \
+        -DENABLE_TESTING=OFF \
+    && cmake --build '/work/build/vast' --target install
+
 # Build and install pasta
 RUN git clone --depth 1 https://github.com/trailofbits/pasta /work/src/pasta \
     && cmake \
@@ -67,16 +92,20 @@ RUN git clone --depth 1 https://github.com/trailofbits/pasta /work/src/pasta \
         -B '/work/build/pasta' \
         -G Ninja \
         -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
-        -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+        -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+        -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER="$(which clang-15)" \
         -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+        -DCMAKE_CXX_FLAGS=-w \
+        -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+        -DLLVM_ENABLE_LLD:BOOL=TRUE \
         -DPASTA_BOOTSTRAP_MACROS=OFF \
         -DPASTA_BOOTSTRAP_TYPES=OFF \
         -DPASTA_ENABLE_TESTING=OFF \
         -DPASTA_ENABLE_INSTALL=ON \
-        -DCMAKE_CXX_FLAGS=-w \
     && cmake --build '/work/build/pasta' --target install
 
 COPY . /work/src/multiplier
@@ -85,13 +114,16 @@ RUN cmake \
     -B '/work/build/multiplier' \
     -G Ninja \
     -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
-    -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
+    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=$(which ld.lld-15)" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER="$(which clang-15)" \
     -DCMAKE_CXX_COMPILER="$(which clang++-15)" \
     -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+    -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
+    -DLLVM_ENABLE_LLD:BOOL=TRUE \
     -DMX_ENABLE_BOOTSTRAP=OFF \
-    -DMX_ENABLE_VAST=OFF \
     -DMX_ENABLE_WEGGLI=ON \
     -DMX_ENABLE_INSTALL=ON
 

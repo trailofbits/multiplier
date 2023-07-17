@@ -155,21 +155,21 @@ std::optional<CapturedStmt> CapturedStmt::from(const TokenContext &t) {
 }
 
 CapturedDecl CapturedStmt::captured_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal9();
   return CapturedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 RecordDecl CapturedStmt::captured_record_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal10();
   return RecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 CapturedRegionKind CapturedStmt::captured_region_kind(void) const {
-  return static_cast<CapturedRegionKind>(impl->reader.getVal59());
+  return static_cast<CapturedRegionKind>(impl->reader.getVal56());
 }
 
 Stmt CapturedStmt::captured_statement(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal11();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

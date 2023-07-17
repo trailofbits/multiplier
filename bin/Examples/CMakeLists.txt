@@ -45,6 +45,7 @@ function(define_example exe_name source_file)
 endfunction(define_example)
 
 define_example("mx-list-files" "ListFiles.cpp")
+define_example("mx-dump-files" "DumpFiles.cpp")
 define_example("mx-print-file" "PrintFile.cpp")
 define_example("mx-highlight-entity" "HighlightEntity.cpp")
 define_example("mx-print-call-hierarchy" "PrintCallHierarchy.cpp")
@@ -73,6 +74,7 @@ define_example("mx-find-sketchy-strchr" "FindSketchyStrchr.cpp")
 define_example("mx-find-symbol" "FindSymbol.cpp")
 define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
+define_example("mx-find-sequoia" "FindSequoia.cpp")
 define_example("mx-print-type-token-graph" "PrintTypeTokenGraph.cpp")
 
 target_compile_definitions("mx-dump-json"
@@ -85,8 +87,7 @@ target_link_libraries("mx-dump-json"
     LLVMCore LLVMSupport
 )
 
-if(MX_ENABLE_VAST)
-  define_example("mx-print-sourceir" "PrintSourceIR.cpp")
-  define_example("mx-dump-sourceir" "DumpSourceIR.cpp")
-  define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")
-endif(MX_ENABLE_VAST)
+define_example("mx-count-sourceir" "CountSourceIR.cpp")
+define_example("mx-print-sourceir" "PrintSourceIR.cpp")
+#  define_example("mx-dump-sourceir" "DumpSourceIR.cpp")
+#  define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")

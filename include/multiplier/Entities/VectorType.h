@@ -18,6 +18,11 @@ class ExtVectorType;
 class Token;
 class Type;
 class VectorType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VectorType : public Type {
  private:

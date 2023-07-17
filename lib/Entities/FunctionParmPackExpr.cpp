@@ -156,20 +156,20 @@ std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const TokenContex
 }
 
 VarDecl FunctionParmPackExpr::parameter_pack(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal38();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token FunctionParmPackExpr::parameter_pack_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 unsigned FunctionParmPackExpr::num_expansions(void) const {
-  return impl->reader.getVal18().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -183,12 +183,12 @@ std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
 }
 
 gap::generator<VarDecl> FunctionParmPackExpr::expansions(void) const & {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d18 = ep->DeclFor(ep, v)) {
-      if (auto e = VarDecl::from(Decl(std::move(d18)))) {
+    if (auto d15 = ep->DeclFor(ep, v)) {
+      if (auto e = VarDecl::from(Decl(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }

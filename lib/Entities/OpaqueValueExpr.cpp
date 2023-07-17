@@ -155,16 +155,16 @@ std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const TokenContext &t) {
 }
 
 Token OpaqueValueExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr OpaqueValueExpr::source_expression(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OpaqueValueExpr::is_unique(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

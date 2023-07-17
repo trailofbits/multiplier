@@ -17,6 +17,11 @@ class Token;
 class Type;
 class UnresolvedUsingType;
 class UnresolvedUsingTypenameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnresolvedUsingType : public Type {
  private:

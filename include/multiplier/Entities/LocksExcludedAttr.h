@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class LocksExcludedAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LocksExcludedAttr : public InheritableAttr {
  private:

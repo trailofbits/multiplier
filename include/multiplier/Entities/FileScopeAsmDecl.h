@@ -18,6 +18,11 @@ class FileScopeAsmDecl;
 class Stmt;
 class StringLiteral;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FileScopeAsmDecl : public Decl {
  private:

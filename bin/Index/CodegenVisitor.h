@@ -54,7 +54,7 @@ class ExceptionThrower {
 
 template< typename Derived >
 struct FallBackDeclVisitor
-    : clang::ConstDeclVisitor< FallBackDeclVisitor< Derived >, vast::Operation* >,
+    : clang::ConstDeclVisitor< FallBackDeclVisitor< Derived >, vast::Operation *>,
       vast::cg::CodeGenVisitorLens< FallBackDeclVisitor< Derived >, Derived >,
       vast::cg::CodeGenBuilderMixin< FallBackDeclVisitor< Derived >, Derived >
 {
@@ -73,14 +73,15 @@ struct FallBackDeclVisitor
       return this->template create< Op >(std::forward< Args >(args)...);
   }
 
-  vast::Operation* VisitFileScopeAsmDecl(const clang::FileScopeAsmDecl *decl) {
+  vast::Operation *VisitFileScopeAsmDecl(const clang::FileScopeAsmDecl *decl) {
     auto loc = meta_location(decl);
     auto asm_string = decl->getAsmString();
     llvm::SmallVector< vast::Value > elements;
-    return make< vast::hl::UnsupportedDeclOp >(loc, asm_string->getString(), elements);
+    return make< vast::hl::UnsupportedDeclOp >(loc, asm_string->getString(),
+                                               elements);
   }
 
-  vast::Operation* VisitNamespaceDecl(const clang::NamespaceDecl *decl) {
+  vast::Operation *VisitNamespaceDecl(const clang::NamespaceDecl *decl) {
       auto loc  = meta_location(decl);
       auto name = context().get_decl_name(decl);
       llvm::SmallVector< vast::Value > elements;
@@ -91,25 +92,27 @@ struct FallBackDeclVisitor
       return make< vast::hl::UnsupportedDeclOp >(loc, name, elements);
   }
 
-  vast::Operation* VisitStaticAssertDecl(const clang::StaticAssertDecl *decl) {
+  vast::Operation *VisitStaticAssertDecl(const clang::StaticAssertDecl *decl) {
       auto loc  = meta_location(decl);
       llvm::SmallVector< vast::Value > elements;
       auto assert_expr  = decl->getAssertExpr();
       elements.push_back(visit(assert_expr)->getResult(0));
-      return make< vast::hl::UnsupportedDeclOp >(loc, decl->getDeclKindName(), elements);
+      return make< vast::hl::UnsupportedDeclOp >(loc, decl->getDeclKindName(),
+                                                 elements);
   }
 
-  vast::Operation* VisitLinkageSpecDecl(const clang::LinkageSpecDecl *decl) {
+  vast::Operation *VisitLinkageSpecDecl(const clang::LinkageSpecDecl *decl) {
      auto loc  = meta_location(decl);
      llvm::SmallVector< vast::Value > elements;
-     for (auto d = decl->decls_begin(), dend = decl->decls_end(); d != dend; ++d) {
+     for (auto d = decl->decls_begin(), dend = decl->decls_end(); d != dend;
+         ++d) {
        auto op = visit(*d);
        elements.push_back(op->getResult(0));
      }
      return make< vast::hl::UnsupportedDeclOp >(loc, "LinkageSpec", elements);
   }
 
-  vast::Operation* VisitParmVarDecl(const clang::ParmVarDecl *decl) {
+  vast::Operation *VisitParmVarDecl(const clang::ParmVarDecl *decl) {
     auto loc  = meta_location(decl);
     llvm::SmallVector< vast::Value > elements;
     return make< vast::hl::UnsupportedDeclOp >(loc, "ParmVar", elements);
@@ -118,7 +121,7 @@ struct FallBackDeclVisitor
 
 template< typename Derived >
 struct FallBackStmtVisitor
-    : clang::ConstStmtVisitor< FallBackStmtVisitor< Derived >, vast::Operation* >,
+    : clang::ConstStmtVisitor< FallBackStmtVisitor< Derived >, vast::Operation *>,
       vast::cg::CodeGenVisitorLens< FallBackStmtVisitor< Derived >, Derived >,
       vast::cg::CodeGenBuilderMixin< FallBackStmtVisitor< Derived >, Derived > {
   using LensType = vast::cg::CodeGenVisitorLens< FallBackStmtVisitor< Derived >, Derived >;
@@ -155,7 +158,7 @@ struct FallBackStmtVisitor
   // adding multiple blocks to mlir region. Updated/Add new Dialect that
   // should enable us to walk through all the child and add unsupported expr
   // node for them
-  vast::Operation* VisitChildExpr(const clang::Expr *expr, std::string node) {
+  vast::Operation *VisitChildExpr(const clang::Expr *expr, std::string node) {
     auto loc  = meta_location(expr);
     if (expr->child_begin() != expr->child_end()) {
       auto first_child = *(expr->child_begin());
@@ -167,7 +170,7 @@ struct FallBackStmtVisitor
     return make<vast::hl::UnsupportedExprOp>(loc, node, visit(expr->getType()), nullptr);
   }
 
-  vast::Operation* VisitOperands(const clang::Expr *expr, std::string node) {
+  vast::Operation *VisitOperands(const clang::Expr *expr, std::string node) {
     auto loc  = meta_location(expr);
     auto rtype =  visit(expr->getType());
 
@@ -178,23 +181,23 @@ struct FallBackStmtVisitor
     return  make<vast::hl::UnsupportedOp>(loc, rtype, node, elements);
   }
 
-  vast::Operation* VisitPredefinedExpr(const clang::PredefinedExpr *expr) {
+  vast::Operation *VisitPredefinedExpr(const clang::PredefinedExpr *expr) {
     return  VisitOperands(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitCompoundLiteralExpr(const clang::CompoundLiteralExpr *expr) {
+  vast::Operation *VisitCompoundLiteralExpr(const clang::CompoundLiteralExpr *expr) {
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitCXXConstructExpr(const clang::CXXConstructExpr *expr) {
+  vast::Operation *VisitCXXConstructExpr(const clang::CXXConstructExpr *expr) {
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitRecoveryExpr(const clang::RecoveryExpr *expr) {
+  vast::Operation *VisitRecoveryExpr(const clang::RecoveryExpr *expr) {
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitBinaryOperator(const clang::BinaryOperator *stmt) {
+  vast::Operation *VisitBinaryOperator(const clang::BinaryOperator *stmt) {
     auto loc = meta_location(stmt);
     auto rtype =  visit(stmt->getType());
 
@@ -204,7 +207,7 @@ struct FallBackStmtVisitor
     return  make<vast::hl::UnsupportedOp>(loc, rtype, stmt->getStmtClassName(), elements);
   }
 
-  vast::Operation* VisitConditionalOperator(const clang::ConditionalOperator *stmt) {
+  vast::Operation *VisitConditionalOperator(const clang::ConditionalOperator *stmt) {
     auto loc = meta_location(stmt);
     auto rtype =  visit(stmt->getType());
 
@@ -216,23 +219,23 @@ struct FallBackStmtVisitor
 
   }
 
-  vast::Operation* VisitCXXDependentScopeMemberExpr(const clang::CXXDependentScopeMemberExpr *expr) {
+  vast::Operation *VisitCXXDependentScopeMemberExpr(const clang::CXXDependentScopeMemberExpr *expr) {
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitUnresolvedLookupExpr(const clang::UnresolvedLookupExpr *expr) {
+  vast::Operation *VisitUnresolvedLookupExpr(const clang::UnresolvedLookupExpr *expr) {
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitVAArgExpr(const clang::VAArgExpr *expr) {
+  vast::Operation *VisitVAArgExpr(const clang::VAArgExpr *expr) {
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitStmtExpr(const clang::StmtExpr *expr) {
+  vast::Operation *VisitStmtExpr(const clang::StmtExpr *expr) {
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitFunctionDeclRefExpr(const clang::DeclRefExpr *expr) {
+  vast::Operation *VisitFunctionDeclRefExpr(const clang::DeclRefExpr *expr) {
     std::stringstream ss;
     auto decl = clang::cast< clang::FunctionDecl >( expr->getDecl()->getUnderlyingDecl() );
     auto rtype = visit_as_lvalue_type(expr->getType());
@@ -252,7 +255,7 @@ struct FallBackStmtVisitor
     return  make<vast::hl::UnsupportedOp>(loc, rtype, ss.str(), elements);
   }
 
-  vast::Operation* VisitVarDeclRefExpr(const clang::DeclRefExpr *expr) {
+  vast::Operation *VisitVarDeclRefExpr(const clang::DeclRefExpr *expr) {
     std::stringstream ss;
     auto rtype = visit_as_lvalue_type(expr->getType());
     auto loc  = meta_location(expr);
@@ -268,7 +271,7 @@ struct FallBackStmtVisitor
     return  make<vast::hl::UnsupportedOp>(loc, rtype, ss.str(), elements);
   }
 
-  vast::Operation* VisitDeclRefExpr(const clang::DeclRefExpr *expr) {
+  vast::Operation *VisitDeclRefExpr(const clang::DeclRefExpr *expr) {
     auto underlying = expr->getDecl()->getUnderlyingDecl();
 
     if (clang::isa< clang::FunctionDecl >(underlying)) {
@@ -287,57 +290,62 @@ struct FallBackStmtVisitor
     return nullptr;
   }
 
-  vast::Operation* VisitTypeTraitExpr(const clang::TypeTraitExpr *expr) {
+  vast::Operation *VisitTypeTraitExpr(const clang::TypeTraitExpr *expr) {
     return VisitOperands(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitObjCAvailabilityCheckExpr(const clang::ObjCAvailabilityCheckExpr *expr){
+  vast::Operation *VisitObjCAvailabilityCheckExpr(
+      const clang::ObjCAvailabilityCheckExpr *expr){
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitOffsetOfExpr(const clang::OffsetOfExpr *expr){
+  vast::Operation *VisitOffsetOfExpr(const clang::OffsetOfExpr *expr){
     auto rtype = visit(expr->getType());
     auto loc = meta_location(expr);
 
-    llvm::SmallVector<vast::Value> elements(expr->getNumExpressions());
+    llvm::SmallVector<vast::Value> elements;
     for (auto i = 0u, n = expr->getNumExpressions(); i < n; ++i) {
       elements.push_back(visit(expr->getIndexExpr(i))->getResult(0));
     }
 
-    return  make<vast::hl::UnsupportedOp>(loc, rtype, expr->getStmtClassName(), elements);
+    return  make<vast::hl::UnsupportedOp>(loc, rtype, expr->getStmtClassName(),
+                                          elements);
   }
 
-  vast::Operation* VisitGCCAsmStmt(const clang::GCCAsmStmt *expr){
+  vast::Operation *VisitGCCAsmStmt(const clang::GCCAsmStmt *expr){
     THROW("Unable to handle GCCASMStmt : {0}", expr->getStmtClassName());
     return nullptr;
   }
 
-  vast::Operation* VisitImplicitValueInitExpr(const clang::ImplicitValueInitExpr *expr) {
+  vast::Operation *VisitImplicitValueInitExpr(
+      const clang::ImplicitValueInitExpr *expr) {
     return VisitOperands(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitAtomicExpr(const clang::AtomicExpr *expr) {
+  vast::Operation *VisitAtomicExpr(const clang::AtomicExpr *expr) {
     return VisitOperands(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitGenericSelectionExpr(const clang::GenericSelectionExpr *expr) {
+  vast::Operation *VisitGenericSelectionExpr(
+      const clang::GenericSelectionExpr *expr) {
     return VisitOperands(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitChooseExpr(const clang::ChooseExpr *expr) {
+  vast::Operation *VisitChooseExpr(const clang::ChooseExpr *expr) {
     return VisitChildExpr(expr, expr->getStmtClassName());
   }
 
-  vast::Operation* VisitUnaryOperator(const clang::UnaryOperator *expr) {
+  vast::Operation *VisitUnaryOperator(const clang::UnaryOperator *expr) {
     auto loc = meta_location(expr);
     auto rtype =  visit(expr->getType());
 
     llvm::SmallVector<vast::Value> elements;
     elements.push_back(visit(expr->getSubExpr())->getResult(0));
-    return make<vast::hl::UnsupportedOp>(loc, rtype, expr->getStmtClassName(), elements);
+    return make<vast::hl::UnsupportedOp>(loc, rtype, expr->getStmtClassName(),
+                                         elements);
   }
 
-  vast::Operation* VisitIndirectGotoStmt(const clang::IndirectGotoStmt *expr) {
+  vast::Operation *VisitIndirectGotoStmt(const clang::IndirectGotoStmt *expr) {
     auto loc = meta_location(expr);
     auto target = expr->getTarget();
     auto [region, type] = make_value_yield_region(target);
@@ -400,7 +408,7 @@ struct FallBackVisitor
     return DefaultFallbackVisitor::Visit(stmt);
   }
 
-  vast::Operation* Visit(const clang::Decl *decl) {
+  vast::Operation *Visit(const clang::Decl *decl) {
     if (auto result = DeclVisitor::Visit(decl)) {
       return result;
     }

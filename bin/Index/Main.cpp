@@ -212,12 +212,13 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   indexer::Executor executor(indexer_exe_options);
   mx::DatabaseWriter database(FLAGS_db, *queue_size);
   auto ic = std::make_shared<indexer::GlobalIndexingState>(database, executor);
-  auto fs = pasta::FileSystem::CreateNative();
-  pasta::FileManager fm(fs);
 
   if (FLAGS_show_progress) {
     ic->InitializeProgressBars();
   }
+
+  auto fs = pasta::FileSystem::CreateNative();
+  pasta::FileManager fm(fs);
 
   if (!FLAGS_generate_sourceir) {
     ic->codegen.Disable();

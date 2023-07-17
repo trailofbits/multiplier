@@ -154,16 +154,16 @@ std::optional<GotoStmt> GotoStmt::from(const TokenContext &t) {
 }
 
 Token GotoStmt::goto_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 LabelDecl GotoStmt::label(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal10();
   return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token GotoStmt::label_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 #pragma GCC diagnostic pop

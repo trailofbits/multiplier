@@ -19,6 +19,11 @@ class Stmt;
 class TemplateParamObjectDecl;
 class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParamObjectDecl : public ValueDecl {
  private:

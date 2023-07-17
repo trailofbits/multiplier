@@ -158,7 +158,7 @@ std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const TokenContext &t) {
 
 std::optional<Expr> CXXUuidofExpr::expression_operand(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal41();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -170,22 +170,22 @@ std::optional<Expr> CXXUuidofExpr::expression_operand(void) const {
 }
 
 MSGuidDecl CXXUuidofExpr::guid_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal39();
   return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type CXXUuidofExpr::type_operand(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal40();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXUuidofExpr::type_operand_source_info(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal41();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool CXXUuidofExpr::is_type_operand(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

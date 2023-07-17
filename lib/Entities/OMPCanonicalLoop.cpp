@@ -155,22 +155,22 @@ std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const TokenContext &t) {
 }
 
 CapturedStmt OMPCanonicalLoop::distance_func(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal9();
   return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt OMPCanonicalLoop::loop_statement(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal10();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CapturedStmt OMPCanonicalLoop::loop_variable_func(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal11();
   return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 DeclRefExpr OMPCanonicalLoop::loop_variable_reference(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal13();
   return DeclRefExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

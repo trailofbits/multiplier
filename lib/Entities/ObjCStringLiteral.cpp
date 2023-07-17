@@ -156,11 +156,11 @@ std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const TokenContext &t) 
 }
 
 Token ObjCStringLiteral::at_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 StringLiteral ObjCStringLiteral::string(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal39();
   return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

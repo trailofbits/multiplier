@@ -19,6 +19,11 @@ class Expr;
 class InheritableAttr;
 class Token;
 class TryAcquireCapabilityAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TryAcquireCapabilityAttr : public InheritableAttr {
  private:

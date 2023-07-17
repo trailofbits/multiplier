@@ -16,6 +16,12 @@
 #include "File.h"
 
 namespace mx {
+namespace ir {
+class SourceIRImpl;
+namespace builtin {
+class ModuleOp;
+}  // namespace builtin
+}  // namespace ir
 
 class EntityProvider;
 class FragmentImpl;
@@ -25,7 +31,6 @@ class ReferenceIteratorImpl;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
-class SourceIR;
 class WeggliQuery;
 class WeggliQueryMatch;
 class WeggliQueryResult;
@@ -58,11 +63,11 @@ class Fragment {
   friend class RemoteEntityProvider;
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
-  friend class SourceIRImpl;
   friend class TokenTree;
   friend class TokenTreeImpl;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
+  friend class ir::SourceIRImpl;
 
 #define MX_FRIEND(type_name, ln, e, c) \
     friend class type_name;
@@ -126,9 +131,6 @@ class Fragment {
   // Return the list of top-level macros or macro tokens in this code.
   gap::generator<MacroOrToken> preprocessed_code(void) const &;
 
-  // Returns source IR for the fragment.
-  std::optional<SourceIR> ir(void) const noexcept;
-
   inline bool operator==(const Fragment &that) const noexcept {
     return id() == that.id();
   }
@@ -142,6 +144,9 @@ class Fragment {
 
   // Run a regular expression search over this fragment.
   gap::generator<RegexQueryMatch> query(const RegexQuery &query) const &;
+
+  // Returns source IR for the fragment.
+  std::optional<ir::builtin::ModuleOp> ir(void) const noexcept;
 };
 
 }  // namespace mx

@@ -156,7 +156,7 @@ std::optional<ReturnStmt> ReturnStmt::from(const TokenContext &t) {
 
 std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal12();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -169,7 +169,7 @@ std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const {
 
 std::optional<Expr> ReturnStmt::return_value(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal13();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -181,7 +181,7 @@ std::optional<Expr> ReturnStmt::return_value(void) const {
 }
 
 Token ReturnStmt::return_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 #pragma GCC diagnostic pop

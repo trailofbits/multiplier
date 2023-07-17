@@ -13,20 +13,24 @@
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Type.h>
+#include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
 
 #include "Attr.h"
 #include "Pseudo.h"
 #include "Decl.h"
 #include "File.h"
+#include "IR/SourceIR.h"
 #include "Macro.h"
 #include "Reference.h"
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
-#include "SourceIR.h"
 #include "WeggliImpl.h"
 
 namespace mx {
+namespace ir {
+class SourceIRImpl;
+}  // namespace ir
 
 // Return the fragment containing a query match.
 Fragment Fragment::containing(const WeggliQueryMatch &match) {
@@ -261,16 +265,15 @@ gap::generator<RegexQueryMatch> Fragment::query(
   }
 }
 
-std::optional<SourceIR> Fragment::ir(void) const noexcept {
-#ifdef MX_ENABLE_SOURCEIR
+std::optional<ir::builtin::ModuleOp> Fragment::ir(void) const noexcept {
   if (auto mlir = impl->SourceIR(); !mlir.empty()) {
-    auto ir_obj = std::make_shared<const SourceIRImpl>(impl, mlir);
-    if (!ir_obj->mod.get()) {
-      return std::nullopt;
+    auto ir_obj = std::make_shared<const ir::SourceIRImpl>(
+        id(), impl->ep, mlir);
+    if (mlir::Operation *ptr = ir_obj->scope()) {
+      ir::Operation op(std::move(ir_obj), ptr);
+      return ir::builtin::ModuleOp::from(op);
     }
-    return SourceIR(std::move(ir_obj));
   }
-#endif
   return std::nullopt;
 }
 

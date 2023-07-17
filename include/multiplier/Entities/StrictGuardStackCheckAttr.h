@@ -17,6 +17,11 @@ class Attr;
 class InheritableAttr;
 class StrictGuardStackCheckAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class StrictGuardStackCheckAttr : public InheritableAttr {
  private:

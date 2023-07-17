@@ -17,6 +17,11 @@ class Token;
 class Type;
 class UsingShadowDecl;
 class UsingType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UsingType : public Type {
  private:

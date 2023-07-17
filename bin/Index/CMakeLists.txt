@@ -71,7 +71,7 @@ add_executable("${exe_name}"
 target_link_libraries("${exe_name}"
   PRIVATE
     ${MX_BEGIN_FORCE_LOAD_GROUP}
-    mx-api
+    "mx-api"
     glog::glog
     gflags::gflags
     concurrentqueue
@@ -93,19 +93,6 @@ target_compile_options("${exe_name}"
     "-Wno-unknown-warning-option"
     "-Wno-pragmas"
 )
-
-if(MX_ENABLE_VAST)
-  target_compile_definitions("${exe_name}"
-    PRIVATE
-      "MX_ENABLE_SOURCEIR"
-  )
-  target_link_libraries("${exe_name}"
-    PRIVATE
-      ${MX_BEGIN_FORCE_LOAD_GROUP}
-      mx-mlir
-      ${MX_END_FORCE_LOAD_GROUP}
-  )
-endif()
 
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 

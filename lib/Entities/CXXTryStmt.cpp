@@ -155,20 +155,20 @@ std::optional<CXXTryStmt> CXXTryStmt::from(const TokenContext &t) {
 }
 
 CompoundStmt CXXTryStmt::try_block(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal9();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXTryStmt::try_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 unsigned CXXTryStmt::num_handlers(void) const {
-  return impl->reader.getVal18().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -182,12 +182,12 @@ std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
 }
 
 gap::generator<CXXCatchStmt> CXXTryStmt::handlers(void) const & {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d18 = ep->StmtFor(ep, v)) {
-      if (auto e = CXXCatchStmt::from(Stmt(std::move(d18)))) {
+    if (auto d15 = ep->StmtFor(ep, v)) {
+      if (auto e = CXXCatchStmt::from(Stmt(std::move(d15)))) {
         co_yield std::move(*e);
       }
     }

@@ -155,15 +155,15 @@ std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const TokenContext &t) {
 }
 
 Token OMPIteratorExpr::iterator_kw_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token OMPIteratorExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token OMPIteratorExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 #pragma GCC diagnostic pop

@@ -156,45 +156,45 @@ std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const TokenContext &t) {
 }
 
 DeclStmt CXXForRangeStmt::begin_statement(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal9();
   return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt CXXForRangeStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal10();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Token CXXForRangeStmt::coawait_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 Token CXXForRangeStmt::colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal16());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 Expr CXXForRangeStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal17();
+  RawEntityId eid = impl->reader.getVal14();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 DeclStmt CXXForRangeStmt::end_statement(void) const {
-  RawEntityId eid = impl->reader.getVal20();
+  RawEntityId eid = impl->reader.getVal17();
   return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXForRangeStmt::for_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal21());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
 Expr CXXForRangeStmt::increment(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal19();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Stmt> CXXForRangeStmt::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal23();
+    RawEntityId eid = impl->reader.getVal20();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -206,26 +206,26 @@ std::optional<Stmt> CXXForRangeStmt::initializer(void) const {
 }
 
 DeclStmt CXXForRangeStmt::loop_variable_statement(void) const {
-  RawEntityId eid = impl->reader.getVal24();
+  RawEntityId eid = impl->reader.getVal21();
   return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 VarDecl CXXForRangeStmt::loop_variable(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal22();
   return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXForRangeStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal33());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal30());
 }
 
 Expr CXXForRangeStmt::range_initializer(void) const {
-  RawEntityId eid = impl->reader.getVal34();
+  RawEntityId eid = impl->reader.getVal31();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 DeclStmt CXXForRangeStmt::range_statement(void) const {
-  RawEntityId eid = impl->reader.getVal35();
+  RawEntityId eid = impl->reader.getVal32();
   return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

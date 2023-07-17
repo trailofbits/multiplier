@@ -20,6 +20,11 @@ class TemplateTypeParmDecl;
 class Token;
 class Type;
 class TypeDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateTypeParmDecl : public TypeDecl {
  private:

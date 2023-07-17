@@ -190,7 +190,33 @@ cmake \
 cmake --build "${WORKSPACE_DIR}/build/weggli-native" --target install
 ```
 
-### Step 6: Download and build Multiplier
+### Step 6: Download and build VAST
+
+```shell
+cd "${WORKSPACE_DIR}/src"
+git clone git@github.com:trailofbits/vast.git
+```
+
+```shell
+mkdir -p "${WORKSPACE_DIR}/build/vast"
+cd "${WORKSPACE_DIR}/build/vast"
+cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  "-DCMAKE_INSTALL_PREFIX=${WORKSPACE_DIR}/install" \
+  "-DVCPKG_ROOT=${VCPKG_ROOT}" \
+  "-DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}" \
+  "-DCMAKE_C_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang" \
+  "-DCMAKE_CXX_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang++" \
+  -DVAST_ENABLE_GAP_SUBMODULE=FALSE \
+  -DVAST_WARNINGS_AS_ERRORS=FALSE \
+  -DVAST_INSTALL=ON \
+  -DENABLE_TESTING=OFF \
+  "${WORKSPACE_DIR}/src/vast"
+
+make install -j13
+```
+
+### Step 7: Download and build Multiplier
 
 
 ```shell
@@ -210,7 +236,6 @@ cmake \
   "-DCMAKE_C_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang" \
   "-DCMAKE_CXX_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang++" \
   -DMX_ENABLE_BOOTSTRAP=OFF \
-  -DMX_ENABLE_VAST=OFF \
   -DMX_ENABLE_WEGGLI=ON \
   -DMX_ENABLE_INSTALL=ON \
   "${WORKSPACE_DIR}/src/multiplier"

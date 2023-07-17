@@ -23,6 +23,11 @@ class ObjCIvarDecl;
 class Stmt;
 class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCIvarDecl : public FieldDecl {
  private:

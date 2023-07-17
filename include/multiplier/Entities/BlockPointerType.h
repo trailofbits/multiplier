@@ -16,6 +16,11 @@ class Index;
 class BlockPointerType;
 class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BlockPointerType : public Type {
  private:

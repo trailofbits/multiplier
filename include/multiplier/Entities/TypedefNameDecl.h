@@ -24,6 +24,11 @@ class TypeAliasDecl;
 class TypeDecl;
 class TypedefDecl;
 class TypedefNameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypedefNameDecl : public TypeDecl {
  private:

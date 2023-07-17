@@ -21,6 +21,11 @@ class Stmt;
 class StringLiteral;
 class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class PredefinedExpr : public Expr {
  private:

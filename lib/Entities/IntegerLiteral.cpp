@@ -155,7 +155,7 @@ std::optional<IntegerLiteral> IntegerLiteral::from(const TokenContext &t) {
 }
 
 Token IntegerLiteral::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 #pragma GCC diagnostic pop

@@ -157,11 +157,11 @@ std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const TokenContext &t
 }
 
 unsigned DesignatedInitExpr::num_designators(void) const {
-  return impl->reader.getVal18().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Designator> DesignatedInitExpr::nth_designator(unsigned n) const {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -175,44 +175,44 @@ std::optional<Designator> DesignatedInitExpr::nth_designator(unsigned n) const {
 }
 
 gap::generator<Designator> DesignatedInitExpr::designators(void) const & {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d18 = ep->DesignatorFor(ep, v)) {
-      co_yield Designator(std::move(d18));
+    if (auto d15 = ep->DesignatorFor(ep, v)) {
+      co_yield Designator(std::move(d15));
     }
   }
   co_return;
 }
 
 TokenRange DesignatedInitExpr::designators_source_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal41(), impl->reader.getVal42());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal38(), impl->reader.getVal39());
 }
 
 Token DesignatedInitExpr::equal_or_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Expr DesignatedInitExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DesignatedInitExpr::is_direct_initializer(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal89();
 }
 
 bool DesignatedInitExpr::uses_gnu_syntax(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal90();
 }
 
 unsigned DesignatedInitExpr::num_sub_expressions(void) const {
-  return impl->reader.getVal29().size();
+  return impl->reader.getVal26().size();
 }
 
 std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
-  auto list = impl->reader.getVal29();
+  auto list = impl->reader.getVal26();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -226,12 +226,12 @@ std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
 }
 
 gap::generator<Expr> DesignatedInitExpr::sub_expressions(void) const & {
-  auto list = impl->reader.getVal29();
+  auto list = impl->reader.getVal26();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d29 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from(Stmt(std::move(d29)))) {
+    if (auto d26 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from(Stmt(std::move(d26)))) {
         co_yield std::move(*e);
       }
     }

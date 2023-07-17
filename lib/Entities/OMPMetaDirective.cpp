@@ -154,7 +154,7 @@ std::optional<OMPMetaDirective> OMPMetaDirective::from(const TokenContext &t) {
 }
 
 Stmt OMPMetaDirective::if_statement(void) const {
-  RawEntityId eid = impl->reader.getVal17();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

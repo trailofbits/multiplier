@@ -20,6 +20,11 @@ class Attr;
 class Expr;
 class LoopHintAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LoopHintAttr : public Attr {
  private:

@@ -234,13 +234,6 @@ void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em,
                              bool is_new_fragment) {
   EntityLabeller labeller(em, pf, is_new_fragment);
 
-  for (uint64_t i = pf.begin_index; i <= pf.end_index; ++i) {
-    pasta::Token tok = tok_range[i];
-    if (IsParsedToken(tok)) {
-      (void) labeller.Label(tok);
-    }
-  }
-
   // Go top-down through the top-level declarations of this pending fragment
   // and build up an initial list of `decls_to_serialize` and
   // `stmts_to_serialize`. This list will be expanded to fixpoint by
@@ -252,26 +245,34 @@ void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em,
   // fragment, and stop when we go too far, whereas the automated approach might
   // just scoop everything reachable into a fragment, even if it doesn't really
   // belong there.
+  //
+  // NOTE(pag): We can do `labeller.Run` after all of the `Accept`s. This is
+  //            what we used to do. To mitigate / limit the issues caused by
+  //            #396 (https://github.com/trailofbits/multiplier/issues/396), we
+  //            do it each time, so that the decls that should go into child
+  //            fragments are at the end of the `pf.top_level_decls` list.
 
   assert(pf.decls_to_serialize.empty());
 
   for (const pasta::Decl &decl : pf.top_level_decls) {
     (void) labeller.Accept(decl);
+    labeller.Run();
   }
 
   for (const pasta::Macro &macro : pf.top_level_macros) {
     (void) labeller.Label(macro);
   }
 
-  labeller.Run();
-
-#ifndef NDEBUG
-  auto i = 0u;
-  assert(pf.top_level_decls.size() <= pf.decls_to_serialize.size());
-  for (const pasta::Decl &decl : pf.top_level_decls) {
-    assert(decl == pf.decls_to_serialize[i++]);
+  // Visit all of the tokens; it's possible we came across something that was
+  // missed by the above process.
+  for (uint64_t i = pf.begin_index; i <= pf.end_index; ++i) {
+    pasta::Token tok = tok_range[i];
+    if (IsParsedToken(tok)) {
+      (void) labeller.Label(tok);
+    }
   }
-#endif
+
+  labeller.Run();
 }
 
 }  // namespace indexer

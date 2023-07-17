@@ -154,21 +154,21 @@ std::optional<CoreturnStmt> CoreturnStmt::from(const TokenContext &t) {
 }
 
 Token CoreturnStmt::keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Expr CoreturnStmt::operand(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal10();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoreturnStmt::promise_call(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal11();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool CoreturnStmt::is_implicit(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

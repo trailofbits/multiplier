@@ -155,11 +155,11 @@ std::optional<CXXThisExpr> CXXThisExpr::from(const TokenContext &t) {
 }
 
 Token CXXThisExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CXXThisExpr::is_implicit(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

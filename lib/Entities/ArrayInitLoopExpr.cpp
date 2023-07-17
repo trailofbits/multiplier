@@ -156,12 +156,12 @@ std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const TokenContext &t) 
 }
 
 OpaqueValueExpr ArrayInitLoopExpr::common_expression(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal38();
   return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ArrayInitLoopExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

@@ -156,24 +156,24 @@ std::optional<TypeTraitExpr> TypeTraitExpr::from(const TokenContext &t) {
 }
 
 TypeTrait TypeTraitExpr::trait(void) const {
-  return static_cast<TypeTrait>(impl->reader.getVal97());
+  return static_cast<TypeTrait>(impl->reader.getVal94());
 }
 
 std::optional<bool> TypeTraitExpr::value(void) const {
-  if (!impl->reader.getVal93()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal92());
+    return static_cast<bool>(impl->reader.getVal89());
   }
   return std::nullopt;
 }
 
 unsigned TypeTraitExpr::num_arguments(void) const {
-  return impl->reader.getVal18().size();
+  return impl->reader.getVal15().size();
 }
 
 std::optional<Type> TypeTraitExpr::nth_argument(unsigned n) const {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -187,12 +187,12 @@ std::optional<Type> TypeTraitExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Type> TypeTraitExpr::arguments(void) const & {
-  auto list = impl->reader.getVal18();
+  auto list = impl->reader.getVal15();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d18 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d18));
+    if (auto d15 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d15));
     }
   }
   co_return;

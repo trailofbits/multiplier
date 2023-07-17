@@ -28,6 +28,11 @@ class Token;
 class TokenRange;
 class TypeDecl;
 class TypedefNameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TagDecl : public TypeDecl {
  private:

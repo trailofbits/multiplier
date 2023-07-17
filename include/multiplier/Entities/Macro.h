@@ -31,9 +31,13 @@ class Index;
 class Macro;
 class MacroImpl;
 class Reference;
-class SourceIR;
 class Token;
 class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
@@ -45,11 +49,13 @@ class Macro {
   friend class FragmentImpl;
   friend class Index;
   friend class Reference;
-  friend class SourceIR;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
   friend class MacroImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const MacroImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
   static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);

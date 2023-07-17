@@ -154,7 +154,7 @@ std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const TokenContex
 }
 
 Token OMPDispatchDirective::target_call_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 #pragma GCC diagnostic pop

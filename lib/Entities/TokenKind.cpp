@@ -38,8 +38,8 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::R_SQUARE: return "R_SQUARE";
     case TokenKind::L_PARENTHESIS: return "L_PARENTHESIS";
     case TokenKind::R_PARENTHESIS: return "R_PARENTHESIS";
-    case TokenKind::L_BRACE_TOKEN: return "L_BRACE_TOKEN";
-    case TokenKind::R_BRACE_TOKEN: return "R_BRACE_TOKEN";
+    case TokenKind::L_BRACE: return "L_BRACE";
+    case TokenKind::R_BRACE: return "R_BRACE";
     case TokenKind::PERIOD: return "PERIOD";
     case TokenKind::ELLIPSIS: return "ELLIPSIS";
     case TokenKind::AMP: return "AMP";

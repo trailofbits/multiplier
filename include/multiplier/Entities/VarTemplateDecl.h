@@ -20,6 +20,11 @@ class Stmt;
 class TemplateDecl;
 class Token;
 class VarTemplateDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarTemplateDecl : public RedeclarableTemplateDecl {
  private:

@@ -6,8 +6,6 @@
 
 #include "Codegen.h"
 
-#ifdef MX_ENABLE_SOURCEIR
-
 #include <vast/Util/Warnings.hpp>
 
 VAST_RELAX_WARNINGS
@@ -23,6 +21,9 @@ VAST_UNRELAX_WARNINGS
 
 #include <glog/logging.h>
 
+#include <pasta/AST/AST.h>
+#include <pasta/AST/Decl.h>
+
 #include <vast/Util/Common.hpp>
 #include <vast/Translation/CodeGenContext.hpp>
 #include <vast/Translation/CodeGenVisitor.hpp>
@@ -31,17 +32,12 @@ VAST_UNRELAX_WARNINGS
 
 #include "CodegenMetaGenerator.h"
 #include "CodegenVisitor.h"
-
-#endif  // MX_ENABLE_SOURCEIR
-
-#include <pasta/AST/Decl.h>
-
 #include "Context.h"
 #include "EntityMapper.h"
+#include "PendingFragment.h"
+#include "Util.h"
 
 namespace indexer {
-
-#ifdef MX_ENABLE_SOURCEIR
 
 template<typename Derived>
 using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
@@ -49,13 +45,10 @@ using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
 
 using CodeGenVisitor = vast::cg::CodeGenVisitor<VisitorConfig, MetaGenerator>;
 
-#endif
-
 class CodeGeneratorImpl {
  public:
   bool disabled{false};
 
-#ifdef MX_ENABLE_SOURCEIR
   mlir::DialectRegistry registry;
 
   CodeGeneratorImpl(void) {
@@ -63,7 +56,6 @@ class CodeGeneratorImpl {
                     vast::meta::MetaDialect,
                     vast::core::CoreDialect>();
   }
-#endif  // MX_ENABLE_SOURCEIR
 };
 
 CodeGenerator::CodeGenerator(void)
@@ -76,21 +68,10 @@ void CodeGenerator::Disable(void) {
 CodeGenerator::~CodeGenerator(void) {}
 
 std::string CodeGenerator::GenerateSourceIRFromTLDs(
-    const pasta::AST &ast,
-    mx::RawEntityId fragment_id,
-    const EntityMapper &em,
-    const std::vector<pasta::Decl> &decls,
-    unsigned num_decls) {
-
-  (void) ast;
-  (void) fragment_id;
-  (void) em;
-  (void) decls;
-  (void) num_decls;
+    const pasta::AST &ast, const EntityMapper &em, const PendingFragment &pf) {
 
   std::string ret;
-#ifdef MX_ENABLE_SOURCEIR
-  if (impl->disabled || decls.empty()) {
+  if (impl->disabled || pf.decls_to_serialize.empty()) {
     return ret;
   }
 
@@ -108,7 +89,7 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   vast::cg::CodeGenBase<CodeGenVisitor> codegen(&context, meta);
 
   try {
-    for (const pasta::Decl &decl : decls) {
+    for (const pasta::Decl &decl : pf.top_level_decls) {
       codegen.append_to_module(const_cast<clang::Decl *>(decl.RawDecl()));
     }
   } catch (std::exception &e) {
@@ -119,7 +100,6 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   auto mod = codegen.freeze();
   llvm::raw_string_ostream os(ret);
   mod->print(os, flags);
-#endif
 
   return ret;
 }

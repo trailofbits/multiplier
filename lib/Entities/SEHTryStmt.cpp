@@ -156,31 +156,31 @@ std::optional<SEHTryStmt> SEHTryStmt::from(const TokenContext &t) {
 }
 
 SEHExceptStmt SEHTryStmt::except_handler(void) const {
-  RawEntityId eid = impl->reader.getVal12();
+  RawEntityId eid = impl->reader.getVal9();
   return SEHExceptStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 SEHFinallyStmt SEHTryStmt::finally_handler(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal10();
   return SEHFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt SEHTryStmt::handler(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal11();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool SEHTryStmt::is_cxx_try(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal12();
 }
 
 CompoundStmt SEHTryStmt::try_block(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal13();
   return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token SEHTryStmt::try_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 #pragma GCC diagnostic pop

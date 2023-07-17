@@ -155,26 +155,26 @@ std::optional<LabelStmt> LabelStmt::from(const TokenContext &t) {
 }
 
 LabelDecl LabelStmt::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal10();
   return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token LabelStmt::identifier_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 std::string_view LabelStmt::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal63();
+  capnp::Text::Reader data = impl->reader.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 
 Stmt LabelStmt::sub_statement(void) const {
-  RawEntityId eid = impl->reader.getVal16();
+  RawEntityId eid = impl->reader.getVal13();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool LabelStmt::is_side_entry(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

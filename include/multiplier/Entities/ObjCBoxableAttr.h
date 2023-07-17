@@ -16,6 +16,11 @@ class Index;
 class Attr;
 class ObjCBoxableAttr;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCBoxableAttr : public Attr {
  private:
