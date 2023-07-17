@@ -64,7 +64,7 @@ RUN git clone --depth 1 https://github.com/trailofbits/weggli-native /work/src/w
     && cmake --build '/work/build/weggli-native' --target install
 
 # Build and install VAST
-RUN git clone --depth 1 https://github.com/trailofbits/vast /work/src/vast \
+RUN git clone --depth 1 https://github.com/trailofbits/vast --branch vspell-future /work/src/vast \
     && cmake \
         -S '/work/src/vast' \
         -B '/work/build/vast' \
