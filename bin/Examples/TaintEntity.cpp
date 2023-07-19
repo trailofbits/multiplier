@@ -344,6 +344,9 @@ static bool Ignore(const mx::CallExpr &, const mx::FunctionDecl &,
 }
 
 static const LibraryModel kLibraryModels[] = {
+    {"__builtin_expect", 0, Ignore},
+    {"__builtin_expect", 1, Ignore},
+
     {"memcpy", 0u, TaintLibraryReturnValue},
     {"memcpy", 0u, AlarmOnLibraryArgument},
     {"memcpy", 1u, AlarmOnLibraryArgument},
@@ -504,7 +507,7 @@ static void TaintTrackReturn(const mx::Stmt &ret, const UsePath &prev,
 // If `taint_source` is a tainted expression, then try to propagate the
 // taints to where the expression is used.
 void TaintTrackExpr(const mx::Expr &taint_source,
-                           const UsePath &prev, SeenEntityMap &seen) {
+                    const UsePath &prev, SeenEntityMap &seen) {
   const UsePath entry{&prev, taint_source.id().Pack()};
   if (AlreadySeen(entry, seen)) {
     return;

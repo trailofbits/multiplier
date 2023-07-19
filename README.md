@@ -36,7 +36,7 @@ subdirectories, `scripts` and `installed`. Rename the extracted directory to
 `vcpkg-install` and set `VCPKG_ROOT` to be the path to the `vcpkg-install` directory.
 
 ```shell
-RELEASE_VERSION=v0.3.2
+RELEASE_VERSION=v0.4.2
 LLVM_VERSION=16
 RELEASE_NAME=vcpkg_macos-12_llvm-${LLVM_VERSION}-pasta_xcode-14.2_amd64
 VCPKG_ROOT="${WORKSPACE_DIR}/vcpkg-install"
