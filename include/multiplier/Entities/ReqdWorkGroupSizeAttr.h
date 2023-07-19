@@ -29,12 +29,12 @@ class ReqdWorkGroupSizeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ReqdWorkGroupSizeAttr> in(const Fragment &frag);
-  static gap::generator<ReqdWorkGroupSizeAttr> in(const File &file);
   static gap::generator<ReqdWorkGroupSizeAttr> in(const Index &index);
   static gap::generator<ReqdWorkGroupSizeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ReqdWorkGroupSizeAttr> by_id(const Index &, EntityId);
+  static gap::generator<ReqdWorkGroupSizeAttr> in(const Fragment &frag);
+  static gap::generator<ReqdWorkGroupSizeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REQD_WORK_GROUP_SIZE;

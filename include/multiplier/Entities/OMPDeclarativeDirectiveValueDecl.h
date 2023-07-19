@@ -33,12 +33,12 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const Fragment &frag);
-  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const File &file);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const Index &index);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclarativeDirectiveValueDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclarativeDirectiveValueDecl> in(const File &file);
 
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclarativeDirectiveValueDecl> containing(const std::optional<Decl> &decl);

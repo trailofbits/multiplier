@@ -32,12 +32,12 @@ class ImplicitValueInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ImplicitValueInitExpr> in(const Fragment &frag);
-  static gap::generator<ImplicitValueInitExpr> in(const File &file);
   static gap::generator<ImplicitValueInitExpr> in(const Index &index);
   static gap::generator<ImplicitValueInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ImplicitValueInitExpr> by_id(const Index &, EntityId);
+  static gap::generator<ImplicitValueInitExpr> in(const Fragment &frag);
+  static gap::generator<ImplicitValueInitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IMPLICIT_VALUE_INIT_EXPR;

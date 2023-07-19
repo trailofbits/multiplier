@@ -29,12 +29,12 @@ class CommonAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CommonAttr> in(const Fragment &frag);
-  static gap::generator<CommonAttr> in(const File &file);
   static gap::generator<CommonAttr> in(const Index &index);
   static gap::generator<CommonAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CommonAttr> by_id(const Index &, EntityId);
+  static gap::generator<CommonAttr> in(const Fragment &frag);
+  static gap::generator<CommonAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::COMMON;

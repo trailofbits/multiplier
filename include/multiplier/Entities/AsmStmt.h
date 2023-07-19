@@ -31,12 +31,12 @@ class AsmStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<AsmStmt> in(const Fragment &frag);
-  static gap::generator<AsmStmt> in(const File &file);
   static gap::generator<AsmStmt> in(const Index &index);
   static gap::generator<AsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AsmStmt> by_id(const Index &, EntityId);
+  static gap::generator<AsmStmt> in(const Fragment &frag);
+  static gap::generator<AsmStmt> in(const File &file);
 
   static gap::generator<AsmStmt> containing(const Decl &decl);
   static gap::generator<AsmStmt> containing(const std::optional<Decl> &decl);

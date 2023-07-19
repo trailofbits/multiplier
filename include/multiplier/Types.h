@@ -31,19 +31,20 @@ enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
 #define MX_IGNORE_ENTITY_CATEGORY(type_name, lower_name, enum_name, category)
-#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, type_, frag_, frag_offset_, pseudo_) \
-    frag_offset_(Decl, declaration, DECLARATION, 1) \
-    frag_offset_(Stmt, statement, STATEMENT, 2) \
-    type_(Type, type, TYPE, 3) \
+#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, type_, frag_, frag_offset_, pseudo_, tu_) \
+    frag_(Fragment, fragment, FRAGMENT, 1) \
+    frag_offset_(Decl, declaration, DECLARATION, 2) \
+    frag_offset_(Stmt, statement, STATEMENT, 3) \
     frag_offset_(Attr, attribute, ATTRIBUTE, 4) \
     frag_offset_(Macro, macro, MACRO, 5) \
-    frag_(Fragment, fragment, FRAGMENT, 6) \
+    type_(Type, type, TYPE, 6) \
     file_(File, file, FILE, 7) \
     token_(Token, token, TOKEN, 8) \
     pseudo_(TemplateArgument, template_argument, TEMPLATE_ARGUMENT, 9) \
     pseudo_(TemplateParameterList, template_parameter_list, TEMPLATE_PARAMETER_LIST, 10) \
     pseudo_(CXXBaseSpecifier, cxx_base_specifier, CXX_BASE_SPECIFIER, 11) \
-    pseudo_(Designator, designator, DESIGNATOR, 12)
+    pseudo_(Designator, designator, DESIGNATOR, 12) \
+    tu_(Compilation, compilation, COMPILATION, 13)
 
 #define MX_DECLARE_ENTITY_CLASS(type, lower, enum_, val) \
     class type;\
@@ -51,6 +52,7 @@ enum class TypeKind : unsigned char;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CLASS,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
@@ -67,6 +69,7 @@ enum class EntityCategory {
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
+                              MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM)
 #undef MX_DECLARE_ENTITY_CATEGORY_ENUM
 };
@@ -74,31 +77,6 @@ enum class EntityCategory {
 using RawEntityId = uint64_t;
 
 static constexpr RawEntityId kInvalidEntityId = 0ull;
-static constexpr RawEntityId kMinEntityIdIncrement = 1ull;
-
-// If we have more than 2^16 tokens in a given code chunk, then we consider
-// this a "big code" chunk. We assume that we'll have few of these, i.e. less
-// than 2^16 of them.
-static constexpr unsigned kBigFragmentIdNumBits = 16u;
-static constexpr RawEntityId kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
-static constexpr uint64_t kNumTokensInBigFragment =
-    1ull << kBigFragmentIdNumBits;
-
-static constexpr unsigned kFileIdNumBits = 20u;
-static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;
-
-static constexpr unsigned kBigTypeIdNumBits = 26u;
-static constexpr RawEntityId kMaxBigTypeId = 1ull << kBigTypeIdNumBits;
-
-static constexpr unsigned kBigTypeOffsetNumBits = 18u;
-static constexpr RawEntityId kNumTokensInBigType = 1ull << kBigTypeOffsetNumBits;
-
-static constexpr unsigned kTypeIdNumBits = 36u;
-static constexpr RawEntityId kMaxTypeId = 1ull << kTypeIdNumBits;
-
-static constexpr unsigned kTypeOffsetNumBits = 8u;
-static constexpr RawEntityId kNumMinTokensInBigType = 1ull << kTypeOffsetNumBits;
-
 
 class EntityId;
 
@@ -116,6 +94,7 @@ struct TemplateArgumentId;
 struct TemplateParameterListId;
 struct CXXBaseSpecifierId;
 struct DesignatorId;
+struct CompilationId;
 
 using EntityOffset = uint32_t;
 using SignedEntityOffset = int32_t;
@@ -123,6 +102,7 @@ using SignedEntityOffset = int32_t;
 inline static constexpr unsigned NumEnumerators(EntityCategory) {
 #define MX_COUNT_ENTITY_CATEGORIES(...) + 1u
   return 1 MX_FOR_EACH_ENTITY_CATEGORY(MX_COUNT_ENTITY_CATEGORIES,
+                                       MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
@@ -138,20 +118,22 @@ inline static constexpr const char *EnumerationName(EntityCategory) {
 const char *EnumeratorName(EntityCategory) noexcept;
 
 // Identifies a serialized file.
-struct FileId {
+struct FileId final {
   RawEntityId file_id;
   
+  bool operator==(const FileId &) const noexcept = default;
   auto operator<=>(const FileId &) const noexcept = default;
 
   inline explicit FileId(RawEntityId file_id_)
       : file_id(file_id_) {}
 
   inline /* implicit */ FileId(const FileTokenId &);
+  inline /* implicit */ FileId(const CompilationId &);
 };
 
 // Identifies a serialized version of a `clang::Decl` or `pasta::Decl`
 // inside of a `Fragment`.
-struct DeclId {
+struct DeclId final {
   RawEntityId fragment_id;
   DeclKind kind;
 
@@ -162,12 +144,13 @@ struct DeclId {
   // Is this declaration a definition?
   bool is_definition;
 
+  bool operator==(const DeclId &) const noexcept = default;
   auto operator<=>(const DeclId &) const noexcept = default;
 };
 
 // Identifies a serialized version of a `clang::Stmt` or `pasta::Stmt`
 // inside of a `Fragment`.
-struct StmtId {
+struct StmtId final {
   RawEntityId fragment_id;
   StmtKind kind;
 
@@ -175,14 +158,16 @@ struct StmtId {
   // `rpc::Fragment::statements`.
   EntityOffset offset;
 
+  bool operator==(const StmtId &) const noexcept = default;
   auto operator<=>(const StmtId &) const noexcept = default;
 };
 
 // Identifies a serialized type
-struct TypeId {
+struct TypeId final {
   RawEntityId type_id;
   TypeKind kind;
 
+  bool operator==(const TypeId &) const noexcept = default;
   auto operator<=>(const TypeId &) const noexcept = default;
 
   inline /* implicit */ TypeId(RawEntityId type_id_, TypeKind kind_)
@@ -193,7 +178,7 @@ struct TypeId {
 
 // Identifies a serialized tokens of a `clang::Type`, `clang::QualType`, or
 // `pasta::Type`
-struct TypeTokenId {
+struct TypeTokenId final {
   RawEntityId type_id;
 
   // Type kind
@@ -205,12 +190,13 @@ struct TypeTokenId {
   // Offset of where this token is stored inside of
   EntityOffset offset;
 
+  bool operator==(const TypeTokenId &) const noexcept = default;
   auto operator<=>(const TypeTokenId &) const noexcept = default;
 };
 
 // Identifies a serialized version of a `clang::Attr` or `pasta::Attr` inside
 // of a `Fragment`.
-struct AttrId {
+struct AttrId final {
   RawEntityId fragment_id;
   AttrKind kind;
 
@@ -218,11 +204,12 @@ struct AttrId {
   // `rpc::Fragment::attrs`.
   EntityOffset offset;
 
+  bool operator==(const AttrId &) const noexcept = default;
   auto operator<=>(const AttrId &) const noexcept = default;
 };
 
 // Identifies a parsed token inside of a `Fragment`.
-struct ParsedTokenId {
+struct ParsedTokenId final {
   RawEntityId fragment_id;
   TokenKind kind;
 
@@ -230,11 +217,12 @@ struct ParsedTokenId {
   // `rpc::Fragment::tokenKinds` (and other token related lists).
   EntityOffset offset;
 
+  bool operator==(const ParsedTokenId &) const noexcept = default;
   auto operator<=>(const ParsedTokenId &) const noexcept = default;
 };
 
 // Identifies a token inside of a `File`.
-struct FileTokenId {
+struct FileTokenId final {
   RawEntityId file_id;
 
   TokenKind kind;
@@ -243,12 +231,13 @@ struct FileTokenId {
   // `rpc::File::tokens` list.
   EntityOffset offset;
 
+  bool operator==(const FileTokenId &) const noexcept = default;
   auto operator<=>(const FileTokenId &) const noexcept = default;
 };
 
 // Identifies a token inside of a `Fragment` that corresponds to a macro
 // use or macro expansion.
-struct MacroTokenId {
+struct MacroTokenId final {
   RawEntityId fragment_id;
   TokenKind kind;
 
@@ -256,11 +245,12 @@ struct MacroTokenId {
   // `rpc::File::tokens` list.
   EntityOffset offset;
 
+  bool operator==(const MacroTokenId &) const noexcept = default;
   auto operator<=>(const MacroTokenId &) const noexcept = default;
 };
 
 // The offset of a substitution inside of a fragment.
-struct MacroId {
+struct MacroId final {
  public:
   RawEntityId fragment_id;
 
@@ -270,10 +260,12 @@ struct MacroId {
   // serialized `rpc::Fragment::tokenSubstitutions`.
   EntityOffset offset;
 
+  bool operator==(const MacroId &) const noexcept = default;
   auto operator<=>(const MacroId &) const noexcept = default;
 };
 
-struct TemplateArgumentId {
+// A template argument is
+struct TemplateArgumentId final {
  public:
   RawEntityId fragment_id;
 
@@ -282,22 +274,30 @@ struct TemplateArgumentId {
 
   static constexpr PseudoKind kind = PseudoKind::TEMPLATE_ARGUMENT;
 
+  bool operator==(const TemplateArgumentId &) const noexcept = default;
   auto operator<=>(const TemplateArgumentId &) const noexcept = default;
 };
 
-struct TemplateParameterListId {
+// A template parameter list is used by a template declaration to describe
+// the list of template parameter declarations.
+struct TemplateParameterListId final {
  public:
   RawEntityId fragment_id;
 
   // Offset of the parameter list inside of the fragment.
   EntityOffset offset;
 
+  // TODO(pag): Have a Boolean to allow representing argument lists as well?
+
   static constexpr PseudoKind kind = PseudoKind::TEMPLATE_PARAMETER_LIST;
 
+  bool operator==(const TemplateParameterListId &) const noexcept = default;
   auto operator<=>(const TemplateParameterListId &) const noexcept = default;
 };
 
-struct CXXBaseSpecifierId {
+// A base specifier is used by a `CXXRecordDecl` (or derived class) to
+// specify base classes.
+struct CXXBaseSpecifierId final {
  public:
   RawEntityId fragment_id;
 
@@ -306,10 +306,12 @@ struct CXXBaseSpecifierId {
 
   static constexpr PseudoKind kind = PseudoKind::CXX_BASE_SPECIFIER;
 
+  bool operator==(const CXXBaseSpecifierId &) const noexcept = default;
   auto operator<=>(const CXXBaseSpecifierId &) const noexcept = default;
 };
 
-struct DesignatorId {
+// A designator is used by a designated initializer expression.
+struct DesignatorId final {
  public:
   RawEntityId fragment_id;
 
@@ -318,13 +320,28 @@ struct DesignatorId {
 
   static constexpr PseudoKind kind = PseudoKind::DESIGNATOR;
 
+  bool operator==(const DesignatorId &) const noexcept = default;
   auto operator<=>(const DesignatorId &) const noexcept = default;
 };
 
+// Translation units represent a compilation. From a translation unit we can
+// get the compile command, the MLIR, etc.
+struct CompilationId {
+  // The ID of the compilation/translation unit.
+  RawEntityId compilation_id;
+
+  // The ID (FileId::file_id) of the main source file of the compilation.
+  RawEntityId file_id;
+
+  bool operator==(const CompilationId &) const noexcept = default;
+  auto operator<=>(const CompilationId &) const noexcept = default;
+};
+
 // Identifies a serialized fragment.
-struct FragmentId {
+struct FragmentId final {
   RawEntityId fragment_id;
 
+  bool operator==(const FragmentId &) const noexcept = default;
   auto operator<=>(const FragmentId &) const noexcept = default;
 
   inline explicit FragmentId(RawEntityId fragment_id_)
@@ -357,6 +374,9 @@ struct FragmentId {
 inline FileId::FileId(const FileTokenId &id_)
     : file_id(id_.file_id) {}
 
+inline FileId::FileId(const CompilationId &id_)
+    : file_id(id_.file_id) {}
+
 inline TypeId::TypeId(const TypeTokenId &id_)
     : type_id(id_.type_id), kind(id_.type_kind) {}
 
@@ -373,6 +393,7 @@ using VariantId = std::variant<
     InvalidId,
     MX_FOR_EACH_ENTITY_CATEGORY(MX_ENTITY_ID_VARIANT,
                                 MX_IGNORE_ENTITY_CATEGORY,
+                                MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
@@ -412,6 +433,7 @@ class EntityId final {
   /* implicit */ EntityId(TemplateParameterListId id);
   /* implicit */ EntityId(CXXBaseSpecifierId id);
   /* implicit */ EntityId(DesignatorId id);
+  /* implicit */ EntityId(CompilationId id);
 
   template <typename T>
   /* implicit */ inline EntityId(SpecificEntityId<T>);
@@ -570,6 +592,7 @@ struct EntityTypeImpl;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_MAP_ENTITY_TYPE,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,

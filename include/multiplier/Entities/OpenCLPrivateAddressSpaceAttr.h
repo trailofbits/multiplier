@@ -30,12 +30,12 @@ class OpenCLPrivateAddressSpaceAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<OpenCLPrivateAddressSpaceAttr> in(const Fragment &frag);
-  static gap::generator<OpenCLPrivateAddressSpaceAttr> in(const File &file);
   static gap::generator<OpenCLPrivateAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLPrivateAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OpenCLPrivateAddressSpaceAttr> by_id(const Index &, EntityId);
+  static gap::generator<OpenCLPrivateAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLPrivateAddressSpaceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_PRIVATE_ADDRESS_SPACE;

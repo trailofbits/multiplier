@@ -66,6 +66,7 @@ class Reference {
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND)
 #undef MX_FRIEND
 
@@ -131,6 +132,7 @@ class Reference {
     std::optional<type_name> as_ ## lower_name (void) const noexcept;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_REF_GETTER,
+                              MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,

@@ -33,12 +33,12 @@ class AddrLabelExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<AddrLabelExpr> in(const Fragment &frag);
-  static gap::generator<AddrLabelExpr> in(const File &file);
   static gap::generator<AddrLabelExpr> in(const Index &index);
   static gap::generator<AddrLabelExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AddrLabelExpr> by_id(const Index &, EntityId);
+  static gap::generator<AddrLabelExpr> in(const Fragment &frag);
+  static gap::generator<AddrLabelExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ADDR_LABEL_EXPR;

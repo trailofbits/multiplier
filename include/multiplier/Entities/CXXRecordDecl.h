@@ -52,12 +52,12 @@ class CXXRecordDecl : public RecordDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<CXXRecordDecl> in(const Fragment &frag);
-  static gap::generator<CXXRecordDecl> in(const File &file);
   static gap::generator<CXXRecordDecl> in(const Index &index);
   static gap::generator<CXXRecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXRecordDecl> by_id(const Index &, EntityId);
+  static gap::generator<CXXRecordDecl> in(const Fragment &frag);
+  static gap::generator<CXXRecordDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_RECORD;

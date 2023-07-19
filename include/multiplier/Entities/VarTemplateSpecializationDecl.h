@@ -41,12 +41,12 @@ class VarTemplateSpecializationDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<VarTemplateSpecializationDecl> in(const Fragment &frag);
-  static gap::generator<VarTemplateSpecializationDecl> in(const File &file);
   static gap::generator<VarTemplateSpecializationDecl> in(const Index &index);
   static gap::generator<VarTemplateSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<VarTemplateSpecializationDecl> by_id(const Index &, EntityId);
+  static gap::generator<VarTemplateSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<VarTemplateSpecializationDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE_SPECIALIZATION;

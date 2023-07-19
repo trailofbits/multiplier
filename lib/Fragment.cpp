@@ -13,13 +13,11 @@
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Type.h>
-#include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
 
 #include "Attr.h"
 #include "Pseudo.h"
 #include "Decl.h"
 #include "File.h"
-#include "IR/SourceIR.h"
 #include "Macro.h"
 #include "Reference.h"
 #include "Re2Impl.h"
@@ -95,9 +93,16 @@ std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
       } else if (std::holds_alternative<type_name>(entity)) { \
         return Fragment::containing(std::get<type_name>(entity));
 
+  // TODO(pag): Pseudo entities have a fragment id.
+
   if (false) {
-    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY, GET_FRAGMENT,
-                                GET_FRAGMENT, GET_FRAGMENT, GET_FRAGMENT, GET_FRAGMENT)
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FRAGMENT,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FRAGMENT,
+                                GET_FRAGMENT,
+                                GET_FRAGMENT,
+                                MX_IGNORE_ENTITY_CATEGORY)
   } else {
     return std::nullopt;
   }
@@ -263,18 +268,6 @@ gap::generator<RegexQueryMatch> Fragment::query(
   for (auto match : res.Enumerate()) {
     co_yield match;
   }
-}
-
-std::optional<ir::builtin::ModuleOp> Fragment::ir(void) const noexcept {
-  if (auto mlir = impl->SourceIR(); !mlir.empty()) {
-    auto ir_obj = std::make_shared<const ir::SourceIRImpl>(
-        id(), impl->ep, mlir);
-    if (mlir::Operation *ptr = ir_obj->scope()) {
-      ir::Operation op(std::move(ir_obj), ptr);
-      return ir::builtin::ModuleOp::from(op);
-    }
-  }
-  return std::nullopt;
 }
 
 }  // namespace mx

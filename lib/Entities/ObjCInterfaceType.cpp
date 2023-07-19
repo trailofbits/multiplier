@@ -71,32 +71,6 @@ gap::generator<ObjCInterfaceType> ObjCInterfaceType::in(const Index &index) {
   }
 }
 
-gap::generator<ObjCInterfaceType> ObjCInterfaceType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kObjCInterfaceTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<ObjCInterfaceType> e = ObjCInterfaceType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ObjCInterfaceType> ObjCInterfaceType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kObjCInterfaceTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<ObjCInterfaceType> e = ObjCInterfaceType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const Reference &r) {
   return ObjCInterfaceType::from(r.as_type());
 }

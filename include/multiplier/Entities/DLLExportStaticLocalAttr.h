@@ -29,12 +29,12 @@ class DLLExportStaticLocalAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<DLLExportStaticLocalAttr> in(const Fragment &frag);
-  static gap::generator<DLLExportStaticLocalAttr> in(const File &file);
   static gap::generator<DLLExportStaticLocalAttr> in(const Index &index);
   static gap::generator<DLLExportStaticLocalAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DLLExportStaticLocalAttr> by_id(const Index &, EntityId);
+  static gap::generator<DLLExportStaticLocalAttr> in(const Fragment &frag);
+  static gap::generator<DLLExportStaticLocalAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DLL_EXPORT_STATIC_LOCAL;

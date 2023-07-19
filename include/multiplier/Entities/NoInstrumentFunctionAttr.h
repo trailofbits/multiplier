@@ -29,12 +29,12 @@ class NoInstrumentFunctionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NoInstrumentFunctionAttr> in(const Fragment &frag);
-  static gap::generator<NoInstrumentFunctionAttr> in(const File &file);
   static gap::generator<NoInstrumentFunctionAttr> in(const Index &index);
   static gap::generator<NoInstrumentFunctionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoInstrumentFunctionAttr> by_id(const Index &, EntityId);
+  static gap::generator<NoInstrumentFunctionAttr> in(const Fragment &frag);
+  static gap::generator<NoInstrumentFunctionAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_INSTRUMENT_FUNCTION;

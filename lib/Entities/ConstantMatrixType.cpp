@@ -70,32 +70,6 @@ gap::generator<ConstantMatrixType> ConstantMatrixType::in(const Index &index) {
   }
 }
 
-gap::generator<ConstantMatrixType> ConstantMatrixType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kConstantMatrixTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<ConstantMatrixType> e = ConstantMatrixType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ConstantMatrixType> ConstantMatrixType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kConstantMatrixTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<ConstantMatrixType> e = ConstantMatrixType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<ConstantMatrixType> ConstantMatrixType::from(const Reference &r) {
   return ConstantMatrixType::from(r.as_type());
 }

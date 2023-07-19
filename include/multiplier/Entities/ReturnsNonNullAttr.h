@@ -29,12 +29,12 @@ class ReturnsNonNullAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ReturnsNonNullAttr> in(const Fragment &frag);
-  static gap::generator<ReturnsNonNullAttr> in(const File &file);
   static gap::generator<ReturnsNonNullAttr> in(const Index &index);
   static gap::generator<ReturnsNonNullAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ReturnsNonNullAttr> by_id(const Index &, EntityId);
+  static gap::generator<ReturnsNonNullAttr> in(const Fragment &frag);
+  static gap::generator<ReturnsNonNullAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RETURNS_NON_NULL;

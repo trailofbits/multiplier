@@ -30,12 +30,12 @@ class NamespaceAliasDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<NamespaceAliasDecl> in(const Fragment &frag);
-  static gap::generator<NamespaceAliasDecl> in(const File &file);
   static gap::generator<NamespaceAliasDecl> in(const Index &index);
   static gap::generator<NamespaceAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NamespaceAliasDecl> by_id(const Index &, EntityId);
+  static gap::generator<NamespaceAliasDecl> in(const Fragment &frag);
+  static gap::generator<NamespaceAliasDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMESPACE_ALIAS;

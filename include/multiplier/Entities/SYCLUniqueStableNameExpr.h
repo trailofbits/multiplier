@@ -32,12 +32,12 @@ class SYCLUniqueStableNameExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<SYCLUniqueStableNameExpr> in(const Fragment &frag);
-  static gap::generator<SYCLUniqueStableNameExpr> in(const File &file);
   static gap::generator<SYCLUniqueStableNameExpr> in(const Index &index);
   static gap::generator<SYCLUniqueStableNameExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SYCLUniqueStableNameExpr> by_id(const Index &, EntityId);
+  static gap::generator<SYCLUniqueStableNameExpr> in(const Fragment &frag);
+  static gap::generator<SYCLUniqueStableNameExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;

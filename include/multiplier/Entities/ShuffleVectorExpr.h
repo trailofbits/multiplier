@@ -32,12 +32,12 @@ class ShuffleVectorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ShuffleVectorExpr> in(const Fragment &frag);
-  static gap::generator<ShuffleVectorExpr> in(const File &file);
   static gap::generator<ShuffleVectorExpr> in(const Index &index);
   static gap::generator<ShuffleVectorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ShuffleVectorExpr> by_id(const Index &, EntityId);
+  static gap::generator<ShuffleVectorExpr> in(const Fragment &frag);
+  static gap::generator<ShuffleVectorExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SHUFFLE_VECTOR_EXPR;

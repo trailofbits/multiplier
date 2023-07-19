@@ -29,12 +29,12 @@ class SYCLSpecialClassAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<SYCLSpecialClassAttr> in(const Fragment &frag);
-  static gap::generator<SYCLSpecialClassAttr> in(const File &file);
   static gap::generator<SYCLSpecialClassAttr> in(const Index &index);
   static gap::generator<SYCLSpecialClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SYCLSpecialClassAttr> by_id(const Index &, EntityId);
+  static gap::generator<SYCLSpecialClassAttr> in(const Fragment &frag);
+  static gap::generator<SYCLSpecialClassAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SYCL_SPECIAL_CLASS;

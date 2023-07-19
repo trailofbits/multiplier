@@ -34,12 +34,12 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTeamsDistributeDirective> in(const Fragment &frag);
-  static gap::generator<OMPTeamsDistributeDirective> in(const File &file);
   static gap::generator<OMPTeamsDistributeDirective> in(const Index &index);
   static gap::generator<OMPTeamsDistributeDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTeamsDistributeDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTeamsDistributeDirective> in(const Fragment &frag);
+  static gap::generator<OMPTeamsDistributeDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_DIRECTIVE;

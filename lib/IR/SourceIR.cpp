@@ -146,9 +146,9 @@ OperationKind Operation::classify(std::string_view name_) {
   }
 }
 
-SourceIRImpl::SourceIRImpl(PackedFragmentId frag_id_, EntityProviderPtr ep_,
-                           std::string_view mlir)
-    : frag_id(frag_id_),
+SourceIRImpl::SourceIRImpl(PackedCompilationId compilation_id_,
+                           EntityProviderPtr ep_, std::string_view mlir)
+    : compilation_id(compilation_id_),
       ep(std::move(ep_)) {
 
   llvm::SourceMgr sm;

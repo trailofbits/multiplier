@@ -29,12 +29,12 @@ class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const Fragment &frag);
-  static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const File &file);
   static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const Index &index);
   static gap::generator<ObjCInertUnsafeUnretainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCInertUnsafeUnretainedAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const Fragment &frag);
+  static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_INERT_UNSAFE_UNRETAINED;

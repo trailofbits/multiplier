@@ -30,12 +30,12 @@ class StaticAssertDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<StaticAssertDecl> in(const Fragment &frag);
-  static gap::generator<StaticAssertDecl> in(const File &file);
   static gap::generator<StaticAssertDecl> in(const Index &index);
   static gap::generator<StaticAssertDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<StaticAssertDecl> by_id(const Index &, EntityId);
+  static gap::generator<StaticAssertDecl> in(const Fragment &frag);
+  static gap::generator<StaticAssertDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::STATIC_ASSERT;

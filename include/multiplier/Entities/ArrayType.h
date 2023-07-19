@@ -32,8 +32,6 @@ class ArrayType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ArrayType> in(const Fragment &frag);
-  static gap::generator<ArrayType> in(const File &file);
   static gap::generator<ArrayType> in(const Index &index);
   static gap::generator<ArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

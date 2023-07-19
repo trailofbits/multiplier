@@ -28,8 +28,6 @@ class BuiltinType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<BuiltinType> in(const Fragment &frag);
-  static gap::generator<BuiltinType> in(const File &file);
   static gap::generator<BuiltinType> in(const Index &index);
   static gap::generator<BuiltinType> containing(const Token &tok);
   bool contains(const Token &tok) const;

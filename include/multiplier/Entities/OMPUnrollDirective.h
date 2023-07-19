@@ -34,12 +34,12 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPUnrollDirective> in(const Fragment &frag);
-  static gap::generator<OMPUnrollDirective> in(const File &file);
   static gap::generator<OMPUnrollDirective> in(const Index &index);
   static gap::generator<OMPUnrollDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPUnrollDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPUnrollDirective> in(const Fragment &frag);
+  static gap::generator<OMPUnrollDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_UNROLL_DIRECTIVE;

@@ -33,12 +33,12 @@ class StringLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<StringLiteral> in(const Fragment &frag);
-  static gap::generator<StringLiteral> in(const File &file);
   static gap::generator<StringLiteral> in(const Index &index);
   static gap::generator<StringLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<StringLiteral> by_id(const Index &, EntityId);
+  static gap::generator<StringLiteral> in(const Fragment &frag);
+  static gap::generator<StringLiteral> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::STRING_LITERAL;

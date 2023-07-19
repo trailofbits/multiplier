@@ -29,12 +29,12 @@ class ObjCPreciseLifetimeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ObjCPreciseLifetimeAttr> in(const Fragment &frag);
-  static gap::generator<ObjCPreciseLifetimeAttr> in(const File &file);
   static gap::generator<ObjCPreciseLifetimeAttr> in(const Index &index);
   static gap::generator<ObjCPreciseLifetimeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCPreciseLifetimeAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCPreciseLifetimeAttr> in(const Fragment &frag);
+  static gap::generator<ObjCPreciseLifetimeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_PRECISE_LIFETIME;

@@ -29,12 +29,12 @@ class PragmaCommentDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<PragmaCommentDecl> in(const Fragment &frag);
-  static gap::generator<PragmaCommentDecl> in(const File &file);
   static gap::generator<PragmaCommentDecl> in(const Index &index);
   static gap::generator<PragmaCommentDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<PragmaCommentDecl> by_id(const Index &, EntityId);
+  static gap::generator<PragmaCommentDecl> in(const Fragment &frag);
+  static gap::generator<PragmaCommentDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PRAGMA_COMMENT;

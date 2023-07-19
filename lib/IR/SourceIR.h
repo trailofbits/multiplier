@@ -9,7 +9,6 @@
 #include <memory>
 #include <string>
 
-#include <multiplier/Types.h>
 #include <unordered_map>
 #include <vector>
 
@@ -18,6 +17,7 @@
 #include <mlir/IR/MLIRContext.h>
 #include <mlir/IR/OwningOpRef.h>
 
+#include "../Types.h"
 #include "../EntityProvider.h"
 
 namespace llvm {
@@ -43,7 +43,7 @@ class SourceIRImpl {
   friend class Fragment;
   friend class FragmentImpl;
 
-  const PackedFragmentId frag_id;
+  const PackedCompilationId compilation_id;
   const EntityProviderPtr ep;
 
   mlir::OwningOpRef<mlir::ModuleOp> mod;
@@ -66,7 +66,7 @@ class SourceIRImpl {
  public:
   virtual ~SourceIRImpl(void);
 
-  explicit SourceIRImpl(PackedFragmentId frag_id_, EntityProviderPtr ep_,
+  explicit SourceIRImpl(PackedCompilationId compilation_id_, EntityProviderPtr ep_,
                         std::string_view mlir);
 
   mlir::Operation *scope(void) const;

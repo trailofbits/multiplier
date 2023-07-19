@@ -29,12 +29,12 @@ class OMPDeclareSimdDeclAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<OMPDeclareSimdDeclAttr> in(const Fragment &frag);
-  static gap::generator<OMPDeclareSimdDeclAttr> in(const File &file);
   static gap::generator<OMPDeclareSimdDeclAttr> in(const Index &index);
   static gap::generator<OMPDeclareSimdDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclareSimdDeclAttr> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclareSimdDeclAttr> in(const Fragment &frag);
+  static gap::generator<OMPDeclareSimdDeclAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_SIMD_DECL;

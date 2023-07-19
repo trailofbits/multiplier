@@ -16,13 +16,9 @@
 #include "File.h"
 
 namespace mx {
-namespace ir {
-class SourceIRImpl;
-namespace builtin {
-class ModuleOp;
-}  // namespace builtin
-}  // namespace ir
 
+class Compilation;
+class CompilationImpl;
 class EntityProvider;
 class FragmentImpl;
 class Index;
@@ -46,6 +42,7 @@ class WeggliQueryResultIterator;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
@@ -56,6 +53,8 @@ using MacroOrToken = std::variant<Macro, Token>;
 // trees, and tokens.
 class Fragment {
  private:
+  friend class Compilation;
+  friend class CompilationImpl;
   friend class EntityProvider;
   friend class FragmentImpl;
   friend class Index;
@@ -67,12 +66,12 @@ class Fragment {
   friend class TokenTreeImpl;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
-  friend class ir::SourceIRImpl;
 
 #define MX_FRIEND(type_name, ln, e, c) \
     friend class type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -84,7 +83,7 @@ class Fragment {
 
  public:
 
-  /* implicit */ inline Fragment(std::shared_ptr<const FragmentImpl> impl_)
+  /* implicit */ inline Fragment(FragmentImplPtr impl_)
       : impl(std::move(impl_)) {}
 
   // Return the fragment containing a query match.
@@ -144,9 +143,6 @@ class Fragment {
 
   // Run a regular expression search over this fragment.
   gap::generator<RegexQueryMatch> query(const RegexQuery &query) const &;
-
-  // Returns source IR for the fragment.
-  std::optional<ir::builtin::ModuleOp> ir(void) const noexcept;
 };
 
 }  // namespace mx

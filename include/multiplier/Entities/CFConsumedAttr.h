@@ -31,12 +31,12 @@ class CFConsumedAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CFConsumedAttr> in(const Fragment &frag);
-  static gap::generator<CFConsumedAttr> in(const File &file);
   static gap::generator<CFConsumedAttr> in(const Index &index);
   static gap::generator<CFConsumedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CFConsumedAttr> by_id(const Index &, EntityId);
+  static gap::generator<CFConsumedAttr> in(const Fragment &frag);
+  static gap::generator<CFConsumedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_CONSUMED;

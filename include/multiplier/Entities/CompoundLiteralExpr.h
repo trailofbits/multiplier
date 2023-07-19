@@ -32,12 +32,12 @@ class CompoundLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CompoundLiteralExpr> in(const Fragment &frag);
-  static gap::generator<CompoundLiteralExpr> in(const File &file);
   static gap::generator<CompoundLiteralExpr> in(const Index &index);
   static gap::generator<CompoundLiteralExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CompoundLiteralExpr> by_id(const Index &, EntityId);
+  static gap::generator<CompoundLiteralExpr> in(const Fragment &frag);
+  static gap::generator<CompoundLiteralExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_LITERAL_EXPR;

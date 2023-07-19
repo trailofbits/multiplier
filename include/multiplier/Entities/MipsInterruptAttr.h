@@ -30,12 +30,12 @@ class MipsInterruptAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<MipsInterruptAttr> in(const Fragment &frag);
-  static gap::generator<MipsInterruptAttr> in(const File &file);
   static gap::generator<MipsInterruptAttr> in(const Index &index);
   static gap::generator<MipsInterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MipsInterruptAttr> by_id(const Index &, EntityId);
+  static gap::generator<MipsInterruptAttr> in(const Fragment &frag);
+  static gap::generator<MipsInterruptAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIPS_INTERRUPT;

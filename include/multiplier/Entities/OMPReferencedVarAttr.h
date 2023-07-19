@@ -28,12 +28,12 @@ class OMPReferencedVarAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<OMPReferencedVarAttr> in(const Fragment &frag);
-  static gap::generator<OMPReferencedVarAttr> in(const File &file);
   static gap::generator<OMPReferencedVarAttr> in(const Index &index);
   static gap::generator<OMPReferencedVarAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPReferencedVarAttr> by_id(const Index &, EntityId);
+  static gap::generator<OMPReferencedVarAttr> in(const Fragment &frag);
+  static gap::generator<OMPReferencedVarAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_REFERENCED_VAR;

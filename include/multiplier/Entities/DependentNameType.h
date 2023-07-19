@@ -29,8 +29,6 @@ class DependentNameType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  static gap::generator<DependentNameType> in(const Fragment &frag);
-  static gap::generator<DependentNameType> in(const File &file);
   static gap::generator<DependentNameType> in(const Index &index);
   static gap::generator<DependentNameType> containing(const Token &tok);
   bool contains(const Token &tok) const;

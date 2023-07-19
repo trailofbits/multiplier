@@ -147,7 +147,7 @@ class CustomTokenReader final : public TokenReader {
   std::vector<TokenKind> token_kinds;
   std::vector<TokenCategory> token_categories;
 
-  CustomTokenReader(std::shared_ptr<const FragmentImpl> fragment_);
+  CustomTokenReader(FragmentImplPtr fragment_);
 
   virtual ~CustomTokenReader(void) noexcept;
 

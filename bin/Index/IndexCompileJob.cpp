@@ -1172,7 +1172,8 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
 
 static void CreatePendingFragment(
     mx::DatabaseWriter &database, EntityMapper &em,
-    const pasta::TokenRange &tok_range, const EntityGroupRange &group_range,
+    const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
+    const EntityGroupRange &group_range,
     std::vector<PendingFragment> &pending_fragments) {
 
   const EntityGroup &entities = std::get<kGroupIndex>(group_range);
@@ -1221,7 +1222,9 @@ static void CreatePendingFragment(
           (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
           HashFragment(entities, tok_range, begin_index, end_index),
           (end_index - begin_index + 1ul)  /* num_tokens */,
-          is_new_fragment_id  /* mutated by reference */), em);
+          is_new_fragment_id  /* mutated by reference */),
+      tu_id,
+      em);
 
   pf.file_location = std::move(floc);
   pf.begin_index = begin_index;
@@ -1276,6 +1279,7 @@ static void CreatePendingFragment(
 // in `#include`d headers.
 static std::vector<PendingFragment> CreatePendingFragments(
     GlobalIndexingState &context, EntityMapper &em, const pasta::AST &ast,
+    mx::PackedCompilationId tu_id,
     std::vector<EntityGroupRange> decl_group_ranges) {
 
   std::vector<PendingFragment> pending_fragments;
@@ -1297,7 +1301,7 @@ static std::vector<PendingFragment> CreatePendingFragments(
 
     try {
       const EntityGroupRange &entities_in_fragment = *it;
-      CreatePendingFragment(context.database, em, tok_range,
+      CreatePendingFragment(context.database, em, tok_range, tu_id,
                             entities_in_fragment, pending_fragments);
     } catch (...) {
       LOG(ERROR)
@@ -1314,10 +1318,11 @@ static std::vector<PendingFragment> CreatePendingFragments(
 static void PersistParsedFragments(
     GlobalIndexingState &context, const pasta::AST &ast,
     EntityMapper &em, TokenProvenanceCalculator &provenance,
+    mx::PackedCompilationId tu_id,
     std::vector<PendingFragment> pending_fragments) {
 
   pasta::TokenRange tok_range = ast.Tokens();
-  NameMangler mangler(ast);
+  NameMangler mangler(ast, tu_id);
 
   std::string main_source_file = ast.MainFile().Path().generic_string();
   DLOG(INFO)
@@ -1361,6 +1366,8 @@ static void PersistParsedFragments(
           << " seconds to persist";
     }
   }
+
+  context.PersistCompilation(ast, em, tu_id, pending_fragments);
 }
 
 // Look through all files referenced by the AST get their unique IDs. If this
@@ -1383,7 +1390,7 @@ static void MaybePersistParsedFile(
 
   bool is_new_file_id = false;
   mx::DatabaseWriter &database = context.database;
-  mx::SpecificEntityId<mx::FileId> file_id = database.GetOrCreateFileIdForHash(
+  mx::PackedFileId file_id = database.GetOrCreateFileIdForHash(
       HashFile(maybe_data.TakeValue()), is_new_file_id);
 
   if (is_new_file_id) {
@@ -1447,23 +1454,34 @@ void IndexCompileJobAction::Run(void) {
     return;
   }
 
-  TypeMapper tm(context->database);
   EntityIdMap entity_ids;
+  TypeMapper tm(context->database);
   EntityMapper em(entity_ids, tm);
 
   pasta::AST ast = std::move(maybe_ast.value());
-
+  pasta::File main_file = ast.MainFile();
+  std::string main_file_path = main_file.Path().generic_string();
   DLOG(INFO)
-      << "Built AST for main source file "
-      << ast.MainFile().Path().generic_string();
-
-  TokenProvenanceCalculator provenance(em);
+      << "Built AST for main source file " << main_file_path;
 
   PersistParsedFiles(*context, ast, entity_ids);
+
+  // Detect if this is a new compilation.
+  bool is_new_tu_id = false;
+  mx::PackedCompilationId tu_id = context->database.GetOrCreateCompilationId(
+      em.EntityId(main_file), HashCompilation(ast, em), is_new_tu_id);
+
+  if (!is_new_tu_id) {
+    DLOG(INFO)
+        << "Skipping redundant AST for main source file " << main_file_path;
+    return;
+  }
+
+  TokenProvenanceCalculator provenance(em);
   PersistParsedFragments(
-      *context, ast, em, provenance,
+      *context, ast, em, provenance, tu_id,
       CreatePendingFragments(
-          *context, em, ast,
+          *context, em, ast, tu_id,
           PartitionEntities(*context, ast)));
 }
 

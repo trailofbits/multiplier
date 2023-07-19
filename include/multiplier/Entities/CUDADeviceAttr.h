@@ -29,12 +29,12 @@ class CUDADeviceAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CUDADeviceAttr> in(const Fragment &frag);
-  static gap::generator<CUDADeviceAttr> in(const File &file);
   static gap::generator<CUDADeviceAttr> in(const Index &index);
   static gap::generator<CUDADeviceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CUDADeviceAttr> by_id(const Index &, EntityId);
+  static gap::generator<CUDADeviceAttr> in(const Fragment &frag);
+  static gap::generator<CUDADeviceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_DEVICE;

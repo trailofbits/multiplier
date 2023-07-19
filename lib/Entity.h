@@ -12,7 +12,8 @@
 #include <string>
 
 #include <multiplier/RPC.capnp.h>
-#include <multiplier/Types.h>
+
+#include "Types.h"
 
 namespace mx {
 namespace {

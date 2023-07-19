@@ -30,8 +30,6 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  static gap::generator<DependentTemplateSpecializationType> in(const Fragment &frag);
-  static gap::generator<DependentTemplateSpecializationType> in(const File &file);
   static gap::generator<DependentTemplateSpecializationType> in(const Index &index);
   static gap::generator<DependentTemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;

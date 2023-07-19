@@ -29,12 +29,12 @@ class UsingIfExistsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<UsingIfExistsAttr> in(const Fragment &frag);
-  static gap::generator<UsingIfExistsAttr> in(const File &file);
   static gap::generator<UsingIfExistsAttr> in(const Index &index);
   static gap::generator<UsingIfExistsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UsingIfExistsAttr> by_id(const Index &, EntityId);
+  static gap::generator<UsingIfExistsAttr> in(const Fragment &frag);
+  static gap::generator<UsingIfExistsAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::USING_IF_EXISTS;

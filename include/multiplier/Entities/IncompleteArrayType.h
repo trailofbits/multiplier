@@ -29,8 +29,6 @@ class IncompleteArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<IncompleteArrayType> in(const Fragment &frag);
-  static gap::generator<IncompleteArrayType> in(const File &file);
   static gap::generator<IncompleteArrayType> in(const Index &index);
   static gap::generator<IncompleteArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

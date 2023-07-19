@@ -30,12 +30,12 @@ class HLSLBufferDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<HLSLBufferDecl> in(const Fragment &frag);
-  static gap::generator<HLSLBufferDecl> in(const File &file);
   static gap::generator<HLSLBufferDecl> in(const Index &index);
   static gap::generator<HLSLBufferDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<HLSLBufferDecl> by_id(const Index &, EntityId);
+  static gap::generator<HLSLBufferDecl> in(const Fragment &frag);
+  static gap::generator<HLSLBufferDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::HLSL_BUFFER;

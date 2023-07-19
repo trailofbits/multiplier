@@ -29,12 +29,12 @@ class ThisCallAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ThisCallAttr> in(const Fragment &frag);
-  static gap::generator<ThisCallAttr> in(const File &file);
   static gap::generator<ThisCallAttr> in(const Index &index);
   static gap::generator<ThisCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ThisCallAttr> by_id(const Index &, EntityId);
+  static gap::generator<ThisCallAttr> in(const Fragment &frag);
+  static gap::generator<ThisCallAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::THIS_CALL;

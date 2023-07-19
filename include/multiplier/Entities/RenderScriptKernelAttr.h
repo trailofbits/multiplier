@@ -27,12 +27,12 @@ class RenderScriptKernelAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<RenderScriptKernelAttr> in(const Fragment &frag);
-  static gap::generator<RenderScriptKernelAttr> in(const File &file);
   static gap::generator<RenderScriptKernelAttr> in(const Index &index);
   static gap::generator<RenderScriptKernelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<RenderScriptKernelAttr> by_id(const Index &, EntityId);
+  static gap::generator<RenderScriptKernelAttr> in(const Fragment &frag);
+  static gap::generator<RenderScriptKernelAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RENDER_SCRIPT_KERNEL;

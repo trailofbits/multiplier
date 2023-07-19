@@ -31,8 +31,6 @@ class DependentSizedArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<DependentSizedArrayType> in(const Fragment &frag);
-  static gap::generator<DependentSizedArrayType> in(const File &file);
   static gap::generator<DependentSizedArrayType> in(const Index &index);
   static gap::generator<DependentSizedArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

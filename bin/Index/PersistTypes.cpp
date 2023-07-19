@@ -532,7 +532,7 @@ static void PersistTokenContexts(
 } // namespace
 
 void GlobalIndexingState::PersistTypes(
-    const pasta::AST &ast, NameMangler &mangler, EntityMapper &em,
+    const pasta::AST &, NameMangler &, EntityMapper &em,
     const PendingFragment &pf) {
 
   for (const pasta::Type &type : pf.types_to_serialize) {
@@ -547,9 +547,6 @@ void GlobalIndexingState::PersistTypes(
     capnp::MallocMessageBuilder message;
     mx::rpc::Type::Builder fb = message.initRoot<mx::rpc::Type>();
 
-    // Set the fragment if for the fragment
-    fb.setId(ptid.Pack());
-
     auto tb = fb.initType();
     (void)SerializeType(type, em, tid.type_id, tb);
 
@@ -559,9 +556,6 @@ void GlobalIndexingState::PersistTypes(
     database.AddAsync(
         mx::EntityRecord{ptid.Pack(), GetSerializedData(message)});
   }
-
-  (void) ast;
-  (void) mangler;
 }
 
 }  // namespace indexer

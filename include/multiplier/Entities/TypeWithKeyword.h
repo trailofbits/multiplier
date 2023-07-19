@@ -31,8 +31,6 @@ class TypeWithKeyword : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TypeWithKeyword> in(const Fragment &frag);
-  static gap::generator<TypeWithKeyword> in(const File &file);
   static gap::generator<TypeWithKeyword> in(const Index &index);
   static gap::generator<TypeWithKeyword> containing(const Token &tok);
   bool contains(const Token &tok) const;

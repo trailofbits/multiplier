@@ -29,12 +29,12 @@ class AMDGPUNumSGPRAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AMDGPUNumSGPRAttr> in(const Fragment &frag);
-  static gap::generator<AMDGPUNumSGPRAttr> in(const File &file);
   static gap::generator<AMDGPUNumSGPRAttr> in(const Index &index);
   static gap::generator<AMDGPUNumSGPRAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AMDGPUNumSGPRAttr> by_id(const Index &, EntityId);
+  static gap::generator<AMDGPUNumSGPRAttr> in(const Fragment &frag);
+  static gap::generator<AMDGPUNumSGPRAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_NUM_SGPR;

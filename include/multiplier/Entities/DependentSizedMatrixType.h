@@ -30,8 +30,6 @@ class DependentSizedMatrixType : public MatrixType {
   friend class MatrixType;
   friend class Type;
  public:
-  static gap::generator<DependentSizedMatrixType> in(const Fragment &frag);
-  static gap::generator<DependentSizedMatrixType> in(const File &file);
   static gap::generator<DependentSizedMatrixType> in(const Index &index);
   static gap::generator<DependentSizedMatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;

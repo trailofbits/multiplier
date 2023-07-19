@@ -18,6 +18,8 @@
 
 namespace mx {
 
+class Compilation;
+class CompilationImpl;
 class Designator;
 class EntityProvider;
 class File;
@@ -47,6 +49,8 @@ using CustomToken = std::variant<SimpleToken, Token>;
 // A single token, e.g. from a file or from a macro expansion.
 class Token final {
  private:
+  friend class Compilation;
+  friend class CompilationImpl;
   friend class EntityProvider;
   friend class File;
   friend class Fragment;

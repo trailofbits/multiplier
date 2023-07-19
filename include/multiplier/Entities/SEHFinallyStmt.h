@@ -29,12 +29,12 @@ class SEHFinallyStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<SEHFinallyStmt> in(const Fragment &frag);
-  static gap::generator<SEHFinallyStmt> in(const File &file);
   static gap::generator<SEHFinallyStmt> in(const Index &index);
   static gap::generator<SEHFinallyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SEHFinallyStmt> by_id(const Index &, EntityId);
+  static gap::generator<SEHFinallyStmt> in(const Fragment &frag);
+  static gap::generator<SEHFinallyStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_FINALLY_STMT;

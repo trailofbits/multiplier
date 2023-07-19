@@ -29,12 +29,12 @@ class MSNoVTableAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<MSNoVTableAttr> in(const Fragment &frag);
-  static gap::generator<MSNoVTableAttr> in(const File &file);
   static gap::generator<MSNoVTableAttr> in(const Index &index);
   static gap::generator<MSNoVTableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MSNoVTableAttr> by_id(const Index &, EntityId);
+  static gap::generator<MSNoVTableAttr> in(const Fragment &frag);
+  static gap::generator<MSNoVTableAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_NO_V_TABLE;

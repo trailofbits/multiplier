@@ -29,8 +29,6 @@ class DeducedTemplateSpecializationType : public DeducedType {
   friend class DeducedType;
   friend class Type;
  public:
-  static gap::generator<DeducedTemplateSpecializationType> in(const Fragment &frag);
-  static gap::generator<DeducedTemplateSpecializationType> in(const File &file);
   static gap::generator<DeducedTemplateSpecializationType> in(const Index &index);
   static gap::generator<DeducedTemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;

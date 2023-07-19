@@ -16,6 +16,8 @@
 
 namespace mx {
 
+class Compilation;
+class CompilationImpl;
 class EntityProvider;
 class FileImpl;
 class FileLocationCache;
@@ -32,6 +34,7 @@ class WeggliQueryMatch;
     class type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
@@ -81,8 +84,8 @@ class FileLocationCache {
 // de-duplicate via a hash of the contents.
 class File {
  private:
-  using Ptr = std::shared_ptr<const FileImpl>;
-
+  friend class Compilation;
+  friend class CompilationImpl;
   friend class EntityProvider;
   friend class FileLocationCache;
   friend class FileLocationCacheImpl;
@@ -106,14 +109,15 @@ class File {
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND)
 #undef MX_FRIEND
 
-  Ptr impl;
+  FileImplPtr impl;
 
  public:
 
-  /* implicit */ inline File(std::shared_ptr<const FileImpl> impl_)
+  /* implicit */ inline File(FileImplPtr impl_)
       : impl(std::move(impl_)) {}
 
   // Return the file containing a regex query match.
@@ -131,13 +135,12 @@ class File {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
-                              MX_DECLARE_CONTAINING)
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_CONTAINING
-
-  static std::optional<File> containing(const VariantEntity &);
 
   // Return the file containing a specific token.
   //
@@ -150,8 +153,13 @@ class File {
   // Go through the tokens of the iterator and return the first file found.
   static std::optional<File> containing(const TokenRange &tokens);
 
-  // Return the file containing the token tree.
+  // Return the file containing the token tree. Token trees can cover multiple
+  // files, e.g. in the case of x-macro like includes (e.g. within an `enum`
+  // declaration). This will return the "top" file.
   static std::optional<File> containing(const TokenTree &tokens);
+
+  // Return the file holding a generic entity.
+  static std::optional<File> containing(const VariantEntity &);
 
   inline static constexpr EntityCategory entity_category(void) {
     return EntityCategory::FILE;

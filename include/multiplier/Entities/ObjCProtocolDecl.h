@@ -33,12 +33,12 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCProtocolDecl> in(const Fragment &frag);
-  static gap::generator<ObjCProtocolDecl> in(const File &file);
   static gap::generator<ObjCProtocolDecl> in(const Index &index);
   static gap::generator<ObjCProtocolDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCProtocolDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCProtocolDecl> in(const Fragment &frag);
+  static gap::generator<ObjCProtocolDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROTOCOL;

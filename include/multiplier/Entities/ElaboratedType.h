@@ -30,8 +30,6 @@ class ElaboratedType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  static gap::generator<ElaboratedType> in(const Fragment &frag);
-  static gap::generator<ElaboratedType> in(const File &file);
   static gap::generator<ElaboratedType> in(const Index &index);
   static gap::generator<ElaboratedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

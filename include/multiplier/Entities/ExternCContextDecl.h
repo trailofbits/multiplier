@@ -28,12 +28,12 @@ class ExternCContextDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ExternCContextDecl> in(const Fragment &frag);
-  static gap::generator<ExternCContextDecl> in(const File &file);
   static gap::generator<ExternCContextDecl> in(const Index &index);
   static gap::generator<ExternCContextDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ExternCContextDecl> by_id(const Index &, EntityId);
+  static gap::generator<ExternCContextDecl> in(const Fragment &frag);
+  static gap::generator<ExternCContextDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXTERN_C_CONTEXT;

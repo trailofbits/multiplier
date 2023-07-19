@@ -88,21 +88,18 @@ struct TokenContext @0xb9ff75e040124cb3 {
 }
 
 struct File @0x987f05f6a48636d5 {
-  # Unique ID of this file. This corresponds to an `mx::FileId`.
-  id @0 :UInt64;
-  
   # The data of the file.
-  data @1 :Text;
+  data @0 :Text;
   
   # Tells us about the tokens inside of `data`. There is one extra element in
   # `tokenOffsets`.
-  tokenKinds @2 :List(UInt16);
-  tokenOffsets @3 :List(UInt32);
+  tokenKinds @1 :List(UInt16);
+  tokenOffsets @2 :List(UInt32);
     
   # Byte offsets of the end of line characters. We use this to map matches in
   # files to matches in fragments, with a persistent set containing <file_id,
   # line_num, fragment_id> triples.
-  eolOffsets @4 :List(UpperBound);
+  eolOffsets @3 :List(UpperBound);
 }
 
 struct FileInfo @0xfd1022cb187f18f8 {
@@ -111,9 +108,9 @@ struct FileInfo @0xfd1022cb187f18f8 {
 }
 
 struct Fragment @0xe5f27760091f9a3a {
-  # The unique identifier for this fragment (set of lexically overlapping
-  # top-level declarations).
-  id @0 :UInt64;
+  # List of parent IDs of this fragment. The first entry in the list is the
+  # immediate parent.
+  parentIds @0 :List(UInt64);
   
   # Inclusive range of file token IDs for the unparsed data of this fragment.
   firstFileTokenId @1 :UInt64;
@@ -185,36 +182,51 @@ struct Fragment @0xe5f27760091f9a3a {
   # The single best related entity ID to the corresponding token. This helps
   # with improving the speed of syntax highlighting.
   relatedEntityId @14 :List(UInt64);
-
-  # Source IR in text format
-  mlir @15 :Text;
+  
+  # The translation unit from which this fragment was derived. We can find
+  # the compile command for a fragment there, if we need to reproduce the
+  # TU, and we can find its MLIR representation there too.
+  compilationId @15 :UInt64;
 }
 
+struct Compilation @0xc8b5fa5dd0739e82 {
+  
+  # List of fragments associated with this compilation.
+  fragmentIds @0 :List(UInt64);
+  
+  # List of files associated with this compilation.
+  fileIds @1 :List(UInt64);
+  
+  # The compile command for this compilation unit.
+  command @2 :CompileCommand;
+  
+  # Source IR in text format
+  mlir @3 :Text;
+} 
+
 struct Type @0xd2d91de1b5fe2e03 {
-  # The unique identifier for this type fragment.
-  id @0 :UInt64;
   
   # List of token contexts.
-  typeTokenContexts @1 :List(TokenContext);
+  typeTokenContexts @0 :List(TokenContext);
   
   # List of offsets of token contexts for each of the tokens.
   #
   # Indexed by `TypeTokenId::offset`.
-  typeTokenContextOffsets @2 :List(UInt32);
+  typeTokenContextOffsets @1 :List(UInt32);
   
   # The type token data in text buffer format.
-  tokenData @3 :Text;
+  tokenData @2 :Text;
   
   # Offsets of the beginning of tokens into `tokenData`. There is one extra
   # element in here than there are tokens, which represents the size of the data.
-  tokenOffsets @4 :List(UInt32);
+  tokenOffsets @3 :List(UInt32);
   
   # List of token kinds in this type fragment.
-  tokenKinds @5 :List(UInt16);
+  tokenKinds @4 :List(UInt16);
   
   # The single best related entity ID to the corresponding token. This helps
   # with improving the speed of syntax highlighting.
-  relatedEntityId @6 :List(UInt64);
+  relatedEntityId @5 :List(UInt64);
 
-  type @7 :AST.Type;
+  type @6 :AST.Type;
 }

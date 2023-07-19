@@ -28,12 +28,12 @@ class CompoundStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<CompoundStmt> in(const Fragment &frag);
-  static gap::generator<CompoundStmt> in(const File &file);
   static gap::generator<CompoundStmt> in(const Index &index);
   static gap::generator<CompoundStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CompoundStmt> by_id(const Index &, EntityId);
+  static gap::generator<CompoundStmt> in(const Fragment &frag);
+  static gap::generator<CompoundStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_STMT;

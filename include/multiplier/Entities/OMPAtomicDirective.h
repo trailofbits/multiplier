@@ -31,12 +31,12 @@ class OMPAtomicDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPAtomicDirective> in(const Fragment &frag);
-  static gap::generator<OMPAtomicDirective> in(const File &file);
   static gap::generator<OMPAtomicDirective> in(const Index &index);
   static gap::generator<OMPAtomicDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPAtomicDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPAtomicDirective> in(const Fragment &frag);
+  static gap::generator<OMPAtomicDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ATOMIC_DIRECTIVE;

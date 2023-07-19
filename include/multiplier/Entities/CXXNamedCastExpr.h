@@ -42,12 +42,12 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXNamedCastExpr> in(const Fragment &frag);
-  static gap::generator<CXXNamedCastExpr> in(const File &file);
   static gap::generator<CXXNamedCastExpr> in(const Index &index);
   static gap::generator<CXXNamedCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXNamedCastExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXNamedCastExpr> in(const Fragment &frag);
+  static gap::generator<CXXNamedCastExpr> in(const File &file);
 
   static gap::generator<CXXNamedCastExpr> containing(const Decl &decl);
   static gap::generator<CXXNamedCastExpr> containing(const std::optional<Decl> &decl);

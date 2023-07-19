@@ -29,12 +29,12 @@ class WeakImportAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<WeakImportAttr> in(const Fragment &frag);
-  static gap::generator<WeakImportAttr> in(const File &file);
   static gap::generator<WeakImportAttr> in(const Index &index);
   static gap::generator<WeakImportAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<WeakImportAttr> by_id(const Index &, EntityId);
+  static gap::generator<WeakImportAttr> in(const Fragment &frag);
+  static gap::generator<WeakImportAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEAK_IMPORT;

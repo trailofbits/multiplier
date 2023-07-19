@@ -29,12 +29,12 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<ArmMveStrictPolymorphismAttr> in(const Fragment &frag);
-  static gap::generator<ArmMveStrictPolymorphismAttr> in(const File &file);
   static gap::generator<ArmMveStrictPolymorphismAttr> in(const Index &index);
   static gap::generator<ArmMveStrictPolymorphismAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ArmMveStrictPolymorphismAttr> by_id(const Index &, EntityId);
+  static gap::generator<ArmMveStrictPolymorphismAttr> in(const Fragment &frag);
+  static gap::generator<ArmMveStrictPolymorphismAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_MVE_STRICT_POLYMORPHISM;

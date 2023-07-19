@@ -29,12 +29,12 @@ class ObjCExternallyRetainedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ObjCExternallyRetainedAttr> in(const Fragment &frag);
-  static gap::generator<ObjCExternallyRetainedAttr> in(const File &file);
   static gap::generator<ObjCExternallyRetainedAttr> in(const Index &index);
   static gap::generator<ObjCExternallyRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCExternallyRetainedAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCExternallyRetainedAttr> in(const Fragment &frag);
+  static gap::generator<ObjCExternallyRetainedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_EXTERNALLY_RETAINED;

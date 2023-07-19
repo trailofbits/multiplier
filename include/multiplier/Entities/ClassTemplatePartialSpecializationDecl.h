@@ -42,12 +42,12 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Fragment &frag);
-  static gap::generator<ClassTemplatePartialSpecializationDecl> in(const File &file);
   static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Index &index);
   static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ClassTemplatePartialSpecializationDecl> by_id(const Index &, EntityId);
+  static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<ClassTemplatePartialSpecializationDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;

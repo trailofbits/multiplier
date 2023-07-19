@@ -28,8 +28,6 @@ class BTFTagAttributedType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<BTFTagAttributedType> in(const Fragment &frag);
-  static gap::generator<BTFTagAttributedType> in(const File &file);
   static gap::generator<BTFTagAttributedType> in(const Index &index);
   static gap::generator<BTFTagAttributedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

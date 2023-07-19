@@ -30,12 +30,12 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<UnresolvedUsingIfExistsDecl> in(const Fragment &frag);
-  static gap::generator<UnresolvedUsingIfExistsDecl> in(const File &file);
   static gap::generator<UnresolvedUsingIfExistsDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingIfExistsDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnresolvedUsingIfExistsDecl> by_id(const Index &, EntityId);
+  static gap::generator<UnresolvedUsingIfExistsDecl> in(const Fragment &frag);
+  static gap::generator<UnresolvedUsingIfExistsDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_IF_EXISTS;

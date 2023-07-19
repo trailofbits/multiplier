@@ -27,12 +27,12 @@ class OMPCaptureKindAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<OMPCaptureKindAttr> in(const Fragment &frag);
-  static gap::generator<OMPCaptureKindAttr> in(const File &file);
   static gap::generator<OMPCaptureKindAttr> in(const Index &index);
   static gap::generator<OMPCaptureKindAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPCaptureKindAttr> by_id(const Index &, EntityId);
+  static gap::generator<OMPCaptureKindAttr> in(const Fragment &frag);
+  static gap::generator<OMPCaptureKindAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_CAPTURE_KIND;

@@ -33,12 +33,12 @@ class EnumConstantDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<EnumConstantDecl> in(const Fragment &frag);
-  static gap::generator<EnumConstantDecl> in(const File &file);
   static gap::generator<EnumConstantDecl> in(const Index &index);
   static gap::generator<EnumConstantDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<EnumConstantDecl> by_id(const Index &, EntityId);
+  static gap::generator<EnumConstantDecl> in(const Fragment &frag);
+  static gap::generator<EnumConstantDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM_CONSTANT;

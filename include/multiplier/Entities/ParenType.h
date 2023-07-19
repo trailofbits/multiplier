@@ -27,8 +27,6 @@ class ParenType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ParenType> in(const Fragment &frag);
-  static gap::generator<ParenType> in(const File &file);
   static gap::generator<ParenType> in(const Index &index);
   static gap::generator<ParenType> containing(const Token &tok);
   bool contains(const Token &tok) const;

@@ -12,6 +12,7 @@
 #include <string_view>
 #include <vector>
 
+#include "Compilation.h"
 #include "Entities/Attr.h"
 #include "Entities/CXXBaseSpecifier.h"
 #include "Entities/DefineMacroDirective.h"
@@ -33,6 +34,8 @@
 namespace mx {
 
 class CachingEntityProvider;
+class Compilation;
+class CompilationImpl;
 class EntityProvider;
 class Fragment;
 class IncludeLikeMacroDirective;
@@ -60,6 +63,7 @@ using EntityProviderPtr = std::shared_ptr<EntityProvider>;
 
 using VariantEntity = std::variant<
     NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
@@ -93,6 +97,7 @@ class Index {
     friend class type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -140,6 +145,10 @@ class Index {
   // in the returned list of fetched files will be `start_at`.
   FilePathMap file_paths(void) const;
 
+  // Download a fragment based off of an entity ID.
+  std::optional<Fragment> fragment_containing(EntityId) const;
+
+#ifndef __CDT_PARSER__
 #define MX_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
   std::optional<type_name> lower_name(RawEntityId id) const; \
   \
@@ -150,11 +159,9 @@ class Index {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,
-                              MX_DECLARE_GETTER, MX_DECLARE_GETTER)
+                              MX_DECLARE_GETTER, MX_DECLARE_GETTER,
+                              MX_DECLARE_GETTER)
 #undef MX_DECLARE_GETTER
-
-  // Download a fragment based off of an entity ID.
-  std::optional<Fragment> fragment_containing(EntityId) const;
 
   template <typename T>
   inline std::optional<EntityType<T>> entity(T eid) const {
@@ -175,6 +182,7 @@ class Index {
       return std::nullopt;
     }
   }
+#endif  // __CDT_PARSER__
 
   // Return an entity given its ID.
   VariantEntity entity(EntityId eid) const;
@@ -190,7 +198,10 @@ class Index {
     }
   }
 
-  // Return all files in the index.
+  // Generate all compilation units in the index.
+  gap::generator<Compilation> compilations(void) const &;
+
+  // Generate all files in the index.
   gap::generator<File> files(void) const &;
 
   // Search for entities by their name and category.
@@ -199,6 +210,7 @@ class Index {
   gap::generator<NamedEntity> query_entities(std::string name) const &;
 };
 
+#ifndef __CDT_PARSER__
 template <typename T>
 std::optional<T> Reference::as(void) const noexcept {
   constexpr EntityCategory c = T::static_category();
@@ -218,12 +230,14 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
+                            MX_REFERENCE_AS,
                             MX_REFERENCE_AS)
 #undef MX_REFERENCE_AS
   } else {
     return std::nullopt;  // Unreachable.
   }
 }
+#endif  // __CDT_PARSER__
 
 class SimpleToken {
  public:

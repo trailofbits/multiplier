@@ -35,12 +35,12 @@ class UserDefinedLiteral : public CallExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<UserDefinedLiteral> in(const Fragment &frag);
-  static gap::generator<UserDefinedLiteral> in(const File &file);
   static gap::generator<UserDefinedLiteral> in(const Index &index);
   static gap::generator<UserDefinedLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UserDefinedLiteral> by_id(const Index &, EntityId);
+  static gap::generator<UserDefinedLiteral> in(const Fragment &frag);
+  static gap::generator<UserDefinedLiteral> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::USER_DEFINED_LITERAL;

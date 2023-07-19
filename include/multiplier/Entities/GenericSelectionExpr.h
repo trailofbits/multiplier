@@ -32,12 +32,12 @@ class GenericSelectionExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<GenericSelectionExpr> in(const Fragment &frag);
-  static gap::generator<GenericSelectionExpr> in(const File &file);
   static gap::generator<GenericSelectionExpr> in(const Index &index);
   static gap::generator<GenericSelectionExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<GenericSelectionExpr> by_id(const Index &, EntityId);
+  static gap::generator<GenericSelectionExpr> in(const Fragment &frag);
+  static gap::generator<GenericSelectionExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GENERIC_SELECTION_EXPR;

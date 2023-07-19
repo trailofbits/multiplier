@@ -64,9 +64,6 @@ class GlobalIndexingState {
   // Number of fragments for which we are attempting to generate source ir.
   std::unique_ptr<ProgressBar> sourceir_progress;
 
-  // Number of fragments for which we successfully generated source ir.
-  std::unique_ptr<ProgressBar> sourceir_success_progress;
-
   const unsigned num_workers;
 
   // Worker pool.
@@ -134,6 +131,10 @@ class GlobalIndexingState {
   void PersistTypes(const pasta::AST &ast, NameMangler &mangler,
                     EntityMapper &em, const PendingFragment &fragment);
 
+  // Persist the compilation.
+  void PersistCompilation(const pasta::AST &ast, const EntityMapper &em,
+                          mx::PackedCompilationId tu_id,
+                          const std::vector<PendingFragment> &fragments);
 };
 
 }  // namespace indexer

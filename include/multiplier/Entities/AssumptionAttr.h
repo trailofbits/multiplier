@@ -29,12 +29,12 @@ class AssumptionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AssumptionAttr> in(const Fragment &frag);
-  static gap::generator<AssumptionAttr> in(const File &file);
   static gap::generator<AssumptionAttr> in(const Index &index);
   static gap::generator<AssumptionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AssumptionAttr> by_id(const Index &, EntityId);
+  static gap::generator<AssumptionAttr> in(const Fragment &frag);
+  static gap::generator<AssumptionAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSUMPTION;

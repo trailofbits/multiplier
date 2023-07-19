@@ -94,12 +94,12 @@ class NamedDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<NamedDecl> in(const Fragment &frag);
-  static gap::generator<NamedDecl> in(const File &file);
   static gap::generator<NamedDecl> in(const Index &index);
   static gap::generator<NamedDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NamedDecl> by_id(const Index &, EntityId);
+  static gap::generator<NamedDecl> in(const Fragment &frag);
+  static gap::generator<NamedDecl> in(const File &file);
 
   static gap::generator<NamedDecl> containing(const Decl &decl);
   static gap::generator<NamedDecl> containing(const std::optional<Decl> &decl);

@@ -31,12 +31,12 @@ class SEHTryStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<SEHTryStmt> in(const Fragment &frag);
-  static gap::generator<SEHTryStmt> in(const File &file);
   static gap::generator<SEHTryStmt> in(const Index &index);
   static gap::generator<SEHTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SEHTryStmt> by_id(const Index &, EntityId);
+  static gap::generator<SEHTryStmt> in(const Fragment &frag);
+  static gap::generator<SEHTryStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_TRY_STMT;

@@ -28,8 +28,6 @@ class UsingType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<UsingType> in(const Fragment &frag);
-  static gap::generator<UsingType> in(const File &file);
   static gap::generator<UsingType> in(const Index &index);
   static gap::generator<UsingType> containing(const Token &tok);
   bool contains(const Token &tok) const;

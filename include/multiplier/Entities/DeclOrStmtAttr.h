@@ -32,12 +32,12 @@ class DeclOrStmtAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<DeclOrStmtAttr> in(const Fragment &frag);
-  static gap::generator<DeclOrStmtAttr> in(const File &file);
   static gap::generator<DeclOrStmtAttr> in(const Index &index);
   static gap::generator<DeclOrStmtAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DeclOrStmtAttr> by_id(const Index &, EntityId);
+  static gap::generator<DeclOrStmtAttr> in(const Fragment &frag);
+  static gap::generator<DeclOrStmtAttr> in(const File &file);
 
   static std::optional<DeclOrStmtAttr> from(const Attr &parent);
 

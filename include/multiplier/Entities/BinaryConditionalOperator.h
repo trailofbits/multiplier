@@ -35,12 +35,12 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<BinaryConditionalOperator> in(const Fragment &frag);
-  static gap::generator<BinaryConditionalOperator> in(const File &file);
   static gap::generator<BinaryConditionalOperator> in(const Index &index);
   static gap::generator<BinaryConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<BinaryConditionalOperator> by_id(const Index &, EntityId);
+  static gap::generator<BinaryConditionalOperator> in(const Fragment &frag);
+  static gap::generator<BinaryConditionalOperator> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;

@@ -30,12 +30,12 @@ class IBOutletCollectionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<IBOutletCollectionAttr> in(const Fragment &frag);
-  static gap::generator<IBOutletCollectionAttr> in(const File &file);
   static gap::generator<IBOutletCollectionAttr> in(const Index &index);
   static gap::generator<IBOutletCollectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<IBOutletCollectionAttr> by_id(const Index &, EntityId);
+  static gap::generator<IBOutletCollectionAttr> in(const Fragment &frag);
+  static gap::generator<IBOutletCollectionAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_OUTLET_COLLECTION;

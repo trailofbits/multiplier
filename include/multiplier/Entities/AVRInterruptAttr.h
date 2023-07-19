@@ -29,12 +29,12 @@ class AVRInterruptAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AVRInterruptAttr> in(const Fragment &frag);
-  static gap::generator<AVRInterruptAttr> in(const File &file);
   static gap::generator<AVRInterruptAttr> in(const Index &index);
   static gap::generator<AVRInterruptAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AVRInterruptAttr> by_id(const Index &, EntityId);
+  static gap::generator<AVRInterruptAttr> in(const Fragment &frag);
+  static gap::generator<AVRInterruptAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AVR_INTERRUPT;

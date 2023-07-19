@@ -29,8 +29,6 @@ class FunctionNoProtoType : public FunctionType {
   friend class FunctionType;
   friend class Type;
  public:
-  static gap::generator<FunctionNoProtoType> in(const Fragment &frag);
-  static gap::generator<FunctionNoProtoType> in(const File &file);
   static gap::generator<FunctionNoProtoType> in(const Index &index);
   static gap::generator<FunctionNoProtoType> containing(const Token &tok);
   bool contains(const Token &tok) const;

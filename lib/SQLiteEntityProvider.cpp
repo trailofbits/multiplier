@@ -15,9 +15,10 @@
 #include <zdict.h>
 #include <zstd.h>
 
-#include "EntityProvider.h"
+#include "Compilation.h"
 #include "Attr.h"
 #include "Decl.h"
+#include "EntityProvider.h"
 #include "File.h"
 #include "Fragment.h"
 #include "Macro.h"
@@ -82,9 +83,6 @@ class SQLiteEntityProviderImpl {
 
 #define DECLARE_GETTERS(type_name, lower_name, ...) \
     sqlite::Statement get_ ## lower_name ## _ids ; \
-    sqlite::Statement get_ ## lower_name ## _ids_by_fragment ; \
-    sqlite::Statement get_ ## lower_name ## _ids_by_kind ; \
-    sqlite::Statement get_ ## lower_name ## _ids_by_kind_fragment ; \
     sqlite::Statement get_ ## lower_name ## _by_id ; \
 
   MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_GETTERS,
@@ -92,7 +90,44 @@ class SQLiteEntityProviderImpl {
                               DECLARE_GETTERS,
                               DECLARE_GETTERS,
                               DECLARE_GETTERS,
+                              DECLARE_GETTERS,
                               DECLARE_GETTERS)
+#undef DECLARE_GETTERS
+
+#define DECLARE_GETTERS(type_name, lower_name, ...) \
+    sqlite::Statement get_ ## lower_name ## _ids_by_fragment ; \
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY)
+#undef DECLARE_GETTERS
+
+#define DECLARE_GETTERS(type_name, lower_name, ...) \
+    sqlite::Statement get_ ## lower_name ## _ids_by_kind ; \
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY)
+#undef DECLARE_GETTERS
+
+#define DECLARE_GETTERS(type_name, lower_name, ...) \
+    sqlite::Statement get_ ## lower_name ## _ids_by_kind_fragment ; \
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef DECLARE_GETTERS
 
   sqlite::Statement get_ref_kind_by_id;
@@ -278,28 +313,6 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "WHERE " #lower_name "_id > ?2 " \
           "ORDER BY " #lower_name "_id ASC " \
           "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
-    get_ ## lower_name ## _ids_by_fragment(db.Prepare( \
-          "SELECT " #lower_name "_id " \
-          "FROM " #lower_name " " \
-          "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
-              "  AND " #lower_name "_id > ?2 " \
-          "ORDER BY " #lower_name "_id ASC " \
-          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
-    get_ ## lower_name ## _ids_by_kind(db.Prepare( \
-          "SELECT " #lower_name "_id " \
-          "FROM " #lower_name " " \
-          "WHERE entity_id_to_kind(" # lower_name "_id) = ?1 " \
-          "  AND " #lower_name "_id > ?2 " \
-          "ORDER BY " #lower_name "_id ASC " \
-          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
-    get_ ## lower_name ## _ids_by_kind_fragment(db.Prepare( \
-          "SELECT " #lower_name "_id " \
-          "FROM " #lower_name " " \
-          "WHERE entity_id_to_kind(" # lower_name "_id) = ?1 " \
-          "  AND entity_id_to_fragment_id(" #lower_name "_id) = ?2 " \
-              "  AND " #lower_name "_id > ?3 " \
-          "ORDER BY " #lower_name "_id ASC " \
-          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
     get_ ## lower_name ## _by_id(db.Prepare( \
           "SELECT data " \
           "FROM " #lower_name " " \
@@ -310,8 +323,65 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
                                 INIT_GETTERS,
                                 INIT_GETTERS,
                                 INIT_GETTERS,
+                                INIT_GETTERS,
                                 INIT_GETTERS)
 #undef INIT_GETTERS
+
+#define INIT_GETTERS(type_name, lower_name, enum_name, id) \
+    get_ ## lower_name ## _ids_by_fragment(db.Prepare( \
+          "SELECT " #lower_name "_id " \
+          "FROM " #lower_name " " \
+          "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
+              "  AND " #lower_name "_id > ?2 " \
+          "ORDER BY " #lower_name "_id ASC " \
+          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))),
+
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY)
+#undef INIT_GETTERS
+
+#define INIT_GETTERS(type_name, lower_name, enum_name, id) \
+    get_ ## lower_name ## _ids_by_kind(db.Prepare( \
+          "SELECT " #lower_name "_id " \
+          "FROM " #lower_name " " \
+          "WHERE entity_id_to_kind(" # lower_name "_id) = ?1 " \
+          "  AND " #lower_name "_id > ?2 " \
+          "ORDER BY " #lower_name "_id ASC " \
+          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))),
+
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY)
+#undef INIT_GETTERS
+
+#define INIT_GETTERS(type_name, lower_name, enum_name, id) \
+    get_ ## lower_name ## _ids_by_kind_fragment(db.Prepare( \
+          "SELECT " #lower_name "_id " \
+          "FROM " #lower_name " " \
+          "WHERE entity_id_to_kind(" # lower_name "_id) = ?1 " \
+          "  AND entity_id_to_fragment_id(" #lower_name "_id) = ?2 " \
+              "  AND " #lower_name "_id > ?3 " \
+          "ORDER BY " #lower_name "_id ASC " \
+          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
+
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY)
+#undef INIT_GETTERS
+
       get_ref_kind_by_id(db.Prepare(
           "SELECT kind FROM reference_kind WHERE rowid = ?1")),
       get_ref_id_by_kind(db.Prepare(
@@ -877,6 +947,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
@@ -924,8 +995,19 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
         co_return; \
       } \
     } \
-  } \
-  \
+  }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
       const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) & { \
     ImplPtr context = impl.Lock(); \
@@ -973,9 +1055,10 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
@@ -1027,10 +1110,11 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
-                            MX_DECLARE_ENTITY_LISTERS)
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
 EntityProviderPtr EntityProvider::CreateFromDatabase(std::filesystem::path path) {

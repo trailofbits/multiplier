@@ -40,12 +40,12 @@ class LambdaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<LambdaExpr> in(const Fragment &frag);
-  static gap::generator<LambdaExpr> in(const File &file);
   static gap::generator<LambdaExpr> in(const Index &index);
   static gap::generator<LambdaExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LambdaExpr> by_id(const Index &, EntityId);
+  static gap::generator<LambdaExpr> in(const Fragment &frag);
+  static gap::generator<LambdaExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LAMBDA_EXPR;

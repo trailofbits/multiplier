@@ -35,12 +35,12 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPDeclareMapperDecl> in(const Fragment &frag);
-  static gap::generator<OMPDeclareMapperDecl> in(const File &file);
   static gap::generator<OMPDeclareMapperDecl> in(const Index &index);
   static gap::generator<OMPDeclareMapperDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclareMapperDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclareMapperDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclareMapperDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_MAPPER;

@@ -29,12 +29,12 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag);
-  static gap::generator<ClassScopeFunctionSpecializationDecl> in(const File &file);
   static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Index &index);
   static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ClassScopeFunctionSpecializationDecl> by_id(const Index &, EntityId);
+  static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<ClassScopeFunctionSpecializationDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;

@@ -32,12 +32,12 @@ class MSPropertySubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<MSPropertySubscriptExpr> in(const Fragment &frag);
-  static gap::generator<MSPropertySubscriptExpr> in(const File &file);
   static gap::generator<MSPropertySubscriptExpr> in(const Index &index);
   static gap::generator<MSPropertySubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MSPropertySubscriptExpr> by_id(const Index &, EntityId);
+  static gap::generator<MSPropertySubscriptExpr> in(const Fragment &frag);
+  static gap::generator<MSPropertySubscriptExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;

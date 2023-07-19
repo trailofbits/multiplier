@@ -30,12 +30,12 @@ class OMPDeclareVariantAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<OMPDeclareVariantAttr> in(const Fragment &frag);
-  static gap::generator<OMPDeclareVariantAttr> in(const File &file);
   static gap::generator<OMPDeclareVariantAttr> in(const Index &index);
   static gap::generator<OMPDeclareVariantAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclareVariantAttr> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclareVariantAttr> in(const Fragment &frag);
+  static gap::generator<OMPDeclareVariantAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_VARIANT;

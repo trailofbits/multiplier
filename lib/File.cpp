@@ -139,8 +139,7 @@ std::optional<std::pair<unsigned, unsigned>> Token::location(
     return std::nullopt;
   }
 
-  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token.impl),
-                                            file_ptr));
+  File file(FileImplPtr(std::move(maybe_file_token.impl), file_ptr));
   const FileLocationVector &vec = cache.impl->Add(std::move(file));
 
   if (maybe_file_token.offset >= vec.size()) {
@@ -165,8 +164,7 @@ std::optional<std::pair<unsigned, unsigned>> Token::next_location(
     return std::nullopt;
   }
 
-  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token.impl),
-                                            file_ptr));
+  File file(FileImplPtr(std::move(maybe_file_token.impl), file_ptr));
   const FileLocationVector &vec = cache.impl->Add(std::move(file));
 
   if ((maybe_file_token.offset + 1u) >= vec.size()) {
@@ -252,17 +250,13 @@ std::optional<File> File::containing(const WeggliQueryMatch &match) {
       return std::nullopt; \
     }
 
-#define MX_DEFINE_CONTAINING_NULL(type_name, lower_name, enum_name, category) \
-    std::optional<File> File::containing(const type_name &) { \
-      return std::nullopt; \
-    }
-
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DEFINE_CONTAINING_NULL,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DEFINE_CONTAINING,
-                              MX_DEFINE_CONTAINING)
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_CONTAINING,
+                            MX_DEFINE_CONTAINING,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_CONTAINING
 
 std::optional<File> File::containing(const VariantEntity &entity) {
@@ -272,7 +266,8 @@ std::optional<File> File::containing(const VariantEntity &entity) {
 
   if (false) {
     MX_FOR_EACH_ENTITY_CATEGORY(GET_FILE, GET_FILE, MX_IGNORE_ENTITY_CATEGORY,
-                                GET_FILE, GET_FILE, GET_FILE)
+                                GET_FILE, GET_FILE, GET_FILE,
+                                MX_IGNORE_ENTITY_CATEGORY)
   } else {
     return std::nullopt;
   }

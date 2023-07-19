@@ -70,32 +70,6 @@ gap::generator<BTFTagAttributedType> BTFTagAttributedType::in(const Index &index
   }
 }
 
-gap::generator<BTFTagAttributedType> BTFTagAttributedType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kBTFTagAttributedTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<BTFTagAttributedType> e = BTFTagAttributedType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<BTFTagAttributedType> BTFTagAttributedType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kBTFTagAttributedTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<BTFTagAttributedType> e = BTFTagAttributedType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const Reference &r) {
   return BTFTagAttributedType::from(r.as_type());
 }

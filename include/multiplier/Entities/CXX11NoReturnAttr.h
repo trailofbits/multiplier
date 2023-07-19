@@ -30,12 +30,12 @@ class CXX11NoReturnAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CXX11NoReturnAttr> in(const Fragment &frag);
-  static gap::generator<CXX11NoReturnAttr> in(const File &file);
   static gap::generator<CXX11NoReturnAttr> in(const Index &index);
   static gap::generator<CXX11NoReturnAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXX11NoReturnAttr> by_id(const Index &, EntityId);
+  static gap::generator<CXX11NoReturnAttr> in(const Fragment &frag);
+  static gap::generator<CXX11NoReturnAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CXX11_NO_RETURN;

@@ -32,12 +32,12 @@ class OMPDeclareTargetDeclAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<OMPDeclareTargetDeclAttr> in(const Fragment &frag);
-  static gap::generator<OMPDeclareTargetDeclAttr> in(const File &file);
   static gap::generator<OMPDeclareTargetDeclAttr> in(const Index &index);
   static gap::generator<OMPDeclareTargetDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclareTargetDeclAttr> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclareTargetDeclAttr> in(const Fragment &frag);
+  static gap::generator<OMPDeclareTargetDeclAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_TARGET_DECL;

@@ -32,12 +32,12 @@ class CXXNoexceptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXNoexceptExpr> in(const Fragment &frag);
-  static gap::generator<CXXNoexceptExpr> in(const File &file);
   static gap::generator<CXXNoexceptExpr> in(const Index &index);
   static gap::generator<CXXNoexceptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXNoexceptExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXNoexceptExpr> in(const Fragment &frag);
+  static gap::generator<CXXNoexceptExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NOEXCEPT_EXPR;

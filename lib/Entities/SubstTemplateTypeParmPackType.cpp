@@ -71,32 +71,6 @@ gap::generator<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::in(
   }
 }
 
-gap::generator<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kSubstTemplateTypeParmPackTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<SubstTemplateTypeParmPackType> e = SubstTemplateTypeParmPackType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kSubstTemplateTypeParmPackTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<SubstTemplateTypeParmPackType> e = SubstTemplateTypeParmPackType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from(const Reference &r) {
   return SubstTemplateTypeParmPackType::from(r.as_type());
 }

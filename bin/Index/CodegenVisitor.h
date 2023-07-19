@@ -73,6 +73,12 @@ struct FallBackDeclVisitor
       return this->template create< Op >(std::forward< Args >(args)...);
   }
 
+  vast::Operation *VisitEmptyDecl(const clang::EmptyDecl *decl) {
+    auto loc = meta_location(decl);
+    llvm::SmallVector< vast::Value > elements;
+    return make< vast::hl::UnsupportedDeclOp >(loc, "empty", elements);
+  }
+
   vast::Operation *VisitFileScopeAsmDecl(const clang::FileScopeAsmDecl *decl) {
     auto loc = meta_location(decl);
     auto asm_string = decl->getAsmString();

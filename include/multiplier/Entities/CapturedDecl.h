@@ -29,12 +29,12 @@ class CapturedDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<CapturedDecl> in(const Fragment &frag);
-  static gap::generator<CapturedDecl> in(const File &file);
   static gap::generator<CapturedDecl> in(const Index &index);
   static gap::generator<CapturedDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CapturedDecl> by_id(const Index &, EntityId);
+  static gap::generator<CapturedDecl> in(const Fragment &frag);
+  static gap::generator<CapturedDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CAPTURED;

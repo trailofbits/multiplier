@@ -32,12 +32,12 @@ class PseudoObjectExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<PseudoObjectExpr> in(const Fragment &frag);
-  static gap::generator<PseudoObjectExpr> in(const File &file);
   static gap::generator<PseudoObjectExpr> in(const Index &index);
   static gap::generator<PseudoObjectExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<PseudoObjectExpr> by_id(const Index &, EntityId);
+  static gap::generator<PseudoObjectExpr> in(const Fragment &frag);
+  static gap::generator<PseudoObjectExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::PSEUDO_OBJECT_EXPR;

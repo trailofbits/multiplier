@@ -29,12 +29,12 @@ class TLSModelAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<TLSModelAttr> in(const Fragment &frag);
-  static gap::generator<TLSModelAttr> in(const File &file);
   static gap::generator<TLSModelAttr> in(const Index &index);
   static gap::generator<TLSModelAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TLSModelAttr> by_id(const Index &, EntityId);
+  static gap::generator<TLSModelAttr> in(const Fragment &frag);
+  static gap::generator<TLSModelAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TLS_MODEL;

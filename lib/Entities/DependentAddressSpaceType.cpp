@@ -70,32 +70,6 @@ gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::in(const In
   }
 }
 
-gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDependentAddressSpaceTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DependentAddressSpaceType> e = DependentAddressSpaceType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDependentAddressSpaceTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DependentAddressSpaceType> e = DependentAddressSpaceType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const Reference &r) {
   return DependentAddressSpaceType::from(r.as_type());
 }

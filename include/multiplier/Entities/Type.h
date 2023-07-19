@@ -87,11 +87,7 @@ class Type {
   TokenRange tokens(void) const;
 
  public:
-  static gap::generator<Type> in(const Fragment &frag, std::span<TypeKind> kinds);
-  static gap::generator<Type> in(const File &file, std::span<TypeKind> kinds);
   static gap::generator<Type> in(const Index &index, std::span<TypeKind> kinds);
-  static gap::generator<Type> in(const Fragment &frag);
-  static gap::generator<Type> in(const File &file);
   static gap::generator<Type> in(const Index &index);
   static gap::generator<Type> containing(const Token &tok);
   bool contains(const Token &tok) const;

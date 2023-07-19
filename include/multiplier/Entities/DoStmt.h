@@ -29,12 +29,12 @@ class DoStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<DoStmt> in(const Fragment &frag);
-  static gap::generator<DoStmt> in(const File &file);
   static gap::generator<DoStmt> in(const Index &index);
   static gap::generator<DoStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DoStmt> by_id(const Index &, EntityId);
+  static gap::generator<DoStmt> in(const Fragment &frag);
+  static gap::generator<DoStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DO_STMT;

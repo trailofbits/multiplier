@@ -334,12 +334,12 @@ class InheritableAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<InheritableAttr> in(const Fragment &frag);
-  static gap::generator<InheritableAttr> in(const File &file);
   static gap::generator<InheritableAttr> in(const Index &index);
   static gap::generator<InheritableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InheritableAttr> by_id(const Index &, EntityId);
+  static gap::generator<InheritableAttr> in(const Fragment &frag);
+  static gap::generator<InheritableAttr> in(const File &file);
 
   static std::optional<InheritableAttr> from(const Attr &parent);
 

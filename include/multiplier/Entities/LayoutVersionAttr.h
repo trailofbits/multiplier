@@ -29,12 +29,12 @@ class LayoutVersionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<LayoutVersionAttr> in(const Fragment &frag);
-  static gap::generator<LayoutVersionAttr> in(const File &file);
   static gap::generator<LayoutVersionAttr> in(const Index &index);
   static gap::generator<LayoutVersionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LayoutVersionAttr> by_id(const Index &, EntityId);
+  static gap::generator<LayoutVersionAttr> in(const Fragment &frag);
+  static gap::generator<LayoutVersionAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LAYOUT_VERSION;

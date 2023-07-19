@@ -80,15 +80,15 @@ class Attr {
   gap::generator<Reference> references(void) const &;
 
  public:
+  static gap::generator<Attr> in(const Index &index, std::span<AttrKind> kinds);
   static gap::generator<Attr> in(const Fragment &frag, std::span<AttrKind> kinds);
   static gap::generator<Attr> in(const File &file, std::span<AttrKind> kinds);
-  static gap::generator<Attr> in(const Index &index, std::span<AttrKind> kinds);
-  static gap::generator<Attr> in(const Fragment &frag);
-  static gap::generator<Attr> in(const File &file);
   static gap::generator<Attr> in(const Index &index);
   static gap::generator<Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<Attr> by_id(const Index &, EntityId);
+  static gap::generator<Attr> in(const Fragment &frag);
+  static gap::generator<Attr> in(const File &file);
 
   inline static std::optional<Attr> from(const Attr &self) {
     return self;

@@ -27,12 +27,12 @@ class ObjCDirectAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<ObjCDirectAttr> in(const Fragment &frag);
-  static gap::generator<ObjCDirectAttr> in(const File &file);
   static gap::generator<ObjCDirectAttr> in(const Index &index);
   static gap::generator<ObjCDirectAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCDirectAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCDirectAttr> in(const Fragment &frag);
+  static gap::generator<ObjCDirectAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DIRECT;

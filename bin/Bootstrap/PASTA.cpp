@@ -2171,14 +2171,18 @@ MethodListPtr CodeGenerator::RunOnClass(
       forward_decls.insert("Index");
       class_os
           << "  static gap::generator<"
-          << class_name << "> in(const Fragment &frag, std::span<"
-          << class_name << "Kind> kinds);\n"
-          << "  static gap::generator<"
-          << class_name << "> in(const File &file, std::span<"
-          << class_name << "Kind> kinds);\n"
-          << "  static gap::generator<"
           << class_name << "> in(const Index &index, std::span<"
           << class_name << "Kind> kinds);\n";
+
+      if (!is_type) {
+        class_os
+            << "  static gap::generator<"
+            << class_name << "> in(const Fragment &frag, std::span<"
+            << class_name << "Kind> kinds);\n"
+            << "  static gap::generator<"
+            << class_name << "> in(const File &file, std::span<"
+            << class_name << "Kind> kinds);\n";
+      }
     }
   }
 
@@ -2188,15 +2192,20 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     class_os
         << "  static gap::generator<"
-        << class_name << "> in(const Fragment &frag);\n"
-        << "  static gap::generator<"
-        << class_name << "> in(const File &file);\n"
-        << "  static gap::generator<"
         << class_name << "> in(const Index &index);\n"
         << "  static gap::generator<" << class_name
         << "> containing(const Token &tok);\n"
         << "  bool contains(const Token &tok) const;\n"
-        << "  static std::optional<" << class_name << "> by_id(const Index &, EntityId);\n\n";
+        << "  static std::optional<" << class_name << "> by_id(const Index &, EntityId);\n";
+
+    if (!is_type) {
+      class_os
+          << "  static gap::generator<"
+          << class_name << "> in(const Fragment &frag);\n"
+          << "  static gap::generator<"
+          << class_name << "> in(const File &file);\n";
+    }
+    class_os << "\n";
 
     lib_cpp_os
         << "gap::generator<" << class_name
@@ -2535,32 +2544,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n"
           << "}\n\n"
           << "gap::generator<" << class_name << "> " << class_name
-          << "::in(const Fragment &frag) {\n"
-          << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
-          << "  PackedFragmentId frag_id = frag.id();\n"
-          << "  for (" << base_name << "ImplPtr eptr : ep->"
-          << base_name << "sFor(ep, frag_id)) {\n"
-          << "    if (std::optional<" << class_name << "> e = "
-          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
-          << "      co_yield std::move(e.value());\n"
-          << "    }\n"
-          << "  }\n"
-          << "}\n\n"
-          << "gap::generator<" << class_name << "> " << class_name
-          << "::in(const File &file) {\n"
-          << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
-          << "  PackedFileId file_id = file.id();\n"
-          << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
-          << "    for (" << base_name << "ImplPtr eptr : ep->"
-          << base_name << "sFor(ep, frag_id)) {\n"
-          << "      if (std::optional<" << class_name << "> e = "
-          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
-          << "        co_yield std::move(e.value());\n"
-          << "      }\n"
-          << "    }\n"
-          << "  }\n"
-          << "}\n\n"
-          << "gap::generator<" << class_name << "> " << class_name
           << "::in(const Index &index, std::span<" << class_name << "Kind> kinds) {\n"
           << "  const EntityProviderPtr ep = entity_provider_of(index);\n"
           << "  for (" << base_name << "Kind k : kinds) {\n"
@@ -2569,31 +2552,62 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "      co_yield " << base_name << "(std::move(eptr));\n"
           << "    }\n"
           << "  }\n"
-          << "}\n\n"
-          << "gap::generator<" << class_name << "> " << class_name
-          << "::in(const Fragment &frag, std::span<" << class_name << "Kind> kinds) {\n"
-          << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
-          << "  PackedFragmentId frag_id = frag.id();\n"
-          << "  for (" << base_name << "Kind k : kinds) {\n"
-          << "    for (" << base_name << "ImplPtr eptr : ep->"
-          << base_name << "sFor(ep, k, frag_id)) {\n"
-          << "      co_yield " << base_name << "(std::move(eptr));\n"
-          << "    }\n"
-          << "  }\n"
-          << "}\n\n"
-          << "gap::generator<" << class_name << "> " << class_name
-          << "::in(const File &file, std::span<" << class_name << "Kind> kinds) {\n"
-          << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
-          << "  PackedFileId file_id = file.id();\n"
-          << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
-          << "    for (" << base_name << "Kind k : kinds) {\n"
-          << "      for (" << base_name << "ImplPtr eptr : ep->"
-          << base_name << "sFor(ep, k, frag_id)) {\n"
-          << "        co_yield " << base_name << "(std::move(eptr));\n"
-          << "      }\n"
-          << "    }\n"
-          << "  }\n"
           << "}\n\n";
+
+      if (!is_type) {
+        lib_cpp_os
+            << "gap::generator<" << class_name << "> " << class_name
+            << "::in(const File &file) {\n"
+            << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
+            << "  PackedFileId file_id = file.id();\n"
+            << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
+            << "    for (" << base_name << "ImplPtr eptr : ep->"
+            << base_name << "sFor(ep, frag_id)) {\n"
+            << "      if (std::optional<" << class_name << "> e = "
+            << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+            << "        co_yield std::move(e.value());\n"
+            << "      }\n"
+            << "    }\n"
+            << "  }\n"
+            << "}\n\n"
+            << "gap::generator<" << class_name << "> " << class_name
+            << "::in(const Fragment &frag) {\n"
+            << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
+            << "  PackedFragmentId frag_id = frag.id();\n"
+            << "  for (" << base_name << "ImplPtr eptr : ep->"
+            << base_name << "sFor(ep, frag_id)) {\n"
+            << "    if (std::optional<" << class_name << "> e = "
+            << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+            << "      co_yield std::move(e.value());\n"
+            << "    }\n"
+            << "  }\n"
+            << "}\n\n"
+            << "gap::generator<" << class_name << "> " << class_name
+            << "::in(const Fragment &frag, std::span<" << class_name << "Kind> kinds) {\n"
+            << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
+            << "  PackedFragmentId frag_id = frag.id();\n"
+            << "  for (" << base_name << "Kind k : kinds) {\n"
+            << "    for (" << base_name << "ImplPtr eptr : ep->"
+            << base_name << "sFor(ep, k, frag_id)) {\n"
+            << "      co_yield " << base_name << "(std::move(eptr));\n"
+            << "    }\n"
+            << "  }\n"
+            << "}\n\n"
+            << "gap::generator<" << class_name << "> " << class_name
+            << "::in(const File &file, std::span<" << class_name << "Kind> kinds) {\n"
+            << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
+            << "  PackedFileId file_id = file.id();\n"
+            << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
+            << "    for (" << base_name << "Kind k : kinds) {\n"
+            << "      for (" << base_name << "ImplPtr eptr : ep->"
+            << base_name << "sFor(ep, k, frag_id)) {\n"
+            << "        co_yield " << base_name << "(std::move(eptr));\n"
+            << "      }\n"
+            << "    }\n"
+            << "  }\n"
+            << "}\n\n";
+      }
+
     } else {
       // Derived classes have optional conversions that need to account for
       // derived kinds.
@@ -2657,37 +2671,41 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "      }\n"
           << "    }\n"
           << "  }\n"
-          << "}\n\n"
-          << "gap::generator<" << class_name << "> " << class_name
-          << "::in(const Fragment &frag) {\n"
-          << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
-          << "  PackedFragmentId frag_id = frag.id();\n"
-          << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
-          << "    for (" << base_name << "ImplPtr eptr : ep->"
-          << base_name << "sFor(ep, k, frag_id)) {\n"
-          << "      if (std::optional<" << class_name << "> e = "
-          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
-          << "        co_yield std::move(e.value());\n"
-          << "      }\n"
-          << "    }\n"
-          << "  }\n"
-          << "}\n\n"
-          << "gap::generator<" << class_name << "> " << class_name
-          << "::in(const File &file) {\n"
-          << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
-          << "  PackedFileId file_id = file.id();\n"
-          << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
-          << "    for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
-          << "      for (" << base_name << "ImplPtr eptr : ep->"
-          << base_name << "sFor(ep, k, frag_id)) {\n"
-          << "        if (std::optional<" << class_name << "> e = "
-          << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
-          << "          co_yield std::move(e.value());\n"
-          << "        }\n"
-          << "      }\n"
-          << "    }\n"
-          << "  }\n"
           << "}\n\n";
+
+      if (!is_type) {
+        lib_cpp_os
+            << "gap::generator<" << class_name << "> " << class_name
+            << "::in(const Fragment &frag) {\n"
+            << "  const EntityProviderPtr ep = entity_provider_of(frag);\n"
+            << "  PackedFragmentId frag_id = frag.id();\n"
+            << "  for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
+            << "    for (" << base_name << "ImplPtr eptr : ep->"
+            << base_name << "sFor(ep, k, frag_id)) {\n"
+            << "      if (std::optional<" << class_name << "> e = "
+            << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+            << "        co_yield std::move(e.value());\n"
+            << "      }\n"
+            << "    }\n"
+            << "  }\n"
+            << "}\n\n"
+            << "gap::generator<" << class_name << "> " << class_name
+            << "::in(const File &file) {\n"
+            << "  const EntityProviderPtr ep = entity_provider_of(file);\n"
+            << "  PackedFileId file_id = file.id();\n"
+            << "  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {\n"
+            << "    for (" << base_name << "Kind k : k" << class_name << "DerivedKinds) {\n"
+            << "      for (" << base_name << "ImplPtr eptr : ep->"
+            << base_name << "sFor(ep, k, frag_id)) {\n"
+            << "        if (std::optional<" << class_name << "> e = "
+            << class_name << "::from(" << base_name << "(std::move(eptr)))) {\n"
+            << "          co_yield std::move(e.value());\n"
+            << "        }\n"
+            << "      }\n"
+            << "    }\n"
+            << "  }\n"
+            << "}\n\n";
+      }
     }
   }
 

@@ -30,12 +30,12 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPCancellationPointDirective> in(const Fragment &frag);
-  static gap::generator<OMPCancellationPointDirective> in(const File &file);
   static gap::generator<OMPCancellationPointDirective> in(const Index &index);
   static gap::generator<OMPCancellationPointDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPCancellationPointDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPCancellationPointDirective> in(const Fragment &frag);
+  static gap::generator<OMPCancellationPointDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE;

@@ -29,12 +29,12 @@ class DisableTailCallsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<DisableTailCallsAttr> in(const Fragment &frag);
-  static gap::generator<DisableTailCallsAttr> in(const File &file);
   static gap::generator<DisableTailCallsAttr> in(const Index &index);
   static gap::generator<DisableTailCallsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DisableTailCallsAttr> by_id(const Index &, EntityId);
+  static gap::generator<DisableTailCallsAttr> in(const Fragment &frag);
+  static gap::generator<DisableTailCallsAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DISABLE_TAIL_CALLS;

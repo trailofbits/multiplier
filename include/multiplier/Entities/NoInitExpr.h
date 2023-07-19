@@ -32,12 +32,12 @@ class NoInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<NoInitExpr> in(const Fragment &frag);
-  static gap::generator<NoInitExpr> in(const File &file);
   static gap::generator<NoInitExpr> in(const Index &index);
   static gap::generator<NoInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoInitExpr> by_id(const Index &, EntityId);
+  static gap::generator<NoInitExpr> in(const Fragment &frag);
+  static gap::generator<NoInitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::NO_INIT_EXPR;

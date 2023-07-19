@@ -28,8 +28,6 @@ class DependentSizedExtVectorType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<DependentSizedExtVectorType> in(const Fragment &frag);
-  static gap::generator<DependentSizedExtVectorType> in(const File &file);
   static gap::generator<DependentSizedExtVectorType> in(const Index &index);
   static gap::generator<DependentSizedExtVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;

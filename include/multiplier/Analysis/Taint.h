@@ -7,6 +7,7 @@
 #include <gap/core/generator.hpp>
 #include <optional>
 #include <memory>
+#include <multiplier/Compilation.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/CallExpr.h>
 #include <multiplier/Entities/CXXBaseSpecifier.h>

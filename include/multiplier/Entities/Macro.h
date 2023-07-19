@@ -90,9 +90,9 @@ class Macro {
   TokenRange expansion_tokens(void) const &;
   gap::generator<Token> generate_expansion_tokens(void) const &;
 
+  static gap::generator<Macro> in(const Index &index, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const Fragment &frag, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const File &file, std::span<MacroKind> kinds);
-  static gap::generator<Macro> in(const Index &index, std::span<MacroKind> kinds);
   static gap::generator<Macro> in(const Fragment &frag);
   static gap::generator<Macro> in(const File &file);
 

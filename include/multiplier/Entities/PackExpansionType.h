@@ -27,8 +27,6 @@ class PackExpansionType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<PackExpansionType> in(const Fragment &frag);
-  static gap::generator<PackExpansionType> in(const File &file);
   static gap::generator<PackExpansionType> in(const Index &index);
   static gap::generator<PackExpansionType> containing(const Token &tok);
   bool contains(const Token &tok) const;

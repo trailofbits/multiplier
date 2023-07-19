@@ -28,8 +28,6 @@ class AdjustedType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<AdjustedType> in(const Fragment &frag);
-  static gap::generator<AdjustedType> in(const File &file);
   static gap::generator<AdjustedType> in(const Index &index);
   static gap::generator<AdjustedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

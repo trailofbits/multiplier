@@ -28,8 +28,6 @@ class TypeOfExprType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TypeOfExprType> in(const Fragment &frag);
-  static gap::generator<TypeOfExprType> in(const File &file);
   static gap::generator<TypeOfExprType> in(const Index &index);
   static gap::generator<TypeOfExprType> containing(const Token &tok);
   bool contains(const Token &tok) const;

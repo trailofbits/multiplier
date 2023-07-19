@@ -27,12 +27,12 @@ class OverloadableAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<OverloadableAttr> in(const Fragment &frag);
-  static gap::generator<OverloadableAttr> in(const File &file);
   static gap::generator<OverloadableAttr> in(const Index &index);
   static gap::generator<OverloadableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OverloadableAttr> by_id(const Index &, EntityId);
+  static gap::generator<OverloadableAttr> in(const Fragment &frag);
+  static gap::generator<OverloadableAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OVERLOADABLE;

@@ -29,8 +29,6 @@ class SubstTemplateTypeParmType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<SubstTemplateTypeParmType> in(const Fragment &frag);
-  static gap::generator<SubstTemplateTypeParmType> in(const File &file);
   static gap::generator<SubstTemplateTypeParmType> in(const Index &index);
   static gap::generator<SubstTemplateTypeParmType> containing(const Token &tok);
   bool contains(const Token &tok) const;

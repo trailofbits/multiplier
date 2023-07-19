@@ -33,7 +33,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
-                            MX_DEFINE_GETTER)
+                            MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 
 std::optional<TokenContextReader::Reader>
@@ -72,7 +73,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
-                            MX_DEFINE_GETTER)
+                            MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 
 std::optional<TokenContextReader::Reader>
@@ -158,7 +160,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER,
-                            MX_DEFINE_GETTER)
+                            MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 
 // Return the aliased context.

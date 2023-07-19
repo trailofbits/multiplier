@@ -29,8 +29,6 @@ class ConstantMatrixType : public MatrixType {
   friend class MatrixType;
   friend class Type;
  public:
-  static gap::generator<ConstantMatrixType> in(const Fragment &frag);
-  static gap::generator<ConstantMatrixType> in(const File &file);
   static gap::generator<ConstantMatrixType> in(const Index &index);
   static gap::generator<ConstantMatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;

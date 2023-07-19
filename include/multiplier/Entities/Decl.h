@@ -97,15 +97,15 @@ class Decl {
   Decl canonical_declaration(void) const;
   gap::generator<Decl> redeclarations(void) const &;
  public:
+  static gap::generator<Decl> in(const Index &index, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const Fragment &frag, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const File &file, std::span<DeclKind> kinds);
-  static gap::generator<Decl> in(const Index &index, std::span<DeclKind> kinds);
-  static gap::generator<Decl> in(const Fragment &frag);
-  static gap::generator<Decl> in(const File &file);
   static gap::generator<Decl> in(const Index &index);
   static gap::generator<Decl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<Decl> by_id(const Index &, EntityId);
+  static gap::generator<Decl> in(const Fragment &frag);
+  static gap::generator<Decl> in(const File &file);
 
   static gap::generator<Decl> containing(const Decl &decl);
   static gap::generator<Decl> containing(const std::optional<Decl> &decl);

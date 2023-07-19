@@ -32,12 +32,12 @@ class OpaqueValueExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<OpaqueValueExpr> in(const Fragment &frag);
-  static gap::generator<OpaqueValueExpr> in(const File &file);
   static gap::generator<OpaqueValueExpr> in(const Index &index);
   static gap::generator<OpaqueValueExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OpaqueValueExpr> by_id(const Index &, EntityId);
+  static gap::generator<OpaqueValueExpr> in(const Fragment &frag);
+  static gap::generator<OpaqueValueExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OPAQUE_VALUE_EXPR;

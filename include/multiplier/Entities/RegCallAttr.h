@@ -29,12 +29,12 @@ class RegCallAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<RegCallAttr> in(const Fragment &frag);
-  static gap::generator<RegCallAttr> in(const File &file);
   static gap::generator<RegCallAttr> in(const Index &index);
   static gap::generator<RegCallAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<RegCallAttr> by_id(const Index &, EntityId);
+  static gap::generator<RegCallAttr> in(const Fragment &frag);
+  static gap::generator<RegCallAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::REG_CALL;

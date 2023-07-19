@@ -33,12 +33,12 @@ class CXXUnresolvedConstructExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXUnresolvedConstructExpr> in(const Fragment &frag);
-  static gap::generator<CXXUnresolvedConstructExpr> in(const File &file);
   static gap::generator<CXXUnresolvedConstructExpr> in(const Index &index);
   static gap::generator<CXXUnresolvedConstructExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXUnresolvedConstructExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXUnresolvedConstructExpr> in(const Fragment &frag);
+  static gap::generator<CXXUnresolvedConstructExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;

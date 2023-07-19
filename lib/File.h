@@ -75,8 +75,8 @@ class ReadFileTokensFromFile final : public TokenReader {
 // Interface for accessing the tokens of a file.
 class FileImpl final : public EntityImpl<rpc::File> {
  public:
-  using Ptr = std::shared_ptr<const FileImpl>;
-  using WeakPtr = std::weak_ptr<const FileImpl>;
+  using Ptr = FileImplPtr;
+  using WeakPtr = WeakFileImplPtr;
 
  private:
   friend class ReadFileTokensFromFile;

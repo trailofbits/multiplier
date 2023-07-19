@@ -29,12 +29,12 @@ class NoReturnAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NoReturnAttr> in(const Fragment &frag);
-  static gap::generator<NoReturnAttr> in(const File &file);
   static gap::generator<NoReturnAttr> in(const Index &index);
   static gap::generator<NoReturnAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoReturnAttr> by_id(const Index &, EntityId);
+  static gap::generator<NoReturnAttr> in(const Fragment &frag);
+  static gap::generator<NoReturnAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_RETURN;

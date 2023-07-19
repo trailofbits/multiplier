@@ -30,8 +30,6 @@ class ConstantArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<ConstantArrayType> in(const Fragment &frag);
-  static gap::generator<ConstantArrayType> in(const File &file);
   static gap::generator<ConstantArrayType> in(const Index &index);
   static gap::generator<ConstantArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

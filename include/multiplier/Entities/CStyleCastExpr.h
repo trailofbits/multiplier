@@ -36,12 +36,12 @@ class CStyleCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CStyleCastExpr> in(const Fragment &frag);
-  static gap::generator<CStyleCastExpr> in(const File &file);
   static gap::generator<CStyleCastExpr> in(const Index &index);
   static gap::generator<CStyleCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CStyleCastExpr> by_id(const Index &, EntityId);
+  static gap::generator<CStyleCastExpr> in(const Fragment &frag);
+  static gap::generator<CStyleCastExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::C_STYLE_CAST_EXPR;

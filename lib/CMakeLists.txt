@@ -77,6 +77,7 @@ add_custom_target("copy_headers"
 
 set(api_headers
   "${source_include_dir}/AST.h"
+  "${source_include_dir}/Compilation.h"
   $<BUILD_INTERFACE:${source_include_dir}/Database.h>
   "${source_include_dir}/Entity.h"
   "${source_include_dir}/File.h"
@@ -102,6 +103,8 @@ add_library("mx-api" STATIC
   "Attr.cpp"
   "CachingEntityProvider.cpp"
   "CachingEntityProvider.h"
+  "Compilation.h"
+  "Compilation.cpp"
   "CXXBaseSpecifier.h"
   "Database.cpp"
   "Decl.h"

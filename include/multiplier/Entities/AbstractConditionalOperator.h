@@ -34,12 +34,12 @@ class AbstractConditionalOperator : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<AbstractConditionalOperator> in(const Fragment &frag);
-  static gap::generator<AbstractConditionalOperator> in(const File &file);
   static gap::generator<AbstractConditionalOperator> in(const Index &index);
   static gap::generator<AbstractConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AbstractConditionalOperator> by_id(const Index &, EntityId);
+  static gap::generator<AbstractConditionalOperator> in(const Fragment &frag);
+  static gap::generator<AbstractConditionalOperator> in(const File &file);
 
   static gap::generator<AbstractConditionalOperator> containing(const Decl &decl);
   static gap::generator<AbstractConditionalOperator> containing(const std::optional<Decl> &decl);

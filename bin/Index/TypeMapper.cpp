@@ -104,8 +104,8 @@ mx::PackedTypeId TypeMapper::GetOrCreateFragmentIdForType(
     const pasta::Type &entity, const pasta::PrintedTokenRange &token_range,
     bool &is_new_type_id) const {
   auto type_id_ = database.GetOrCreateTypeIdForHash(
-      mx::kInvalidEntityId, mx::FromPasta(entity.Kind()),
-      HashType(entity), token_range.size(), is_new_type_id);
+      mx::FromPasta(entity.Kind()), HashType(entity), token_range.size(),
+      is_new_type_id);
   return type_id_;
 }
 

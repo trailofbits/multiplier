@@ -29,8 +29,6 @@ class InjectedClassNameType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<InjectedClassNameType> in(const Fragment &frag);
-  static gap::generator<InjectedClassNameType> in(const File &file);
   static gap::generator<InjectedClassNameType> in(const Index &index);
   static gap::generator<InjectedClassNameType> containing(const Token &tok);
   bool contains(const Token &tok) const;

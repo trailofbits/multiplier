@@ -29,12 +29,12 @@ class CDeclAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CDeclAttr> in(const Fragment &frag);
-  static gap::generator<CDeclAttr> in(const File &file);
   static gap::generator<CDeclAttr> in(const Index &index);
   static gap::generator<CDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CDeclAttr> by_id(const Index &, EntityId);
+  static gap::generator<CDeclAttr> in(const Fragment &frag);
+  static gap::generator<CDeclAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::C_DECL;
