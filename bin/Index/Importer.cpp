@@ -467,7 +467,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
         << "Creating indexing action for main source file "
         << job.SourceFile().Path().generic_string();
 
-    ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
+    ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, cc, job);
   }
 
   LOG_IF(ERROR, !num_jobs)

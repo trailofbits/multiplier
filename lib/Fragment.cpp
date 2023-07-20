@@ -31,9 +31,9 @@ namespace ir {
 class SourceIRImpl;
 }  // namespace ir
 
-std::optional<Fragment> Fragment::containing(const Fragment &child) {
-  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
-    return Fragment(impl->ep->FragmentFor(impl->ep, parent_id));
+Fragment Fragment::containing(const Fragment &child) {
+  for (mx::RawEntityId parent_id : child.impl->reader.getParentIds()) {
+    return Fragment(child.impl->ep->FragmentFor(child.impl->ep, parent_id));
   }
   return child;
 }

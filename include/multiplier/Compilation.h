@@ -65,6 +65,7 @@ class Compilation {
 
   // The compilation containing/owning a fragment.
   static Compilation containing(const Fragment &);
+  static std::optional<Compilation> containing(const std::optional<Fragment> &);
 
   static Compilation containing(const Decl &);
   static Compilation containing(const Stmt &);

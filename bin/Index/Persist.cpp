@@ -1052,8 +1052,20 @@ void GlobalIndexingState::PersistCompilation(
   cc.setSystemRootIncludeDirectory(job.SystemRootIncludeDirectory().generic_string());
   cc.setResourceDirectory(job.ResourceDirectory().generic_string());
   cc.setInstallationDirectory(compiler.InstallationDirectory().generic_string());
-  cc.setTargetTriple(job.TargetTriple());
-  cc.setAuxTargetTriple(job.AuxiliaryTargetTriple());
+
+  capnp::Text::Reader reader("", 0u);
+  std::string_view triple = job.TargetTriple();
+  if (!triple.empty()) {
+    reader = capnp::Text::Reader(triple.data(), triple.size());
+  }
+  cc.setTargetTriple(reader);
+
+  triple = job.AuxiliaryTargetTriple();
+  reader = capnp::Text::Reader("", 0u);
+  if (!triple.empty()) {
+    reader = capnp::Text::Reader(triple.data(), triple.size());
+  }
+  cc.setAuxTargetTriple(reader);
 
   auto i = 0u;
   const pasta::ArgumentVector &args = job.Arguments();
@@ -1073,7 +1085,7 @@ void GlobalIndexingState::PersistCompilation(
 
   i = 0u;
   paths = compiler.UserIncludeDirectories();
-  auto ipl = cc.initUserIncludePaths(static_cast<unsigned>(paths.size()));
+  ipl = cc.initUserIncludePaths(static_cast<unsigned>(paths.size()));
   for (const pasta::IncludePath &path : paths) {
     mx::rpc::IncludePath::Builder ipb = ipl[i++];
     ipb.setDirectory(path.Path().generic_string());
@@ -1082,7 +1094,7 @@ void GlobalIndexingState::PersistCompilation(
 
   i = 0u;
   paths = compiler.FrameworkDirectories();
-  auto ipl = cc.initFrameworkPaths(static_cast<unsigned>(paths.size()));
+  ipl = cc.initFrameworkPaths(static_cast<unsigned>(paths.size()));
   for (const pasta::IncludePath &path : paths) {
     mx::rpc::IncludePath::Builder ipb = ipl[i++];
     ipb.setDirectory(path.Path().generic_string());

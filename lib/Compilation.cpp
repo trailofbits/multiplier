@@ -14,6 +14,8 @@
 #include "IR/SourceIR.h"
 #endif
 
+#include "Token.h"
+
 namespace mx {
 
 CompilationImpl::~CompilationImpl(void) noexcept {}
@@ -39,6 +41,15 @@ PackedCompilationId Compilation::id(void) const noexcept {
 // The compilation containing/owning a fragment.
 Compilation Compilation::containing(const Fragment &frag) {
   return frag.compilation();
+}
+
+std::optional<Compilation> Compilation::containing(
+    const std::optional<Fragment> &frag) {
+  if (frag) {
+    return Compilation::containing(frag.value());
+  } else {
+    return std::nullopt;
+  }
 }
 
 Compilation Compilation::containing(const Decl &entity) {
@@ -73,33 +84,13 @@ Compilation Compilation::containing(const Macro &entity) {
   return Compilation::containing(Fragment::containing(entity));
 }
 
-std::optional<Fragment> Fragment::containing(const Token &entity) {
-  if (auto frag = entity.impl->NthOwningFragment(entity.offset)) {
-    return Fragment(FragmentImplPtr(entity.impl, frag));
-  } else {
-    return std::nullopt;
-  }
+std::optional<Compilation> Compilation::containing(const Token &entity) {
+  return Compilation::containing(Fragment::containing(entity));
 }
 
-std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
-#define GET_FRAGMENT(type_name, lower_name, enum_name, category) \
-      } else if (std::holds_alternative<type_name>(entity)) { \
-        return Fragment::containing(std::get<type_name>(entity));
-
-  // TODO(pag): Pseudo entities have a fragment id.
-
-  if (false) {
-    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                                GET_FRAGMENT,
-                                MX_IGNORE_ENTITY_CATEGORY,
-                                GET_FRAGMENT,
-                                GET_FRAGMENT,
-                                GET_FRAGMENT,
-                                MX_IGNORE_ENTITY_CATEGORY)
-  } else {
-    return std::nullopt;
-  }
-#undef GET_FRAGMENT
+std::optional<Compilation> Compilation::containing(
+    const VariantEntity &entity) {
+  return Compilation::containing(Fragment::containing(entity));
 }
 
 // The fragments owned by this compilation. This will be a subset of all
