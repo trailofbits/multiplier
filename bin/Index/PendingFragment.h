@@ -111,6 +111,9 @@ class PendingFragment {
   // `TemplateParamterList` or a `TemplateArgument` is a pseudo entity.
   std::vector<Pseudo> pseudos_to_serialize;
 
+  // Did we encounter an error during serialization?
+  bool has_error{false};
+
   bool Add(const pasta::Decl &entity, EntityIdMap &entity_ids);
   bool Add(const pasta::Stmt &entity, EntityIdMap &entity_ids);
   bool Add(const pasta::Type &entity, TypeMapper &type_map);

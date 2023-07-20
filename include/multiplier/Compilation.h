@@ -6,8 +6,12 @@
 
 #pragma once
 
+#include <filesystem>
 #include <gap/core/generator.hpp>
 #include <memory>
+#include <optional>
+#include <string_view>
+#include <utility>
 
 #include "Types.h"
 
@@ -29,11 +33,15 @@ class Reference;
 
 using CompilationImplPtr = std::shared_ptr<const CompilationImpl>;
 
+enum class IncludePathLocation : unsigned char;
+
 // Represents a single compile command.
 class Compilation {
  private:
   friend class CompilationImpl;
   friend class EntityProvider;
+  friend class File;
+  friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Reference;
@@ -64,6 +72,58 @@ class Compilation {
 
   // The main source file of this compilation.
   File main_source_file(void) const noexcept;
+
+  // The path of the main source file for this job. This should be one of the
+  // paths in teh `main_source_file().paths()` list.
+  std::filesystem::path main_source_file_path(void) const noexcept;
+
+  // Path of the compiler's executable.
+  std::filesystem::path compiler_executable_path(void) const noexcept;
+
+  // Path of the compiler's installation directory. The compiler uses this
+  // when locating runtime libraries.
+  std::filesystem::path compiler_installation_directory(void) const noexcept;
+
+  // Path of the working directory in which this compilation was executed.
+  std::filesystem::path working_directory(void) const noexcept;
+
+  // Path of the system root directory. This is relevant to cross-compilations,
+  // where sometimes one will instruct the compiler to treat something as an
+  // alternate system root.
+  std::filesystem::path system_root_directory(void) const noexcept;
+
+  // Path of the system root directory for include resolution.
+  std::filesystem::path system_root_directory_include_path(void) const noexcept;
+
+  // Path of the compiler's resource directory. This is where things like
+  // `stdarg.h` come from.
+  std::filesystem::path resource_directory(void) const noexcept;
+
+  // The target triple used by the compiler. This selects the target
+  // architecture, operating system, platform, etc.
+  std::string_view target_triple(void) const noexcept;
+
+  // The auxiliary target triple used by the compiler. This selects sub-target
+  // features, e.g. for a GPU.
+  std::optional<std::string_view> auxiliary_target_triple(void) const noexcept;
+
+  // Arguments to this compile command.
+  gap::generator<std::string_view> arguments(void) const noexcept;
+
+  // List of system include directories that influenced parsing. These can be
+  // built-in or specified with command-line options like `-isystem /path`.
+  gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
+  system_include_directories(void) const & noexcept;
+
+  // List of system include directories that influenced parsing. These are
+  // usually specified with command-line options like `-I /path`.
+  gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
+  user_include_directories(void) const & noexcept;
+
+  // List of framework directories that influenced parsing. These are relevant
+  // on macOS.
+  gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
+  framework_directories(void) const & noexcept;
 };
 
 }  // namespace mx

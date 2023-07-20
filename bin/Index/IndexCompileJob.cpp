@@ -1316,9 +1316,9 @@ static std::vector<PendingFragment> CreatePendingFragments(
 // Serialize the parsed fragments that were identified as new and/or "won"
 // the race to assign a fragment ID in this thread of execution.
 static void PersistParsedFragments(
-    GlobalIndexingState &context, const pasta::AST &ast,
-    EntityMapper &em, TokenProvenanceCalculator &provenance,
-    mx::PackedCompilationId tu_id,
+    GlobalIndexingState &context, const pasta::CompileJob &job,
+    const pasta::AST &ast, EntityMapper &em,
+    TokenProvenanceCalculator &provenance, mx::PackedCompilationId tu_id,
     std::vector<PendingFragment> pending_fragments) {
 
   pasta::TokenRange tok_range = ast.Tokens();
@@ -1336,6 +1336,8 @@ static void PersistParsedFragments(
       context.PersistFragment(ast, tok_range, mangler, em, provenance, pf);
       context.PersistTypes(ast, mangler, em, pf);
     } catch (...) {
+      pf.has_error = true;
+
       if (!pf.top_level_decls.empty()) {
         const pasta::Decl &leader_decl = pf.top_level_decls.front();
         LOG(ERROR)
@@ -1367,7 +1369,7 @@ static void PersistParsedFragments(
     }
   }
 
-  context.PersistCompilation(ast, em, tu_id, pending_fragments);
+  context.PersistCompilation(job, ast, em, tu_id, pending_fragments);
 }
 
 // Look through all files referenced by the AST get their unique IDs. If this
@@ -1479,7 +1481,7 @@ void IndexCompileJobAction::Run(void) {
 
   TokenProvenanceCalculator provenance(em);
   PersistParsedFragments(
-      *context, ast, em, provenance, tu_id,
+      *context, job, ast, em, provenance, tu_id,
       CreatePendingFragments(
           *context, em, ast, tu_id,
           PartitionEntities(*context, ast)));

@@ -30,6 +30,23 @@ namespace ir {
 class SourceIRImpl;
 }  // namespace ir
 
+std::optional<Fragment> Fragment::containing(const Fragment &child) {
+  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
+    return Fragment(impl->ep->FragmentFor(impl->ep, parent_id));
+  }
+  return child;
+}
+
+// A fragment can be nested inside of another fragment. This is very common
+// with C++ templates, but can also happen in C due to elaborated type uses,
+// such as `struct foo`, acting as forward declarations upon their first use.
+std::optional<Fragment> Fragment::parent(void) const noexcept {
+  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
+    return Fragment(impl->ep->FragmentFor(impl->ep, parent_id));
+  }
+  return std::nullopt;
+}
+
 // Return the fragment containing a query match.
 Fragment Fragment::containing(const WeggliQueryMatch &match) {
   return Fragment(match.frag);

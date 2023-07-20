@@ -37,6 +37,7 @@ class FragmentBuilder final {
       : em(em_),
         fragment(fragment_) {}
 
+#ifndef __CDT_PARSER__
 #define MX_BEGIN_VISIT_DECL(name) void Visit ## name (const pasta::name &);
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
@@ -44,6 +45,7 @@ class FragmentBuilder final {
 #define MX_BEGIN_VISIT_MACRO MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
+#endif
 
   void Accept(const pasta::Decl &entity);
   void Accept(const pasta::Stmt &entity);
@@ -97,6 +99,7 @@ class FragmentBuilder final {
   }
 };
 
+#ifndef __CDT_PARSER__
 #define MX_VISIT_BASE(derived_type, base_type) \
     Visit ## base_type(entity);
 
@@ -151,6 +154,7 @@ class FragmentBuilder final {
 #define MX_END_VISIT_MACRO MX_END_VISIT_DECL
 
 #include <multiplier/Visitor.inc.h>
+#endif
 
 void FragmentBuilder::Accept(const pasta::Decl &entity) {
   switch (entity.Kind()) {

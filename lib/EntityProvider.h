@@ -35,6 +35,7 @@ class EntityProvider {
 
  private:
   friend class CachingEntityProvider;
+  friend class Compilation;
   friend class Decl;
   friend class File;
   friend class Fragment;

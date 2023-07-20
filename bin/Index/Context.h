@@ -19,6 +19,8 @@
 #include "Util.h"
 
 namespace pasta {
+class CompileJob;
+class Compiler;
 class File;
 class TokenRange;
 }  // namespace pasta
@@ -132,8 +134,9 @@ class GlobalIndexingState {
                     EntityMapper &em, const PendingFragment &fragment);
 
   // Persist the compilation.
-  void PersistCompilation(const pasta::AST &ast, const EntityMapper &em,
-                          mx::PackedCompilationId tu_id,
+  void PersistCompilation(const pasta::Compiler &compiler,
+                          const pasta::CompileJob &job, const pasta::AST &ast,
+                          const EntityMapper &em, mx::PackedCompilationId tu_id,
                           const std::vector<PendingFragment> &fragments);
 };
 

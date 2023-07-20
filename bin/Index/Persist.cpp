@@ -17,9 +17,12 @@
 #include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
+#include <pasta/Compile/Compiler.h>
+#include <pasta/Compile/Job.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Printer.h>
+#include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
 #include <sstream>
 #include <utility>
@@ -962,6 +965,9 @@ void GlobalIndexingState::PersistFragment(
   auto ids = fb.initParentIds(0u);
   (void) ids;
 
+  // The compilation containing this fragment.
+  fb.setCompilationId(pf.compilation_id.Pack());
+
   if (pf.file_location) {
     fb.setFirstFileTokenId(pf.file_location->first_file_token_id.Pack());
     fb.setLastFileTokenId(pf.file_location->last_file_token_id.Pack());
@@ -1030,6 +1036,7 @@ void GlobalIndexingState::PersistFragment(
 
 // Persist the compilation.
 void GlobalIndexingState::PersistCompilation(
+    const pasta::Compiler &compiler, const pasta::CompileJob &job,
     const pasta::AST &ast, const EntityMapper &em,
     mx::PackedCompilationId tu_id,
     const std::vector<PendingFragment> &fragments) {
@@ -1037,32 +1044,85 @@ void GlobalIndexingState::PersistCompilation(
   capnp::MallocMessageBuilder message;
   mx::rpc::Compilation::Builder cb = message.initRoot<mx::rpc::Compilation>();
 
-  if (sourceir_progress) {
-    sourceir_progress->AddWork(1u);
-  }
-
-  if (std::string mlir = codegen.GenerateSourceIR(ast, em);
-      !mlir.empty()) {
-    if (sourceir_progress) {
-      sourceir_progress->Advance();
-    }
-    cb.setMlir(mlir);
-  } else {
-    cb.initMlir(0u);
-  }
+  mx::rpc::CompileCommand::Builder cc = cb.initCommand();
+  cc.setSourcePath(ast.MainFile().Path().generic_string());
+  cc.setCompilerPath(compiler.ExecutablePath().generic_string());
+  cc.setWorkingDirectory(job.WorkingDirectory().generic_string());
+  cc.setSystemRootDirectory(job.SystemRootDirectory().generic_string());
+  cc.setSystemRootIncludeDirectory(job.SystemRootIncludeDirectory().generic_string());
+  cc.setResourceDirectory(job.ResourceDirectory().generic_string());
+  cc.setInstallationDirectory(compiler.InstallationDirectory().generic_string());
+  cc.setTargetTriple(job.TargetTriple());
+  cc.setAuxTargetTriple(job.AuxiliaryTargetTriple());
 
   auto i = 0u;
+  const pasta::ArgumentVector &args = job.Arguments();
+  auto al = cc.initArguments(static_cast<unsigned>(args.Size()));
+  for (const char *arg : args) {
+    al.set(i++, arg);
+  }
 
+  i = 0u;
+  std::vector<pasta::IncludePath> paths = compiler.SystemIncludeDirectories();
+  auto ipl = cc.initSystemIncludePaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
+  paths = compiler.UserIncludeDirectories();
+  auto ipl = cc.initUserIncludePaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
+  paths = compiler.FrameworkDirectories();
+  auto ipl = cc.initFrameworkPaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
   const auto &files = ast.ParsedFiles();
   auto fl = cb.initFileIds(static_cast<unsigned>(files.size()));
   for (const pasta::File &file : files) {
     fl.set(i++, em.EntityId(file));
   }
 
-  i = 0u;
-  fl = cb.initFragmentIds(static_cast<unsigned>(fragments.size()));
+  auto num_fragments = 0u;
   for (const PendingFragment &frag : fragments) {
-    fl.set(i++, frag.fragment_id.Pack());
+    if (!frag.has_error) {
+      ++num_fragments;
+    }
+  }
+
+  i = 0u;
+  fl = cb.initFragmentIds(num_fragments);
+  for (const PendingFragment &frag : fragments) {
+    if (!frag.has_error) {
+      fl.set(i++, frag.fragment_id.Pack());
+    }
+  }
+
+  if (sourceir_progress) {
+    sourceir_progress->AddWork(1u);
+  }
+
+  if (std::string mlir = codegen.GenerateSourceIR(ast, em);
+      !mlir.empty()) {
+    cb.setMlir(mlir);
+    if (sourceir_progress) {
+      sourceir_progress->Advance();
+    }
+  } else {
+    cb.initMlir(0u);
   }
 
   // Add the compilation to the database.

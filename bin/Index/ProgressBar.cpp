@@ -97,15 +97,15 @@ static std::pair<size_t, std::string *> AllocateLine(void) {
   return {index, line_data};
 }
 
-// Free a previously allocated line.
-static void FreeLine(size_t index) {
-  std::unique_lock<std::mutex> locker(gProgressLinesLock);
-  if (gNumProgressBars.fetch_sub(1u) == 1) {
-    gReportSem->signal(1u);
-    gReportSem = nullptr;
-  }
-  gProgressLines[index].reset();
-}
+//// Free a previously allocated line.
+//static void FreeLine(size_t index) {
+//  std::unique_lock<std::mutex> locker(gProgressLinesLock);
+//  if (gNumProgressBars.fetch_sub(1u) == 1) {
+//    gReportSem->signal(1u);
+//    gReportSem = nullptr;
+//  }
+//  gProgressLines[index].reset();
+//}
 
 }  // namespace
 
@@ -161,7 +161,8 @@ ProgressBar::Impl::~Impl(void) {
   // FreeLine(line.first);
 }
 
-void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
+void ProgressBar::Impl::Report(uint32_t curr, uint32_t max,
+                               std::string &curr_line,
                                std::string &next_line) {
   if (!max) {
     return;
@@ -194,7 +195,7 @@ void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
 
   // Publish `next_line` into `gProgressLines`, wherever it is meant to be
   // in there.
-  line.swap(next_line);
+  curr_line.swap(next_line);
 
   gReportSem->signal(1);
 }
