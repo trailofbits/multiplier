@@ -8,6 +8,7 @@
 
 #include <multiplier/Entities/AttributedType.h>
 
+#include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Token.h>
 #include <multiplier/Entities/Type.h>
 
@@ -82,12 +83,25 @@ Type AttributedType::desugar(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+std::optional<Attr> AttributedType::attribute(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal230();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
+      return Attr(std::move(eptr));
+    }
+  }
+  return std::nullopt;
+}
+
 AttrKind AttributedType::attribute_kind(void) const {
   return static_cast<AttrKind>(impl->reader.getVal275());
 }
 
 Type AttributedType::equivalent_type(void) const {
-  RawEntityId eid = impl->reader.getVal230();
+  RawEntityId eid = impl->reader.getVal236();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
@@ -101,24 +115,28 @@ std::optional<NullabilityKind> AttributedType::immediate_nullability(void) const
 }
 
 Type AttributedType::modified_type(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal237();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-bool AttributedType::is_calling_conv(void) const {
+bool AttributedType::has_attribute(void) const {
   return impl->reader.getVal232();
 }
 
-bool AttributedType::is_ms_type_spec(void) const {
+bool AttributedType::is_calling_conv(void) const {
   return impl->reader.getVal233();
 }
 
-bool AttributedType::is_qualifier(void) const {
+bool AttributedType::is_ms_type_spec(void) const {
   return impl->reader.getVal239();
 }
 
-bool AttributedType::is_sugared(void) const {
+bool AttributedType::is_qualifier(void) const {
   return impl->reader.getVal240();
+}
+
+bool AttributedType::is_sugared(void) const {
+  return impl->reader.getVal241();
 }
 
 #pragma GCC diagnostic pop

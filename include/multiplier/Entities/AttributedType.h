@@ -15,6 +15,7 @@
 namespace mx {
 class EntityProvider;
 class Index;
+class Attr;
 class AttributedType;
 class Token;
 class Type;
@@ -52,10 +53,12 @@ class AttributedType : public Type {
   static std::optional<AttributedType> from(const TokenContext &t);
 
   Type desugar(void) const;
+  std::optional<Attr> attribute(void) const;
   AttrKind attribute_kind(void) const;
   Type equivalent_type(void) const;
   std::optional<NullabilityKind> immediate_nullability(void) const;
   Type modified_type(void) const;
+  bool has_attribute(void) const;
   bool is_calling_conv(void) const;
   bool is_ms_type_spec(void) const;
   bool is_qualifier(void) const;
