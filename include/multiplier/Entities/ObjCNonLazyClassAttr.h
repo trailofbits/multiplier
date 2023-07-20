@@ -27,12 +27,12 @@ class ObjCNonLazyClassAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<ObjCNonLazyClassAttr> in(const Fragment &frag);
-  static gap::generator<ObjCNonLazyClassAttr> in(const File &file);
   static gap::generator<ObjCNonLazyClassAttr> in(const Index &index);
   static gap::generator<ObjCNonLazyClassAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCNonLazyClassAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCNonLazyClassAttr> in(const Fragment &frag);
+  static gap::generator<ObjCNonLazyClassAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_NON_LAZY_CLASS;

@@ -35,12 +35,12 @@ class OMPTargetParallelForDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTargetParallelForDirective> in(const Fragment &frag);
-  static gap::generator<OMPTargetParallelForDirective> in(const File &file);
   static gap::generator<OMPTargetParallelForDirective> in(const Index &index);
   static gap::generator<OMPTargetParallelForDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTargetParallelForDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTargetParallelForDirective> in(const Fragment &frag);
+  static gap::generator<OMPTargetParallelForDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_PARALLEL_FOR_DIRECTIVE;

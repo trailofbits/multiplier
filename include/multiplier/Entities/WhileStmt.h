@@ -31,12 +31,12 @@ class WhileStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<WhileStmt> in(const Fragment &frag);
-  static gap::generator<WhileStmt> in(const File &file);
   static gap::generator<WhileStmt> in(const Index &index);
   static gap::generator<WhileStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<WhileStmt> by_id(const Index &, EntityId);
+  static gap::generator<WhileStmt> in(const Fragment &frag);
+  static gap::generator<WhileStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::WHILE_STMT;

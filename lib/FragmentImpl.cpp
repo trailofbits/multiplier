@@ -619,13 +619,4 @@ TokenRange FragmentImpl::TokenRangeFor(
   return TokenRange();
 }
 
-std::string_view FragmentImpl::SourceIR(void) const & noexcept {
-  if (reader.hasMlir()) {
-    if (auto mlir = reader.getMlir(); auto size = mlir.size()) {
-      return std::string_view(mlir.cStr(), size);
-    }
-  }
-  return {};
-}
-
 }  // namespace mx

@@ -29,12 +29,12 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ArcWeakrefUnavailableAttr> in(const Fragment &frag);
-  static gap::generator<ArcWeakrefUnavailableAttr> in(const File &file);
   static gap::generator<ArcWeakrefUnavailableAttr> in(const Index &index);
   static gap::generator<ArcWeakrefUnavailableAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ArcWeakrefUnavailableAttr> by_id(const Index &, EntityId);
+  static gap::generator<ArcWeakrefUnavailableAttr> in(const Fragment &frag);
+  static gap::generator<ArcWeakrefUnavailableAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARC_WEAKREF_UNAVAILABLE;

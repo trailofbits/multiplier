@@ -30,12 +30,12 @@ class OMPTargetDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTargetDirective> in(const Fragment &frag);
-  static gap::generator<OMPTargetDirective> in(const File &file);
   static gap::generator<OMPTargetDirective> in(const Index &index);
   static gap::generator<OMPTargetDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTargetDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTargetDirective> in(const Fragment &frag);
+  static gap::generator<OMPTargetDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_DIRECTIVE;

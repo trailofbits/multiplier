@@ -28,12 +28,12 @@ class LinkageSpecDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<LinkageSpecDecl> in(const Fragment &frag);
-  static gap::generator<LinkageSpecDecl> in(const File &file);
   static gap::generator<LinkageSpecDecl> in(const Index &index);
   static gap::generator<LinkageSpecDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LinkageSpecDecl> by_id(const Index &, EntityId);
+  static gap::generator<LinkageSpecDecl> in(const Fragment &frag);
+  static gap::generator<LinkageSpecDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LINKAGE_SPEC;

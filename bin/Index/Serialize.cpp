@@ -4549,8 +4549,15 @@ void SerializeAttributedType(const EntityMapper &es, mx::ast::Type::Builder b, c
   (void) e;
   SerializeType(es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
+  auto v230 = e.Attribute();
+  if (v230) {
+    auto id230 = es.EntityId(v230.value());
+    b.setVal230(id230);
+  } else {
+    b.setVal230(mx::kInvalidEntityId);
+  }
   b.setVal275(static_cast<unsigned short>(mx::FromPasta(e.AttributeKind())));
-  b.setVal230(es.EntityId(e.EquivalentType()));
+  b.setVal236(es.EntityId(e.EquivalentType()));
   auto v238 = e.ImmediateNullability();
   if (v238) {
     b.setVal238(static_cast<unsigned char>(v238.value()));
@@ -4558,11 +4565,12 @@ void SerializeAttributedType(const EntityMapper &es, mx::ast::Type::Builder b, c
   } else {
     b.setVal231(false);
   }
-  b.setVal236(es.EntityId(e.ModifiedType()));
-  b.setVal232(e.IsCallingConv());
-  b.setVal233(e.IsMSTypeSpec());
-  b.setVal239(e.IsQualifier());
-  b.setVal240(e.IsSugared());
+  b.setVal237(es.EntityId(e.ModifiedType()));
+  b.setVal232(e.HasAttribute());
+  b.setVal233(e.IsCallingConv());
+  b.setVal239(e.IsMSTypeSpec());
+  b.setVal240(e.IsQualifier());
+  b.setVal241(e.IsSugared());
 }
 
 void SerializeAtomicType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AtomicType &e, const TokenTree *) {
@@ -5746,6 +5754,15 @@ void SerializeAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
     }
   } while (false);
   do {
+    auto v27 = e.OutputExpressions();
+    auto sv27 = b.initVal27(static_cast<unsigned>(v27.size()));
+    auto i27 = 0u;
+    for (const auto &e27 : v27) {
+      sv27.set(i27, es.EntityId(e27));
+      ++i27;
+    }
+  } while (false);
+  do {
     auto v61 = e.OutputConstraints();
     auto sv61 = b.initVal61(static_cast<unsigned>(v61.size()));
     auto i61 = 0u;
@@ -5756,12 +5773,12 @@ void SerializeAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
     }
   } while (false);
   do {
-    auto v27 = e.OutputExpressions();
-    auto sv27 = b.initVal27(static_cast<unsigned>(v27.size()));
-    auto i27 = 0u;
-    for (const auto &e27 : v27) {
-      sv27.set(i27, es.EntityId(e27));
-      ++i27;
+    auto v28 = e.InputExpressions();
+    auto sv28 = b.initVal28(static_cast<unsigned>(v28.size()));
+    auto i28 = 0u;
+    for (const auto &e28 : v28) {
+      sv28.set(i28, es.EntityId(e28));
+      ++i28;
     }
   } while (false);
   do {
@@ -5772,15 +5789,6 @@ void SerializeAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
       std::string se62(e62.data(), e62.size());
       sv62.set(i62, se62);
       ++i62;
-    }
-  } while (false);
-  do {
-    auto v28 = e.InputExpressions();
-    auto sv28 = b.initVal28(static_cast<unsigned>(v28.size()));
-    auto i28 = 0u;
-    for (const auto &e28 : v28) {
-      sv28.set(i28, es.EntityId(e28));
-      ++i28;
     }
   } while (false);
   do {
@@ -5840,7 +5848,7 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     }
   } while (false);
   do {
-    auto v52 = e.OutputConstraintLiterals();
+    auto v52 = e.ClobberStringLiterals();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
     auto i52 = 0u;
     for (const auto &e52 : v52) {
@@ -5859,7 +5867,7 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     }
   } while (false);
   do {
-    auto v53 = e.InputConstraintLiterals();
+    auto v53 = e.OutputConstraintLiterals();
     auto sv53 = b.initVal53(static_cast<unsigned>(v53.size()));
     auto i53 = 0u;
     for (const auto &e53 : v53) {
@@ -5878,7 +5886,7 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     }
   } while (false);
   do {
-    auto v54 = e.ClobberStringLiterals();
+    auto v54 = e.InputConstraintLiterals();
     auto sv54 = b.initVal54(static_cast<unsigned>(v54.size()));
     auto i54 = 0u;
     for (const auto &e54 : v54) {
@@ -5887,21 +5895,21 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     }
   } while (false);
   do {
-    auto v67 = e.LabelExpressions();
+    auto v67 = e.LabelNames();
     auto sv67 = b.initVal67(static_cast<unsigned>(v67.size()));
     auto i67 = 0u;
     for (const auto &e67 : v67) {
-      sv67.set(i67, es.EntityId(e67));
+      std::string se67(e67.data(), e67.size());
+      sv67.set(i67, se67);
       ++i67;
     }
   } while (false);
   do {
-    auto v68 = e.LabelNames();
+    auto v68 = e.LabelExpressions();
     auto sv68 = b.initVal68(static_cast<unsigned>(v68.size()));
     auto i68 = 0u;
     for (const auto &e68 : v68) {
-      std::string se68(e68.data(), e68.size());
-      sv68.set(i68, se68);
+      sv68.set(i68, es.EntityId(e68));
       ++i68;
     }
   } while (false);

@@ -88,6 +88,5 @@ target_link_libraries("mx-dump-json"
 )
 
 define_example("mx-count-sourceir" "CountSourceIR.cpp")
-define_example("mx-print-sourceir" "PrintSourceIR.cpp")
-#  define_example("mx-dump-sourceir" "DumpSourceIR.cpp")
-#  define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")
+# define_example("mx-print-sourceir" "PrintSourceIR.cpp")
+# define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")

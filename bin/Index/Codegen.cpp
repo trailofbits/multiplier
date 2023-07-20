@@ -32,6 +32,7 @@ VAST_UNRELAX_WARNINGS
 
 #include "CodegenMetaGenerator.h"
 #include "CodegenVisitor.h"
+
 #include "Context.h"
 #include "EntityMapper.h"
 #include "PendingFragment.h"
@@ -67,11 +68,11 @@ void CodeGenerator::Disable(void) {
 
 CodeGenerator::~CodeGenerator(void) {}
 
-std::string CodeGenerator::GenerateSourceIRFromTLDs(
-    const pasta::AST &ast, const EntityMapper &em, const PendingFragment &pf) {
+std::string CodeGenerator::GenerateSourceIR(
+    const pasta::AST &ast, const EntityMapper &em) {
 
   std::string ret;
-  if (impl->disabled || pf.decls_to_serialize.empty()) {
+  if (impl->disabled) {
     return ret;
   }
 
@@ -87,19 +88,17 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
 
   MetaGenerator meta(ast, &context, em);
   vast::cg::CodeGenBase<CodeGenVisitor> codegen(&context, meta);
+  llvm::raw_string_ostream os(ret);
 
   try {
-    for (const pasta::Decl &decl : pf.top_level_decls) {
-      codegen.append_to_module(const_cast<clang::Decl *>(decl.RawDecl()));
-    }
+    auto mod = codegen.emit_module(
+        const_cast<clang::TranslationUnitDecl *>(
+            ast.TranslationUnit().RawDecl()));
+    mod->print(os, flags);
+
   } catch (std::exception &e) {
     LOG(ERROR) << e.what();
-    return ret;
   }
-
-  auto mod = codegen.freeze();
-  llvm::raw_string_ostream os(ret);
-  mod->print(os, flags);
 
   return ret;
 }

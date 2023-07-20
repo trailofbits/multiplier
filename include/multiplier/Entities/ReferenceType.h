@@ -29,8 +29,6 @@ class ReferenceType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ReferenceType> in(const Fragment &frag);
-  static gap::generator<ReferenceType> in(const File &file);
   static gap::generator<ReferenceType> in(const Index &index);
   static gap::generator<ReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;

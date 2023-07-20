@@ -34,12 +34,12 @@ class UnaryExprOrTypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<UnaryExprOrTypeTraitExpr> in(const Fragment &frag);
-  static gap::generator<UnaryExprOrTypeTraitExpr> in(const File &file);
   static gap::generator<UnaryExprOrTypeTraitExpr> in(const Index &index);
   static gap::generator<UnaryExprOrTypeTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnaryExprOrTypeTraitExpr> by_id(const Index &, EntityId);
+  static gap::generator<UnaryExprOrTypeTraitExpr> in(const Fragment &frag);
+  static gap::generator<UnaryExprOrTypeTraitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;

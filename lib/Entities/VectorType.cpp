@@ -72,32 +72,6 @@ gap::generator<VectorType> VectorType::in(const Index &index) {
   }
 }
 
-gap::generator<VectorType> VectorType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kVectorTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<VectorType> e = VectorType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<VectorType> VectorType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kVectorTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<VectorType> e = VectorType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<VectorType> VectorType::from(const Reference &r) {
   return VectorType::from(r.as_type());
 }

@@ -28,8 +28,6 @@ class DecltypeType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<DecltypeType> in(const Fragment &frag);
-  static gap::generator<DecltypeType> in(const File &file);
   static gap::generator<DecltypeType> in(const Index &index);
   static gap::generator<DecltypeType> containing(const Token &tok);
   bool contains(const Token &tok) const;

@@ -34,12 +34,12 @@ class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPLoopTransformationDirective> in(const Fragment &frag);
-  static gap::generator<OMPLoopTransformationDirective> in(const File &file);
   static gap::generator<OMPLoopTransformationDirective> in(const Index &index);
   static gap::generator<OMPLoopTransformationDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPLoopTransformationDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPLoopTransformationDirective> in(const Fragment &frag);
+  static gap::generator<OMPLoopTransformationDirective> in(const File &file);
 
   static gap::generator<OMPLoopTransformationDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopTransformationDirective> containing(const std::optional<Decl> &decl);

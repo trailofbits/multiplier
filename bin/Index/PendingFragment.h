@@ -57,14 +57,20 @@ class FileLocationOfFragment {
 // represents a single logical thing.
 class PendingFragment {
  public:
-  inline PendingFragment(mx::PackedFragmentId fragment_id_, EntityMapper &em_)
+  inline PendingFragment(mx::PackedFragmentId fragment_id_,
+                         mx::PackedCompilationId tu_id_,
+                         EntityMapper &em_)
       : fragment_id(fragment_id_),
         fragment_index(fragment_id.Unpack().fragment_id),
+        compilation_id(tu_id_),
         em(em_){}
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::PackedFragmentId fragment_id;
   mx::RawEntityId fragment_index;
+
+  // The ID of the compilation from which this fragment is derived.
+  mx::PackedCompilationId compilation_id;
 
   // Instance of entity mapper that will hold a map of entity ids
   // and type mapper. Each translation unit will have single instance
@@ -104,6 +110,9 @@ class PendingFragment {
   // identifiable, but is attached to some other entity. For example, a
   // `TemplateParamterList` or a `TemplateArgument` is a pseudo entity.
   std::vector<Pseudo> pseudos_to_serialize;
+
+  // Did we encounter an error during serialization?
+  bool has_error{false};
 
   bool Add(const pasta::Decl &entity, EntityIdMap &entity_ids);
   bool Add(const pasta::Stmt &entity, EntityIdMap &entity_ids);

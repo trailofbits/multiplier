@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <multiplier/AST.h>
+#include <multiplier/Compilation.h>
 #include <multiplier/Entity.h>
 #include <multiplier/File.h>
 #include <multiplier/Fragment.h>
@@ -22,6 +23,7 @@ enum OtherKind : uint64_t {
   kType,
   kFileToken,
   kTypeToken,
+  kCompilation
 };
 
 // A code chunk with many tokens. This
@@ -133,33 +135,43 @@ union PackedEntityId {
   } __attribute__((packed)) file_token;
 
   struct {
-     uint64_t token_offset:(62u - (kTokenKindNumBits + kTypeKindNumBits +
-                            kTypeIdNumBits + kOtherKindBits));
-     uint64_t token_kind:kTokenKindNumBits;
-     uint64_t type_kind:kTypeKindNumBits;
-     uint64_t type_id:kTypeIdNumBits;
-     uint64_t is_big:1;
-     uint64_t kind:kOtherKindBits;
-     uint64_t is_fragment_entity:1u;
-   } __attribute__((packed)) small_type;
+    uint64_t token_offset:(62u - (kTokenKindNumBits + kTypeKindNumBits +
+                                  kTypeIdNumBits + kOtherKindBits));
+    uint64_t token_kind:kTokenKindNumBits;
+    uint64_t type_kind:kTypeKindNumBits;
+    uint64_t type_id:kTypeIdNumBits;
+    uint64_t is_big:1;
+    uint64_t kind:kOtherKindBits;
+    uint64_t is_fragment_entity:1u;
+  } __attribute__((packed)) small_type;
 
-   struct {
-     uint64_t token_offset:(62u - (kTokenKindNumBits + kTypeKindNumBits +
-                            kBigTypeIdNumBits + kOtherKindBits));
-     uint64_t token_kind:kTokenKindNumBits;
-     uint64_t type_kind:kTypeKindNumBits;
-     uint64_t type_id:kBigTypeIdNumBits;
-     uint64_t is_big:1;
-     uint64_t kind:kOtherKindBits;
-     uint64_t is_fragment_entity:1u;
-   } __attribute__((packed)) big_type;
+  struct {
+    uint64_t token_offset:(62u - (kTokenKindNumBits + kTypeKindNumBits +
+                                  kBigTypeIdNumBits + kOtherKindBits));
+    uint64_t token_kind:kTokenKindNumBits;
+    uint64_t type_kind:kTypeKindNumBits;
+    uint64_t type_id:kBigTypeIdNumBits;
+    uint64_t is_big:1;
+    uint64_t kind:kOtherKindBits;
+    uint64_t is_fragment_entity:1u;
+  } __attribute__((packed)) big_type;
 
-   struct {
-      uint64_t opaque:(62u - kOtherKindBits);
-      uint64_t is_big:1;
-      uint64_t kind:kOtherKindBits;
-      uint64_t is_fragment_entity:1u;
-    } __attribute__((packed)) small_or_big_type;
+  struct {
+    uint64_t opaque:(62u - kOtherKindBits);
+    uint64_t is_big:1;
+    uint64_t kind:kOtherKindBits;
+    uint64_t is_fragment_entity:1u;
+  } __attribute__((packed)) small_or_big_type;
+
+  struct {
+    uint64_t compilation_id:(63u - (kFileIdNumBits + kOtherKindBits));
+
+    // Second so that `file_id` is significant in sorting. If there are multiple
+    // TUs with the same main source file then we want them sorted side-by-side.
+    uint64_t file_id:kFileIdNumBits;
+    uint64_t kind:kOtherKindBits;
+    uint64_t is_fragment_entity:1u;
+  } __attribute__((packed)) compilation;
 
 } __attribute__((packed));
 
@@ -174,6 +186,7 @@ const char *EnumeratorName(EntityCategory e) noexcept {
     case EntityCategory::enum_name: return #enum_name;
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_ENTITY_CASE_NAME,
+                                MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
@@ -631,6 +644,26 @@ EntityId::EntityId(DesignatorId id) {
   }
 }
 
+EntityId::EntityId(CompilationId id) {
+  if (id.file_id && id.compilation_id) {
+    PackedEntityId packed = {};
+    packed.compilation.is_fragment_entity = 0u;
+    packed.compilation.compilation_id = id.compilation_id;
+    assert(packed.compilation.compilation_id == id.compilation_id);
+    packed.compilation.file_id = id.file_id;
+    assert(packed.compilation.file_id == id.file_id);
+    packed.compilation.kind =
+        static_cast<uint64_t>(OtherKind::kCompilation);
+    opaque = packed.opaque;
+
+#ifndef NDEBUG
+    auto unpacked = Unpack();
+    assert(std::holds_alternative<CompilationId>(unpacked));
+    assert(std::get<CompilationId>(unpacked) == id);
+#endif
+  }
+}
+
 EntityId::EntityId(FileTokenId id) {
   if (id.file_id) {
     PackedEntityId packed = {};
@@ -717,6 +750,7 @@ struct IDKind {
   inline int operator()(FileId) const noexcept { return -1; }
   inline int operator()(FragmentId) const noexcept { return -1; }
   inline int operator()(DesignatorId) const noexcept { return -1; }
+  inline int operator()(CompilationId) const noexcept { return -1; }
   template <typename T>
   inline int operator()(T t) const noexcept {
     return static_cast<int>(t.kind);
@@ -762,6 +796,9 @@ struct IDCategory {
   }
   inline EntityCategory operator()(DesignatorId) const noexcept {
     return EntityCategory::DESIGNATOR;
+  }
+  inline EntityCategory operator()(CompilationId) const noexcept {
+    return EntityCategory::COMPILATION;
   }
   template <typename T>
   inline EntityCategory operator()(T) const noexcept {
@@ -1027,6 +1064,12 @@ VariantId EntityId::Unpack(void) const noexcept {
           id.offset = static_cast<EntityOffset>(packed.small_type.token_offset);
           return id;
         }
+      }
+      case OtherKind::kCompilation: {
+        CompilationId id;
+        id.compilation_id = packed.compilation.compilation_id;
+        id.file_id = packed.compilation.file_id;
+        return id;
       }
     }
   }

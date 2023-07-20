@@ -70,32 +70,6 @@ gap::generator<MemberPointerType> MemberPointerType::in(const Index &index) {
   }
 }
 
-gap::generator<MemberPointerType> MemberPointerType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kMemberPointerTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<MemberPointerType> e = MemberPointerType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MemberPointerType> MemberPointerType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kMemberPointerTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<MemberPointerType> e = MemberPointerType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<MemberPointerType> MemberPointerType::from(const Reference &r) {
   return MemberPointerType::from(r.as_type());
 }

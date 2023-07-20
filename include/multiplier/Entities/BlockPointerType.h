@@ -27,8 +27,6 @@ class BlockPointerType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<BlockPointerType> in(const Fragment &frag);
-  static gap::generator<BlockPointerType> in(const File &file);
   static gap::generator<BlockPointerType> in(const Index &index);
   static gap::generator<BlockPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;

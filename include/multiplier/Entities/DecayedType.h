@@ -29,8 +29,6 @@ class DecayedType : public AdjustedType {
   friend class AdjustedType;
   friend class Type;
  public:
-  static gap::generator<DecayedType> in(const Fragment &frag);
-  static gap::generator<DecayedType> in(const File &file);
   static gap::generator<DecayedType> in(const Index &index);
   static gap::generator<DecayedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

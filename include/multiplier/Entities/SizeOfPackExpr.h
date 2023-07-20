@@ -34,12 +34,12 @@ class SizeOfPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<SizeOfPackExpr> in(const Fragment &frag);
-  static gap::generator<SizeOfPackExpr> in(const File &file);
   static gap::generator<SizeOfPackExpr> in(const Index &index);
   static gap::generator<SizeOfPackExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SizeOfPackExpr> by_id(const Index &, EntityId);
+  static gap::generator<SizeOfPackExpr> in(const Fragment &frag);
+  static gap::generator<SizeOfPackExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SIZE_OF_PACK_EXPR;

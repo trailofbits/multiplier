@@ -32,12 +32,12 @@ class MSGuidDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<MSGuidDecl> in(const Fragment &frag);
-  static gap::generator<MSGuidDecl> in(const File &file);
   static gap::generator<MSGuidDecl> in(const Index &index);
   static gap::generator<MSGuidDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MSGuidDecl> by_id(const Index &, EntityId);
+  static gap::generator<MSGuidDecl> in(const Fragment &frag);
+  static gap::generator<MSGuidDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_GUID;

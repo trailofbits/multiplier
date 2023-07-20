@@ -29,12 +29,12 @@ class CapturedRecordAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CapturedRecordAttr> in(const Fragment &frag);
-  static gap::generator<CapturedRecordAttr> in(const File &file);
   static gap::generator<CapturedRecordAttr> in(const Index &index);
   static gap::generator<CapturedRecordAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CapturedRecordAttr> by_id(const Index &, EntityId);
+  static gap::generator<CapturedRecordAttr> in(const Fragment &frag);
+  static gap::generator<CapturedRecordAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CAPTURED_RECORD;

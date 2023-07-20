@@ -29,12 +29,12 @@ class X86ForceAlignArgPointerAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<X86ForceAlignArgPointerAttr> in(const Fragment &frag);
-  static gap::generator<X86ForceAlignArgPointerAttr> in(const File &file);
   static gap::generator<X86ForceAlignArgPointerAttr> in(const Index &index);
   static gap::generator<X86ForceAlignArgPointerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<X86ForceAlignArgPointerAttr> by_id(const Index &, EntityId);
+  static gap::generator<X86ForceAlignArgPointerAttr> in(const Fragment &frag);
+  static gap::generator<X86ForceAlignArgPointerAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::X86_FORCE_ALIGN_ARG_POINTER;

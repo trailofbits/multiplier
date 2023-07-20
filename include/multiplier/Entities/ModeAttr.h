@@ -27,12 +27,12 @@ class ModeAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<ModeAttr> in(const Fragment &frag);
-  static gap::generator<ModeAttr> in(const File &file);
   static gap::generator<ModeAttr> in(const Index &index);
   static gap::generator<ModeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ModeAttr> by_id(const Index &, EntityId);
+  static gap::generator<ModeAttr> in(const Fragment &frag);
+  static gap::generator<ModeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MODE;

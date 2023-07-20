@@ -30,8 +30,6 @@ class TagType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TagType> in(const Fragment &frag);
-  static gap::generator<TagType> in(const File &file);
   static gap::generator<TagType> in(const Index &index);
   static gap::generator<TagType> containing(const Token &tok);
   bool contains(const Token &tok) const;

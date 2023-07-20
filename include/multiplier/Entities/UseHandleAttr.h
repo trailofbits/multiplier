@@ -31,12 +31,12 @@ class UseHandleAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<UseHandleAttr> in(const Fragment &frag);
-  static gap::generator<UseHandleAttr> in(const File &file);
   static gap::generator<UseHandleAttr> in(const Index &index);
   static gap::generator<UseHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UseHandleAttr> by_id(const Index &, EntityId);
+  static gap::generator<UseHandleAttr> in(const Fragment &frag);
+  static gap::generator<UseHandleAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::USE_HANDLE;

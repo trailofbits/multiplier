@@ -30,12 +30,12 @@ class SectionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<SectionAttr> in(const Fragment &frag);
-  static gap::generator<SectionAttr> in(const File &file);
   static gap::generator<SectionAttr> in(const Index &index);
   static gap::generator<SectionAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SectionAttr> by_id(const Index &, EntityId);
+  static gap::generator<SectionAttr> in(const Fragment &frag);
+  static gap::generator<SectionAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SECTION;

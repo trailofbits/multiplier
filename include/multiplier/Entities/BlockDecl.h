@@ -31,12 +31,12 @@ class BlockDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<BlockDecl> in(const Fragment &frag);
-  static gap::generator<BlockDecl> in(const File &file);
   static gap::generator<BlockDecl> in(const Index &index);
   static gap::generator<BlockDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<BlockDecl> by_id(const Index &, EntityId);
+  static gap::generator<BlockDecl> in(const Fragment &frag);
+  static gap::generator<BlockDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BLOCK;

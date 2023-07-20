@@ -85,15 +85,15 @@ class Stmt {
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
  public:
+  static gap::generator<Stmt> in(const Index &index, std::span<StmtKind> kinds);
   static gap::generator<Stmt> in(const Fragment &frag, std::span<StmtKind> kinds);
   static gap::generator<Stmt> in(const File &file, std::span<StmtKind> kinds);
-  static gap::generator<Stmt> in(const Index &index, std::span<StmtKind> kinds);
-  static gap::generator<Stmt> in(const Fragment &frag);
-  static gap::generator<Stmt> in(const File &file);
   static gap::generator<Stmt> in(const Index &index);
   static gap::generator<Stmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<Stmt> by_id(const Index &, EntityId);
+  static gap::generator<Stmt> in(const Fragment &frag);
+  static gap::generator<Stmt> in(const File &file);
 
   static gap::generator<Stmt> containing(const Decl &decl);
   static gap::generator<Stmt> containing(const std::optional<Decl> &decl);

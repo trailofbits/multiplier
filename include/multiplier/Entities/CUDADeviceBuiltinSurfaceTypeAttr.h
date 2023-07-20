@@ -29,12 +29,12 @@ class CUDADeviceBuiltinSurfaceTypeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const Fragment &frag);
-  static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const File &file);
   static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const Index &index);
   static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> by_id(const Index &, EntityId);
+  static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const Fragment &frag);
+  static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;

@@ -31,8 +31,6 @@ class VariableArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<VariableArrayType> in(const Fragment &frag);
-  static gap::generator<VariableArrayType> in(const File &file);
   static gap::generator<VariableArrayType> in(const Index &index);
   static gap::generator<VariableArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;

@@ -31,12 +31,12 @@ class HLSLAnnotationAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<HLSLAnnotationAttr> in(const Fragment &frag);
-  static gap::generator<HLSLAnnotationAttr> in(const File &file);
   static gap::generator<HLSLAnnotationAttr> in(const Index &index);
   static gap::generator<HLSLAnnotationAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<HLSLAnnotationAttr> by_id(const Index &, EntityId);
+  static gap::generator<HLSLAnnotationAttr> in(const Fragment &frag);
+  static gap::generator<HLSLAnnotationAttr> in(const File &file);
 
   static std::optional<HLSLAnnotationAttr> from(const Attr &parent);
 

@@ -30,12 +30,12 @@ class CXXTryStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<CXXTryStmt> in(const Fragment &frag);
-  static gap::generator<CXXTryStmt> in(const File &file);
   static gap::generator<CXXTryStmt> in(const Index &index);
   static gap::generator<CXXTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXTryStmt> by_id(const Index &, EntityId);
+  static gap::generator<CXXTryStmt> in(const Fragment &frag);
+  static gap::generator<CXXTryStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_TRY_STMT;

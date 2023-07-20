@@ -27,12 +27,12 @@ class LoaderUninitializedAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<LoaderUninitializedAttr> in(const Fragment &frag);
-  static gap::generator<LoaderUninitializedAttr> in(const File &file);
   static gap::generator<LoaderUninitializedAttr> in(const Index &index);
   static gap::generator<LoaderUninitializedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LoaderUninitializedAttr> by_id(const Index &, EntityId);
+  static gap::generator<LoaderUninitializedAttr> in(const Fragment &frag);
+  static gap::generator<LoaderUninitializedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOADER_UNINITIALIZED;

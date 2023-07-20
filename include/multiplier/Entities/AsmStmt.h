@@ -31,12 +31,12 @@ class AsmStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<AsmStmt> in(const Fragment &frag);
-  static gap::generator<AsmStmt> in(const File &file);
   static gap::generator<AsmStmt> in(const Index &index);
   static gap::generator<AsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AsmStmt> by_id(const Index &, EntityId);
+  static gap::generator<AsmStmt> in(const Fragment &frag);
+  static gap::generator<AsmStmt> in(const File &file);
 
   static gap::generator<AsmStmt> containing(const Decl &decl);
   static gap::generator<AsmStmt> containing(const std::optional<Decl> &decl);
@@ -70,14 +70,14 @@ class AsmStmt : public Stmt {
   std::optional<Expr> nth_output(unsigned n) const;
   unsigned num_outputs(void) const;
   gap::generator<Expr> outputs(void) const &;
-  gap::generator<std::string_view> output_constraints(void) const &;
   std::optional<Expr> nth_output_expression(unsigned n) const;
   unsigned num_output_expressions(void) const;
   gap::generator<Expr> output_expressions(void) const &;
-  gap::generator<std::string_view> input_constraints(void) const &;
+  gap::generator<std::string_view> output_constraints(void) const &;
   std::optional<Expr> nth_input_expression(unsigned n) const;
   unsigned num_input_expressions(void) const;
   gap::generator<Expr> input_expressions(void) const &;
+  gap::generator<std::string_view> input_constraints(void) const &;
   gap::generator<std::string_view> clobbers(void) const &;
 };
 

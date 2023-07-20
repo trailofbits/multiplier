@@ -519,7 +519,7 @@ enum class RemarkKind : unsigned;
 enum class ReservedIdentifierStatus : int;
 enum class SFINAEResponse : unsigned;
 enum class SYCLMajorVersion : unsigned;
-enum class SanitizerOrdinal : unsigned long long;
+enum class SanitizerOrdinal : unsigned long;
 enum class SelectorLocationsKind : unsigned;
 enum class ShaderStage : int;
 enum class SignReturnAddressKeyKind : int;

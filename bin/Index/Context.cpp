@@ -61,8 +61,6 @@ void GlobalIndexingState::InitializeProgressBars(void) {
                                       report_freq));
 
   sourceir_progress.reset(new ProgressBar("SourceIR", report_freq));
-  sourceir_success_progress.reset(new ProgressBar("Successful SourceIR",
-                                                  report_freq));
 }
 
 }  // namespace indexer

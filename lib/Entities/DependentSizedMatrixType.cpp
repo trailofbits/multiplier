@@ -71,32 +71,6 @@ gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Inde
   }
 }
 
-gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DependentSizedMatrixType> e = DependentSizedMatrixType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DependentSizedMatrixType> e = DependentSizedMatrixType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Reference &r) {
   return DependentSizedMatrixType::from(r.as_type());
 }

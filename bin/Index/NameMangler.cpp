@@ -76,7 +76,7 @@ class NameManglerImpl {
   bool is_precise{false};
 
   explicit NameManglerImpl(clang::ASTContext &ast_context_,
-                           std::filesystem::path tu_);
+                           mx::PackedCompilationId tu_id_);
 
   // Returns the mangled name of `decl`.
   //
@@ -98,8 +98,8 @@ class NameManglerImpl {
 };
 
 NameManglerImpl::NameManglerImpl(clang::ASTContext &ast_context_,
-                                 std::filesystem::path tu_)
-    : tu(std::hash<std::string>{}(tu_.generic_string())),
+                                 mx::PackedCompilationId tu_id_)
+    : tu(tu_id_.Pack()),
       mangled_name_os(mangled_name),
       mangle_context(ast_context_.createMangleContext()) {
 
@@ -478,9 +478,8 @@ const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
 
 NameMangler::~NameMangler(void) {}
 
-NameMangler::NameMangler(const pasta::AST &ast)
-    : impl(std::make_unique<NameManglerImpl>(ast.UnderlyingAST(),
-                                             ast.MainFile().Path())) {}
+NameMangler::NameMangler(const pasta::AST &ast, mx::PackedCompilationId tu_id_)
+    : impl(std::make_unique<NameManglerImpl>(ast.UnderlyingAST(), tu_id_)) {}
 
 const std::string &NameMangler::Mangle(const pasta::Decl &decl) const {
   return impl->GetMangledName(decl.RawDecl());

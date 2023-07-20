@@ -32,12 +32,12 @@ class GCCAsmStmt : public AsmStmt {
   friend class AsmStmt;
   friend class Stmt;
  public:
-  static gap::generator<GCCAsmStmt> in(const Fragment &frag);
-  static gap::generator<GCCAsmStmt> in(const File &file);
   static gap::generator<GCCAsmStmt> in(const Index &index);
   static gap::generator<GCCAsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<GCCAsmStmt> by_id(const Index &, EntityId);
+  static gap::generator<GCCAsmStmt> in(const Fragment &frag);
+  static gap::generator<GCCAsmStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GCC_ASM_STMT;
@@ -71,21 +71,21 @@ class GCCAsmStmt : public AsmStmt {
   std::optional<AddrLabelExpr> nth_label(unsigned n) const;
   unsigned num_labels(void) const;
   gap::generator<AddrLabelExpr> labels(void) const &;
-  std::optional<StringLiteral> nth_output_constraint_literal(unsigned n) const;
-  unsigned num_output_constraint_literals(void) const;
-  gap::generator<StringLiteral> output_constraint_literals(void) const &;
-  gap::generator<std::string_view> output_names(void) const &;
-  std::optional<StringLiteral> nth_input_constraint_literal(unsigned n) const;
-  unsigned num_input_constraint_literals(void) const;
-  gap::generator<StringLiteral> input_constraint_literals(void) const &;
-  gap::generator<std::string_view> input_names(void) const &;
   std::optional<StringLiteral> nth_clobber_string_literal(unsigned n) const;
   unsigned num_clobber_string_literals(void) const;
   gap::generator<StringLiteral> clobber_string_literals(void) const &;
+  gap::generator<std::string_view> output_names(void) const &;
+  std::optional<StringLiteral> nth_output_constraint_literal(unsigned n) const;
+  unsigned num_output_constraint_literals(void) const;
+  gap::generator<StringLiteral> output_constraint_literals(void) const &;
+  gap::generator<std::string_view> input_names(void) const &;
+  std::optional<StringLiteral> nth_input_constraint_literal(unsigned n) const;
+  unsigned num_input_constraint_literals(void) const;
+  gap::generator<StringLiteral> input_constraint_literals(void) const &;
+  gap::generator<std::string_view> label_names(void) const &;
   std::optional<AddrLabelExpr> nth_label_expression(unsigned n) const;
   unsigned num_label_expressions(void) const;
   gap::generator<AddrLabelExpr> label_expressions(void) const &;
-  gap::generator<std::string_view> label_names(void) const &;
 };
 
 static_assert(sizeof(GCCAsmStmt) == sizeof(AsmStmt));

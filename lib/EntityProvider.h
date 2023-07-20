@@ -35,6 +35,7 @@ class EntityProvider {
 
  private:
   friend class CachingEntityProvider;
+  friend class Compilation;
   friend class Decl;
   friend class File;
   friend class Fragment;
@@ -123,21 +124,33 @@ class EntityProvider {
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
     virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, type_name ## Kind kind) & = 0; \
-    \
-    virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, type_name ## Kind kind, PackedFragmentId id) & = 0;
+        const Ptr &, type_name ## Kind kind) & = 0;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+    virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &, type_name ## Kind kind, PackedFragmentId id) & = 0;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
@@ -147,10 +160,11 @@ class EntityProvider {
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
-                              MX_DECLARE_ENTITY_LISTERS)
+                              MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
   // Return the list of fragments covering / overlapping some tokens in a file.

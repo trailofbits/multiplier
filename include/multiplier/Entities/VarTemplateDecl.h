@@ -34,12 +34,12 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<VarTemplateDecl> in(const Fragment &frag);
-  static gap::generator<VarTemplateDecl> in(const File &file);
   static gap::generator<VarTemplateDecl> in(const Index &index);
   static gap::generator<VarTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<VarTemplateDecl> by_id(const Index &, EntityId);
+  static gap::generator<VarTemplateDecl> in(const Fragment &frag);
+  static gap::generator<VarTemplateDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE;

@@ -29,12 +29,12 @@ class CUDADeviceBuiltinTextureTypeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CUDADeviceBuiltinTextureTypeAttr> in(const Fragment &frag);
-  static gap::generator<CUDADeviceBuiltinTextureTypeAttr> in(const File &file);
   static gap::generator<CUDADeviceBuiltinTextureTypeAttr> in(const Index &index);
   static gap::generator<CUDADeviceBuiltinTextureTypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CUDADeviceBuiltinTextureTypeAttr> by_id(const Index &, EntityId);
+  static gap::generator<CUDADeviceBuiltinTextureTypeAttr> in(const Fragment &frag);
+  static gap::generator<CUDADeviceBuiltinTextureTypeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE;

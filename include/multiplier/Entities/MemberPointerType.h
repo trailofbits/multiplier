@@ -28,8 +28,6 @@ class MemberPointerType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<MemberPointerType> in(const Fragment &frag);
-  static gap::generator<MemberPointerType> in(const File &file);
   static gap::generator<MemberPointerType> in(const Index &index);
   static gap::generator<MemberPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;

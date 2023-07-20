@@ -71,12 +71,11 @@ gap::generator<Attr> Attr::in(const Index &index) {
   }
 }
 
-gap::generator<Attr> Attr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrImplPtr eptr : ep->AttrsFor(ep, frag_id)) {
-    if (std::optional<Attr> e = Attr::from(Attr(std::move(eptr)))) {
-      co_yield std::move(e.value());
+gap::generator<Attr> Attr::in(const Index &index, std::span<AttrKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      co_yield Attr(std::move(eptr));
     }
   }
 }
@@ -93,11 +92,12 @@ gap::generator<Attr> Attr::in(const File &file) {
   }
 }
 
-gap::generator<Attr> Attr::in(const Index &index, std::span<AttrKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      co_yield Attr(std::move(eptr));
+gap::generator<Attr> Attr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrImplPtr eptr : ep->AttrsFor(ep, frag_id)) {
+    if (std::optional<Attr> e = Attr::from(Attr(std::move(eptr)))) {
+      co_yield std::move(e.value());
     }
   }
 }

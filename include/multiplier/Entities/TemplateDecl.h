@@ -38,12 +38,12 @@ class TemplateDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TemplateDecl> in(const Fragment &frag);
-  static gap::generator<TemplateDecl> in(const File &file);
   static gap::generator<TemplateDecl> in(const Index &index);
   static gap::generator<TemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TemplateDecl> by_id(const Index &, EntityId);
+  static gap::generator<TemplateDecl> in(const Fragment &frag);
+  static gap::generator<TemplateDecl> in(const File &file);
 
   static gap::generator<TemplateDecl> containing(const Decl &decl);
   static gap::generator<TemplateDecl> containing(const std::optional<Decl> &decl);

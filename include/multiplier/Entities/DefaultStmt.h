@@ -30,12 +30,12 @@ class DefaultStmt : public SwitchCase {
   friend class SwitchCase;
   friend class Stmt;
  public:
-  static gap::generator<DefaultStmt> in(const Fragment &frag);
-  static gap::generator<DefaultStmt> in(const File &file);
   static gap::generator<DefaultStmt> in(const Index &index);
   static gap::generator<DefaultStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DefaultStmt> by_id(const Index &, EntityId);
+  static gap::generator<DefaultStmt> in(const Fragment &frag);
+  static gap::generator<DefaultStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEFAULT_STMT;

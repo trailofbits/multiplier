@@ -17,9 +17,12 @@
 #include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
+#include <pasta/Compile/Compiler.h>
+#include <pasta/Compile/Job.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Printer.h>
+#include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
 #include <sstream>
 #include <utility>
@@ -139,7 +142,6 @@ void GlobalIndexingState::PersistFile(
   std::string_view file_data = maybe_file_data.TakeValue();
   capnp::MallocMessageBuilder message;
   mx::rpc::File::Builder fb = message.initRoot<mx::rpc::File>();
-  fb.setId(file_id.Unpack().file_id);
 
   std::string utf8_file_data;
   utf8_file_data.reserve(file_data.size());
@@ -958,7 +960,14 @@ void GlobalIndexingState::PersistFragment(
   std::vector<pasta::Token> parsed_tokens = FindParsedTokens(
       tokens, begin_index, end_index);
 
-  fb.setId(pf.fragment_id.Pack());
+  // List of fragments IDs, where index `0` is this fragment's id, and the
+  // max index is the "root" fragment.
+  auto ids = fb.initParentIds(0u);
+  (void) ids;
+
+  // The compilation containing this fragment.
+  fb.setCompilationId(pf.compilation_id.Pack());
+
   if (pf.file_location) {
     fb.setFirstFileTokenId(pf.file_location->first_file_token_id.Pack());
     fb.setLastFileTokenId(pf.file_location->last_file_token_id.Pack());
@@ -975,17 +984,6 @@ void GlobalIndexingState::PersistFragment(
             pf.fragment_id,
             pf.file_location->first_file_token_id,
             pf.file_location->last_file_token_id});
-  }
-
-  // Generate source IR before saving the fragments to the persistent
-  // storage.
-  if (!pf.decls_to_serialize.empty()) {
-    ProgressBarWork sourceir_progress_tracker(sourceir_progress);
-    std::string mlir = codegen.GenerateSourceIRFromTLDs(ast, em, pf);
-    if (!mlir.empty()) {
-      ProgressBarWork success_progress_tracker(sourceir_success_progress);
-      fb.setMlir(mlir);
-    }
   }
 
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
@@ -1034,6 +1032,114 @@ void GlobalIndexingState::PersistFragment(
   // Add the fragment to the database.
   database.AddAsync(
       mx::EntityRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
+}
+
+// Persist the compilation.
+void GlobalIndexingState::PersistCompilation(
+    const pasta::Compiler &compiler, const pasta::CompileJob &job,
+    const pasta::AST &ast, const EntityMapper &em,
+    mx::PackedCompilationId tu_id,
+    const std::vector<PendingFragment> &fragments) {
+
+  capnp::MallocMessageBuilder message;
+  mx::rpc::Compilation::Builder cb = message.initRoot<mx::rpc::Compilation>();
+
+  mx::rpc::CompileCommand::Builder cc = cb.initCommand();
+  cc.setSourcePath(ast.MainFile().Path().generic_string());
+  cc.setCompilerPath(compiler.ExecutablePath().generic_string());
+  cc.setWorkingDirectory(job.WorkingDirectory().generic_string());
+  cc.setSystemRootDirectory(job.SystemRootDirectory().generic_string());
+  cc.setSystemRootIncludeDirectory(job.SystemRootIncludeDirectory().generic_string());
+  cc.setResourceDirectory(job.ResourceDirectory().generic_string());
+  cc.setInstallationDirectory(compiler.InstallationDirectory().generic_string());
+
+  capnp::Text::Reader reader("", 0u);
+  std::string_view triple = job.TargetTriple();
+  if (!triple.empty()) {
+    reader = capnp::Text::Reader(triple.data(), triple.size());
+  }
+  cc.setTargetTriple(reader);
+
+  triple = job.AuxiliaryTargetTriple();
+  reader = capnp::Text::Reader("", 0u);
+  if (!triple.empty()) {
+    reader = capnp::Text::Reader(triple.data(), triple.size());
+  }
+  cc.setAuxTargetTriple(reader);
+
+  auto i = 0u;
+  const pasta::ArgumentVector &args = job.Arguments();
+  auto al = cc.initArguments(static_cast<unsigned>(args.Size()));
+  for (const char *arg : args) {
+    al.set(i++, arg);
+  }
+
+  i = 0u;
+  std::vector<pasta::IncludePath> paths = compiler.SystemIncludeDirectories();
+  auto ipl = cc.initSystemIncludePaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
+  paths = compiler.UserIncludeDirectories();
+  ipl = cc.initUserIncludePaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
+  paths = compiler.FrameworkDirectories();
+  ipl = cc.initFrameworkPaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
+  const auto &files = ast.ParsedFiles();
+  auto fl = cb.initFileIds(static_cast<unsigned>(files.size()));
+  for (const pasta::File &file : files) {
+    fl.set(i++, em.EntityId(file));
+  }
+
+  auto num_fragments = 0u;
+  for (const PendingFragment &frag : fragments) {
+    if (!frag.has_error) {
+      ++num_fragments;
+    }
+  }
+
+  i = 0u;
+  fl = cb.initFragmentIds(num_fragments);
+  for (const PendingFragment &frag : fragments) {
+    if (!frag.has_error) {
+      fl.set(i++, frag.fragment_id.Pack());
+    }
+  }
+
+  if (sourceir_progress) {
+    sourceir_progress->AddWork(1u);
+  }
+
+  if (std::string mlir = codegen.GenerateSourceIR(ast, em);
+      !mlir.empty()) {
+    cb.setMlir(mlir);
+    if (sourceir_progress) {
+      sourceir_progress->Advance();
+    }
+  } else {
+    cb.initMlir(0u);
+  }
+
+  // Add the compilation to the database.
+  database.AddAsync(
+      mx::EntityRecord{tu_id.Pack(), GetSerializedData(message)});
 }
 
 }  // namespace indexer

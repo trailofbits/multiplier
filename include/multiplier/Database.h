@@ -285,6 +285,7 @@ struct EntityRecord {
                                   MX_CREATE_ENTITY_VIEW,
                                   MX_CREATE_ENTITY_VIEW,
                                   MX_CREATE_ENTITY_VIEW,
+                                  MX_CREATE_ENTITY_VIEW,
                                   MX_CREATE_ENTITY_VIEW)
       #undef MX_CREATE_ENTITY_VIEW
   };
@@ -305,6 +306,22 @@ class DatabaseWriter final {
 
   DatabaseWriter(void) = delete;
 
+  // Get, or create and return, a fragment ID for the specific fragment hash.
+  PackedFragmentId GetOrCreateSmallFragmentIdForHash(
+      RawEntityId tok_id, const std::string &hash, bool &is_new);
+
+  // Get, or create and return, a fragment ID for the specific fragment hash.
+  PackedFragmentId GetOrCreateBigFragmentIdForHash(
+      RawEntityId tok_id, const std::string &hash, bool &is_new);
+
+  // Get, or create and return, a type ID for the specific type.
+  PackedTypeId GetOrCreateSmallTypeIdForHash(
+      mx::TypeKind type_kind, const std::string &hash, bool &is_new);
+
+  // Get, or create and return, a type ID for the specific type.
+  PackedTypeId GetOrCreateBigTypeIdForHash(
+      mx::TypeKind type_kind, const std::string &hash, bool &is_new);
+
  public:
   static constexpr const char *kInitStatements[] = {
       "PRAGMA application_id = 0xce9ccea7",
@@ -320,7 +337,8 @@ class DatabaseWriter final {
            next_small_fragment_index INTEGER NOT NULL,
            next_big_fragment_index INTEGER NOT NULL,
            next_small_type_index INTEGER NOT NULL,
-           next_big_type_index INTEGER NOT NULL
+           next_big_type_index INTEGER NOT NULL,
+           next_compilation_index INTEGER NOT NULL
          ))",
 
       R"(CREATE TABLE IF NOT EXISTS version (
@@ -346,50 +364,17 @@ class DatabaseWriter final {
   PackedFileId GetOrCreateFileIdForHash(
       std::string hash, bool &is_new);
 
-  // Get, or create and return, a fragment ID for the specific fragment hash.
-  PackedFragmentId GetOrCreateSmallFragmentIdForHash(
-      RawEntityId tok_id, std::string hash, bool &is_new);
-
-  // Get, or create and return, a fragment ID for the specific fragment hash.
-  PackedFragmentId GetOrCreateLargeFragmentIdForHash(
-      RawEntityId tok_id, std::string hash, bool &is_new);
-
   PackedFragmentId GetOrCreateFragmentIdForHash(
-      RawEntityId tok_id, std::string hash, size_t num_tokens, bool &is_new) {
-
-    // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
-    //
-    // NOTE(pag): We have a fudge factor here of `3x` to account for macro
-    //            expansions.
-    if ((num_tokens * 3u) >= mx::kNumTokensInBigFragment) {
-      return GetOrCreateLargeFragmentIdForHash(
-          tok_id, std::move(hash), is_new);
-    } else {
-      return GetOrCreateSmallFragmentIdForHash(
-          tok_id, std::move(hash), is_new);
-    }
-  }
-
-  // Get, or create and return, a type ID for the specific type.
-  PackedTypeId GetOrCreateSmallTypeIdForHash(
-      RawEntityId type_id, mx::TypeKind type_kind, std::string hash, bool &is_new);
-
-  // Get, or create and return, a type ID for the specific type.
-  PackedTypeId GetOrCreateBigTypeIdForHash(
-      RawEntityId type_id, mx::TypeKind type_kind, std::string hash, bool &is_new);
+      RawEntityId tok_id, std::string hash, size_t num_tokens, bool &is_new);
 
   PackedTypeId GetOrCreateTypeIdForHash(
-      RawEntityId type_id, mx::TypeKind type_kind,
-      std::string hash, size_t num_tokens, bool &is_new) {
+      mx::TypeKind type_kind, std::string hash, size_t num_tokens,
+      bool &is_new);
 
-    // Big types will have IDs in the range [1, mx::kMaxBigTypeId) and small types
-    // will have ids [mx::kMaxBigTypeId: 2^36 + mx::kMaxBigTypeId)
-    if (num_tokens >= mx::kNumMinTokensInBigType) {
-      return GetOrCreateBigTypeIdForHash(type_id, type_kind, hash, is_new);
-    } else {
-      return GetOrCreateSmallTypeIdForHash(type_id, type_kind, hash, is_new);
-    }
-  }
+  // Get, or create and return, a translation unit ID for the specific compile
+  // command hash.
+  PackedCompilationId GetOrCreateCompilationId(
+      RawEntityId file_id, std::string hash, bool &is_new);
 
 //  // Flush all outstanding writes to the database.
 //  void Flush(void);

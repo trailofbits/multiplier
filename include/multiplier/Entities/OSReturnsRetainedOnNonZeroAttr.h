@@ -29,12 +29,12 @@ class OSReturnsRetainedOnNonZeroAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<OSReturnsRetainedOnNonZeroAttr> in(const Fragment &frag);
-  static gap::generator<OSReturnsRetainedOnNonZeroAttr> in(const File &file);
   static gap::generator<OSReturnsRetainedOnNonZeroAttr> in(const Index &index);
   static gap::generator<OSReturnsRetainedOnNonZeroAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OSReturnsRetainedOnNonZeroAttr> by_id(const Index &, EntityId);
+  static gap::generator<OSReturnsRetainedOnNonZeroAttr> in(const Fragment &frag);
+  static gap::generator<OSReturnsRetainedOnNonZeroAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_RETURNS_RETAINED_ON_NON_ZERO;

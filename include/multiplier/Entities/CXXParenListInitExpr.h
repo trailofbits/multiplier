@@ -33,12 +33,12 @@ class CXXParenListInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXParenListInitExpr> in(const Fragment &frag);
-  static gap::generator<CXXParenListInitExpr> in(const File &file);
   static gap::generator<CXXParenListInitExpr> in(const Index &index);
   static gap::generator<CXXParenListInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXParenListInitExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXParenListInitExpr> in(const Fragment &frag);
+  static gap::generator<CXXParenListInitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_PAREN_LIST_INIT_EXPR;

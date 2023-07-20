@@ -11,6 +11,37 @@
 #include <optional>
 
 namespace mx {
+namespace {
+
+static constexpr RawEntityId kMinEntityIdIncrement = 1ull;
+
+// If we have more than 2^16 tokens in a given code chunk, then we consider
+// this a "big code" chunk. We assume that we'll have few of these, i.e. less
+// than 2^16 of them.
+static constexpr unsigned kBigFragmentIdNumBits = 16u;
+static constexpr RawEntityId kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
+static constexpr uint64_t kNumTokensInBigFragment =
+    1ull << kBigFragmentIdNumBits;
+
+static constexpr unsigned kFileIdNumBits = 20u;
+static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;
+
+static constexpr unsigned kBigTypeIdNumBits = 26u;
+static constexpr RawEntityId kMaxBigTypeId = 1ull << kBigTypeIdNumBits;
+
+static constexpr unsigned kBigTypeOffsetNumBits = 18u;
+static constexpr RawEntityId kNumTokensInBigType = 1ull << kBigTypeOffsetNumBits;
+
+static constexpr unsigned kTypeIdNumBits = 36u;
+static constexpr RawEntityId kMaxTypeId = 1ull << kTypeIdNumBits;
+
+static constexpr unsigned kTypeOffsetNumBits = 8u;
+static constexpr RawEntityId kNumMinTokensInBigType = 1ull << kTypeOffsetNumBits;
+
+static constexpr unsigned kCompilationIdNumBits = kFileIdNumBits;
+static constexpr RawEntityId kMaxCompilationId = 1ull << kCompilationIdNumBits;
+
+}  // namespace
 
 // Return the fragment offset from an entity ID. Returns `~0u` if it's not
 // a fragment-specific entity ID.

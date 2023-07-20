@@ -29,12 +29,12 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<OMPCaptureNoInitAttr> in(const Fragment &frag);
-  static gap::generator<OMPCaptureNoInitAttr> in(const File &file);
   static gap::generator<OMPCaptureNoInitAttr> in(const Index &index);
   static gap::generator<OMPCaptureNoInitAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPCaptureNoInitAttr> by_id(const Index &, EntityId);
+  static gap::generator<OMPCaptureNoInitAttr> in(const Fragment &frag);
+  static gap::generator<OMPCaptureNoInitAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_CAPTURE_NO_INIT;

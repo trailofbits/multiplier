@@ -29,12 +29,12 @@ class AnnotateTypeAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<AnnotateTypeAttr> in(const Fragment &frag);
-  static gap::generator<AnnotateTypeAttr> in(const File &file);
   static gap::generator<AnnotateTypeAttr> in(const Index &index);
   static gap::generator<AnnotateTypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AnnotateTypeAttr> by_id(const Index &, EntityId);
+  static gap::generator<AnnotateTypeAttr> in(const Fragment &frag);
+  static gap::generator<AnnotateTypeAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANNOTATE_TYPE;

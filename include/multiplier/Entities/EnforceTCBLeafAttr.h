@@ -29,12 +29,12 @@ class EnforceTCBLeafAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<EnforceTCBLeafAttr> in(const Fragment &frag);
-  static gap::generator<EnforceTCBLeafAttr> in(const File &file);
   static gap::generator<EnforceTCBLeafAttr> in(const Index &index);
   static gap::generator<EnforceTCBLeafAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<EnforceTCBLeafAttr> by_id(const Index &, EntityId);
+  static gap::generator<EnforceTCBLeafAttr> in(const Fragment &frag);
+  static gap::generator<EnforceTCBLeafAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENFORCE_TCB_LEAF;

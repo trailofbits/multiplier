@@ -29,8 +29,6 @@ class DeducedType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<DeducedType> in(const Fragment &frag);
-  static gap::generator<DeducedType> in(const File &file);
   static gap::generator<DeducedType> in(const Index &index);
   static gap::generator<DeducedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

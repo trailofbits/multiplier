@@ -9,11 +9,11 @@
 #include <algorithm>
 #include <cassert>
 #include <multiplier/Index.h>
-#include <multiplier/Types.h>
 
 #include "File.h"
 #include "Fragment.h"
 #include "Token.h"
+#include "Types.h"
 #include "Util.h"
 
 #ifndef MX_DISABLE_RE2

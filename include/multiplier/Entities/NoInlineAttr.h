@@ -31,12 +31,12 @@ class NoInlineAttr : public DeclOrStmtAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NoInlineAttr> in(const Fragment &frag);
-  static gap::generator<NoInlineAttr> in(const File &file);
   static gap::generator<NoInlineAttr> in(const Index &index);
   static gap::generator<NoInlineAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NoInlineAttr> by_id(const Index &, EntityId);
+  static gap::generator<NoInlineAttr> in(const Fragment &frag);
+  static gap::generator<NoInlineAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_INLINE;

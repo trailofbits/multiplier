@@ -36,12 +36,12 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<NonTypeTemplateParmDecl> in(const Fragment &frag);
-  static gap::generator<NonTypeTemplateParmDecl> in(const File &file);
   static gap::generator<NonTypeTemplateParmDecl> in(const Index &index);
   static gap::generator<NonTypeTemplateParmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NonTypeTemplateParmDecl> by_id(const Index &, EntityId);
+  static gap::generator<NonTypeTemplateParmDecl> in(const Fragment &frag);
+  static gap::generator<NonTypeTemplateParmDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NON_TYPE_TEMPLATE_PARM;

@@ -29,12 +29,12 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Fragment &frag);
-  static gap::generator<ObjCRequiresPropertyDefsAttr> in(const File &file);
   static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Index &index);
   static gap::generator<ObjCRequiresPropertyDefsAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCRequiresPropertyDefsAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Fragment &frag);
+  static gap::generator<ObjCRequiresPropertyDefsAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFS;

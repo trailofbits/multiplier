@@ -36,12 +36,12 @@ class ObjCPropertyDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCPropertyDecl> in(const Fragment &frag);
-  static gap::generator<ObjCPropertyDecl> in(const File &file);
   static gap::generator<ObjCPropertyDecl> in(const Index &index);
   static gap::generator<ObjCPropertyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCPropertyDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCPropertyDecl> in(const Fragment &frag);
+  static gap::generator<ObjCPropertyDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROPERTY;

@@ -29,8 +29,6 @@ class RecordType : public TagType {
   friend class TagType;
   friend class Type;
  public:
-  static gap::generator<RecordType> in(const Fragment &frag);
-  static gap::generator<RecordType> in(const File &file);
   static gap::generator<RecordType> in(const Index &index);
   static gap::generator<RecordType> containing(const Token &tok);
   bool contains(const Token &tok) const;

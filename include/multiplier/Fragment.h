@@ -16,13 +16,9 @@
 #include "File.h"
 
 namespace mx {
-namespace ir {
-class SourceIRImpl;
-namespace builtin {
-class ModuleOp;
-}  // namespace builtin
-}  // namespace ir
 
+class Compilation;
+class CompilationImpl;
 class EntityProvider;
 class FragmentImpl;
 class Index;
@@ -46,6 +42,7 @@ class WeggliQueryResultIterator;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
@@ -56,6 +53,8 @@ using MacroOrToken = std::variant<Macro, Token>;
 // trees, and tokens.
 class Fragment {
  private:
+  friend class Compilation;
+  friend class CompilationImpl;
   friend class EntityProvider;
   friend class FragmentImpl;
   friend class Index;
@@ -67,12 +66,12 @@ class Fragment {
   friend class TokenTreeImpl;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
-  friend class ir::SourceIRImpl;
 
 #define MX_FRIEND(type_name, ln, e, c) \
     friend class type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -84,8 +83,17 @@ class Fragment {
 
  public:
 
-  /* implicit */ inline Fragment(std::shared_ptr<const FragmentImpl> impl_)
+  /* implicit */ inline Fragment(FragmentImplPtr impl_)
       : impl(std::move(impl_)) {}
+
+  // A fragment can be nested inside of another fragment. This is very common
+  // with C++ templates, but can also happen in C due to elaborated type uses,
+  // such as `struct foo`, acting as forward declarations upon their first use.
+  std::optional<Fragment> parent(void) const noexcept;
+
+  // Return a fragment's parent fragment. If this is a top-level fragment, then
+  // this returns the argument.
+  static Fragment containing(const Fragment &);
 
   // Return the fragment containing a query match.
   static Fragment containing(const WeggliQueryMatch &);
@@ -93,10 +101,6 @@ class Fragment {
 
   // Return the fragment containing a token tree.
   static std::optional<Fragment> containing(const TokenTree &);
-
-  inline static Fragment containing(const Fragment &fragment) {
-    return fragment;
-  }
 
   static Fragment containing(const Decl &);
   static Fragment containing(const Stmt &);
@@ -115,6 +119,11 @@ class Fragment {
 
   // Return the entity ID of this fragment.
   SpecificEntityId<FragmentId> id(void) const noexcept;
+
+  // Returns the unique owning compilation that produced this fragment. There
+  // may be many compilations which produced equivalent/redundant fragments, but
+  // those redundancies are eliminated by the indexer.
+  Compilation compilation(void) const noexcept;
 
   // The range of file tokens in this fragment.
   TokenRange file_tokens(void) const;
@@ -144,9 +153,6 @@ class Fragment {
 
   // Run a regular expression search over this fragment.
   gap::generator<RegexQueryMatch> query(const RegexQuery &query) const &;
-
-  // Returns source IR for the fragment.
-  std::optional<ir::builtin::ModuleOp> ir(void) const noexcept;
 };
 
 }  // namespace mx

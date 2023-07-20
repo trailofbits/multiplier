@@ -70,32 +70,6 @@ gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const 
   }
 }
 
-gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kTemplateSpecializationTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<TemplateSpecializationType> e = TemplateSpecializationType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<TemplateSpecializationType> TemplateSpecializationType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kTemplateSpecializationTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<TemplateSpecializationType> e = TemplateSpecializationType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const Reference &r) {
   return TemplateSpecializationType::from(r.as_type());
 }

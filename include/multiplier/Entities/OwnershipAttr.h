@@ -31,12 +31,12 @@ class OwnershipAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<OwnershipAttr> in(const Fragment &frag);
-  static gap::generator<OwnershipAttr> in(const File &file);
   static gap::generator<OwnershipAttr> in(const Index &index);
   static gap::generator<OwnershipAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OwnershipAttr> by_id(const Index &, EntityId);
+  static gap::generator<OwnershipAttr> in(const Fragment &frag);
+  static gap::generator<OwnershipAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OWNERSHIP;

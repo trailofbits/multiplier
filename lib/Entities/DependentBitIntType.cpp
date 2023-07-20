@@ -70,32 +70,6 @@ gap::generator<DependentBitIntType> DependentBitIntType::in(const Index &index) 
   }
 }
 
-gap::generator<DependentBitIntType> DependentBitIntType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DependentBitIntType> e = DependentBitIntType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentBitIntType> DependentBitIntType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DependentBitIntType> e = DependentBitIntType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<DependentBitIntType> DependentBitIntType::from(const Reference &r) {
   return DependentBitIntType::from(r.as_type());
 }

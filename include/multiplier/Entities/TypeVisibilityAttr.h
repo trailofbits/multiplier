@@ -30,12 +30,12 @@ class TypeVisibilityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<TypeVisibilityAttr> in(const Fragment &frag);
-  static gap::generator<TypeVisibilityAttr> in(const File &file);
   static gap::generator<TypeVisibilityAttr> in(const Index &index);
   static gap::generator<TypeVisibilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeVisibilityAttr> by_id(const Index &, EntityId);
+  static gap::generator<TypeVisibilityAttr> in(const Fragment &frag);
+  static gap::generator<TypeVisibilityAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_VISIBILITY;

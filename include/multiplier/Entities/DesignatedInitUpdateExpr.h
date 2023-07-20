@@ -33,12 +33,12 @@ class DesignatedInitUpdateExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<DesignatedInitUpdateExpr> in(const Fragment &frag);
-  static gap::generator<DesignatedInitUpdateExpr> in(const File &file);
   static gap::generator<DesignatedInitUpdateExpr> in(const Index &index);
   static gap::generator<DesignatedInitUpdateExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DesignatedInitUpdateExpr> by_id(const Index &, EntityId);
+  static gap::generator<DesignatedInitUpdateExpr> in(const Fragment &frag);
+  static gap::generator<DesignatedInitUpdateExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DESIGNATED_INIT_UPDATE_EXPR;

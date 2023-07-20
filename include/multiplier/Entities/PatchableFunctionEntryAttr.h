@@ -29,12 +29,12 @@ class PatchableFunctionEntryAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<PatchableFunctionEntryAttr> in(const Fragment &frag);
-  static gap::generator<PatchableFunctionEntryAttr> in(const File &file);
   static gap::generator<PatchableFunctionEntryAttr> in(const Index &index);
   static gap::generator<PatchableFunctionEntryAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<PatchableFunctionEntryAttr> by_id(const Index &, EntityId);
+  static gap::generator<PatchableFunctionEntryAttr> in(const Fragment &frag);
+  static gap::generator<PatchableFunctionEntryAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PATCHABLE_FUNCTION_ENTRY;

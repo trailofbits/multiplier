@@ -171,9 +171,6 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   // Return the inclusive token range associated with two entity IDs.
   TokenRange TokenRangeFor(const FragmentImplPtr &, EntityId begin_id,
                            EntityId end_id) const;
-
-  // Return the source ir for the fragment.
-  std::string_view SourceIR(void) const & noexcept;
 };
 
 }  // namespace mx

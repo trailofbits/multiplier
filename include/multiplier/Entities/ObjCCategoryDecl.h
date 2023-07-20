@@ -37,12 +37,12 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCCategoryDecl> in(const Fragment &frag);
-  static gap::generator<ObjCCategoryDecl> in(const File &file);
   static gap::generator<ObjCCategoryDecl> in(const Index &index);
   static gap::generator<ObjCCategoryDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCCategoryDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCCategoryDecl> in(const Fragment &frag);
+  static gap::generator<ObjCCategoryDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_CATEGORY;

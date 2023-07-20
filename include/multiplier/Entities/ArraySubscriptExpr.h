@@ -32,12 +32,12 @@ class ArraySubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ArraySubscriptExpr> in(const Fragment &frag);
-  static gap::generator<ArraySubscriptExpr> in(const File &file);
   static gap::generator<ArraySubscriptExpr> in(const Index &index);
   static gap::generator<ArraySubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ArraySubscriptExpr> by_id(const Index &, EntityId);
+  static gap::generator<ArraySubscriptExpr> in(const Fragment &frag);
+  static gap::generator<ArraySubscriptExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_SUBSCRIPT_EXPR;

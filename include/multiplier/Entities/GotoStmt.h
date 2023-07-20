@@ -29,12 +29,12 @@ class GotoStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<GotoStmt> in(const Fragment &frag);
-  static gap::generator<GotoStmt> in(const File &file);
   static gap::generator<GotoStmt> in(const Index &index);
   static gap::generator<GotoStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<GotoStmt> by_id(const Index &, EntityId);
+  static gap::generator<GotoStmt> in(const Fragment &frag);
+  static gap::generator<GotoStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GOTO_STMT;

@@ -31,12 +31,12 @@ class CaseStmt : public SwitchCase {
   friend class SwitchCase;
   friend class Stmt;
  public:
-  static gap::generator<CaseStmt> in(const Fragment &frag);
-  static gap::generator<CaseStmt> in(const File &file);
   static gap::generator<CaseStmt> in(const Index &index);
   static gap::generator<CaseStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CaseStmt> by_id(const Index &, EntityId);
+  static gap::generator<CaseStmt> in(const Fragment &frag);
+  static gap::generator<CaseStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CASE_STMT;

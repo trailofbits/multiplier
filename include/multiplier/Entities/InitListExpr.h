@@ -33,12 +33,12 @@ class InitListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<InitListExpr> in(const Fragment &frag);
-  static gap::generator<InitListExpr> in(const File &file);
   static gap::generator<InitListExpr> in(const Index &index);
   static gap::generator<InitListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InitListExpr> by_id(const Index &, EntityId);
+  static gap::generator<InitListExpr> in(const Fragment &frag);
+  static gap::generator<InitListExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INIT_LIST_EXPR;

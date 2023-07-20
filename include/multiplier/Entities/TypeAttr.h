@@ -52,12 +52,12 @@ class TypeAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<TypeAttr> in(const Fragment &frag);
-  static gap::generator<TypeAttr> in(const File &file);
   static gap::generator<TypeAttr> in(const Index &index);
   static gap::generator<TypeAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeAttr> by_id(const Index &, EntityId);
+  static gap::generator<TypeAttr> in(const Fragment &frag);
+  static gap::generator<TypeAttr> in(const File &file);
 
   static std::optional<TypeAttr> from(const Attr &parent);
 

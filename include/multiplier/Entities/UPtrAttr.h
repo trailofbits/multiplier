@@ -29,12 +29,12 @@ class UPtrAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<UPtrAttr> in(const Fragment &frag);
-  static gap::generator<UPtrAttr> in(const File &file);
   static gap::generator<UPtrAttr> in(const Index &index);
   static gap::generator<UPtrAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UPtrAttr> by_id(const Index &, EntityId);
+  static gap::generator<UPtrAttr> in(const Fragment &frag);
+  static gap::generator<UPtrAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::U_PTR;

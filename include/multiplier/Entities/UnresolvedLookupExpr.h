@@ -34,12 +34,12 @@ class UnresolvedLookupExpr : public OverloadExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<UnresolvedLookupExpr> in(const Fragment &frag);
-  static gap::generator<UnresolvedLookupExpr> in(const File &file);
   static gap::generator<UnresolvedLookupExpr> in(const Index &index);
   static gap::generator<UnresolvedLookupExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnresolvedLookupExpr> by_id(const Index &, EntityId);
+  static gap::generator<UnresolvedLookupExpr> in(const Fragment &frag);
+  static gap::generator<UnresolvedLookupExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_LOOKUP_EXPR;

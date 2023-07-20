@@ -29,12 +29,12 @@ class MSStructAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<MSStructAttr> in(const Fragment &frag);
-  static gap::generator<MSStructAttr> in(const File &file);
   static gap::generator<MSStructAttr> in(const Index &index);
   static gap::generator<MSStructAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MSStructAttr> by_id(const Index &, EntityId);
+  static gap::generator<MSStructAttr> in(const Fragment &frag);
+  static gap::generator<MSStructAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_STRUCT;

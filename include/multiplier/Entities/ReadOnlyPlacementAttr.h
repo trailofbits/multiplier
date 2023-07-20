@@ -29,12 +29,12 @@ class ReadOnlyPlacementAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ReadOnlyPlacementAttr> in(const Fragment &frag);
-  static gap::generator<ReadOnlyPlacementAttr> in(const File &file);
   static gap::generator<ReadOnlyPlacementAttr> in(const Index &index);
   static gap::generator<ReadOnlyPlacementAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ReadOnlyPlacementAttr> by_id(const Index &, EntityId);
+  static gap::generator<ReadOnlyPlacementAttr> in(const Fragment &frag);
+  static gap::generator<ReadOnlyPlacementAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::READ_ONLY_PLACEMENT;

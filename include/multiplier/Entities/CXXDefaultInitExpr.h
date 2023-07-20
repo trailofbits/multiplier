@@ -33,12 +33,12 @@ class CXXDefaultInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXDefaultInitExpr> in(const Fragment &frag);
-  static gap::generator<CXXDefaultInitExpr> in(const File &file);
   static gap::generator<CXXDefaultInitExpr> in(const Index &index);
   static gap::generator<CXXDefaultInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXDefaultInitExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXDefaultInitExpr> in(const Fragment &frag);
+  static gap::generator<CXXDefaultInitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_DEFAULT_INIT_EXPR;

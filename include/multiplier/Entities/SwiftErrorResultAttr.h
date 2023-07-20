@@ -33,12 +33,12 @@ class SwiftErrorResultAttr : public ParameterABIAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<SwiftErrorResultAttr> in(const Fragment &frag);
-  static gap::generator<SwiftErrorResultAttr> in(const File &file);
   static gap::generator<SwiftErrorResultAttr> in(const Index &index);
   static gap::generator<SwiftErrorResultAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SwiftErrorResultAttr> by_id(const Index &, EntityId);
+  static gap::generator<SwiftErrorResultAttr> in(const Fragment &frag);
+  static gap::generator<SwiftErrorResultAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ERROR_RESULT;

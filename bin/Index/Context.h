@@ -19,6 +19,8 @@
 #include "Util.h"
 
 namespace pasta {
+class CompileJob;
+class Compiler;
 class File;
 class TokenRange;
 }  // namespace pasta
@@ -63,9 +65,6 @@ class GlobalIndexingState {
 
   // Number of fragments for which we are attempting to generate source ir.
   std::unique_ptr<ProgressBar> sourceir_progress;
-
-  // Number of fragments for which we successfully generated source ir.
-  std::unique_ptr<ProgressBar> sourceir_success_progress;
 
   const unsigned num_workers;
 
@@ -134,6 +133,11 @@ class GlobalIndexingState {
   void PersistTypes(const pasta::AST &ast, NameMangler &mangler,
                     EntityMapper &em, const PendingFragment &fragment);
 
+  // Persist the compilation.
+  void PersistCompilation(const pasta::Compiler &compiler,
+                          const pasta::CompileJob &job, const pasta::AST &ast,
+                          const EntityMapper &em, mx::PackedCompilationId tu_id,
+                          const std::vector<PendingFragment> &fragments);
 };
 
 }  // namespace indexer

@@ -32,8 +32,6 @@ class AutoType : public DeducedType {
   friend class DeducedType;
   friend class Type;
  public:
-  static gap::generator<AutoType> in(const Fragment &frag);
-  static gap::generator<AutoType> in(const File &file);
   static gap::generator<AutoType> in(const Index &index);
   static gap::generator<AutoType> containing(const Token &tok);
   bool contains(const Token &tok) const;

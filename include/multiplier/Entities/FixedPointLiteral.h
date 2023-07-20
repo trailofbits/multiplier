@@ -32,12 +32,12 @@ class FixedPointLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<FixedPointLiteral> in(const Fragment &frag);
-  static gap::generator<FixedPointLiteral> in(const File &file);
   static gap::generator<FixedPointLiteral> in(const Index &index);
   static gap::generator<FixedPointLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<FixedPointLiteral> by_id(const Index &, EntityId);
+  static gap::generator<FixedPointLiteral> in(const Fragment &frag);
+  static gap::generator<FixedPointLiteral> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FIXED_POINT_LITERAL;

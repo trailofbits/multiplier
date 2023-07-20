@@ -159,12 +159,12 @@ class Expr : public ValueStmt {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<Expr> in(const Fragment &frag);
-  static gap::generator<Expr> in(const File &file);
   static gap::generator<Expr> in(const Index &index);
   static gap::generator<Expr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<Expr> by_id(const Index &, EntityId);
+  static gap::generator<Expr> in(const Fragment &frag);
+  static gap::generator<Expr> in(const File &file);
 
   static gap::generator<Expr> containing(const Decl &decl);
   static gap::generator<Expr> containing(const std::optional<Decl> &decl);

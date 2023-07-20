@@ -33,12 +33,12 @@ class VAArgExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<VAArgExpr> in(const Fragment &frag);
-  static gap::generator<VAArgExpr> in(const File &file);
   static gap::generator<VAArgExpr> in(const Index &index);
   static gap::generator<VAArgExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<VAArgExpr> by_id(const Index &, EntityId);
+  static gap::generator<VAArgExpr> in(const Fragment &frag);
+  static gap::generator<VAArgExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::VA_ARG_EXPR;

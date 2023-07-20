@@ -27,8 +27,6 @@ class AtomicType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<AtomicType> in(const Fragment &frag);
-  static gap::generator<AtomicType> in(const File &file);
   static gap::generator<AtomicType> in(const Index &index);
   static gap::generator<AtomicType> containing(const Token &tok);
   bool contains(const Token &tok) const;

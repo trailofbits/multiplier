@@ -36,12 +36,12 @@ class ObjCImplDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCImplDecl> in(const Fragment &frag);
-  static gap::generator<ObjCImplDecl> in(const File &file);
   static gap::generator<ObjCImplDecl> in(const Index &index);
   static gap::generator<ObjCImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCImplDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCImplDecl> in(const Fragment &frag);
+  static gap::generator<ObjCImplDecl> in(const File &file);
 
   static gap::generator<ObjCImplDecl> containing(const Decl &decl);
   static gap::generator<ObjCImplDecl> containing(const std::optional<Decl> &decl);

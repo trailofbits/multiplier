@@ -28,8 +28,6 @@ class QualifiedType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<QualifiedType> in(const Fragment &frag);
-  static gap::generator<QualifiedType> in(const File &file);
   static gap::generator<QualifiedType> in(const Index &index);
   static gap::generator<QualifiedType> containing(const Token &tok);
   bool contains(const Token &tok) const;

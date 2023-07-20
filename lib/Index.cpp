@@ -136,8 +136,13 @@ FilePathMap Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }
 
+// Generate all compilation units in the index.
+gap::generator<Compilation> Index::compilations(void) const & {
+  co_return;  // TODO(pag): Implement me!
+}
+
 gap::generator<File> Index::files(void) const & {
-  std::vector<SpecificEntityId<FileId>> file_ids;
+  std::vector<PackedFileId> file_ids;
   auto file_paths = impl->ListFiles(impl);
   file_ids.reserve(file_paths.size());
   for (const auto &[path, file_id] : file_paths) {
@@ -166,7 +171,8 @@ gap::generator<File> Index::files(void) const & {
   }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DEFINE_GETTER, MX_DEFINE_GETTER, MX_DEFINE_GETTER,
+                            MX_DEFINE_GETTER, MX_DEFINE_GETTER,
+                            MX_DEFINE_GETTER, MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER)
 #undef MX_DEFINE_GETTER
 
@@ -246,7 +252,8 @@ VariantEntity Index::entity(EntityId eid) const {
       assert(false);
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
-                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
+                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
+                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER
 

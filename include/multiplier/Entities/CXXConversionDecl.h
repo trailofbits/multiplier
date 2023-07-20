@@ -39,12 +39,12 @@ class CXXConversionDecl : public CXXMethodDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<CXXConversionDecl> in(const Fragment &frag);
-  static gap::generator<CXXConversionDecl> in(const File &file);
   static gap::generator<CXXConversionDecl> in(const Index &index);
   static gap::generator<CXXConversionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXConversionDecl> by_id(const Index &, EntityId);
+  static gap::generator<CXXConversionDecl> in(const Fragment &frag);
+  static gap::generator<CXXConversionDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_CONVERSION;

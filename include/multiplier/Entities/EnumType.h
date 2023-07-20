@@ -29,8 +29,6 @@ class EnumType : public TagType {
   friend class TagType;
   friend class Type;
  public:
-  static gap::generator<EnumType> in(const Fragment &frag);
-  static gap::generator<EnumType> in(const File &file);
   static gap::generator<EnumType> in(const Index &index);
   static gap::generator<EnumType> containing(const Token &tok);
   bool contains(const Token &tok) const;

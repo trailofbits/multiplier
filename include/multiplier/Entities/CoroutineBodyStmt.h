@@ -30,12 +30,12 @@ class CoroutineBodyStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<CoroutineBodyStmt> in(const Fragment &frag);
-  static gap::generator<CoroutineBodyStmt> in(const File &file);
   static gap::generator<CoroutineBodyStmt> in(const Index &index);
   static gap::generator<CoroutineBodyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CoroutineBodyStmt> by_id(const Index &, EntityId);
+  static gap::generator<CoroutineBodyStmt> in(const Fragment &frag);
+  static gap::generator<CoroutineBodyStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COROUTINE_BODY_STMT;

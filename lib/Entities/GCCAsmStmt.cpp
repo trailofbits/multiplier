@@ -200,11 +200,11 @@ gap::generator<AddrLabelExpr> GCCAsmStmt::labels(void) const & {
   co_return;
 }
 
-unsigned GCCAsmStmt::num_output_constraint_literals(void) const {
+unsigned GCCAsmStmt::num_clobber_string_literals(void) const {
   return impl->reader.getVal52().size();
 }
 
-std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned n) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) const {
   auto list = impl->reader.getVal52();
   if (n >= list.size()) {
     return std::nullopt;
@@ -218,7 +218,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned 
   return StringLiteral::from(Stmt(std::move(e)));
 }
 
-gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const & {
+gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const & {
   auto list = impl->reader.getVal52();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
@@ -241,11 +241,11 @@ co_yield std::string_view(v.cStr(), v.size());
   co_return;
 }
 
-unsigned GCCAsmStmt::num_input_constraint_literals(void) const {
+unsigned GCCAsmStmt::num_output_constraint_literals(void) const {
   return impl->reader.getVal53().size();
 }
 
-std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned n) const {
   auto list = impl->reader.getVal53();
   if (n >= list.size()) {
     return std::nullopt;
@@ -259,7 +259,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n
   return StringLiteral::from(Stmt(std::move(e)));
 }
 
-gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const & {
+gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const & {
   auto list = impl->reader.getVal53();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
@@ -282,11 +282,11 @@ co_yield std::string_view(v.cStr(), v.size());
   co_return;
 }
 
-unsigned GCCAsmStmt::num_clobber_string_literals(void) const {
+unsigned GCCAsmStmt::num_input_constraint_literals(void) const {
   return impl->reader.getVal54().size();
 }
 
-std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n) const {
   auto list = impl->reader.getVal54();
   if (n >= list.size()) {
     return std::nullopt;
@@ -300,7 +300,7 @@ std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) 
   return StringLiteral::from(Stmt(std::move(e)));
 }
 
-gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const & {
+gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const & {
   auto list = impl->reader.getVal54();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
@@ -314,12 +314,21 @@ gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const & 
   co_return;
 }
 
+gap::generator<std::string_view> GCCAsmStmt::label_names(void) const & {
+  auto list = impl->reader.getVal67();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+co_yield std::string_view(v.cStr(), v.size());
+  }
+  co_return;
+}
+
 unsigned GCCAsmStmt::num_label_expressions(void) const {
-  return impl->reader.getVal67().size();
+  return impl->reader.getVal68().size();
 }
 
 std::optional<AddrLabelExpr> GCCAsmStmt::nth_label_expression(unsigned n) const {
-  auto list = impl->reader.getVal67();
+  auto list = impl->reader.getVal68();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -333,24 +342,15 @@ std::optional<AddrLabelExpr> GCCAsmStmt::nth_label_expression(unsigned n) const 
 }
 
 gap::generator<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const & {
-  auto list = impl->reader.getVal67();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d67 = ep->StmtFor(ep, v)) {
-      if (auto e = AddrLabelExpr::from(Stmt(std::move(d67)))) {
-        co_yield std::move(*e);
-      }
-    }
-  }
-  co_return;
-}
-
-gap::generator<std::string_view> GCCAsmStmt::label_names(void) const & {
   auto list = impl->reader.getVal68();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
-co_yield std::string_view(v.cStr(), v.size());
+    EntityId id(v);
+    if (auto d68 = ep->StmtFor(ep, v)) {
+      if (auto e = AddrLabelExpr::from(Stmt(std::move(d68)))) {
+        co_yield std::move(*e);
+      }
+    }
   }
   co_return;
 }

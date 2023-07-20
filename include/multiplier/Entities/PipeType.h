@@ -27,8 +27,6 @@ class PipeType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<PipeType> in(const Fragment &frag);
-  static gap::generator<PipeType> in(const File &file);
   static gap::generator<PipeType> in(const Index &index);
   static gap::generator<PipeType> containing(const Token &tok);
   bool contains(const Token &tok) const;

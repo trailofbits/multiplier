@@ -31,8 +31,6 @@ class ObjCObjectPointerType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ObjCObjectPointerType> in(const Fragment &frag);
-  static gap::generator<ObjCObjectPointerType> in(const File &file);
   static gap::generator<ObjCObjectPointerType> in(const Index &index);
   static gap::generator<ObjCObjectPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;

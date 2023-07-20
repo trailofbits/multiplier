@@ -14,6 +14,7 @@
 #include <vector>
 
 namespace pasta {
+class AST;
 class Decl;
 class File;
 class Macro;
@@ -22,6 +23,7 @@ class TokenRange;
 namespace indexer {
 
 using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
+class EntityMapper;
 
 // Compute a SHA256 hash of some data from a file.
 std::string HashFile(std::string_view data);
@@ -39,5 +41,8 @@ std::string HashFragment(
     const std::vector<Entity> &entity_range,
     const pasta::TokenRange &toks,
     uint64_t begin_index, uint64_t end_index);
+
+// Hash the entire compilation.
+std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em);
 
 }  // namespace indexer

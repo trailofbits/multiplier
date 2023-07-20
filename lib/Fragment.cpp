@@ -8,18 +8,17 @@
 
 #include <iostream>
 #include <cassert>
+#include <multiplier/Compilation.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Type.h>
-#include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
 
 #include "Attr.h"
 #include "Pseudo.h"
 #include "Decl.h"
 #include "File.h"
-#include "IR/SourceIR.h"
 #include "Macro.h"
 #include "Reference.h"
 #include "Re2Impl.h"
@@ -31,6 +30,23 @@ namespace mx {
 namespace ir {
 class SourceIRImpl;
 }  // namespace ir
+
+Fragment Fragment::containing(const Fragment &child) {
+  for (mx::RawEntityId parent_id : child.impl->reader.getParentIds()) {
+    return Fragment(child.impl->ep->FragmentFor(child.impl->ep, parent_id));
+  }
+  return child;
+}
+
+// A fragment can be nested inside of another fragment. This is very common
+// with C++ templates, but can also happen in C due to elaborated type uses,
+// such as `struct foo`, acting as forward declarations upon their first use.
+std::optional<Fragment> Fragment::parent(void) const noexcept {
+  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
+    return Fragment(impl->ep->FragmentFor(impl->ep, parent_id));
+  }
+  return std::nullopt;
+}
 
 // Return the fragment containing a query match.
 Fragment Fragment::containing(const WeggliQueryMatch &match) {
@@ -95,9 +111,16 @@ std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
       } else if (std::holds_alternative<type_name>(entity)) { \
         return Fragment::containing(std::get<type_name>(entity));
 
+  // TODO(pag): Pseudo entities have a fragment id.
+
   if (false) {
-    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY, GET_FRAGMENT,
-                                GET_FRAGMENT, GET_FRAGMENT, GET_FRAGMENT, GET_FRAGMENT)
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FRAGMENT,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FRAGMENT,
+                                GET_FRAGMENT,
+                                GET_FRAGMENT,
+                                MX_IGNORE_ENTITY_CATEGORY)
   } else {
     return std::nullopt;
   }
@@ -116,6 +139,14 @@ std::optional<Fragment> Fragment::containing(const TokenTree &tree) {
 // Return the ID of this fragment.
 SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
   return FragmentId(impl->fragment_id);
+}
+
+// Returns the unique owning compilation that produced this fragment. There
+// may be many compilations which produced equivalent/redundant fragments, but
+// those redundancies are eliminated by the indexer.
+Compilation Fragment::compilation(void) const noexcept {
+  return Compilation(impl->ep->CompilationFor(
+      impl->ep, impl->reader.getCompilationId()));
 }
 
 // The range of file tokens in this fragment.
@@ -263,18 +294,6 @@ gap::generator<RegexQueryMatch> Fragment::query(
   for (auto match : res.Enumerate()) {
     co_yield match;
   }
-}
-
-std::optional<ir::builtin::ModuleOp> Fragment::ir(void) const noexcept {
-  if (auto mlir = impl->SourceIR(); !mlir.empty()) {
-    auto ir_obj = std::make_shared<const ir::SourceIRImpl>(
-        id(), impl->ep, mlir);
-    if (mlir::Operation *ptr = ir_obj->scope()) {
-      ir::Operation op(std::move(ir_obj), ptr);
-      return ir::builtin::ModuleOp::from(op);
-    }
-  }
-  return std::nullopt;
 }
 
 }  // namespace mx

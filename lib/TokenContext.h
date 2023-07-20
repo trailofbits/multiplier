@@ -25,7 +25,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
-                            MX_FORWARD_DECLARE_GETTER)
+                            MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
 
   virtual std::optional<Reader> TokenContexts(EntityOffset) const = 0;
@@ -54,7 +55,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
-                            MX_FORWARD_DECLARE_GETTER)
+                            MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
 
   std::optional<TokenContextReader::Reader> TokenContexts(EntityOffset) const final;
@@ -82,7 +84,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_FORWARD_DECLARE_GETTER,
-                            MX_FORWARD_DECLARE_GETTER)
+                            MX_FORWARD_DECLARE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
 
   std::optional<TokenContextReader::Reader> TokenContexts(EntityOffset) const final;

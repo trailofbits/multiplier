@@ -31,12 +31,12 @@ class MSAsmStmt : public AsmStmt {
   friend class AsmStmt;
   friend class Stmt;
  public:
-  static gap::generator<MSAsmStmt> in(const Fragment &frag);
-  static gap::generator<MSAsmStmt> in(const File &file);
   static gap::generator<MSAsmStmt> in(const Index &index);
   static gap::generator<MSAsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MSAsmStmt> by_id(const Index &, EntityId);
+  static gap::generator<MSAsmStmt> in(const Fragment &frag);
+  static gap::generator<MSAsmStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_ASM_STMT;

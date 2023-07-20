@@ -29,8 +29,6 @@ class ObjCObjectType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ObjCObjectType> in(const Fragment &frag);
-  static gap::generator<ObjCObjectType> in(const File &file);
   static gap::generator<ObjCObjectType> in(const Index &index);
   static gap::generator<ObjCObjectType> containing(const Token &tok);
   bool contains(const Token &tok) const;

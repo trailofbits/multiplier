@@ -28,12 +28,12 @@ class TopLevelStmtDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<TopLevelStmtDecl> in(const Fragment &frag);
-  static gap::generator<TopLevelStmtDecl> in(const File &file);
   static gap::generator<TopLevelStmtDecl> in(const Index &index);
   static gap::generator<TopLevelStmtDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TopLevelStmtDecl> by_id(const Index &, EntityId);
+  static gap::generator<TopLevelStmtDecl> in(const Fragment &frag);
+  static gap::generator<TopLevelStmtDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TOP_LEVEL_STMT;

@@ -34,12 +34,12 @@ class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPTeamsDistributeParallelForSimdDirective> in(const Fragment &frag);
-  static gap::generator<OMPTeamsDistributeParallelForSimdDirective> in(const File &file);
   static gap::generator<OMPTeamsDistributeParallelForSimdDirective> in(const Index &index);
   static gap::generator<OMPTeamsDistributeParallelForSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPTeamsDistributeParallelForSimdDirective> in(const Fragment &frag);
+  static gap::generator<OMPTeamsDistributeParallelForSimdDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_SIMD_DIRECTIVE;

@@ -31,12 +31,12 @@ class LifetimeExtendedTemporaryDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<LifetimeExtendedTemporaryDecl> in(const Fragment &frag);
-  static gap::generator<LifetimeExtendedTemporaryDecl> in(const File &file);
   static gap::generator<LifetimeExtendedTemporaryDecl> in(const Index &index);
   static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LifetimeExtendedTemporaryDecl> by_id(const Index &, EntityId);
+  static gap::generator<LifetimeExtendedTemporaryDecl> in(const Fragment &frag);
+  static gap::generator<LifetimeExtendedTemporaryDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LIFETIME_EXTENDED_TEMPORARY;

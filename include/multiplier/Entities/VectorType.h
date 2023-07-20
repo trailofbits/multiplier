@@ -29,8 +29,6 @@ class VectorType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<VectorType> in(const Fragment &frag);
-  static gap::generator<VectorType> in(const File &file);
   static gap::generator<VectorType> in(const Index &index);
   static gap::generator<VectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;

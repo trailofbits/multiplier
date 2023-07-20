@@ -34,12 +34,12 @@ class AtomicExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<AtomicExpr> in(const Fragment &frag);
-  static gap::generator<AtomicExpr> in(const File &file);
   static gap::generator<AtomicExpr> in(const Index &index);
   static gap::generator<AtomicExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AtomicExpr> by_id(const Index &, EntityId);
+  static gap::generator<AtomicExpr> in(const Fragment &frag);
+  static gap::generator<AtomicExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ATOMIC_EXPR;

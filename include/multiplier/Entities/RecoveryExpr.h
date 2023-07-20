@@ -32,12 +32,12 @@ class RecoveryExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<RecoveryExpr> in(const Fragment &frag);
-  static gap::generator<RecoveryExpr> in(const File &file);
   static gap::generator<RecoveryExpr> in(const Index &index);
   static gap::generator<RecoveryExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<RecoveryExpr> by_id(const Index &, EntityId);
+  static gap::generator<RecoveryExpr> in(const Fragment &frag);
+  static gap::generator<RecoveryExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::RECOVERY_EXPR;

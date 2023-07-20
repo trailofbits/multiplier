@@ -29,12 +29,12 @@ class SuppressAttr : public StmtAttr {
   friend class StmtAttr;
   friend class Attr;
  public:
-  static gap::generator<SuppressAttr> in(const Fragment &frag);
-  static gap::generator<SuppressAttr> in(const File &file);
   static gap::generator<SuppressAttr> in(const Index &index);
   static gap::generator<SuppressAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SuppressAttr> by_id(const Index &, EntityId);
+  static gap::generator<SuppressAttr> in(const Fragment &frag);
+  static gap::generator<SuppressAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SUPPRESS;

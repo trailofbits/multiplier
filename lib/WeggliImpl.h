@@ -9,9 +9,9 @@
 #include <multiplier/Weggli.h>
 
 #include <map>
-#include <multiplier/Types.h>
 
 #include "Fragment.h"
+#include "Types.h"
 
 namespace mx {
 

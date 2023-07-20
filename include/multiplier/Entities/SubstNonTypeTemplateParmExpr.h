@@ -34,12 +34,12 @@ class SubstNonTypeTemplateParmExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<SubstNonTypeTemplateParmExpr> in(const Fragment &frag);
-  static gap::generator<SubstNonTypeTemplateParmExpr> in(const File &file);
   static gap::generator<SubstNonTypeTemplateParmExpr> in(const Index &index);
   static gap::generator<SubstNonTypeTemplateParmExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SubstNonTypeTemplateParmExpr> by_id(const Index &, EntityId);
+  static gap::generator<SubstNonTypeTemplateParmExpr> in(const Fragment &frag);
+  static gap::generator<SubstNonTypeTemplateParmExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR;

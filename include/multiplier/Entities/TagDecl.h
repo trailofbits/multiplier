@@ -41,12 +41,12 @@ class TagDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TagDecl> in(const Fragment &frag);
-  static gap::generator<TagDecl> in(const File &file);
   static gap::generator<TagDecl> in(const Index &index);
   static gap::generator<TagDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TagDecl> by_id(const Index &, EntityId);
+  static gap::generator<TagDecl> in(const Fragment &frag);
+  static gap::generator<TagDecl> in(const File &file);
 
   static gap::generator<TagDecl> containing(const Decl &decl);
   static gap::generator<TagDecl> containing(const std::optional<Decl> &decl);

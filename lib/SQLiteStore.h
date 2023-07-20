@@ -14,9 +14,10 @@
 #include <filesystem>
 #include <functional>
 #include <memory>
-#include <multiplier/Types.h>
 #include <optional>
 #include <string>
+
+#include "Types.h"
 
 extern "C" {
 struct sqlite3;

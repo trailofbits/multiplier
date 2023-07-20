@@ -6,6 +6,7 @@
 
 #include "Hash.h"
 
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
@@ -28,6 +29,7 @@
 #include <llvm/Support/SHA256.h>
 #pragma clang diagnostic pop
 
+#include "EntityMapper.h"
 #include "PASTA.h"
 #include "Util.h"
 
@@ -116,6 +118,29 @@ class HashVisitor final : public pasta::DeclVisitor {
 std::string HashFile(std::string_view data) {
   llvm::SHA256 hash;
   hash.update(data);
+
+  std::string result;
+  result.reserve(32);
+  auto final_ = hash.final();
+  auto final_data = reinterpret_cast<const char *>(final_.data());
+  result.insert(result.end(), final_data, &(final_data[final_.size()]));
+  return result;
+}
+
+// Hash the entire compilation.
+std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em) {
+  llvm::SHA256 hash;
+
+  // Hash all file ids.
+  std::stringstream ss;
+  for (const pasta::File &file : ast.ParsedFiles()) {
+    ss << ':' << std::hex << em.EntityId(file);
+  }
+  hash.update(ss.str());
+
+  // Hash the results of preprocessing.
+  hash.update(ast.PreprocessedCode());
+
   std::string result;
   result.reserve(32);
   auto final_ = hash.final();

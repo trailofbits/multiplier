@@ -33,12 +33,12 @@ class SwiftContextAttr : public ParameterABIAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<SwiftContextAttr> in(const Fragment &frag);
-  static gap::generator<SwiftContextAttr> in(const File &file);
   static gap::generator<SwiftContextAttr> in(const Index &index);
   static gap::generator<SwiftContextAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<SwiftContextAttr> by_id(const Index &, EntityId);
+  static gap::generator<SwiftContextAttr> in(const Fragment &frag);
+  static gap::generator<SwiftContextAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_CONTEXT;

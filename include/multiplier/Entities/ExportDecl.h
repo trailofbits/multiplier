@@ -28,12 +28,12 @@ class ExportDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ExportDecl> in(const Fragment &frag);
-  static gap::generator<ExportDecl> in(const File &file);
   static gap::generator<ExportDecl> in(const Index &index);
   static gap::generator<ExportDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ExportDecl> by_id(const Index &, EntityId);
+  static gap::generator<ExportDecl> in(const Fragment &frag);
+  static gap::generator<ExportDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXPORT;

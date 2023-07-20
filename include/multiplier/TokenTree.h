@@ -28,6 +28,7 @@ class TokenTreeVisitor {
 // into a singular linear range of tokens.
 class TokenTree {
  private:
+  friend class Compilation;
   friend class File;
   friend class Fragment;
 

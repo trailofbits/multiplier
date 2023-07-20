@@ -27,12 +27,12 @@ class ObjCDesignatedInitializerAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<ObjCDesignatedInitializerAttr> in(const Fragment &frag);
-  static gap::generator<ObjCDesignatedInitializerAttr> in(const File &file);
   static gap::generator<ObjCDesignatedInitializerAttr> in(const Index &index);
   static gap::generator<ObjCDesignatedInitializerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCDesignatedInitializerAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCDesignatedInitializerAttr> in(const Fragment &frag);
+  static gap::generator<ObjCDesignatedInitializerAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DESIGNATED_INITIALIZER;

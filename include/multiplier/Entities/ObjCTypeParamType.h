@@ -28,8 +28,6 @@ class ObjCTypeParamType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ObjCTypeParamType> in(const Fragment &frag);
-  static gap::generator<ObjCTypeParamType> in(const File &file);
   static gap::generator<ObjCTypeParamType> in(const Index &index);
   static gap::generator<ObjCTypeParamType> containing(const Token &tok);
   bool contains(const Token &tok) const;

@@ -34,12 +34,12 @@ class OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPParallelMasterTaskLoopSimdDirective> in(const Fragment &frag);
-  static gap::generator<OMPParallelMasterTaskLoopSimdDirective> in(const File &file);
   static gap::generator<OMPParallelMasterTaskLoopSimdDirective> in(const Index &index);
   static gap::generator<OMPParallelMasterTaskLoopSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPParallelMasterTaskLoopSimdDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPParallelMasterTaskLoopSimdDirective> in(const Fragment &frag);
+  static gap::generator<OMPParallelMasterTaskLoopSimdDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE;

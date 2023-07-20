@@ -52,12 +52,12 @@ class DeclaratorDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<DeclaratorDecl> in(const Fragment &frag);
-  static gap::generator<DeclaratorDecl> in(const File &file);
   static gap::generator<DeclaratorDecl> in(const Index &index);
   static gap::generator<DeclaratorDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<DeclaratorDecl> by_id(const Index &, EntityId);
+  static gap::generator<DeclaratorDecl> in(const Fragment &frag);
+  static gap::generator<DeclaratorDecl> in(const File &file);
 
   static gap::generator<DeclaratorDecl> containing(const Decl &decl);
   static gap::generator<DeclaratorDecl> containing(const std::optional<Decl> &decl);

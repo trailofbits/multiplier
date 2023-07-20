@@ -35,12 +35,12 @@ class TypeAliasDecl : public TypedefNameDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TypeAliasDecl> in(const Fragment &frag);
-  static gap::generator<TypeAliasDecl> in(const File &file);
   static gap::generator<TypeAliasDecl> in(const Index &index);
   static gap::generator<TypeAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeAliasDecl> by_id(const Index &, EntityId);
+  static gap::generator<TypeAliasDecl> in(const Fragment &frag);
+  static gap::generator<TypeAliasDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPE_ALIAS;

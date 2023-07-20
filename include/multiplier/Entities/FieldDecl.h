@@ -39,12 +39,12 @@ class FieldDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<FieldDecl> in(const Fragment &frag);
-  static gap::generator<FieldDecl> in(const File &file);
   static gap::generator<FieldDecl> in(const Index &index);
   static gap::generator<FieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<FieldDecl> by_id(const Index &, EntityId);
+  static gap::generator<FieldDecl> in(const Fragment &frag);
+  static gap::generator<FieldDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FIELD;

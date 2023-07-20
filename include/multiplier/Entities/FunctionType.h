@@ -30,8 +30,6 @@ class FunctionType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<FunctionType> in(const Fragment &frag);
-  static gap::generator<FunctionType> in(const File &file);
   static gap::generator<FunctionType> in(const Index &index);
   static gap::generator<FunctionType> containing(const Token &tok);
   bool contains(const Token &tok) const;

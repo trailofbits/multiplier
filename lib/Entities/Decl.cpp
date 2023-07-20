@@ -147,12 +147,11 @@ gap::generator<Decl> Decl::in(const Index &index) {
   }
 }
 
-gap::generator<Decl> Decl::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
-    if (std::optional<Decl> e = Decl::from(Decl(std::move(eptr)))) {
-      co_yield std::move(e.value());
+gap::generator<Decl> Decl::in(const Index &index, std::span<DeclKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclKind k : kinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
+      co_yield Decl(std::move(eptr));
     }
   }
 }
@@ -169,11 +168,12 @@ gap::generator<Decl> Decl::in(const File &file) {
   }
 }
 
-gap::generator<Decl> Decl::in(const Index &index, std::span<DeclKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (DeclKind k : kinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      co_yield Decl(std::move(eptr));
+gap::generator<Decl> Decl::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
+    if (std::optional<Decl> e = Decl::from(Decl(std::move(eptr)))) {
+      co_yield std::move(e.value());
     }
   }
 }

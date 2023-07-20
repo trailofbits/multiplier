@@ -375,7 +375,7 @@ struct Stmt @0x91127d30fade9a32{
   val63 @3 :List(Text);
   val64 @4 :List(Text);
   val66 @5 :List(Text);
-  val68 @6 :List(Text);
+  val67 @6 :List(Text);
   val4 @7 :List(UInt64);
   val15 @8 :List(UInt64);
   val26 @9 :List(UInt64);
@@ -385,7 +385,7 @@ struct Stmt @0x91127d30fade9a32{
   val52 @13 :List(UInt64);
   val53 @14 :List(UInt64);
   val54 @15 :List(UInt64);
-  val67 @16 :List(UInt64);
+  val68 @16 :List(UInt64);
   val7 @17 :UInt8;
   val56 @18 :UInt8;
   val69 @19 :UInt8;

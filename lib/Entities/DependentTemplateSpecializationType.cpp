@@ -71,32 +71,6 @@ gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializat
   }
 }
 
-gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (TypeKind k : kDependentTemplateSpecializationTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-      if (std::optional<DependentTemplateSpecializationType> e = DependentTemplateSpecializationType::from(Type(std::move(eptr)))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (TypeKind k : kDependentTemplateSpecializationTypeDerivedKinds) {
-      for (TypeImplPtr eptr : ep->TypesFor(ep, k, frag_id)) {
-        if (std::optional<DependentTemplateSpecializationType> e = DependentTemplateSpecializationType::from(Type(std::move(eptr)))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializationType::from(const Reference &r) {
   return DependentTemplateSpecializationType::from(r.as_type());
 }

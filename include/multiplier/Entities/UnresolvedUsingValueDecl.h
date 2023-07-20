@@ -32,12 +32,12 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<UnresolvedUsingValueDecl> in(const Fragment &frag);
-  static gap::generator<UnresolvedUsingValueDecl> in(const File &file);
   static gap::generator<UnresolvedUsingValueDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnresolvedUsingValueDecl> by_id(const Index &, EntityId);
+  static gap::generator<UnresolvedUsingValueDecl> in(const Fragment &frag);
+  static gap::generator<UnresolvedUsingValueDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_VALUE;

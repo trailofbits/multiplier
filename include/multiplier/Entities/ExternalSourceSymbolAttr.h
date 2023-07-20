@@ -29,12 +29,12 @@ class ExternalSourceSymbolAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ExternalSourceSymbolAttr> in(const Fragment &frag);
-  static gap::generator<ExternalSourceSymbolAttr> in(const File &file);
   static gap::generator<ExternalSourceSymbolAttr> in(const Index &index);
   static gap::generator<ExternalSourceSymbolAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ExternalSourceSymbolAttr> by_id(const Index &, EntityId);
+  static gap::generator<ExternalSourceSymbolAttr> in(const Fragment &frag);
+  static gap::generator<ExternalSourceSymbolAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EXTERNAL_SOURCE_SYMBOL;

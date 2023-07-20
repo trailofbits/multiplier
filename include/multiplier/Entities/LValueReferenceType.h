@@ -29,8 +29,6 @@ class LValueReferenceType : public ReferenceType {
   friend class ReferenceType;
   friend class Type;
  public:
-  static gap::generator<LValueReferenceType> in(const Fragment &frag);
-  static gap::generator<LValueReferenceType> in(const File &file);
   static gap::generator<LValueReferenceType> in(const Index &index);
   static gap::generator<LValueReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;

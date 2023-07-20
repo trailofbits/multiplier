@@ -29,8 +29,6 @@ class ExtVectorType : public VectorType {
   friend class VectorType;
   friend class Type;
  public:
-  static gap::generator<ExtVectorType> in(const Fragment &frag);
-  static gap::generator<ExtVectorType> in(const File &file);
   static gap::generator<ExtVectorType> in(const Index &index);
   static gap::generator<ExtVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;

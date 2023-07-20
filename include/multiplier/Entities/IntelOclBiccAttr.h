@@ -29,12 +29,12 @@ class IntelOclBiccAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<IntelOclBiccAttr> in(const Fragment &frag);
-  static gap::generator<IntelOclBiccAttr> in(const File &file);
   static gap::generator<IntelOclBiccAttr> in(const Index &index);
   static gap::generator<IntelOclBiccAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<IntelOclBiccAttr> by_id(const Index &, EntityId);
+  static gap::generator<IntelOclBiccAttr> in(const Fragment &frag);
+  static gap::generator<IntelOclBiccAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INTEL_OCL_BICC;

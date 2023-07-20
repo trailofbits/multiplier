@@ -27,8 +27,6 @@ class ComplexType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ComplexType> in(const Fragment &frag);
-  static gap::generator<ComplexType> in(const File &file);
   static gap::generator<ComplexType> in(const Index &index);
   static gap::generator<ComplexType> containing(const Token &tok);
   bool contains(const Token &tok) const;

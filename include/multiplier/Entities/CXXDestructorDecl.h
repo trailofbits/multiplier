@@ -39,12 +39,12 @@ class CXXDestructorDecl : public CXXMethodDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<CXXDestructorDecl> in(const Fragment &frag);
-  static gap::generator<CXXDestructorDecl> in(const File &file);
   static gap::generator<CXXDestructorDecl> in(const Index &index);
   static gap::generator<CXXDestructorDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXDestructorDecl> by_id(const Index &, EntityId);
+  static gap::generator<CXXDestructorDecl> in(const Fragment &frag);
+  static gap::generator<CXXDestructorDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DESTRUCTOR;

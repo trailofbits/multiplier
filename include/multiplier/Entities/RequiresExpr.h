@@ -34,12 +34,12 @@ class RequiresExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<RequiresExpr> in(const Fragment &frag);
-  static gap::generator<RequiresExpr> in(const File &file);
   static gap::generator<RequiresExpr> in(const Index &index);
   static gap::generator<RequiresExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<RequiresExpr> by_id(const Index &, EntityId);
+  static gap::generator<RequiresExpr> in(const Fragment &frag);
+  static gap::generator<RequiresExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::REQUIRES_EXPR;

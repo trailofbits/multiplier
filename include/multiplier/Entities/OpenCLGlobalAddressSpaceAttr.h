@@ -30,12 +30,12 @@ class OpenCLGlobalAddressSpaceAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const Fragment &frag);
-  static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const File &file);
   static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGlobalAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OpenCLGlobalAddressSpaceAttr> by_id(const Index &, EntityId);
+  static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GLOBAL_ADDRESS_SPACE;

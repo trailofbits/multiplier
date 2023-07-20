@@ -42,12 +42,12 @@ class InheritableParamAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<InheritableParamAttr> in(const Fragment &frag);
-  static gap::generator<InheritableParamAttr> in(const File &file);
   static gap::generator<InheritableParamAttr> in(const Index &index);
   static gap::generator<InheritableParamAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InheritableParamAttr> by_id(const Index &, EntityId);
+  static gap::generator<InheritableParamAttr> in(const Fragment &frag);
+  static gap::generator<InheritableParamAttr> in(const File &file);
 
   static std::optional<InheritableParamAttr> from(const Attr &parent);
 

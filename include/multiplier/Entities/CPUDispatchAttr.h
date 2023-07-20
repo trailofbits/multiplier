@@ -29,12 +29,12 @@ class CPUDispatchAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CPUDispatchAttr> in(const Fragment &frag);
-  static gap::generator<CPUDispatchAttr> in(const File &file);
   static gap::generator<CPUDispatchAttr> in(const Index &index);
   static gap::generator<CPUDispatchAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CPUDispatchAttr> by_id(const Index &, EntityId);
+  static gap::generator<CPUDispatchAttr> in(const Fragment &frag);
+  static gap::generator<CPUDispatchAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CPU_DISPATCH;

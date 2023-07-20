@@ -29,12 +29,12 @@ class CodeSegAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CodeSegAttr> in(const Fragment &frag);
-  static gap::generator<CodeSegAttr> in(const File &file);
   static gap::generator<CodeSegAttr> in(const Index &index);
   static gap::generator<CodeSegAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CodeSegAttr> by_id(const Index &, EntityId);
+  static gap::generator<CodeSegAttr> in(const Fragment &frag);
+  static gap::generator<CodeSegAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CODE_SEG;

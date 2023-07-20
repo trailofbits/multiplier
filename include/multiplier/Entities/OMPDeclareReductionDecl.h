@@ -34,12 +34,12 @@ class OMPDeclareReductionDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPDeclareReductionDecl> in(const Fragment &frag);
-  static gap::generator<OMPDeclareReductionDecl> in(const File &file);
   static gap::generator<OMPDeclareReductionDecl> in(const Index &index);
   static gap::generator<OMPDeclareReductionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclareReductionDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclareReductionDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclareReductionDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_REDUCTION;
