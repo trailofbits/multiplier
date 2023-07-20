@@ -7,6 +7,7 @@
 #include "Compilation.h"
 
 #include <multiplier/Entities/IncludePathLocation.h>
+#include <multiplier/Fragment.h>
 
 #ifndef __CDT_PARSER__
 #include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
@@ -37,8 +38,68 @@ PackedCompilationId Compilation::id(void) const noexcept {
 
 // The compilation containing/owning a fragment.
 Compilation Compilation::containing(const Fragment &frag) {
-  return Compilation(frag.impl->ep->CompilationFor(
-      frag.impl->ep, frag.impl->reader.getCompilationId()));
+  return frag.compilation();
+}
+
+Compilation Compilation::containing(const Decl &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
+Compilation Compilation::containing(const Stmt &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
+Compilation Compilation::containing(const Attr &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
+Compilation Compilation::containing(const TemplateArgument &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
+Compilation Compilation::containing(const TemplateParameterList &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
+Compilation Compilation::containing(const CXXBaseSpecifier &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
+Compilation Compilation::containing(const Designator &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
+Compilation Compilation::containing(const Macro &entity) {
+  return Compilation::containing(Fragment::containing(entity));
+}
+
+std::optional<Fragment> Fragment::containing(const Token &entity) {
+  if (auto frag = entity.impl->NthOwningFragment(entity.offset)) {
+    return Fragment(FragmentImplPtr(entity.impl, frag));
+  } else {
+    return std::nullopt;
+  }
+}
+
+std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
+#define GET_FRAGMENT(type_name, lower_name, enum_name, category) \
+      } else if (std::holds_alternative<type_name>(entity)) { \
+        return Fragment::containing(std::get<type_name>(entity));
+
+  // TODO(pag): Pseudo entities have a fragment id.
+
+  if (false) {
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FRAGMENT,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FRAGMENT,
+                                GET_FRAGMENT,
+                                GET_FRAGMENT,
+                                MX_IGNORE_ENTITY_CATEGORY)
+  } else {
+    return std::nullopt;
+  }
+#undef GET_FRAGMENT
 }
 
 // The fragments owned by this compilation. This will be a subset of all

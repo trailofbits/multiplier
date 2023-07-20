@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <multiplier/Compilation.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Designator.h>
@@ -138,6 +139,14 @@ std::optional<Fragment> Fragment::containing(const TokenTree &tree) {
 // Return the ID of this fragment.
 SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
   return FragmentId(impl->fragment_id);
+}
+
+// Returns the unique owning compilation that produced this fragment. There
+// may be many compilations which produced equivalent/redundant fragments, but
+// those redundancies are eliminated by the indexer.
+Compilation Fragment::compilation(void) const noexcept {
+  return Compilation(impl->ep->CompilationFor(
+      impl->ep, impl->reader.getCompilationId()));
 }
 
 // The range of file tokens in this fragment.

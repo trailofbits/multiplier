@@ -13,7 +13,7 @@
 #include <string_view>
 #include <utility>
 
-#include "Types.h"
+#include "Entity.h"
 
 namespace mx {
 namespace ir {
@@ -25,11 +25,21 @@ class ModuleOp;
 
 class CompilationImpl;
 class EntityProvider;
-class File;
-class Fragment;
 class FragmentImpl;
 class Index;
 class Reference;
+
+#define MX_FORWARD_DECLARE(type_name, ln, e, c) \
+    class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE)
+#undef MX_FORWARD_DECLARE
 
 using CompilationImplPtr = std::shared_ptr<const CompilationImpl>;
 
@@ -55,6 +65,17 @@ class Compilation {
 
   // The compilation containing/owning a fragment.
   static Compilation containing(const Fragment &);
+
+  static Compilation containing(const Decl &);
+  static Compilation containing(const Stmt &);
+  static Compilation containing(const Attr &);
+  static Compilation containing(const TemplateArgument &);
+  static Compilation containing(const TemplateParameterList &);
+  static Compilation containing(const CXXBaseSpecifier &);
+  static Compilation containing(const Designator &);
+  static std::optional<Compilation> containing(const Token &);
+  static Compilation containing(const Macro &);
+  static std::optional<Compilation> containing(const VariantEntity &);
 
   // Return the unique ID of this compilation.
   PackedCompilationId id(void) const noexcept;
