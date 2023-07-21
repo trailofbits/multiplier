@@ -552,8 +552,6 @@ static void PersistTokenTree(
 //  provenance.Dump(std::cerr);
 //#endif
 
-  std::string utf8_fragment_data;
-
   unsigned num_macros = static_cast<unsigned>(pf.macros_to_serialize.size());
   unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
   unsigned num_tokens = static_cast<unsigned>(sched.tokens.size());
@@ -564,6 +562,18 @@ static void PersistTokenTree(
   auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
   auto mti2mi = fb.initMacroTokenIndexToMacroId(num_tokens);
   auto i = 0u;
+
+  size_t data_reserve = 128u;
+  for (const TokenTreeNode &tok_node : sched.tokens) {
+    if (auto pt = tok_node.Token()) {
+      data_reserve += pt->Data().size();
+    } else if (auto ft = tok_node.FileToken()) {
+      data_reserve += ft->Data().size();
+    }
+  }
+
+  std::string utf8_fragment_data;
+  utf8_fragment_data.reserve(data_reserve);
 
   // Serialize the tokens.
   for (const TokenTreeNode &tok_node : sched.tokens) {

@@ -170,7 +170,7 @@ std::optional<TokenContext> TokenContext::aliasee(void) const {
     return std::nullopt;
   }
 
-  auto tc = reader->TokenContexts(parent_offset.value());
+  auto tc = reader->TokenContexts(alias_offset.value());
   if (!tc.has_value()) {
     assert(false);
     return std::nullopt;

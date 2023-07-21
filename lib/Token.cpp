@@ -669,6 +669,49 @@ static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
   }
 }
 
+static TokenCategory ClassifyType(TypeId id, TokenKind,
+                                  TokenCategory baseline_category) {
+  switch (baseline_category) {
+    case TokenCategory::IDENTIFIER:
+    case TokenCategory::UNKNOWN:
+      break;
+    default:
+      return baseline_category;
+  }
+
+  switch (id.kind) {
+    case TypeKind::ENUM:
+      return TokenCategory::ENUM;
+
+    case TypeKind::RECORD:
+      return TokenCategory::STRUCT;  // Could also be a union.
+
+    case TypeKind::TEMPLATE_SPECIALIZATION:
+      return TokenCategory::CLASS;
+
+    case TypeKind::TEMPLATE_TYPE_PARM:
+      return TokenCategory::TEMPLATE_PARAMETER_TYPE;
+
+    case TypeKind::TYPEDEF:
+    case TypeKind::USING:
+      return TokenCategory::TYPE_ALIAS;
+
+    case TypeKind::BUILTIN:
+      return TokenCategory::BUILTIN_TYPE_NAME;
+
+    // Try to force unrecognized identifiers inside of function prototypes
+    // to be interpreted as function parameter names.
+    //
+    // XREF: https://github.com/trailofbits/multiplier/issues/344
+    case TypeKind::FUNCTION_PROTO:
+      return TokenCategory::PARAMETER_VARIABLE;
+
+    default:
+      break;
+  }
+  return baseline_category;
+}
+
 static TokenCategory ClassifyFile(TokenKind kind,
                                   TokenCategory baseline_category) {
   switch (kind) {
@@ -707,6 +750,9 @@ TokenCategory TokenReader::NthTokenCategory(EntityOffset token_index) const {
 
   } else if (std::holds_alternative<StmtId>(vid)) {
     return ClassifyStmt(std::get<StmtId>(vid), kind, baseline_category);
+
+  } else if (std::holds_alternative<TypeId>(vid)) {
+    return ClassifyType(std::get<TypeId>(vid), kind, baseline_category);
 
   } else if (std::holds_alternative<FileId>(vid)) {
     return ClassifyFile(kind, baseline_category);
