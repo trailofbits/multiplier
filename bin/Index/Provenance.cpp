@@ -152,7 +152,8 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 }
 
 static const void *VisitType(const pasta::Type &type,
-                                            const pasta::Token &token) {
+                             const pasta::Token &token,
+                             unsigned context_depth) {
   const std::string_view tok_data = token.Data();
 
   if (auto typedef_type = pasta::TypedefType::From(type)) {
@@ -168,11 +169,20 @@ static const void *VisitType(const pasta::Type &type,
     }
 
   } else if (auto deduced_type = pasta::DeducedType::From(type)) {
-    return VisitType(deduced_type.value(), token);
+    return VisitType(deduced_type.value(), token, context_depth);
+
+  // Handle issue #344, where parameter names in function type prototypes
+  // don't have related entities.
+  //
+  // XREF: https://github.com/trailofbits/multiplier/issues/344.
+  } else if (auto func_type = pasta::FunctionProtoType::From(type);
+             func_type && !context_depth) {
+    return type.RawType();
 
   } else if (auto unqual_type = type.UnqualifiedType();
              unqual_type.RawType() != type.RawType()) {
-    return VisitType(unqual_type, token);
+    return VisitType(unqual_type, token, context_depth);
+
   }
 
   return nullptr;
@@ -295,7 +305,7 @@ static mx::RawEntityId RelatedEntityIdToParsedToken(
         if (!is_literal) {
           related_entity = VisitType(
               pasta::Type::From(context.value()).value(),
-              token);
+              token, depth);
         }
         break;
       case pasta::TokenContextKind::kDecl:
