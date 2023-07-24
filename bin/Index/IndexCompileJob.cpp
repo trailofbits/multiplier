@@ -1014,9 +1014,13 @@ static std::vector<EntityGroupRange> PartitionEntities(
       // function declaration, or it expands to nothing, and so looks disjoint
       // from the function declaration. We want to make it logically part of
       // the declaration, fusing the two.
+      //
+      // XREF: Issue 412 (https://github.com/trailofbits/multiplier/issues/412).
       if (std::holds_alternative<pasta::Macro>(prev_entity) &&
           std::holds_alternative<pasta::Decl>(next_entity) &&
           (prev_end_index + 1u) == next_begin &&
+          tokens[prev_end_index].MacroLocation() &&
+          tokens[prev_end_index].Kind() != pasta::TokenKind::kSemi &&
           (std::get<pasta::Macro>(prev_entity).Kind() ==
               pasta::MacroKind::kExpansion) &&
           !NumParsedTokens(std::get<pasta::Macro>(prev_entity), tokens)) {
