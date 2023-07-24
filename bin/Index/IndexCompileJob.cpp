@@ -1019,6 +1019,7 @@ static std::vector<EntityGroupRange> PartitionEntities(
       if (std::holds_alternative<pasta::Macro>(prev_entity) &&
           std::holds_alternative<pasta::Decl>(next_entity) &&
           (prev_end_index + 1u) == next_begin &&
+          tokens[prev_end_index].MacroLocation() &&
           tokens[prev_end_index].Kind() != pasta::TokenKind::kSemi &&
           (std::get<pasta::Macro>(prev_entity).Kind() ==
               pasta::MacroKind::kExpansion) &&
