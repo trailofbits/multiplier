@@ -170,20 +170,6 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 };
 
-// Determines whether or not a TLD is likely to have to go into a child
-// fragment. This happens when the TLD is a forward declaration, e.g. of a
-// struct.
-static bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
-  switch (decl.Kind()) {
-    case pasta::DeclKind::kRecord:
-    case pasta::DeclKind::kCXXRecord:
-    case pasta::DeclKind::kEnum:
-      return !IsDefinition(decl);
-    default:
-      return false;
-  }
-}
-
 // Find all top-level declarations.
 static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
 
@@ -1221,60 +1207,140 @@ static void CreatePendingFragment(
 //    return;
 //  }
 
-  PendingFragment pf(
-      database.GetOrCreateFragmentIdForHash(
-          (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
-          HashFragment(entities, tok_range, begin_index, end_index),
-          (end_index - begin_index + 1ul)  /* num_tokens */,
-          is_new_fragment_id  /* mutated by reference */),
-      tu_id,
-      em);
+  std::vector<std::vector<pasta::Decl>> top_level_decl_groups;
+  std::vector<pasta::Macro> top_level_macros;
 
-  pf.file_location = std::move(floc);
-  pf.begin_index = begin_index;
-  pf.end_index = end_index;
-
-  for (const Entity &entity : entities) {
-    if (std::holds_alternative<pasta::Decl>(entity)) {
-      pf.top_level_decls.push_back(std::get<pasta::Decl>(entity));
-      pf.num_top_level_declarations++;
-
-    } else if (std::holds_alternative<pasta::Macro>(entity)) {
-      pf.top_level_macros.push_back(std::get<pasta::Macro>(entity));
-      pf.num_top_level_macros++;
-
-    } else {
-      LOG(FATAL)
-          << "TODO: Unsupported top-level entity kind";
-    }
-  }
+  top_level_decl_groups.emplace_back();
+  bool has_root_fragment = false;
 
   // Partition the top-level declarations so that ones that definitely won't
   // need to go in a nested fragment show up first. This acts as a minor
   // mitigation to #396 (https://github.com/trailofbits/multiplier/issues/396).
-  std::partition(pf.top_level_decls.begin(), pf.top_level_decls.end(),
-                 ShouldGoInNestedFragment);
+  for (const Entity &entity : entities) {
+    if (std::holds_alternative<pasta::Decl>(entity)) {
+      const pasta::Decl &decl = std::get<pasta::Decl>(entity);
 
-  CHECK_NE((pf.num_top_level_declarations + pf.num_top_level_macros), 0u);
+      // Dummy initialize all the top-level decls. The way we apply the
+      // labeller and visitor to top-level decls requires us to prevent the
+      // nested stuff from showing up too early.
+      //
+      // XREF Issue #396: https://github.com/trailofbits/multiplier/issues/396.
+      em.entity_ids.emplace(decl.RawDecl(), mx::kInvalidEntityId);
 
-  // We always need to label the entities inside of a fragment, regardless of
-  // if fragment is new. This is because each fragment might have arbitrary
-  // references to other declarations. We need to be able to form cross-
-  // fragment references when serializing things, so we use the labeller to
-  // assign IDs to entities (decls, statements, etc.) in a uniform and
-  // deterministic way so that other threads doing similar indexing will form
-  // identically labelled chunks for the same logical entities.
-  //
-  // Unfortunately, the labeller needs to be manually written as opposed to
-  // auto-generated, as our auto-generation has no concept of which AST
-  // methods descend vs. cross the tree (into other fragments).
-  LabelEntitiesInFragment(pf, em, tok_range, is_new_fragment_id);
+      if (ShouldGoInNestedFragment(decl)) {
+        LOG(ERROR)
+            << "Will have nested fragment";
+        top_level_decl_groups.emplace_back().push_back(decl);
+      } else {
+        LOG(ERROR)
+            << "Will have root fragment";
+        has_root_fragment = true;
+        top_level_decl_groups.front().push_back(decl);
+      }
 
-  if (!is_new_fragment_id) {
-    return;
+    } else if (std::holds_alternative<pasta::Macro>(entity)) {
+      top_level_macros.push_back(std::get<pasta::Macro>(entity));
+
+    } else {
+      LOG(ERROR)
+          << "TODO: Unsupported top-level entity kind";
+      return;
+    }
   }
 
-  pending_fragments.emplace_back(std::move(pf));
+  // If we have no specific root fragment, then force all nested fragments back
+  // into the main fragment. This could happen if we have a macro expanding to
+  // a bunch of forward declarations.
+  if (!has_root_fragment) {
+    LOG(ERROR)
+        << "Didn't have root fragment";
+    for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
+      if (!top_level_decls.empty()) {
+        top_level_decl_groups.front().push_back(top_level_decls.back());
+      }
+    }
+    top_level_decl_groups.resize(1u);
+  }
+
+  LOG(ERROR) << "Num groups: " << top_level_decl_groups.size();
+
+  std::optional<mx::PackedFragmentId> parent_fid;
+
+  for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
+    LOG(ERROR) << "GROUP ----";
+    if (top_level_decls.empty() && top_level_macros.empty()) {
+      LOG(ERROR) << "Empty group";
+      continue;
+    }
+
+    // Undo the dummy initialization from above. This lets the labeller below,
+    // which recursively calls `PendingFragment::Add` in a fixpoint loop, skip
+    // over the top-level decls that should be nested. If we didn't do the
+    // skipping over, then we'd risk accidentally labelling those decls as
+    // though they were part of the root fragment, which would cause issue #396.
+    //
+    // XREF Issue #396: https://github.com/trailofbits/multiplier/issues/396.
+    for (const pasta::Decl &decl : top_level_decls) {
+      LOG(ERROR) << "Decl " << reinterpret_cast<const void *>(decl.RawDecl());
+      if (em.EntityId(decl) == mx::kInvalidEntityId) {
+        em.entity_ids.erase(decl.RawDecl());
+      }
+    }
+
+    std::string frag_hash = HashFragment(
+        top_level_decls, top_level_macros, tok_range, begin_index, end_index);
+
+    LOG(ERROR) << "Frag hash: " << frag_hash;
+
+    PendingFragment pf(
+        database.GetOrCreateFragmentIdForHash(
+            (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
+            std::move(frag_hash),
+            (end_index - begin_index + 1ul)  /* num_tokens */,
+            is_new_fragment_id  /* mutated by reference */),
+        tu_id,
+        em);
+
+    // The first fragment is the one we look at for
+    if (!parent_fid.has_value()) {
+      parent_fid = pf.fragment_id;
+    } else {
+      CHECK_NE(pf.fragment_id.Pack(), parent_fid.value().Pack());
+      LOG(ERROR)
+          << "Nested fragment id: " << pf.fragment_id.Pack();
+      pf.parent_fragment_ids.push_back(parent_fid.value());
+    }
+
+    pf.file_location = std::move(floc);
+    pf.begin_index = begin_index;
+    pf.end_index = end_index;
+    pf.num_top_level_declarations = static_cast<unsigned>(top_level_decls.size());
+    pf.num_top_level_macros = static_cast<unsigned>(top_level_macros.size());
+
+    // Steal the TLDs and TLMs. If we have child fragments, then we want the
+    // root fragment to own the macros.
+    pf.top_level_decls = std::move(top_level_decls);
+    pf.top_level_macros = std::move(top_level_macros);
+
+    // We always need to label the entities inside of a fragment, regardless of
+    // if fragment is new. This is because each fragment might have arbitrary
+    // references to other declarations. We need to be able to form cross-
+    // fragment references when serializing things, so we use the labeller to
+    // assign IDs to entities (decls, statements, etc.) in a uniform and
+    // deterministic way so that other threads doing similar indexing will form
+    // identically labelled chunks for the same logical entities.
+    //
+    // Unfortunately, the labeller needs to be manually written as opposed to
+    // auto-generated, as our auto-generation has no concept of which AST
+    // methods descend vs. cross the tree (into other fragments).
+    LabelEntitiesInFragment(pf, em, tok_range, is_new_fragment_id);
+
+    if (!is_new_fragment_id) {
+      return;
+    }
+
+    pending_fragments.emplace_back(std::move(pf));
+  }
 }
 
 // Create fragments in reverse order that we see them in the AST. The hope

@@ -947,6 +947,22 @@ bool IsSerializableDecl(const pasta::Decl &decl) {
   return true;
 }
 
+// Determines whether or not a TLD is likely to have to go into a child
+// fragment. This happens when the TLD is a forward declaration, e.g. of a
+// struct.
+//
+// TODO(pag): Thing about forward declarations in template parameter lists.
+bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kRecord:
+    case pasta::DeclKind::kCXXRecord:
+    case pasta::DeclKind::kEnum:
+      return !IsDefinition(decl);
+    default:
+      return false;
+  }
+}
+
 namespace {
 
 class StringOutputStream final : public kj::OutputStream {

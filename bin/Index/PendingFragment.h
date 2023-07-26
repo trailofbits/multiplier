@@ -69,6 +69,9 @@ class PendingFragment {
   mx::PackedFragmentId fragment_id;
   mx::RawEntityId fragment_index;
 
+  // Provenance back to the root fragment.
+  std::vector<mx::PackedFragmentId> parent_fragment_ids;
+
   // The ID of the compilation from which this fragment is derived.
   mx::PackedCompilationId compilation_id;
 

@@ -98,7 +98,13 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 // Try to find the `Decl` referenced by a particular `type`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
 
+// Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl);
+
+// Determines whether or not a TLD is likely to have to go into a child
+// fragment. This happens when the TLD is a forward declaration, e.g. of a
+// struct.
+bool ShouldGoInNestedFragment(const pasta::Decl &decl);
 
 template <typename T>
 struct EntityBuilder {

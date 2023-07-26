@@ -970,10 +970,13 @@ void GlobalIndexingState::PersistFragment(
   std::vector<pasta::Token> parsed_tokens = FindParsedTokens(
       tokens, begin_index, end_index);
 
-  // List of fragments IDs, where index `0` is this fragment's id, and the
-  // max index is the "root" fragment.
-  auto ids = fb.initParentIds(0u);
-  (void) ids;
+  // List of fragments IDs, where index `0` is this fragment's immediate parent.
+  auto ids = fb.initParentIds(
+      static_cast<unsigned>(pf.parent_fragment_ids.size()));
+  auto i = 0u;
+  for (mx::PackedFragmentId parent_id : pf.parent_fragment_ids) {
+    ids.set(i++, parent_id.Pack());
+  }
 
   // The compilation containing this fragment.
   fb.setCompilationId(pf.compilation_id.Pack());
@@ -997,7 +1000,7 @@ void GlobalIndexingState::PersistFragment(
   }
 
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
-  for (auto i = 0u; i < pf.num_top_level_declarations; ++i) {
+  for (i = 0u; i < pf.num_top_level_declarations; ++i) {
     tlds.set(i, em.EntityId(pf.top_level_decls[i]));
   }
 
