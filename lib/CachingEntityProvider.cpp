@@ -72,6 +72,12 @@ gap::generator<std::filesystem::path> CachingEntityProvider::ListPathsForFile(
   return next->ListPathsForFile(self, id);
 }
 
+// Get the list nested fragments for a given fragment.
+FragmentIdList CachingEntityProvider::ListNestedFragmentIds(
+    const Ptr &self, PackedFragmentId id) {
+  return next->ListNestedFragmentIds(self, id);
+}
+
 // Get the current list of fragment IDs associated with a file.
 //
 // TODO(pag): Re-evaluate if caching this is beneficial/useful.

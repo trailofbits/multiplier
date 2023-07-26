@@ -82,6 +82,10 @@ class EntityProvider {
   virtual gap::generator<std::filesystem::path> ListPathsForFile(
       const Ptr &, PackedFileId id) = 0;
 
+  // Get the list nested fragments for a given fragment.
+  virtual FragmentIdList ListNestedFragmentIds(
+      const Ptr &, PackedFragmentId id) = 0;
+
   // Download a list of fragment IDs contained in a specific file.
   virtual FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) = 0;
 

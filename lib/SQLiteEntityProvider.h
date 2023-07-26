@@ -62,6 +62,9 @@ class SQLiteEntityProvider final : public EntityProvider {
   gap::generator<std::filesystem::path> ListPathsForFile(
       const Ptr &, PackedFileId) final;
 
+  // Get the list nested fragments for a given fragment.
+  FragmentIdList ListNestedFragmentIds(const Ptr &, PackedFragmentId) final;
+
   FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id);
 
   // Return the list of fragments covering / overlapping some tokens in a file.

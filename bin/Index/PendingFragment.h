@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <memory>
 #include <multiplier/Types.h>
 #include <optional>
 #include <pasta/AST/Attr.h>
@@ -117,6 +118,13 @@ class PendingFragment {
   // Did we encounter an error during serialization?
   bool has_error{false};
 
+  // Is this a new fragment? This affects whether or not we keep track of types.
+  // We don't want `PendingFragment` for a pre-existing type to "take ownership"
+  // of a type, only to have that pending fragment "thrown away" later (due to
+  // it being redundant), yet have other fragments in the TU point to type IDs
+  // that logically belong to this type.
+  bool is_new{false};
+
   bool Add(const pasta::Decl &entity, EntityIdMap &entity_ids);
   bool Add(const pasta::Stmt &entity, EntityIdMap &entity_ids);
   bool Add(const pasta::Type &entity, TypeMapper &type_map);
@@ -130,5 +138,7 @@ class PendingFragment {
   void InitFileLocationRange(
       EntityIdMap &entity_ids, const pasta::TokenRange &toks);
 };
+
+using PendingFragmentPtr = std::unique_ptr<PendingFragment>;
 
 }  // namespace indexer

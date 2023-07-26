@@ -23,6 +23,7 @@ class DatabaseWriterImpl;
 #define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
     m(FilePathRecord) \
     m(FragmentFileRecord) \
+    m(NestedFragmentRecord) \
     m(FragmentFileRangeRecord) \
     m(RedeclarationRecord) \
     m(MangledNameRecord) \
@@ -72,6 +73,26 @@ struct FragmentFileRecord {
 
   PackedFragmentId fragment_id;
   PackedFileId file_id;
+};
+
+struct NestedFragmentRecord {
+  static constexpr const char *kTableName = "nested_fragment";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS nested_fragment (
+            parent_id INTEGER NOT NULL,
+            child_id INTEGER NOT NULL,
+            PRIMARY KEY(parent_id, child_id)
+          ) WITHOUT ROWID)",};
+
+  static constexpr const char *kExitStatements[] = {nullptr};
+
+  static constexpr const char *kInsertStatement =
+      R"(INSERT OR IGNORE INTO nested_fragment (parent_id, child_id)
+         VALUES (?1, ?2))";
+
+  PackedFragmentId parent_id;
+  PackedFragmentId child_id;
 };
 
 // Tells us a the inclusive range of file tokens of a file covered by a

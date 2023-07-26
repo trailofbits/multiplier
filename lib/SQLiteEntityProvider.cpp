@@ -73,6 +73,7 @@ class SQLiteEntityProviderImpl {
   sqlite::Statement get_file_paths;
   sqlite::Statement get_file_paths_by_id;
   sqlite::Statement get_file_fragments;
+  sqlite::Statement get_nested_fragments;
   sqlite::Statement clear_entity_id_list;
   sqlite::Statement add_entity_id_to_list;
   sqlite::Statement get_entity_ids;
@@ -243,6 +244,10 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "SELECT DISTINCT(fragment_id) "
           "FROM fragment_file "
           "WHERE file_id = ?1")),
+      get_nested_fragments(db.Prepare(
+          "SELECT DISTINCT(child_id) "
+          "FROM nested_fragment "
+          "WHERE parent_id = ?1")),
       clear_entity_id_list(db.Prepare(
           "DELETE FROM " + entity_id_list)),
       add_entity_id_to_list(db.Prepare(
@@ -496,6 +501,34 @@ gap::generator<std::filesystem::path> SQLiteEntityProvider::ListPathsForFile(
   for (auto &path : paths) {
     co_yield std::move(path);
   }
+}
+
+// Get the list nested fragments for a given fragment.
+FragmentIdList SQLiteEntityProvider::ListNestedFragmentIds(
+    const Ptr &, PackedFragmentId frag_id) {
+
+  FragmentIdList res;
+  res.reserve(128u);
+
+  ImplPtr context = impl.Lock();
+  sqlite::Statement &query = context->get_nested_fragments;
+  query.BindValues(frag_id.Pack());
+
+  while (query.ExecuteStep()) {
+    RawEntityId id = kInvalidEntityId;
+    query.Row().Columns(id);
+
+    VariantId vid = EntityId(id).Unpack();
+    if (!std::holds_alternative<FragmentId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    res.emplace_back(std::get<FragmentId>(vid));
+  }
+  query.Reset();
+
+  return res;
 }
 
 FragmentIdList SQLiteEntityProvider::ListFragmentsInFile(

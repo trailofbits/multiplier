@@ -981,6 +981,13 @@ void GlobalIndexingState::PersistFragment(
   // The compilation containing this fragment.
   fb.setCompilationId(pf.compilation_id.Pack());
 
+  if (!pf.parent_fragment_ids.empty()) {
+    database.AddAsync(
+        mx::NestedFragmentRecord{
+          pf.parent_fragment_ids.front(),
+          pf.fragment_id});
+  }
+
   if (pf.file_location) {
     fb.setFirstFileTokenId(pf.file_location->first_file_token_id.Pack());
     fb.setLastFileTokenId(pf.file_location->last_file_token_id.Pack());
@@ -1052,7 +1059,7 @@ void GlobalIndexingState::PersistCompilation(
     const pasta::Compiler &compiler, const pasta::CompileJob &job,
     const pasta::AST &ast, const EntityMapper &em,
     mx::PackedCompilationId tu_id,
-    const std::vector<PendingFragment> &fragments) {
+    std::vector<mx::PackedFragmentId> fragment_ids) {
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Compilation::Builder cb = message.initRoot<mx::rpc::Compilation>();
@@ -1121,19 +1128,10 @@ void GlobalIndexingState::PersistCompilation(
     fl.set(i++, em.EntityId(file));
   }
 
-  auto num_fragments = 0u;
-  for (const PendingFragment &frag : fragments) {
-    if (!frag.has_error) {
-      ++num_fragments;
-    }
-  }
-
   i = 0u;
-  fl = cb.initFragmentIds(num_fragments);
-  for (const PendingFragment &frag : fragments) {
-    if (!frag.has_error) {
-      fl.set(i++, frag.fragment_id.Pack());
-    }
+  fl = cb.initFragmentIds(static_cast<unsigned>(fragment_ids.size()));
+  for (mx::PackedFragmentId frag_id : fragment_ids) {
+    fl.set(i++, frag_id.Pack());
   }
 
   if (sourceir_progress) {

@@ -90,6 +90,7 @@ class Fragment {
   // with C++ templates, but can also happen in C due to elaborated type uses,
   // such as `struct foo`, acting as forward declarations upon their first use.
   std::optional<Fragment> parent(void) const noexcept;
+  std::optional<PackedFragmentId> parent_id(void) const noexcept;
 
   // Return a fragment's parent fragment. If this is a top-level fragment, then
   // this returns the argument.
@@ -130,6 +131,9 @@ class Fragment {
 
   // The range of parsed tokens in this fragment.
   TokenRange parsed_tokens(void) const;
+
+  // Return child fragments.
+  gap::generator<Fragment> nested_fragments(void) const &;
 
   // Return references to this fragment.
   gap::generator<Reference> references(void) const &;

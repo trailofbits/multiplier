@@ -944,6 +944,17 @@ bool BulkInserterState::InsertAsync(
   return true;
 }
 
+size_t BulkInserterState::SizeOfRecord(const NestedFragmentRecord &record) {
+  return sizeof(record);
+}
+
+bool BulkInserterState::InsertAsync(
+    const NestedFragmentRecord &record, sqlite::Statement &insert) {
+  insert.BindValuesWithoutCopying(record.parent_id.Pack(),
+                                  record.child_id.Pack());
+  return true;
+}
+
 size_t BulkInserterState::SizeOfRecord(const FragmentFileRangeRecord &record) {
   return sizeof(record);
 }

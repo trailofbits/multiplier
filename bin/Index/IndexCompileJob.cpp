@@ -41,7 +41,7 @@ namespace indexer {
 // new fragments that we want to serialize.
 extern void LabelEntitiesInFragment(
     PendingFragment &pf, EntityMapper &em,
-    const pasta::TokenRange &tok_range, bool is_new_fragment);
+    const pasta::TokenRange &tok_range);
 
 namespace {
 
@@ -1164,7 +1164,7 @@ static void CreatePendingFragment(
     mx::DatabaseWriter &database, EntityMapper &em,
     const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
     const EntityGroupRange &group_range,
-    std::vector<PendingFragment> &pending_fragments) {
+    std::vector<PendingFragmentPtr> &pending_fragments) {
 
   const EntityGroup &entities = std::get<kGroupIndex>(group_range);
   uint64_t begin_index = std::get<kBeginIndex>(group_range);
@@ -1173,10 +1173,6 @@ static void CreatePendingFragment(
   // Locate where this fragment is in its file.
   std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
       em.entity_ids, entities, tok_range, begin_index, end_index);
-
-  // Don't create token `decls_for_chunk` if the decl is already seen. This
-  // means it's already been indexed.
-  bool is_new_fragment_id = false;
 
   // NOTE(pag): Left here for niftiness of debugging issues, e.g. where some
   //            top-level decl doesn't have all of its tokens properly
@@ -1220,20 +1216,9 @@ static void CreatePendingFragment(
     if (std::holds_alternative<pasta::Decl>(entity)) {
       const pasta::Decl &decl = std::get<pasta::Decl>(entity);
 
-      // Dummy initialize all the top-level decls. The way we apply the
-      // labeller and visitor to top-level decls requires us to prevent the
-      // nested stuff from showing up too early.
-      //
-      // XREF Issue #396: https://github.com/trailofbits/multiplier/issues/396.
-      em.entity_ids.emplace(decl.RawDecl(), mx::kInvalidEntityId);
-
       if (ShouldGoInNestedFragment(decl)) {
-        LOG(ERROR)
-            << "Will have nested fragment";
         top_level_decl_groups.emplace_back().push_back(decl);
       } else {
-        LOG(ERROR)
-            << "Will have root fragment";
         has_root_fragment = true;
         top_level_decl_groups.front().push_back(decl);
       }
@@ -1252,8 +1237,6 @@ static void CreatePendingFragment(
   // into the main fragment. This could happen if we have a macro expanding to
   // a bunch of forward declarations.
   if (!has_root_fragment) {
-    LOG(ERROR)
-        << "Didn't have root fragment";
     for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
       if (!top_level_decls.empty()) {
         top_level_decl_groups.front().push_back(top_level_decls.back());
@@ -1262,84 +1245,96 @@ static void CreatePendingFragment(
     top_level_decl_groups.resize(1u);
   }
 
-  LOG(ERROR) << "Num groups: " << top_level_decl_groups.size();
-
-  std::optional<mx::PackedFragmentId> parent_fid;
+  std::optional<mx::PackedFragmentId> root_fragment_id;
+  std::vector<PendingFragmentPtr> local_pending_fragments;
 
   for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
-    LOG(ERROR) << "GROUP ----";
     if (top_level_decls.empty() && top_level_macros.empty()) {
-      LOG(ERROR) << "Empty group";
       continue;
     }
 
-    // Undo the dummy initialization from above. This lets the labeller below,
-    // which recursively calls `PendingFragment::Add` in a fixpoint loop, skip
-    // over the top-level decls that should be nested. If we didn't do the
-    // skipping over, then we'd risk accidentally labelling those decls as
-    // though they were part of the root fragment, which would cause issue #396.
-    //
-    // XREF Issue #396: https://github.com/trailofbits/multiplier/issues/396.
-    for (const pasta::Decl &decl : top_level_decls) {
-      LOG(ERROR) << "Decl " << reinterpret_cast<const void *>(decl.RawDecl());
-      if (em.EntityId(decl) == mx::kInvalidEntityId) {
-        em.entity_ids.erase(decl.RawDecl());
-      }
-    }
-
-    std::string frag_hash = HashFragment(
-        top_level_decls, top_level_macros, tok_range, begin_index, end_index);
-
-    LOG(ERROR) << "Frag hash: " << frag_hash;
-
-    PendingFragment pf(
+    bool is_new_fragment_id = false;
+    local_pending_fragments.emplace_back(new PendingFragment(
         database.GetOrCreateFragmentIdForHash(
             (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
-            std::move(frag_hash),
+            HashFragment(top_level_decls, top_level_macros, tok_range,
+                         begin_index, end_index),
             (end_index - begin_index + 1ul)  /* num_tokens */,
             is_new_fragment_id  /* mutated by reference */),
         tu_id,
-        em);
+        em));
 
-    // The first fragment is the one we look at for
-    if (!parent_fid.has_value()) {
-      parent_fid = pf.fragment_id;
-    } else {
-      CHECK_NE(pf.fragment_id.Pack(), parent_fid.value().Pack());
-      LOG(ERROR)
-          << "Nested fragment id: " << pf.fragment_id.Pack();
-      pf.parent_fragment_ids.push_back(parent_fid.value());
-    }
-
+    PendingFragment &pf = *local_pending_fragments.back();
+    pf.is_new = is_new_fragment_id;
     pf.file_location = std::move(floc);
     pf.begin_index = begin_index;
     pf.end_index = end_index;
     pf.num_top_level_declarations = static_cast<unsigned>(top_level_decls.size());
     pf.num_top_level_macros = static_cast<unsigned>(top_level_macros.size());
 
+    // The first fragment is the root fragment.
+    if (!root_fragment_id.has_value()) {
+      root_fragment_id = pf.fragment_id;
+
+    // These are all nested fragments.
+    } else {
+      CHECK_EQ(top_level_decls.size(), 1u);
+      CHECK(top_level_macros.empty());
+      CHECK_NE(pf.fragment_id.Pack(), root_fragment_id.value().Pack());
+      pf.parent_fragment_ids.push_back(root_fragment_id.value());
+
+      auto decl_range = BaselineEntityRange(top_level_decls.front(),
+                                            top_level_decls.front().Token(),
+                                            "");
+      pf.begin_index = decl_range.first;
+      pf.end_index = decl_range.second;
+      CHECK_LE(begin_index, pf.begin_index);
+      CHECK_LE(pf.begin_index, pf.end_index);
+      CHECK_LE(pf.end_index, end_index);
+    }
+
     // Steal the TLDs and TLMs. If we have child fragments, then we want the
     // root fragment to own the macros.
     pf.top_level_decls = std::move(top_level_decls);
     pf.top_level_macros = std::move(top_level_macros);
+  }
 
-    // We always need to label the entities inside of a fragment, regardless of
-    // if fragment is new. This is because each fragment might have arbitrary
-    // references to other declarations. We need to be able to form cross-
-    // fragment references when serializing things, so we use the labeller to
-    // assign IDs to entities (decls, statements, etc.) in a uniform and
-    // deterministic way so that other threads doing similar indexing will form
-    // identically labelled chunks for the same logical entities.
-    //
-    // Unfortunately, the labeller needs to be manually written as opposed to
-    // auto-generated, as our auto-generation has no concept of which AST
-    // methods descend vs. cross the tree (into other fragments).
-    LabelEntitiesInFragment(pf, em, tok_range, is_new_fragment_id);
+  // The local list starts with the root fragment, then has the nested ones.
+  // Reorder to have the root fragment last.
+  std::rotate(local_pending_fragments.begin(),
+              local_pending_fragments.begin() + 1,
+              local_pending_fragments.end());
 
-    if (!is_new_fragment_id) {
-      return;
+  // We always need to label the entities inside of a fragment, regardless of
+  // if fragment is new. This is because each fragment might have arbitrary
+  // references to other declarations. We need to be able to form cross-
+  // fragment references when serializing things, so we use the labeller to
+  // assign IDs to entities (decls, statements, etc.) in a uniform and
+  // deterministic way so that other threads doing similar indexing will form
+  // identically labelled chunks for the same logical entities.
+  //
+  // Unfortunately, the labeller needs to be manually written as opposed to
+  // auto-generated, as our auto-generation has no concept of which AST
+  // methods descend vs. cross the tree (into other fragments).
+  for (const PendingFragmentPtr &pfp : local_pending_fragments) {
+    PendingFragment &pf = *pfp;
+
+    for (const pasta::Decl &decl : pf.top_level_decls) {
+      CHECK_EQ(em.EntityId(decl), mx::kInvalidEntityId);
     }
 
-    pending_fragments.emplace_back(std::move(pf));
+    LabelEntitiesInFragment(pf, em, tok_range);
+
+    for (const pasta::Decl &decl : pf.top_level_decls) {
+      CHECK_NE(em.EntityId(decl), mx::kInvalidEntityId);
+    }
+  }
+
+  // Only progress toward serialization on the new fragments.
+  for (PendingFragmentPtr &pfp : local_pending_fragments) {
+    if (pfp->is_new) {
+      pending_fragments.emplace_back(std::move(pfp));
+    }
   }
 }
 
@@ -1347,12 +1342,12 @@ static void CreatePendingFragment(
 // is that this will reduce contention in trying to create fragment IDs for
 // the redundant declarations that are likely to appear early in ASTs, i.e.
 // in `#include`d headers.
-static std::vector<PendingFragment> CreatePendingFragments(
+static std::vector<PendingFragmentPtr> CreatePendingFragments(
     GlobalIndexingState &context, EntityMapper &em, const pasta::AST &ast,
     mx::PackedCompilationId tu_id,
     std::vector<EntityGroupRange> decl_group_ranges) {
 
-  std::vector<PendingFragment> pending_fragments;
+  std::vector<PendingFragmentPtr> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
 
   std::string main_job_file = ast.MainFile().Path().generic_string();
@@ -1389,7 +1384,7 @@ static void PersistParsedFragments(
     GlobalIndexingState &context, const pasta::Compiler &compiler,
     const pasta::CompileJob &job, const pasta::AST &ast, EntityMapper &em,
     TokenProvenanceCalculator &provenance, mx::PackedCompilationId tu_id,
-    std::vector<PendingFragment> pending_fragments) {
+    std::vector<PendingFragmentPtr> pending_fragments) {
 
   pasta::TokenRange tok_range = ast.Tokens();
   NameMangler mangler(ast, tu_id);
@@ -1399,17 +1394,23 @@ static void PersistParsedFragments(
       << "Main source file " << main_source_file
       << " has " << pending_fragments.size() << " unique fragments";
 
-  for (PendingFragment &pf : pending_fragments) {
+  std::vector<mx::PackedFragmentId> fragment_ids;
+  fragment_ids.reserve(pending_fragments.size());
+  for (PendingFragmentPtr &pf : pending_fragments) {
+    fragment_ids.push_back(pf->fragment_id);
+  }
+
+  for (PendingFragmentPtr &pf : pending_fragments) {
     auto start_time = std::chrono::system_clock::now();
     try {
       em.ResetForFragment();
-      context.PersistFragment(ast, tok_range, mangler, em, provenance, pf);
-      context.PersistTypes(ast, mangler, em, pf);
+      context.PersistFragment(ast, tok_range, mangler, em, provenance, *pf);
+      context.PersistTypes(ast, mangler, em, *pf);
     } catch (...) {
-      pf.has_error = true;
+      pf->has_error = true;
 
-      if (!pf.top_level_decls.empty()) {
-        const pasta::Decl &leader_decl = pf.top_level_decls.front();
+      if (!pf->top_level_decls.empty()) {
+        const pasta::Decl &leader_decl = pf->top_level_decls.front();
         LOG(ERROR)
             << "Persisting fragment"
             << PrefixedLocation(leader_decl, " at or near ")
@@ -1429,8 +1430,8 @@ static void PersistParsedFragments(
     auto end_time = std::chrono::system_clock::now();
     auto elapsed_time_s = std::chrono::duration_cast<std::chrono::seconds>(
         end_time - start_time).count();
-    if (elapsed_time_s >= 30 && !pf.top_level_decls.empty()) {
-      const pasta::Decl &leader_decl = pf.top_level_decls.front();
+    if (elapsed_time_s >= 30 && !pf->top_level_decls.empty()) {
+      const pasta::Decl &leader_decl = pf->top_level_decls.front();
       LOG(WARNING)
           << "Fragment" << PrefixedLocation(leader_decl, " at or near ")
           << " on main job file " << main_source_file
@@ -1439,7 +1440,8 @@ static void PersistParsedFragments(
     }
   }
 
-  context.PersistCompilation(compiler, job, ast, em, tu_id, pending_fragments);
+  context.PersistCompilation(compiler, job, ast, em, tu_id,
+                             std::move(fragment_ids));
 }
 
 // Look through all files referenced by the AST get their unique IDs. If this

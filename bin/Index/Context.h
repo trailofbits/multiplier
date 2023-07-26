@@ -137,7 +137,7 @@ class GlobalIndexingState {
   void PersistCompilation(const pasta::Compiler &compiler,
                           const pasta::CompileJob &job, const pasta::AST &ast,
                           const EntityMapper &em, mx::PackedCompilationId tu_id,
-                          const std::vector<PendingFragment> &fragments);
+                          std::vector<mx::PackedFragmentId> fragment_ids);
 };
 
 }  // namespace indexer

@@ -32,6 +32,12 @@ gap::generator<std::filesystem::path> InvalidEntityProvider::ListPathsForFile(
   co_return;
 }
 
+// Get the list nested fragments for a given fragment.
+FragmentIdList InvalidEntityProvider::ListNestedFragmentIds(
+    const Ptr &, PackedFragmentId) {
+  return {};
+}
+
 FragmentIdList InvalidEntityProvider::ListFragmentsInFile(
     const Ptr &, SpecificEntityId<FileId>) {
   return {};

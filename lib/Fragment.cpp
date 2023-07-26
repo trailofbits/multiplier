@@ -48,6 +48,18 @@ std::optional<Fragment> Fragment::parent(void) const noexcept {
   return std::nullopt;
 }
 
+std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
+  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
+    VariantId vid = EntityId(parent_id).Unpack();
+    if (std::holds_alternative<FragmentId>(vid)) {
+      return std::get<FragmentId>(vid);
+    } else {
+      break;
+    }
+  }
+  return std::nullopt;
+}
+
 // Return the fragment containing a query match.
 Fragment Fragment::containing(const WeggliQueryMatch &match) {
   return Fragment(match.frag);
@@ -208,6 +220,18 @@ gap::generator<Decl> Fragment::top_level_declarations(void) const & {
     }
 
     co_yield Decl(std::move(decl_ptr));
+  }
+}
+
+// Return child fragments.
+gap::generator<Fragment> Fragment::nested_fragments(void) const & {
+  auto ep = impl->ep;
+  for (PackedFragmentId fid : ep->ListNestedFragmentIds(ep, id())) {
+    if (FragmentImplPtr fptr = ep->FragmentFor(ep, fid)) {
+      co_yield Fragment(std::move(fptr));
+    } else {
+      assert(false);
+    }
   }
 }
 
