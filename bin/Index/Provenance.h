@@ -15,9 +15,13 @@
 #include <vector>
 #include <unordered_map>
 
+#include "Util.h"
+
 namespace pasta {
-class Token;
 class MacroToken;
+class PrintedToken;
+class PrintedTokenRange;
+class Token;
 }  // namespace mx
 namespace indexer {
 
@@ -38,11 +42,11 @@ class TokenProvenanceCalculator {
 
     // The directly related entity id to the corresponding token. This may be
     // an invalid entity id, or it may be overwritten as the analysis progresses.
-    mx::RawEntityId related_entity_id;
+    mx::RawEntityId related_entity_id{mx::kInvalidEntityId};
 
     // If `related_entity_id` is derived from a parsed token, then this is the
     // entity id of the parsed token, otherwise it is the leftmost parsed token.
-    mx::RawEntityId parsed_token_id;
+    mx::RawEntityId parsed_token_id{mx::kInvalidEntityId};
 
     mx::RawEntityId derived_token_id{mx::kInvalidEntityId};
 
@@ -98,7 +102,8 @@ class TokenProvenanceCalculator {
   void Init(mx::RawEntityId fragment_index_,
             const std::vector<TokenTreeNode> &tokens);
   void Init(mx::RawEntityId fragment_index_,
-            const std::vector<pasta::Token> &tokens);
+            const std::vector<pasta::Token> &tokens,
+            const std::optional<pasta::PrintedTokenRange> &printed_toks);
 
   mx::RawEntityId RelatedEntityId(const pasta::Token &tok);
   mx::RawEntityId RelatedEntityId(const TokenTreeNode &tok);

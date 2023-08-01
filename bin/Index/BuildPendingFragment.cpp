@@ -381,23 +381,25 @@ void BuildPendingFragment(
   FragmentBuilder builder(em, pf);
 
   // Make sure to collect everything reachable from token contexts.
-  for (auto i = pf.begin_index; i <= pf.end_index; ++i) {
-    for (auto context = tokens[i].Context(); context;
-         context = context->Parent()) {
-      if (auto decl = pasta::Decl::From(*context)) {
-        builder.MaybeVisitNext(*decl);
+  if (pf.printed_tokens) {
+    for (pasta::PrintedToken tok : pf.printed_tokens.value()) {
+      for (auto context = tok.Context(); context;
+           context = context->Parent()) {
+        if (auto decl = pasta::Decl::From(*context)) {
+          builder.MaybeVisitNext(*decl);
 
-      } else if (auto stmt = pasta::Stmt::From(*context)) {
-        builder.MaybeVisitNext(*stmt);
+        } else if (auto stmt = pasta::Stmt::From(*context)) {
+          builder.MaybeVisitNext(*stmt);
 
-      } else if (auto type = pasta::Type::From(*context)) {
-        builder.MaybeVisitNext(*type);
-      
-      } else if (auto attr = pasta::Attr::From(*context)) {
-        builder.MaybeVisitNext(*attr);
-      
-      } else if (auto designator = pasta::Designator::From(*context)) {
-        builder.MaybeVisitNext(*designator);
+        } else if (auto type = pasta::Type::From(*context)) {
+          builder.MaybeVisitNext(*type);
+
+        } else if (auto attr = pasta::Attr::From(*context)) {
+          builder.MaybeVisitNext(*attr);
+
+        } else if (auto designator = pasta::Designator::From(*context)) {
+          builder.MaybeVisitNext(*designator);
+        }
       }
     }
   }

@@ -191,7 +191,8 @@ static const void *VisitType(const pasta::Type &type,
 // Find the entity ID of the declaration that is most related to a particular
 // token.
 static mx::RawEntityId RelatedEntityIdToParsedToken(
-    const EntityMapper &em, const pasta::Token &token) {
+    const EntityMapper &em, const pasta::PrintedToken &printed_tok,
+    const pasta::Token &token) {
 
   const void *self = token.RawToken();
   const void *related_entity = nullptr;
@@ -276,7 +277,7 @@ static mx::RawEntityId RelatedEntityIdToParsedToken(
   }
 
   unsigned depth = 0u;
-  for (auto context = token.Context();
+  for (auto context = printed_tok.Context();
        !related_entity && eid == mx::kInvalidEntityId && context;
        ++depth, context = context->Parent()) {
     switch (context->Kind()) {
@@ -1284,6 +1285,7 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
   // Collect all of our tokens.
   for (const TokenTreeNode &node : tokens) {
     std::optional<pasta::Token> pl = node.Token();
+    std::optional<pasta::PrintedToken> cl = node.PrintedToken();
     std::optional<pasta::MacroToken> ml = node.MacroToken();
     std::optional<pasta::FileToken> fl = node.FileToken();
 
@@ -1300,10 +1302,11 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
 
     bool is_parsed = false;
     if (pl) {
-      is_parsed = IsParsedToken(pl.value());
-      if (is_parsed) {
-        rel_id = RelatedEntityIdToParsedToken(em, pl.value());
-        parsed_id = em.EntityId(pl.value());
+      const pasta::Token &parsed_tok = pl.value();
+      is_parsed = IsParsedToken(parsed_tok);
+      if (is_parsed && cl) {
+        parsed_id = em.EntityId(parsed_tok);
+        rel_id = RelatedEntityIdToParsedToken(em, cl.value(), parsed_tok);
       }
     }
 
@@ -1363,20 +1366,26 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
 }
 
 // This is the backup version when `tokens` only contains parsed tokens.
-void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
-                                     const std::vector<pasta::Token> &tokens) {
+void TokenProvenanceCalculator::Init(
+    mx::RawEntityId fragment_index_, const std::vector<pasta::Token> &tokens,
+    const std::optional<pasta::PrintedTokenRange> &printed_toks) {
+
   Clear();
   fragment_index = fragment_index_;
 
+  const bool has_printed = printed_toks.has_value();
   for (const pasta::Token &tok : tokens) {
     bool is_parsed = IsParsedToken(tok);
+    if (is_parsed && has_printed) {
+      continue;  // Dealt with below.
+    }
+
     std::optional<pasta::MacroToken> ml = tok.MacroLocation();
     mx::RawEntityId tok_id = em.EntityId(tok);
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
     mx::RawEntityId parsed_id = mx::kInvalidEntityId;
 
     if (is_parsed) {
-      rel_id = RelatedEntityIdToParsedToken(em, tok);
       parsed_id = tok_id;
 
     } else if (ml) {
@@ -1396,6 +1405,30 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
     }
 
     ordered_tokens.push_back(&info);
+  }
+
+  // Bring in the token contexts from the printed tokens.
+  if (printed_toks) {
+    for (pasta::PrintedToken tok : *printed_toks) {
+      std::optional<pasta::Token> parsed_tok = tok.DerivedLocation();
+      if (!parsed_tok || !IsParsedToken(*parsed_tok)) {
+        continue;
+      }
+
+      mx::RawEntityId rel_id = RelatedEntityIdToParsedToken(
+          em, tok, *parsed_tok);
+      mx::RawEntityId tok_id = em.EntityId(*parsed_tok);
+
+      TokenInfo &info = infos.emplace_back(
+          tok_id, kHasher(tok.Data()), rel_id, tok_id);
+      info_map.emplace(parsed_tok->RawToken(), &info);
+
+#ifndef NDEBUG
+      info.data = tok.Data();
+#endif
+
+      ordered_tokens.push_back(&info);
+    }
   }
 
   // Do single-step connections between the tokens.

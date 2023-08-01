@@ -364,12 +364,21 @@ struct TokenTreeSerializationSchedule {
 
 // Get the list of parsed tokens.
 static std::vector<pasta::Token> FindParsedTokens(
-    const pasta::TokenRange &tokens, uint64_t min_index, uint64_t max_index) {
+    const PendingFragment &pf) {
   std::vector<pasta::Token> parsed_toks;
-  for (auto i = min_index; i <= max_index; ++i) {
-    pasta::Token tok = tokens[i];
-    if (IsParsedToken(tok)) {
-      parsed_toks.emplace_back(std::move(tok));
+  
+  if (pf.printed_tokens) {
+    for (pasta::PrintedToken tok : *(pf.printed_tokens)) {
+      auto parsed_tok = tok.DerivedLocation();
+      CHECK(parsed_tok.has_value());
+      CHECK(IsParsedToken(parsed_tok.value()));
+      parsed_toks.emplace_back(std::move(parsed_tok.value()));
+    }
+  } else {
+    for (pasta::Token tok : pf.parsed_tokens) {
+      if (IsParsedToken(tok)) {
+        parsed_toks.emplace_back(std::move(tok));
+      }
     }
   }
   return parsed_toks;
@@ -454,7 +463,7 @@ static void PersistParsedTokens(
     VisitMacros(pf, em, tlm, macros_to_serialize);
   }
 
-  provenance.Init(pf.fragment_index, parsed_tokens);
+  provenance.Init(pf.fragment_index, parsed_tokens, pf.printed_tokens);
 
   unsigned num_macros = static_cast<unsigned>(macros_to_serialize.size());
   unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
@@ -745,6 +754,20 @@ static mx::RawEntityId IdOfRedeclInFragment(
   return ret_id;
 }
 
+
+static void PersistEmptyTokenContexts(
+    const std::vector<pasta::Token> &parsed_tokens,
+    mx::rpc::Fragment::Builder &fb) {
+
+  (void) fb.initParsedTokenContexts(0u);
+
+  unsigned num_tokens = static_cast<unsigned>(parsed_tokens.size());
+  auto tco_list = fb.initParsedTokenContextOffsets(num_tokens);
+  for (auto i = 0u; i < num_tokens; ++i) {
+    tco_list.set(i, 0u);
+  }
+}
+
 // Persist the token contexts. The token contexts are a kind of inverted tree,
 // e.g.
 //
@@ -764,7 +787,7 @@ static mx::RawEntityId IdOfRedeclInFragment(
 // lists, though; there are special "alias" nodes that tend to link you further
 // down the lists, and so that takes some special handling.
 static void PersistTokenContexts(
-    EntityMapper &em, const std::vector<pasta::Token> &parsed_tokens,
+    EntityMapper &em, const pasta::PrintedTokenRange &parsed_tokens,
     mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb) {
 
   using DeclContextSet = std::unordered_set<pasta::TokenContext>;
@@ -773,7 +796,7 @@ static void PersistTokenContexts(
   // First, collect only the relevant contexts for this fragment. Group them by
   // entity ID, as we store the context list inline inside of the entities.
   unsigned num_tokens = 0u;
-  for (const pasta::Token &tok : parsed_tokens) {
+  for (pasta::PrintedToken tok : parsed_tokens) {
     ++num_tokens;
 
     for (auto context = tok.Context(); context; context = context->Parent()) {
@@ -878,7 +901,7 @@ static void PersistTokenContexts(
 
   // Finally, serialize the contexts.
   num_tokens = 0u;
-  for (const pasta::Token &tok : parsed_tokens) {
+  for (pasta::PrintedToken tok : parsed_tokens) {
     tco_list.set(num_tokens, 0u);
 
     std::optional<mx::rpc::TokenContext::Builder> tcb;
@@ -951,9 +974,6 @@ void GlobalIndexingState::PersistFragment(
 
   ProgressBarWork fragment_progress_tracker(fragment_progress);
 
-  const uint64_t begin_index = pf.begin_index;
-  const uint64_t end_index = pf.end_index;
-
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
@@ -967,8 +987,7 @@ void GlobalIndexingState::PersistFragment(
   // Serialize all discovered entities.
   SerializePendingFragment(database, pf, em);
 
-  std::vector<pasta::Token> parsed_tokens = FindParsedTokens(
-      tokens, begin_index, end_index);
+  std::vector<pasta::Token> parsed_tokens = FindParsedTokens(pf);
 
   // List of fragments IDs, where index `0` is this fragment's immediate parent.
   auto ids = fb.initParentIds(
@@ -1016,7 +1035,7 @@ void GlobalIndexingState::PersistFragment(
   // fragment or its data.
   std::stringstream tok_tree_err;
   std::optional<TokenTreeNodeRange> maybe_tt = TokenTree::Create(
-      tokens, begin_index, end_index, tok_tree_err);
+      pf.parsed_tokens, pf.printed_tokens, tok_tree_err);
 
   if (maybe_tt) {
     PersistTokenTree(database, pf, em, fb, std::move(maybe_tt.value()),
@@ -1044,7 +1063,12 @@ void GlobalIndexingState::PersistFragment(
     PersistParsedTokens(database, pf, em, fb, provenance, parsed_tokens);
   }
 
-  PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
+  if (pf.printed_tokens) {
+    PersistTokenContexts(em, pf.printed_tokens.value(), pf.fragment_index, fb);
+  } else {
+    PersistEmptyTokenContexts(parsed_tokens, fb);
+  }
+
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
   LinkExternalReferencesInFragment(database, pf, em);
   LinkEntityNamesToFragment(database, pf, em);

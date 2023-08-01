@@ -833,7 +833,7 @@ class TemplateArgument;
 class TemplateParameterList;
 class CXXBaseSpecifier;
 class Designator;
-enum class TokenRole : unsigned short;
+enum class TokenRole : unsigned char;
 enum class DeclKind : unsigned;
 enum class AttrKind : unsigned;
 enum class AArch64SVEPcsAttrSpelling : unsigned;

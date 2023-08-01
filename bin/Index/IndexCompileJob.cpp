@@ -39,9 +39,7 @@ namespace indexer {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-extern void LabelEntitiesInFragment(
-    PendingFragment &pf, EntityMapper &em,
-    const pasta::TokenRange &tok_range);
+extern void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em);
 
 namespace {
 
@@ -1170,6 +1168,15 @@ static void CreatePendingFragment(
   uint64_t begin_index = std::get<kBeginIndex>(group_range);
   uint64_t end_index = std::get<kEndIndex>(group_range);
 
+  std::optional<pasta::TokenRange> parsed_toks = pasta::TokenRange::From(
+      tok_range[begin_index], tok_range[end_index]);
+
+  if (!parsed_toks) {
+    LOG(FATAL)
+        << "Invalid parsed token range for pending fragment";
+    return;
+  }
+
   // Locate where this fragment is in its file.
   std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
       em.entity_ids, entities, tok_range, begin_index, end_index);
@@ -1248,6 +1255,7 @@ static void CreatePendingFragment(
   std::optional<mx::PackedFragmentId> root_fragment_id;
   std::vector<PendingFragmentPtr> local_pending_fragments;
 
+  bool any_new = false;
   for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
     if (top_level_decls.empty() && top_level_macros.empty()) {
       continue;
@@ -1262,15 +1270,16 @@ static void CreatePendingFragment(
             (end_index - begin_index + 1ul)  /* num_tokens */,
             is_new_fragment_id  /* mutated by reference */),
         tu_id,
-        em));
+        em,
+        parsed_toks.value()));
 
     PendingFragment &pf = *local_pending_fragments.back();
     pf.is_new = is_new_fragment_id;
     pf.file_location = std::move(floc);
-    pf.begin_index = begin_index;
-    pf.end_index = end_index;
     pf.num_top_level_declarations = static_cast<unsigned>(top_level_decls.size());
     pf.num_top_level_macros = static_cast<unsigned>(top_level_macros.size());
+
+    any_new = any_new || is_new_fragment_id;
 
     // The first fragment is the root fragment.
     if (!root_fragment_id.has_value()) {
@@ -1286,11 +1295,6 @@ static void CreatePendingFragment(
       auto decl_range = BaselineEntityRange(top_level_decls.front(),
                                             top_level_decls.front().Token(),
                                             "");
-      pf.begin_index = decl_range.first;
-      pf.end_index = decl_range.second;
-      CHECK_LE(begin_index, pf.begin_index);
-      CHECK_LE(pf.begin_index, pf.end_index);
-      CHECK_LE(pf.end_index, end_index);
     }
 
     // Steal the TLDs and TLMs. If we have child fragments, then we want the
@@ -1323,16 +1327,52 @@ static void CreatePendingFragment(
       CHECK_EQ(em.EntityId(decl), mx::kInvalidEntityId);
     }
 
-    LabelEntitiesInFragment(pf, em, tok_range);
+    LabelEntitiesInFragment(pf, em);
 
     for (const pasta::Decl &decl : pf.top_level_decls) {
       CHECK_NE(em.EntityId(decl), mx::kInvalidEntityId);
     }
   }
 
+  // None of the fragments were new.
+  if (!any_new) {
+    return;
+  }
+
+  // Create a printed token range for the top-level, non-nested declarations.
+  std::optional<pasta::PrintedTokenRange> printed_toks;
+  for (const Entity &entity : entities) {
+    if (std::holds_alternative<pasta::Decl>(entity)) {
+      const pasta::Decl &decl = std::get<pasta::Decl>(entity);
+
+      if (!ShouldGoInNestedFragment(decl)) {
+        if (!printed_toks) {
+          printed_toks = pasta::PrintedTokenRange::Create(decl);
+        } else {
+          printed_toks = pasta::PrintedTokenRange::Concatenate(
+              printed_toks.value(),
+              pasta::PrintedTokenRange::Create(decl));
+        }
+      }
+    }
+  }
+
+  std::optional<pasta::PrintedTokenRange> aligned_toks;
+  if (printed_toks.has_value()) {
+    auto maybe_aligned_toks = pasta::PrintedTokenRange::Align(
+        parsed_toks.value(), printed_toks.value());
+    if (maybe_aligned_toks.Succeeded()) {
+      aligned_toks = maybe_aligned_toks.TakeValue();
+    } else {
+      LOG(ERROR)
+          << maybe_aligned_toks.TakeError();
+    }
+  }
+
   // Only progress toward serialization on the new fragments.
   for (PendingFragmentPtr &pfp : local_pending_fragments) {
     if (pfp->is_new) {
+      pfp->printed_tokens = aligned_toks;
       pending_fragments.emplace_back(std::move(pfp));
     }
   }

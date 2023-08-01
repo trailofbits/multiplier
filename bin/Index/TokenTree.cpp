@@ -17,6 +17,7 @@
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Macro.h>
+#include <pasta/AST/Printer.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 #include <sstream>
@@ -26,6 +27,7 @@
 #include <iostream>
 
 #include "PASTA.h"
+#include "Util.h"
 
 //#define D(...) __VA_ARGS__
 #ifndef D
@@ -80,6 +82,7 @@ struct TokenInfo {
   TokenInfo *next{nullptr};
 
   std::optional<pasta::Token> parsed_tok;
+  std::optional<pasta::PrintedToken> printed_tok;
   std::optional<pasta::FileToken> file_tok;
   std::optional<pasta::MacroToken> macro_tok;
   Category category{kFileToken};
@@ -187,10 +190,10 @@ class TokenTreeImpl {
   // parsed, plus the file tokens that were macro uses. This does not contain
   // file tokens that were elided due to things like conditional macros, e.g.
   // `#if 0`.
-  TokenInfo *BuildInitialTokenList(pasta::TokenRange range,
-                                   uint64_t begin_index,
-                                   uint64_t end_index,
-                                   std::ostream &err);
+  TokenInfo *BuildInitialTokenList(
+      const pasta::TokenRange &range,
+      const std::optional<pasta::PrintedTokenRange> &printed_range,
+      std::ostream &err);
 
   Substitution *GetMacroBody(pasta::DefineMacroDirective def,
                              std::ostream &err);
@@ -961,16 +964,23 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 // parsed, plus the file tokens that were macro uses. This does not contain
 // file tokens that were elided due to things like conditional macros, e.g.
 // `#if 0`.
-TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
-                                                uint64_t begin_index,
-                                                uint64_t end_index,
-                                                std::ostream &err) {
+TokenInfo *TokenTreeImpl::BuildInitialTokenList(
+    const pasta::TokenRange &range,
+    const std::optional<pasta::PrintedTokenRange> &printed_range,
+    std::ostream &err) {
   int macro_depth = 0;
   TokenInfo *last_macro_use_token = nullptr;
 
-  for (auto i = begin_index; i <= end_index; ++i) {
-    pasta::Token tok = range[i];
 
+  size_t next_printed_tok = 1u;
+  size_t num_printed_toks = 0u;
+  std::optional<pasta::PrintedToken> npt;
+  if (printed_range) {
+    num_printed_toks = printed_range->Size();
+    npt = (*printed_range)[0];
+  }
+
+  for (pasta::Token tok : range) {
     TokenInfo &info = tokens_alloc.emplace_back();
     info.file_tok = tok.FileLocation();
     info.macro_tok = tok.MacroLocation();
@@ -982,6 +992,27 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
           &info);
     }
 
+    // Match up the parsed token with a printed token.
+    const auto pti = tok.Index();
+    const bool is_parsed_tok = IsParsedToken(tok);
+    while (is_parsed_tok && !info.printed_tok.has_value() && npt.has_value()) {
+
+      if (auto npt_pt = npt->DerivedLocation()) {
+        auto npt_pti = npt_pt->Index();
+        if (npt_pti == pti) {
+          info.printed_tok = std::move(npt);
+
+        } else if (npt_pti > pti) {
+          break;
+        }
+      }
+
+      npt.reset();
+      if (next_printed_tok < num_printed_toks) {
+        npt = (*printed_range)[next_printed_tok++];
+      }
+    }
+
     switch (tok.Role()) {
       default:
       case pasta::TokenRole::kInvalid:
@@ -989,6 +1020,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         return nullptr;
 
       case pasta::TokenRole::kBeginOfMacroExpansionMarker: {
+        assert(!is_parsed_tok);
         assert(!last_macro_use_token);
         assert(tok.FileLocation().has_value());
         info.category = TokenInfo::kMarkerToken;
@@ -998,6 +1030,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kEndOfMacroExpansionMarker: {
+        assert(!is_parsed_tok);
         assert(last_macro_use_token != nullptr);
         pasta::File file = pasta::File::Containing(
             last_macro_use_token->file_tok.value());
@@ -1011,6 +1044,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kInitialMacroUseToken: {
+        assert(!is_parsed_tok);
         assert(0 < macro_depth);
         assert(last_macro_use_token != nullptr);
         info.category = TokenInfo::kMacroUseToken;
@@ -1022,6 +1056,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken: {
+        assert(!is_parsed_tok);
         assert(0 < macro_depth);
         assert(last_macro_use_token != nullptr);
         info.category = TokenInfo::kMacroStepToken;
@@ -1056,6 +1091,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kEndOfInternalMacroEventMarker: {
+        assert(!is_parsed_tok);
         assert(macro_depth);
         assert(last_macro_use_token);
         info.category = TokenInfo::kMarkerToken;
@@ -2647,30 +2683,17 @@ TokenTree::~TokenTree(void) {}
 
 // Create a token tree from the tokens in the inclusive range
 // `[begin_index, end_index]` from `range`.
-std::optional<TokenTreeNodeRange>
-TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
-                  uint64_t end_index, std::ostream &err) {
-
-  if (begin_index > end_index) {
-    err << "Cannot create token tree; begin index (" << begin_index
-        << ") is greater than end index (" << end_index << ")";
-    return std::nullopt;
-  }
-
-  if (auto range_size = range.Size(); end_index >= range_size) {
-    err << "Cannot create token tree; end index (" << end_index
-        << ") is greater than or equal to the range size ("
-        << range_size << ")";
-    return std::nullopt;
-  }
+std::optional<TokenTreeNodeRange> TokenTree::Create(
+    const pasta::TokenRange &range,
+    const std::optional<pasta::PrintedTokenRange> &printed_range,
+    std::ostream &err) {
 
   auto impl = std::make_shared<TokenTreeImpl>();
 
   try {
 
     // Build and classify the initial list of tokens.
-    if (!impl->BuildInitialTokenList(std::move(range), begin_index,
-                                     end_index, err)) {
+    if (!impl->BuildInitialTokenList(range, printed_range, err)) {
       return std::nullopt;
     }
 
@@ -2710,6 +2733,15 @@ TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
 
   } catch (const char *msg) {
     err << msg;
+    return std::nullopt;
+  }
+}
+
+std::optional<pasta::PrintedToken> TokenTreeNode::PrintedToken(void) const noexcept {
+  if (const auto &ent = (*impl)[offset];
+      std::holds_alternative<TokenInfo *>(ent)) {
+    return std::get<TokenInfo *>(ent)->printed_tok;
+  } else {
     return std::nullopt;
   }
 }

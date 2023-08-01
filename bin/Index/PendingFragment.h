@@ -15,6 +15,7 @@
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Macro.h>
+#include <pasta/AST/Printer.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Token.h>
 #include <pasta/AST/Type.h>
@@ -60,11 +61,13 @@ class PendingFragment {
  public:
   inline PendingFragment(mx::PackedFragmentId fragment_id_,
                          mx::PackedCompilationId tu_id_,
-                         EntityMapper &em_)
+                         EntityMapper &em_,
+                         const pasta::TokenRange &parsed_tokens_)
       : fragment_id(fragment_id_),
         fragment_index(fragment_id.Unpack().fragment_id),
         compilation_id(tu_id_),
-        em(em_){}
+        em(em_),
+        parsed_tokens(parsed_tokens_) {}
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::PackedFragmentId fragment_id;
@@ -81,9 +84,10 @@ class PendingFragment {
   // of entity mapper.
   EntityMapper &em;
 
-  // Inclusive range of indices into the parsed tokens.
-  uint64_t begin_index{0u};
-  uint64_t end_index{0u};
+  // Parsed tokens, and printed tokens created by aligning parsed and printed
+  // tokens.
+  pasta::TokenRange parsed_tokens;
+  std::optional<pasta::PrintedTokenRange> printed_tokens;
 
   std::optional<FileLocationOfFragment> file_location;
 

@@ -143,9 +143,7 @@ class EntityLabeller final : public EntityVisitor {
 //            serialized into fragments, and how token trees are serialized
 //            into fragments.
 bool EntityLabeller::Label(const pasta::Token &entity) {
-  auto index = entity.Index();
-  CHECK_LE(fragment.begin_index, index);
-  CHECK_LE(index, fragment.end_index);
+  CHECK(fragment.parsed_tokens.Contains(entity));
 
   mx::ParsedTokenId id;
   switch (entity.Role()) {
@@ -220,8 +218,7 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em,
-                             const pasta::TokenRange &tok_range) {
+void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em) {
   EntityLabeller labeller(em, pf);
 
   // Go top-down through the top-level declarations of this pending fragment
@@ -255,8 +252,7 @@ void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em,
 
   // Visit all of the tokens; it's possible we came across something that was
   // missed by the above process.
-  for (uint64_t i = pf.begin_index; i <= pf.end_index; ++i) {
-    pasta::Token tok = tok_range[i];
+  for (pasta::Token tok : pf.parsed_tokens) {
     if (IsParsedToken(tok)) {
       (void) labeller.Label(tok);
     }

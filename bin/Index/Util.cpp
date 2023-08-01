@@ -51,40 +51,7 @@ namespace indexer {
 
 // Return `true` of `tok` is in the context of `decl`.
 bool TokenIsInContextOfDecl(const pasta::Token &tok, const pasta::Decl &decl) {
-  auto cdecl = decl.CanonicalDeclaration();
-  for (auto context = tok.Context(); context; context = context->Parent()) {
-    switch (context->Kind()) {
-      case pasta::TokenContextKind::kTemplateArgument:
-      case pasta::TokenContextKind::kTemplateParameterList:
-        return true;
-      case pasta::TokenContextKind::kDecl:
-        if (auto maybe_decl = pasta::Decl::From(*context)) {
-          pasta::DeclKind dk = maybe_decl->Kind();
-          if (*maybe_decl == cdecl) {
-            return true;
-          } else if (dk == pasta::DeclKind::kClassTemplateSpecialization ||
-                     dk == pasta::DeclKind::kClassTemplatePartialSpecialization ||
-                     dk == pasta::DeclKind::kVarTemplateSpecialization ||
-                     dk == pasta::DeclKind::kVarTemplatePartialSpecialization ||
-                     dk == pasta::DeclKind::kClassScopeFunctionSpecialization) {
-            return true;
-          }
-        }
-        break;  // Keep looking.
-      case pasta::TokenContextKind::kType:
-        if (auto maybe_type = pasta::Type::From(*context)) {
-          pasta::TypeKind tk = maybe_type->Kind();
-          if (tk == pasta::TypeKind::kTemplateSpecialization ||
-              tk == pasta::TypeKind::kElaborated) {
-            return true;
-          }
-        }
-        break;  // Keep looking.
-      default:
-        break;  // Keep looking.
-    }
-  }
-  return false;
+  return decl.Tokens().Contains(tok);
 }
 
 // Returns the `pasta::FileToken` if this is a top-level token in the parse.

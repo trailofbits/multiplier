@@ -18,6 +18,8 @@ class MacroArgument;
 class MacroDirective;
 class MacroExpansion;
 class MacroToken;
+class PrintedToken;
+class PrintedTokenRange;
 class Token;
 class TokenRange;
 }  // namespace pasta
@@ -45,6 +47,7 @@ class TokenTreeNode {
       : impl(std::move(impl_)) {}
 
  public:
+  std::optional<pasta::PrintedToken> PrintedToken(void) const noexcept;
   std::optional<pasta::FileToken> FileToken(void) const noexcept;
   std::optional<pasta::MacroToken> MacroToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
@@ -135,8 +138,9 @@ class TokenTree {
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static std::optional<TokenTreeNodeRange>
-  Create(const pasta::TokenRange &range, uint64_t begin_index,
-         uint64_t end_index, std::ostream &err);
+  Create(const pasta::TokenRange &range,
+         const std::optional<pasta::PrintedTokenRange> &printed_range,
+         std::ostream &err);
 
   // Dump.
   void Dump(std::ostream &os) const;

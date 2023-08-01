@@ -204,38 +204,6 @@ std::string HashFragment(
       case pasta::TokenRole::kFinalMacroExpansionToken:
         D( std::cerr << "\t2 kind=" << int(kind) << " data="
                      << token.Data() << '\n'; )
-
-       for (auto context = token.Context(); context;
-             context = context->Parent()) {
-          D( std::cerr << "\t\tcontext->kind=" << int(context->Kind()) << '\n'; )
-
-          switch (context->Kind()) {
-            case pasta::TokenContextKind::kDecl:
-              fs.AddInteger(static_cast<uint16_t>(
-                  mx::FromPasta(pasta::Decl::From(*context)->Kind())));
-              break;
-            case pasta::TokenContextKind::kStmt:
-              fs.AddInteger(static_cast<uint16_t>(
-                  mx::FromPasta(pasta::Stmt::From(*context)->Kind())));
-              break;
-            case pasta::TokenContextKind::kType:
-              fs.AddInteger(static_cast<uint16_t>(
-                  mx::FromPasta(pasta::Type::From(*context)->Kind())));
-              break;
-            case pasta::TokenContextKind::kAttr:
-              fs.AddInteger(static_cast<uint16_t>(
-                  mx::FromPasta(pasta::Attr::From(*context)->Kind())));
-              break;
-            case pasta::TokenContextKind::kAlias:
-            case pasta::TokenContextKind::kString:
-            case pasta::TokenContextKind::kAST:
-              break;
-            default:
-              fs.AddInteger(static_cast<uint16_t>(context->Kind()));
-              break;
-          }
-        }
-
         fs.AddInteger(static_cast<uint16_t>(kind));
         fs.AddString(data);
         break;

@@ -378,17 +378,22 @@ static void PersistTokenContexts(
   for (const pasta::PrintedToken &tok : printed_tokens) {
     ++num_tokens;
 
-    for (auto context = tok.Context(); context; context = context->Parent()) {
+    std::optional<pasta::TokenContext> next_context;
+    for (auto context = tok.Context(); context;
+         context = std::move(next_context)) {
 
+      next_context = context->Parent();
       pasta::TokenContext c = context.value();
       if (auto alias_context = c.Aliasee()) {
         c = std::move(alias_context.value());
       }
 
       switch(c.Kind()) {
-        case pasta::TokenContextKind::kInvalid:
         case pasta::TokenContextKind::kAST:
-          assert(false); // don't expect these context kind
+          assert(!next_context);
+          break;  // Should always be the root.
+        case pasta::TokenContextKind::kInvalid:
+          assert(false); // Don't expect these context kind
           break;
         case pasta::TokenContextKind::kDecl:
         case pasta::TokenContextKind::kStmt:

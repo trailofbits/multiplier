@@ -76,6 +76,7 @@ define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
 define_example("mx-find-sequoia" "FindSequoia.cpp")
 define_example("mx-print-type-token-graph" "PrintTypeTokenGraph.cpp")
+define_example("mx-find-linked-structures" "FindLinkedStructures.cpp")
 
 target_compile_definitions("mx-dump-json"
   PRIVATE
