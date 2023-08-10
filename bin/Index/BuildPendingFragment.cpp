@@ -231,7 +231,7 @@ void FragmentBuilder::Accept(const pasta::Macro &) {}
 
 
 bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
-  if (!IsSerializableDecl(entity))  {
+  if (ShouldHideFromIndexer(entity))  {
     return false;
   }
 
@@ -367,11 +367,7 @@ bool PendingFragment::Add(const pasta::Designator &entity,
 }
 
 // Build the fragment. This fills out the decls/stmts/types to serialize.
-//
-// NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-void BuildPendingFragment(
-    PendingFragment &pf, EntityMapper &em,
-    const pasta::TokenRange &tokens) {
+void BuildPendingFragment(PendingFragment &pf, EntityMapper &em) {
   size_t prev_num_decls = 0ul;
   size_t prev_num_stmts = 0ul;
   size_t prev_num_types = 0ul;

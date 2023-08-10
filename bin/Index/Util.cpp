@@ -921,10 +921,68 @@ bool IsSerializableDecl(const pasta::Decl &decl) {
 // TODO(pag): Thing about forward declarations in template parameter lists.
 bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
   switch (decl.Kind()) {
+    case pasta::DeclKind::kClassTemplateSpecialization:
+    case pasta::DeclKind::kVarTemplateSpecialization:
+      return true;
+
+    // TODO(pag): This might not be the right type of check.
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXMethod: {
+      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      return pasta::TemplateSpecializationKind::kUndeclared !=
+             func.TemplateSpecializationKind();
+    }
+    // TODO(pag): FriendDecl for FriendTemplateDecl.
+    default:
+      return false;
+  }
+}
+
+// Tells us if a given decl is probably a use that also acts as a forward
+// declaration.
+bool IsInjectedForwardDeclaration(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
     case pasta::DeclKind::kRecord:
     case pasta::DeclKind::kCXXRecord:
-    case pasta::DeclKind::kEnum:
-      return !IsDefinition(decl);
+    case pasta::DeclKind::kEnum: {
+      const auto &tag = reinterpret_cast<const pasta::TagDecl &>(decl);
+      return tag.IsEmbeddedInDeclarator() && !IsDefinition(tag);
+    }
+    default:
+      return false;
+  }
+}
+
+// Should a declaration be hidden from the indexer?
+bool ShouldHideFromIndexer(const pasta::Decl &decl) {
+  if (!IsSerializableDecl(decl)) {
+    return true;
+  }
+
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kClassScopeFunctionSpecializationDecl:
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+    case pasta::DeclKind::kFriendTemplate:
+      return true;
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXMethod: {
+      const auto &func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      return func.TemplatedKind() ==
+             pasta::FunctionDeclTemplatedKind::kFunctionTemplate;
+    }
+
     default:
       return false;
   }

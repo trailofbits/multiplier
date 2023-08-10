@@ -425,7 +425,9 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
     // Next argument after opt_x flag will be lang value; Compare
     // it with the supported language i.e. C.
     arg = *it;
-    if (strcmp(arg, "c")) {
+    if (!strcmp(arg, "c") || !strcmp(arg, "c++")) {
+
+    } else {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
                  << arg << ": " << args.Join();
       return false;

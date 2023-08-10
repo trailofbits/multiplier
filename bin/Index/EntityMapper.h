@@ -42,7 +42,7 @@ class EntityMapper final {
 
   inline explicit EntityMapper(EntityIdMap &entity_ids_, TypeMapper &tm_)
       : entity_ids(entity_ids_),
-        tm(tm_), token_tree_ids(entity_ids_) {}
+        tm(tm_) {}
 
   mx::RawEntityId ParentDeclId(const pasta::Decl &entity) const;
   mx::RawEntityId ParentDeclId(const pasta::Stmt &entity) const;

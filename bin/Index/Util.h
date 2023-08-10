@@ -106,6 +106,13 @@ bool IsSerializableDecl(const pasta::Decl &decl);
 // struct.
 bool ShouldGoInNestedFragment(const pasta::Decl &decl);
 
+// Tells us if a given decl is probably a use that also acts as a forward
+// declaration.
+bool IsInjectedForwardDeclaration(const pasta::Decl &decl);
+
+// Should a declaration be hidden from the indexer?
+bool ShouldHideFromIndexer(const pasta::Decl &decl);
+
 template <typename T>
 struct EntityBuilder {
   capnp::MallocMessageBuilder message;

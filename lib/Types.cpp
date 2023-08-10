@@ -750,6 +750,9 @@ struct IDKind {
   inline int operator()(FileId) const noexcept { return -1; }
   inline int operator()(FragmentId) const noexcept { return -1; }
   inline int operator()(DesignatorId) const noexcept { return -1; }
+  inline int operator()(TemplateArgumentId) const noexcept { return -1; }
+  inline int operator()(TemplateParameterListId) const noexcept { return -1; }
+  inline int operator()(CXXBaseSpecifierId) const noexcept { return -1; }
   inline int operator()(CompilationId) const noexcept { return -1; }
   template <typename T>
   inline int operator()(T t) const noexcept {
@@ -796,6 +799,15 @@ struct IDCategory {
   }
   inline EntityCategory operator()(DesignatorId) const noexcept {
     return EntityCategory::DESIGNATOR;
+  }
+  inline EntityCategory operator()(TemplateArgumentId) const noexcept {
+    return EntityCategory::TEMPLATE_ARGUMENT;
+  }
+  inline EntityCategory operator()(TemplateParameterListId) const noexcept {
+    return EntityCategory::TEMPLATE_PARAMETER_LIST;
+  }
+  inline EntityCategory operator()(CXXBaseSpecifierId) const noexcept {
+    return EntityCategory::CXX_BASE_SPECIFIER;
   }
   inline EntityCategory operator()(CompilationId) const noexcept {
     return EntityCategory::COMPILATION;

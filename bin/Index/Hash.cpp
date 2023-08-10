@@ -166,28 +166,26 @@ std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em) {
 //            two different fragments to have the same hash, because their
 //            ASTs might be different, and if their ASTs are different, then
 //            our entity ID numbering scheme will fail horribly.
+//
+// TODO(pag): Integrate template parameter lists for specializations?
 std::string HashFragment(
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
-    const pasta::TokenRange &toks,
-    uint64_t begin_index, uint64_t end_index) {
+    const pasta::TokenRange *frag_tok_range,
+    const pasta::PrintedTokenRange *decl_tok_range) {
 
   D( std::cerr
         << "begin_index=" << begin_index << " end_index=" << end_index
         << " entities.size()=" << entities.size() << '\n'; )
 
   llvm::FoldingSetNodeID fs;
-  if (begin_index > end_index || end_index > toks.size()) {
-    return std::string();
-  }
 
-  for (uint64_t i = begin_index; i <= end_index; i++) {
-    pasta::Token token = toks[i];
-    mx::TokenKind kind = mx::FromPasta(token.Kind());
-    llvm::StringRef data(token.Data());
+  uint64_t end_index = 0u;
+  std::hash<std::string_view> kHasher;
 
+  auto mixin_token = [&fs] (mx::TokenKind kind, std::string_view data) {
     if (data.empty()) {
-      continue;
+      return;
     }
 
     // Mix in generic token/structure/context information.
@@ -197,7 +195,7 @@ std::string HashFragment(
         D( std::cerr << "\t1 kind=" << int(kind) << " data="
                      << token.Data() << '\n'; )
         fs.AddInteger(static_cast<uint16_t>(kind));
-        fs.AddString(data);
+        fs.AddInteger(kHasher(data));
         break;
 
       case pasta::TokenRole::kFileToken:
@@ -205,11 +203,24 @@ std::string HashFragment(
         D( std::cerr << "\t2 kind=" << int(kind) << " data="
                      << token.Data() << '\n'; )
         fs.AddInteger(static_cast<uint16_t>(kind));
-        fs.AddString(data);
+        fs.AddInteger(kHasher(data));
         break;
 
       default:
         break;
+    }
+  };
+
+  if (*frag_tok_range) {
+    for (pasta::Token token : *frag_tok_range) {
+      end_index = token.Index();
+      mixin_token(mx::FromPasta(token.Kind()), token.Data());
+    }
+  }
+
+  if (*decl_tok_range) {
+    for (pasta::PrintedToken token : *decl_tok_range) {
+      mixin_token(mx::FromPasta(token.Kind()), token.Data());
     }
   }
 
@@ -224,13 +235,12 @@ std::string HashFragment(
   // that might only manifest as nested fragments.
   for (const pasta::Decl &decl : decls) {
     fs.AddInteger(static_cast<uint16_t>(decl.Kind()));
-    if (auto decl_tok_index = decl.Token().Index();
-        decl_tok_index >= begin_index &&
-        decl_tok_index <= end_index) {
-      fs.AddInteger(decl_tok_index - begin_index);
-    } else {
-      fs.AddInteger(~0ull);
+
+    pasta::Token decl_token = decl.Token();
+    if (frag_tok_range && frag_tok_range->Contains(decl_token)) {
+      fs.AddInteger(end_index - decl_token.Index());
     }
+
     visitor.Accept(decl);
   }
 

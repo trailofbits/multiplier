@@ -57,7 +57,11 @@ class EntityLabeller final : public EntityVisitor {
   virtual ~EntityLabeller(void) = default;
 
   bool Enter(const pasta::Decl &entity) final {
-    return fragment.Add(entity, em.entity_ids);
+    if (ShouldHideFromIndexer(entity)) {
+      return false;
+    } else {
+      return fragment.Add(entity, em.entity_ids);
+    }
   }
 
   bool Enter(const pasta::Stmt &entity) final {
@@ -145,35 +149,26 @@ class EntityLabeller final : public EntityVisitor {
 bool EntityLabeller::Label(const pasta::Token &entity) {
   CHECK(fragment.parsed_tokens.Contains(entity));
 
-  mx::ParsedTokenId id;
-  switch (entity.Role()) {
-    // This is a token that actually reached the parser.
-    case pasta::TokenRole::kFileToken:
-    case pasta::TokenRole::kFinalMacroExpansionToken:
-      id.offset = next_parsed_token_index++;
-      break;
-
-    // Alias whatever the next ID to be generated is.
-    case pasta::TokenRole::kBeginOfFileMarker:
-    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-    case pasta::TokenRole::kInitialMacroUseToken:
-    case pasta::TokenRole::kIntermediateMacroExpansionToken:
-      return false;
-
-    // Alias whatever the previous ID to be generated is.
-    case pasta::TokenRole::kEndOfFileMarker:
-    case pasta::TokenRole::kEndOfMacroExpansionMarker:
-      return false;
-
-    case pasta::TokenRole::kInvalid:
-    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
-      return false;
+  if (!IsParsedToken(entity)) {
+    return false;
   }
-
+  mx::ParsedTokenId id;    
+  id.offset = next_parsed_token_index++;
   id.fragment_id = fragment.fragment_index;
   id.kind = TokenKindFromPasta(entity);
 
-  return em.entity_ids.emplace(entity.RawToken(), id).second;
+  CHECK(em.token_tree_ids.emplace(entity.RawToken(), id).second);
+
+  // // If we didn't just add the token, then we should be in the nested fragment
+  // // case, and we want to overwrite the token id.
+  // if (!res.second) {
+  //   mx::EntityId prev_id(res.first->second);
+  //   CHECK_NE(prev_id.Extract<mx::ParsedTokenId>()->fragment_id,
+  //            fragment.fragment_index);
+  //   res.first->second = id;
+  // }
+
+  return true;
 }
 
 // Create initial macro IDs for all of the top-level macros in the range of
@@ -184,12 +179,17 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<mx::EntityOffset>(fragment.macros_to_serialize.size());
 
-  // If we added this node (we should have), then add in a `nullopt` reservation
-  // to `macros_to_serialize`.
-  if (!em.entity_ids.emplace(entity.RawMacro(), id).second) {
-    LOG(FATAL) << "Top-level macro already labelled?";
-    return false;
-  }
+  CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
+
+  // // If we added this node (we should have), then add in a `nullopt` reservation
+  // // to `macros_to_serialize`. If we didn't add it, then there was likely an
+  // // overlapping (nested) fragment. Overwrite in that case.
+  // if (!res.second) {
+  //   mx::EntityId prev_id(res.first->second);
+  //   CHECK_NE(prev_id.Extract<mx::MacroId>()->fragment_id,
+  //            fragment.fragment_index);
+  //   res.first->second = id;
+  // }
 
   // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
   //            fills in the empty slots.
@@ -201,14 +201,15 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
     return true;
   }
 
-  if (auto def = pasta::DefineMacroDirective::From(entity)) {
-    for (pasta::Macro param : def->Parameters()) {
-      Label(param);
-    }
+  auto def = pasta::DefineMacroDirective::From(entity);
+  if (!def) {
+    assert(false);
     return true;
   }
+  for (pasta::Macro param : def->Parameters()) {
+    Label(param);
+  }
 
-  assert(false);
   return true;
 }
 
@@ -218,7 +219,7 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em) {
+void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em) {
   EntityLabeller labeller(em, pf);
 
   // Go top-down through the top-level declarations of this pending fragment
@@ -241,10 +242,34 @@ void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em) {
 
   assert(pf.decls_to_serialize.empty());
 
+#ifndef NDEBUG
+  for (const pasta::Decl &decl : pf.top_level_decls) {
+    CHECK_EQ(em.EntityId(decl), mx::kInvalidEntityId);
+  }
+#endif
+
   for (const pasta::Decl &decl : pf.top_level_decls) {
     (void) labeller.Accept(decl);
     labeller.Run();
   }
+
+  labeller.Run();
+
+#ifndef NDEBUG
+  for (const pasta::Decl &decl : pf.top_level_decls) {
+    CHECK_NE(em.EntityId(decl), mx::kInvalidEntityId);
+  }
+#endif
+}
+
+// Label the parsed tokens and macros of this fragment. This focuses on finding the
+// entities that syntactically belong to this fragment, and assigning them
+// IDs. Labeling happens first for all fragments, then we run `Build` for
+// new fragments that we want to serialize.
+void LabelTokensAndMacrosInFragment(PendingFragment &pf, EntityMapper &em) {
+  EntityLabeller labeller(em, pf);
+
+  assert(pf.macros_to_serialize.empty());
 
   for (const pasta::Macro &macro : pf.top_level_macros) {
     (void) labeller.Label(macro);
@@ -253,12 +278,8 @@ void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em) {
   // Visit all of the tokens; it's possible we came across something that was
   // missed by the above process.
   for (pasta::Token tok : pf.parsed_tokens) {
-    if (IsParsedToken(tok)) {
-      (void) labeller.Label(tok);
-    }
+    (void) labeller.Label(tok);
   }
-
-  labeller.Run();
 }
 
 }  // namespace indexer

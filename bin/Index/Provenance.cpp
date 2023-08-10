@@ -1294,6 +1294,10 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
     mx::RawEntityId parsed_id = mx::kInvalidEntityId;
     uint64_t data_hash = 0u;
 
+    if (!pl && cl) {
+      pl = cl->DerivedLocation();
+    }
+
     if (!pl && ml) {
       pl = ml->ParsedLocation();
     } else if (pl && !ml) {
@@ -1308,6 +1312,11 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
         parsed_id = em.EntityId(parsed_tok);
         rel_id = RelatedEntityIdToParsedToken(em, cl.value(), parsed_tok);
       }
+    }
+
+    // Make sure that the printed token range matches up with the parsed one.
+    if (parsed_id == mx::kInvalidEntityId) {
+      assert(!pl || !IsParsedToken(pl.value()));
     }
 
     if (!is_parsed && ml) {

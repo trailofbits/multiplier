@@ -71,13 +71,15 @@ extern void DispatchSerializeMacro(const EntityMapper &em,
 // Build the fragment. This fills out the decls/stmts/types to serialize.
 //
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-extern void BuildPendingFragment(
-    PendingFragment &pf, EntityMapper &em,
-    const pasta::TokenRange &tokens);
+extern void BuildPendingFragment(PendingFragment &pf, EntityMapper &em);
 
 // Label the parent entity ids.
 extern void LabelParentsInPendingFragment(PendingFragment &pf,
                                           EntityMapper &em);
+
+// Label tokens and macros.
+extern void LabelTokensAndMacrosInFragment(PendingFragment &pf,
+                                           EntityMapper &em);
 
 // Store information persistently to enable linking of declarations across
 // fragments.
@@ -278,7 +280,7 @@ struct TokenTreeSerializationSchedule {
     // macro, if any.
     CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
     if (raw_tt != raw_locator) {
-      (void) em.entity_ids.emplace(raw_locator, raw_id);
+      (void) em.token_tree_ids.emplace(raw_locator, raw_id);
     }
     return raw_id;
   }
@@ -300,7 +302,7 @@ struct TokenTreeSerializationSchedule {
       if (std::optional<pasta::Token> pt = node.Token()) {
         id.kind = TokenKindFromPasta(pt.value());
         raw_pt = pt->RawToken();
-        DCHECK(!IsParsedToken(pt.value()) == !em.entity_ids.count(raw_pt));
+        DCHECK(!IsParsedToken(pt.value()) == !em.token_tree_ids.count(raw_pt));
         CHECK(parsed_token_index.emplace(pt->RawToken(), id.offset).second);
 
       } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
@@ -309,7 +311,7 @@ struct TokenTreeSerializationSchedule {
 
       raw_id = mx::EntityId(id).Pack();
       if (raw_pt) {
-        em.entity_ids.emplace(raw_pt, raw_id);
+        em.token_tree_ids.emplace(raw_pt, raw_id);
       }
 
       containing_macro.push_back(parent_id);
@@ -424,7 +426,7 @@ void VisitMacros(
       id.offset = static_cast<unsigned>(macros_to_serialize.size());
       id.fragment_id = pf.fragment_index;
       raw_id = mx::EntityId(id).Pack();
-      em.entity_ids.emplace(macro.RawMacro(), raw_id);
+      em.token_tree_ids.emplace(macro.RawMacro(), raw_id);
       macros_to_serialize.emplace_back(macro);
     }
 
@@ -619,6 +621,11 @@ static void PersistTokenTree(
     } else {
       CHECK(std::holds_alternative<mx::InvalidId>(parsed_vid));
       mti2po.set(i, num_parsed_tokens);
+
+      if (pt) {
+        parsed_vid = mx::EntityId(em.EntityId(pt.value())).Unpack();
+        CHECK(!std::holds_alternative<mx::ParsedTokenId>(parsed_vid));
+      }
     }
 
     // Map the token to its containing macro.
@@ -977,9 +984,12 @@ void GlobalIndexingState::PersistFragment(
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
+  // Labels tokens and macros.
+  LabelTokensAndMacrosInFragment(pf, em);
+
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  BuildPendingFragment(pf, em, tokens);
+  BuildPendingFragment(pf, em);
 
   // Figure out parentage/inheritance between the entities.
   LabelParentsInPendingFragment(pf, em);

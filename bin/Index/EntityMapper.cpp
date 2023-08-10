@@ -116,10 +116,13 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   if (auto eid = EntityId(entity.RawToken()); eid != mx::kInvalidEntityId) {
     return eid;
+  }
+
+  assert(!IsParsedToken(entity));
 
   // If this token is derived from another one, and we don't have an entity
   // ID for it, then try to get the entity ID for the derived token.
-  } else if (auto dt = entity.DerivedLocation()) {
+  if (auto dt = entity.DerivedLocation()) {
     return EntityId(dt.value());
 
   // If we fail to resolve the parsed token to an entity ID, then try to

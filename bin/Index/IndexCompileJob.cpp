@@ -39,7 +39,7 @@ namespace indexer {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-extern void LabelEntitiesInFragment(PendingFragment &pf, EntityMapper &em);
+extern void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em);
 
 namespace {
 
@@ -70,6 +70,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   std::unordered_set<pasta::Decl> seen_specs;
 
   unsigned order{0u};
+  unsigned depth{0u};
 
  public:
   virtual ~TLDFinder(void) = default;
@@ -79,7 +80,9 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitDeclContext(const pasta::DeclContext &dc) {;
     for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
-      Accept(decl);
+      if (!decl.IsInvalidDeclaration()) {
+        Accept(decl);
+      }
     }
   }
 
@@ -99,31 +102,58 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeclContext(decl);
   }
 
+  // Specializations / instantiations of a partial template specialization end
+  // up attaching to the `ClassTemplateDecl`, however, partial specializations
+  // can contain their own `ClassTemplateDecl`s, which themselves can be
+  // specialized, so we want to go find those.
+  //
+  // For example: https://gcc.godbolt.org/z/9Wjde1WYo
+  //              https://gcc.godbolt.org/z/MGrMjxxvx
   void VisitClassTemplatePartialSpecializationDecl(
-      const pasta::ClassTemplatePartialSpecializationDecl &) final {
-    // Do nothing.
+      const pasta::ClassTemplatePartialSpecializationDecl &decl) final {
+
+    ++depth;
+    VisitDeclContext(decl);
+    --depth;
   }
 
-  void VisitVarTemplatePartialSpecializationDecl(
-      const pasta::VarTemplatePartialSpecializationDecl &) final {
-    // Do nothing.
+  void VisitClassTemplateSpecializationDecl(
+      const pasta::ClassTemplateSpecializationDecl &decl) final {
+
+    tlds.emplace_back(decl, order++);
+
+    ++depth;
+    VisitDeclContext(decl);
+    --depth;
   }
+
+  // void VisitVarTemplatePartialSpecializationDecl(
+  //     const pasta::VarTemplatePartialSpecializationDecl &) final {
+  //   // Do nothing.
+  // }
 
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
-    if (seen_specs.emplace(decl.CanonicalDeclaration()).second) {
-      for (const pasta::ClassTemplateSpecializationDecl &spec :
-               decl.Specializations()) {
 
-        // We should observe the explicit specializations and instantiations
-        // separately.
-        switch (spec.TemplateSpecializationKind()) {
-          case pasta::TemplateSpecializationKind::kExplicitSpecialization:
-          case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
-          case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
-            continue;
-          default:
-            Accept(spec);
-        }
+    ++depth;
+    VisitDeclContext(decl.TemplatedDeclaration());
+    --depth;
+
+    if (!seen_specs.emplace(decl.CanonicalDeclaration()).second) {
+      return;
+    }
+
+    for (const pasta::ClassTemplateSpecializationDecl &spec :
+             decl.Specializations()) {
+
+      // We should observe the explicit specializations and instantiations
+      // separately.
+      switch (spec.TemplateSpecializationKind()) {
+        case pasta::TemplateSpecializationKind::kExplicitSpecialization:
+        case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
+        case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
+          continue;
+        default:
+          Accept(spec);
       }
     }
   }
@@ -132,20 +162,32 @@ class TLDFinder final : public pasta::DeclVisitor {
     // Do nothing; we will see the specializations as top-level declarations.
   }
 
-  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
-    if (seen_specs.emplace(decl.CanonicalDeclaration()).second) {
-      for (const pasta::FunctionDecl &spec : decl.Specializations()) {
+  void VisitVarTemplatePartialSpecializationDecl(
+      const pasta::VarTemplatePartialSpecializationDecl &) final {
+    // Do nothing; we will see the specializations as top-level declarations.
+  }
 
-        // We should observe the explicit specializations and instantiations
-        // separately.
-        switch (spec.TemplateSpecializationKind()) {
-          case pasta::TemplateSpecializationKind::kExplicitSpecialization:
-          case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
-          case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
-            continue;
-          default:
-            Accept(spec);
-        }
+  void VisitVarTemplateSpecializationDecl(
+      const pasta::VarTemplateSpecializationDecl &decl) {
+    tlds.emplace_back(decl, order++);
+  }
+
+  void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
+    if (!seen_specs.emplace(decl.CanonicalDeclaration()).second) {
+      return;
+    }
+
+    for (const pasta::FunctionDecl &spec : decl.Specializations()) {
+
+      // We should observe the explicit specializations and instantiations
+      // separately.
+      switch (spec.TemplateSpecializationKind()) {
+        case pasta::TemplateSpecializationKind::kExplicitSpecialization:
+        case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
+        case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
+          continue;
+        default:
+          Accept(spec);
       }
     }
   }
@@ -162,7 +204,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitDecl(const pasta::Decl &decl) final {
-    if (!decl.IsInvalidDeclaration()) {
+    if (!depth) {
       tlds.emplace_back(decl, order++);
     }
   }
@@ -1158,6 +1200,49 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
   return FileLocationOfFragment(fid, btid, etid);
 }
 
+static PendingFragmentPtr CreatePendingFragment(
+    mx::DatabaseWriter &database, EntityMapper &em,
+    const pasta::TokenRange &frag_tok_range,
+    const std::optional<FileLocationOfFragment> &floc,
+    mx::PackedCompilationId tu_id,
+    std::vector<pasta::Decl> decls,
+    std::vector<pasta::Macro> macros,
+    std::optional<mx::PackedFragmentId> &root_fragment_id) {
+
+  // Compute the fragment ID, and in doing so, 
+  bool is_new_fragment_id = false;
+  PendingFragmentPtr pf(new PendingFragment(
+      database.GetOrCreateFragmentIdForHash(
+          (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
+          HashFragment(decls, macros, frag_tok_range),
+          frag_tok_range.Size()  /* num_tokens */,
+          is_new_fragment_id  /* mutated by reference */),
+      tu_id,
+      em,
+      tok_range));
+
+  pf->is_new = is_new_fragment_id;
+  pf->file_location = std::move(floc);
+  pf->num_top_level_declarations = static_cast<unsigned>(decls.size());
+  pf->num_top_level_macros = static_cast<unsigned>(macros.size());
+
+  any_new = any_new || is_new_fragment_id;
+
+  if (root_fragment_id.has_value()) {
+    CHECK_EQ(top_level_decls.size(), 1u);
+    CHECK(top_level_macros.empty());
+    CHECK_NE(pf.fragment_id.Pack(), root_fragment_id.value().Pack());
+    pf->parent_fragment_ids.push_back(root_fragment_id.value());
+  }
+
+  // Steal the TLDs and TLMs. If we have child fragments, then we want the
+  // root fragment to own the macros.
+  pf->top_level_decls = std::move(decls);
+  pf->top_level_macros = std::move(macros);
+
+  return pf;
+}
+
 static void CreatePendingFragment(
     mx::DatabaseWriter &database, EntityMapper &em,
     const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
@@ -1168,18 +1253,20 @@ static void CreatePendingFragment(
   uint64_t begin_index = std::get<kBeginIndex>(group_range);
   uint64_t end_index = std::get<kEndIndex>(group_range);
 
-  std::optional<pasta::TokenRange> parsed_toks = pasta::TokenRange::From(
+  std::optional<pasta::TokenRange> sub_tok_rage = pasta::TokenRange::From(
       tok_range[begin_index], tok_range[end_index]);
 
-  if (!parsed_toks) {
+  if (!sub_tok_rage) {
     LOG(FATAL)
         << "Invalid parsed token range for pending fragment";
     return;
   }
 
+  const pasta::TokenRange &frag_tok_range = sub_tok_rage.value();
+
   // Locate where this fragment is in its file.
   std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
-      em.entity_ids, entities, tok_range, begin_index, end_index);
+      em.entity_ids, entities, frag_tok_range, begin_index, end_index);
 
   // NOTE(pag): Left here for niftiness of debugging issues, e.g. where some
   //            top-level decl doesn't have all of its tokens properly
@@ -1210,11 +1297,11 @@ static void CreatePendingFragment(
 //    return;
 //  }
 
-  std::vector<std::vector<pasta::Decl>> top_level_decl_groups;
+  std::vector<pasta::Decl> root_decls;
+  std::vector<std::vector<pasta::Decl>> nested_decls;
+  std::vector<pasta::Decl> forward_decls;
+  const std::vector<pasta::Macro> empty_macros;
   std::vector<pasta::Macro> top_level_macros;
-
-  top_level_decl_groups.emplace_back();
-  bool has_root_fragment = false;
 
   // Partition the top-level declarations so that ones that definitely won't
   // need to go in a nested fragment show up first. This acts as a minor
@@ -1223,11 +1310,43 @@ static void CreatePendingFragment(
     if (std::holds_alternative<pasta::Decl>(entity)) {
       const pasta::Decl &decl = std::get<pasta::Decl>(entity);
 
-      if (ShouldGoInNestedFragment(decl)) {
-        top_level_decl_groups.emplace_back().push_back(decl);
+      // Things like C++ templates (but not their full specializations) are
+      // hidden from the indexer. Nonetheless, we do want to inherit the bounds
+      // from the templates themselves, and use those bounds for overlap/nesting
+      // calculation, hence why we don't omit them earlier in the process.
+      if (ShouldHideFromIndexer(decl)) {
+        continue;
+
+      // E.g. if there's something like: `typedef struct page *pgtable_t;`,
+      // and if there is no prior declaration of `struct page`, then the
+      // `struct page` declaration will show up on the same level as the
+      // `typedef`.
+      } else if (IsInjectedForwardDeclaration(decl) || !floc ||
+                 decl.IsImplicit()) {
+        
+        pasta::Tokens decl_tokens = decl.Tokens();
+        CHECK(!decl_tokens.empty());
+        forward_decls.emplace_back(decl);
+        
+        std::optional<FileLocationOfFragment> empty_floc;
+        PendingFragmentPtr pf = CreatePendingFragment(
+            database, em, decl_tokens, empty_floc, tu_id,
+            std::move(forward_decls), empty_macros, root_fragment_id);
+
+        LabelDeclsInFragment(*pf, em);
+
+        if (pf->is_new) {
+          pending_fragments.emplace_back(std::move(pf));
+        }
+
+      // These are generally template instantiations.
+      } else if (ShouldGoInNestedFragment(decl)) {
+        nested_decls.emplace_back().push_back(decl);
+
+      // E.g. `int a, b;` will produce two `VarDecl`s that we want to merge into
+      // a single root decl.
       } else {
-        has_root_fragment = true;
-        top_level_decl_groups.front().push_back(decl);
+        root_decls.push_back(decl);
       }
 
     } else if (std::holds_alternative<pasta::Macro>(entity)) {
@@ -1240,142 +1359,149 @@ static void CreatePendingFragment(
     }
   }
 
-  // If we have no specific root fragment, then force all nested fragments back
-  // into the main fragment. This could happen if we have a macro expanding to
-  // a bunch of forward declarations.
-  if (!has_root_fragment) {
-    for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
-      if (!top_level_decls.empty()) {
-        top_level_decl_groups.front().push_back(top_level_decls.back());
-      }
-    }
-    top_level_decl_groups.resize(1u);
-  }
-
-  std::optional<mx::PackedFragmentId> root_fragment_id;
   std::vector<PendingFragmentPtr> local_pending_fragments;
 
-  bool any_new = false;
-  for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
-    if (top_level_decls.empty() && top_level_macros.empty()) {
-      continue;
-    }
+  // Create the root fragment.
+  std::optional<mx::PackedFragmentId> root_fragment_id;
+  if (!root_decls.empty() || (nested_decls.empty() &&
+                              !top_level_macros.empty())) {
+    PendingFragmentPtr pf = CreatePendingFragment(
+        database, em, frag_tok_range, floc, tu_id, std::move(root_decls),
+        top_level_macros  /* copied */, root_fragment_id);
+  
+    root_fragment_id = pf->fragment_id;
 
-    bool is_new_fragment_id = false;
-    local_pending_fragments.emplace_back(new PendingFragment(
-        database.GetOrCreateFragmentIdForHash(
-            (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
-            HashFragment(top_level_decls, top_level_macros, tok_range,
-                         begin_index, end_index),
-            (end_index - begin_index + 1ul)  /* num_tokens */,
-            is_new_fragment_id  /* mutated by reference */),
-        tu_id,
-        em,
-        parsed_toks.value()));
+    LabelDeclsInFragment(*pf, em);
 
-    PendingFragment &pf = *local_pending_fragments.back();
-    pf.is_new = is_new_fragment_id;
-    pf.file_location = std::move(floc);
-    pf.num_top_level_declarations = static_cast<unsigned>(top_level_decls.size());
-    pf.num_top_level_macros = static_cast<unsigned>(top_level_macros.size());
-
-    any_new = any_new || is_new_fragment_id;
-
-    // The first fragment is the root fragment.
-    if (!root_fragment_id.has_value()) {
-      root_fragment_id = pf.fragment_id;
-
-    // These are all nested fragments.
-    } else {
-      CHECK_EQ(top_level_decls.size(), 1u);
-      CHECK(top_level_macros.empty());
-      CHECK_NE(pf.fragment_id.Pack(), root_fragment_id.value().Pack());
-      pf.parent_fragment_ids.push_back(root_fragment_id.value());
-
-      auto decl_range = BaselineEntityRange(top_level_decls.front(),
-                                            top_level_decls.front().Token(),
-                                            "");
-    }
-
-    // Steal the TLDs and TLMs. If we have child fragments, then we want the
-    // root fragment to own the macros.
-    pf.top_level_decls = std::move(top_level_decls);
-    pf.top_level_macros = std::move(top_level_macros);
-  }
-
-  // The local list starts with the root fragment, then has the nested ones.
-  // Reorder to have the root fragment last.
-  std::rotate(local_pending_fragments.begin(),
-              local_pending_fragments.begin() + 1,
-              local_pending_fragments.end());
-
-  // We always need to label the entities inside of a fragment, regardless of
-  // if fragment is new. This is because each fragment might have arbitrary
-  // references to other declarations. We need to be able to form cross-
-  // fragment references when serializing things, so we use the labeller to
-  // assign IDs to entities (decls, statements, etc.) in a uniform and
-  // deterministic way so that other threads doing similar indexing will form
-  // identically labelled chunks for the same logical entities.
-  //
-  // Unfortunately, the labeller needs to be manually written as opposed to
-  // auto-generated, as our auto-generation has no concept of which AST
-  // methods descend vs. cross the tree (into other fragments).
-  for (const PendingFragmentPtr &pfp : local_pending_fragments) {
-    PendingFragment &pf = *pfp;
-
-    for (const pasta::Decl &decl : pf.top_level_decls) {
-      CHECK_EQ(em.EntityId(decl), mx::kInvalidEntityId);
-    }
-
-    LabelEntitiesInFragment(pf, em);
-
-    for (const pasta::Decl &decl : pf.top_level_decls) {
-      CHECK_NE(em.EntityId(decl), mx::kInvalidEntityId);
+    if (pf->is_new) {
+      local_pending_fragments.emplace_back(std::move(pf));
     }
   }
 
-  // None of the fragments were new.
-  if (!any_new) {
+  // Create the nested fragments for the root fragment. These correspond to
+  // things like template specializations/isntantiations.
+  for (const pasta::Decl &nested_decl : nested_decls) {
+    PendingFragmentPtr pf = CreatePendingFragment(
+        database, em, frag_tok_range, floc, tu_id, std::move(root_decls),
+        top_level_macros  /* copied */, root_fragment_id);
+
+    LabelDeclsInFragment(*pf, em);
+
+    if (pf->is_new) {
+      local_pending_fragments.emplace_back(std::move(pf));
+    }
+  }
+
+  if (local_pending_fragments.empty()) {
     return;
   }
 
-  // Create a printed token range for the top-level, non-nested declarations.
-  std::optional<pasta::PrintedTokenRange> printed_toks;
-  for (const Entity &entity : entities) {
-    if (std::holds_alternative<pasta::Decl>(entity)) {
-      const pasta::Decl &decl = std::get<pasta::Decl>(entity);
+  // // If we have no specific root fragment, then force all nested fragments back
+  // // into the main fragment. This could happen if we have a macro expanding to
+  // // a bunch of forward declarations.
+  // if (!has_root_fragment && !has_nested_fragment) {
+  //   for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
+  //     if (!top_level_decls.empty()) {
+  //       top_level_decl_groups.front().push_back(top_level_decls.back());
+  //     }
+  //   }
+  //   top_level_decl_groups.resize(1u);
+  // }
 
-      if (!ShouldGoInNestedFragment(decl)) {
-        if (!printed_toks) {
-          printed_toks = pasta::PrintedTokenRange::Create(decl);
-        } else {
-          printed_toks = pasta::PrintedTokenRange::Concatenate(
-              printed_toks.value(),
-              pasta::PrintedTokenRange::Create(decl));
-        }
-      }
-    }
-  }
+  // std::vector<PendingFragmentPtr> local_pending_fragments;
 
-  std::optional<pasta::PrintedTokenRange> aligned_toks;
-  if (printed_toks.has_value()) {
-    auto maybe_aligned_toks = pasta::PrintedTokenRange::Align(
-        parsed_toks.value(), printed_toks.value());
-    if (maybe_aligned_toks.Succeeded()) {
-      aligned_toks = maybe_aligned_toks.TakeValue();
-    } else {
-      LOG(ERROR)
-          << maybe_aligned_toks.TakeError();
-    }
-  }
+  // bool any_new = false;
+  // for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
+  //   if (top_level_decls.empty() && top_level_macros.empty()) {
+  //     continue;
+  //   }
 
-  // Only progress toward serialization on the new fragments.
-  for (PendingFragmentPtr &pfp : local_pending_fragments) {
-    if (pfp->is_new) {
-      pfp->printed_tokens = aligned_toks;
-      pending_fragments.emplace_back(std::move(pfp));
-    }
-  }
+    
+  // }
+
+  // // The local list starts with the root fragment, then has the nested ones.
+  // // Reorder to have the root fragment last.
+  // //
+  // // NOTE(pag): This rotation behaviour also means the root fragment is the last
+  // //            fragment on which token labelling applies below.
+  // std::rotate(local_pending_fragments.begin(),
+  //             local_pending_fragments.begin() + 1,
+  //             local_pending_fragments.end());
+
+  // // We always need to label the entities inside of a fragment, regardless of
+  // // if fragment is new. This is because each fragment might have arbitrary
+  // // references to other declarations. We need to be able to form cross-
+  // // fragment references when serializing things, so we use the labeller to
+  // // assign IDs to entities (decls, statements, etc.) in a uniform and
+  // // deterministic way so that other threads doing similar indexing will form
+  // // identically labelled chunks for the same logical entities.
+  // //
+  // // Unfortunately, the labeller needs to be manually written as opposed to
+  // // auto-generated, as our auto-generation has no concept of which AST
+  // // methods descend vs. cross the tree (into other fragments).
+  // for (const PendingFragmentPtr &pfp : local_pending_fragments) {
+
+    
+
+  //   // // If this is the Nth overlapping fragment, then erase the labels on the
+  //   // // overlapping tokens. The root fragment is processed last, so its labels
+  //   // // "win" from a global perspective.
+  //   // if (!first) {
+  //   //   for (pasta::Token tok : pf.parsed_tokens) {
+  //   //     em.entity_ids.erase(tok.RawToken());
+  //   //   }
+  //   // }
+
+  //   LabelDeclsInFragment(*pfp, em);
+  // }
+
+  // // None of the fragments were new. Label with the root fragment.
+  // if (!any_new) {
+  //   return;
+  // }
+
+  // // Create a printed token range for the top-level, non-nested declarations.
+  // std::optional<pasta::PrintedTokenRange> printed_toks;
+  // for (const Entity &entity : entities) {
+  //   if (std::holds_alternative<pasta::Decl>(entity)) {
+  //     const pasta::Decl &decl = std::get<pasta::Decl>(entity);
+
+  //     if (!IsInjectedForwardDeclaration(decl)) {
+  //       if (!printed_toks) {
+  //         printed_toks = pasta::PrintedTokenRange::Create(decl);
+  //       } else {
+  //         printed_toks = pasta::PrintedTokenRange::Concatenate(
+  //             printed_toks.value(),
+  //             pasta::PrintedTokenRange::Create(decl));
+  //       }
+  //     }
+  //   }
+  // }
+
+  // std::optional<pasta::PrintedTokenRange> aligned_toks;
+  // if (printed_toks.has_value()) {
+  //   auto maybe_aligned_toks = pasta::PrintedTokenRange::Align(
+  //       parsed_toks.value(), printed_toks.value());
+  //   if (maybe_aligned_toks.Succeeded()) {
+  //     aligned_toks = maybe_aligned_toks.TakeValue();
+  //   } else {
+  //     LOG(ERROR)
+  //         << maybe_aligned_toks.TakeError();
+  //   }
+  // }
+
+  // // for (pasta::Token tok : parsed_toks.value()) {
+  // //   CHECK(!em.entity_ids.count(tok.RawToken()));
+  // //   em.entity_ids.erase(tok.RawToken());
+  // // }
+
+  // // Only progress toward serialization on the new fragments.
+  // for (PendingFragmentPtr &pfp : local_pending_fragments) {
+  //   if (pfp->is_new) {
+  //     pfp->printed_tokens = aligned_toks;
+  //     pending_fragments.emplace_back(std::move(pfp));
+  //   }
+  // }
 }
 
 // Create fragments in reverse order that we see them in the AST. The hope
