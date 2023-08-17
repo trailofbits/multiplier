@@ -214,7 +214,7 @@ std::string HashFragment(
     }
   };
 
-  if (*frag_tok_range) {
+  if (frag_tok_range && *frag_tok_range) {
     for (pasta::Token token : *frag_tok_range) {
       end_index = token.Index();
       mixin_token(mx::FromPasta(token.Kind()), token.Role(), token.Data());

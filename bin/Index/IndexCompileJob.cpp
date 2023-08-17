@@ -1140,16 +1140,16 @@ static bool FindTokenFileBounds(const pasta::Token &ptok,
 //            declarations in that case.
 static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
     const EntityIdMap &entity_ids, const EntityGroup &entities,
-    const pasta::TokenRange &tokens, uint64_t begin_index, uint64_t end_index) {
+    const pasta::TokenRange &tokens) {
 
   std::optional<pasta::FileToken> begin_tok;
   std::optional<pasta::FileToken> end_tok;
 
-  auto range_size = end_index - begin_index;
+  auto range_size = tokens.size();
 
   // Find a good begin index candidate.
-  for (auto i = 0u; i <= range_size; ++i) {
-    if (FindTokenFileBounds(tokens[begin_index + i], begin_tok, end_tok)) {
+  for (pasta::Token tok : tokens) {
+    if (FindTokenFileBounds(tok, begin_tok, end_tok)) {
       break;
     }
   }
@@ -1157,8 +1157,8 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
   // Find a good end index candidate.
   //
   // NOTE(pag): `end_index` is inclusive.
-  for (auto i = 0u; i <= range_size; ++i) {
-    if (FindTokenFileBounds(tokens[end_index - i], begin_tok, end_tok)) {
+  for (auto i = 1u; i <= range_size; ++i) {
+    if (FindTokenFileBounds(tokens[range_size - i], begin_tok, end_tok)) {
       break;
     }
   }
@@ -1242,16 +1242,6 @@ static PendingFragmentPtr CreatePendingFragment(
   pf->file_location = std::move(floc);
   pf->num_top_level_declarations = static_cast<unsigned>(decls.size());
   pf->num_top_level_macros = static_cast<unsigned>(macros.size());
-
-  // if (frag_tok_range) {
-  //   pf->parsed_tokens = *frag_tok_range;
-  // }
-
-  // if (decl_tok_range) {
-  //   pf->printed_tokens = *decl_tok_range;
-  // }
-
-  // any_new = any_new || is_new_fragment_id;
 
   if (root_fragment_id.has_value()) {
     CHECK_EQ(decls.size(), 1u);
@@ -1338,7 +1328,7 @@ static void CreatePendingFragment(
 
   // Locate where this fragment is in its file.
   std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
-      em.entity_ids, entities, frag_tok_range, begin_index, end_index);
+      em.entity_ids, entities, frag_tok_range);
 
   // NOTE(pag): Left here for niftiness of debugging issues, e.g. where some
   //            top-level decl doesn't have all of its tokens properly
@@ -1410,7 +1400,8 @@ static void CreatePendingFragment(
         //            macro expansions.
         forward_decls.emplace_back(decl);
         pf = CreatePendingFragment(
-            database, em,
+            database,
+            em,
             nullptr  /* original_tokens */,
             printed_toks  /* parsed_tokens */,
             empty_floc,

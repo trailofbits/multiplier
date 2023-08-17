@@ -92,7 +92,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
     return EntityId(mt->ParsedLocation());
   }
 
-  auto ret = EntityId(entity.RawMacro());
+  auto ret = PerFragmentEntityId(entity.RawMacro());
   if (ret || entity.Kind() != pasta::MacroKind::kExpansion) {
     return ret;
   }
@@ -120,7 +120,8 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
-  if (auto eid = EntityId(entity.RawToken()); eid != mx::kInvalidEntityId) {
+  if (auto eid = PerFragmentEntityId(entity.RawToken());
+      eid != mx::kInvalidEntityId) {
     return eid;
   }
 

@@ -377,25 +377,32 @@ void BuildPendingFragment(PendingFragment &pf, EntityMapper &em) {
   FragmentBuilder builder(em, pf);
 
   // Make sure to collect everything reachable from token contexts.
-  if (pf.printed_tokens) {
-    for (pasta::PrintedToken tok : pf.printed_tokens.value()) {
-      for (auto context = tok.Context(); context;
-           context = context->Parent()) {
-        if (auto decl = pasta::Decl::From(*context)) {
-          builder.MaybeVisitNext(*decl);
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
+    for (auto context = tok.Context(); context;
+         context = context->Parent()) {
+      if (auto decl = pasta::Decl::From(*context)) {
+        builder.MaybeVisitNext(*decl);
 
-        } else if (auto stmt = pasta::Stmt::From(*context)) {
-          builder.MaybeVisitNext(*stmt);
+      } else if (auto stmt = pasta::Stmt::From(*context)) {
+        builder.MaybeVisitNext(*stmt);
 
-        } else if (auto type = pasta::Type::From(*context)) {
-          builder.MaybeVisitNext(*type);
+      } else if (auto type = pasta::Type::From(*context)) {
+        builder.MaybeVisitNext(*type);
 
-        } else if (auto attr = pasta::Attr::From(*context)) {
-          builder.MaybeVisitNext(*attr);
+      } else if (auto attr = pasta::Attr::From(*context)) {
+        builder.MaybeVisitNext(*attr);
 
-        } else if (auto designator = pasta::Designator::From(*context)) {
-          builder.MaybeVisitNext(*designator);
-        }
+      } else if (auto designator = pasta::Designator::From(*context)) {
+        builder.MaybeVisitNext(*designator);
+
+      } else if (auto arg = pasta::TemplateArgument::From(*context)) {
+        builder.MaybeVisitNext(*arg);
+      
+      } else if (auto params = pasta::TemplateParameterList::From(*context)) {
+        builder.MaybeVisitNext(*params);
+      
+      } else if (auto spec = pasta::CXXBaseSpecifier::From(*context)) {
+        builder.MaybeVisitNext(*spec);
       }
     }
   }

@@ -92,13 +92,13 @@ class PendingFragment {
   // The original tokens of the fragment.
   std::optional<pasta::TokenRange> original_tokens;
 
-  // Adopted tokens from `original_tokens`.
+  // Adopted tokens from `original_tokens`, or tokens created by printing a
+  // implicit declaration.
+  //
+  // In the adoption case, we try to align the original tokens with the
+  // parsed tokens, so that parsed tokens are associated with rich token
+  // contexts.
   pasta::PrintedTokenRange parsed_tokens;
-
-  // Parsed tokens, and printed tokens created by aligning parsed and printed
-  // tokens.
-  // std::optional<pasta::TokenRange> parsed_tokens;
-  std::optional<pasta::PrintedTokenRange> printed_tokens;
 
   std::optional<FileLocationOfFragment> file_location;
 

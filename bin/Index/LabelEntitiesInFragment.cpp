@@ -155,6 +155,11 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
 
   CHECK(em.token_tree_ids.emplace(entity.RawToken(), id).second);
 
+  if (std::optional<pasta::Token> pt = entity.DerivedLocation()) {
+    CHECK(IsParsedToken(pt.value()));
+    CHECK(em.token_tree_ids.emplace(pt->RawToken(), id).second);    
+  }
+
   // // If we didn't just add the token, then we should be in the nested fragment
   // // case, and we want to overwrite the token id.
   // if (!res.second) {
