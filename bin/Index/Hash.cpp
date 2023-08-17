@@ -9,6 +9,7 @@
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
+#include <pasta/AST/Printer.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
@@ -172,7 +173,7 @@ std::string HashFragment(
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
     const pasta::TokenRange *frag_tok_range,
-    const pasta::PrintedTokenRange *decl_tok_range) {
+    const pasta::PrintedTokenRange &decl_tok_range) {
 
   D( std::cerr
         << "begin_index=" << begin_index << " end_index=" << end_index
@@ -181,15 +182,17 @@ std::string HashFragment(
   llvm::FoldingSetNodeID fs;
 
   uint64_t end_index = 0u;
-  std::hash<std::string_view> kHasher;
 
-  auto mixin_token = [&fs] (mx::TokenKind kind, std::string_view data) {
+  auto mixin_token = [&fs] (mx::TokenKind kind, pasta::TokenRole role,
+                            std::string_view data) {
     if (data.empty()) {
       return;
     }
 
+    static constexpr std::hash<std::string_view> kHasher;
+
     // Mix in generic token/structure/context information.
-    switch (token.Role()) {
+    switch (role) {
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kInitialMacroUseToken:
         D( std::cerr << "\t1 kind=" << int(kind) << " data="
@@ -214,13 +217,14 @@ std::string HashFragment(
   if (*frag_tok_range) {
     for (pasta::Token token : *frag_tok_range) {
       end_index = token.Index();
-      mixin_token(mx::FromPasta(token.Kind()), token.Data());
+      mixin_token(mx::FromPasta(token.Kind()), token.Role(), token.Data());
     }
   }
 
-  if (*decl_tok_range) {
-    for (pasta::PrintedToken token : *decl_tok_range) {
-      mixin_token(mx::FromPasta(token.Kind()), token.Data());
+  if (decl_tok_range) {
+    for (pasta::PrintedToken token : decl_tok_range) {
+      mixin_token(mx::FromPasta(token.Kind()), pasta::TokenRole::kFileToken,
+                  token.Data());
     }
   }
 

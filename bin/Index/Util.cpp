@@ -964,7 +964,7 @@ bool ShouldHideFromIndexer(const pasta::Decl &decl) {
   }
 
   switch (decl.Kind()) {
-    case pasta::DeclKind::kClassScopeFunctionSpecializationDecl:
+    case pasta::DeclKind::kClassScopeFunctionSpecialization:
     case pasta::DeclKind::kClassTemplate:
     case pasta::DeclKind::kClassTemplatePartialSpecialization:
     case pasta::DeclKind::kFunctionTemplate:

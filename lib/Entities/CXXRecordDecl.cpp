@@ -1326,6 +1326,55 @@ std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) 
   return vec;
 }
 
+std::optional<CXXRecordDecl> CXXRecordDecl::primary_base(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal131();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXRecordDecl::from(Decl(std::move(eptr)));
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_own_virtual_function_table_pointer(void) const {
+  if (!impl->reader.getVal345()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal344());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_extendable_virtual_function_table_pointer(void) const {
+  if (!impl->reader.getVal347()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal346());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_virtual_base_table_pointer(void) const {
+  if (!impl->reader.getVal349()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal348());
+  }
+  return std::nullopt;
+}
+
+std::optional<bool> CXXRecordDecl::has_own_virtual_base_table_pointer(void) const {
+  if (!impl->reader.getVal351()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal350());
+  }
+  return std::nullopt;
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

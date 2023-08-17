@@ -49,10 +49,12 @@ class EntityMapper final {
   mx::RawEntityId ParentStmtId(const pasta::Decl &entity) const;
   mx::RawEntityId ParentStmtId(const pasta::Stmt &entity) const;
   mx::RawEntityId EntityId(const void *entity) const;
+  mx::RawEntityId PerFragmentEntityId(const void *entity) const;
   mx::RawEntityId EntityId(const pasta::File &file) const;
   mx::RawEntityId EntityId(const pasta::Decl &entity) const;
   mx::RawEntityId EntityId(const pasta::Stmt &entity) const;
   mx::RawEntityId EntityId(const pasta::Token &entity) const;
+  mx::RawEntityId EntityId(const pasta::PrintedToken &entity) const;
   mx::RawEntityId EntityId(const pasta::FileToken &entity) const;
   mx::RawEntityId EntityId(const pasta::MacroToken &entity);
   mx::RawEntityId EntityId(const pasta::Type &entity) const;

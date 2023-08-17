@@ -2461,6 +2461,7 @@ void SerializeSwiftAsyncAttr(const EntityMapper &es, mx::ast::Attr::Builder b, c
   (void) b;
   (void) e;
   SerializeInheritableAttr(es, b, e, nullptr);
+  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.AttributeKind())));
 }
 
 void SerializeStrictGuardStackCheckAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StrictGuardStackCheckAttr &e, const TokenTree *) {
@@ -4503,7 +4504,7 @@ void SerializeBuiltinType(const EntityMapper &es, mx::ast::Type::Builder b, cons
   (void) e;
   SerializeType(es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
-  b.setVal238(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
+  b.setVal238(static_cast<unsigned char>(mx::FromPasta(e.BuiltinKind())));
   b.setVal231(e.IsFloatingPoint());
   b.setVal232(e.IsInteger());
   b.setVal233(e.IsSVEBool());
@@ -4798,6 +4799,7 @@ void SerializeTypeOfType(const EntityMapper &es, mx::ast::Type::Builder b, const
   (void) e;
   SerializeType(es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
+  b.setVal238(static_cast<unsigned char>(mx::FromPasta(e.TypeKind())));
   b.setVal230(es.EntityId(e.UnmodifiedType()));
   b.setVal231(e.IsSugared());
 }
@@ -4808,6 +4810,7 @@ void SerializeTypeOfExprType(const EntityMapper &es, mx::ast::Type::Builder b, c
   (void) e;
   SerializeType(es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
+  b.setVal238(static_cast<unsigned char>(mx::FromPasta(e.TypeKind())));
   b.setVal230(es.EntityId(e.UnderlyingExpression()));
   b.setVal231(e.IsSugared());
 }
@@ -5754,15 +5757,6 @@ void SerializeAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
     }
   } while (false);
   do {
-    auto v27 = e.OutputExpressions();
-    auto sv27 = b.initVal27(static_cast<unsigned>(v27.size()));
-    auto i27 = 0u;
-    for (const auto &e27 : v27) {
-      sv27.set(i27, es.EntityId(e27));
-      ++i27;
-    }
-  } while (false);
-  do {
     auto v61 = e.OutputConstraints();
     auto sv61 = b.initVal61(static_cast<unsigned>(v61.size()));
     auto i61 = 0u;
@@ -5773,12 +5767,12 @@ void SerializeAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
     }
   } while (false);
   do {
-    auto v28 = e.InputExpressions();
-    auto sv28 = b.initVal28(static_cast<unsigned>(v28.size()));
-    auto i28 = 0u;
-    for (const auto &e28 : v28) {
-      sv28.set(i28, es.EntityId(e28));
-      ++i28;
+    auto v27 = e.OutputExpressions();
+    auto sv27 = b.initVal27(static_cast<unsigned>(v27.size()));
+    auto i27 = 0u;
+    for (const auto &e27 : v27) {
+      sv27.set(i27, es.EntityId(e27));
+      ++i27;
     }
   } while (false);
   do {
@@ -5789,6 +5783,15 @@ void SerializeAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
       std::string se62(e62.data(), e62.size());
       sv62.set(i62, se62);
       ++i62;
+    }
+  } while (false);
+  do {
+    auto v28 = e.InputExpressions();
+    auto sv28 = b.initVal28(static_cast<unsigned>(v28.size()));
+    auto i28 = 0u;
+    for (const auto &e28 : v28) {
+      sv28.set(i28, es.EntityId(e28));
+      ++i28;
     }
   } while (false);
   do {
@@ -5848,7 +5851,7 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     }
   } while (false);
   do {
-    auto v52 = e.ClobberStringLiterals();
+    auto v52 = e.OutputConstraintLiterals();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
     auto i52 = 0u;
     for (const auto &e52 : v52) {
@@ -5867,7 +5870,7 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     }
   } while (false);
   do {
-    auto v53 = e.OutputConstraintLiterals();
+    auto v53 = e.InputConstraintLiterals();
     auto sv53 = b.initVal53(static_cast<unsigned>(v53.size()));
     auto i53 = 0u;
     for (const auto &e53 : v53) {
@@ -5886,7 +5889,7 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     }
   } while (false);
   do {
-    auto v54 = e.InputConstraintLiterals();
+    auto v54 = e.ClobberStringLiterals();
     auto sv54 = b.initVal54(static_cast<unsigned>(v54.size()));
     auto i54 = 0u;
     for (const auto &e54 : v54) {
@@ -5895,21 +5898,21 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     }
   } while (false);
   do {
-    auto v67 = e.LabelNames();
+    auto v67 = e.LabelExpressions();
     auto sv67 = b.initVal67(static_cast<unsigned>(v67.size()));
     auto i67 = 0u;
     for (const auto &e67 : v67) {
-      std::string se67(e67.data(), e67.size());
-      sv67.set(i67, se67);
+      sv67.set(i67, es.EntityId(e67));
       ++i67;
     }
   } while (false);
   do {
-    auto v68 = e.LabelExpressions();
+    auto v68 = e.LabelNames();
     auto sv68 = b.initVal68(static_cast<unsigned>(v68.size()));
     auto i68 = 0u;
     for (const auto &e68 : v68) {
-      sv68.set(i68, es.EntityId(e68));
+      std::string se68(e68.data(), e68.size());
+      sv68.set(i68, se68);
       ++i68;
     }
   } while (false);
@@ -6199,7 +6202,7 @@ void SerializeChooseExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const
 
 void SerializeCharacterLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CharacterLiteral &e, const TokenTree *) {
   SerializeExpr(es, b, e, nullptr);
-  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
+  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.LiteralKind())));
   auto t38 = e.Token();
   b.setVal38(es.EntityId(t38));
 }
@@ -6955,7 +6958,7 @@ void SerializeUnaryExprOrTypeTraitExpr(const EntityMapper &es, mx::ast::Stmt::Bu
   } else {
     b.setVal39(mx::kInvalidEntityId);
   }
-  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
+  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.KeywordKind())));
   auto t40 = e.OperatorToken();
   b.setVal40(es.EntityId(t40));
   auto t41 = e.RParenToken();
@@ -7034,7 +7037,7 @@ void SerializeStringLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   auto v60 = e.Bytes();
   std::string s60(v60.data(), v60.size());
   b.setVal60(s60);
-  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
+  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.LiteralKind())));
   auto v65 = e.String();
   if (v65) {
     if (v65->empty()) {
@@ -10180,6 +10183,41 @@ void SerializeCXXRecordDecl(const EntityMapper &es, mx::ast::Decl::Builder b, co
       ++i342;
     }
   } while (false);
+  auto v131 = e.PrimaryBase();
+  if (v131) {
+    auto id131 = es.EntityId(v131.value());
+    b.setVal131(id131);
+  } else {
+    b.setVal131(mx::kInvalidEntityId);
+  }
+  auto v344 = e.HasOwnVirtualFunctionTablePointer();
+  if (v344) {
+    b.setVal344(static_cast<bool>(v344.value()));
+    b.setVal345(true);
+  } else {
+    b.setVal345(false);
+  }
+  auto v346 = e.HasExtendableVirtualFunctionTablePointer();
+  if (v346) {
+    b.setVal346(static_cast<bool>(v346.value()));
+    b.setVal347(true);
+  } else {
+    b.setVal347(false);
+  }
+  auto v348 = e.HasVirtualBaseTablePointer();
+  if (v348) {
+    b.setVal348(static_cast<bool>(v348.value()));
+    b.setVal349(true);
+  } else {
+    b.setVal349(false);
+  }
+  auto v350 = e.HasOwnVirtualBaseTablePointer();
+  if (v350) {
+    b.setVal350(static_cast<bool>(v350.value()));
+    b.setVal351(true);
+  } else {
+    b.setVal351(false);
+  }
 }
 
 void SerializeClassTemplateSpecializationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplateSpecializationDecl &e, const TokenTree *) {
@@ -10187,42 +10225,42 @@ void SerializeClassTemplateSpecializationDecl(const EntityMapper &es, mx::ast::D
   (void) b;
   (void) e;
   SerializeCXXRecordDecl(es, b, e, nullptr);
-  auto t131 = e.ExternToken();
-  b.setVal131(es.EntityId(t131));
-  auto t133 = e.PointOfInstantiation();
+  auto t133 = e.ExternToken();
   b.setVal133(es.EntityId(t133));
+  auto t134 = e.PointOfInstantiation();
+  b.setVal134(es.EntityId(t134));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.SpecializationKind())));
-  b.setVal134(es.EntityId(e.SpecializedTemplate()));
+  b.setVal142(es.EntityId(e.SpecializedTemplate()));
   do {
-    auto v344 = e.TemplateArguments();
-    auto sv344 = b.initVal344(static_cast<unsigned>(v344.size()));
-    auto i344 = 0u;
-    for (const auto &e344 : v344) {
-      sv344.set(i344, es.EntityId(e344));
-      ++i344;
+    auto v352 = e.TemplateArguments();
+    auto sv352 = b.initVal352(static_cast<unsigned>(v352.size()));
+    auto i352 = 0u;
+    for (const auto &e352 : v352) {
+      sv352.set(i352, es.EntityId(e352));
+      ++i352;
     }
   } while (false);
   do {
-    auto v345 = e.TemplateInstantiationArguments();
-    auto sv345 = b.initVal345(static_cast<unsigned>(v345.size()));
-    auto i345 = 0u;
-    for (const auto &e345 : v345) {
-      sv345.set(i345, es.EntityId(e345));
-      ++i345;
+    auto v353 = e.TemplateInstantiationArguments();
+    auto sv353 = b.initVal353(static_cast<unsigned>(v353.size()));
+    auto i353 = 0u;
+    for (const auto &e353 : v353) {
+      sv353.set(i353, es.EntityId(e353));
+      ++i353;
     }
   } while (false);
-  auto t142 = e.TemplateKeywordToken();
-  b.setVal142(es.EntityId(t142));
-  auto v144 = e.TypeAsWritten();
-  if (v144) {
-    auto id144 = es.EntityId(v144.value());
-    b.setVal144(id144);
+  auto t144 = e.TemplateKeywordToken();
+  b.setVal144(es.EntityId(t144));
+  auto v145 = e.TypeAsWritten();
+  if (v145) {
+    auto id145 = es.EntityId(v145.value());
+    b.setVal145(id145);
   } else {
-    b.setVal144(mx::kInvalidEntityId);
+    b.setVal145(mx::kInvalidEntityId);
   }
-  b.setVal346(e.IsClassScopeExplicitSpecialization());
-  b.setVal347(e.IsExplicitInstantiationOrSpecialization());
-  b.setVal348(e.IsExplicitSpecialization());
+  b.setVal354(e.IsClassScopeExplicitSpecialization());
+  b.setVal355(e.IsExplicitInstantiationOrSpecialization());
+  b.setVal356(e.IsExplicitSpecialization());
 }
 
 void SerializeClassTemplatePartialSpecializationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplatePartialSpecializationDecl &e, const TokenTree *) {
@@ -10230,11 +10268,11 @@ void SerializeClassTemplatePartialSpecializationDecl(const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeClassTemplateSpecializationDecl(es, b, e, nullptr);
-  b.setVal145(es.EntityId(e.InjectedSpecializationType()));
-  b.setVal146(es.EntityId(e.InstantiatedFromMember()));
-  b.setVal147(es.EntityId(e.InstantiatedFromMemberTemplate()));
-  b.setVal166(es.EntityId(e.TemplateParameters()));
-  b.setVal349(e.HasAssociatedConstraints());
+  b.setVal146(es.EntityId(e.InjectedSpecializationType()));
+  b.setVal147(es.EntityId(e.InstantiatedFromMember()));
+  b.setVal166(es.EntityId(e.InstantiatedFromMemberTemplate()));
+  b.setVal168(es.EntityId(e.TemplateParameters()));
+  b.setVal357(e.HasAssociatedConstraints());
 }
 
 void SerializeEnumDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::EnumDecl &e, const TokenTree *) {
@@ -10661,12 +10699,12 @@ void SerializeObjCCategoryDecl(const EntityMapper &es, mx::ast::Decl::Builder b,
     }
   } while (false);
   do {
-    auto v344 = e.Protocols();
-    auto sv344 = b.initVal344(static_cast<unsigned>(v344.size()));
-    auto i344 = 0u;
-    for (const auto &e344 : v344) {
-      sv344.set(i344, es.EntityId(e344));
-      ++i344;
+    auto v352 = e.Protocols();
+    auto sv352 = b.initVal352(static_cast<unsigned>(v352.size()));
+    auto i352 = 0u;
+    for (const auto &e352 : v352) {
+      sv352.set(i352, es.EntityId(e352));
+      ++i352;
     }
   } while (false);
 }
@@ -10756,43 +10794,7 @@ void SerializeObjCInterfaceDecl(const EntityMapper &es, mx::ast::Decl::Builder b
     }
   } while (false);
   do {
-    auto v344 = e.KnownCategories();
-    auto sv344 = b.initVal344(static_cast<unsigned>(v344.size()));
-    auto i344 = 0u;
-    for (const auto &e344 : v344) {
-      sv344.set(i344, es.EntityId(e344));
-      ++i344;
-    }
-  } while (false);
-  do {
-    auto v345 = e.KnownExtensions();
-    auto sv345 = b.initVal345(static_cast<unsigned>(v345.size()));
-    auto i345 = 0u;
-    for (const auto &e345 : v345) {
-      sv345.set(i345, es.EntityId(e345));
-      ++i345;
-    }
-  } while (false);
-  do {
-    auto v350 = e.ProtocolTokens();
-    auto sv350 = b.initVal350(static_cast<unsigned>(v350.size()));
-    auto i350 = 0u;
-    for (const auto &e350 : v350) {
-      sv350.set(i350, es.EntityId(e350));
-      ++i350;
-    }
-  } while (false);
-  do {
-    auto v351 = e.Protocols();
-    auto sv351 = b.initVal351(static_cast<unsigned>(v351.size()));
-    auto i351 = 0u;
-    for (const auto &e351 : v351) {
-      sv351.set(i351, es.EntityId(e351));
-      ++i351;
-    }
-  } while (false);
-  do {
-    auto v352 = e.VisibleCategories();
+    auto v352 = e.KnownCategories();
     auto sv352 = b.initVal352(static_cast<unsigned>(v352.size()));
     auto i352 = 0u;
     for (const auto &e352 : v352) {
@@ -10801,12 +10803,48 @@ void SerializeObjCInterfaceDecl(const EntityMapper &es, mx::ast::Decl::Builder b
     }
   } while (false);
   do {
-    auto v353 = e.VisibleExtensions();
+    auto v353 = e.KnownExtensions();
     auto sv353 = b.initVal353(static_cast<unsigned>(v353.size()));
     auto i353 = 0u;
     for (const auto &e353 : v353) {
       sv353.set(i353, es.EntityId(e353));
       ++i353;
+    }
+  } while (false);
+  do {
+    auto v358 = e.ProtocolTokens();
+    auto sv358 = b.initVal358(static_cast<unsigned>(v358.size()));
+    auto i358 = 0u;
+    for (const auto &e358 : v358) {
+      sv358.set(i358, es.EntityId(e358));
+      ++i358;
+    }
+  } while (false);
+  do {
+    auto v359 = e.Protocols();
+    auto sv359 = b.initVal359(static_cast<unsigned>(v359.size()));
+    auto i359 = 0u;
+    for (const auto &e359 : v359) {
+      sv359.set(i359, es.EntityId(e359));
+      ++i359;
+    }
+  } while (false);
+  do {
+    auto v360 = e.VisibleCategories();
+    auto sv360 = b.initVal360(static_cast<unsigned>(v360.size()));
+    auto i360 = 0u;
+    for (const auto &e360 : v360) {
+      sv360.set(i360, es.EntityId(e360));
+      ++i360;
+    }
+  } while (false);
+  do {
+    auto v361 = e.VisibleExtensions();
+    auto sv361 = b.initVal361(static_cast<unsigned>(v361.size()));
+    auto i361 = 0u;
+    for (const auto &e361 : v361) {
+      sv361.set(i361, es.EntityId(e361));
+      ++i361;
     }
   } while (false);
 }

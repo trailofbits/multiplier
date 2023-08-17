@@ -299,11 +299,17 @@ struct TokenTreeSerializationSchedule {
       id.offset = static_cast<unsigned>(tokens.size());
 
       const void *raw_pt = nullptr;
-      if (std::optional<pasta::Token> pt = node.Token()) {
+
+      if (std::optional<pasta::PrintedToken> pt = node.PrintedToken()) {
         id.kind = TokenKindFromPasta(pt.value());
         raw_pt = pt->RawToken();
-        DCHECK(!IsParsedToken(pt.value()) == !em.token_tree_ids.count(raw_pt));
-        CHECK(parsed_token_index.emplace(pt->RawToken(), id.offset).second);
+        CHECK(em.token_tree_ids.contains(raw_pt));
+        CHECK(parsed_token_index.emplace(raw_pt, id.offset).second);
+
+      } else if (std::optional<pasta::Token> mt = node.Token()) {
+        id.kind = TokenKindFromPasta(mt.value());
+        raw_pt = mt->RawToken();
+        DCHECK(!IsParsedToken(mt.value()) == !em.token_tree_ids.count(raw_pt));
 
       } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
         id.kind = TokenKindFromPasta(ft.value());
@@ -363,28 +369,6 @@ struct TokenTreeSerializationSchedule {
       : pf(pf_),
         em(em_) {}
 };
-
-// Get the list of parsed tokens.
-static std::vector<pasta::Token> FindParsedTokens(
-    const PendingFragment &pf) {
-  std::vector<pasta::Token> parsed_toks;
-  
-  if (pf.printed_tokens) {
-    for (pasta::PrintedToken tok : *(pf.printed_tokens)) {
-      auto parsed_tok = tok.DerivedLocation();
-      CHECK(parsed_tok.has_value());
-      CHECK(IsParsedToken(parsed_tok.value()));
-      parsed_toks.emplace_back(std::move(parsed_tok.value()));
-    }
-  } else {
-    for (pasta::Token tok : pf.parsed_tokens) {
-      if (IsParsedToken(tok)) {
-        parsed_toks.emplace_back(std::move(tok));
-      }
-    }
-  }
-  return parsed_toks;
-}
 
 static void VisitMacros(
     PendingFragment &pf, EntityMapper &em, const pasta::Macro &macro,
@@ -454,8 +438,7 @@ void VisitMacros(
 static void PersistParsedTokens(
     mx::DatabaseWriter &database,
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
-    TokenProvenanceCalculator &provenance,
-    const std::vector<pasta::Token> &parsed_tokens) {
+    TokenProvenanceCalculator &provenance) {
 
   std::string utf8_fragment_data;
 
@@ -465,10 +448,10 @@ static void PersistParsedTokens(
     VisitMacros(pf, em, tlm, macros_to_serialize);
   }
 
-  provenance.Init(pf.fragment_index, parsed_tokens, pf.printed_tokens);
+  provenance.Init(pf.fragment_index, pf.parsed_tokens);
 
   unsigned num_macros = static_cast<unsigned>(macros_to_serialize.size());
-  unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
+  unsigned num_parsed_tokens = static_cast<unsigned>(pf.parsed_tokens.size());
   unsigned num_tokens = num_parsed_tokens;
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
@@ -480,23 +463,10 @@ static void PersistParsedTokens(
   auto i = 0u;
 
   // Serialize the tokens.
-  for (const pasta::Token &tok : parsed_tokens) {
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
     pto2i.set(i, i);  // Parsed tokens to macro tokens.
     mti2po.set(i, i);  // Macro tokens to parsed tokens.
     mti2mi.set(i, mx::kInvalidEntityId);  // Mapping of token to containing macros.
-
-    if (std::optional<pasta::MacroToken> mt = tok.MacroLocation()) {
-      if (auto pm = mt->Parent()) {
-        mx::RawEntityId eid = em.EntityId(pm.value());
-        mx::VariantId vid = mx::EntityId(eid).Unpack();
-        if (std::holds_alternative<mx::MacroId>(vid)) {
-          mx::MacroId mid = std::get<mx::MacroId>(vid);
-          if (mid.fragment_id == pf.fragment_index) {
-            mti2mi.set(i, eid);
-          }
-        }
-      }
-    }
 
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
     tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
@@ -532,14 +502,35 @@ static void PersistParsedTokens(
 
 // Combine all parsed tokens into a string for diagnostic purposes.
 static std::string DiagnoseParsedTokens(
-    const std::vector<pasta::Token> &parsed_tokens) {
+    const pasta::PrintedTokenRange &parsed_tokens) {
   std::stringstream ss;
   auto sep = "";
-  for (const pasta::Token &tok : parsed_tokens) {
+  for (pasta::PrintedToken tok : parsed_tokens) {
     ss << sep << tok.Data();
     sep = " ";
   }
   return ss.str();
+}
+
+
+static std::string MainSourceFile(const pasta::AST &ast) {
+  return ast.MainFile().Path().generic_string();
+}
+
+static std::string MainSourceFile(const PendingFragment &pf) {
+  if (!pf.top_level_decls.empty()) {
+    return MainSourceFile(pasta::AST::From(pf.top_level_decls.front()));
+
+  } else if (!pf.top_level_macros.empty()) {
+    return MainSourceFile(pasta::AST::From(pf.top_level_macros.front()));
+
+  } else if (pf.original_tokens && !pf.original_tokens->empty()) {
+    return MainSourceFile(pasta::AST::From(
+        pf.original_tokens->Front().value()));
+  
+  } else {
+    return "<unknown file>";
+  }
 }
 
 // Persist the token tree, which is a tree of substitutions, i.e. before/after
@@ -551,8 +542,7 @@ static std::string DiagnoseParsedTokens(
 static void PersistTokenTree(
     mx::DatabaseWriter &database,
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
-    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance,
-    const std::vector<pasta::Token> &parsed_tokens) {
+    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance) {
 
   TokenTreeSerializationSchedule sched(pf, em);
   sched.Schedule(nodes);
@@ -564,7 +554,7 @@ static void PersistTokenTree(
 //#endif
 
   unsigned num_macros = static_cast<unsigned>(pf.macros_to_serialize.size());
-  unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
+  unsigned num_parsed_tokens = static_cast<unsigned>(pf.parsed_tokens.size());
   unsigned num_tokens = static_cast<unsigned>(sched.tokens.size());
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
@@ -576,8 +566,10 @@ static void PersistTokenTree(
 
   size_t data_reserve = 128u;
   for (const TokenTreeNode &tok_node : sched.tokens) {
-    if (auto pt = tok_node.Token()) {
+    if (auto pt = tok_node.PrintedToken()) {
       data_reserve += pt->Data().size();
+    } else if (auto mt = tok_node.Token()) {
+      data_reserve += mt->Data().size();
     } else if (auto ft = tok_node.FileToken()) {
       data_reserve += ft->Data().size();
     }
@@ -590,7 +582,8 @@ static void PersistTokenTree(
   for (const TokenTreeNode &tok_node : sched.tokens) {
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
 
-    std::optional<pasta::Token> pt = tok_node.Token();
+    std::optional<pasta::Token> mt = tok_node.Token();
+    std::optional<pasta::PrintedToken> pt = tok_node.PrintedToken();
     std::optional<pasta::FileToken> ft = tok_node.FileToken();
 
     dt.set(i, provenance.DerivedTokenId(tok_node));
@@ -600,16 +593,19 @@ static void PersistTokenTree(
       AccumulateTokenData(utf8_fragment_data, pt.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(pt.value())));
 
+    } else if (mt) {
+      AccumulateTokenData(utf8_fragment_data, mt.value());
+      tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(mt.value())));
+
     } else if (ft) {
       AccumulateTokenData(utf8_fragment_data, ft.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(ft.value())));
 
     } else {
-      auto ast = pasta::AST::From(parsed_tokens.front());
       LOG(FATAL)
           << "Missing parsed/file token for token node in source file "
-          << ast.MainFile().Path().generic_string() << " with parsed tokens "
-          << DiagnoseParsedTokens(parsed_tokens);
+          << MainSourceFile(pf) << " with parsed tokens "
+          << DiagnoseParsedTokens(pf.parsed_tokens);
     }
 
     // Associate this token node with a parsed token. Generally this can be
@@ -651,7 +647,7 @@ static void PersistTokenTree(
   // get into the token kinds/data.
   auto pto2i = fb.initParsedTokenOffsetToIndex(num_parsed_tokens);
   i = 0u;
-  for (const pasta::Token &parsed_tok : parsed_tokens) {
+  for (pasta::PrintedToken parsed_tok : pf.parsed_tokens) {
     auto it = sched.parsed_token_index.find(parsed_tok.RawToken());
     if (it != sched.parsed_token_index.end()) {
       auto mi = static_cast<mx::EntityOffset>(it->second);
@@ -659,7 +655,6 @@ static void PersistTokenTree(
       CHECK_EQ(mti2po[mi], i);  // Should be set.
 
     } else {
-      auto ast = pasta::AST::From(parsed_tokens.front());
       if (!pf.decls_to_serialize.empty()) {
         auto err = PrefixedLocation(pf.decls_to_serialize[0],
                                     "Token tree didn't cover code near ");
@@ -670,8 +665,8 @@ static void PersistTokenTree(
           << "TokenTree nodes didn't cover parsed token '" << parsed_tok.Data()
           << "' at index " << i << " (PTI " << parsed_tok.Index()
           << ") in parsed token list from source file "
-          << ast.MainFile().Path().generic_string() << " with parsed tokens "
-          << DiagnoseParsedTokens(parsed_tokens);
+          << MainSourceFile(pf) << " with parsed tokens "
+          << DiagnoseParsedTokens(pf.parsed_tokens);
     }
     ++i;
   }
@@ -759,20 +754,6 @@ static mx::RawEntityId IdOfRedeclInFragment(
   }
 
   return ret_id;
-}
-
-
-static void PersistEmptyTokenContexts(
-    const std::vector<pasta::Token> &parsed_tokens,
-    mx::rpc::Fragment::Builder &fb) {
-
-  (void) fb.initParsedTokenContexts(0u);
-
-  unsigned num_tokens = static_cast<unsigned>(parsed_tokens.size());
-  auto tco_list = fb.initParsedTokenContextOffsets(num_tokens);
-  for (auto i = 0u; i < num_tokens; ++i) {
-    tco_list.set(i, 0u);
-  }
 }
 
 // Persist the token contexts. The token contexts are a kind of inverted tree,
@@ -975,8 +956,7 @@ static void PersistTokenContexts(
 // and partially so that we can do things like print out fragments, or chunks
 // thereof.
 void GlobalIndexingState::PersistFragment(
-    const pasta::AST &ast, const pasta::TokenRange &tokens,
-    NameMangler &mangler, EntityMapper &em,
+    const pasta::AST &ast, NameMangler &mangler, EntityMapper &em,
     TokenProvenanceCalculator &provenance, PendingFragment &pf) {
 
   ProgressBarWork fragment_progress_tracker(fragment_progress);
@@ -996,8 +976,6 @@ void GlobalIndexingState::PersistFragment(
 
   // Serialize all discovered entities.
   SerializePendingFragment(database, pf, em);
-
-  std::vector<pasta::Token> parsed_tokens = FindParsedTokens(pf);
 
   // List of fragments IDs, where index `0` is this fragment's immediate parent.
   auto ids = fb.initParentIds(
@@ -1045,11 +1023,11 @@ void GlobalIndexingState::PersistFragment(
   // fragment or its data.
   std::stringstream tok_tree_err;
   std::optional<TokenTreeNodeRange> maybe_tt = TokenTree::Create(
-      pf.parsed_tokens, pf.printed_tokens, tok_tree_err);
+      pf.original_tokens, pf.parsed_tokens, tok_tree_err);
 
   if (maybe_tt) {
     PersistTokenTree(database, pf, em, fb, std::move(maybe_tt.value()),
-                     provenance, parsed_tokens);
+                     provenance);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
@@ -1062,23 +1040,17 @@ void GlobalIndexingState::PersistFragment(
           << tok_tree_err.str() << " for top-level declaration "
           << DeclToString(leader_decl)
           << PrefixedLocation(leader_decl, " at or near ")
-          << " on main job file "
-          << ast.MainFile().Path().generic_string();
+          << " on main job file " << MainSourceFile(ast);
     } else {
       LOG(ERROR)
           << tok_tree_err.str() << " for macros on main job file "
-          << ast.MainFile().Path().generic_string();
+          << MainSourceFile(ast);
     }
 
-    PersistParsedTokens(database, pf, em, fb, provenance, parsed_tokens);
+    PersistParsedTokens(database, pf, em, fb, provenance);
   }
 
-  if (pf.printed_tokens) {
-    PersistTokenContexts(em, pf.printed_tokens.value(), pf.fragment_index, fb);
-  } else {
-    PersistEmptyTokenContexts(parsed_tokens, fb);
-  }
-
+  PersistTokenContexts(em, pf.parsed_tokens, pf.fragment_index, fb);
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
   LinkExternalReferencesInFragment(database, pf, em);
   LinkEntityNamesToFragment(database, pf, em);

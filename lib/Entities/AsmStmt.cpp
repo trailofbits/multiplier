@@ -238,6 +238,15 @@ gap::generator<Expr> AsmStmt::outputs(void) const & {
   co_return;
 }
 
+gap::generator<std::string_view> AsmStmt::output_constraints(void) const & {
+  auto list = impl->reader.getVal61();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+co_yield std::string_view(v.cStr(), v.size());
+  }
+  co_return;
+}
+
 unsigned AsmStmt::num_output_expressions(void) const {
   return impl->reader.getVal27().size();
 }
@@ -270,8 +279,8 @@ gap::generator<Expr> AsmStmt::output_expressions(void) const & {
   co_return;
 }
 
-gap::generator<std::string_view> AsmStmt::output_constraints(void) const & {
-  auto list = impl->reader.getVal61();
+gap::generator<std::string_view> AsmStmt::input_constraints(void) const & {
+  auto list = impl->reader.getVal62();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
@@ -307,15 +316,6 @@ gap::generator<Expr> AsmStmt::input_expressions(void) const & {
         co_yield std::move(*e);
       }
     }
-  }
-  co_return;
-}
-
-gap::generator<std::string_view> AsmStmt::input_constraints(void) const & {
-  auto list = impl->reader.getVal62();
-  EntityProviderPtr ep = impl->ep;
-  for (auto v : list) {
-co_yield std::string_view(v.cStr(), v.size());
   }
   co_return;
 }

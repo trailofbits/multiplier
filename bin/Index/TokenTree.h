@@ -138,8 +138,8 @@ class TokenTree {
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static std::optional<TokenTreeNodeRange>
-  Create(const pasta::TokenRange &range,
-         const std::optional<pasta::PrintedTokenRange> &printed_range,
+  Create(const std::optional<pasta::TokenRange> &range,
+         const pasta::PrintedTokenRange &printed_range,
          std::ostream &err);
 
   // Dump.

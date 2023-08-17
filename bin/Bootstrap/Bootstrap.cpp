@@ -228,7 +228,7 @@ std::string SnakeCaseToEnumCase(std::string_view name) {
 const char *CxxIntType(const pasta::Type &type) {
   auto t = type;
   if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
-    switch (bt->Kind()) {
+    switch (bt->BuiltinKind()) {
       case pasta::BuiltinTypeKind::kBoolean: return "bool";
       case pasta::BuiltinTypeKind::kCharacterS: return "char";  // `char`.
       case pasta::BuiltinTypeKind::kCharacterU: return "char";  // `char`.

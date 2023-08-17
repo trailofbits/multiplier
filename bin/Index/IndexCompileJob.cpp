@@ -1202,36 +1202,60 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
 
 static PendingFragmentPtr CreatePendingFragment(
     mx::DatabaseWriter &database, EntityMapper &em,
-    const pasta::TokenRange &frag_tok_range,
+    const pasta::TokenRange *original_tokens,
+    const pasta::PrintedTokenRange &parsed_tokens,
     const std::optional<FileLocationOfFragment> &floc,
     mx::PackedCompilationId tu_id,
     std::vector<pasta::Decl> decls,
     std::vector<pasta::Macro> macros,
     std::optional<mx::PackedFragmentId> &root_fragment_id) {
 
-  // Compute the fragment ID, and in doing so, 
+  // The number of tokens is used to estimate the "size" of this fragment.
+  // Mostly, it's a proxy of the complexity of the macro expansions as well.
+  // The size of the fragment affects which encoding format we use: the "big"
+  // fragment ID encoding scheme (i.e. has lots of stuff, but we can't encode
+  // as many of them), or the small one (i.e. doesn't have as much stuff, and
+  // we can encode substantially more of them).
+  size_t num_tokens = 0u;
+  if (original_tokens && *original_tokens) {
+    num_tokens = original_tokens->Size();
+
+  } else {
+    num_tokens = parsed_tokens.Size();
+  }
+
+  // Compute the fragment ID, and in doing so, figure out if this is actually
+  // a new fragment.
   bool is_new_fragment_id = false;
   PendingFragmentPtr pf(new PendingFragment(
       database.GetOrCreateFragmentIdForHash(
           (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
-          HashFragment(decls, macros, frag_tok_range),
-          frag_tok_range.Size()  /* num_tokens */,
+          HashFragment(decls, macros, original_tokens, parsed_tokens),
+          num_tokens,
           is_new_fragment_id  /* mutated by reference */),
       tu_id,
       em,
-      tok_range));
+      original_tokens,
+      parsed_tokens));
 
   pf->is_new = is_new_fragment_id;
   pf->file_location = std::move(floc);
   pf->num_top_level_declarations = static_cast<unsigned>(decls.size());
   pf->num_top_level_macros = static_cast<unsigned>(macros.size());
 
-  any_new = any_new || is_new_fragment_id;
+  // if (frag_tok_range) {
+  //   pf->parsed_tokens = *frag_tok_range;
+  // }
+
+  // if (decl_tok_range) {
+  //   pf->printed_tokens = *decl_tok_range;
+  // }
+
+  // any_new = any_new || is_new_fragment_id;
 
   if (root_fragment_id.has_value()) {
-    CHECK_EQ(top_level_decls.size(), 1u);
-    CHECK(top_level_macros.empty());
-    CHECK_NE(pf.fragment_id.Pack(), root_fragment_id.value().Pack());
+    CHECK_EQ(decls.size(), 1u);
+    CHECK_NE(pf->fragment_id.Pack(), root_fragment_id.value().Pack());
     pf->parent_fragment_ids.push_back(root_fragment_id.value());
   }
 
@@ -1241,6 +1265,54 @@ static PendingFragmentPtr CreatePendingFragment(
   pf->top_level_macros = std::move(macros);
 
   return pf;
+}
+
+// Create a printed token range for a sequence of declarations, and make it
+// represent the parsed tokens.
+static pasta::PrintedTokenRange CreateParsedTokenRange(
+    const pasta::PrintedTokenRange &parsed_tokens,
+    const std::vector<pasta::Decl> &root_decls,
+    const std::vector<pasta::Decl> &child_decls,
+    const pasta::PrintingPolicy &pp) {
+  
+  if (root_decls.empty()) {
+    if (child_decls.empty()) {
+      CHECK(!parsed_tokens);
+      return parsed_tokens;
+    } else {
+      return CreateParsedTokenRange(parsed_tokens, child_decls, root_decls, pp);
+    }
+  }
+
+  CHECK(!root_decls.empty());
+
+  // Print the root declarations one after the other, and then try to apply the
+  // alignment algorithm.
+  pasta::PrintedTokenRange printed_tokens =
+      pasta::PrintedTokenRange::Create(root_decls.front());
+  for (auto i = 1u; i < root_decls.size(); ++i) {
+    auto concat = pasta::PrintedTokenRange::Concatenate(
+        printed_tokens,
+        pasta::PrintedTokenRange::Create(root_decls[i]));
+    CHECK(concat.has_value());
+    printed_tokens = std::move(concat.value());
+  }
+
+  // If the alignment algorithm succeeds, then we will have token contexts
+  // for each of the parsed tokens.
+  auto maybe_aligned_tokens = pasta::PrintedTokenRange::Align(
+      parsed_tokens, printed_tokens);
+
+  if (maybe_aligned_tokens.Succeeded()) {
+    return maybe_aligned_tokens.TakeValue();
+
+  // It's not fatal if we can't match them here, because this is really a
+  // kind of implicit fragment anyway.
+  } else {
+    LOG(ERROR)
+        << "Unable to align tokens: " << maybe_aligned_tokens.TakeError();
+    return parsed_tokens;
+  }
 }
 
 static void CreatePendingFragment(
@@ -1302,6 +1374,11 @@ static void CreatePendingFragment(
   std::vector<pasta::Decl> forward_decls;
   const std::vector<pasta::Macro> empty_macros;
   std::vector<pasta::Macro> top_level_macros;
+  std::optional<mx::PackedFragmentId> root_fragment_id;
+  std::optional<FileLocationOfFragment> empty_floc;
+  PendingFragmentPtr pf;
+
+  const pasta::PrintingPolicy empty_pp;
 
   // Partition the top-level declarations so that ones that definitely won't
   // need to go in a nested fragment show up first. This acts as a minor
@@ -1323,15 +1400,24 @@ static void CreatePendingFragment(
       // `typedef`.
       } else if (IsInjectedForwardDeclaration(decl) || !floc ||
                  decl.IsImplicit()) {
-        
-        pasta::Tokens decl_tokens = decl.Tokens();
-        CHECK(!decl_tokens.empty());
+
+        pasta::PrintedTokenRange printed_toks =
+            pasta::PrintedTokenRange::Create(
+                decl, empty_pp, false  /* keep_provenance */);
+
+        // NOTE(pag): We pass `nullptr` as the parsed tokens, because we can't
+        //            guarantee that the parsed tokens aren't the result of
+        //            macro expansions.
         forward_decls.emplace_back(decl);
-        
-        std::optional<FileLocationOfFragment> empty_floc;
-        PendingFragmentPtr pf = CreatePendingFragment(
-            database, em, decl_tokens, empty_floc, tu_id,
-            std::move(forward_decls), empty_macros, root_fragment_id);
+        pf = CreatePendingFragment(
+            database, em,
+            nullptr  /* original_tokens */,
+            printed_toks  /* parsed_tokens */,
+            empty_floc,
+            tu_id,
+            std::move(forward_decls),
+            empty_macros,
+            root_fragment_id);
 
         LabelDeclsInFragment(*pf, em);
 
@@ -1361,13 +1447,25 @@ static void CreatePendingFragment(
 
   std::vector<PendingFragmentPtr> local_pending_fragments;
 
+  pasta::PrintingPolicy pp;
+  pasta::PrintedTokenRange parsed_tokens =
+      pasta::PrintedTokenRange::Adopt(frag_tok_range);
+
   // Create the root fragment.
-  std::optional<mx::PackedFragmentId> root_fragment_id;
   if (!root_decls.empty() || (nested_decls.empty() &&
                               !top_level_macros.empty())) {
-    PendingFragmentPtr pf = CreatePendingFragment(
-        database, em, frag_tok_range, floc, tu_id, std::move(root_decls),
-        top_level_macros  /* copied */, root_fragment_id);
+
+    CHECK(forward_decls.empty());
+    pasta::PrintedTokenRange aligned_tokens =
+        CreateParsedTokenRange(parsed_tokens, root_decls, forward_decls, pp);
+
+    pf = CreatePendingFragment(
+        database,
+        em,
+        &frag_tok_range  /* original_tokens */,
+        aligned_tokens  /* parsed_tokens */,
+        floc, tu_id, std::move(root_decls), top_level_macros  /* copied */,
+        root_fragment_id);
   
     root_fragment_id = pf->fragment_id;
 
@@ -1380,9 +1478,20 @@ static void CreatePendingFragment(
 
   // Create the nested fragments for the root fragment. These correspond to
   // things like template specializations/isntantiations.
-  for (const pasta::Decl &nested_decl : nested_decls) {
-    PendingFragmentPtr pf = CreatePendingFragment(
-        database, em, frag_tok_range, floc, tu_id, std::move(root_decls),
+  for (std::vector<pasta::Decl> &decls : nested_decls) {
+    CHECK_EQ(decls.size(), 1ul);
+    CHECK(root_fragment_id.has_value());
+
+    pasta::PrintedTokenRange aligned_tokens =
+        CreateParsedTokenRange(parsed_tokens, root_decls, decls, pp);
+
+    pf = CreatePendingFragment(
+        database,
+        em,
+        &frag_tok_range  /* original_tokens */,
+        aligned_tokens  /* parsed_tokens */,
+        floc, tu_id,
+        std::move(decls),
         top_level_macros  /* copied */, root_fragment_id);
 
     LabelDeclsInFragment(*pf, em);
@@ -1552,7 +1661,6 @@ static void PersistParsedFragments(
     TokenProvenanceCalculator &provenance, mx::PackedCompilationId tu_id,
     std::vector<PendingFragmentPtr> pending_fragments) {
 
-  pasta::TokenRange tok_range = ast.Tokens();
   NameMangler mangler(ast, tu_id);
 
   std::string main_source_file = ast.MainFile().Path().generic_string();
@@ -1570,7 +1678,7 @@ static void PersistParsedFragments(
     auto start_time = std::chrono::system_clock::now();
     try {
       em.ResetForFragment();
-      context.PersistFragment(ast, tok_range, mangler, em, provenance, *pf);
+      context.PersistFragment(ast, mangler, em, provenance, *pf);
       context.PersistTypes(ast, mangler, em, *pf);
     } catch (...) {
       pf->has_error = true;

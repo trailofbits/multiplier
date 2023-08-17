@@ -1277,8 +1277,9 @@ bool TokenProvenanceCalculator::Push(void) {
 // This is the version containing all toekn tree nodes. `tokens` is generally
 // already in the order we want it to be in, but we can't guarantee this long
 // term, so we implement a sorting procedure.
-void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
-                                     const std::vector<TokenTreeNode> &tokens) {
+void TokenProvenanceCalculator::Init(
+    mx::RawEntityId fragment_index_, const std::vector<TokenTreeNode> &tokens) {
+
   Clear();
   fragment_index = fragment_index_;
 
@@ -1323,6 +1324,11 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
       rel_id = RelatedEntityIdToMacroToken(em, ml.value());
     }
 
+    if (tok_id == mx::kInvalidEntityId && fl) {
+      assert(false);
+      tok_id = em.EntityId(fl.value());
+    }
+
     // Hash the data. Data equivalence helps to prioritize the propagation of
     // info.
     if (pl) {
@@ -1347,6 +1353,10 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
 
     if (pl) {
       info_map.emplace(pl->RawToken(), &info);
+    }
+
+    if (cl) {
+      info_map.emplace(cl->RawToken(), &info);
     }
 
     if (ml) {
@@ -1376,38 +1386,56 @@ void TokenProvenanceCalculator::Init(mx::RawEntityId fragment_index_,
 
 // This is the backup version when `tokens` only contains parsed tokens.
 void TokenProvenanceCalculator::Init(
-    mx::RawEntityId fragment_index_, const std::vector<pasta::Token> &tokens,
-    const std::optional<pasta::PrintedTokenRange> &printed_toks) {
+    mx::RawEntityId fragment_index_,
+    const pasta::PrintedTokenRange &tokens) {
 
   Clear();
   fragment_index = fragment_index_;
 
-  const bool has_printed = printed_toks.has_value();
-  for (const pasta::Token &tok : tokens) {
-    bool is_parsed = IsParsedToken(tok);
-    if (is_parsed && has_printed) {
-      continue;  // Dealt with below.
-    }
+  for (pasta::PrintedToken tok : tokens) {
+    std::optional<pasta::Token> pl = tok.DerivedLocation();
+    std::optional<pasta::MacroToken> ml;
+    std::optional<pasta::FileToken> fl;
 
-    std::optional<pasta::MacroToken> ml = tok.MacroLocation();
     mx::RawEntityId tok_id = em.EntityId(tok);
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
     mx::RawEntityId parsed_id = mx::kInvalidEntityId;
 
-    if (is_parsed) {
-      parsed_id = tok_id;
+    if (pl) {
+      const pasta::Token &parsed_tok = pl.value();
+      ml = parsed_tok.MacroLocation();
+      fl = parsed_tok.FileLocation();
 
-    } else if (ml) {
-      rel_id = RelatedEntityIdToMacroToken(em, ml.value());
+      if (tok_id == mx::kInvalidEntityId) {
+        tok_id = em.EntityId(parsed_tok);
+      }
+
+      if (IsParsedToken(parsed_tok)) {
+        parsed_id = em.EntityId(parsed_tok);
+        rel_id = RelatedEntityIdToParsedToken(em, tok, parsed_tok);
+
+      } else if (ml) {
+        assert(false);
+        rel_id = RelatedEntityIdToMacroToken(em, ml.value());
+      }
+    }
+
+    if (tok_id == mx::kInvalidEntityId && fl) {
+      tok_id = em.EntityId(fl.value());
     }
 
     TokenInfo &info = infos.emplace_back(
         tok_id, kHasher(tok.Data()), rel_id, parsed_id);
-    info_map.emplace(tok.RawToken(), &info);
 
 #ifndef NDEBUG
     info.data = tok.Data();
 #endif
+
+    info_map.emplace(tok.RawToken(), &info);
+
+    if (pl) {
+      info_map.emplace(pl->RawToken(), &info);
+    }
 
     if (ml) {
       info_map.emplace(ml->RawMacro(), &info);
@@ -1416,34 +1444,12 @@ void TokenProvenanceCalculator::Init(
     ordered_tokens.push_back(&info);
   }
 
-  // Bring in the token contexts from the printed tokens.
-  if (printed_toks) {
-    for (pasta::PrintedToken tok : *printed_toks) {
-      std::optional<pasta::Token> parsed_tok = tok.DerivedLocation();
-      if (!parsed_tok || !IsParsedToken(*parsed_tok)) {
-        continue;
-      }
-
-      mx::RawEntityId rel_id = RelatedEntityIdToParsedToken(
-          em, tok, *parsed_tok);
-      mx::RawEntityId tok_id = em.EntityId(*parsed_tok);
-
-      TokenInfo &info = infos.emplace_back(
-          tok_id, kHasher(tok.Data()), rel_id, tok_id);
-      info_map.emplace(parsed_tok->RawToken(), &info);
-
-#ifndef NDEBUG
-      info.data = tok.Data();
-#endif
-
-      ordered_tokens.push_back(&info);
-    }
-  }
-
   // Do single-step connections between the tokens.
-  for (const pasta::Token &tok : tokens) {
-    TokenInfo *info = info_map[tok.RawToken()];
-    Connect(info, tok);
+  for (pasta::PrintedToken tok : tokens) {
+    if (std::optional<pasta::Token> pt = tok.DerivedLocation()) {
+      TokenInfo *info = info_map[tok.RawToken()];
+      Connect(info, pt.value());
+    }
   }
 
   Sort();
@@ -1452,6 +1458,16 @@ void TokenProvenanceCalculator::Init(
     changed = Pull();
     changed = Push() || changed;
   }
+}
+
+mx::RawEntityId TokenProvenanceCalculator::RelatedEntityId(
+    const pasta::PrintedToken &tok) {
+  auto info_it = info_map.find(tok.RawToken());
+  if (info_it != info_map.end()) {
+    TokenInfo *info = info_it->second;
+    return info->related_entity_id;
+  }
+  return mx::kInvalidEntityId;
 }
 
 mx::RawEntityId TokenProvenanceCalculator::RelatedEntityId(
@@ -1471,6 +1487,22 @@ mx::RawEntityId TokenProvenanceCalculator::RelatedEntityId(
     TokenInfo *info = info_it->second;
     return info->related_entity_id;
   }
+  return mx::kInvalidEntityId;
+}
+
+mx::RawEntityId TokenProvenanceCalculator::DerivedTokenId(
+    const pasta::PrintedToken &tok) {
+  
+  if (auto pl = tok.DerivedLocation()) {
+    return DerivedTokenId(pl.value());
+  }
+
+  auto info_it = info_map.find(tok.RawToken());
+  if (info_it != info_map.end()) {
+    TokenInfo *info = info_it->second;
+    return info->derived_token_id;
+  }
+
   return mx::kInvalidEntityId;
 }
 
@@ -1514,6 +1546,16 @@ mx::RawEntityId TokenProvenanceCalculator::DerivedTokenId(
 mx::RawEntityId TokenProvenanceCalculator::DerivedTokenId(
     const TokenTreeNode &tok) {
   return DerivedTokenId(tok.Token().value());
+}
+
+mx::RawEntityId TokenProvenanceCalculator::ParsedTokenId(
+    const pasta::PrintedToken &tok) {
+  auto info_it = info_map.find(tok.RawToken());
+  if (info_it != info_map.end()) {
+    TokenInfo *info = info_it->second;
+    return info->parsed_token_id;
+  }
+  return mx::kInvalidEntityId;
 }
 
 mx::RawEntityId TokenProvenanceCalculator::ParsedTokenId(

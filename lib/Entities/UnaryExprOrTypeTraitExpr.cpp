@@ -181,7 +181,7 @@ std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
   return std::nullopt;
 }
 
-UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::expression_or_trait_kind(void) const {
+UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::keyword_kind(void) const {
   return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal94());
 }
 

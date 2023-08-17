@@ -410,7 +410,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 static const char *SchemaIntType(pasta::Type type) {
   auto t = type;
   if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
-    switch (bt->Kind()) {
+    switch (bt->BuiltinKind()) {
       case pasta::BuiltinTypeKind::kBoolean: return "Bool";
       case pasta::BuiltinTypeKind::kCharacterS: return "Int8";  // `char`.
       case pasta::BuiltinTypeKind::kCharacterU: return "UInt8";  // `char`.
@@ -2790,17 +2790,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (snake_name == "is_this_declarationaration_a_demoted_definition") {
       snake_name = "is_demoted_definition";
-    
-    } else if (snake_name == "kind") {
-      if (class_name == "BuiltinType") {
-        snake_name = "builtin_kind";
-      } else if (class_name == "UnaryExprOrTypeTraitExpr") {
-        snake_name = "expression_or_trait_kind";
-      } else if (class_name == "CharacterLiteral") {
-        snake_name = "character_kind";
-      } else if (class_name == "StringLiteral") {
-        snake_name = "string_kind";
-      }
     
     } else if (snake_name == "kind_name") {
       if (class_name == "TagDecl") {

@@ -101,16 +101,20 @@ class TokenProvenanceCalculator {
 
   void Init(mx::RawEntityId fragment_index_,
             const std::vector<TokenTreeNode> &tokens);
-  void Init(mx::RawEntityId fragment_index_,
-            const std::vector<pasta::Token> &tokens,
-            const std::optional<pasta::PrintedTokenRange> &printed_toks);
 
+  void Init(mx::RawEntityId fragment_index_,
+            const pasta::PrintedTokenRange &printed_toks);
+
+
+  mx::RawEntityId RelatedEntityId(const pasta::PrintedToken &tok);
   mx::RawEntityId RelatedEntityId(const pasta::Token &tok);
   mx::RawEntityId RelatedEntityId(const TokenTreeNode &tok);
 
+  mx::RawEntityId DerivedTokenId(const pasta::PrintedToken &tok);
   mx::RawEntityId DerivedTokenId(const pasta::Token &tok);
   mx::RawEntityId DerivedTokenId(const TokenTreeNode &tok);
 
+  mx::RawEntityId ParsedTokenId(const pasta::PrintedToken &tok);
   mx::RawEntityId ParsedTokenId(const pasta::Token &tok);
   mx::RawEntityId ParsedTokenId(const TokenTreeNode &tok);
 };

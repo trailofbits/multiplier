@@ -82,6 +82,10 @@ Type TypeOfType::desugar(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+TypeOfKind TypeOfType::type_kind(void) const {
+  return static_cast<TypeOfKind>(impl->reader.getVal238());
+}
+
 Type TypeOfType::unmodified_type(void) const {
   RawEntityId eid = impl->reader.getVal230();
   return Type(impl->ep->TypeFor(impl->ep, eid));

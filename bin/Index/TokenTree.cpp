@@ -191,8 +191,17 @@ class TokenTreeImpl {
   // file tokens that were elided due to things like conditional macros, e.g.
   // `#if 0`.
   TokenInfo *BuildInitialTokenList(
+      const std::optional<pasta::TokenRange> &range,
+      const pasta::PrintedTokenRange &printed_range,
+      std::ostream &err);
+
+  TokenInfo *BuildParsedTokenList(
       const pasta::TokenRange &range,
-      const std::optional<pasta::PrintedTokenRange> &printed_range,
+      const pasta::PrintedTokenRange &printed_range,
+      std::ostream &err);
+
+  TokenInfo *BuildPrintedTokenList(
+      const pasta::PrintedTokenRange &printed_range,
       std::ostream &err);
 
   Substitution *GetMacroBody(pasta::DefineMacroDirective def,
@@ -965,20 +974,67 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 // file tokens that were elided due to things like conditional macros, e.g.
 // `#if 0`.
 TokenInfo *TokenTreeImpl::BuildInitialTokenList(
-    const pasta::TokenRange &range,
-    const std::optional<pasta::PrintedTokenRange> &printed_range,
+    const std::optional<pasta::TokenRange> &range,
+    const pasta::PrintedTokenRange &printed_range,
     std::ostream &err) {
+
+  if (range.has_value()) {
+    return BuildParsedTokenList(range.value(), printed_range, err);
+
+  } else if (printed_range) {
+    return BuildPrintedTokenList(printed_range, err);
+
+  } else {
+    err << "Empty parsed and printed token ranges.";
+    return nullptr;
+  }
+}
+
+TokenInfo *TokenTreeImpl::BuildPrintedTokenList(
+    const pasta::PrintedTokenRange &range, std::ostream &err) {
+
+  for (pasta::PrintedToken tok : range) {
+    
+    TokenInfo &info = tokens_alloc.emplace_back();
+    info.printed_tok = tok;
+    info.category = TokenInfo::kFileToken;
+    info.is_part_of_sub = true;
+    info.parsed_tok = tok.DerivedLocation();
+
+    if (info.parsed_tok) {
+      info.file_tok = info.parsed_tok->FileLocation();
+
+      if (info.file_tok) {
+        nth_file_token.emplace(
+            std::make_pair(info.file_tok->RawFile(), info.file_tok->Index()),
+            &info);
+      }
+    }
+  }
+
+  // Link all of the tokens together.
+  if (auto num_toks = tokens_alloc.size()) {
+    for (auto i = 1ull, j = 0ull; i < num_toks; ++i, ++j) {
+      tokens_alloc[j].next = &(tokens_alloc[i]);
+    }
+
+    return &(tokens_alloc.front());
+  }
+
+  err << "Cannot create token tree from empty token range";
+  return nullptr;
+}
+
+TokenInfo *TokenTreeImpl::BuildParsedTokenList(
+    const pasta::TokenRange &range,
+    const pasta::PrintedTokenRange &printed_range,
+    std::ostream &err) {
+
   int macro_depth = 0;
   TokenInfo *last_macro_use_token = nullptr;
 
-
   size_t next_printed_tok = 1u;
-  size_t num_printed_toks = 0u;
-  std::optional<pasta::PrintedToken> npt;
-  if (printed_range) {
-    num_printed_toks = printed_range->Size();
-    npt = (*printed_range)[0];
-  }
+  std::optional<pasta::PrintedToken> npt = printed_range.At(0);
 
   for (pasta::Token tok : range) {
     TokenInfo &info = tokens_alloc.emplace_back();
@@ -1008,9 +1064,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(
       }
 
       npt.reset();
-      if (next_printed_tok < num_printed_toks) {
-        npt = (*printed_range)[next_printed_tok++];
-      }
+      npt = printed_range.At(next_printed_tok++);
     }
 
     switch (tok.Role()) {
@@ -2298,7 +2352,8 @@ Substitution *TokenTreeImpl::BuildSubstitutionsIter(
     // the issue of unbalanced BOF/EOF tokens in `IndexCompileJob.cpp` by
     // identifying when decls include `EOF` markers, and then expanding their
     // ranges to contain the associated `#include` directive.
-    if (curr->parsed_tok->Role() == pasta::TokenRole::kEndOfFileMarker) {
+    if (curr->parsed_tok &&
+        curr->parsed_tok->Role() == pasta::TokenRole::kEndOfFileMarker) {
       prev = curr;
       curr = curr->next;
       continue;
@@ -2684,8 +2739,8 @@ TokenTree::~TokenTree(void) {}
 // Create a token tree from the tokens in the inclusive range
 // `[begin_index, end_index]` from `range`.
 std::optional<TokenTreeNodeRange> TokenTree::Create(
-    const pasta::TokenRange &range,
-    const std::optional<pasta::PrintedTokenRange> &printed_range,
+    const std::optional<pasta::TokenRange> &range,
+    const pasta::PrintedTokenRange &printed_range,
     std::ostream &err) {
 
   auto impl = std::make_shared<TokenTreeImpl>();

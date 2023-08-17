@@ -177,7 +177,7 @@ std::string_view StringLiteral::bytes(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-StringLiteralStringKind StringLiteral::string_kind(void) const {
+StringLiteralStringKind StringLiteral::literal_kind(void) const {
   return static_cast<StringLiteralStringKind>(impl->reader.getVal94());
 }
 

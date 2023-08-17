@@ -57,9 +57,15 @@ mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
   if (auto it = entity_ids.find(entity); it != entity_ids.end()) {
     return it->second.Pack();
 
-  } else if (auto it2 = token_tree_ids.find(entity);
-             it2 != token_tree_ids.end()) {
-    return it2->second.Pack();
+  } else {
+    return PerFragmentEntityId(entity);
+  }
+}
+
+
+mx::RawEntityId EntityMapper::PerFragmentEntityId(const void *entity) const {
+  if (auto it = token_tree_ids.find(entity); it != token_tree_ids.end()) {
+    return it->second.Pack();
 
   } else if (auto eid = tm.EntityId(entity); eid != mx::kInvalidEntityId) {
     return eid;
@@ -137,8 +143,22 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   }
 }
 
+mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {
+  if (auto id = PerFragmentEntityId(entity.RawToken());
+      id != mx::kInvalidEntityId) {
+    return id;
+
+  } else if (auto pt = entity.DerivedLocation()) {
+    return EntityId(pt.value());
+  
+  } else {
+    return mx::kInvalidEntityId;
+  }
+}
+
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
-  if (auto id = EntityId(entity.RawMacro()); id != mx::kInvalidEntityId) {
+  if (auto id = PerFragmentEntityId(entity.RawMacro());
+      id != mx::kInvalidEntityId) {
     return id;
   } else {
     return EntityId(entity.ParsedLocation());

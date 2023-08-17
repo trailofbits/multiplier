@@ -41,12 +41,12 @@ struct Decl @0xfb5879761ffaedb6{
   val188 @26 :List(UInt64);
   val316 @27 :List(UInt64);
   val342 @28 :List(UInt64);
-  val344 @29 :List(UInt64);
-  val345 @30 :List(UInt64);
-  val350 @31 :List(UInt64);
-  val351 @32 :List(UInt64);
-  val352 @33 :List(UInt64);
-  val353 @34 :List(UInt64);
+  val352 @29 :List(UInt64);
+  val353 @30 :List(UInt64);
+  val358 @31 :List(UInt64);
+  val359 @32 :List(UInt64);
+  val360 @33 :List(UInt64);
+  val361 @34 :List(UInt64);
   val64 @35 :Text;
   val65 @36 :Text;
   val74 @37 :Text;
@@ -359,13 +359,21 @@ struct Decl @0xfb5879761ffaedb6{
   val340 @344 :Bool;
   val341 @345 :Bool;
   val343 @346 :Bool;
-  val346 @347 :Bool;
-  val347 @348 :Bool;
-  val348 @349 :Bool;
-  val349 @350 :Bool;
-  val11 @351 :UInt32;
-  val143 @352 :UInt32;
-  val189 @353 :UInt32;
+  val344 @347 :Bool;
+  val345 @348 :Bool;
+  val346 @349 :Bool;
+  val347 @350 :Bool;
+  val348 @351 :Bool;
+  val349 @352 :Bool;
+  val350 @353 :Bool;
+  val351 @354 :Bool;
+  val354 @355 :Bool;
+  val355 @356 :Bool;
+  val356 @357 :Bool;
+  val357 @358 :Bool;
+  val11 @359 :UInt32;
+  val143 @360 :UInt32;
+  val189 @361 :UInt32;
 }
 
 struct Stmt @0x91127d30fade9a32{
@@ -375,7 +383,7 @@ struct Stmt @0x91127d30fade9a32{
   val63 @3 :List(Text);
   val64 @4 :List(Text);
   val66 @5 :List(Text);
-  val67 @6 :List(Text);
+  val68 @6 :List(Text);
   val4 @7 :List(UInt64);
   val15 @8 :List(UInt64);
   val26 @9 :List(UInt64);
@@ -385,7 +393,7 @@ struct Stmt @0x91127d30fade9a32{
   val52 @13 :List(UInt64);
   val53 @14 :List(UInt64);
   val54 @15 :List(UInt64);
-  val68 @16 :List(UInt64);
+  val67 @16 :List(UInt64);
   val7 @17 :UInt8;
   val56 @18 :UInt8;
   val69 @19 :UInt8;

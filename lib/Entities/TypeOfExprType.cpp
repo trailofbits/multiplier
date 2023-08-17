@@ -83,6 +83,10 @@ Type TypeOfExprType::desugar(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+TypeOfKind TypeOfExprType::type_kind(void) const {
+  return static_cast<TypeOfKind>(impl->reader.getVal238());
+}
+
 Expr TypeOfExprType::underlying_expression(void) const {
   RawEntityId eid = impl->reader.getVal230();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();

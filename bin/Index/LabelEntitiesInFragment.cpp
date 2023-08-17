@@ -131,7 +131,7 @@ class EntityLabeller final : public EntityVisitor {
   // NOTE(pag): This labeling process is tightly coupled with how tokens are
   //            serialized into fragments, and how token trees are serialized
   //            into fragments.
-  bool Label(const pasta::Token &entity);
+  bool Label(const pasta::PrintedToken &entity);
 
   // Create initial macro IDs for all of the top-level macros in the range of
   // this fragment.
@@ -146,12 +146,8 @@ class EntityLabeller final : public EntityVisitor {
 // NOTE(pag): This labeling process is tightly coupled with how tokens are
 //            serialized into fragments, and how token trees are serialized
 //            into fragments.
-bool EntityLabeller::Label(const pasta::Token &entity) {
+bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
   CHECK(fragment.parsed_tokens.Contains(entity));
-
-  if (!IsParsedToken(entity)) {
-    return false;
-  }
   mx::ParsedTokenId id;    
   id.offset = next_parsed_token_index++;
   id.fragment_id = fragment.fragment_index;
@@ -277,7 +273,7 @@ void LabelTokensAndMacrosInFragment(PendingFragment &pf, EntityMapper &em) {
 
   // Visit all of the tokens; it's possible we came across something that was
   // missed by the above process.
-  for (pasta::Token tok : pf.parsed_tokens) {
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
     (void) labeller.Label(tok);
   }
 }

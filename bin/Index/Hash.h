@@ -18,6 +18,7 @@ class AST;
 class Decl;
 class File;
 class Macro;
+class PrintedTokenRange;
 class TokenRange;
 }  // namespace pasta
 namespace indexer {
@@ -40,7 +41,8 @@ std::string HashFile(std::string_view data);
 std::string HashFragment(
     const std::vector<pasta::Decl> &decls,
     const std::vector<pasta::Macro> &macros,
-    const pasta::TokenRange &frag_tok_range);
+    const pasta::TokenRange *frag_tok_range,
+    const pasta::PrintedTokenRange &decl_tok_range);
 
 // Hash the entire compilation.
 std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em);

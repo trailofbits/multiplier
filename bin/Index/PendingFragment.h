@@ -62,12 +62,17 @@ class PendingFragment {
   inline PendingFragment(mx::PackedFragmentId fragment_id_,
                          mx::PackedCompilationId tu_id_,
                          EntityMapper &em_,
-                         const pasta::TokenRange &parsed_tokens_)
+                         const pasta::TokenRange *original_tokens_,
+                         const pasta::PrintedTokenRange &parsed_tokens_)
       : fragment_id(fragment_id_),
         fragment_index(fragment_id.Unpack().fragment_id),
         compilation_id(tu_id_),
         em(em_),
-        parsed_tokens(parsed_tokens_) {}
+        parsed_tokens(parsed_tokens_) {
+    if (original_tokens_) {
+      original_tokens = *original_tokens_;
+    }
+  }
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::PackedFragmentId fragment_id;
@@ -84,9 +89,15 @@ class PendingFragment {
   // of entity mapper.
   EntityMapper &em;
 
+  // The original tokens of the fragment.
+  std::optional<pasta::TokenRange> original_tokens;
+
+  // Adopted tokens from `original_tokens`.
+  pasta::PrintedTokenRange parsed_tokens;
+
   // Parsed tokens, and printed tokens created by aligning parsed and printed
   // tokens.
-  pasta::TokenRange parsed_tokens;
+  // std::optional<pasta::TokenRange> parsed_tokens;
   std::optional<pasta::PrintedTokenRange> printed_tokens;
 
   std::optional<FileLocationOfFragment> file_location;
