@@ -1030,7 +1030,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
     const pasta::PrintedTokenRange &printed_range,
     std::ostream &err) {
 
-  int macro_depth = 0;
   TokenInfo *last_macro_use_token = nullptr;
 
   size_t next_printed_tok = 1u;
@@ -1079,7 +1078,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
         assert(tok.FileLocation().has_value());
         info.category = TokenInfo::kMarkerToken;
         last_macro_use_token = &info;
-        ++macro_depth;
         break;
       }
 
@@ -1092,15 +1090,11 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
             last_macro_use_token->file_tok->Index() + 1u);
         info.category = TokenInfo::kMarkerToken;
         last_macro_use_token = nullptr;
-        --macro_depth;
-        assert(0 <= macro_depth);
         break;
       }
 
       case pasta::TokenRole::kInitialMacroUseToken: {
         assert(!is_parsed_tok);
-        assert(0 < macro_depth);
-        assert(last_macro_use_token != nullptr);
         info.category = TokenInfo::kMacroUseToken;
         info.is_part_of_sub = true;
         assert(info.file_tok.has_value());
@@ -1111,7 +1105,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken: {
         assert(!is_parsed_tok);
-        assert(0 < macro_depth);
         assert(last_macro_use_token != nullptr);
         info.category = TokenInfo::kMacroStepToken;
         assert(info.macro_tok.has_value());
@@ -1119,7 +1112,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
       }
 
       case pasta::TokenRole::kFinalMacroExpansionToken: {
-        assert(0 < macro_depth);
         assert(last_macro_use_token != nullptr);
         assert(info.macro_tok.has_value());
         info.category = TokenInfo::kMacroExpansionToken;
@@ -1135,7 +1127,6 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
       }
 
       case pasta::TokenRole::kFileToken: {
-        assert(!macro_depth);
         assert(!last_macro_use_token);
         assert(info.file_tok.has_value());
         assert(info.file_tok->Data() == tok.Data());
@@ -1146,15 +1137,12 @@ TokenInfo *TokenTreeImpl::BuildParsedTokenList(
 
       case pasta::TokenRole::kEndOfInternalMacroEventMarker: {
         assert(!is_parsed_tok);
-        assert(macro_depth);
         assert(last_macro_use_token);
         info.category = TokenInfo::kMarkerToken;
         break;
       }
     }
   }
-
-  (void) macro_depth;
 
   // Link all of the tokens together.
   if (auto num_toks = tokens_alloc.size()) {
@@ -1174,7 +1162,13 @@ Substitution *TokenTreeImpl::CreateSubstitution(mx::MacroKind kind_) {
 }
 
 static pasta::Macro RootNodeFrom(const pasta::Macro &node) {
-  if (auto parent = node.Parent()) {
+  
+  // NOTE(pag): We extract macro directives into their own (nested) fragments,
+  //            even if they are logically nested within a macro use.
+  if (pasta::MacroDirective::From(node)) {
+    return node;
+  
+  } else if (auto parent = node.Parent()) {
     return RootNodeFrom(parent.value());
   } else {
     return node;
@@ -1777,7 +1771,14 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     }
   }
 
-  if (!curr || !curr->macro_tok) {
+  // Walked off the end of the list. Probably because the root macro is
+  // actually a directive, and so we're dealing with a token range that
+  // doesn't have our begin/end macro markers.
+  if (!curr) {
+    return sub;
+  }
+
+  if (!curr->macro_tok) {
     assert(false);
     err << "Failed to find the next macro token";
     return nullptr;
@@ -2382,12 +2383,27 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
         continue;
 
       // Inside of a macro expansion region; this shoudln't happen.
-      case TokenInfo::kMacroUseToken:
       case TokenInfo::kMacroStepToken:
       case TokenInfo::kMacroExpansionToken:
         sub->before.has_error = true;
         Die(this);
-        err << "Macro tokens should not be seen here";
+        err << "Macro step/expansion tokens should not be seen here";
+        return nullptr;
+
+      // If we're here then it means we're probably in a directive that's been
+      // pulled out of its (parent) fragment.
+      case TokenInfo::kMacroUseToken:
+        if (substitutions_alloc.size() == 1u && curr->macro_tok) {
+          pasta::Macro root_macro = RootNodeFrom(curr->macro_tok.value());
+          if (auto dir = pasta::MacroDirective::From(root_macro)) {
+            TryAddBeforeToken(sub, curr);
+            return BuildMacroSubstitutions(
+                prev, curr, sub, sub->before, dir.value(), err);
+          }
+        }
+        sub->before.has_error = true;
+        Die(this);
+        err << "Macro use tokens should not be seen here";
         return nullptr;
 
       // At a marker token.

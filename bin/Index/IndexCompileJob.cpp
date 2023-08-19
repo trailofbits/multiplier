@@ -39,7 +39,9 @@ namespace indexer {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-extern void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em);
+extern void LabelDeclsInFragment(PendingFragment &, EntityMapper &);
+
+extern void LabelTokensAndMacrosInFragment(PendingFragment &, EntityMapper &);
 
 namespace {
 
@@ -313,6 +315,22 @@ static std::pair<uint64_t, uint64_t> BaselineEntityRange(
   }
 
   return {begin_tok_index, end_tok_index};
+}
+
+static pasta::TokenRange BaselineEntityRange(
+    const pasta::MacroDirective &macro) {
+
+  std::optional<pasta::MacroToken> begin_tok = macro.BeginToken();
+  std::optional<pasta::MacroToken> end_tok = macro.EndToken();
+
+  CHECK(begin_tok.has_value());
+  CHECK(end_tok.has_value());
+
+  std::optional<pasta::TokenRange> range = pasta::TokenRange::From(
+      begin_tok->ParsedLocation(), end_tok->ParsedLocation());
+
+  CHECK(range.has_value());
+  return range.value();
 }
 
 //static bool ShouldEndInSemiColon(const pasta::Decl &decl) {
@@ -1106,6 +1124,7 @@ static void FindMacroFileBounds(const pasta::Macro &macro,
     }
   }
 }
+
 static bool FindTokenFileBounds(const pasta::Token &ptok,
                                 std::optional<pasta::FileToken> &begin_tok,
                                 std::optional<pasta::FileToken> &end_tok) {
@@ -1231,7 +1250,7 @@ static PendingFragmentPtr CreatePendingFragment(
       database.GetOrCreateFragmentIdForHash(
           (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
           HashFragment(decls, macros, original_tokens, parsed_tokens),
-          num_tokens,
+          num_tokens  /* for fragment id packing format */,
           is_new_fragment_id  /* mutated by reference */),
       tu_id,
       em,
@@ -1244,7 +1263,6 @@ static PendingFragmentPtr CreatePendingFragment(
   pf->num_top_level_macros = static_cast<unsigned>(macros.size());
 
   if (root_fragment_id.has_value()) {
-    CHECK_EQ(decls.size(), 1u);
     CHECK_NE(pf->fragment_id.Pack(), root_fragment_id.value().Pack());
     pf->parent_fragment_ids.push_back(root_fragment_id.value());
   }
@@ -1305,6 +1323,38 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   }
 }
 
+// NOTE(pag): Left here for niftiness of debugging issues, e.g. where some
+//            top-level decl doesn't have all of its tokens properly
+//            identified. Usually this would be a bug in PASTA's
+//            `lib/AST/Bounds.cpp` file, but having a restriction here also
+//            helps the end-to-end debugging process.
+//
+// NOTE(pag): Likely, an `assert(false)` in `TrackRedeclarations` in
+//            `LinkEntitiesAcrossFragments.cpp` needs to be commented out
+//            when using this debugging technique.
+static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
+  // bool found = false;
+  // for (const Entity &entity : entities) {
+  //   if (!std::holds_alternative<pasta::Decl>(entity)) {
+  //     continue;
+  //   }
+
+  //   auto nd = pasta::FunctionDecl::From(std::get<pasta::Decl>(entity));
+  //   if (!nd) {
+  //     continue;
+  //   }
+
+  //   if (nd->Name() == "function name here") {
+  //     found = true;
+  //     break;
+  //   }
+  // }
+
+  // return found;
+  (void) entities;
+  return true;
+}
+
 static void CreatePendingFragment(
     mx::DatabaseWriter &database, EntityMapper &em,
     const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
@@ -1312,6 +1362,10 @@ static void CreatePendingFragment(
     std::vector<PendingFragmentPtr> &pending_fragments) {
 
   const EntityGroup &entities = std::get<kGroupIndex>(group_range);
+  if (!DebugIndexOnlyThisFragment(entities)) {
+    return;
+  }
+
   uint64_t begin_index = std::get<kBeginIndex>(group_range);
   uint64_t end_index = std::get<kEndIndex>(group_range);
 
@@ -1330,40 +1384,14 @@ static void CreatePendingFragment(
   std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
       em.entity_ids, entities, frag_tok_range);
 
-  // NOTE(pag): Left here for niftiness of debugging issues, e.g. where some
-  //            top-level decl doesn't have all of its tokens properly
-  //            identified. Usually this would be a bug in PASTA's
-  //            `lib/AST/Bounds.cpp` file, but having a restriction here also
-  //            helps the end-to-end debugging process.
-  //
-  // NOTE(pag): Likely, an `assert(false)` in `TrackRedeclarations` in
-  //            `LinkEntitiesAcrossFragments.cpp` needs to be commented out
-  //            when using this debugging technique.
-//  bool found = false;
-//  for (const Entity &entity : entities) {
-//    if (!std::holds_alternative<pasta::Decl>(entity)) {
-//      continue;
-//    }
-//
-//    auto nd = pasta::FunctionDecl::From(std::get<pasta::Decl>(entity));
-//    if (!nd) {
-//      continue;
-//    }
-//
-//    if (nd->Name() == "sctp_sf_do_9_1_abort") {
-//      found = true;
-//      break;
-//    }
-//  }
-//  if (!found) {
-//    return;
-//  }
-
   std::vector<pasta::Decl> root_decls;
   std::vector<std::vector<pasta::Decl>> nested_decls;
-  std::vector<pasta::Decl> forward_decls;
-  const std::vector<pasta::Macro> empty_macros;
   std::vector<pasta::Macro> top_level_macros;
+  std::vector<std::vector<pasta::Macro>> nested_macros;
+
+  std::vector<pasta::Decl> forward_decls;
+  const std::vector<pasta::Decl> empty_decls;
+  const std::vector<pasta::Macro> empty_macros;
   std::optional<mx::PackedFragmentId> root_fragment_id;
   std::optional<FileLocationOfFragment> empty_floc;
   PendingFragmentPtr pf;
@@ -1427,7 +1455,19 @@ static void CreatePendingFragment(
       }
 
     } else if (std::holds_alternative<pasta::Macro>(entity)) {
-      top_level_macros.push_back(std::get<pasta::Macro>(entity));
+      const pasta::Macro &macro = std::get<pasta::Macro>(entity);
+
+      // Directives, especially `#define` directives, are treated as nested
+      // fragments, as they are kind of "free standing" w.r.t. expansion, and
+      // define directives in particular can be referenced from other locations,
+      // and so we need special handling of their tokens/entities w.r.t. the
+      // entity mapper.
+      if (pasta::MacroDirective::From(macro)) {
+        nested_macros.emplace_back().emplace_back(macro);
+
+      } else {
+        top_level_macros.emplace_back(macro);
+      }
 
     } else {
       LOG(ERROR)
@@ -1435,8 +1475,6 @@ static void CreatePendingFragment(
       return;
     }
   }
-
-  std::vector<PendingFragmentPtr> local_pending_fragments;
 
   pasta::PrintingPolicy pp;
   pasta::PrintedTokenRange parsed_tokens =
@@ -1446,16 +1484,18 @@ static void CreatePendingFragment(
   if (!root_decls.empty() || (nested_decls.empty() &&
                               !top_level_macros.empty())) {
 
-    CHECK(forward_decls.empty());
     pasta::PrintedTokenRange aligned_tokens =
-        CreateParsedTokenRange(parsed_tokens, root_decls, forward_decls, pp);
+        CreateParsedTokenRange(parsed_tokens, root_decls, empty_decls, pp);
 
     pf = CreatePendingFragment(
         database,
         em,
         &frag_tok_range  /* original_tokens */,
         aligned_tokens  /* parsed_tokens */,
-        floc, tu_id, std::move(root_decls), top_level_macros  /* copied */,
+        floc,
+        tu_id,
+        std::move(root_decls),
+        top_level_macros  /* copied */,
         root_fragment_id);
   
     root_fragment_id = pf->fragment_id;
@@ -1463,12 +1503,47 @@ static void CreatePendingFragment(
     LabelDeclsInFragment(*pf, em);
 
     if (pf->is_new) {
-      local_pending_fragments.emplace_back(std::move(pf));
+      pending_fragments.emplace_back(std::move(pf));
+    }
+  }
+
+  // Create the nested fragments for the macro directives. It's possible that
+  // we don't have a root fragment ID, and that is fine.
+  for (std::vector<pasta::Macro> &macros : nested_macros) {
+    CHECK_EQ(macros.size(), 1ul);
+    CHECK(!frag_tok_range.empty());
+    CHECK(floc.has_value());
+
+    pasta::TokenRange directive_range = BaselineEntityRange(
+        reinterpret_cast<const pasta::MacroDirective &>(macros.front()));
+    CHECK(!directive_range.empty());
+    DCHECK_LE(begin_index, directive_range.Front()->Index());
+    DCHECK_GE(end_index, directive_range.Back()->Index());
+    
+    pasta::PrintedTokenRange parsed_tokens_in_directive_range =
+        pasta::PrintedTokenRange::Adopt(directive_range);
+    CHECK(parsed_tokens_in_directive_range.empty());
+
+    pf = CreatePendingFragment(
+        database,
+        em,
+        &directive_range  /* original_tokens */,
+        parsed_tokens_in_directive_range  /* parsed_tokens */,
+        floc,
+        tu_id,
+        std::move(empty_decls),
+        std::move(macros),
+        root_fragment_id);
+
+    LabelTokensAndMacrosInFragment(*pf, em);
+
+    if (pf->is_new) {
+      pending_fragments.emplace_back(std::move(pf));
     }
   }
 
   // Create the nested fragments for the root fragment. These correspond to
-  // things like template specializations/isntantiations.
+  // things like template specializations/instantiations.
   for (std::vector<pasta::Decl> &decls : nested_decls) {
     CHECK_EQ(decls.size(), 1ul);
     CHECK(root_fragment_id.has_value());
@@ -1481,127 +1556,18 @@ static void CreatePendingFragment(
         em,
         &frag_tok_range  /* original_tokens */,
         aligned_tokens  /* parsed_tokens */,
-        floc, tu_id,
+        floc,
+        tu_id,
         std::move(decls),
-        top_level_macros  /* copied */, root_fragment_id);
+        top_level_macros  /* copied */,
+        root_fragment_id);
 
     LabelDeclsInFragment(*pf, em);
 
     if (pf->is_new) {
-      local_pending_fragments.emplace_back(std::move(pf));
+      pending_fragments.emplace_back(std::move(pf));
     }
   }
-
-  if (local_pending_fragments.empty()) {
-    return;
-  }
-
-  // // If we have no specific root fragment, then force all nested fragments back
-  // // into the main fragment. This could happen if we have a macro expanding to
-  // // a bunch of forward declarations.
-  // if (!has_root_fragment && !has_nested_fragment) {
-  //   for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
-  //     if (!top_level_decls.empty()) {
-  //       top_level_decl_groups.front().push_back(top_level_decls.back());
-  //     }
-  //   }
-  //   top_level_decl_groups.resize(1u);
-  // }
-
-  // std::vector<PendingFragmentPtr> local_pending_fragments;
-
-  // bool any_new = false;
-  // for (std::vector<pasta::Decl> &top_level_decls : top_level_decl_groups) {
-  //   if (top_level_decls.empty() && top_level_macros.empty()) {
-  //     continue;
-  //   }
-
-    
-  // }
-
-  // // The local list starts with the root fragment, then has the nested ones.
-  // // Reorder to have the root fragment last.
-  // //
-  // // NOTE(pag): This rotation behaviour also means the root fragment is the last
-  // //            fragment on which token labelling applies below.
-  // std::rotate(local_pending_fragments.begin(),
-  //             local_pending_fragments.begin() + 1,
-  //             local_pending_fragments.end());
-
-  // // We always need to label the entities inside of a fragment, regardless of
-  // // if fragment is new. This is because each fragment might have arbitrary
-  // // references to other declarations. We need to be able to form cross-
-  // // fragment references when serializing things, so we use the labeller to
-  // // assign IDs to entities (decls, statements, etc.) in a uniform and
-  // // deterministic way so that other threads doing similar indexing will form
-  // // identically labelled chunks for the same logical entities.
-  // //
-  // // Unfortunately, the labeller needs to be manually written as opposed to
-  // // auto-generated, as our auto-generation has no concept of which AST
-  // // methods descend vs. cross the tree (into other fragments).
-  // for (const PendingFragmentPtr &pfp : local_pending_fragments) {
-
-    
-
-  //   // // If this is the Nth overlapping fragment, then erase the labels on the
-  //   // // overlapping tokens. The root fragment is processed last, so its labels
-  //   // // "win" from a global perspective.
-  //   // if (!first) {
-  //   //   for (pasta::Token tok : pf.parsed_tokens) {
-  //   //     em.entity_ids.erase(tok.RawToken());
-  //   //   }
-  //   // }
-
-  //   LabelDeclsInFragment(*pfp, em);
-  // }
-
-  // // None of the fragments were new. Label with the root fragment.
-  // if (!any_new) {
-  //   return;
-  // }
-
-  // // Create a printed token range for the top-level, non-nested declarations.
-  // std::optional<pasta::PrintedTokenRange> printed_toks;
-  // for (const Entity &entity : entities) {
-  //   if (std::holds_alternative<pasta::Decl>(entity)) {
-  //     const pasta::Decl &decl = std::get<pasta::Decl>(entity);
-
-  //     if (!IsInjectedForwardDeclaration(decl)) {
-  //       if (!printed_toks) {
-  //         printed_toks = pasta::PrintedTokenRange::Create(decl);
-  //       } else {
-  //         printed_toks = pasta::PrintedTokenRange::Concatenate(
-  //             printed_toks.value(),
-  //             pasta::PrintedTokenRange::Create(decl));
-  //       }
-  //     }
-  //   }
-  // }
-
-  // std::optional<pasta::PrintedTokenRange> aligned_toks;
-  // if (printed_toks.has_value()) {
-  //   auto maybe_aligned_toks = pasta::PrintedTokenRange::Align(
-  //       parsed_toks.value(), printed_toks.value());
-  //   if (maybe_aligned_toks.Succeeded()) {
-  //     aligned_toks = maybe_aligned_toks.TakeValue();
-  //   } else {
-  //     LOG(ERROR)
-  //         << maybe_aligned_toks.TakeError();
-  //   }
-  // }
-
-  // // for (pasta::Token tok : parsed_toks.value()) {
-  // //   CHECK(!em.entity_ids.count(tok.RawToken()));
-  // //   em.entity_ids.erase(tok.RawToken());
-  // // }
-
-  // // Only progress toward serialization on the new fragments.
-  // for (PendingFragmentPtr &pfp : local_pending_fragments) {
-  //   if (pfp->is_new) {
-  //     pfp->printed_tokens = aligned_toks;
-  //     pending_fragments.emplace_back(std::move(pfp));
-  //   }
-  // }
 }
 
 // Create fragments in reverse order that we see them in the AST. The hope

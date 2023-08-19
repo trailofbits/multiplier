@@ -92,7 +92,10 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
     return EntityId(mt->ParsedLocation());
   }
 
-  auto ret = PerFragmentEntityId(entity.RawMacro());
+  // NOTE(pag): May be part of a directive, which may be referenced by other
+  //            fragments, so we use `EntityId`, which falls back on
+  //            `PerFragmentEntityId`.
+  auto ret = EntityId(entity.RawMacro());
   if (ret || entity.Kind() != pasta::MacroKind::kExpansion) {
     return ret;
   }
@@ -119,29 +122,50 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
   return ret;
 }
 
+mx::RawEntityId EntityMapper::EntityId(const TokenTree &entity) const {
+  return EntityId(entity.RawNode());
+}
+
+mx::RawEntityId EntityMapper::EntityId(const TokenTreeNode &entity) const {
+  return EntityId(entity.RawNode());
+}
+
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
-  if (auto eid = PerFragmentEntityId(entity.RawToken());
-      eid != mx::kInvalidEntityId) {
+  // NOTE(pag): May be part of a directive, which may be referenced by other
+  //            fragments, so we use `EntityId`, which falls back on
+  //            `PerFragmentEntityId`.
+  auto eid = EntityId(entity.RawToken());
+  if (eid != mx::kInvalidEntityId) {
     return eid;
   }
 
   assert(!IsParsedToken(entity));
 
+  if (auto mt = entity.MacroLocation()) {
+    eid = EntityId(mt->RawMacro());
+    if (eid != mx::kInvalidEntityId) {
+      return eid;
+    }
+  }
+
   // If this token is derived from another one, and we don't have an entity
   // ID for it, then try to get the entity ID for the derived token.
   if (auto dt = entity.DerivedLocation()) {
-    return EntityId(dt.value());
+    eid = EntityId(dt.value());
+    if (eid != mx::kInvalidEntityId) {
+      return eid;
+    }
+  }
 
   // If we fail to resolve the parsed token to an entity ID, then try to
   // see if it's associated with a `pasta::FileToken`, and if so, then form
   // an entity ID for that. We unify `Token` and `FileToken` in our serialized
   // representation, because we always want references to "point somewhere."
-  } else if (auto ft = entity.FileLocation()) {
-    return EntityId(ft.value());
-  
-  } else {
-    return mx::kInvalidEntityId;
+  if (auto ft = entity.FileLocation()) {
+    eid = EntityId(ft.value());  
   }
+
+  return eid;
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {
@@ -158,12 +182,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const 
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
-  if (auto id = PerFragmentEntityId(entity.RawMacro());
-      id != mx::kInvalidEntityId) {
-    return id;
-  } else {
-    return EntityId(entity.ParsedLocation());
-  }
+  return EntityId(entity.ParsedLocation());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::File &file) const {

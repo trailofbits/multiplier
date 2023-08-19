@@ -180,17 +180,15 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<mx::EntityOffset>(fragment.macros_to_serialize.size());
 
-  CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
+  // Macro definitions and their parameters can be referenced by other fragments
+  // that contain expansions of those definitions, and substitutions of those
+  // parameters for arguments.
+  if (pasta::MacroDirective::From(entity) ||
+      pasta::MacroParameter::From(entity)) {
+    CHECK(em.entity_ids.emplace(entity.RawMacro(), id).second);
+  }
 
-  // // If we added this node (we should have), then add in a `nullopt` reservation
-  // // to `macros_to_serialize`. If we didn't add it, then there was likely an
-  // // overlapping (nested) fragment. Overwrite in that case.
-  // if (!res.second) {
-  //   mx::EntityId prev_id(res.first->second);
-  //   CHECK_NE(prev_id.Extract<mx::MacroId>()->fragment_id,
-  //            fragment.fragment_index);
-  //   res.first->second = id;
-  // }
+  CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
 
   // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
   //            fills in the empty slots.
@@ -204,9 +202,10 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 
   auto def = pasta::DefineMacroDirective::From(entity);
   if (!def) {
-    assert(false);
+    DCHECK(false);
     return true;
   }
+
   for (pasta::Macro param : def->Parameters()) {
     Label(param);
   }
@@ -241,7 +240,7 @@ void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em) {
   //            do it each time, so that the decls that should go into child
   //            fragments are at the end of the `pf.top_level_decls` list.
 
-  assert(pf.decls_to_serialize.empty());
+  CHECK(pf.decls_to_serialize.empty());
 
 #ifndef NDEBUG
   for (const pasta::Decl &decl : pf.top_level_decls) {
@@ -268,9 +267,18 @@ void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em) {
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
 void LabelTokensAndMacrosInFragment(PendingFragment &pf, EntityMapper &em) {
+
+  if (!pf.macros_to_serialize.empty()) {
+    return;  // Already done.
+  }
+
   EntityLabeller labeller(em, pf);
 
-  assert(pf.macros_to_serialize.empty());
+  // TODO(pag): Define macro directives and their parameters need to be
+  //            part of the global entity map, not the per-fragment ones.
+  //
+  //            Make sure to check and fix uses of `PerFragmentEntityId` in
+  //            entity mapper.
 
   for (const pasta::Macro &macro : pf.top_level_macros) {
     (void) labeller.Label(macro);

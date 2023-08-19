@@ -243,7 +243,9 @@ struct TokenTreeSerializationSchedule {
   // Maps parsed tokens to the macro in which they are contained.
   std::vector<mx::RawEntityId> containing_macro;
 
-  mx::RawEntityId RecordEntityId(const TokenTree &tt) {
+  mx::RawEntityId RecordEntityId(const TokenTree &tt,
+                                 bool &is_part_of_fragment) {
+
     const void *raw_tt = tt.RawNode();
     const void *raw_locator = raw_tt;
     std::optional<pasta::Macro> macro = tt.Macro();
@@ -255,14 +257,19 @@ struct TokenTreeSerializationSchedule {
     mx::RawEntityId raw_id = em.EntityId(raw_locator);
 
     // NOTE(pag): This is some collusion with `EntityLabeller::Label` in terms
-    //            of labelling the top-level macros.
+    //            of labelling the top-level macros. This also happens with
+    //            nested macro directives.
     if (raw_id != mx::kInvalidEntityId) {
       CHECK_NE(raw_tt, raw_locator);
       mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(raw_id).Unpack());
       CHECK(id.kind == tt.Kind());
-      CHECK_LT(id.offset, pf.macros_to_serialize.size());
-      CHECK(!pf.macros_to_serialize[id.offset].has_value());
-      pf.macros_to_serialize[id.offset] = tt;
+
+      is_part_of_fragment = id.fragment_id == pf.fragment_index;
+      if (is_part_of_fragment) {
+        CHECK_LT(id.offset, pf.macros_to_serialize.size());
+        CHECK(!pf.macros_to_serialize[id.offset].has_value());
+        pf.macros_to_serialize[id.offset] = tt;
+      }
 
     // We need to form a new macro id for something we discovered along the way.
     } else {
@@ -286,10 +293,12 @@ struct TokenTreeSerializationSchedule {
   }
 
   mx::RawEntityId RecordEntityId(const TokenTreeNode &node,
-                                 mx::RawEntityId parent_id) {
+                                 mx::RawEntityId parent_id,
+                                 bool &is_part_of_fragment) {
     mx::RawEntityId raw_id = mx::kInvalidEntityId;
+
     if (std::optional<TokenTree> sub = node.SubTree()) {
-      raw_id = RecordEntityId(sub.value());
+      raw_id = RecordEntityId(sub.value(), is_part_of_fragment);
 
     // Fill in IDs for derived tokens.
     } else {
@@ -336,7 +345,18 @@ struct TokenTreeSerializationSchedule {
                 const TokenTreeNodeRange &nodes) {
 
     for (TokenTreeNode node : nodes) {
-      mx::RawEntityId child_id = RecordEntityId(node, parent_id);
+
+      bool is_part_of_fragment = true;
+      mx::RawEntityId child_id = RecordEntityId(node, parent_id,
+                                                is_part_of_fragment);
+
+      // If this is a macro directive that is nested inside of another fragment,
+      // then assume that we've already extracted the directive from that other
+      // fragment and persisted it.
+      if (!is_part_of_fragment) {
+        continue;
+      }
+
       if (std::optional<TokenTree> sub = node.SubTree()) {
 
         const void *child = sub->RawNode();
@@ -398,6 +418,7 @@ void VisitMacros(
     }
 
     // TODO(pag): Do this at some point.
+    // TODO(pag): Don't remember what "this" is anymore...
 
   } else {
 
@@ -412,6 +433,16 @@ void VisitMacros(
       raw_id = mx::EntityId(id).Pack();
       em.token_tree_ids.emplace(macro.RawMacro(), raw_id);
       macros_to_serialize.emplace_back(macro);
+    
+    // If we've seen this already, then only process it further if it's part
+    // of this fragment. In the case of a macro directive, it may not be part
+    // of this fragment.
+    } else {
+      mx::VariantId vid = mx::EntityId(raw_id).Unpack();
+      CHECK(std::holds_alternative<mx::MacroId>(vid));
+      if (std::get<mx::MacroId>(vid).fragment_id != pf.fragment_index) {
+        return;
+      }
     }
 
     // Recursive visit this macro.
@@ -677,6 +708,7 @@ static void PersistTokenTree(
 
     mx::RawEntityId eid = em.EntityId(raw_tt);
     mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(eid).Unpack());
+    CHECK_EQ(id.fragment_id, pf.fragment_index);
 
     EntityBuilder<mx::ast::Macro> storage;
     CHECK_LT(id.offset, num_macros);
@@ -702,16 +734,19 @@ static void PersistTokenTree(
   auto tlms = fb.initTopLevelMacros(nodes.Size());
   i = 0u;
   for (TokenTreeNode node : nodes) {
-    mx::RawEntityId eid = em.EntityId(node.RawNode());
-#ifndef NDEBUG
+    mx::RawEntityId eid = em.EntityId(node);
     mx::VariantId vid = mx::EntityId(eid).Unpack();
     if (std::holds_alternative<mx::MacroId>(vid)) {
       mx::MacroId mid = std::get<mx::MacroId>(vid);
-      CHECK_EQ(mid.fragment_id, pf.fragment_index);
+      if (mid.fragment_id != pf.fragment_index) {
+        continue;  // A directive that's hoisted into a different fragment.
+      }
+
       CHECK_LT(mid.offset, pf.macros_to_serialize.size());
       CHECK(pf.macros_to_serialize[mid.offset].has_value());
+      CHECK_EQ(em.EntityId(pf.macros_to_serialize[mid.offset].value()),
+               eid);
     }
-#endif
     tlms.set(i++, eid);
   }
 }

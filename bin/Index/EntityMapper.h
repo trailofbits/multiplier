@@ -60,6 +60,8 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
   mx::RawEntityId EntityId(const pasta::Attr &entity) const;
   mx::RawEntityId EntityId(const pasta::Macro &entity) const;
+  mx::RawEntityId EntityId(const TokenTree &entity) const;
+  mx::RawEntityId EntityId(const TokenTreeNode &entity) const;
   mx::RawEntityId EntityId(const pasta::TemplateArgument &pseudo) const;
   mx::RawEntityId EntityId(const pasta::TemplateParameterList &pseudo) const;
   mx::RawEntityId EntityId(const pasta::CXXBaseSpecifier &pseudo) const;

@@ -250,7 +250,7 @@ gap::generator<Reference> Fragment::references(void) const & {
 gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
 
-  const EntityProviderPtr &ep = impl->ep;
+  const EntityProviderPtr ep = impl->ep;
   for (RawEntityId eid : macro_ids) {
     VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
