@@ -183,12 +183,14 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   // Macro definitions and their parameters can be referenced by other fragments
   // that contain expansions of those definitions, and substitutions of those
   // parameters for arguments.
-  if (pasta::MacroDirective::From(entity) ||
-      pasta::MacroParameter::From(entity)) {
+  if (AreVisibleAcrossFragments(entity)) {
     CHECK(em.entity_ids.emplace(entity.RawMacro(), id).second);
   }
 
   CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
+  LOG(ERROR) << fragment.macros_to_serialize.size() << ' '
+             << fragment.fragment_index << ' '
+             << entity.KindName() << ' ' << mx::EntityId(id).Pack();
 
   // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
   //            fills in the empty slots.

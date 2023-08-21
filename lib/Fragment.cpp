@@ -256,7 +256,11 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
     if (std::holds_alternative<MacroId>(vid)) {
       MacroId macro_id = std::get<MacroId>(vid);
       MacroImplPtr eptr = ep->MacroFor(ep, eid);
-      if (macro_id.fragment_id == impl->fragment_id && eptr) {
+      
+      // NOTE(pag): We don't check for fragments matching as we might have
+      //            macros (e.g. `#define` in nested macros that we inject as
+      //            top-level macros).
+      if (eptr) {
         co_yield Macro(std::move(eptr));
       } else {
         assert(false);

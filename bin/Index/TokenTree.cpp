@@ -1165,7 +1165,7 @@ static pasta::Macro RootNodeFrom(const pasta::Macro &node) {
   
   // NOTE(pag): We extract macro directives into their own (nested) fragments,
   //            even if they are logically nested within a macro use.
-  if (pasta::MacroDirective::From(node)) {
+  if (ShouldGoInNestedFragment(node)) {
     return node;
   
   } else if (auto parent = node.Parent()) {

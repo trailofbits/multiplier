@@ -1355,10 +1355,10 @@ static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
   return true;
 }
 
-static void CreatePendingFragment(
+static void CreatePendingFragments(
     mx::DatabaseWriter &database, EntityMapper &em,
     const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
-    const EntityGroupRange &group_range,
+    EntityGroupRange group_range,
     std::vector<PendingFragmentPtr> &pending_fragments) {
 
   const EntityGroup &entities = std::get<kGroupIndex>(group_range);
@@ -1462,7 +1462,7 @@ static void CreatePendingFragment(
       // define directives in particular can be referenced from other locations,
       // and so we need special handling of their tokens/entities w.r.t. the
       // entity mapper.
-      if (pasta::MacroDirective::From(macro)) {
+      if (ShouldGoInNestedFragment(macro)) {
         nested_macros.emplace_back().emplace_back(macro);
 
       } else {
@@ -1597,9 +1597,10 @@ static std::vector<PendingFragmentPtr> CreatePendingFragments(
        it != end; ++it) {
 
     try {
-      const EntityGroupRange &entities_in_fragment = *it;
-      CreatePendingFragment(context.database, em, tok_range, tu_id,
-                            entities_in_fragment, pending_fragments);
+      EntityGroupRange &entities_in_fragment = *it;
+      CreatePendingFragments(context.database, em, tok_range, tu_id,
+                             std::move(entities_in_fragment),
+                             pending_fragments);
     } catch (...) {
       LOG(ERROR)
           << "Caught exception in main job file " << main_job_file

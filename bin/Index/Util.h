@@ -106,6 +106,14 @@ bool IsSerializableDecl(const pasta::Decl &decl);
 // struct.
 bool ShouldGoInNestedFragment(const pasta::Decl &decl);
 
+// Determines whether or not a TLM is likely to have to go into a child
+// fragment. This generally happens when a TLM is a directive.
+bool ShouldGoInNestedFragment(const pasta::Macro &macro);
+
+// Returns `true` if a macro is visible across fragments, and should have an
+// entity id stored in the global mapper.
+bool AreVisibleAcrossFragments(const pasta::Macro &macro);
+
 // Tells us if a given decl is probably a use that also acts as a forward
 // declaration.
 bool IsInjectedForwardDeclaration(const pasta::Decl &decl);

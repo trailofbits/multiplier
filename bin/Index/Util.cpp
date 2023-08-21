@@ -942,6 +942,24 @@ bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
   }
 }
 
+// Determines whether or not a TLM is likely to have to go into a child
+// fragment. This generally happens when a TLM is a directive.
+bool ShouldGoInNestedFragment(const pasta::Macro &macro) {
+  switch (macro.Kind()) {
+    case pasta::MacroKind::kDefineDirective:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// Returns `true` if a macro is visible across fragments, and should have an
+// entity id stored in the global mapper.
+bool AreVisibleAcrossFragments(const pasta::Macro &macro) {
+  return pasta::DefineMacroDirective::From(macro) ||
+         pasta::MacroParameter::From(macro);
+}
+
 // Tells us if a given decl is probably a use that also acts as a forward
 // declaration.
 bool IsInjectedForwardDeclaration(const pasta::Decl &decl) {

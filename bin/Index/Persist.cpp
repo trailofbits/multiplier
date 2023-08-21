@@ -527,7 +527,9 @@ static void PersistParsedTokens(
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
   for (i = 0u; i < pf.num_top_level_macros; ++i) {
-    tlms.set(i, em.EntityId(pf.top_level_macros[i]));
+    mx::RawEntityId eid = em.EntityId(pf.top_level_macros[i]);
+    CHECK_NE(eid, mx::kInvalidEntityId);
+    tlms.set(i, eid);
   }
 }
 
@@ -704,10 +706,14 @@ static void PersistTokenTree(
 
   // Serialize the token trees / macros.
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
-    const void *raw_tt = tt->RawNode();
+    CHECK(tt.has_value());
 
+    const void *raw_tt = tt->RawNode();
     mx::RawEntityId eid = em.EntityId(raw_tt);
-    mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(eid).Unpack());
+    mx::VariantId vid = mx::EntityId(eid).Unpack();
+    CHECK(std::holds_alternative<mx::MacroId>(vid));
+
+    mx::MacroId id = std::get<mx::MacroId>(vid);
     CHECK_EQ(id.fragment_id, pf.fragment_index);
 
     EntityBuilder<mx::ast::Macro> storage;
@@ -736,17 +742,21 @@ static void PersistTokenTree(
   for (TokenTreeNode node : nodes) {
     mx::RawEntityId eid = em.EntityId(node);
     mx::VariantId vid = mx::EntityId(eid).Unpack();
+    
+    CHECK(!std::holds_alternative<mx::InvalidId>(vid));
+    
     if (std::holds_alternative<mx::MacroId>(vid)) {
+      
+      // A directive that's not hoisted into a different fragment.
       mx::MacroId mid = std::get<mx::MacroId>(vid);
-      if (mid.fragment_id != pf.fragment_index) {
-        continue;  // A directive that's hoisted into a different fragment.
+      if (mid.fragment_id == pf.fragment_index) {
+        CHECK_LT(mid.offset, pf.macros_to_serialize.size());
+        CHECK(pf.macros_to_serialize[mid.offset].has_value());
+        CHECK_EQ(em.EntityId(pf.macros_to_serialize[mid.offset].value()),
+                 eid);
       }
-
-      CHECK_LT(mid.offset, pf.macros_to_serialize.size());
-      CHECK(pf.macros_to_serialize[mid.offset].has_value());
-      CHECK_EQ(em.EntityId(pf.macros_to_serialize[mid.offset].value()),
-               eid);
     }
+
     tlms.set(i++, eid);
   }
 }

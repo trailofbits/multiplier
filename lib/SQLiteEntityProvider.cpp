@@ -897,20 +897,26 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
 #define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
     type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
         const Ptr &self, RawEntityId raw_id) { \
-      if (raw_id == kInvalidEntityId) { \
+      \
+      EntityCategory cat = CategoryFromEntityId(raw_id); \
+      if (cat == EntityCategory::NOT_AN_ENTITY) { \
+        assert(raw_id == kInvalidEntityId); \
         return {}; \
       } \
       \
-      assert(CategoryFromEntityId(raw_id) == EntityCategory::enum_name); \
+      assert(cat == EntityCategory::enum_name); \
       const auto cat_index = static_cast<unsigned>(EntityCategory::enum_name); \
       if (!dict->dict[cat_index]) { \
+        assert(false); \
         return {}; \
       } \
+      \
       ImplPtr context = impl.Lock(); \
       sqlite::Statement &query = context->get_ ## lower_name ## _by_id; \
       query.BindValues(raw_id); \
       if (!query.ExecuteStep()) { \
         query.Reset(); \
+        assert(false); \
         return {}; \
       } \
       \
