@@ -11,24 +11,25 @@
 #include "Operation.h"
 
 namespace vast::hl {
-class LabelStmt;
+class ClassDeclOp;
 }  // namespace vast::hl
 namespace mx::ir::hl {
-class LabelStmt final : public Operation {
+class ClassDeclOp final : public Operation {
  public:
   inline static OperationKind static_kind(void) {
-    return OperationKind::HL_LABEL;
+    return OperationKind::HL_CLASS;
   }
 
-  static std::optional<LabelStmt> from(const ::mx::ir::Operation &that);
-  static std::optional<LabelStmt> producing(const ::mx::ir::Value &val);
+  static std::optional<ClassDeclOp> from(const ::mx::ir::Operation &that);
+  static std::optional<ClassDeclOp> producing(const ::mx::ir::Value &val);
 
-  ::vast::hl::LabelStmt underlying_op(void) const noexcept;
+  ::vast::hl::ClassDeclOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::vast::hl::LabelType> label(void) const;
-  ::mx::ir::Region body(void) const;
+  ::mx::ir::Region bases(void) const;
+  ::mx::ir::Region fields(void) const;
+  std::string_view name(void) const;
 };
-static_assert(sizeof(LabelStmt) == sizeof(Operation));
+static_assert(sizeof(ClassDeclOp) == sizeof(Operation));
 
 }  // namespace mx::ir::hl

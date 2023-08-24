@@ -276,8 +276,10 @@ enum class OperationKind : unsigned {
   MEMREF_SUBVIEW,
   MEMREF_TENSOR_STORE,
   LL_BR,
+  LL_CONCAT,
   LL_COND_BR,
   LL_COND_SCOPE_RET,
+  LL_EXTRACT,
   LL_INITIALIZE,
   LL_INLINE_SCOPE,
   LL_GEP,
@@ -286,6 +288,7 @@ enum class OperationKind : unsigned {
   LL_SCOPE_RECURSE,
   LL_SCOPE_RET,
   LL_UNINITIALIZED_VAR,
+  HL_ACCESS,
   HL_ASSIGN_FADD,
   HL_FADD,
   HL_ASSIGN_ADD,
@@ -311,8 +314,11 @@ enum class OperationKind : unsigned {
   HL_BUILTIN_BITCAST,
   HL_CSTYLE_CAST,
   HL_CALL,
+  HL_CLASS,
   HL_CMP,
   HL_CONST,
+  HL_BASE,
+  HL_CXXSTRUCT,
   HL_REF,
   HL_DEREF,
   HL_ASSIGN_FDIV,
@@ -338,6 +344,7 @@ enum class OperationKind : unsigned {
   HL_CONTINUE,
   HL_DEFAULT,
   HL_DO,
+  HL_EMPTY_DECL,
   HL_FOR,
   HL_GOTO,
   HL_IF,
@@ -345,9 +352,7 @@ enum class OperationKind : unsigned {
   HL_LABEL,
   HL_SKIP,
   HL_SWITCH,
-  HL_UNSUPPORTEDDECL,
-  HL_UNSUPPORTEDEXPR,
-  HL_UNSUPPORTEDOP,
+  HL_TYPE_YIELD,
   HL_VALUE_YIELD,
   HL_VAR,
   HL_WHILE,
@@ -385,15 +390,20 @@ enum class OperationKind : unsigned {
   HL_ASSIGN_SUB,
   HL_SUB,
   HL_SUBSCRIPT,
+  HL_THIS,
   HL_TRANSLATION_UNIT,
   HL_TYPE,
   HL_TYPEDEF,
+  HL_TYPEOF_EXPR,
+  HL_TYPEOF_TYPE,
   HL_UNION,
   HL_UNREACHABLE,
   CORE_BIN_LAND,
   CORE_BIN_LOR,
   CORE_LAZY_OP,
   CORE_SELECT,
+  UNSUP_DECL,
+  UNSUP_STMT,
 };
 
 }  // namespace ir
@@ -403,7 +413,7 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 381;
+  return 391;
 }
 
 const char *EnumeratorName(ir::OperationKind);
