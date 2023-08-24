@@ -47,10 +47,15 @@ const char *EnumeratorName(ir::TypeKind kind) {
     case ir::TypeKind::LONGTYPE: return "LONGTYPE";
     case ir::TypeKind::PARENTYPE: return "PARENTYPE";
     case ir::TypeKind::POINTERTYPE: return "POINTERTYPE";
+    case ir::TypeKind::RVALUETYPE: return "RVALUETYPE";
     case ir::TypeKind::RECORDTYPE: return "RECORDTYPE";
+    case ir::TypeKind::REFERENCETYPE: return "REFERENCETYPE";
     case ir::TypeKind::SHORTTYPE: return "SHORTTYPE";
+    case ir::TypeKind::TYPEOFEXPRTYPE: return "TYPEOFEXPRTYPE";
+    case ir::TypeKind::TYPEOFTYPETYPE: return "TYPEOFTYPETYPE";
     case ir::TypeKind::TYPEDEFTYPE: return "TYPEDEFTYPE";
     case ir::TypeKind::VOIDTYPE: return "VOIDTYPE";
+    case ir::TypeKind::UNSUPPORTEDTYPE: return "UNSUPPORTEDTYPE";
   }
 }
 

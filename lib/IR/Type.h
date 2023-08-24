@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define MX_IR_FOR_EACH_MLIR_TYPE(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta) \
+#define MX_IR_FOR_EACH_MLIR_TYPE(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta, _unsup) \
    _llvm(LLVMArrayType, TypeKind::LLVMARRAYTYPE, mlir::LLVM::LLVMArrayType) \
    _llvm(LLVMFixedVectorType, TypeKind::LLVMFIXEDVECTORTYPE, mlir::LLVM::LLVMFixedVectorType) \
    _llvm(LLVMFunctionType, TypeKind::LLVMFUNCTIONTYPE, mlir::LLVM::LLVMFunctionType) \
@@ -43,10 +43,15 @@
    _hl(LongType, TypeKind::LONGTYPE, vast::hl::LongType) \
    _hl(ParenType, TypeKind::PARENTYPE, vast::hl::ParenType) \
    _hl(PointerType, TypeKind::POINTERTYPE, vast::hl::PointerType) \
+   _hl(RValueType, TypeKind::RVALUETYPE, vast::hl::RValueType) \
    _hl(RecordType, TypeKind::RECORDTYPE, vast::hl::RecordType) \
+   _hl(ReferenceType, TypeKind::REFERENCETYPE, vast::hl::ReferenceType) \
    _hl(ShortType, TypeKind::SHORTTYPE, vast::hl::ShortType) \
+   _hl(TypeOfExprType, TypeKind::TYPEOFEXPRTYPE, vast::hl::TypeOfExprType) \
+   _hl(TypeOfTypeType, TypeKind::TYPEOFTYPETYPE, vast::hl::TypeOfTypeType) \
    _hl(TypedefType, TypeKind::TYPEDEFTYPE, vast::hl::TypedefType) \
-   _hl(VoidType, TypeKind::VOIDTYPE, vast::hl::VoidType)
+   _hl(VoidType, TypeKind::VOIDTYPE, vast::hl::VoidType) \
+   _unsup(UnsupportedType, TypeKind::UNSUPPORTEDTYPE, vast::unsup::UnsupportedType)
 
-#define MX_IR_NUM_MLIR_TYPES 38
+#define MX_IR_NUM_MLIR_TYPES 43
 

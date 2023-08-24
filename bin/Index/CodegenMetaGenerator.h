@@ -7,10 +7,10 @@
 #pragma once
 
 #include <vast/Util/Common.hpp>
-#include <vast/Translation/CodeGen.hpp>
-#include <vast/Translation/CodeGenContext.hpp>
-#include <vast/Translation/CodeGenVisitor.hpp>
-#include <vast/Translation/CodeGenBuilder.hpp>
+#include <vast/CodeGen/CodeGen.hpp>
+#include <vast/CodeGen/CodeGenContext.hpp>
+#include <vast/CodeGen/CodeGenVisitor.hpp>
+#include <vast/CodeGen/CodeGenBuilder.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
 
 #include <pasta/AST/AST.h>
@@ -45,6 +45,10 @@ class MetaGenerator {
     if (auto type_ptr = type.getTypePtrOrNull()) {
       return {Location(type_ptr)};
     }
+    return {LocationUnknown()};
+  }
+
+  vast::cg::DefaultMeta get(auto token) const {
     return {LocationUnknown()};
   }
 

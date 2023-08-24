@@ -11,25 +11,25 @@
 #include "Operation.h"
 
 namespace vast::hl {
-class UnsupportedExprOp;
+class TypeOfExprOp;
 }  // namespace vast::hl
 namespace mx::ir::hl {
-class UnsupportedExprOp final : public Operation {
+class TypeOfExprOp final : public Operation {
  public:
   inline static OperationKind static_kind(void) {
-    return OperationKind::HL_UNSUPPORTEDEXPR;
+    return OperationKind::HL_TYPEOF_EXPR;
   }
 
-  static std::optional<UnsupportedExprOp> from(const ::mx::ir::Operation &that);
-  static std::optional<UnsupportedExprOp> producing(const ::mx::ir::Value &val);
+  static std::optional<TypeOfExprOp> from(const ::mx::ir::Operation &that);
+  static std::optional<TypeOfExprOp> producing(const ::mx::ir::Value &val);
 
-  ::vast::hl::UnsupportedExprOp underlying_op(void) const noexcept;
+  ::vast::hl::TypeOfExprOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value result(void) const;
-  ::mx::ir::Region subexpr(void) const;
+  ::mx::ir::Region expr(void) const;
   std::string_view name(void) const;
+  //::mlir::Type type(void) const;
 };
-static_assert(sizeof(UnsupportedExprOp) == sizeof(Operation));
+static_assert(sizeof(TypeOfExprOp) == sizeof(Operation));
 
 }  // namespace mx::ir::hl

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define MX_IR_FOR_EACH_MLIR_ATTRIBUTE(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta) \
+#define MX_IR_FOR_EACH_MLIR_ATTRIBUTE(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta, _unsup) \
    _llvm(CConvAttr, AttributeKind::CCONVATTR, mlir::LLVM::CConvAttr) \
    _llvm(DIBasicTypeAttr, AttributeKind::DIBASICTYPEATTR, mlir::LLVM::DIBasicTypeAttr) \
    _llvm(DICompileUnitAttr, AttributeKind::DICOMPILEUNITATTR, mlir::LLVM::DICompileUnitAttr) \

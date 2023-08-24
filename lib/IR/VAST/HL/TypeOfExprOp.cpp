@@ -6,7 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#include <multiplier/IR/VAST/HL/UnsupportedDeclOp.h>
+#include <multiplier/IR/VAST/HL/TypeOfExprOp.h>
 #include <multiplier/IR/Attribute.h>
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Region.h>
@@ -18,32 +18,30 @@
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 
 namespace mx::ir::hl {
-std::optional<UnsupportedDeclOp> UnsupportedDeclOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_UNSUPPORTEDDECL) {
-    return reinterpret_cast<const UnsupportedDeclOp &>(that);
+std::optional<TypeOfExprOp> TypeOfExprOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_TYPEOF_EXPR) {
+    return reinterpret_cast<const TypeOfExprOp &>(that);
   }
   return std::nullopt;
 }
 
-std::optional<UnsupportedDeclOp> UnsupportedDeclOp::producing(const ::mx::ir::Value &that) {
+std::optional<TypeOfExprOp> TypeOfExprOp::producing(const ::mx::ir::Value &that) {
   if (auto op = ::mx::ir::Operation::producing(that)) {
     return from(op.value());
   }
   return std::nullopt;
 }
 
-::vast::hl::UnsupportedDeclOp UnsupportedDeclOp::underlying_op(void) const noexcept {
-  return ::vast::hl::UnsupportedDeclOp(this->Operation::op_);
+::vast::hl::TypeOfExprOp TypeOfExprOp::underlying_op(void) const noexcept {
+  return ::vast::hl::TypeOfExprOp(this->Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> UnsupportedDeclOp::elements(void) const {
-  auto range = underlying_op().getElements();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
+::mx::ir::Region TypeOfExprOp::expr(void) const {
+  auto &val = underlying_op().getExpr();
+  return ::mx::ir::Region(module_, val);
 }
 
-std::string_view UnsupportedDeclOp::name(void) const {
+std::string_view TypeOfExprOp::name(void) const {
   auto val = underlying_op().getName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);

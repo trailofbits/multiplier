@@ -6,6 +6,7 @@
 
 #include "Codegen.h"
 
+#define VAST_ENABLE_EXCEPTIONS
 #include <vast/Util/Warnings.hpp>
 
 VAST_RELAX_WARNINGS
@@ -25,14 +26,12 @@ VAST_UNRELAX_WARNINGS
 #include <pasta/AST/Decl.h>
 
 #include <vast/Util/Common.hpp>
-#include <vast/Translation/CodeGenContext.hpp>
-#include <vast/Translation/CodeGenVisitor.hpp>
+#include <vast/CodeGen/CodeGenContext.hpp>
+#include <vast/CodeGen/CodeGenVisitor.hpp>
+#include <vast/CodeGen/CodeGen.hpp>
 #include <vast/Dialect/Dialects.hpp>
-#include <vast/Translation/CodeGen.hpp>
 
 #include "CodegenMetaGenerator.h"
-#include "CodegenVisitor.h"
-
 #include "Context.h"
 #include "EntityMapper.h"
 #include "PendingFragment.h"
@@ -40,11 +39,13 @@ VAST_UNRELAX_WARNINGS
 
 namespace indexer {
 
-template<typename Derived>
-using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
-    Derived, vast::cg::DefaultCodeGenVisitorMixin, FallBackVisitor >;
+using MXCodeGenContext = vast::cg::CodeGenContext;
 
-using CodeGenVisitor = vast::cg::CodeGenVisitor<VisitorConfig, MetaGenerator>;
+using MXCodeGenVisitor = vast::cg::CodeGenVisitor<
+    vast::cg::CodeGenContext, vast::cg::DefaultVisitorConfig, MetaGenerator
+    >;
+
+using MXCodeGenerator = vast::cg::CodeGenBase<MXCodeGenVisitor, MXCodeGenContext>;
 
 class CodeGeneratorImpl {
  public:
@@ -87,7 +88,8 @@ std::string CodeGenerator::GenerateSourceIR(
   mlir::MLIRContext context(impl->registry);
 
   MetaGenerator meta(ast, &context, em);
-  vast::cg::CodeGenBase<CodeGenVisitor> codegen(&context, meta);
+  MXCodeGenContext cgctx(context, ast.UnderlyingAST());
+  MXCodeGenerator codegen(cgctx, meta);
   llvm::raw_string_ostream os(ret);
 
   try {

@@ -6,7 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#include <multiplier/IR/VAST/HL/UnsupportedExprOp.h>
+#include <multiplier/IR/VAST/HL/CxxStructDeclOp.h>
 #include <multiplier/IR/Attribute.h>
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Region.h>
@@ -18,35 +18,35 @@
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 
 namespace mx::ir::hl {
-std::optional<UnsupportedExprOp> UnsupportedExprOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_UNSUPPORTEDEXPR) {
-    return reinterpret_cast<const UnsupportedExprOp &>(that);
+std::optional<CxxStructDeclOp> CxxStructDeclOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_CXXSTRUCT) {
+    return reinterpret_cast<const CxxStructDeclOp &>(that);
   }
   return std::nullopt;
 }
 
-std::optional<UnsupportedExprOp> UnsupportedExprOp::producing(const ::mx::ir::Value &that) {
+std::optional<CxxStructDeclOp> CxxStructDeclOp::producing(const ::mx::ir::Value &that) {
   if (auto op = ::mx::ir::Operation::producing(that)) {
     return from(op.value());
   }
   return std::nullopt;
 }
 
-::vast::hl::UnsupportedExprOp UnsupportedExprOp::underlying_op(void) const noexcept {
-  return ::vast::hl::UnsupportedExprOp(this->Operation::op_);
+::vast::hl::CxxStructDeclOp CxxStructDeclOp::underlying_op(void) const noexcept {
+  return ::vast::hl::CxxStructDeclOp(this->Operation::op_);
 }
 
-::mx::ir::Value UnsupportedExprOp::result(void) const {
-  auto val = underlying_op().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region UnsupportedExprOp::subexpr(void) const {
-  auto &val = underlying_op().getSubexpr();
+::mx::ir::Region CxxStructDeclOp::bases(void) const {
+  auto &val = underlying_op().getBases();
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view UnsupportedExprOp::name(void) const {
+::mx::ir::Region CxxStructDeclOp::fields(void) const {
+  auto &val = underlying_op().getFields();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::string_view CxxStructDeclOp::name(void) const {
   auto val = underlying_op().getName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);

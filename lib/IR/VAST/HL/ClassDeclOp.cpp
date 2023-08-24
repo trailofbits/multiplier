@@ -6,7 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#include <multiplier/IR/VAST/HL/UnsupportedOp.h>
+#include <multiplier/IR/VAST/HL/ClassDeclOp.h>
 #include <multiplier/IR/Attribute.h>
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Region.h>
@@ -18,37 +18,35 @@
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 
 namespace mx::ir::hl {
-std::optional<UnsupportedOp> UnsupportedOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_UNSUPPORTEDOP) {
-    return reinterpret_cast<const UnsupportedOp &>(that);
+std::optional<ClassDeclOp> ClassDeclOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_CLASS) {
+    return reinterpret_cast<const ClassDeclOp &>(that);
   }
   return std::nullopt;
 }
 
-std::optional<UnsupportedOp> UnsupportedOp::producing(const ::mx::ir::Value &that) {
+std::optional<ClassDeclOp> ClassDeclOp::producing(const ::mx::ir::Value &that) {
   if (auto op = ::mx::ir::Operation::producing(that)) {
     return from(op.value());
   }
   return std::nullopt;
 }
 
-::vast::hl::UnsupportedOp UnsupportedOp::underlying_op(void) const noexcept {
-  return ::vast::hl::UnsupportedOp(this->Operation::op_);
+::vast::hl::ClassDeclOp ClassDeclOp::underlying_op(void) const noexcept {
+  return ::vast::hl::ClassDeclOp(this->Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> UnsupportedOp::elements(void) const {
-  auto range = underlying_op().getElements();
-  for (auto val : range) {
-    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
-  }
+::mx::ir::Region ClassDeclOp::bases(void) const {
+  auto &val = underlying_op().getBases();
+  return ::mx::ir::Region(module_, val);
 }
 
-::mx::ir::Value UnsupportedOp::result(void) const {
-  auto val = underlying_op().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+::mx::ir::Region ClassDeclOp::fields(void) const {
+  auto &val = underlying_op().getFields();
+  return ::mx::ir::Region(module_, val);
 }
 
-std::string_view UnsupportedOp::name(void) const {
+std::string_view ClassDeclOp::name(void) const {
   auto val = underlying_op().getName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
