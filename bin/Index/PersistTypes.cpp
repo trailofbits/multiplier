@@ -334,7 +334,7 @@ static mx::RawEntityId RelatedEntityIdToPrintedToken(
 // creating Token tree for printed tokens
 static void PersistPrintedTokens(
     EntityMapper &em, mx::rpc::Type::Builder &fb,
-    const pasta::PrintedTokenRange &range) {
+    const pasta::PrintedTokenRange &range, const mx::TypeId type_id) {
 
   std::string utf8_fragment_data;
   (void)em;
@@ -344,17 +344,35 @@ static void PersistPrintedTokens(
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
   auto re = fb.initRelatedEntityId(num_tokens);
-  auto i = 0u;
+  mx::EntityOffset i = 0u;
+
+  mx::TypeTokenId token_id;
+  token_id.type_id = type_id.type_id;
+  token_id.type_kind = type_id.kind;
 
   // Serialize the tokens.
-  while (i < range.size()) {
-    const pasta::PrintedToken &tok = range[i];
+  for (pasta::PrintedToken tok : range) {
+    token_id.kind = TokenKindFromPasta(tok);
+    token_id.offset = i;
+
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
-    tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
+    tk.set(i, static_cast<uint16_t>(token_id.kind));
     re.set(i, RelatedEntityIdToPrintedToken(em, tok));
 
     AccumulateTokenData<pasta::PrintedToken>(utf8_fragment_data, tok);
     ++i;
+    
+    // When persisting the types, some lookups will find tokens, e.g. `...`
+    // in a `FunctionProtoType` for a variadic function. These will reference
+    // parsed locations, but we want to arrange for them to instead reference
+    // the type tokens.
+    if (std::optional<pasta::Token> pt = tok.DerivedLocation()) {
+      CHECK(em.token_tree_ids.emplace(pt->RawToken(),
+                                      mx::EntityId(token_id)).second);
+    
+      LOG_IF(ERROR, pt->Kind() == pasta::TokenKind::kEllipsis)
+          << pt->RawToken() << ' ' << mx::EntityId(token_id);
+    }
   }
 
   to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
@@ -541,10 +559,12 @@ void GlobalIndexingState::PersistTypes(
     const PendingFragment &pf) {
 
   for (const pasta::Type &type : pf.types_to_serialize) {
+    em.ResetForFragment();
+
     ProgressBarWork type_progress_tracker(type_progress);
 
     auto maybe_token_range = em.tm.TypeTokenRange(type);
-    assert(maybe_token_range.has_value());
+    CHECK(maybe_token_range.has_value());
 
     mx::PackedTypeId ptid = em.tm.TypeId(type);
     mx::TypeId tid = ptid.Unpack();
@@ -553,10 +573,10 @@ void GlobalIndexingState::PersistTypes(
     mx::rpc::Type::Builder fb = message.initRoot<mx::rpc::Type>();
 
     auto tb = fb.initType();
-    (void)SerializeType(type, em, tid.type_id, tb);
-
-    PersistPrintedTokens(em, fb, maybe_token_range.value());
+    PersistPrintedTokens(em, fb, maybe_token_range.value(), tid);
     PersistTokenContexts(em, maybe_token_range.value(), fb);
+
+    (void) SerializeType(type, em, tid.type_id, tb);
 
     database.AddAsync(
         mx::EntityRecord{ptid.Pack(), GetSerializedData(message)});

@@ -186,7 +186,7 @@ gap::generator<Designator> DesignatedInitExpr::designators(void) const & {
   co_return;
 }
 
-TokenRange DesignatedInitExpr::designators_source_range(void) const {
+TokenRange DesignatedInitExpr::designators_tokens(void) const {
   return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal38(), impl->reader.getVal39());
 }
 

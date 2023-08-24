@@ -70,7 +70,7 @@ class DesignatedInitExpr : public Expr {
   std::optional<Designator> nth_designator(unsigned n) const;
   unsigned num_designators(void) const;
   gap::generator<Designator> designators(void) const &;
-  TokenRange designators_source_range(void) const;
+  TokenRange designators_tokens(void) const;
   Token equal_or_colon_token(void) const;
   Expr initializer(void) const;
   bool is_direct_initializer(void) const;

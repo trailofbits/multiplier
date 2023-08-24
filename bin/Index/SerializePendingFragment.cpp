@@ -161,19 +161,20 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #ifndef NDEBUG
   std::unordered_set<mx::RawEntityId> seen_eids;
   auto is_new_eid = [&seen_eids] (mx::RawEntityId eid) {
-    auto old_size = seen_eids.size();
-    seen_eids.insert(eid);
-    return old_size != seen_eids.size();
+    return seen_eids.emplace(eid).second;
   };
 #endif
 
+  mx::EntityOffset i = 0u;
   for (const pasta::Decl &entity : pf.decls_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
     auto vid = std::get<mx::DeclId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::Decl> storage;
@@ -184,13 +185,16 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
     auto vid = std::get<mx::StmtId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::Stmt> storage;
@@ -204,14 +208,16 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
   // Note: We don't serialize types to the same fragments. They are
   //       serialized as different fragment in the database. This
   //       will avoid duplication of the types in each fragments.
-
+  i = 0u;
   for (const pasta::Attr &entity : pf.attrs_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
     auto vid = std::get<mx::AttrId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::Attr> storage;
@@ -222,13 +228,16 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::Designator &entity : pf.designators_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
     auto vid = std::get<mx::DesignatorId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::Designator> storage;
@@ -239,6 +248,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::CXXBaseSpecifier &entity :
            pf.cxx_base_specifiers_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
@@ -246,7 +256,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #ifndef NDEBUG
     auto vid = std::get<mx::CXXBaseSpecifierId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::CXXBaseSpecifier> storage;
@@ -257,6 +269,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::TemplateArgument &entity :
            pf.template_arguments_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
@@ -264,7 +277,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #ifndef NDEBUG
     auto vid = std::get<mx::TemplateArgumentId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::TemplateArgument> storage;
@@ -275,6 +290,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::TemplateParameterList &entity :
            pf.template_parameter_lists_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
@@ -283,7 +299,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     auto vid = std::get<mx::TemplateParameterListId>(
         mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::TemplateParameterList> storage;
@@ -293,6 +311,8 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
+
+  (void) i;
 }
 
 void SerializeType(const pasta::Type &entity,

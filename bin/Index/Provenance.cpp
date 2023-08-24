@@ -1545,7 +1545,10 @@ mx::RawEntityId TokenProvenanceCalculator::DerivedTokenId(
 
 mx::RawEntityId TokenProvenanceCalculator::DerivedTokenId(
     const TokenTreeNode &tok) {
-  return DerivedTokenId(tok.Token().value());
+  if (auto pt = tok.Token()) {
+    return DerivedTokenId(pt.value());
+  }
+  return mx::kInvalidEntityId;
 }
 
 mx::RawEntityId TokenProvenanceCalculator::ParsedTokenId(

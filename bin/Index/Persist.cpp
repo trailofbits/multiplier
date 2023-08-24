@@ -645,16 +645,21 @@ static void PersistTokenTree(
     // a one-to-many mapping, but we try to choose a reasonable one.
     mx::VariantId parsed_vid =
         mx::EntityId(provenance.ParsedTokenId(tok_node)).Unpack();
+    
+    // We might have a backup case if we're serializing a builtin, where
+    // we serialized a buitlin or forward declaration in a declarator and
+    // (intentionally) droppped provenance so that we wouldn't accidentally
+    // bring in macros.
+    if (std::holds_alternative<mx::InvalidId>(parsed_vid) && pt) {
+      CHECK(pf.drop_token_provenance);
+      parsed_vid = mx::EntityId(em.EntityId(pt.value())).Unpack();
+    }
+
     if (std::holds_alternative<mx::ParsedTokenId>(parsed_vid)) {
       mti2po.set(i, std::get<mx::ParsedTokenId>(parsed_vid).offset);
     } else {
       CHECK(std::holds_alternative<mx::InvalidId>(parsed_vid));
       mti2po.set(i, num_parsed_tokens);
-
-      if (pt) {
-        parsed_vid = mx::EntityId(em.EntityId(pt.value())).Unpack();
-        CHECK(!std::holds_alternative<mx::ParsedTokenId>(parsed_vid));
-      }
     }
 
     // Map the token to its containing macro.

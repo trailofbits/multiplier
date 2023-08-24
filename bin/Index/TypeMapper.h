@@ -23,8 +23,13 @@ namespace indexer {
 class TypeMapper final {
  private:
   using TypeTokenRangeMap = std::map<TypeKey, pasta::PrintedTokenRange>;
-
+  using OpaqueOrderedDecl = std::pair<const void *, unsigned>;
+  std::vector<OpaqueOrderedDecl> decls;
   TypeTokenRangeMap types_token_range;
+
+  std::string HashType(
+      const EntityMapper &em, const pasta::Type &type,
+      const pasta::PrintedTokenRange &range);
 
  public:
   TypeIdMap type_ids;
@@ -47,20 +52,12 @@ class TypeMapper final {
   mx::RawEntityId EntityId(const void *type, uint32_t quals=0u) const;
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
 
-  bool AddEntityId(const pasta::Type &entity);
+  bool AddEntityId(const EntityMapper &em, const pasta::Type &entity);
 
   mx::PackedTypeId TypeId(const pasta::Type &entity) const;
 
   std::optional<pasta::PrintedTokenRange>
   TypeTokenRange(const pasta::Type &entity) const;
-
- private:
-  mx::PackedTypeId
-  GetOrCreateFragmentIdForType(
-      const pasta::Type &type,
-      const pasta::PrintedTokenRange &token_range,
-      bool &is_new_type_id) const;
-
 };
 
 }  // namespace indexer

@@ -329,19 +329,21 @@ class DatabaseWriter final {
 
   // Get, or create and return, a fragment ID for the specific fragment hash.
   PackedFragmentId GetOrCreateSmallFragmentIdForHash(
-      RawEntityId tok_id, const std::string &hash, bool &is_new);
+      RawEntityId tok_id, std::string hash, bool &is_new);
 
   // Get, or create and return, a fragment ID for the specific fragment hash.
   PackedFragmentId GetOrCreateBigFragmentIdForHash(
-      RawEntityId tok_id, const std::string &hash, bool &is_new);
+      RawEntityId tok_id, std::string hash, bool &is_new);
 
   // Get, or create and return, a type ID for the specific type.
   PackedTypeId GetOrCreateSmallTypeIdForHash(
-      mx::TypeKind type_kind, const std::string &hash, bool &is_new);
+      mx::TypeKind type_kind, uint32_t type_qualifiers,
+      std::string hash, bool &is_new);
 
   // Get, or create and return, a type ID for the specific type.
   PackedTypeId GetOrCreateBigTypeIdForHash(
-      mx::TypeKind type_kind, const std::string &hash, bool &is_new);
+      mx::TypeKind type_kind, uint32_t type_qualifiers,
+      std::string hash, bool &is_new);
 
  public:
   static constexpr const char *kInitStatements[] = {
@@ -389,8 +391,8 @@ class DatabaseWriter final {
       RawEntityId tok_id, std::string hash, size_t num_tokens, bool &is_new);
 
   PackedTypeId GetOrCreateTypeIdForHash(
-      mx::TypeKind type_kind, std::string hash, size_t num_tokens,
-      bool &is_new);
+      mx::TypeKind type_kind, uint32_t type_qualifiers,
+      std::string hash, size_t num_tokens, bool &is_new);
 
   // Get, or create and return, a translation unit ID for the specific compile
   // command hash.

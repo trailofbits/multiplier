@@ -63,19 +63,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::Token &) {}
 
   void MaybeVisitNext(const pasta::Decl &entity) {
-    fragment.Add(entity, em.entity_ids);
+    fragment.Add(entity, em.entity_ids, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Stmt &entity) {
-    fragment.Add(entity, em.entity_ids);
+    fragment.Add(entity, em.token_tree_ids, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Type &entity) {
-    fragment.Add(entity, em.tm);
+    fragment.Add(entity, em);
   }
 
   void MaybeVisitNext(const pasta::Attr &entity) {
-    fragment.Add(entity, em.entity_ids);
+    fragment.Add(entity, em.token_tree_ids, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Macro &) {}
@@ -83,19 +83,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::File &) {}
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
-    fragment.Add(pseudo, em.entity_ids);
+    fragment.Add(pseudo, em.token_tree_ids, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
-    fragment.Add(pseudo, em.entity_ids);
+    fragment.Add(pseudo, em.token_tree_ids, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::TemplateParameterList &pseudo) {
-    fragment.Add(pseudo, em.entity_ids);
+    fragment.Add(pseudo, em.token_tree_ids, em.entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Designator &pseudo) {
-    fragment.Add(pseudo, em.entity_ids);
+    fragment.Add(pseudo, em.token_tree_ids, em.entity_ids);
   }
 };
 
@@ -230,8 +230,15 @@ void FragmentBuilder::Accept(const pasta::Macro &) {}
 }  // namespace
 
 
-bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
+bool PendingFragment::Add(const pasta::Decl &entity,
+                          EntityIdMap &write_entity_ids,
+                          const EntityIdMap &read_entity_ids) {
   if (ShouldHideFromIndexer(entity))  {
+    return false;
+  }
+
+  auto locator = entity.RawDecl();
+  if (read_entity_ids.contains(locator)) {
     return false;
   }
 
@@ -242,19 +249,27 @@ bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
   id.kind = mx::FromPasta(kind);
   id.is_definition = IsDefinition(entity);
 
-  auto [it, added] = entity_ids.emplace(entity.RawDecl(), id);
-  if (added) {
+  if (write_entity_ids.emplace(locator, id).second) {
     decls_to_serialize.emplace_back(entity);  // New decl found.
     return true;
   }
+
   return false;
 }
 
-bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
+bool PendingFragment::Add(const pasta::Stmt &entity,
+                          EntityIdMap &write_entity_ids,
+                          const EntityIdMap &read_entity_ids) {
+
   if (auto expr = pasta::Expr::From(entity)) {
     if (expr->ContainsErrors()) {
       return false;
     }
+  }
+
+  auto locator = entity.RawStmt();
+  if (read_entity_ids.contains(locator)) {
+    return false;
   }
 
   auto kind = entity.Kind();
@@ -263,7 +278,7 @@ bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
   id.offset = static_cast<mx::EntityOffset>(stmts_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
-  if (entity_ids.emplace(entity.RawStmt(), id).second) {
+  if (write_entity_ids.emplace(locator, id).second) {
     stmts_to_serialize.emplace_back(entity);  // New stmt found.
     return true;
   }
@@ -271,8 +286,8 @@ bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
   return false;
 }
 
-bool PendingFragment::Add(const pasta::Type &entity, TypeMapper &tm) {
-  if (!tm.AddEntityId(entity)) {
+bool PendingFragment::Add(const pasta::Type &entity, EntityMapper &em) {
+  if (!em.tm.AddEntityId(em, entity)) {
     return false;
   }
 
@@ -296,14 +311,22 @@ bool PendingFragment::Add(const pasta::Type &entity, TypeMapper &tm) {
   return true;
 }
 
-bool PendingFragment::Add(const pasta::Attr &entity, EntityIdMap &entity_ids) {
+bool PendingFragment::Add(const pasta::Attr &entity,
+                          EntityIdMap &write_entity_ids,
+                          const EntityIdMap &read_entity_ids) {
+
+  auto locator = entity.RawAttr();
+  if (read_entity_ids.contains(locator)) {
+    return false;
+  }
+
   auto kind = entity.Kind();
   mx::AttrId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(attrs_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
-  if (entity_ids.emplace(entity.RawAttr(), id).second) {
+  if (write_entity_ids.emplace(locator, id).second) {
     attrs_to_serialize.emplace_back(entity);  // New attribute found.
     return true;
   }
@@ -312,13 +335,20 @@ bool PendingFragment::Add(const pasta::Attr &entity, EntityIdMap &entity_ids) {
 }
 
 bool PendingFragment::Add(const pasta::TemplateArgument &entity,
-                          EntityIdMap &entity_ids) {
+                          EntityIdMap &write_entity_ids,
+                          const EntityIdMap &read_entity_ids) {
+
+  auto locator = entity.RawTemplateArgument();
+  if (read_entity_ids.contains(locator)) {
+    return false;
+  }
+
   mx::TemplateArgumentId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(
       template_arguments_to_serialize.size());
 
-  if (entity_ids.emplace(entity.RawTemplateArgument(), id).second) {
+  if (write_entity_ids.emplace(locator, id).second) {
     template_arguments_to_serialize.emplace_back(entity);
     return true;
   }
@@ -326,13 +356,20 @@ bool PendingFragment::Add(const pasta::TemplateArgument &entity,
 }
 
 bool PendingFragment::Add(const pasta::TemplateParameterList &entity,
-                          EntityIdMap &entity_ids) {
+                          EntityIdMap &write_entity_ids,
+                          const EntityIdMap &read_entity_ids) {
+
+  auto locator = entity.RawTemplateParameterList();
+  if (read_entity_ids.contains(locator)) {
+    return false;
+  }
+
   mx::TemplateParameterListId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(
       template_parameter_lists_to_serialize.size());
 
-  if (entity_ids.emplace(entity.RawTemplateParameterList(), id).second) {
+  if (write_entity_ids.emplace(locator, id).second) {
     template_parameter_lists_to_serialize.emplace_back(entity);
     return true;
   }
@@ -340,13 +377,20 @@ bool PendingFragment::Add(const pasta::TemplateParameterList &entity,
 }
 
 bool PendingFragment::Add(const pasta::CXXBaseSpecifier &entity,
-                          EntityIdMap &entity_ids) {
+                          EntityIdMap &write_entity_ids,
+                          const EntityIdMap &read_entity_ids) {
+
+  auto locator = entity.RawCXXBaseSpecifier();
+  if (read_entity_ids.contains(locator)) {
+    return false;
+  }
+
   mx::CXXBaseSpecifierId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(
       cxx_base_specifiers_to_serialize.size());
 
-  if (entity_ids.emplace(entity.RawCXXBaseSpecifier(), id).second) {
+  if (write_entity_ids.emplace(locator, id).second) {
     cxx_base_specifiers_to_serialize.emplace_back(entity);
     return true;
   }
@@ -354,12 +398,19 @@ bool PendingFragment::Add(const pasta::CXXBaseSpecifier &entity,
 }
 
 bool PendingFragment::Add(const pasta::Designator &entity,
-                          EntityIdMap &entity_ids) {
+                          EntityIdMap &write_entity_ids,
+                          const EntityIdMap &read_entity_ids) {
+
+  auto locator = entity.RawDesignator();
+  if (read_entity_ids.contains(locator)) {
+    return false;
+  }
+
   mx::DesignatorId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(designators_to_serialize.size());
 
-  if (entity_ids.emplace(entity.RawDesignator(), id).second) {
+  if (write_entity_ids.emplace(locator, id).second) {
     designators_to_serialize.emplace_back(entity);
     return true;
   }

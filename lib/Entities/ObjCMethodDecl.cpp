@@ -225,7 +225,7 @@ Type ObjCMethodDecl::return_type(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-TokenRange ObjCMethodDecl::return_type_source_range(void) const {
+TokenRange ObjCMethodDecl::return_type_tokens(void) const {
   return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal69(), impl->reader.getVal79());
 }
 

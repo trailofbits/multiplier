@@ -98,7 +98,7 @@ class FunctionDecl : public DeclaratorDecl {
   Token default_token(void) const;
   std::optional<FunctionTemplateDecl> described_function_template(void) const;
   Token ellipsis_token(void) const;
-  TokenRange exception_spec_source_range(void) const;
+  TokenRange exception_spec_tokens(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
   std::optional<FunctionDecl> instantiated_from_declaration(void) const;
   std::optional<FunctionDecl> instantiated_from_member_function(void) const;
@@ -106,11 +106,10 @@ class FunctionDecl : public DeclaratorDecl {
   MultiVersionKind multi_version_kind(void) const;
   std::optional<unsigned> odr_hash(void) const;
   OverloadedOperatorKind overloaded_operator(void) const;
-  TokenRange parameters_source_range(void) const;
+  TokenRange parameters_tokens(void) const;
   Token point_of_instantiation(void) const;
   std::optional<FunctionTemplateDecl> primary_template(void) const;
   Type return_type(void) const;
-  TokenRange return_type_source_range(void) const;
   StorageClass storage_class(void) const;
   std::optional<FunctionDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;

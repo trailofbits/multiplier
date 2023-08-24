@@ -804,6 +804,11 @@ void CodeGenerator::RunOnOptional(
     cxx_element_name = "unsigned";
     cxx_underlying_name = cxx_element_name;
 
+  } else if (*element_name == "uint64_t") {
+    capn_element_name = "UInt64";
+    cxx_element_name = "uint64_t";
+    cxx_underlying_name = cxx_element_name;
+
   } else if (*element_name == "int") {
     capn_element_name = "Int32";
     cxx_element_name = "int";

@@ -55,11 +55,11 @@ mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
 
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
   if (auto it = entity_ids.find(entity); it != entity_ids.end()) {
-    return it->second.Pack();
-
-  } else {
-    return PerFragmentEntityId(entity);
+    if (mx::RawEntityId eid = it->second.Pack(); eid != mx::kInvalidEntityId) {
+      return eid;
+    }
   }
+  return PerFragmentEntityId(entity);
 }
 
 
@@ -67,11 +67,8 @@ mx::RawEntityId EntityMapper::PerFragmentEntityId(const void *entity) const {
   if (auto it = token_tree_ids.find(entity); it != token_tree_ids.end()) {
     return it->second.Pack();
 
-  } else if (auto eid = tm.EntityId(entity); eid != mx::kInvalidEntityId) {
-    return eid;
-
   } else {
-    return mx::kInvalidEntityId;
+    return tm.EntityId(entity);
   }
 }
 
@@ -80,11 +77,11 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Decl &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) const {
-  return EntityId(entity.RawStmt());
+  return PerFragmentEntityId(entity.RawStmt());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
-  return EntityId(entity.RawAttr());
+  return PerFragmentEntityId(entity.RawAttr());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
@@ -131,6 +128,10 @@ mx::RawEntityId EntityMapper::EntityId(const TokenTreeNode &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
+  if (!entity) {
+    return mx::kInvalidEntityId;
+  }
+
   // NOTE(pag): May be part of a directive, which may be referenced by other
   //            fragments, so we use `EntityId`, which falls back on
   //            `PerFragmentEntityId`.
@@ -139,7 +140,13 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
     return eid;
   }
 
-  assert(!IsParsedToken(entity));
+  // We shouldn't get parsed tokens here, though when serializing types, we
+  // might
+  if (IsParsedToken(entity)) {
+    assert(false);
+    //assert(entity.Kind() == pasta::TokenKind::kEllipsis);
+    return eid;
+  }
 
   if (auto mt = entity.MacroLocation()) {
     eid = EntityId(mt->RawMacro());
@@ -214,22 +221,22 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) const {
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::TemplateArgument &pseudo) const {
-  return EntityId(pseudo.RawTemplateArgument());
+  return PerFragmentEntityId(pseudo.RawTemplateArgument());
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::TemplateParameterList &pseudo) const {
-  return EntityId(pseudo.RawTemplateParameterList());
+  return PerFragmentEntityId(pseudo.RawTemplateParameterList());
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::CXXBaseSpecifier &pseudo) const {
-  return EntityId(pseudo.RawCXXBaseSpecifier());
+  return PerFragmentEntityId(pseudo.RawCXXBaseSpecifier());
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::Designator &pseudo) const {
-  return EntityId(pseudo.RawDesignator());
+  return PerFragmentEntityId(pseudo.RawDesignator());
 }
 
 mx::RawEntityId EntityMapper::EntityIdOfType(

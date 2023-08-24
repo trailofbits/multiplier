@@ -27,6 +27,7 @@
 
 namespace indexer {
 
+class EntityMapper;
 class TypeMapper;
 
 using Pseudo = std::variant<pasta::TemplateArgument,
@@ -59,16 +60,19 @@ class FileLocationOfFragment {
 // represents a single logical thing.
 class PendingFragment {
  public:
-  inline PendingFragment(mx::PackedFragmentId fragment_id_,
+  inline PendingFragment(mx::PackedFragmentId fragment_id_, bool is_new_,
                          mx::PackedCompilationId tu_id_,
                          EntityMapper &em_,
                          const pasta::TokenRange *original_tokens_,
-                         const pasta::PrintedTokenRange &parsed_tokens_)
+                         pasta::PrintedTokenRange parsed_tokens_,
+                         std::optional<FileLocationOfFragment> file_location_)
       : fragment_id(fragment_id_),
         fragment_index(fragment_id.Unpack().fragment_id),
         compilation_id(tu_id_),
         em(em_),
-        parsed_tokens(parsed_tokens_) {
+        parsed_tokens(std::move(parsed_tokens_)),
+        file_location(std::move(file_location_)),
+        is_new(is_new_) {
     if (original_tokens_) {
       original_tokens = *original_tokens_;
     }
@@ -100,7 +104,7 @@ class PendingFragment {
   // contexts.
   pasta::PrintedTokenRange parsed_tokens;
 
-  std::optional<FileLocationOfFragment> file_location;
+  const std::optional<FileLocationOfFragment> file_location;
 
   // Top-level declarations. These are the roots of serialization.
   std::vector<pasta::Decl> top_level_decls;
@@ -138,20 +142,48 @@ class PendingFragment {
   // of a type, only to have that pending fragment "thrown away" later (due to
   // it being redundant), yet have other fragments in the TU point to type IDs
   // that logically belong to this type.
-  bool is_new{false};
+  const bool is_new;
 
-  bool Add(const pasta::Decl &entity, EntityIdMap &entity_ids);
-  bool Add(const pasta::Stmt &entity, EntityIdMap &entity_ids);
-  bool Add(const pasta::Type &entity, TypeMapper &type_map);
-  bool Add(const pasta::Attr &entity, EntityIdMap &entity_ids);
-  bool Add(const pasta::TemplateArgument &pseudo, EntityIdMap &entity_ids);
-  bool Add(const pasta::CXXBaseSpecifier &pseudo, EntityIdMap &entity_ids);
-  bool Add(const pasta::TemplateParameterList &pseudo, EntityIdMap &entity_ids);
-  bool Add(const pasta::Designator &pseudo, EntityIdMap &entity_ids);
+  // Keep track on if we've labelled some top-level entities in the entity
+  // mapper.
+  bool has_labelled_decls{false};
+  bool has_labelled_tokens{false};
+
+  // Should we drop token provenance after we've labelled tokens? This helps
+  bool drop_token_provenance{false};
+
+  // Possibly add an entity to this fragment. We have two entity ID maps:
+  // The `read_entity_ids` map, which we use to decide if globally we should
+  // ignore this entity without formulating an ID. If our entity isn't in
+  // `read_entity_ids`, then we opportunistically create an id and try to add
+  // it to `write_entity_ids`.
+
+  bool Add(const pasta::Decl &entity, EntityIdMap &write_entity_ids,
+           const EntityIdMap &read_entity_ids);
+  
+  bool Add(const pasta::Stmt &entity, EntityIdMap &write_entity_ids,
+           const EntityIdMap &read_entity_ids);
+  
+  bool Add(const pasta::Type &entity, EntityMapper &type_map);
+  
+  bool Add(const pasta::Attr &entity, EntityIdMap &write_entity_ids,
+           const EntityIdMap &read_entity_ids);
+  
+  bool Add(const pasta::TemplateArgument &pseudo, EntityIdMap &write_entity_ids,
+           const EntityIdMap &read_entity_ids);
+  
+  bool Add(const pasta::CXXBaseSpecifier &pseudo, EntityIdMap &write_entity_ids,
+           const EntityIdMap &read_entity_ids);
+  
+  bool Add(const pasta::TemplateParameterList &pseudo,
+           EntityIdMap &write_entity_ids, const EntityIdMap &read_entity_ids);
+  
+  bool Add(const pasta::Designator &pseudo, EntityIdMap &write_entity_ids,
+           const EntityIdMap &read_entity_ids);
 
   // Find and initialize `parent_decl_ids` and `last_file_token_id`.
-  void InitFileLocationRange(
-      EntityIdMap &entity_ids, const pasta::TokenRange &toks);
+  void InitFileLocationRange(EntityIdMap &entity_ids,
+                             const pasta::TokenRange &toks);
 };
 
 using PendingFragmentPtr = std::unique_ptr<PendingFragment>;

@@ -40,7 +40,6 @@ class EntityLabeller final : public EntityVisitor {
   PendingFragment &fragment;
 
   std::vector<pasta::Decl> next_decls;
-  std::vector<pasta::Stmt> next_stmts;
   std::vector<pasta::Type> next_types;
 
   // Tracks the index of the next parsed token. Logic surrounding this
@@ -60,46 +59,61 @@ class EntityLabeller final : public EntityVisitor {
     if (ShouldHideFromIndexer(entity)) {
       return false;
     } else {
-      return fragment.Add(entity, em.entity_ids);
+      return fragment.Add(entity, em.entity_ids, em.entity_ids);
     }
   }
 
-  bool Enter(const pasta::Stmt &entity) final {
-    return fragment.Add(entity, em.entity_ids);
+  void Accept(const pasta::Decl &entity) final {
+    next_decls.push_back(entity);
   }
 
-  bool Enter(const pasta::Type &entity) final {
-    if (fragment.is_new) {
-      return fragment.Add(entity, em.tm);
-    } else {
-      return false;
-    }
+  // NOTE(pag): Don't label statements as they are not referenceable across
+  //            fragments, and if we did label them, then we'd want them to
+  //            be fragment-specific, and that data would get wiped out by
+  //            `EntityMapper::ResetForFragment`.
+  bool Enter(const pasta::Stmt &) final {
+    return false;
+  }
+
+  void Accept(const pasta::Stmt &) final {}
+
+  // NOTE(pag): Don't recursively descend into types. We may end up walking
+  //            from a `FunctionProtoType` into a `typedef` (e.g. an argument
+  //            or return value type), and that `typedef` is likely part of
+  //            a different fragment, and we don't want to pull in things like
+  //            structures from that other fragment.
+  //
+  // NOTE(pag): We can't rely on the order of types being deterministic for
+  //            the "same" fragment in different translation units.
+  bool Enter(const pasta::Type &) final {
+
+    // if (fragment.is_new) {
+    //   return fragment.Add(entity, em.tm);
+    // }
+    
+    return false;
+  }
+
+  void Accept(const pasta::Type &entity) final {
+    next_types.push_back(entity);
   }
 
   void Run(void) {
     std::vector<pasta::Decl> curr_decls;
-    std::vector<pasta::Stmt> curr_stmts;
     std::vector<pasta::Type> curr_types;
 
     for (auto changed = true; changed; ) {
       changed = false;
       curr_decls.swap(next_decls);
-      curr_stmts.swap(next_stmts);
       curr_types.swap(next_types);
 
       // NOTE(pag): Macros are handled in `Persist.cpp`, because we want to
       //            merge expansions and argument pre-expansion phases.
 
       next_decls.clear();
-      next_stmts.clear();
       next_types.clear();
 
       for (const auto &entity : curr_decls) {
-        changed = true;
-        this->EntityVisitor::Accept(entity);
-      }
-
-      for (const auto &entity : curr_stmts) {
         changed = true;
         this->EntityVisitor::Accept(entity);
       }
@@ -109,18 +123,6 @@ class EntityLabeller final : public EntityVisitor {
         this->EntityVisitor::Accept(entity);
       }
     }
-  }
-
-  void Accept(const pasta::Decl &entity) final {
-    next_decls.push_back(entity);
-  }
-
-  void Accept(const pasta::Stmt &entity) final {
-    next_stmts.push_back(entity);
-  }
-
-  void Accept(const pasta::Type &entity) final {
-    next_types.push_back(entity);
   }
 
   // Create initial fragment token IDs for all of the tokens in the range of
@@ -157,7 +159,7 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
 
   if (std::optional<pasta::Token> pt = entity.DerivedLocation()) {
     CHECK(IsParsedToken(pt.value()));
-    CHECK(em.token_tree_ids.emplace(pt->RawToken(), id).second);    
+    CHECK(em.token_tree_ids.emplace(pt->RawToken(), id).second);
   }
 
   // // If we didn't just add the token, then we should be in the nested fragment
@@ -188,9 +190,6 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   }
 
   CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
-  LOG(ERROR) << fragment.macros_to_serialize.size() << ' '
-             << fragment.fragment_index << ' '
-             << entity.KindName() << ' ' << mx::EntityId(id).Pack();
 
   // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
   //            fills in the empty slots.
@@ -222,6 +221,12 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
 void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em) {
+  if (pf.has_labelled_decls) {
+    return;
+  }
+
+  pf.has_labelled_decls = true;
+
   EntityLabeller labeller(em, pf);
 
   // Go top-down through the top-level declarations of this pending fragment
@@ -270,9 +275,11 @@ void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em) {
 // new fragments that we want to serialize.
 void LabelTokensAndMacrosInFragment(PendingFragment &pf, EntityMapper &em) {
 
-  if (!pf.macros_to_serialize.empty()) {
+  if (pf.has_labelled_tokens) {
     return;  // Already done.
   }
+
+  pf.has_labelled_tokens = true;
 
   EntityLabeller labeller(em, pf);
 
@@ -290,6 +297,10 @@ void LabelTokensAndMacrosInFragment(PendingFragment &pf, EntityMapper &em) {
   // missed by the above process.
   for (pasta::PrintedToken tok : pf.parsed_tokens) {
     (void) labeller.Label(tok);
+  }
+
+  if (pf.drop_token_provenance) {
+    pf.parsed_tokens.DumpProvenanceInformation();
   }
 }
 
