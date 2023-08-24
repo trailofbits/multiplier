@@ -14,7 +14,6 @@
 namespace mx {
 class EntityProvider;
 class Index;
-class Attr;
 class CUDAKernelCallExpr;
 class CXXMemberCallExpr;
 class CXXOperatorCallExpr;
@@ -83,7 +82,6 @@ class CallExpr : public Expr {
   std::optional<Decl> callee_declaration(void) const;
   std::optional<FunctionDecl> direct_callee(void) const;
   Token r_paren_token(void) const;
-  std::optional<Attr> unused_result_attribute(void) const;
   bool has_stored_fp_features(void) const;
   bool has_unused_result_attribute(void) const;
   bool is_builtin_assume_false(void) const;

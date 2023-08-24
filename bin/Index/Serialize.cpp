@@ -6344,13 +6344,6 @@ void SerializeCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const p
   }
   auto t42 = e.RParenToken();
   b.setVal42(es.EntityId(t42));
-  auto v43 = e.UnusedResultAttribute();
-  if (v43) {
-    auto id43 = es.EntityId(v43.value());
-    b.setVal43(id43);
-  } else {
-    b.setVal43(mx::kInvalidEntityId);
-  }
   b.setVal89(e.HasStoredFPFeatures());
   b.setVal90(e.HasUnusedResultAttribute());
   b.setVal91(e.IsBuiltinAssumeFalse());
@@ -6362,8 +6355,8 @@ void SerializeCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const p
 void SerializeCXXOperatorCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXOperatorCallExpr &e, const TokenTree *) {
   SerializeCallExpr(es, b, e, nullptr);
   b.setVal96(static_cast<unsigned char>(mx::FromPasta(e.Operator())));
-  auto t44 = e.OperatorToken();
-  b.setVal44(es.EntityId(t44));
+  auto t43 = e.OperatorToken();
+  b.setVal43(es.EntityId(t43));
   b.setVal97(e.IsAssignmentOperation());
   b.setVal98(e.IsComparisonOperation());
   b.setVal99(e.IsInfixBinaryOperation());
@@ -6371,29 +6364,29 @@ void SerializeCXXOperatorCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder
 
 void SerializeCXXMemberCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXMemberCallExpr &e, const TokenTree *) {
   SerializeCallExpr(es, b, e, nullptr);
-  b.setVal44(es.EntityId(e.ImplicitObjectArgument()));
-  auto v45 = e.MethodDeclaration();
-  if (v45) {
-    auto id45 = es.EntityId(v45.value());
-    b.setVal45(id45);
+  b.setVal43(es.EntityId(e.ImplicitObjectArgument()));
+  auto v44 = e.MethodDeclaration();
+  if (v44) {
+    auto id44 = es.EntityId(v44.value());
+    b.setVal44(id44);
   } else {
-    b.setVal45(mx::kInvalidEntityId);
+    b.setVal44(mx::kInvalidEntityId);
   }
-  b.setVal46(es.EntityId(e.ObjectType()));
-  b.setVal47(es.EntityId(e.RecordDeclaration()));
+  b.setVal45(es.EntityId(e.ObjectType()));
+  b.setVal46(es.EntityId(e.RecordDeclaration()));
 }
 
 void SerializeCUDAKernelCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CUDAKernelCallExpr &e, const TokenTree *) {
   SerializeCallExpr(es, b, e, nullptr);
-  b.setVal44(es.EntityId(e.Config()));
+  b.setVal43(es.EntityId(e.Config()));
 }
 
 void SerializeUserDefinedLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UserDefinedLiteral &e, const TokenTree *) {
   SerializeCallExpr(es, b, e, nullptr);
-  b.setVal44(es.EntityId(e.CookedLiteral()));
+  b.setVal43(es.EntityId(e.CookedLiteral()));
   b.setVal96(static_cast<unsigned char>(mx::FromPasta(e.LiteralOperatorKind())));
-  auto t45 = e.UDSuffixToken();
-  b.setVal45(es.EntityId(t45));
+  auto t44 = e.UDSuffixToken();
+  b.setVal44(es.EntityId(t44));
 }
 
 void SerializeCXXUuidofExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXUuidofExpr &e, const TokenTree *) {

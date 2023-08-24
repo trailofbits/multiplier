@@ -14,6 +14,22 @@
 #include "PASTA.h"
 
 namespace indexer {
+namespace {
+
+static bool IsSizedBuiltinType(const pasta::Type &type) {
+  auto bt = pasta::BuiltinType::From(type);
+  if (!bt) {
+    return false;
+  }
+
+  if (bt->BuiltinKind() == pasta::BuiltinTypeKind::kBuiltinFn) {
+    return false;
+  } else {
+    return !bt->IsSizelessType();
+  }
+}
+
+}  // namespace
 
 // Hash a type.
 std::string TypeMapper::HashType(
@@ -27,7 +43,8 @@ std::string TypeMapper::HashType(
      << 'q' << type.RawQualifiers();
 
   pasta::Type canonical_type = type.CanonicalType();
-  if (canonical_type.IsBuiltinType() || canonical_type.IsPointerType()) {
+  
+  if (IsSizedBuiltinType(canonical_type) || canonical_type.IsPointerType()) {
     if (auto size = canonical_type.SizeInBits()) {
       ss << 's' << size.value();
     }
@@ -83,6 +100,9 @@ std::string TypeMapper::HashType(
     ss << " d";
     for (OpaqueOrderedDecl od : decls) {
       auto eid = em.EntityId(od.first);
+
+      // NOTE(pag): Eventually this may trigger as a result of top-level
+      //            decls that are ignored due to `ShouldHideFromIndexer`.
       assert(eid != mx::kInvalidEntityId);
       ss << ' ' << eid;
     }

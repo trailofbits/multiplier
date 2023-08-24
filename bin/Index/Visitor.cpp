@@ -436,7 +436,7 @@ void EntityVisitor::VisitTypeOfExprType(const pasta::TypeOfExprType &type) {
 void EntityVisitor::VisitDecltypeType(const pasta::DecltypeType &type) {
   if (EnterType(type)) {
     Accept(type.UnderlyingExpression());
-  } 
+  }
 }
 
 void EntityVisitor::VisitDependentAddressSpaceType(
@@ -513,24 +513,25 @@ void EntityVisitor::VisitFunctionProtoType(
   }
 }
 
+void EntityVisitor::VisitAlignedAttr(const pasta::AlignedAttr &attr) {
+  if (auto aligned_expr = attr.AlignmentExpression()) {
+    Accept(aligned_expr.value());
+  }
+}
+
 bool EntityVisitor::EnterDecl(const pasta::Decl &decl) {
-  if (Enter(decl)) {
-    for (const pasta::Attr &attr : decl.Attributes()) {
-      if (auto aligned_attr = pasta::AlignedAttr::From(attr)) {
-        if (auto aligned_expr = aligned_attr->AlignmentExpression()) {
-          Accept(*aligned_expr);
-        }
-      }
-    }
-    if (auto ls = decl.DescribedTemplateParameters()) {
-      for (const pasta::NamedDecl &param_decl : ls->Parameters()) {
-        Accept(param_decl);
-      }
-    }
-    return true;
-  } else {
+  if (!Enter(decl)) {
     return false;
   }
+  for (const pasta::Attr &attr : decl.Attributes()) {
+    Accept(attr);
+  }
+  if (auto ls = decl.DescribedTemplateParameters()) {
+    for (const pasta::NamedDecl &param_decl : ls->Parameters()) {
+      Accept(param_decl);
+    }
+  }
+  return true;
 }
 
 bool EntityVisitor::EnterStmt(const pasta::Stmt &stmt) {
@@ -548,6 +549,10 @@ bool EntityVisitor::EnterType(const pasta::Type &type) {
   return Enter(type);
 }
 
+bool EntityVisitor::EnterAttr(const pasta::Attr &attr) {
+  return Enter(attr);
+}
+
 // Backups.
 void EntityVisitor::VisitDecl(const pasta::Decl &decl) {
   EnterDecl(decl);
@@ -559,6 +564,14 @@ void EntityVisitor::VisitStmt(const pasta::Stmt &stmt) {
 
 void EntityVisitor::VisitType(const pasta::Type &stmt) {
   EnterType(stmt);
+}
+
+void EntityVisitor::VisitAttr(const pasta::Attr &attr) {
+  EnterAttr(attr);
+}
+
+void EntityVisitor::Accept(const pasta::Attr &entity) {
+  this->AttrVisitor::Accept(entity);
 }
 
 void EntityVisitor::Accept(const pasta::Decl &entity) {

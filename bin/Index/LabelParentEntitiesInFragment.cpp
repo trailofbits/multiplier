@@ -45,8 +45,8 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   virtual ~ParentTrackerVisitor(void) = default;
 
-  ParentTrackerVisitor(EntityMapper &em_, PendingFragment &fragment_)
-      : em(em_),
+  explicit ParentTrackerVisitor(PendingFragment &fragment_)
+      : em(fragment_.em),
         fragment(fragment_) {}
 
   void Accept(const pasta::Decl &entity) final {
@@ -103,6 +103,8 @@ class ParentTrackerVisitor : public EntityVisitor {
     this->EntityVisitor::Accept(entity);
   }
 
+  void Accept(const pasta::Attr &) final {}
+
   bool Enter(const pasta::Decl &entity) final {
     return not_yet_seen.erase(entity.RawDecl());
   }
@@ -114,15 +116,19 @@ class ParentTrackerVisitor : public EntityVisitor {
   bool Enter(const pasta::Type &entity) final {
     return not_yet_seen.erase(entity.RawType());
   }
+
+  bool Enter(const pasta::Attr &) final {
+    return false;
+  }
 };
 
 }  // namespace
 
 // Maps the child-to-parent relationships in the fragment, storing the
 // relationships in `parent_decls` and `parent_stmts`.
-void LabelParentsInPendingFragment(
-    PendingFragment &pf, EntityMapper &em) {
-  ParentTrackerVisitor vis(em, pf);
+void LabelParentsInPendingFragment(PendingFragment &pf) {
+
+  ParentTrackerVisitor vis(pf);
   for (const pasta::Decl &decl : pf.decls_to_serialize) {
     vis.not_yet_seen.emplace(decl.RawDecl());
   }
@@ -166,11 +172,12 @@ void LabelParentsInPendingFragment(
 #endif
 
 // #ifndef NDEBUG
-  // TODO(kumarak): Does the manually written Visitor.cpp should have traverse function
-  //                for all stmt types. If not then we can probably remove assert here.
-  // for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-  //   assert(!vis.not_yet_seen.count(stmt.RawStmt()));
-  // }
+//   // TODO(kumarak): Does the manually written Visitor.cpp have to traverse
+//   //                all stmt types. If not then we can probably remove
+//   //                assert here.
+//   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
+//     assert(!vis.not_yet_seen.count(stmt.RawStmt()));
+//   }
 // #endif
 }
 

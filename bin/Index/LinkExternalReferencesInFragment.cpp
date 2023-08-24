@@ -24,9 +24,10 @@ namespace indexer {
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 void LinkExternalReferencesInFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
-    EntityMapper &em) {
+    mx::DatabaseWriter &database, const PendingFragment &pf) {
 
+  const EntityMapper &em = pf.em;
+  
   // XREF(pag): Issue #214. We want to record references to other decls that are
   //            expressed in types. In PASTA, we don't present Clang's
   //            `TypeLoc`s, so we need to instead go through the types to find

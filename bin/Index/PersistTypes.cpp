@@ -369,9 +369,6 @@ static void PersistPrintedTokens(
     if (std::optional<pasta::Token> pt = tok.DerivedLocation()) {
       CHECK(em.token_tree_ids.emplace(pt->RawToken(),
                                       mx::EntityId(token_id)).second);
-    
-      LOG_IF(ERROR, pt->Kind() == pasta::TokenKind::kEllipsis)
-          << pt->RawToken() << ' ' << mx::EntityId(token_id);
     }
   }
 

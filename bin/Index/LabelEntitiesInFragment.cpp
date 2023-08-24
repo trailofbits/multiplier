@@ -48,9 +48,8 @@ class EntityLabeller final : public EntityVisitor {
   // or intermediate macro expansion tokens.
   unsigned next_parsed_token_index{0u};
 
-  inline explicit EntityLabeller(EntityMapper &em_,
-                                 PendingFragment &fragment_)
-      : em(em_),
+  inline explicit EntityLabeller(PendingFragment &fragment_)
+      : em(fragment_.em),
         fragment(fragment_) {}
 
   virtual ~EntityLabeller(void) = default;
@@ -58,9 +57,13 @@ class EntityLabeller final : public EntityVisitor {
   bool Enter(const pasta::Decl &entity) final {
     if (ShouldHideFromIndexer(entity)) {
       return false;
-    } else {
-      return fragment.Add(entity, em.entity_ids, em.entity_ids);
     }
+    
+    if (!fragment.Add(entity)) {
+      return false;
+    }
+
+    return true;
   }
 
   void Accept(const pasta::Decl &entity) final {
@@ -88,7 +91,7 @@ class EntityLabeller final : public EntityVisitor {
   bool Enter(const pasta::Type &) final {
 
     // if (fragment.is_new) {
-    //   return fragment.Add(entity, em.tm);
+    //   return fragment.Add(entity);
     // }
     
     return false;
@@ -96,6 +99,14 @@ class EntityLabeller final : public EntityVisitor {
 
   void Accept(const pasta::Type &entity) final {
     next_types.push_back(entity);
+  }
+
+  bool Enter(const pasta::Attr &attr) final {
+    fragment.Add(attr);
+
+    // NOTE(pag): Want to return `true` because some attributes contain constant
+    //            expressions.
+    return true;
   }
 
   void Run(void) {
@@ -113,12 +124,12 @@ class EntityLabeller final : public EntityVisitor {
       next_decls.clear();
       next_types.clear();
 
-      for (const auto &entity : curr_decls) {
+      for (const pasta::Decl &entity : curr_decls) {
         changed = true;
         this->EntityVisitor::Accept(entity);
       }
 
-      for (const auto &entity : curr_types) {
+      for (const pasta::Type &entity : curr_types) {
         changed = true;
         this->EntityVisitor::Accept(entity);
       }
@@ -220,14 +231,14 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em) {
+void LabelDeclsInFragment(PendingFragment &pf) {
   if (pf.has_labelled_decls) {
     return;
   }
 
   pf.has_labelled_decls = true;
 
-  EntityLabeller labeller(em, pf);
+  EntityLabeller labeller(pf);
 
   // Go top-down through the top-level declarations of this pending fragment
   // and build up an initial list of `decls_to_serialize` and
@@ -250,6 +261,7 @@ void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em) {
   CHECK(pf.decls_to_serialize.empty());
 
 #ifndef NDEBUG
+  const EntityMapper &em = pf.em;
   for (const pasta::Decl &decl : pf.top_level_decls) {
     CHECK_EQ(em.EntityId(decl), mx::kInvalidEntityId);
   }
@@ -273,7 +285,7 @@ void LabelDeclsInFragment(PendingFragment &pf, EntityMapper &em) {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-void LabelTokensAndMacrosInFragment(PendingFragment &pf, EntityMapper &em) {
+void LabelTokensAndMacrosInFragment(PendingFragment &pf) {
 
   if (pf.has_labelled_tokens) {
     return;  // Already done.
@@ -281,7 +293,7 @@ void LabelTokensAndMacrosInFragment(PendingFragment &pf, EntityMapper &em) {
 
   pf.has_labelled_tokens = true;
 
-  EntityLabeller labeller(em, pf);
+  EntityLabeller labeller(pf);
 
   // TODO(pag): Define macro directives and their parameters need to be
   //            part of the global entity map, not the per-fragment ones.

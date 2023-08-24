@@ -71,36 +71,32 @@ extern void DispatchSerializeMacro(const EntityMapper &em,
 // Build the fragment. This fills out the decls/stmts/types to serialize.
 //
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-extern void BuildPendingFragment(PendingFragment &pf, EntityMapper &em);
+extern void BuildPendingFragment(PendingFragment &pf);
 
 // Label the parent entity ids.
-extern void LabelParentsInPendingFragment(PendingFragment &pf,
-                                          EntityMapper &em);
+extern void LabelParentsInPendingFragment(PendingFragment &pf);
 
 // Label tokens and macros.
-extern void LabelTokensAndMacrosInFragment(PendingFragment &pf,
-                                           EntityMapper &em);
+extern void LabelTokensAndMacrosInFragment(PendingFragment &pf);
 
 // Store information persistently to enable linking of declarations across
 // fragments.
 extern void LinkEntitiesAcrossFragments(
     mx::DatabaseWriter &database, const PendingFragment &pf,
-    const EntityMapper &em, const NameMangler &mangler);
+    const NameMangler &mangler);
 
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 extern void LinkExternalReferencesInFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
-    EntityMapper &em);
+    mx::DatabaseWriter &database, const PendingFragment &pf);
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
 extern void SerializePendingFragment(mx::DatabaseWriter &database,
-                                     const PendingFragment &pf,
-                                     const EntityMapper &em);
+                                     const PendingFragment &pf);
 
 // Save the symbolic names of all declarations into the database.
 extern void LinkEntityNamesToFragment(
-    mx::DatabaseWriter &db, const PendingFragment &pf, EntityMapper &em);
+    mx::DatabaseWriter &db, const PendingFragment &pf);
 
 namespace {
 
@@ -385,20 +381,20 @@ struct TokenTreeSerializationSchedule {
     }
   }
 
-  TokenTreeSerializationSchedule(PendingFragment &pf_, EntityMapper &em_)
+  TokenTreeSerializationSchedule(PendingFragment &pf_)
       : pf(pf_),
-        em(em_) {}
+        em(pf_.em) {}
 };
 
 static void VisitMacros(
-    PendingFragment &pf, EntityMapper &em, const pasta::Macro &macro,
+    PendingFragment &pf, const pasta::Macro &macro,
     std::vector<pasta::Macro> &macros_to_serialize);
 
 static void VisitMacroRange(
-    PendingFragment &pf, EntityMapper &em, pasta::MacroRange range,
+    PendingFragment &pf, pasta::MacroRange range,
     std::vector<pasta::Macro> &macros_to_serialize) {
   for (pasta::Macro macro : range) {
-    VisitMacros(pf, em, macro, macros_to_serialize);
+    VisitMacros(pf, macro, macros_to_serialize);
   }
 }
 
@@ -408,8 +404,10 @@ static void VisitMacroRange(
 // so we need to recursively visit the macro tree and try to serialize all the
 // macros as seen by PASTA.
 void VisitMacros(
-    PendingFragment &pf, EntityMapper &em, const pasta::Macro &macro,
+    PendingFragment &pf, const pasta::Macro &macro,
     std::vector<pasta::Macro> &macros_to_serialize) {
+
+  EntityMapper &em = pf.em;
 
   if (auto tok = pasta::MacroToken::From(macro)) {
     pasta::Token pt = tok->ParsedLocation();
@@ -446,18 +444,18 @@ void VisitMacros(
     }
 
     // Recursive visit this macro.
-    VisitMacroRange(pf, em, macro.Children(), macros_to_serialize);
+    VisitMacroRange(pf, macro.Children(), macros_to_serialize);
 
     // Get the intermediae children. This live between the children and the
     // replacement children. Some substitutions happen here, but their trees
     // can't logically nest with those of the replacement children.
     if (auto intermediates = IntermediateChildren(macro)) {
-      VisitMacroRange(pf, em, *intermediates, macros_to_serialize);
+      VisitMacroRange(pf, *intermediates, macros_to_serialize);
     }
 
     // Visit replacement children.
     if (auto sub = pasta::MacroSubstitution::From(macro)) {
-      VisitMacroRange(pf, em, sub->ReplacementChildren(),
+      VisitMacroRange(pf, sub->ReplacementChildren(),
                       macros_to_serialize);
     }
   }
@@ -467,16 +465,17 @@ void VisitMacros(
 //
 // NOTE(pag): This is a *backup* approach when building a token tree fails.
 static void PersistParsedTokens(
-    mx::DatabaseWriter &database,
-    PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
-    TokenProvenanceCalculator &provenance) {
+    mx::DatabaseWriter &database, PendingFragment &pf,
+    mx::rpc::Fragment::Builder &fb, TokenProvenanceCalculator &provenance) {
+
+  EntityMapper &em = pf.em;
 
   std::string utf8_fragment_data;
 
   // Find the set of macros to serialize.
   std::vector<pasta::Macro> macros_to_serialize = pf.top_level_macros;
   for (const pasta::Macro &tlm : pf.top_level_macros) {
-    VisitMacros(pf, em, tlm, macros_to_serialize);
+    VisitMacros(pf, tlm, macros_to_serialize);
   }
 
   provenance.Init(pf.fragment_index, pf.parsed_tokens);
@@ -573,11 +572,13 @@ static std::string MainSourceFile(const PendingFragment &pf) {
 // are macro tokens. The top-level substitution points to the macro code in
 // before IDs, and the
 static void PersistTokenTree(
-    mx::DatabaseWriter &database,
-    PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
-    TokenTreeNodeRange nodes, TokenProvenanceCalculator &provenance) {
+    mx::DatabaseWriter &database, PendingFragment &pf,
+    mx::rpc::Fragment::Builder &fb, TokenTreeNodeRange nodes,
+    TokenProvenanceCalculator &provenance) {
 
-  TokenTreeSerializationSchedule sched(pf, em);
+  const EntityMapper &em = pf.em;
+
+  TokenTreeSerializationSchedule sched(pf);
   sched.Schedule(nodes);
 
   provenance.Init(pf.fragment_index, sched.tokens);
@@ -1015,17 +1016,17 @@ void GlobalIndexingState::PersistFragment(
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
   // Labels tokens and macros.
-  LabelTokensAndMacrosInFragment(pf, em);
+  LabelTokensAndMacrosInFragment(pf);
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  BuildPendingFragment(pf, em);
+  BuildPendingFragment(pf);
 
   // Figure out parentage/inheritance between the entities.
-  LabelParentsInPendingFragment(pf, em);
+  LabelParentsInPendingFragment(pf);
 
   // Serialize all discovered entities.
-  SerializePendingFragment(database, pf, em);
+  SerializePendingFragment(database, pf);
 
   // List of fragments IDs, where index `0` is this fragment's immediate parent.
   auto ids = fb.initParentIds(
@@ -1076,8 +1077,7 @@ void GlobalIndexingState::PersistFragment(
       pf.original_tokens, pf.parsed_tokens, tok_tree_err);
 
   if (maybe_tt) {
-    PersistTokenTree(database, pf, em, fb, std::move(maybe_tt.value()),
-                     provenance);
+    PersistTokenTree(database, pf, fb, std::move(maybe_tt.value()), provenance);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
@@ -1097,13 +1097,13 @@ void GlobalIndexingState::PersistFragment(
           << MainSourceFile(ast);
     }
 
-    PersistParsedTokens(database, pf, em, fb, provenance);
+    PersistParsedTokens(database, pf, fb, provenance);
   }
 
   PersistTokenContexts(em, pf.parsed_tokens, pf.fragment_index, fb);
-  LinkEntitiesAcrossFragments(database, pf, em, mangler);
-  LinkExternalReferencesInFragment(database, pf, em);
-  LinkEntityNamesToFragment(database, pf, em);
+  LinkEntitiesAcrossFragments(database, pf, mangler);
+  LinkExternalReferencesInFragment(database, pf);
+  LinkEntityNamesToFragment(database, pf);
 
   // Add the fragment to the database.
   database.AddAsync(

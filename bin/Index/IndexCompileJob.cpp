@@ -39,9 +39,9 @@ namespace indexer {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-extern void LabelDeclsInFragment(PendingFragment &, EntityMapper &);
+extern void LabelDeclsInFragment(PendingFragment &);
 
-extern void LabelTokensAndMacrosInFragment(PendingFragment &, EntityMapper &);
+extern void LabelTokensAndMacrosInFragment(PendingFragment &);
 
 namespace {
 
@@ -102,6 +102,26 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitLinkageSpecDecl(const pasta::LinkageSpecDecl &decl) final {
     VisitDeclContext(decl);
+  }
+
+  void VisitTypedefDecl(const pasta::TypedefDecl &decl) final {
+    if (!decl.IsImplicit() || decl.Token()) {
+      VisitTypedefNameDecl(decl);
+      return;
+    }
+
+    assert(!depth);
+
+    // It's probably a builtin typedef, e.g. `__NSConstantString`. This may
+    // contain a reference to a builtin record type, e.g.
+    // `__NSConstantString_tag`, that is technically part of the same
+    // declaration context, but hasn't actually been added to the declaration
+    // context.
+    if (auto tag = decl.UnderlyingType().AsTagDeclaration()) {
+      Accept(tag.value());
+    }
+
+    VisitTypedefNameDecl(decl);
   }
 
   // Specializations / instantiations of a partial template specialization end
@@ -520,6 +540,29 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 // preamble.
 static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
 
+  // The compiler knows how to recognize builtin functions.
+  if (auto fd = pasta::FunctionDecl::From(decl)) {
+    return fd->BuiltinID() != 0u;
+  }
+
+  if (!decl.IsImplicit()) {
+    return false;
+  }
+
+  if (decl.Token()) {
+    return false;
+  }
+
+  auto dc = decl.DeclarationContext();
+  if (!dc) {
+    assert(false);
+    return false;
+  }
+
+  if (dc.value() != pasta::AST::From(decl).TranslationUnit()) {
+    return false;
+  }
+
   // NOTE(pag): Not all implicit declarations are builtin, but in general, most
   //            top-level implicit declarations are builtins. An example of a
   //            nested implicit decl is the implicit field decl for the `union`:
@@ -530,22 +573,23 @@ static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
   //                        float bar;
   //                      } /* implicit field here */ ;
   //                    };
-  if (decl.IsImplicit()) {
-    return true;
+  //
+  // Likely/common builtin typedef names:
+  //    __builtin_ms_va_list
+  //    __builtin_va_list
+  //    __va_list
+  //    __int128_t
+  //    __uint128_t
+  //    __NSConstantString
+  if (auto td = pasta::TypedefDecl::From(decl)) {
+    return td->Name().starts_with("__");
+  
+  // E.g. `__NSConstantString_tag`, `__va_list_tag`.
+  } else if (auto rd = pasta::RecordDecl::From(decl)) {
+    std::string name = rd->Name();
+    return name.starts_with("__") && name.ends_with("_tag");
   }
 
-  // The compiler knows how to recognize builtin functions.
-  if (auto fd = pasta::FunctionDecl::From(decl)) {
-    return fd->BuiltinID() != 0u;
-  }
-
-  // Technically we should look for `__builtin_*` but there are other things
-  // that are likely to be `__`-prefixed.
-  if (auto nd = pasta::NamedDecl::From(decl)) {
-    if (nd->Name().starts_with("__builtin")) {
-      return true;
-    }
-  }
   return false;
 }
 
@@ -605,11 +649,13 @@ static void AddDeclRangeToEntityList(
   // These are probably part of the preamble of compiler-provided builtin
   // declarations.
   if (!tok) {
-    LOG_IF(WARNING, !IsProbablyABuiltinDecl(decl))
+    LOG_IF(ERROR, !IsProbablyABuiltinDecl(decl))
         << "Could not find location of " << decl.KindName()
         << " declaration: " << DeclToString(decl)
         << PrefixedLocation(decl, " at or near ")
         << " on main job file " << main_file_path;
+    
+    entity_ranges.emplace_back(decl, 0u, 0u);
     return;
   }
 
@@ -670,7 +716,8 @@ static void AddDeclRangeToEntityList(
   }
 
   // There should always be at least two tokens in any top-level decl.
-  LOG_IF(ERROR, begin_index == end_index && !IsProbablyABuiltinDecl(decl))
+  LOG_IF(ERROR, begin_index == end_index &&
+                decl.Kind() != pasta::DeclKind::kEmpty)
       << "Only found one token " << tok.Data() << " for: "
       << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
       << " on main job file " << main_file_path;
@@ -835,7 +882,7 @@ static std::vector<OrderedMacro> FindTLMs(
     return a.second < b.second;
   };
 
-  std::sort(tlms.begin(), tlms.end(), less);
+  std::stable_sort(tlms.begin(), tlms.end(), less);
   auto it = std::unique(tlms.begin(), tlms.end(), eq);
   tlms.erase(it, tlms.end());
 
@@ -845,7 +892,7 @@ static std::vector<OrderedMacro> FindTLMs(
   //            side-by-side declarations one-after-another in memory, thus
   //            getting the same sort order. This is why we keep the extra info
   //            in the `pair` of the original sort order.
-  std::sort(tlms.begin(), tlms.end(), orig_less);
+  std::stable_sort(tlms.begin(), tlms.end(), orig_less);
 
   return tlms;
 }
@@ -1441,7 +1488,13 @@ static void CreatePendingFragments(
             empty_macros,
             root_fragment_id);
 
-        LabelDeclsInFragment(*pf, em);
+        LabelDeclsInFragment(*pf);
+
+        if (auto nd = pasta::NamedDecl::From(decl)) {
+          if (nd->Name() == "__va_list_tag") {
+
+          }
+        }
 
         // `printed_toks` above may contain derived locations that the decls
         // themselves will reference, and so we need to make sure that we'll
@@ -1517,7 +1570,7 @@ static void CreatePendingFragments(
   
     root_fragment_id = pf->fragment_id;
 
-    LabelDeclsInFragment(*pf, em);
+    LabelDeclsInFragment(*pf);
 
     if (pf->is_new) {
       pending_fragments.emplace_back(std::move(pf));
@@ -1556,7 +1609,7 @@ static void CreatePendingFragments(
     //            in `parsed_tokens_in_directive_range`, but it will persist
     //            some macros globally. When the `EntityMapper` is reset for
     //            a fragment prior to persisting, those macros ids will persist.
-    LabelTokensAndMacrosInFragment(*pf, em);
+    LabelTokensAndMacrosInFragment(*pf);
 
     if (pf->is_new) {
       pending_fragments.emplace_back(std::move(pf));
@@ -1583,7 +1636,7 @@ static void CreatePendingFragments(
         top_level_macros  /* copied */,
         root_fragment_id);
 
-    LabelDeclsInFragment(*pf, em);
+    LabelDeclsInFragment(*pf);
 
     if (pf->is_new) {
       pending_fragments.emplace_back(std::move(pf));
@@ -1703,8 +1756,7 @@ static void PersistParsedFragments(
 // Look through all files referenced by the AST get their unique IDs. If this
 // is the first time seeing a file, then tokenize the file.
 static void MaybePersistParsedFile(
-    GlobalIndexingState &context, const pasta::File &file,
-    EntityIdMap &entity_ids) {
+    GlobalIndexingState &context, const pasta::File &file, EntityMapper &em) {
 
   if (!file.WasParsed()) {
     return;
@@ -1727,19 +1779,18 @@ static void MaybePersistParsedFile(
     context.PersistFile(file_id, file);
   }
 
-  entity_ids.emplace(file.RawFile(), file_id.Pack());
+  em.entity_ids.emplace(file.RawFile(), file_id.Pack());
 }
 
 // This persists any not-yet-seen files and their tokens. It also creates the
 // file IDs for those files, so this always must happen.
 static void PersistParsedFiles(
-    GlobalIndexingState &context, const pasta::AST &ast,
-    EntityIdMap &entity_ids) {
+    GlobalIndexingState &context, const pasta::AST &ast, EntityMapper &em) {
   auto parsed_files = ast.ParsedFiles();
   for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
        it != end; ++it) {
     const pasta::File &parsed_file = *it;
-    MaybePersistParsedFile(context, parsed_file, entity_ids);
+    MaybePersistParsedFile(context, parsed_file, em);
   }
 }
 
@@ -1785,9 +1836,8 @@ void IndexCompileJobAction::Run(void) {
     return;
   }
 
-  EntityIdMap entity_ids;
   TypeMapper tm(context->database);
-  EntityMapper em(entity_ids, tm);
+  EntityMapper em(tm);
 
   pasta::AST ast = std::move(maybe_ast.value());
   pasta::File main_file = ast.MainFile();
@@ -1795,7 +1845,7 @@ void IndexCompileJobAction::Run(void) {
   DLOG(INFO)
       << "Built AST for main source file " << main_file_path;
 
-  PersistParsedFiles(*context, ast, entity_ids);
+  PersistParsedFiles(*context, ast, em);
 
   // Detect if this is a new compilation.
   bool is_new_tu_id = false;

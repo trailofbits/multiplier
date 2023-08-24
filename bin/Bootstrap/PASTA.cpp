@@ -318,8 +318,14 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 
   // We want to make sure we get the most derived spelling.
   {"Attr", "Spelling"},
+  {"Attr", "SpellingListIndex"},
   {"InheritableAttr", "Spelling"},
   {"InheritableParamAttr", "Spelling"},
+
+  // These are problematic for indexing, where our model is to deduplicate
+  // inherted attributes, and also treat attributes as being specific to
+  // fragments, and thus not observable across fragments.
+  {"CallExpr", "UnusedResultAttribute"},
 
   // These have complicated assertions in them.
   {"CXXRecordDecl", "DefaultedCopyConstructorIsDeleted"},

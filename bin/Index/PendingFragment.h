@@ -152,34 +152,14 @@ class PendingFragment {
   // Should we drop token provenance after we've labelled tokens? This helps
   bool drop_token_provenance{false};
 
-  // Possibly add an entity to this fragment. We have two entity ID maps:
-  // The `read_entity_ids` map, which we use to decide if globally we should
-  // ignore this entity without formulating an ID. If our entity isn't in
-  // `read_entity_ids`, then we opportunistically create an id and try to add
-  // it to `write_entity_ids`.
-
-  bool Add(const pasta::Decl &entity, EntityIdMap &write_entity_ids,
-           const EntityIdMap &read_entity_ids);
-  
-  bool Add(const pasta::Stmt &entity, EntityIdMap &write_entity_ids,
-           const EntityIdMap &read_entity_ids);
-  
-  bool Add(const pasta::Type &entity, EntityMapper &type_map);
-  
-  bool Add(const pasta::Attr &entity, EntityIdMap &write_entity_ids,
-           const EntityIdMap &read_entity_ids);
-  
-  bool Add(const pasta::TemplateArgument &pseudo, EntityIdMap &write_entity_ids,
-           const EntityIdMap &read_entity_ids);
-  
-  bool Add(const pasta::CXXBaseSpecifier &pseudo, EntityIdMap &write_entity_ids,
-           const EntityIdMap &read_entity_ids);
-  
-  bool Add(const pasta::TemplateParameterList &pseudo,
-           EntityIdMap &write_entity_ids, const EntityIdMap &read_entity_ids);
-  
-  bool Add(const pasta::Designator &pseudo, EntityIdMap &write_entity_ids,
-           const EntityIdMap &read_entity_ids);
+  bool Add(const pasta::Decl &entity);
+  bool Add(const pasta::Stmt &entity);
+  bool Add(const pasta::Type &entity);
+  bool Add(const pasta::Attr &entity);
+  bool Add(const pasta::TemplateArgument &pseudo);
+  bool Add(const pasta::CXXBaseSpecifier &pseudo);
+  bool Add(const pasta::TemplateParameterList &pseudo);
+  bool Add(const pasta::Designator &pseudo);
 
   // Find and initialize `parent_decl_ids` and `last_file_token_id`.
   void InitFileLocationRange(EntityIdMap &entity_ids,

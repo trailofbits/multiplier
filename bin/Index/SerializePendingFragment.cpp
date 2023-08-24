@@ -156,8 +156,9 @@ void DispatchSerializeMacro(const EntityMapper &em,
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
 void SerializePendingFragment(mx::DatabaseWriter &database,
-                              const PendingFragment &pf,
-                              const EntityMapper &em) {
+                              const PendingFragment &pf) {
+  const EntityMapper &em = pf.em;
+
 #ifndef NDEBUG
   std::unordered_set<mx::RawEntityId> seen_eids;
   auto is_new_eid = [&seen_eids] (mx::RawEntityId eid) {

@@ -15524,7 +15524,6 @@ MX_BEGIN_VISIT_STMT(CallExpr)
   MX_VISIT_OPTIONAL_ENTITY(CallExpr, callee_declaration, 40, MX_APPLY_METHOD, CalleeDeclaration, Decl, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(CallExpr, direct_callee, 41, MX_APPLY_METHOD, DirectCallee, FunctionDecl, NthStmt)
   MX_VISIT_ENTITY(CallExpr, r_paren_token, 42, MX_APPLY_METHOD, RParenToken, Token, NthStmt)
-  MX_VISIT_OPTIONAL_ENTITY(CallExpr, unused_result_attribute, 43, MX_APPLY_METHOD, UnusedResultAttribute, Attr, NthStmt)
   MX_VISIT_BOOL(CallExpr, has_stored_fp_features, 89, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
   MX_VISIT_BOOL(CallExpr, has_unused_result_attribute, 90, MX_APPLY_METHOD, HasUnusedResultAttribute, bool, NthStmt)
   MX_VISIT_BOOL(CallExpr, is_builtin_assume_false, 91, MX_APPLY_METHOD, IsBuiltinAssumeFalse, bool, NthStmt)
@@ -15545,7 +15544,7 @@ MX_BEGIN_VISIT_STMT(CXXOperatorCallExpr)
   MX_ENTER_VISIT_CXXOperatorCallExpr
   MX_VISIT_BASE(CXXOperatorCallExpr, CallExpr)
   MX_VISIT_ENUM(CXXOperatorCallExpr, operator_, 96, MX_APPLY_METHOD, Operator, OverloadedOperatorKind, NthStmt)
-  MX_VISIT_ENTITY(CXXOperatorCallExpr, operator_token, 44, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
+  MX_VISIT_ENTITY(CXXOperatorCallExpr, operator_token, 43, MX_APPLY_METHOD, OperatorToken, Token, NthStmt)
   MX_VISIT_BOOL(CXXOperatorCallExpr, is_assignment_operation, 97, MX_APPLY_METHOD, IsAssignmentOperation, bool, NthStmt)
   MX_VISIT_BOOL(CXXOperatorCallExpr, is_comparison_operation, 98, MX_APPLY_METHOD, IsComparisonOperation, bool, NthStmt)
   MX_VISIT_BOOL(CXXOperatorCallExpr, is_infix_binary_operation, 99, MX_APPLY_METHOD, IsInfixBinaryOperation, bool, NthStmt)
@@ -15562,10 +15561,10 @@ MX_END_VISIT_STMT(CXXOperatorCallExpr)
 MX_BEGIN_VISIT_STMT(CXXMemberCallExpr)
   MX_ENTER_VISIT_CXXMemberCallExpr
   MX_VISIT_BASE(CXXMemberCallExpr, CallExpr)
-  MX_VISIT_ENTITY(CXXMemberCallExpr, implicit_object_argument, 44, MX_APPLY_METHOD, ImplicitObjectArgument, Expr, NthStmt)
-  MX_VISIT_OPTIONAL_ENTITY(CXXMemberCallExpr, method_declaration, 45, MX_APPLY_METHOD, MethodDeclaration, CXXMethodDecl, NthStmt)
-  MX_VISIT_ENTITY(CXXMemberCallExpr, object_type, 46, MX_APPLY_METHOD, ObjectType, Type, NthStmt)
-  MX_VISIT_ENTITY(CXXMemberCallExpr, record_declaration, 47, MX_APPLY_METHOD, RecordDeclaration, CXXRecordDecl, NthStmt)
+  MX_VISIT_ENTITY(CXXMemberCallExpr, implicit_object_argument, 43, MX_APPLY_METHOD, ImplicitObjectArgument, Expr, NthStmt)
+  MX_VISIT_OPTIONAL_ENTITY(CXXMemberCallExpr, method_declaration, 44, MX_APPLY_METHOD, MethodDeclaration, CXXMethodDecl, NthStmt)
+  MX_VISIT_ENTITY(CXXMemberCallExpr, object_type, 45, MX_APPLY_METHOD, ObjectType, Type, NthStmt)
+  MX_VISIT_ENTITY(CXXMemberCallExpr, record_declaration, 46, MX_APPLY_METHOD, RecordDeclaration, CXXRecordDecl, NthStmt)
   MX_EXIT_VISIT_CXXMemberCallExpr
 MX_END_VISIT_STMT(CXXMemberCallExpr)
 
@@ -15579,7 +15578,7 @@ MX_END_VISIT_STMT(CXXMemberCallExpr)
 MX_BEGIN_VISIT_STMT(CUDAKernelCallExpr)
   MX_ENTER_VISIT_CUDAKernelCallExpr
   MX_VISIT_BASE(CUDAKernelCallExpr, CallExpr)
-  MX_VISIT_ENTITY(CUDAKernelCallExpr, config, 44, MX_APPLY_METHOD, Config, CallExpr, NthStmt)
+  MX_VISIT_ENTITY(CUDAKernelCallExpr, config, 43, MX_APPLY_METHOD, Config, CallExpr, NthStmt)
   MX_EXIT_VISIT_CUDAKernelCallExpr
 MX_END_VISIT_STMT(CUDAKernelCallExpr)
 
@@ -15593,9 +15592,9 @@ MX_END_VISIT_STMT(CUDAKernelCallExpr)
 MX_BEGIN_VISIT_STMT(UserDefinedLiteral)
   MX_ENTER_VISIT_UserDefinedLiteral
   MX_VISIT_BASE(UserDefinedLiteral, CallExpr)
-  MX_VISIT_ENTITY(UserDefinedLiteral, cooked_literal, 44, MX_APPLY_METHOD, CookedLiteral, Expr, NthStmt)
+  MX_VISIT_ENTITY(UserDefinedLiteral, cooked_literal, 43, MX_APPLY_METHOD, CookedLiteral, Expr, NthStmt)
   MX_VISIT_ENUM(UserDefinedLiteral, literal_operator_kind, 96, MX_APPLY_METHOD, LiteralOperatorKind, UserDefinedLiteralLiteralOperatorKind, NthStmt)
-  MX_VISIT_ENTITY(UserDefinedLiteral, ud_suffix_token, 45, MX_APPLY_METHOD, UDSuffixToken, Token, NthStmt)
+  MX_VISIT_ENTITY(UserDefinedLiteral, ud_suffix_token, 44, MX_APPLY_METHOD, UDSuffixToken, Token, NthStmt)
   MX_EXIT_VISIT_UserDefinedLiteral
 MX_END_VISIT_STMT(UserDefinedLiteral)
 

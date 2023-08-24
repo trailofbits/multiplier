@@ -8,7 +8,6 @@
 
 #include <multiplier/Entities/CallExpr.h>
 
-#include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/CUDAKernelCallExpr.h>
 #include <multiplier/Entities/CXXMemberCallExpr.h>
 #include <multiplier/Entities/CXXOperatorCallExpr.h>
@@ -244,19 +243,6 @@ std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
 
 Token CallExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
-}
-
-std::optional<Attr> CallExpr::unused_result_attribute(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal43();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
-      return Attr(std::move(eptr));
-    }
-  }
-  return std::nullopt;
 }
 
 bool CallExpr::has_stored_fp_features(void) const {
