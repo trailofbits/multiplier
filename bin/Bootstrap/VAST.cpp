@@ -22,6 +22,8 @@
 #include <vast/Dialect/LowLevel/LowLevelOps.hpp>
 #include <vast/Dialect/Meta/MetaAttributes.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedOps.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedTypes.hpp>
 
 #else
 
@@ -378,6 +380,7 @@ static Dialect gDialects[] = {
   {"HighLevel", "VAST/HL", "hl", "vast::hl", "vast", "hl", {}, {}, {}},
   {"Core", "VAST/Core", "core", "vast::core", "vast", "core", {}, {}, {}},
   {"Meta", "VAST/Meta", "meta", "vast::meta", "vast", "meta", {}, {}, {}},
+  {"Unsupported", "VAST/Unsupported", "unsup", "vast::unsup", "vast", "unsup", {}, {}, {}},
 };
 
 class TypeWrapper {
@@ -1153,7 +1156,7 @@ void CodeGenerator::RunOnOpClass(const std::string &root_ns, const std::string &
   op.methods = std::move(methods);
   op.attributes = std::move(attributes);
 
-//  std::cerr << "OP: " << root_ns << "::" << ns << "::" << name << " = "
+//  std::cerr << "OP: " << root_ns << "::" << ns << "::" << cls.Name() << " = "
 //            << op_name << '\n';
 //  for (const pasta::CXXMethodDecl &meth : methods) {
 //    std::string meth_name = meth.Name();
@@ -1327,7 +1330,7 @@ void CodeGenerator::RunOnNamespace(const pasta::NamespaceDecl &root_ns,
 
   if (root_ns_name == "vast") {
     if (ns_name != "hl" && ns_name != "ll" && ns_name != "meta" &&
-        ns_name != "core") {
+        ns_name != "core" && ns_name != "unsup") {
       return;
     }
   } else if (root_ns_name == "mlir") {

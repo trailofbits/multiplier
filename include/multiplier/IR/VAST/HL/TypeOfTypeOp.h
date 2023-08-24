@@ -11,24 +11,23 @@
 #include "Operation.h"
 
 namespace vast::hl {
-class LabelStmt;
+class TypeOfTypeOp;
 }  // namespace vast::hl
 namespace mx::ir::hl {
-class LabelStmt final : public Operation {
+class TypeOfTypeOp final : public Operation {
  public:
   inline static OperationKind static_kind(void) {
-    return OperationKind::HL_LABEL;
+    return OperationKind::HL_TYPEOF_TYPE;
   }
 
-  static std::optional<LabelStmt> from(const ::mx::ir::Operation &that);
-  static std::optional<LabelStmt> producing(const ::mx::ir::Value &val);
+  static std::optional<TypeOfTypeOp> from(const ::mx::ir::Operation &that);
+  static std::optional<TypeOfTypeOp> producing(const ::mx::ir::Value &val);
 
-  ::vast::hl::LabelStmt underlying_op(void) const noexcept;
+  ::vast::hl::TypeOfTypeOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<::vast::hl::LabelType> label(void) const;
-  ::mx::ir::Region body(void) const;
+  //::mlir::Type type(void) const;
 };
-static_assert(sizeof(LabelStmt) == sizeof(Operation));
+static_assert(sizeof(TypeOfTypeOp) == sizeof(Operation));
 
 }  // namespace mx::ir::hl

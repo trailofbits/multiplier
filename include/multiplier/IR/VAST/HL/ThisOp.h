@@ -11,25 +11,23 @@
 #include "Operation.h"
 
 namespace vast::hl {
-class UnsupportedOp;
+class ThisOp;
 }  // namespace vast::hl
 namespace mx::ir::hl {
-class UnsupportedOp final : public Operation {
+class ThisOp final : public Operation {
  public:
   inline static OperationKind static_kind(void) {
-    return OperationKind::HL_UNSUPPORTEDOP;
+    return OperationKind::HL_THIS;
   }
 
-  static std::optional<UnsupportedOp> from(const ::mx::ir::Operation &that);
-  static std::optional<UnsupportedOp> producing(const ::mx::ir::Value &val);
+  static std::optional<ThisOp> from(const ::mx::ir::Operation &that);
+  static std::optional<ThisOp> producing(const ::mx::ir::Value &val);
 
-  ::vast::hl::UnsupportedOp underlying_op(void) const noexcept;
+  ::vast::hl::ThisOp underlying_op(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> elements(void) const;
   ::mx::ir::Value result(void) const;
-  std::string_view name(void) const;
 };
-static_assert(sizeof(UnsupportedOp) == sizeof(Operation));
+static_assert(sizeof(ThisOp) == sizeof(Operation));
 
 }  // namespace mx::ir::hl

@@ -27,7 +27,8 @@ std::string_view Operation::kind_name(void) const noexcept {
     case kind: return name;
 
   MX_IR_FOR_EACH_MLIR_OP(MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME,
-                         MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME)
+                         MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME,
+                         MAP_OP_NAME)
 #undef MAP_OP_NAME
   }
 

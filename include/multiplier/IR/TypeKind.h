@@ -47,10 +47,15 @@ enum class TypeKind : unsigned {
   LONGTYPE,
   PARENTYPE,
   POINTERTYPE,
+  RVALUETYPE,
   RECORDTYPE,
+  REFERENCETYPE,
   SHORTTYPE,
+  TYPEOFEXPRTYPE,
+  TYPEOFTYPETYPE,
   TYPEDEFTYPE,
   VOIDTYPE,
+  UNSUPPORTEDTYPE,
 };
 
 }  // namespace ir
@@ -60,7 +65,7 @@ inline static const char *EnumerationName(ir::TypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::TypeKind) {
-  return 38;
+  return 43;
 }
 
 const char *EnumeratorName(ir::TypeKind);

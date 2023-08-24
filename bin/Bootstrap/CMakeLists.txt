@@ -87,11 +87,12 @@ if(MX_BOOTSTRAP_VAST)
     PRIVATE
       "mx-bootstrap"
       
-      vast::vast
-      vast::MLIRCore
-      vast::MLIRMeta
-      vast::MLIRLowLevel
-      vast::MLIRHighLevel
+      VAST::VASTCore
+      VAST::VASTMeta
+      VAST::VASTLowLevel
+      VAST::VASTHighLevel
+      VAST::VASTUnsupported
+
       MLIRDialect
       MLIRAMDGPUDialect
       MLIRAsyncDialect
