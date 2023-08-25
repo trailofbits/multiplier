@@ -154,7 +154,7 @@ class PendingFragment {
 
   bool Add(const pasta::Decl &entity);
   bool Add(const pasta::Stmt &entity);
-  bool Add(const pasta::Type &entity);
+  bool Add(pasta::Type entity);
   bool Add(const pasta::Attr &entity);
   bool Add(const pasta::TemplateArgument &pseudo);
   bool Add(const pasta::CXXBaseSpecifier &pseudo);

@@ -10,6 +10,22 @@
 
 #include <multiplier/Database.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <clang/AST/Decl.h>
+#include <clang/AST/Type.h>
+#include <llvm/Support/Casting.h>
+#pragma clang diagnostic pop
+
+#include <pasta/AST/AST.h>
+
 #include "EntityMapper.h"
 #include "PASTA.h"
 
@@ -29,7 +45,119 @@ static bool IsSizedBuiltinType(const pasta::Type &type) {
   }
 }
 
+// When serializing types, we'd ideally like to be able to remove "fluff"
+// that doesn't really benefit us. This can involve stuff like drilling through
+// `auto` or `decltype(...)` types to the true underlying type, or selecting
+// the adjusted version of an adjusted type. This also helps us persist fewer
+// overall types.
+static clang::Type *BasicTypeDeduplication(clang::Type *type,
+                                           uint32_t &up_quals);
+
+static clang::Type *BasicTypeDeduplication(clang::QualType type,
+                                           uint32_t &up_quals) {
+  up_quals |= type.getQualifiers().getAsOpaqueValue();
+  return BasicTypeDeduplication(
+      const_cast<clang::Type *>(type.getTypePtr()), up_quals);
+}
+
+clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
+  if (!type) {
+    return nullptr;
+  }
+
+  if (type->isDependentType()) {
+    return type;
+  }
+
+  clang::Type *new_type = type;
+  switch (type->getTypeClass()) {
+    case clang::Type::Auto:
+      new_type = BasicTypeDeduplication(
+          clang::dyn_cast<clang::AutoType>(type)->getDeducedType(), up_quals);
+      break;
+
+    case clang::Type::TypeOfExpr:
+      new_type = BasicTypeDeduplication(
+          clang::dyn_cast<clang::TypeOfExprType>(type)->desugar(), up_quals);
+      break;
+
+    case clang::Type::TypeOf:
+      new_type = BasicTypeDeduplication(
+          clang::dyn_cast<clang::TypeOfType>(type)->desugar(), up_quals);
+      break;
+
+    case clang::Type::Decltype:
+      new_type = BasicTypeDeduplication(
+          clang::dyn_cast<clang::DecltypeType>(type)->getUnderlyingType(),
+          up_quals);
+      break;
+
+    case clang::Type::Adjusted:
+      new_type = BasicTypeDeduplication(
+          clang::dyn_cast<clang::AdjustedType>(type)->getAdjustedType(),
+          up_quals);
+      break;
+
+    case clang::Type::UnaryTransform:
+      new_type = BasicTypeDeduplication(
+          clang::dyn_cast<clang::UnaryTransformType>(type)->getBaseType(),
+          up_quals);
+      break;
+
+    // We don't really care about the elaborator, e.g. `struct`, `union`, etc.
+    // and Clang also embeds typedef types within elaborated types.
+    case clang::Type::Elaborated: {
+      clang::ElaboratedType *et = clang::dyn_cast<clang::ElaboratedType>(type);
+      if (auto decl = et->getOwnedTagDecl()) {
+        if (!decl->getIdentifier()) {
+          break;
+        }
+      }
+      new_type = BasicTypeDeduplication(et->getNamedType(), up_quals);
+      break;
+    }
+    case clang::Type::DeducedTemplateSpecialization:
+      new_type = BasicTypeDeduplication(
+          clang::dyn_cast<clang::DeducedTemplateSpecializationType>(type)->getDeducedType(),
+          up_quals);
+      break;
+
+    case clang::Type::Decayed:
+      new_type = BasicTypeDeduplication(
+          clang::dyn_cast<clang::DecayedType>(type)->getDecayedType(),
+          up_quals);
+      break;
+
+    default:
+      break;
+  }
+
+  if (!new_type) {
+    new_type = type;
+  }
+
+  return new_type;
+}
+
 }  // namespace
+
+TypePrintingPolicy::~TypePrintingPolicy(void) {}
+
+bool TypePrintingPolicy::ShouldPrintTagBodies(void) const {
+  return false;
+}
+
+bool TypePrintingPolicy::ShouldPrintConstantExpressionsInTypes(void) const {
+  return false;
+}
+
+bool TypePrintingPolicy::ShouldPrintOriginalTypeOfAdjustedType(void) const {
+  return false;
+}
+
+bool TypePrintingPolicy::ShouldPrintOriginalTypeOfDecayedType(void) const {
+  return false;
+}
 
 // Hash a type.
 std::string TypeMapper::HashType(
@@ -111,9 +239,14 @@ std::string TypeMapper::HashType(
   return ss.str();
 }
 
-mx::RawEntityId TypeMapper::EntityId(const void *type,
-                                     uint32_t quals) const {
-  TypeKey type_key(type, quals);
+mx::RawEntityId TypeMapper::EntityId(const void *raw_type_,
+                                     uint32_t raw_qualifiers) const {
+
+  clang::Type *raw_type = BasicTypeDeduplication(
+      reinterpret_cast<clang::Type *>(const_cast<void *>(raw_type_)),
+      raw_qualifiers);
+
+  TypeKey type_key(raw_type, raw_qualifiers);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
     return it->second.Pack();
   } else {
@@ -122,7 +255,11 @@ mx::RawEntityId TypeMapper::EntityId(const void *type,
 }
 
 mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
+  uint32_t raw_qualifiers = entity.RawQualifiers();
+  clang::Type *raw_type = BasicTypeDeduplication(
+      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers);
+
+  TypeKey type_key(raw_type, raw_qualifiers);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
     return it->second.Pack();
   } else {
@@ -130,52 +267,62 @@ mx::RawEntityId TypeMapper::EntityId(const pasta::Type &entity) const {
   }
 }
 
-bool TypeMapper::AddEntityId(const EntityMapper &em,
-                             const pasta::Type &entity) {
+// NOTE(pag): `entity` may be updated.
+bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_) {
   assert(!read_only);
 
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  assert(type_key.first != nullptr);
+  pasta::Type &entity = *entity_;
 
-  if (auto it = type_ids.find(type_key); it != type_ids.end()) {
+  // First, check the non-shallow deduplicatd type.
+  uint32_t raw_qualifiers = entity.RawQualifiers();
+  TypeKey orig_type_key(entity.RawType(), raw_qualifiers);
+  auto it = type_ids.find(orig_type_key);
+  if (it != type_ids.end()) {
     return false;
   }
+
+  clang::Type *raw_type = BasicTypeDeduplication(
+      const_cast<clang::Type *>(entity.RawType()), raw_qualifiers);
+
+  TypeKey dedup_type_key(raw_type, raw_qualifiers);
+  assert(dedup_type_key.first != nullptr);
+
+  // Make sure we didn't bring in random new qualifiers.
+  if (orig_type_key.first == dedup_type_key.first) {
+    assert(orig_type_key.second == dedup_type_key.second);
+  }
+
+  // Found a hit in our cache.
+  it = type_ids.find(dedup_type_key);
+  if (it != type_ids.end()) {
+    type_ids.emplace(orig_type_key, it->second);
+    return false;
+  }
+
+  TypePrintingPolicy pp;
+
+  entity = pasta::AST::From(entity).Adopt(raw_type, raw_qualifiers);
 
   bool is_new_type_id = false;
-  auto token_range = pasta::PrintedTokenRange::Create(entity);
+  auto token_range = pasta::PrintedTokenRange::Create(entity, pp);
 
   mx::PackedTypeId tid = database.GetOrCreateTypeIdForHash(
-      mx::FromPasta(entity.Kind()), entity.RawQualifiers(),
-      HashType(em, entity, token_range), token_range.size(),
+      mx::FromPasta(entity.Kind()),
+      raw_qualifiers,
+      HashType(em, entity, token_range),
+      token_range.size(),
       is_new_type_id).Unpack();
 
-  type_ids.emplace(type_key, tid);
+  type_ids.emplace(orig_type_key, tid);
+  type_ids.emplace(dedup_type_key, tid);
 
-  if (!is_new_type_id) {
-    return false;
-  }
-
-  types_token_range.emplace(type_key, std::move(token_range));
-  return true;
+  return is_new_type_id;
 }
 
 mx::PackedTypeId TypeMapper::TypeId(const pasta::Type &type) const {
   mx::VariantId vid = mx::EntityId(this->EntityId(type)).Unpack();
   assert(std::holds_alternative<mx::TypeId>(vid));
   return std::get<mx::TypeId>(vid);
-}
-
-std::optional<pasta::PrintedTokenRange>
-TypeMapper::TypeTokenRange(const pasta::Type &entity) const {
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  assert(type_key.first != nullptr);
-  if (auto it = types_token_range.find(type_key);
-      it != types_token_range.end()) {
-    return it->second;
-  }
-
-  assert(false);
-  return std::nullopt;
 }
 
 } // namespace

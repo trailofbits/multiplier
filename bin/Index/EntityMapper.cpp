@@ -68,7 +68,7 @@ mx::RawEntityId EntityMapper::PerFragmentEntityId(const void *entity) const {
     return it->second.Pack();
 
   } else {
-    return tm.EntityId(entity);
+    return mx::kInvalidEntityId;
   }
 }
 

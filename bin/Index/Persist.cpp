@@ -544,7 +544,6 @@ static std::string DiagnoseParsedTokens(
   return ss.str();
 }
 
-
 static std::string MainSourceFile(const pasta::AST &ast) {
   return ast.MainFile().Path().generic_string();
 }

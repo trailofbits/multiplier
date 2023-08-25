@@ -292,8 +292,8 @@ bool PendingFragment::Add(const pasta::Stmt &entity) {
   return true;
 }
 
-bool PendingFragment::Add(const pasta::Type &entity) {
-  if (!em.tm.AddEntityId(em, entity)) {
+bool PendingFragment::Add(pasta::Type entity) {
+  if (!em.tm.AddEntityId(em, &entity)) {
     return false;
   }
 

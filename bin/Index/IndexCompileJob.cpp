@@ -1345,14 +1345,35 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
 
   CHECK(!root_decls.empty());
 
+  // We don't want to concatenate the printed output of declarations that are
+  // embedded in the declarators of other declarations, because we'll capture
+  // those decls when printing those declarators.
+  std::vector<pasta::Decl> decls_to_print;
+  for (const pasta::Decl &decl : root_decls) {
+    if (std::optional<pasta::TagDecl> td = pasta::TagDecl::From(decl)) {
+      if (!td->IsEmbeddedInDeclarator()) {
+        decls_to_print.emplace_back(decl);
+      }
+    } else {
+      decls_to_print.emplace_back(decl);
+    }
+  }
+
+  // We've hoisted the decls embedded in declarators out into their own
+  // independent fragments.
+  if (decls_to_print.empty()) {
+    CHECK_EQ(root_decls.size(), 1u);
+    decls_to_print = root_decls;
+  }
+
   // Print the root declarations one after the other, and then try to apply the
   // alignment algorithm.
   pasta::PrintedTokenRange printed_tokens =
-      pasta::PrintedTokenRange::Create(root_decls.front());
-  for (auto i = 1u; i < root_decls.size(); ++i) {
+      pasta::PrintedTokenRange::Create(decls_to_print.front());
+  for (auto i = 1u; i < decls_to_print.size(); ++i) {
     auto concat = pasta::PrintedTokenRange::Concatenate(
         printed_tokens,
-        pasta::PrintedTokenRange::Create(root_decls[i]));
+        pasta::PrintedTokenRange::Create(decls_to_print[i]));
     CHECK(concat.has_value());
     printed_tokens = std::move(concat.value());
   }

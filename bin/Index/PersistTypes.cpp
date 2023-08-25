@@ -366,9 +366,16 @@ static void PersistPrintedTokens(
     // in a `FunctionProtoType` for a variadic function. These will reference
     // parsed locations, but we want to arrange for them to instead reference
     // the type tokens.
+    //
+    // NOTE(pag): It's possible that we'll see duplicates. This generally is
+    //            the result of type deduplication. For example, with
+    //            elaborated types in particular, we would could have:
+    //
+    //                struct FOO *()(struct FOO *)
+    //
+    //            And the we'd see the same derived token for `struct` twice.
     if (std::optional<pasta::Token> pt = tok.DerivedLocation()) {
-      CHECK(em.token_tree_ids.emplace(pt->RawToken(),
-                                      mx::EntityId(token_id)).second);
+      em.token_tree_ids.emplace(pt->RawToken(), mx::EntityId(token_id));
     }
   }
 
@@ -549,6 +556,18 @@ static void PersistTokenContexts(
   DCHECK_GT(fb.getTokenKinds().size(), 0u);
 }
 
+// Combine all parsed tokens into a string for diagnostic purposes.
+static std::string DiagnosePrintedTokens(
+    const pasta::PrintedTokenRange &parsed_tokens) {
+  std::stringstream ss;
+  auto sep = "";
+  for (pasta::PrintedToken tok : parsed_tokens) {
+    ss << sep << tok.Data();
+    sep = " ";
+  }
+  return ss.str();
+}
+
 } // namespace
 
 void GlobalIndexingState::PersistTypes(
@@ -560,8 +579,11 @@ void GlobalIndexingState::PersistTypes(
 
     ProgressBarWork type_progress_tracker(type_progress);
 
-    auto maybe_token_range = em.tm.TypeTokenRange(type);
-    CHECK(maybe_token_range.has_value());
+    TypePrintingPolicy pp;
+    pasta::PrintedTokenRange token_range =
+        pasta::PrintedTokenRange::Create(type, pp);
+
+    LOG(ERROR) << DiagnosePrintedTokens(token_range);
 
     mx::PackedTypeId ptid = em.tm.TypeId(type);
     mx::TypeId tid = ptid.Unpack();
@@ -570,8 +592,8 @@ void GlobalIndexingState::PersistTypes(
     mx::rpc::Type::Builder fb = message.initRoot<mx::rpc::Type>();
 
     auto tb = fb.initType();
-    PersistPrintedTokens(em, fb, maybe_token_range.value(), tid);
-    PersistTokenContexts(em, maybe_token_range.value(), fb);
+    PersistPrintedTokens(em, fb, token_range, tid);
+    PersistTokenContexts(em, token_range, fb);
 
     (void) SerializeType(type, em, tid.type_id, tb);
 
