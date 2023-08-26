@@ -112,13 +112,29 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     assert(!depth);
 
+    pasta::Type ut = decl.UnderlyingType();
+
     // It's probably a builtin typedef, e.g. `__NSConstantString`. This may
     // contain a reference to a builtin record type, e.g.
     // `__NSConstantString_tag`, that is technically part of the same
     // declaration context, but hasn't actually been added to the declaration
     // context.
-    if (auto tag = decl.UnderlyingType().AsTagDeclaration()) {
+    if (auto tag = ut.AsTagDeclaration()) {
       Accept(tag.value());
+    
+    // Builtin typedefs may be hiding top-level entities that are logically
+    // only defined in the declarator of the typedef, e.g.
+    // `__builtin_va_list_tag` within `__builtin_va_list`. Unlike when normal
+    // code does this, Clang doesn't add these internal declarations to the
+    // `TranslationUnitDecl`'s list of declararations, which "hides" it from
+    // the top-level decl list, and what can be labelled. This matters
+    // because the underlyng structure type might become directly externally
+    // reachable by way of dayed types, e.g. `va_list` as a parameter to a
+    // function.
+    } else if (auto tp = ut.PointeeOrArrayElementType()) {
+      if (tag = tp->AsTagDeclaration(); tag.has_value()) {
+        Accept(tag.value());
+      }
     }
 
     VisitTypedefNameDecl(decl);
@@ -239,28 +255,20 @@ static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
   TLDFinder tld_finder(tlds);
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
 
-  auto eq = +[] (const OrderedDecl &a, const OrderedDecl &b) {
+  auto decl_eq = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     return a.first.RawDecl() == b.first.RawDecl();
   };
 
-  auto less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
-    auto a_id = a.first.RawDecl();
-    auto b_id = b.first.RawDecl();
-    if (a_id < b_id) {
-      return true;
-    } else if (a_id > b_id) {
-      return false;
-    } else {
-      return a.second < b.second;
-    }
+  auto decl_less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
+    return a.first.RawDecl() < b.first.RawDecl();
   };
 
-  auto orig_less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
+  auto order_less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     return a.second < b.second;
   };
 
-  std::sort(tlds.begin(), tlds.end(), less);
-  auto it = std::unique(tlds.begin(), tlds.end(), eq);
+  std::sort(tlds.begin(), tlds.end(), decl_less);
+  auto it = std::unique(tlds.begin(), tlds.end(), decl_eq);
   tlds.erase(it, tlds.end());
 
   // NOTE(pag): It is extremely important to retain the original ordering. You
@@ -269,7 +277,7 @@ static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
   //            side-by-side declarations one-after-another in memory, thus
   //            getting the same sort order. This is why we keep the extra info
   //            in the `pair` of the original sort order.
-  std::sort(tlds.begin(), tlds.end(), orig_less);
+  std::sort(tlds.begin(), tlds.end(), order_less);
 
   return tlds;
 }
@@ -638,6 +646,24 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
   }
 }
 
+// Clang's ASTContext code adds builtins, but they don't behave like user-
+// written code, in that Clang doesn't always add the nested decls into
+// the `DeclContext`.
+static void AddBuiltinDeclRangeToEntityList(
+    std::string_view main_file_path, pasta::Decl decl,
+    std::vector<EntityRange> &entity_ranges) {
+
+  LOG_IF(ERROR, !IsProbablyABuiltinDecl(decl))
+      << "Could not find location of " << decl.KindName()
+      << " declaration: " << DeclToString(decl)
+      << PrefixedLocation(decl, " at or near ")
+      << " on main job file " << main_file_path;
+
+  entity_ranges.emplace_back(std::move(decl), 0u, 0u);
+}
+
+// Figure out the inclusive token index bounds of `decl` and add it to
+// `entity_ranges`.
 static void AddDeclRangeToEntityList(
     const pasta::TokenRange &tokens, std::string_view main_file_path,
     const std::map<uint64_t, uint64_t> &eof_to_include,
@@ -649,13 +675,8 @@ static void AddDeclRangeToEntityList(
   // These are probably part of the preamble of compiler-provided builtin
   // declarations.
   if (!tok) {
-    LOG_IF(ERROR, !IsProbablyABuiltinDecl(decl))
-        << "Could not find location of " << decl.KindName()
-        << " declaration: " << DeclToString(decl)
-        << PrefixedLocation(decl, " at or near ")
-        << " on main job file " << main_file_path;
-    
-    entity_ranges.emplace_back(decl, 0u, 0u);
+    AddBuiltinDeclRangeToEntityList(main_file_path, std::move(decl),
+                                    entity_ranges);
     return;
   }
 
