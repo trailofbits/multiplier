@@ -1373,7 +1373,6 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
   
   if (root_decls.empty()) {
     if (child_decls.empty()) {
-      CHECK(!parsed_tokens);
       return parsed_tokens;
     } else {
       return CreateParsedTokenRange(parsed_tokens, child_decls, root_decls, pp);
@@ -1663,11 +1662,13 @@ static void CreatePendingFragments(
       pasta::PrintedTokenRange::Adopt(frag_tok_range);
 
   // Create the root fragment.
-  if (!root_decls.empty() || (nested_decls.empty() &&
-                              !top_level_macros.empty())) {
+  auto has_top_level_macros = !top_level_macros.empty();
+  if (!root_decls.empty() || (nested_decls.empty() && has_top_level_macros)) {
 
     pasta::PrintedTokenRange aligned_tokens =
         CreateParsedTokenRange(parsed_tokens, root_decls, empty_decls, pp);
+
+    CHECK(!aligned_tokens.empty() || has_top_level_macros);
 
     pf = CreatePendingFragment(
         database,
@@ -1740,6 +1741,8 @@ static void CreatePendingFragments(
 
     pasta::PrintedTokenRange aligned_tokens =
         CreateParsedTokenRange(parsed_tokens, root_decls, decls, pp);
+
+    CHECK(!aligned_tokens.empty());
 
     pf = CreatePendingFragment(
         database,
