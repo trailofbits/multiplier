@@ -157,7 +157,7 @@ std::optional<InitListExpr> InitListExpr::from(const TokenContext &t) {
 
 std::optional<Expr> InitListExpr::array_filler(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -170,7 +170,7 @@ std::optional<Expr> InitListExpr::array_filler(void) const {
 
 std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,16 +182,16 @@ std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
 }
 
 Token InitListExpr::l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token InitListExpr::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal42();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -204,7 +204,7 @@ std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
 
 std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

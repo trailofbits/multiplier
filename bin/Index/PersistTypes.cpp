@@ -556,18 +556,6 @@ static void PersistTokenContexts(
   DCHECK_GT(fb.getTokenKinds().size(), 0u);
 }
 
-// Combine all parsed tokens into a string for diagnostic purposes.
-static std::string DiagnosePrintedTokens(
-    const pasta::PrintedTokenRange &parsed_tokens) {
-  std::stringstream ss;
-  auto sep = "";
-  for (pasta::PrintedToken tok : parsed_tokens) {
-    ss << sep << tok.Data();
-    sep = " ";
-  }
-  return ss.str();
-}
-
 } // namespace
 
 void GlobalIndexingState::PersistTypes(
@@ -582,8 +570,6 @@ void GlobalIndexingState::PersistTypes(
     TypePrintingPolicy pp;
     pasta::PrintedTokenRange token_range =
         pasta::PrintedTokenRange::Create(type, pp);
-
-    LOG(ERROR) << DiagnosePrintedTokens(token_range);
 
     mx::PackedTypeId ptid = em.tm.TypeId(type);
     mx::TypeId tid = ptid.Unpack();

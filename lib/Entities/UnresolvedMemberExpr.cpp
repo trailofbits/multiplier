@@ -157,21 +157,21 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const TokenContex
 }
 
 Expr UnresolvedMemberExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type UnresolvedMemberExpr::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal43();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token UnresolvedMemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token UnresolvedMemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool UnresolvedMemberExpr::has_unresolved_using(void) const {

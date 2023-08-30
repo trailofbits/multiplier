@@ -160,7 +160,7 @@ OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const {
 }
 
 Token CXXOperatorCallExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool CXXOperatorCallExpr::is_assignment_operation(void) const {

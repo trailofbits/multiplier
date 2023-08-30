@@ -206,18 +206,18 @@ CallExprADLCallKind CallExpr::adl_call_kind(void) const {
 }
 
 Type CallExpr::call_return_type(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr CallExpr::callee(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Decl> CallExpr::callee_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,7 +230,7 @@ std::optional<Decl> CallExpr::callee_declaration(void) const {
 
 std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal41();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -242,7 +242,7 @@ std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
 }
 
 Token CallExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool CallExpr::has_stored_fp_features(void) const {

@@ -157,7 +157,7 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const T
 }
 
 ImplicitConceptSpecializationDecl ConceptSpecializationExpr::specialization_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return ImplicitConceptSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

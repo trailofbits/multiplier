@@ -207,7 +207,7 @@ TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameter
 }
 
 bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal355();
+  return impl->reader.getVal354();
 }
 
 #pragma GCC diagnostic pop

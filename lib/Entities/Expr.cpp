@@ -597,22 +597,17 @@ bool Expr::contains_unexpanded_parameter_pack(void) const {
   return impl->reader.getVal23();
 }
 
-Expr Expr::best_dynamic_class_type_expression(void) const {
-  RawEntityId eid = impl->reader.getVal32();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
-}
-
 ExprDependence Expr::dependence(void) const {
   return static_cast<ExprDependence>(impl->reader.getVal56());
 }
 
 Token Expr::expression_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal33());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal32());
 }
 
 std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal34();
+    RawEntityId eid = impl->reader.getVal33();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -629,7 +624,7 @@ ExprObjectKind Expr::object_kind(void) const {
 
 std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal35();
+    RawEntityId eid = impl->reader.getVal34();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -642,7 +637,7 @@ std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
 
 std::optional<FieldDecl> Expr::source_bit_field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal36();
+    RawEntityId eid = impl->reader.getVal35();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -655,7 +650,7 @@ std::optional<FieldDecl> Expr::source_bit_field(void) const {
 
 std::optional<Type> Expr::type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal37();
+    RawEntityId eid = impl->reader.getVal36();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

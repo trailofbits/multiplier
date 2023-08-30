@@ -157,7 +157,7 @@ std::optional<RequiresExpr> RequiresExpr::from(const TokenContext &t) {
 }
 
 RequiresExprBodyDecl RequiresExpr::body(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
@@ -194,11 +194,11 @@ gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
 }
 
 Token RequiresExpr::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token RequiresExpr::requires_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool RequiresExpr::is_satisfied(void) const {

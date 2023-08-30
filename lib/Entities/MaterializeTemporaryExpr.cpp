@@ -158,7 +158,7 @@ std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Tok
 
 std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -171,7 +171,7 @@ std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) c
 
 std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_extended_temporary_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -187,7 +187,7 @@ StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
 }
 
 Expr MaterializeTemporaryExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

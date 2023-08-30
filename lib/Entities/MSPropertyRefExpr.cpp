@@ -156,16 +156,16 @@ std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const TokenContext &t) 
 }
 
 Expr MSPropertyRefExpr::base_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MSPropertyRefExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 MSPropertyDecl MSPropertyRefExpr::property_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return MSPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

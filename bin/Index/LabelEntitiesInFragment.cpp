@@ -151,6 +151,18 @@ class EntityLabeller final : public EntityVisitor {
   bool Label(const pasta::Macro &entity);
 };
 
+static bool IsAcceptableRepeatedToken(const pasta::Token &tok) {
+  switch (tok.Kind()) {
+    case pasta::TokenKind::kKeyword__Attribute:
+    case pasta::TokenKind::kKeyword__Declspec:
+    case pasta::TokenKind::kLParenthesis:
+    case pasta::TokenKind::kRParenthesis:
+      return true;
+    default:
+      return false;
+  }
+}
+
 // Create initial fragment token IDs for all of the tokens in the range of
 // this fragment. This needs to be careful about assigning IDs to tokens that
 // aren't actually parsed, i.e. tokens whose roles are things like
@@ -170,7 +182,17 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
 
   if (std::optional<pasta::Token> pt = entity.DerivedLocation()) {
     CHECK(IsParsedToken(pt.value()));
-    CHECK(em.token_tree_ids.emplace(pt->RawToken(), id).second);
+
+    // NOTE(pag): We may see the same token come up multiple times, especially
+    //            if this is purely printed tokens, rather than parsed tokens
+    //            aligned with printed tokens. A good example is that the
+    //            pure pretty-printed code will separately print the syntax for
+    //            each attribute in its own `__attribute__` block, whereas in
+    //            the pasrsed source code, multiple attributes may belong to the
+    //            same syntactical block.
+    if (!em.token_tree_ids.emplace(pt->RawToken(), id).second) {
+      DCHECK(IsAcceptableRepeatedToken(pt.value()));
+    }
   }
 
   // // If we didn't just add the token, then we should be in the nested fragment

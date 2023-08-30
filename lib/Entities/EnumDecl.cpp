@@ -247,7 +247,7 @@ TokenRange EnumDecl::integer_type_range(void) const {
 }
 
 std::optional<unsigned> EnumDecl::odr_hash(void) const {
-  if (!impl->reader.getVal106()) {
+  if (!impl->reader.getVal105()) {
     return std::nullopt;
   } else {
     return static_cast<unsigned>(impl->reader.getVal143());
@@ -286,31 +286,31 @@ TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
 }
 
 bool EnumDecl::is_closed(void) const {
-  return impl->reader.getVal107();
+  return impl->reader.getVal106();
 }
 
 bool EnumDecl::is_closed_flag(void) const {
-  return impl->reader.getVal108();
+  return impl->reader.getVal107();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const {
-  return impl->reader.getVal109();
+  return impl->reader.getVal108();
 }
 
 bool EnumDecl::is_complete(void) const {
-  return impl->reader.getVal110();
+  return impl->reader.getVal109();
 }
 
 bool EnumDecl::is_fixed(void) const {
-  return impl->reader.getVal111();
+  return impl->reader.getVal110();
 }
 
 bool EnumDecl::is_scoped(void) const {
-  return impl->reader.getVal112();
+  return impl->reader.getVal111();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const {
-  return impl->reader.getVal113();
+  return impl->reader.getVal112();
 }
 
 #pragma GCC diagnostic pop

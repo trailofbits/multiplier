@@ -145,11 +145,21 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
     return eid;
   }
 
-  // We shouldn't get parsed tokens here, though when serializing types, we
-  // might
+  // We shouldn't get parsed tokens here, though when serializing types or
+  // freestanding fragments, i.e. where we've pulled out a forward declaration
+  // embedded in a declarator, then we might get here. Generally, this suggests
+  // a bug in PASTA, where we've used `PrintedTokenRange::Create(decl)`, and
+  // then there is some method, e.g. `decl.Location()` that should correspond
+  // to one of the `PrintedToken::DerivedLocation()`s return values, but
+  // doesn't. This means that PASTA's internal pretty printers aren't
+  // sufficiently marking locations/provenenance info. A good way to diagnose
+  // this is to check if `PendingFragment::drop_token_provenance` is `true`, and
+  // if so, then go and print out each printed token and whether its derived
+  // location has a value (where we create the fragment). What you'll see is
+  // that `entity.Data()` here likely matches some printed token data over there
+  // that has no corresponding derived (parsed) token.
   if (IsParsedToken(entity)) {
     assert(false);
-    //assert(entity.Kind() == pasta::TokenKind::kEllipsis);
     return eid;
   }
 

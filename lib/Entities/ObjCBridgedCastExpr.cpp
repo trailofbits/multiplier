@@ -157,7 +157,7 @@ std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const TokenContext 
 }
 
 Token ObjCBridgedCastExpr::bridge_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 ObjCBridgeCastKind ObjCBridgedCastExpr::bridge_kind(void) const {
@@ -170,7 +170,7 @@ std::string_view ObjCBridgedCastExpr::bridge_kind_name(void) const {
 }
 
 Token ObjCBridgedCastExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 #pragma GCC diagnostic pop

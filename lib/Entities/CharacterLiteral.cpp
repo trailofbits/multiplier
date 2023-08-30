@@ -159,7 +159,7 @@ CharacterLiteralCharacterKind CharacterLiteral::literal_kind(void) const {
 }
 
 Token CharacterLiteral::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 #pragma GCC diagnostic pop

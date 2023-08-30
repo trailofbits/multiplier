@@ -5,6 +5,11 @@
 "directory": ""
 },
 {
+"file": "CFAvailability.c",
+"command": "/usr/bin/cc CFAvailability.c",
+"directory": ""
+},
+{
 "file": "EmptyFunctionMacroWithParams.c",
 "command": "/usr/bin/cc EmptyFunctionMacroWithParams.c",
 "directory": ""

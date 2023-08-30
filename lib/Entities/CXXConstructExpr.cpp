@@ -196,16 +196,16 @@ CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const
 }
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXConstructExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 TokenRange CXXConstructExpr::parenthesis_or_brace_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal40(), impl->reader.getVal41());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal39(), impl->reader.getVal40());
 }
 
 bool CXXConstructExpr::had_multiple_candidates(void) const {

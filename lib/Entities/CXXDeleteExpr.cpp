@@ -161,17 +161,17 @@ bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
 }
 
 Expr CXXDeleteExpr::argument(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type CXXDeleteExpr::destroyed_type(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 FunctionDecl CXXDeleteExpr::operator_delete(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

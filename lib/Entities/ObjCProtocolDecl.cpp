@@ -199,11 +199,11 @@ bool ObjCProtocolDecl::is_this_declaration_a_definition(void) const {
 }
 
 unsigned ObjCProtocolDecl::num_protocol_tokens(void) const {
-  return impl->reader.getVal314().size();
+  return impl->reader.getVal313().size();
 }
 
 std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
-  auto list = impl->reader.getVal314();
+  auto list = impl->reader.getVal313();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -217,7 +217,7 @@ std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const & {
-  auto list = impl->reader.getVal314();
+  auto list = impl->reader.getVal313();
   EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
@@ -227,19 +227,19 @@ gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t314 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t314;
+    if (auto t313 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t313;
     }
   }
   co_return;
 }
 
 unsigned ObjCProtocolDecl::num_protocols(void) const {
-  return impl->reader.getVal340().size();
+  return impl->reader.getVal339().size();
 }
 
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const {
-  auto list = impl->reader.getVal340();
+  auto list = impl->reader.getVal339();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -253,12 +253,12 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const & {
-  auto list = impl->reader.getVal340();
+  auto list = impl->reader.getVal339();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d340 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d340)))) {
+    if (auto d339 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d339)))) {
         co_yield std::move(*e);
       }
     }

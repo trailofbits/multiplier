@@ -79,30 +79,30 @@ std::optional<DependentVectorType> DependentVectorType::from(const TokenContext 
 }
 
 Type DependentVectorType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal228();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token DependentVectorType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal230());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal229());
 }
 
 Type DependentVectorType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal235();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentVectorType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal237();
+  RawEntityId eid = impl->reader.getVal236();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 VectorTypeVectorKind DependentVectorType::vector_kind(void) const {
-  return static_cast<VectorTypeVectorKind>(impl->reader.getVal238());
+  return static_cast<VectorTypeVectorKind>(impl->reader.getVal237());
 }
 
 bool DependentVectorType::is_sugared(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal230();
 }
 
 #pragma GCC diagnostic pop

@@ -84,7 +84,6 @@ class TagDecl : public TypeDecl {
   bool is_complete_definition(void) const;
   bool is_complete_definition_required(void) const;
   bool is_dependent_type(void) const;
-  bool is_embedded_in_declarator(void) const;
   bool is_enum(void) const;
   bool is_free_standing(void) const;
   bool is_interface(void) const;

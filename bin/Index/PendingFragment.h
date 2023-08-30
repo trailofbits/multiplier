@@ -62,6 +62,8 @@ class PendingFragment {
  public:
   inline PendingFragment(mx::PackedFragmentId fragment_id_, bool is_new_,
                          mx::PackedCompilationId tu_id_,
+                         uint64_t first_parsed_token_index_,
+                         uint64_t last_parsed_token_index_,
                          EntityMapper &em_,
                          const pasta::TokenRange *original_tokens_,
                          pasta::PrintedTokenRange parsed_tokens_,
@@ -72,6 +74,8 @@ class PendingFragment {
         em(em_),
         parsed_tokens(std::move(parsed_tokens_)),
         file_location(std::move(file_location_)),
+        first_parsed_token_index(first_parsed_token_index_),
+        last_parsed_token_index(last_parsed_token_index_),
         is_new(is_new_) {
     if (original_tokens_) {
       original_tokens = *original_tokens_;
@@ -104,14 +108,19 @@ class PendingFragment {
   // contexts.
   pasta::PrintedTokenRange parsed_tokens;
 
-  const std::optional<FileLocationOfFragment> file_location;
+  std::optional<FileLocationOfFragment> file_location;
 
   // Top-level declarations. These are the roots of serialization.
   std::vector<pasta::Decl> top_level_decls;
   std::vector<pasta::Macro> top_level_macros;
 
-  // Offsets of the serialized version of pseudo entities in this fragment.
-  PseudoOffsetMap pseudo_offsets;
+  // These are original PASTA parsed token indexes, representing the bounds of
+  // this fragment, even if this is a freestanding fragment. These bounds help
+  // us to avoid oddities in Clang, e.g. where clang will associate struct
+  // attributes on forward declarations with prior definitions if they already
+  // exist.
+  const uint64_t first_parsed_token_index;
+  const uint64_t last_parsed_token_index;  // Inclusive.
 
   unsigned num_top_level_declarations{0u};
   unsigned num_top_level_macros{0u};
@@ -127,12 +136,6 @@ class PendingFragment {
   std::vector<pasta::TemplateParameterList> template_parameter_lists_to_serialize;
   std::vector<pasta::CXXBaseSpecifier> cxx_base_specifiers_to_serialize;
   std::vector<pasta::Designator> designators_to_serialize;
-
-  // We distinguish entities from "pseudo" entities, where an entity is uniquely
-  // identifiable via an `mx::EntityId`, whereas a pseudo entity is not uniquely
-  // identifiable, but is attached to some other entity. For example, a
-  // `TemplateParamterList` or a `TemplateArgument` is a pseudo entity.
-  std::vector<Pseudo> pseudos_to_serialize;
 
   // Did we encounter an error during serialization?
   bool has_error{false};

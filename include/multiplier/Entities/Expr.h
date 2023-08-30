@@ -203,7 +203,6 @@ class Expr : public ValueStmt {
   Expr ignore_unless_spelled_in_source(void) const;
   bool contains_errors(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
-  Expr best_dynamic_class_type_expression(void) const;
   ExprDependence dependence(void) const;
   Token expression_token(void) const;
   std::optional<ObjCPropertyRefExpr> obj_c_property(void) const;

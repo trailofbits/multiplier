@@ -164,12 +164,12 @@ CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(voi
 }
 
 CXXConstructorDecl CXXInheritedCtorInitExpr::constructor(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXInheritedCtorInitExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CXXInheritedCtorInitExpr::inherited_from_virtual_base(void) const {

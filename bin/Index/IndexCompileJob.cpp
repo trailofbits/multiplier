@@ -737,11 +737,23 @@ static void AddDeclRangeToEntityList(
   }
 
   // There should always be at least two tokens in any top-level decl.
-  LOG_IF(ERROR, begin_index == end_index &&
-                decl.Kind() != pasta::DeclKind::kEmpty)
-      << "Only found one token " << tok.Data() << " for: "
-      << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
-      << " on main job file " << main_file_path;
+  if (begin_index == end_index && decl.Kind() != pasta::DeclKind::kEmpty) {
+
+    // Clang is able to convert some uses of library functions into uses of
+    // builtin functions. This also happens at the usage site of builtin
+    // functions themselves.
+    if (IsProbablyABuiltinDecl(decl)) {
+      AddBuiltinDeclRangeToEntityList(main_file_path, std::move(decl),
+                                      entity_ranges);
+      return;
+
+    } else {
+      LOG(ERROR)
+          << "Only found one token " << tok.Data() << " for: "
+          << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
+          << " on main job file " << main_file_path;
+    }
+  }
 
   entity_ranges.emplace_back(std::move(decl), begin_index, end_index);
 }
@@ -1295,9 +1307,11 @@ static PendingFragmentPtr CreatePendingFragment(
     pasta::PrintedTokenRange parsed_tokens,
     std::optional<FileLocationOfFragment> floc,
     mx::PackedCompilationId tu_id,
+    uint64_t begin_index,
+    uint64_t end_index,
     std::vector<pasta::Decl> decls,
     std::vector<pasta::Macro> macros,
-    std::optional<mx::PackedFragmentId> &root_fragment_id) {
+    const std::optional<mx::PackedFragmentId> &root_fragment_id) {
 
   // The number of tokens is used to estimate the "size" of this fragment.
   // Mostly, it's a proxy of the complexity of the macro expansions as well.
@@ -1317,15 +1331,17 @@ static PendingFragmentPtr CreatePendingFragment(
   // a new fragment.
   bool is_new_fragment_id = false;
   mx::PackedFragmentId fid = database.GetOrCreateFragmentIdForHash(
-          (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
-          HashFragment(decls, macros, original_tokens, parsed_tokens),
-          num_tokens  /* for fragment id packing format */,
-          is_new_fragment_id  /* mutated by reference */);
+      (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
+      HashFragment(decls, macros, original_tokens, parsed_tokens),
+      num_tokens  /* for fragment id packing format */,
+      is_new_fragment_id  /* mutated by reference */);
 
   PendingFragmentPtr pf(new PendingFragment(
       fid,
       is_new_fragment_id  /* is_new */,
       tu_id,
+      begin_index,
+      end_index,
       em,
       original_tokens,
       std::move(parsed_tokens),
@@ -1448,10 +1464,107 @@ static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
   return true;
 }
 
+// Create a freestanding fragment. This is generally for builtin types, e.g.
+// `__builtin_va_list`, or for forward declarations that are embedded within
+// the declarators of other declarations. We need to specially handle these
+// forward declarations to prevent Issue #396.
+//
+// XREF(pag): https://github.com/trailofbits/multiplier/issues/396
+static void CreateFreestandingDeclFragment(
+    mx::DatabaseWriter &database,
+    EntityMapper &em, 
+    std::optional<FileLocationOfFragment> floc, 
+    mx::PackedCompilationId tu_id,
+    uint64_t begin_index,
+    uint64_t end_index,
+    const pasta::Decl &decl,
+    std::vector<PendingFragmentPtr> &pending_fragments,
+    std::string_view main_file_path) {
+
+  const std::vector<pasta::Macro> empty_macros;
+  const std::vector<pasta::Decl> empty_decls;
+  std::vector<pasta::Decl> decls;
+  decls.push_back(decl);
+
+  // NOTE(pag): For builtin declaration, this will be empty.
+  const pasta::PrintingPolicy pp;
+  pasta::PrintedTokenRange parsed_tokens =
+      pasta::PrintedTokenRange::Adopt(decl.Tokens());
+  pasta::PrintedTokenRange printed_tokens = parsed_tokens;
+
+  // If this is a builtin declaration, then we want the fragment hash to be
+  // generic across the whole program, not specific to this file. For example,
+  // we don't want *every* use of `__builtin_bswap32` to show up as a distinct
+  // re-declaration.
+  auto is_builtin = IsProbablyABuiltinDecl(decl);
+  if (is_builtin) {
+    floc.reset();
+  }
+
+  if (parsed_tokens) {
+    printed_tokens = CreateParsedTokenRange(
+        parsed_tokens, decls, empty_decls, pp);
+
+  } else {
+    LOG_IF(ERROR, !is_builtin)
+        << "Could not find tokens of " << decl.KindName()
+        << " declaration: " << DeclToString(decl)
+        << PrefixedLocation(decl, " at or near ")
+        << " on main job file " << main_file_path;
+  }
+
+  // Detect the builtin case, as well as the alignment failure case.
+  if (!printed_tokens || printed_tokens == parsed_tokens) {
+    printed_tokens = pasta::PrintedTokenRange::Create(decl, pp);
+  }
+
+  // NOTE(pag): We pass `nullptr` as the parsed tokens, because we can't
+  //            guarantee that the parsed tokens aren't the result of
+  //            macro expansions.
+  auto pf = CreatePendingFragment(
+      database,
+      em,
+      nullptr  /* original_tokens */,
+      std::move(printed_tokens)  /* parsed_tokens */,
+      std::move(floc),
+      tu_id,
+      begin_index,
+      end_index,
+      std::move(decls),
+      empty_macros,
+      std::nullopt  /* root_fragment_id */);
+
+  // We move `floc` into `CreatePendingFragment` so that it affects our
+  // hashing/deduplicating, but beyond that, we don't want to associate this
+  // freestanding declaration with this file location, so if it's set, we clear
+  // it.
+  pf->file_location.reset();
+
+  // `printed_toks` above may contain derived locations that the decls
+  // themselves will reference, and so we need to make sure that we'll
+  // be able to find those tokens when serializing those decls. However,
+  // when persisting the fragment and building the token tree, we don't
+  // want to retain the connections back to the parsed tokens as they
+  // may be related to macros.
+  //
+  // NOTE(pag): This is a bit ugly, because we're "scheduling" to drop
+  //            provenance later after labelling. The crux of the issue
+  //            is that labelling is per-fragment, and if we did it now,
+  //            then that info would be dropped when we reset the
+  //            `EntityMapper` for the fragment.
+  pf->drop_token_provenance = true;
+
+  LabelDeclsInFragment(*pf);
+
+  if (pf->is_new) {
+    pending_fragments.emplace_back(std::move(pf));
+  }
+}
+
 static void CreatePendingFragments(
     mx::DatabaseWriter &database, EntityMapper &em,
     const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
-    EntityGroupRange group_range,
+    EntityGroupRange group_range, std::string_view main_file_path,
     std::vector<PendingFragmentPtr> &pending_fragments) {
 
   const EntityGroup &entities = std::get<kGroupIndex>(group_range);
@@ -1486,10 +1599,7 @@ static void CreatePendingFragments(
   const std::vector<pasta::Decl> empty_decls;
   const std::vector<pasta::Macro> empty_macros;
   std::optional<mx::PackedFragmentId> root_fragment_id;
-  std::optional<FileLocationOfFragment> empty_floc;
   PendingFragmentPtr pf;
-
-  const pasta::PrintingPolicy empty_pp;
 
   // Partition the top-level declarations so that ones that definitely won't
   // need to go in a nested fragment show up first. This acts as a minor
@@ -1511,50 +1621,10 @@ static void CreatePendingFragments(
       // `typedef`.
       } else if (IsInjectedForwardDeclaration(decl) || !floc ||
                  decl.IsImplicit()) {
-
-        pasta::PrintedTokenRange printed_toks =
-            pasta::PrintedTokenRange::Create(decl, empty_pp);
-
-        // NOTE(pag): We pass `nullptr` as the parsed tokens, because we can't
-        //            guarantee that the parsed tokens aren't the result of
-        //            macro expansions.
-        forward_decls.emplace_back(decl);
-        pf = CreatePendingFragment(
-            database,
-            em,
-            nullptr  /* original_tokens */,
-            std::move(printed_toks)  /* parsed_tokens */,
-            std::move(empty_floc),
-            tu_id,
-            std::move(forward_decls),
-            empty_macros,
-            root_fragment_id);
-
-        LabelDeclsInFragment(*pf);
-
-        if (auto nd = pasta::NamedDecl::From(decl)) {
-          if (nd->Name() == "__va_list_tag") {
-
-          }
-        }
-
-        // `printed_toks` above may contain derived locations that the decls
-        // themselves will reference, and so we need to make sure that we'll
-        // be able to find those tokens when serializing those decls. However,
-        // when persisting the fragment and building the token tree, we don't
-        // want to retain the connections back to the parsed tokens as they
-        // may be related to macros.
-        //
-        // NOTE(pag): This is a bit ugly, because we're "scheduling" to drop
-        //            provenance later after labelling. The crux of the issue
-        //            is that labelling is per-fragment, and if we did it now,
-        //            then that info would be dropped when we reset the
-        //            `EntityMapper` for the fragment.
-        pf->drop_token_provenance = true;
-
-        if (pf->is_new) {
-          pending_fragments.emplace_back(std::move(pf));
-        }
+        
+        CreateFreestandingDeclFragment(
+            database, em, floc, tu_id, begin_index, end_index,
+            decl, pending_fragments, main_file_path);
 
       // These are generally template instantiations.
       } else if (ShouldGoInNestedFragment(decl)) {
@@ -1606,6 +1676,8 @@ static void CreatePendingFragments(
         std::move(aligned_tokens)  /* parsed_tokens */,
         floc  /* copied */,
         tu_id,
+        begin_index,
+        end_index,
         std::move(root_decls),
         top_level_macros  /* copied */,
         root_fragment_id);
@@ -1643,6 +1715,8 @@ static void CreatePendingFragments(
         std::move(parsed_tokens_in_directive_range)  /* parsed_tokens */,
         floc  /* copied */,
         tu_id,
+        begin_index,
+        end_index,
         std::move(empty_decls),
         std::move(macros),
         root_fragment_id);
@@ -1674,6 +1748,8 @@ static void CreatePendingFragments(
         std::move(aligned_tokens)  /* parsed_tokens */,
         floc  /* copied */,
         tu_id,
+        begin_index,
+        end_index,
         std::move(decls),
         top_level_macros  /* copied */,
         root_fragment_id);
@@ -1718,7 +1794,7 @@ static std::vector<PendingFragmentPtr> CreatePendingFragments(
   for (EntityGroupRange &entities_in_fragment : decl_group_ranges) {
     try {
       CreatePendingFragments(context.database, em, tok_range, tu_id,
-                             std::move(entities_in_fragment),
+                             std::move(entities_in_fragment), main_job_file,
                              pending_fragments);
     } catch (...) {
       LOG(ERROR)
@@ -1733,12 +1809,15 @@ static std::vector<PendingFragmentPtr> CreatePendingFragments(
 // Serialize the parsed fragments that were identified as new and/or "won"
 // the race to assign a fragment ID in this thread of execution.
 static void PersistParsedFragments(
-    GlobalIndexingState &context, const pasta::Compiler &compiler,
-    const pasta::CompileJob &job, const pasta::AST &ast, EntityMapper &em,
-    TokenProvenanceCalculator &provenance, mx::PackedCompilationId tu_id,
+    GlobalIndexingState &context,
+    const pasta::Compiler &compiler,
+    const pasta::CompileJob &job,
+    const pasta::AST &ast, EntityMapper &em,
+    mx::PackedCompilationId tu_id,
     std::vector<PendingFragmentPtr> pending_fragments) {
 
   NameMangler mangler(ast, tu_id);
+  TokenProvenanceCalculator provenance(em);
 
   std::string main_source_file = ast.MainFile().Path().generic_string();
   DLOG(INFO)
@@ -1747,9 +1826,6 @@ static void PersistParsedFragments(
 
   std::vector<mx::PackedFragmentId> fragment_ids;
   fragment_ids.reserve(pending_fragments.size());
-  for (PendingFragmentPtr &pf : pending_fragments) {
-    fragment_ids.push_back(pf->fragment_id);
-  }
 
   for (PendingFragmentPtr &pf : pending_fragments) {
     auto start_time = std::chrono::system_clock::now();
@@ -1757,6 +1833,8 @@ static void PersistParsedFragments(
       em.ResetForFragment();
       context.PersistFragment(ast, mangler, em, provenance, *pf);
       context.PersistTypes(ast, mangler, em, *pf);
+      fragment_ids.push_back(pf->fragment_id);
+
     } catch (...) {
       pf->has_error = true;
 
@@ -1900,9 +1978,8 @@ void IndexCompileJobAction::Run(void) {
     return;
   }
 
-  TokenProvenanceCalculator provenance(em);
   PersistParsedFragments(
-      *context, compiler, job, ast, em, provenance, tu_id,
+      *context, compiler, job, ast, em, tu_id,
       CreatePendingFragments(
           *context, em, ast, tu_id,
           PartitionEntities(*context, ast)));

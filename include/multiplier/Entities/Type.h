@@ -114,7 +114,6 @@ class Type {
   bool can_have_nullability(void) const;
   bool contains_errors(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
-  std::optional<Type> array_element_type_no_type_qualified(void) const;
   Linkage linkage(void) const;
   std::optional<NullabilityKind> nullability(void) const;
   std::optional<CXXRecordDecl> pointee_cxx_record_declaration(void) const;

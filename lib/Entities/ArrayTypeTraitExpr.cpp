@@ -156,12 +156,12 @@ std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const TokenContext &t
 }
 
 Expr ArrayTypeTraitExpr::dimension_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type ArrayTypeTraitExpr::queried_type(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

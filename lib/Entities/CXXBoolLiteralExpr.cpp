@@ -155,7 +155,7 @@ std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const TokenContext &t
 }
 
 Token CXXBoolLiteralExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 bool CXXBoolLiteralExpr::value(void) const {

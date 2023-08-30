@@ -164,7 +164,7 @@ SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const {
 }
 
 Token SourceLocExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 bool SourceLocExpr::is_int_type(void) const {

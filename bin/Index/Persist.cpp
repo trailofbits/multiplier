@@ -532,18 +532,6 @@ static void PersistParsedTokens(
   }
 }
 
-// Combine all parsed tokens into a string for diagnostic purposes.
-static std::string DiagnoseParsedTokens(
-    const pasta::PrintedTokenRange &parsed_tokens) {
-  std::stringstream ss;
-  auto sep = "";
-  for (pasta::PrintedToken tok : parsed_tokens) {
-    ss << sep << tok.Data();
-    sep = " ";
-  }
-  return ss.str();
-}
-
 static std::string MainSourceFile(const pasta::AST &ast) {
   return ast.MainFile().Path().generic_string();
 }
@@ -638,7 +626,7 @@ static void PersistTokenTree(
       LOG(FATAL)
           << "Missing parsed/file token for token node in source file "
           << MainSourceFile(pf) << " with parsed tokens "
-          << DiagnoseParsedTokens(pf.parsed_tokens);
+          << DiagnosePrintedTokens(pf.parsed_tokens);
     }
 
     // Associate this token node with a parsed token. Generally this can be
@@ -704,7 +692,7 @@ static void PersistTokenTree(
           << "' at index " << i << " (PTI " << parsed_tok.Index()
           << ") in parsed token list from source file "
           << MainSourceFile(pf) << " with parsed tokens "
-          << DiagnoseParsedTokens(pf.parsed_tokens);
+          << DiagnosePrintedTokens(pf.parsed_tokens);
     }
     ++i;
   }

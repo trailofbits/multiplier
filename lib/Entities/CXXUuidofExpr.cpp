@@ -158,7 +158,7 @@ std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const TokenContext &t) {
 
 std::optional<Expr> CXXUuidofExpr::expression_operand(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -170,17 +170,17 @@ std::optional<Expr> CXXUuidofExpr::expression_operand(void) const {
 }
 
 MSGuidDecl CXXUuidofExpr::guid_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type CXXUuidofExpr::type_operand(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXUuidofExpr::type_operand_source_info(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

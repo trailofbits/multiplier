@@ -1079,4 +1079,16 @@ template void AccumulateTokenData<pasta::Token>(
 template void AccumulateTokenData<pasta::PrintedToken>(
     std::string &data, const pasta::PrintedToken &tok);
 
+// Combine all parsed tokens into a string for diagnostic purposes.
+std::string DiagnosePrintedTokens(
+    const pasta::PrintedTokenRange &parsed_tokens) {
+  std::stringstream ss;
+  auto sep = "";
+  for (pasta::PrintedToken tok : parsed_tokens) {
+    ss << sep << tok.Data();
+    sep = " ";
+  }
+  return ss.str();
+}
+
 }  // namespace indexer

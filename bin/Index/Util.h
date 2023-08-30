@@ -26,6 +26,7 @@ class FileToken;
 class Macro;
 class MacroToken;
 class PrintedToken;
+class PrintedTokenRange;
 class Stmt;
 class Token;
 class Type;
@@ -134,5 +135,7 @@ std::string GetSerializedData(capnp::MessageBuilder &builder);
 
 template <typename Tok>
 void AccumulateTokenData(std::string &data, const Tok &tok);
+
+std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
 
 }  // namespace indexer

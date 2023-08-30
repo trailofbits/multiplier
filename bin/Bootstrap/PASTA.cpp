@@ -293,7 +293,6 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"FunctionTemplateDecl", "MostRecentDeclaration"},
   {"CXXRecordDecl", "MostRecentDeclaration"},
   {"RecordDecl", "MostRecentDeclaration"},
-
   {"Decl", "PreviousDeclaration"},
   {"TypeAliasTemplateDecl", "PreviousDeclaration"},
   {"VarTemplateDecl", "PreviousDeclaration"},
@@ -303,6 +302,11 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"EnumDecl", "PreviousDeclaration"},
   {"RecordDecl", "PreviousDeclaration"},
   {"RecordDecl", "FirstNamedDataMember"},
+
+  // We hoist forward declarations embedded in declarators out into their own
+  // freestanding fragments that aren't associated with files, and so the return
+  // value of this method loses its meaning in those cases.
+  {"TagDecl", "IsEmbeddedInDeclarator"},
 
   // These are redundant.
   {"FunctionDecl", "ParameterDeclarations"},
@@ -381,6 +385,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"QualifiedType", "WithoutLocalFastQualifiers"},
 
   // End up being a bit spammy in serialization, and we support `::from`.
+  {"Type", "ArrayElementTypeNoTypeQualified"},
   {"Type", "AsCXXRecordDeclaration"},
   {"Type", "AsComplexIntegerType"},
   {"Type", "AsObjCInterfacePointerType"},

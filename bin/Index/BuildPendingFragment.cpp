@@ -58,10 +58,6 @@ class FragmentBuilder final {
   void Accept(const pasta::Type &entity);
   void Accept(const pasta::Attr &entity);
   void Accept(const pasta::Macro &entity);
-  void Accept(const pasta::TemplateArgument &entity);
-  void Accept(const pasta::CXXBaseSpecifier &entity);
-  void Accept(const pasta::TemplateParameterList &entity);
-  void Accept(const pasta::Designator &entity);
 
   void MaybeVisitNext(std::optional<pasta::MacroToken>) {}
   void MaybeVisitNext(std::optional<pasta::FileToken>) {}
@@ -342,12 +338,28 @@ bool PendingFragment::Add(const pasta::Attr &entity) {
   id.offset = static_cast<mx::EntityOffset>(attrs_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
-  if (auto tok = entity.Token().RawToken()) {
-    auto [it, added] = em.attr_ids.emplace(tok, id);
-    if (!added) {
+  if (auto tok = entity.Token(); auto raw_tok = tok.RawToken()) {
+    auto it = em.attr_ids.find(raw_tok);
+    if (it != em.attr_ids.end()) {
       entity_ids.emplace(locator, it->second);
+      return false;  // We've seen this.
+    }
+
+    // If we have something like:
+    //
+    //      struct CGPoint { int x; int y; };
+    //      typedef struct __attribute__((objc_boxable)) CGPoint CGPoint;
+    //
+    // Then the attribute will apply to the structure definition rather than
+    // the declaration embedded in the declarator of the `typedef`. In these
+    // cases, we opt to defer our attribute merging logic to later.
+    const uint64_t tok_index = tok.Index();
+    if (first_parsed_token_index > tok_index ||
+        last_parsed_token_index < tok_index) {
       return false;
     }
+
+    em.attr_ids.emplace(raw_tok, id);
 
   // NOTE(pag): This is pretty ugly, but we need to label the attributes
   //            when we're processing all fragments, as the attributes may
@@ -457,7 +469,10 @@ void BuildPendingFragment(PendingFragment &pf) {
   size_t prev_num_stmts = 0ul;
   size_t prev_num_types = 0ul;
   size_t prev_num_attrs = 0ul;
-  size_t prev_num_pseudos = 0ul;
+  size_t prev_num_designators = 0ul;
+  size_t prev_num_template_args = 0ul;
+  size_t prev_num_template_params = 0ul;
+  size_t prev_num_cxx_base_specifiers = 0ul;
 
   FragmentBuilder builder(em, pf);
 
@@ -502,7 +517,12 @@ void BuildPendingFragment(PendingFragment &pf) {
       size_t num_stmts = pf.stmts_to_serialize.size();
       size_t num_types = pf.types_to_serialize.size();
       size_t num_attrs = pf.attrs_to_serialize.size();
-      size_t num_pseudos = pf.pseudos_to_serialize.size();
+      size_t num_designators = pf.designators_to_serialize.size();
+      size_t num_template_args = pf.template_arguments_to_serialize.size();
+      size_t num_template_params =
+          pf.template_parameter_lists_to_serialize.size();
+      size_t num_cxx_base_specifiers =
+          pf.cxx_base_specifiers_to_serialize.size();
 
       for (size_t i = prev_num_decls; i < num_decls; ++i) {
         changed = true;
@@ -528,27 +548,40 @@ void BuildPendingFragment(PendingFragment &pf) {
         builder.Accept(entity);
       }
 
-      for (size_t i = prev_num_pseudos; i < num_pseudos; ++i) {
+      for (size_t i = prev_num_designators; i < num_designators; ++i) {
         changed = true;
-        Pseudo pseudo = pf.pseudos_to_serialize[i];
-        if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
-          builder.VisitTemplateArgument(std::get<pasta::TemplateArgument>(pseudo));
-        } else if (std::holds_alternative<pasta::CXXBaseSpecifier>(pseudo)) {
-          builder.VisitCXXBaseSpecifier(std::get<pasta::CXXBaseSpecifier>(pseudo));
-        } else if (std::holds_alternative<pasta::TemplateParameterList>(pseudo)) {
-          builder.VisitTemplateParameterList(std::get<pasta::TemplateParameterList>(pseudo));
-        } else if (std::holds_alternative<pasta::Designator>(pseudo)) {
-          builder.VisitDesignator(std::get<pasta::Designator>(pseudo));
-        } else {
-          assert(false);
-        }
+        pasta::Designator entity = pf.designators_to_serialize[i];
+        builder.VisitDesignator(entity);
+      }
+
+      for (size_t i = prev_num_template_args; i < num_template_args; ++i) {
+        changed = true;
+        pasta::TemplateArgument entity = pf.template_arguments_to_serialize[i];
+        builder.VisitTemplateArgument(entity);
+      }
+
+      for (size_t i = prev_num_template_params; i < num_template_params; ++i) {
+        changed = true;
+        pasta::TemplateParameterList entity =
+            pf.template_parameter_lists_to_serialize[i];
+        builder.VisitTemplateParameterList(entity);
+      }
+
+      for (size_t i = prev_num_cxx_base_specifiers;
+           i < num_cxx_base_specifiers; ++i) {
+        changed = true;
+        pasta::CXXBaseSpecifier entity = pf.cxx_base_specifiers_to_serialize[i];
+        builder.VisitCXXBaseSpecifier(entity);
       }
 
       prev_num_decls = num_decls;
       prev_num_stmts = num_stmts;
       prev_num_types = num_types;
       prev_num_attrs = num_attrs;
-      prev_num_pseudos = num_pseudos;
+      prev_num_designators = num_designators;
+      prev_num_template_args = num_template_args;
+      prev_num_template_params = num_template_params;
+      prev_num_cxx_base_specifiers = num_cxx_base_specifiers;
     }
 
     // We defer the processing of types as late as possible, as deduplicating

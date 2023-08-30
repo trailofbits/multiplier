@@ -158,7 +158,7 @@ std::optional<BinaryOperator> BinaryOperator::from(const TokenContext &t) {
 }
 
 Expr BinaryOperator::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
@@ -172,11 +172,11 @@ std::string_view BinaryOperator::opcode_string(void) const {
 }
 
 Token BinaryOperator::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr BinaryOperator::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

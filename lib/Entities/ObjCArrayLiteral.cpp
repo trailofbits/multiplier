@@ -156,7 +156,7 @@ std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const TokenContext &t) {
 }
 
 ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

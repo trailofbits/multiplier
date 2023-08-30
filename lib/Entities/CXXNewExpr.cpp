@@ -163,13 +163,13 @@ bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
 }
 
 Type CXXNewExpr::allocated_type(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> CXXNewExpr::array_size(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,7 +182,7 @@ std::optional<Expr> CXXNewExpr::array_size(void) const {
 
 std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -194,7 +194,7 @@ std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal41(), impl->reader.getVal42());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal40(), impl->reader.getVal41());
 }
 
 CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
@@ -203,7 +203,7 @@ CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
 
 std::optional<Expr> CXXNewExpr::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -215,17 +215,17 @@ std::optional<Expr> CXXNewExpr::initializer(void) const {
 }
 
 FunctionDecl CXXNewExpr::operator_delete(void) const {
-  RawEntityId eid = impl->reader.getVal44();
+  RawEntityId eid = impl->reader.getVal43();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 FunctionDecl CXXNewExpr::operator_new(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal44();
   return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal45(), impl->reader.getVal46());
 }
 
 bool CXXNewExpr::has_initializer(void) const {
