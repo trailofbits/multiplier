@@ -901,7 +901,7 @@ static void PersistTokenContexts(
       info = tpl;  // Copy the template.
 
       // Adjust the kind to be an aliasee.
-      if (context.Aliasee()) {
+      if (remapped_context.Aliasee()) {
         info.is_alias = true;
       }
 

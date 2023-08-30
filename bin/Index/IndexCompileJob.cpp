@@ -1487,9 +1487,12 @@ static void CreateFreestandingDeclFragment(
 
   // NOTE(pag): For builtin declaration, this will be empty.
   const pasta::PrintingPolicy pp;
+
   pasta::PrintedTokenRange parsed_tokens =
       pasta::PrintedTokenRange::Adopt(decl.Tokens());
-  pasta::PrintedTokenRange printed_tokens = parsed_tokens;
+
+  pasta::PrintedTokenRange printed_tokens =
+      pasta::PrintedTokenRange::Create(decl, pp);
 
   // If this is a builtin declaration, then we want the fragment hash to be
   // generic across the whole program, not specific to this file. For example,
@@ -1500,9 +1503,20 @@ static void CreateFreestandingDeclFragment(
     floc.reset();
   }
 
+  // Align against the parsed tokens, if we can. 
   if (parsed_tokens) {
-    printed_tokens = CreateParsedTokenRange(
-        parsed_tokens, decls, empty_decls, pp);
+    auto maybe_aligned_tokens = pasta::PrintedTokenRange::Align(
+        parsed_tokens, printed_tokens);
+
+    if (maybe_aligned_tokens.Succeeded()) {
+      (void) maybe_aligned_tokens.TakeValue();  // Drop it.
+
+      // NOTE(pag): PASTA mutates the printed tokens in place when doing the
+      //            alignment, so that they also now have token locations.
+
+    } else {
+      (void) maybe_aligned_tokens.TakeError();  // Drop it.
+    }
 
   } else {
     LOG_IF(ERROR, !is_builtin)
@@ -1510,11 +1524,6 @@ static void CreateFreestandingDeclFragment(
         << " declaration: " << DeclToString(decl)
         << PrefixedLocation(decl, " at or near ")
         << " on main job file " << main_file_path;
-  }
-
-  // Detect the builtin case, as well as the alignment failure case.
-  if (!printed_tokens || printed_tokens == parsed_tokens) {
-    printed_tokens = pasta::PrintedTokenRange::Create(decl, pp);
   }
 
   // NOTE(pag): We pass `nullptr` as the parsed tokens, because we can't
@@ -1620,7 +1629,7 @@ static void CreatePendingFragments(
       // `typedef`.
       } else if (IsInjectedForwardDeclaration(decl) || !floc ||
                  decl.IsImplicit()) {
-        
+
         CreateFreestandingDeclFragment(
             database, em, floc, tu_id, begin_index, end_index,
             decl, pending_fragments, main_file_path);
