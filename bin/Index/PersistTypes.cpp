@@ -386,9 +386,8 @@ static void PersistPrintedTokens(
 // The implementation of PersistTokenContexts is same as for parsed tokens. Some
 // of the checks here are redundant for printed token. Move to the specialized
 // implementation for printed tokens
-
 static void PersistTokenContexts(
-    EntityMapper &em, const pasta::PrintedTokenRange &printed_tokens,
+    EntityMapper &em, const pasta::PrintedTokenRange &parsed_tokens,
     mx::rpc::Type::Builder &fb) {
 
   using DeclContextSet = std::unordered_set<pasta::TokenContext>;
@@ -397,46 +396,28 @@ static void PersistTokenContexts(
   // First, collect only the relevant contexts for this fragment. Group them by
   // entity ID, as we store the context list inline inside of the entities.
   unsigned num_tokens = 0u;
-  for (const pasta::PrintedToken &tok : printed_tokens) {
+  for (pasta::PrintedToken tok : parsed_tokens) {
     ++num_tokens;
 
-    std::optional<pasta::TokenContext> next_context;
-    for (auto context = tok.Context(); context;
-         context = std::move(next_context)) {
+    for (auto context = tok.Context(); context; context = context->Parent()) {
 
-      next_context = context->Parent();
       pasta::TokenContext c = context.value();
       if (auto alias_context = c.Aliasee()) {
         c = std::move(alias_context.value());
       }
 
-      switch(c.Kind()) {
-        case pasta::TokenContextKind::kAST:
-          assert(!next_context);
-          break;  // Should always be the root.
-        case pasta::TokenContextKind::kInvalid:
-          assert(false); // Don't expect these context kind
-          break;
-        case pasta::TokenContextKind::kDecl:
-        case pasta::TokenContextKind::kStmt:
-        case pasta::TokenContextKind::kType:
-        case pasta::TokenContextKind::kAttr:
-        case pasta::TokenContextKind::kDesignator:
-        case pasta::TokenContextKind::kTemplateArgument:
-        case pasta::TokenContextKind::kTemplateParameterList:
-        case pasta::TokenContextKind::kCXXBaseSpecifier:
-        case pasta::TokenContextKind::kTypeConstraint: {
-          const mx::RawEntityId eid = em.EntityId(c.Data());
-          if (eid != mx::kInvalidEntityId) {
-            contexts[eid].insert(context.value());
-          }
-          break;
-        }
-        /* It is possible for context to be of Alias kind. We don't get entity id
-         *  in that case. */
-        case pasta::TokenContextKind::kAlias:
-        case pasta::TokenContextKind::kString:
-          break;
+      if (false) {
+
+#define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
+    } else if (auto lower_name ## _ = pasta::type_name::From(c)) { \
+      const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
+      if (eid != mx::kInvalidEntityId) { \
+        contexts[eid].insert(context.value()); \
+      }
+
+      FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)
+#undef ADD_ENTITY_TO_CONTEXT
+
       }
     }
   }
@@ -447,6 +428,12 @@ static void PersistTokenContexts(
     unsigned offset{0};
     unsigned alias_offset{0};
   };
+
+  // NOTE(pag): The `TypeMapper` "compresses" out some types via desugaring,
+  //            so there will be redundant entries that we'll want to get
+  //            rid of.
+  std::unordered_map<pasta::TokenContext, pasta::TokenContext>
+      remapped_contexts;
 
   std::unordered_map<pasta::TokenContext, PendingTokenContext>
       pending_contexts;
@@ -467,7 +454,18 @@ static void PersistTokenContexts(
 
     // Then, specialize this template for each context we encounter.
     for (const pasta::TokenContext &context : entity_contexts) {
-      PendingTokenContext &info = pending_contexts[context];
+
+      // Detect type compression.
+      pasta::TokenContext remapped_context = context;
+      for (auto pc = context.Parent(); pc; pc = pc->Parent()) {
+        if (entity_contexts.contains(pc.value())) {
+          remapped_context = pc.value();
+        }
+      }
+
+      remapped_contexts.emplace(context, remapped_context);
+
+      PendingTokenContext &info = pending_contexts[remapped_context];
       info = tpl;  // Copy the template.
 
       // Adjust the kind to be an aliasee.
@@ -483,7 +481,18 @@ static void PersistTokenContexts(
   // will end up in the same entity-specific lists. This is because the entity
   // in which the context resides will tell us its type.
   for (const auto &entry : contexts) {
-    for (const pasta::TokenContext &context : entry.second) {
+    for (const pasta::TokenContext &orig_context : entry.second) {
+
+      auto remap_it = remapped_contexts.find(orig_context);
+      if (remap_it == remapped_contexts.end()) {
+        continue;
+      }
+
+      const pasta::TokenContext &context = remap_it->second;
+      if (context != orig_context) {
+        continue;
+      }
+
       auto pc_it = pending_contexts.find(context);
       if (pc_it == pending_contexts.end()) {
         continue;  // E.g. translation unit contexts.
@@ -492,15 +501,19 @@ static void PersistTokenContexts(
       PendingTokenContext &info = pc_it->second;
       CHECK_NE(info.entity_id, mx::kInvalidEntityId);
 
+      auto orig_alias_context = context.Aliasee();
       if (!info.is_alias) {
-        DCHECK(!context.Aliasee());
+        DCHECK(!orig_alias_context.has_value());
         continue;
       }
 
-      auto alias_context = context.Aliasee();
-      CHECK(alias_context.has_value());
+      CHECK(orig_alias_context.has_value());
 
-      PendingTokenContext &alias_info = pending_contexts[alias_context.value()];
+      remap_it = remapped_contexts.find(orig_alias_context.value());
+      CHECK(remap_it != remapped_contexts.end());
+
+      const pasta::TokenContext &alias_context = remap_it->second;
+      PendingTokenContext &alias_info = pending_contexts[alias_context];
       CHECK_EQ(info.entity_id, alias_info.entity_id);
       CHECK_NE(info.offset, alias_info.offset);
       CHECK_LT(alias_info.offset, num_contexts);
@@ -512,15 +525,30 @@ static void PersistTokenContexts(
   auto tcb_list = fb.initTypeTokenContexts(num_contexts);
   auto tco_list = fb.initTypeTokenContextOffsets(num_tokens);
 
+  std::vector<bool> already_created;
+  already_created.resize(num_contexts);
+
   // Finally, serialize the contexts.
   num_tokens = 0u;
-  for (const pasta::PrintedToken &tok : printed_tokens) {
+  for (pasta::PrintedToken tok : parsed_tokens) {
+
+    // `0` is an invalid value. A low bit of `1` means "present".
     tco_list.set(num_tokens, 0u);
 
     std::optional<mx::rpc::TokenContext::Builder> tcb;
-    for (auto context = tok.Context(); context; context = context->Parent()) {
+    for (auto orig_context = tok.Context(); orig_context;
+         orig_context = orig_context->Parent()) {
 
-      pasta::TokenContext c = *context;
+      auto remap_it = remapped_contexts.find(orig_context.value());
+      if (remap_it == remapped_contexts.end()) {
+        continue;
+      }
+
+      const pasta::TokenContext &c = remap_it->second;
+      if (c != orig_context.value()) {
+        continue;  // It was compressed out; skip it.
+      }
+
       auto pc_it = pending_contexts.find(c);
       if (pc_it == pending_contexts.end()) {
         continue;  // E.g. translation unit contexts, attributes.
@@ -536,6 +564,12 @@ static void PersistTokenContexts(
       }
 
       CHECK_NE(info.entity_id, mx::kInvalidEntityId);
+
+      // Don't double-build the same token contexts.
+      if (already_created[info.offset]) {
+        break;
+      }
+      already_created[info.offset] = true;
 
       tcb.reset();
       tcb.emplace(tcb_list[info.offset]);

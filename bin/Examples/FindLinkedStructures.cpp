@@ -12,25 +12,11 @@
 #include <multiplier/Entities/RecordDecl.h>
 #include <multiplier/Entities/RecordType.h>
 #include <sstream>
-#include <csignal>
-#include <csetjmp>
 
 #include "Index.h"
 
 DECLARE_bool(help);
 DECLARE_string(db);
-
-static bool gHasJumpBuf = false;
-static sigjmp_buf gJumpBuf;
-
-static void HandleSegfault(int) {
-  if (gHasJumpBuf) {
-    gHasJumpBuf = false;
-    siglongjmp(gJumpBuf, 1);
-  } else {
-    abort();
-  }
-}
 
 static void RenderField(const mx::RecordDecl &record,
                         const mx::FieldDecl &field,
@@ -56,8 +42,6 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  signal(SIGSEGV, HandleSegfault);
-
   if (FLAGS_help) {
     std::cerr << google::ProgramUsage() << std::endl;
     return EXIT_FAILURE;
@@ -82,28 +66,18 @@ extern "C" int main(int argc, char *argv[]) {
       continue;
     }
 
-    gHasJumpBuf = false;
-    if (!sigsetjmp(gJumpBuf, 1)) {
-      gHasJumpBuf = true;
+    record_type = mx::RecordType::from(pointee_type->desugared_type());
+    if (!record_type) {
+      continue;
+    }
 
-      record_type = mx::RecordType::from(pointee_type->desugared_type());
-      if (!record_type) {
-        continue;
-      }
+    record = mx::RecordDecl::from(field.parent_declaration());
+    if (!record) {
+      continue;
+    }
 
-      record = mx::RecordDecl::from(field.parent_declaration());
-      if (!record) {
-        continue;
-      }
-
-      if (*record != record_type->declaration()) {
-        continue;
-      }
-
-      gHasJumpBuf = false;
-
-    } else {
-      continue;  // Crash.
+    if (*record != record_type->declaration()) {
+      continue;
     }
 
     RenderField(record.value(), field, level);
@@ -124,26 +98,19 @@ extern "C" int main(int argc, char *argv[]) {
         continue;
       }
 
-      gHasJumpBuf = false;
-      if (!sigsetjmp(gJumpBuf, 1)) {
-        gHasJumpBuf = true;
+      record_type = mx::RecordType::from(field.type().desugared_type());
+      if (!record_type) {
+        continue;
+      }
 
-        record_type = mx::RecordType::from(field.type().desugared_type());
-        if (!record_type) {
-          continue;
-        }
+      byval_record = record_type->declaration();
+      if (!self_referencing.contains(byval_record->id())) {
+        continue;
+      }
 
-        byval_record = record_type->declaration();
-        if (!self_referencing.contains(byval_record->id())) {
-          continue;
-        }
-
-        record = mx::RecordDecl::from(field.parent_declaration());
-        if (!record) {
-          continue;
-        }
-      } else {
-        continue;  // Crash.
+      record = mx::RecordDecl::from(field.parent_declaration());
+      if (!record) {
+        continue;
       }
 
       RenderField(record.value(), field, level);
