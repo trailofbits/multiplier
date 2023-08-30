@@ -55,9 +55,17 @@ static clang::Type *BasicTypeDeduplication(clang::Type *type,
 
 static clang::Type *BasicTypeDeduplication(clang::QualType type,
                                            uint32_t &up_quals) {
+  if (type.isNull()) {
+    return nullptr;
+  }
+
+  clang::Type *tp = const_cast<clang::Type *>(type.getTypePtr());
+  if (!tp) {
+    return tp;
+  }
+
   up_quals |= type.getQualifiers().getAsOpaqueValue();
-  return BasicTypeDeduplication(
-      const_cast<clang::Type *>(type.getTypePtr()), up_quals);
+  return BasicTypeDeduplication(tp, up_quals);
 }
 
 clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
@@ -71,60 +79,79 @@ clang::Type *BasicTypeDeduplication(clang::Type *type, uint32_t &up_quals) {
 
   clang::Type *new_type = type;
   switch (type->getTypeClass()) {
-    case clang::Type::Auto:
-      new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::AutoType>(type)->getDeducedType(), up_quals);
+    case clang::Type::Auto: {
+      clang::AutoType *at = clang::dyn_cast<clang::AutoType>(type);
+      if (at->isSugared()) {
+        new_type = BasicTypeDeduplication(at->desugar(), up_quals);
+      }
       break;
+    }
 
-    case clang::Type::TypeOfExpr:
-      new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::TypeOfExprType>(type)->desugar(), up_quals);
+    case clang::Type::TypeOfExpr: {
+      clang::TypeOfExprType *et = clang::dyn_cast<clang::TypeOfExprType>(type);
+      if (et->isSugared()) {
+        new_type = BasicTypeDeduplication(et->desugar(), up_quals);
+      }
       break;
+    }
 
     case clang::Type::TypeOf:
       new_type = BasicTypeDeduplication(
           clang::dyn_cast<clang::TypeOfType>(type)->desugar(), up_quals);
       break;
 
-    case clang::Type::Decltype:
-      new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::DecltypeType>(type)->getUnderlyingType(),
-          up_quals);
+    case clang::Type::Decltype: {
+      clang::DecltypeType *dt = clang::dyn_cast<clang::DecltypeType>(type);
+      if (dt->getUnderlyingExpr()) {
+        if (dt->isSugared()) {
+          new_type = BasicTypeDeduplication(dt->desugar(), up_quals);
+        }
+      } else {
+        new_type = BasicTypeDeduplication(dt->getUnderlyingType(), up_quals);
+      }
       break;
+    }
 
     case clang::Type::Adjusted:
       new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::AdjustedType>(type)->getAdjustedType(),
+          clang::dyn_cast<clang::AdjustedType>(type)->desugar(),
           up_quals);
       break;
 
-    case clang::Type::UnaryTransform:
-      new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::UnaryTransformType>(type)->getBaseType(),
-          up_quals);
+    case clang::Type::UnaryTransform: {
+      auto ut = clang::dyn_cast<clang::UnaryTransformType>(type);
+      if (ut->isSugared()) {
+        new_type = BasicTypeDeduplication(ut->desugar(), up_quals);
+      }
       break;
+    }
 
     // We don't really care about the elaborator, e.g. `struct`, `union`, etc.
     // and Clang also embeds typedef types within elaborated types.
     case clang::Type::Elaborated: {
       clang::ElaboratedType *et = clang::dyn_cast<clang::ElaboratedType>(type);
+      
+      // If this represents a tag, e.g. `struct { ... }`, that has no name,
+      // then we don't want to desugar this.
       if (auto decl = et->getOwnedTagDecl()) {
         if (!decl->getIdentifier()) {
           break;
         }
       }
-      new_type = BasicTypeDeduplication(et->getNamedType(), up_quals);
+      new_type = BasicTypeDeduplication(et->desugar(), up_quals);
       break;
     }
-    case clang::Type::DeducedTemplateSpecialization:
-      new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::DeducedTemplateSpecializationType>(type)->getDeducedType(),
-          up_quals);
+    case clang::Type::DeducedTemplateSpecialization: {
+      auto dt = clang::dyn_cast<clang::DeducedTemplateSpecializationType>(type);
+      if (dt->isSugared()) {
+        new_type = BasicTypeDeduplication(dt->desugar(), up_quals);
+      }
       break;
+    }
 
     case clang::Type::Decayed:
       new_type = BasicTypeDeduplication(
-          clang::dyn_cast<clang::DecayedType>(type)->getDecayedType(),
+          clang::dyn_cast<clang::DecayedType>(type)->desugar(),
           up_quals);
       break;
 
