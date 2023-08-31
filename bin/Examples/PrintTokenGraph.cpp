@@ -460,16 +460,11 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  auto file = mx::File::containing(fragment.value());
-  if (!file) {
-    std::cerr
-        << "Fragment " << FLAGS_fragment_id
-        << " does not reside in a file." << std::endl;
-    return EXIT_FAILURE;
+  mx::TokenRange file_toks;
+  if (auto file = mx::File::containing(fragment.value())) {
+    file_toks = fragment->file_tokens();
   }
 
-
-  mx::TokenRange file_toks = fragment->file_tokens();
   mx::TokenRange parsed_toks = fragment->parsed_tokens();
 
   auto &os = std::cout;

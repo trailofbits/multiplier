@@ -332,10 +332,6 @@ void LabelTokensAndMacrosInFragment(PendingFragment &pf) {
   for (pasta::PrintedToken tok : pf.parsed_tokens) {
     (void) labeller.Label(tok);
   }
-
-  if (pf.drop_token_provenance) {
-    pf.parsed_tokens.DumpProvenanceInformation();
-  }
 }
 
 }  // namespace indexer

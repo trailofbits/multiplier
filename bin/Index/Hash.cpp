@@ -34,13 +34,6 @@
 #include "PASTA.h"
 #include "Util.h"
 
-//#define D(...) __VA_ARGS__
-#ifndef D
-# define D(...)
-#else
-# include <iostream>
-#endif
-
 namespace indexer {
 namespace {
 
@@ -173,10 +166,6 @@ std::string HashFragment(
     const pasta::PrintedTokenRange &decl_tok_range) {
 
   std::stringstream ss;
-
-  D( std::cerr
-        << "begin_index=" << begin_index << " end_index=" << end_index
-        << " entities.size()=" << entities.size() << '\n'; )
 
   uint64_t end_index = 0u;
 

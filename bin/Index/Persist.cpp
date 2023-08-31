@@ -478,7 +478,7 @@ static void PersistParsedTokens(
     VisitMacros(pf, tlm, macros_to_serialize);
   }
 
-  provenance.Init(pf.fragment_index, pf.parsed_tokens);
+  provenance.Run(pf.fragment_index, pf.parsed_tokens);
 
   unsigned num_macros = static_cast<unsigned>(macros_to_serialize.size());
   unsigned num_parsed_tokens = static_cast<unsigned>(pf.parsed_tokens.size());
@@ -568,7 +568,7 @@ static void PersistTokenTree(
   TokenTreeSerializationSchedule sched(pf);
   sched.Schedule(nodes);
 
-  provenance.Init(pf.fragment_index, sched.tokens);
+  provenance.Run(pf.fragment_index, sched.tokens);
 
 //#ifndef NDEBUG
 //  provenance.Dump(std::cerr);
@@ -1057,6 +1057,13 @@ void GlobalIndexingState::PersistFragment(
 
   // Labels tokens and macros.
   LabelTokensAndMacrosInFragment(pf);
+
+  // Drop the connections between `pasta::PrintedToken::DerivedLocation` and
+  // `pasta::Token`.
+  provenance.Init(pf.parsed_tokens);
+  if (pf.drop_token_provenance) {
+    pf.parsed_tokens.DumpProvenanceInformation();
+  }
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
