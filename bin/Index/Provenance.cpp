@@ -36,6 +36,7 @@
 
 #include "EntityMapper.h"
 #include "PASTA.h"
+#include "PendingFragment.h"
 #include "TokenTree.h"
 #include "Util.h"
 
@@ -818,6 +819,22 @@ mx::RawEntityId RelatedEntityIdToToken(
   }
 
   return eid;
+}
+
+// Go and try to find the entity ID to be used for `Decl::Token`. We might
+// not have any return values for that for builtin types/declarations, and
+// that prevents a lot of API users (especially the GUI) from using the
+// declaration token to render the entity name.
+mx::RawEntityId PendingFragment::DeclTokenEntityId(
+    const pasta::Decl &decl) const {
+  auto decl_id = em.EntityId(decl);
+  for (pasta::PrintedToken tok : parsed_tokens) {
+    auto rel_id = RelatedEntityIdToToken(em, tok, tok.DerivedLocation());
+    if (decl_id == rel_id) {
+      return em.EntityId(tok);
+    }
+  }
+  return mx::kInvalidEntityId;
 }
 
 unsigned TokenProvenanceCalculator::TokenInfo::Depth(

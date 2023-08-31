@@ -1982,7 +1982,7 @@ static std::shared_ptr<TokenReader> CreateWhitespaceReader(void) {
 static const std::shared_ptr<TokenTreeImpl> kInvalidTree =
     std::make_shared<TokenTreeImpl>();
 
-static const std::shared_ptr<TokenReader> kWhitespceReader =
+static const std::shared_ptr<TokenReader> kWhitespaceReader =
     CreateWhitespaceReader();
 
 //static constexpr EntityOffset kFileReaderIndex = 0u;
@@ -2001,7 +2001,7 @@ TokenTree TokenTree::from(const File &file) {
   auto file_tokens = file.tokens();
   self->file = file.impl;
   self->readers.emplace_back(file_tokens.impl);
-  self->readers.emplace_back(kWhitespceReader);
+  self->readers.emplace_back(kWhitespaceReader);
   self->root = self->CreateFileNode(file);
 
   return TokenTree(file.impl->cached_token_tree.Put(std::move(self)));
@@ -2024,7 +2024,7 @@ TokenTree TokenTree::from(const Fragment &frag) {
     self->readers.emplace_back(TokenRange().impl);
   }
 
-  self->readers.emplace_back(kWhitespceReader);
+  self->readers.emplace_back(kWhitespaceReader);
 
   TokenTreeImpl::Bounds frag_bounds = self->FragmentBounds(frag.file_tokens());
   self->root = self->CreateFragmentNode(frag, frag_bounds);

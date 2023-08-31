@@ -33,7 +33,7 @@
 namespace indexer {
 
 extern void SerializeType(const pasta::Type &entity,
-                          const EntityMapper &em,
+                          const PendingFragment &pf,
                           mx::RawEntityId type_index,
                           mx::ast::Type::Builder builder);
 
@@ -330,7 +330,7 @@ void GlobalIndexingState::PersistTypes(
     PersistPrintedTokens(em, fb, token_range, tid);
     PersistTokenContexts(em, token_range, fb);
 
-    (void) SerializeType(type, em, tid.type_id, tb);
+    (void) SerializeType(type, pf, tid.type_id, tb);
 
     database.AddAsync(
         mx::EntityRecord{ptid.Pack(), GetSerializedData(message)});

@@ -63,7 +63,7 @@ class TokenTreeNode;
 class TokenTreeNodeRange;
 
 // Dispatch to the right macro serializer.
-extern void DispatchSerializeMacro(const EntityMapper &em,
+extern void DispatchSerializeMacro(const PendingFragment &pf,
                                    mx::ast::Macro::Builder builder,
                                    const pasta::Macro &entity,
                                    const TokenTree *tt);
@@ -512,7 +512,7 @@ static void PersistParsedTokens(
 
   for (i = 0u; i < num_macros; ++i) {
     EntityBuilder<mx::ast::Macro> storage;
-    DispatchSerializeMacro(em, storage.builder, macros_to_serialize[i],
+    DispatchSerializeMacro(pf, storage.builder, macros_to_serialize[i],
                            nullptr);
 
     mx::MacroId id;
@@ -712,7 +712,7 @@ static void PersistTokenTree(
     EntityBuilder<mx::ast::Macro> storage;
     CHECK_LT(id.offset, num_macros);
     if (std::optional<pasta::Macro> macro = tt->Macro()) {
-      DispatchSerializeMacro(em, storage.builder, macro.value(), &(tt.value()));
+      DispatchSerializeMacro(pf, storage.builder, macro.value(), &(tt.value()));
 
     // NOTE(pag): This is only reasonable on a case-by-case basis!! Right now,
     //            we only expect `SUBSITUTION`s to be invented by the
@@ -722,7 +722,7 @@ static void PersistTokenTree(
       CHECK(tt->Kind() == mx::MacroKind::SUBSTITUTION);
       const pasta::Macro &invalid_macro =
           *reinterpret_cast<const pasta::Macro *>(0xdeadbeefull);
-      DispatchSerializeMacro(em, storage.builder, invalid_macro, &(tt.value()));
+      DispatchSerializeMacro(pf, storage.builder, invalid_macro, &(tt.value()));
     }
 
     database.AddAsync(

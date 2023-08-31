@@ -164,6 +164,12 @@ class PendingFragment {
   bool Add(const pasta::TemplateParameterList &pseudo);
   bool Add(const pasta::Designator &pseudo);
 
+  // Go and try to find the entity ID to be used for `Decl::Token`. We might
+  // not have any return values for that for builtin types/declarations, and
+  // that prevents a lot of API users (especially the GUI) from using the
+  // declaration token to render the entity name.
+  mx::RawEntityId DeclTokenEntityId(const pasta::Decl &) const;
+
   // Find and initialize `parent_decl_ids` and `last_file_token_id`.
   void InitFileLocationRange(EntityIdMap &entity_ids,
                              const pasta::TokenRange &toks);

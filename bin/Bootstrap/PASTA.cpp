@@ -1686,8 +1686,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::"
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::"
         << class_name << " &e, const TokenTree *) {\n"
+        << "  (void) pf;\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -1715,7 +1716,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
         << class_name << " &e, const TokenTree *) {\n";
 
     if (is_concrete) {
@@ -1740,8 +1741,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::"
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::"
         << class_name << " &e, const TokenTree *) {\n"
+        << "  (void) pf;\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -1767,8 +1769,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::"
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::"
         << class_name << " &e, const TokenTree *) {\n"
+        << "  (void) pf;\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -1796,8 +1799,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Macro::Builder b, "
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, "
         << "const pasta::" << class_name << " &e, const TokenTree *tt) {\n"
+        << "  (void) pf;\n"
         << "  (void) tt;\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
@@ -1822,9 +1826,10 @@ MethodListPtr CodeGenerator::RunOnClass(
       needed_decls.insert("PseudoKind"); \
       serialize_cpp_os \
           << "void Serialize" << class_name \
-          << "(const EntityMapper &es, mx::ast::" #type_name \
+          << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::" #type_name \
           << "::Builder b, const pasta::" \
           << class_name << " &e, const TokenTree *) {\n" \
+          << "  (void) pf;\n" \
           << "  (void) es;\n" \
           << "  (void) b;\n" \
           << "  (void) e;\n"; \
@@ -1879,10 +1884,10 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (!dont_serialize) {
       if (is_macro) {
         serialize_cpp_os
-            << "  Serialize" << base_class_name << "(es, b, e, tt);\n";
+            << "  Serialize" << base_class_name << "(pf, es, b, e, tt);\n";
       } else {
         serialize_cpp_os
-            << "  Serialize" << base_class_name << "(es, b, e, nullptr);\n";
+            << "  Serialize" << base_class_name << "(pf, es, b, e, nullptr);\n";
       }
 
       serialize_inc_os
@@ -2882,8 +2887,19 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "}\n\n";
 
         serialize_cpp_os
-            << "  auto t" << i << " = e." << method_name << "();\n"
-            << "  b." << setter_name << "(es.EntityId(t" << i << "));\n";
+            << "  auto et" << i << " = es.EntityId(e." << method_name << "());\n";
+
+        // For builtin declarations, we sometimes need to go looking for the
+        // token, because it never existed in any parsed representation.
+        if (class_name == "Decl" && method_name == "Token") {
+          serialize_cpp_os
+              << "  if (!et" << i << ") {\n"
+              << "    et" << i << " = pf.DeclTokenEntityId(e);\n"
+              << "  }\n";
+        }
+
+        serialize_cpp_os
+            << "  b." << setter_name << "(et" << i << ");\n";
 
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
@@ -3605,6 +3621,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Entity.h\"\n"
       << "#include \"EntityMapper.h\"\n"
       << "#include \"PASTA.h\"\n"
+      << "#include \"PendingFragment.h\"\n"
       << "#include \"TokenTree.h\"\n"
       << "#include \"Util.h\"\n"
       << "namespace indexer {\n\n"
@@ -3731,6 +3748,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   serialize_h_os
       << "class EntityMapper;\n"
+      << "class PendingFragment;\n"
       << "class TokenTree;\n";
 
   // Forward declarations.
@@ -3739,7 +3757,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       std::string name = record.Name(); \
       serialize_h_os \
           << "void Serialize" << name \
-          << "(const EntityMapper &, mx::ast::" #type_name \
+          << "(const PendingFragment &, const EntityMapper &, mx::ast::" #type_name \
           << "::Builder, const pasta::" << name \
           << " &, const TokenTree *);\n"; \
     }

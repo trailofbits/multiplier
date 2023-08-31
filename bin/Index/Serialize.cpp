@@ -23,6 +23,7 @@
 #include "Entity.h"
 #include "EntityMapper.h"
 #include "PASTA.h"
+#include "PendingFragment.h"
 #include "TokenTree.h"
 #include "Util.h"
 namespace indexer {
@@ -30,7 +31,8 @@ namespace indexer {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
-void SerializeDesignator(const EntityMapper &es, mx::ast::Designator::Builder b, const pasta::Designator &e, const TokenTree *) {
+void SerializeDesignator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Designator::Builder b, const pasta::Designator &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -51,16 +53,16 @@ void SerializeDesignator(const EntityMapper &es, mx::ast::Designator::Builder b,
     b.setVal4(0);
     b.setVal5(0);
   }
-  auto t6 = e.DotToken();
-  b.setVal6(es.EntityId(t6));
-  auto t7 = e.FieldToken();
-  b.setVal7(es.EntityId(t7));
-  auto t8 = e.LeftBracketToken();
-  b.setVal8(es.EntityId(t8));
-  auto t9 = e.RightBracketToken();
-  b.setVal9(es.EntityId(t9));
-  auto t10 = e.EllipsisToken();
-  b.setVal10(es.EntityId(t10));
+  auto et6 = es.EntityId(e.DotToken());
+  b.setVal6(et6);
+  auto et7 = es.EntityId(e.FieldToken());
+  b.setVal7(et7);
+  auto et8 = es.EntityId(e.LeftBracketToken());
+  b.setVal8(et8);
+  auto et9 = es.EntityId(e.RightBracketToken());
+  b.setVal9(et9);
+  auto et10 = es.EntityId(e.EllipsisToken());
+  b.setVal10(et10);
   auto v11 = e.FirstExpressionIndex();
   if (v11) {
     b.setVal11(static_cast<unsigned>(v11.value()));
@@ -70,7 +72,8 @@ void SerializeDesignator(const EntityMapper &es, mx::ast::Designator::Builder b,
   }
 }
 
-void SerializeCXXBaseSpecifier(const EntityMapper &es, mx::ast::CXXBaseSpecifier::Builder b, const pasta::CXXBaseSpecifier &e, const TokenTree *) {
+void SerializeCXXBaseSpecifier(const PendingFragment &pf, const EntityMapper &es, mx::ast::CXXBaseSpecifier::Builder b, const pasta::CXXBaseSpecifier &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -81,8 +84,8 @@ void SerializeCXXBaseSpecifier(const EntityMapper &es, mx::ast::CXXBaseSpecifier
     b.setVal0(0);
     b.setVal1(0);
   }
-  auto t2 = e.BaseTypeToken();
-  b.setVal2(es.EntityId(t2));
+  auto et2 = es.EntityId(e.BaseTypeToken());
+  b.setVal2(et2);
   b.setVal3(e.IsVirtual());
   b.setVal4(static_cast<unsigned char>(mx::FromPasta(e.BaseKind())));
   b.setVal5(e.IsPackExpansion());
@@ -99,7 +102,8 @@ void SerializeCXXBaseSpecifier(const EntityMapper &es, mx::ast::CXXBaseSpecifier
   b.setVal10(es.EntityId(e.BaseType()));
 }
 
-void SerializeTemplateParameterList(const EntityMapper &es, mx::ast::TemplateParameterList::Builder b, const pasta::TemplateParameterList &e, const TokenTree *) {
+void SerializeTemplateParameterList(const PendingFragment &pf, const EntityMapper &es, mx::ast::TemplateParameterList::Builder b, const pasta::TemplateParameterList &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -113,12 +117,12 @@ void SerializeTemplateParameterList(const EntityMapper &es, mx::ast::TemplatePar
   } else {
     b.setVal3(mx::kInvalidEntityId);
   }
-  auto t4 = e.TemplateKeywordToken();
-  b.setVal4(es.EntityId(t4));
-  auto t5 = e.LeftAngleToken();
-  b.setVal5(es.EntityId(t5));
-  auto t6 = e.RightAngleToken();
-  b.setVal6(es.EntityId(t6));
+  auto et4 = es.EntityId(e.TemplateKeywordToken());
+  b.setVal4(et4);
+  auto et5 = es.EntityId(e.LeftAngleToken());
+  b.setVal5(et5);
+  auto et6 = es.EntityId(e.RightAngleToken());
+  b.setVal6(et6);
   if (auto r7 = e.Tokens(); auto rs7 = r7.Size()) {
     b.setVal7(es.EntityId(r7[0]));
     b.setVal8(es.EntityId(r7[rs7 - 1u]));
@@ -137,7 +141,8 @@ void SerializeTemplateParameterList(const EntityMapper &es, mx::ast::TemplatePar
   } while (false);
 }
 
-void SerializeTemplateArgument(const EntityMapper &es, mx::ast::TemplateArgument::Builder b, const pasta::TemplateArgument &e, const TokenTree *) {
+void SerializeTemplateArgument(const PendingFragment &pf, const EntityMapper &es, mx::ast::TemplateArgument::Builder b, const pasta::TemplateArgument &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -177,7 +182,8 @@ void SerializeTemplateArgument(const EntityMapper &es, mx::ast::TemplateArgument
   }
 }
 
-void SerializeMacro(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::Macro &e, const TokenTree *tt) {
+void SerializeMacro(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::Macro &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
@@ -224,29 +230,32 @@ void SerializeMacro(const EntityMapper &es, mx::ast::Macro::Builder b, const pas
   }
 }
 
-void SerializeMacroVAOptArgument(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroVAOptArgument &e, const TokenTree *tt) {
+void SerializeMacroVAOptArgument(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroVAOptArgument &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacro(es, b, e, tt);
+  SerializeMacro(pf, es, b, e, tt);
 }
 
-void SerializeMacroVAOpt(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroVAOpt &e, const TokenTree *tt) {
+void SerializeMacroVAOpt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroVAOpt &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacro(es, b, e, tt);
+  SerializeMacro(pf, es, b, e, tt);
   b.setVal3(e.ContentsAreElided());
 }
 
-void SerializeMacroSubstitution(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroSubstitution &e, const TokenTree *tt) {
+void SerializeMacroSubstitution(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroSubstitution &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacro(es, b, e, tt);
+  SerializeMacro(pf, es, b, e, tt);
   if (tt) {
     auto v4 = tt->ReplacementChildren();
     auto sv4 = b.initVal4(static_cast<unsigned>(v4.size()));
@@ -302,32 +311,35 @@ void SerializeMacroSubstitution(const EntityMapper &es, mx::ast::Macro::Builder 
   }
 }
 
-void SerializeMacroConcatenate(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroConcatenate &e, const TokenTree *tt) {
+void SerializeMacroConcatenate(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroConcatenate &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroSubstitution(es, b, e, tt);
-  auto t8 = e.PastedToken();
-  b.setVal8(es.EntityId(t8));
+  SerializeMacroSubstitution(pf, es, b, e, tt);
+  auto et8 = es.EntityId(e.PastedToken());
+  b.setVal8(et8);
 }
 
-void SerializeMacroStringify(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroStringify &e, const TokenTree *tt) {
+void SerializeMacroStringify(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroStringify &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroSubstitution(es, b, e, tt);
-  auto t8 = e.StringifiedToken();
-  b.setVal8(es.EntityId(t8));
+  SerializeMacroSubstitution(pf, es, b, e, tt);
+  auto et8 = es.EntityId(e.StringifiedToken());
+  b.setVal8(et8);
 }
 
-void SerializeMacroExpansion(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroExpansion &e, const TokenTree *tt) {
+void SerializeMacroExpansion(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroExpansion &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroSubstitution(es, b, e, tt);
+  SerializeMacroSubstitution(pf, es, b, e, tt);
   if (tt) {
     auto v9 = tt->IntermediateChildren();
     auto sv9 = b.initVal9(static_cast<unsigned>(v9.size()));
@@ -363,33 +375,36 @@ void SerializeMacroExpansion(const EntityMapper &es, mx::ast::Macro::Builder b, 
   } while (false);
 }
 
-void SerializeMacroParameterSubstitution(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroParameterSubstitution &e, const TokenTree *tt) {
+void SerializeMacroParameterSubstitution(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroParameterSubstitution &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroSubstitution(es, b, e, tt);
+  SerializeMacroSubstitution(pf, es, b, e, tt);
   b.setVal8(es.EntityId(e.Parameter()));
-  auto t11 = e.ParameterUse();
-  b.setVal11(es.EntityId(t11));
+  auto et11 = es.EntityId(e.ParameterUse());
+  b.setVal11(et11);
 }
 
-void SerializeMacroArgument(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroArgument &e, const TokenTree *tt) {
+void SerializeMacroArgument(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroArgument &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacro(es, b, e, tt);
+  SerializeMacro(pf, es, b, e, tt);
   b.setVal3(e.IsVariadic());
   b.setVal12(e.Index());
 }
 
-void SerializeMacroParameter(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroParameter &e, const TokenTree *tt) {
+void SerializeMacroParameter(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroParameter &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacro(es, b, e, tt);
+  SerializeMacro(pf, es, b, e, tt);
   auto v5 = e.VariadicDots();
   if (v5) {
     auto id5 = es.EntityId(v5.value());
@@ -407,14 +422,15 @@ void SerializeMacroParameter(const EntityMapper &es, mx::ast::Macro::Builder b, 
   b.setVal12(e.Index());
 }
 
-void SerializeMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroDirective &e, const TokenTree *tt) {
+void SerializeMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::MacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacro(es, b, e, tt);
-  auto t5 = e.Hash();
-  b.setVal5(es.EntityId(t5));
+  SerializeMacro(pf, es, b, e, tt);
+  auto et5 = es.EntityId(e.Hash());
+  b.setVal5(et5);
   auto v6 = e.DirectiveName();
   if (v6) {
     auto id6 = es.EntityId(v6.value());
@@ -424,12 +440,13 @@ void SerializeMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, 
   }
 }
 
-void SerializeDefineMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::DefineMacroDirective &e, const TokenTree *tt) {
+void SerializeDefineMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::DefineMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroDirective(es, b, e, tt);
+  SerializeMacroDirective(pf, es, b, e, tt);
   auto v7 = e.Name();
   if (v7) {
     auto id7 = es.EntityId(v7.value());
@@ -459,108 +476,121 @@ void SerializeDefineMacroDirective(const EntityMapper &es, mx::ast::Macro::Build
   }
 }
 
-void SerializePragmaMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::PragmaMacroDirective &e, const TokenTree *tt) {
+void SerializePragmaMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::PragmaMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroDirective(es, b, e, tt);
+  SerializeMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeUndefineMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::UndefineMacroDirective &e, const TokenTree *tt) {
+void SerializeUndefineMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::UndefineMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroDirective(es, b, e, tt);
+  SerializeMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeOtherMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::OtherMacroDirective &e, const TokenTree *tt) {
+void SerializeOtherMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::OtherMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroDirective(es, b, e, tt);
+  SerializeMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeConditionalMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ConditionalMacroDirective &e, const TokenTree *tt) {
+void SerializeConditionalMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ConditionalMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroDirective(es, b, e, tt);
+  SerializeMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeEndIfMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::EndIfMacroDirective &e, const TokenTree *tt) {
+void SerializeEndIfMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::EndIfMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeConditionalMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeElseMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseMacroDirective &e, const TokenTree *tt) {
+void SerializeElseMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeConditionalMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeElseIfNotDefinedMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfNotDefinedMacroDirective &e, const TokenTree *tt) {
+void SerializeElseIfNotDefinedMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfNotDefinedMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeConditionalMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeElseIfDefinedMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfDefinedMacroDirective &e, const TokenTree *tt) {
+void SerializeElseIfDefinedMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfDefinedMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeConditionalMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeElseIfMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfMacroDirective &e, const TokenTree *tt) {
+void SerializeElseIfMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeConditionalMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeIfNotDefinedMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfNotDefinedMacroDirective &e, const TokenTree *tt) {
+void SerializeIfNotDefinedMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfNotDefinedMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeConditionalMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeIfDefinedMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfDefinedMacroDirective &e, const TokenTree *tt) {
+void SerializeIfDefinedMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfDefinedMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeConditionalMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeIfMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfMacroDirective &e, const TokenTree *tt) {
+void SerializeIfMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeConditionalMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeIncludeLikeMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeLikeMacroDirective &e, const TokenTree *tt) {
+void SerializeIncludeLikeMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeLikeMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMacroDirective(es, b, e, tt);
+  SerializeMacroDirective(pf, es, b, e, tt);
   auto v7 = e.IncludedFile();
   if (v7) {
     auto id7 = es.EntityId(v7.value());
@@ -570,44 +600,49 @@ void SerializeIncludeLikeMacroDirective(const EntityMapper &es, mx::ast::Macro::
   }
 }
 
-void SerializeImportMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ImportMacroDirective &e, const TokenTree *tt) {
+void SerializeImportMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ImportMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+  SerializeIncludeLikeMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeIncludeMacrosMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeMacrosMacroDirective &e, const TokenTree *tt) {
+void SerializeIncludeMacrosMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeMacrosMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+  SerializeIncludeLikeMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeIncludeNextMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeNextMacroDirective &e, const TokenTree *tt) {
+void SerializeIncludeNextMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeNextMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+  SerializeIncludeLikeMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeIncludeMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeMacroDirective &e, const TokenTree *tt) {
+void SerializeIncludeMacroDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeMacroDirective &e, const TokenTree *tt) {
+  (void) pf;
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
-  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+  SerializeIncludeLikeMacroDirective(pf, es, b, e, tt);
 }
 
-void SerializeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Attr &e, const TokenTree *) {
+void SerializeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Attr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  auto t0 = e.Token();
-  b.setVal0(es.EntityId(t0));
+  auto et0 = es.EntityId(e.Token());
+  b.setVal0(et0);
   b.setVal1(e.IsImplicit());
   b.setVal2(e.IsInherited());
   b.setVal3(e.IsLateParsed());
@@ -622,428 +657,485 @@ void SerializeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta
   }
 }
 
-void SerializeAlignValueAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignValueAttr &e, const TokenTree *) {
+void SerializeAlignValueAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignValueAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Alignment()));
 }
 
-void SerializeAliasAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AliasAttr &e, const TokenTree *) {
+void SerializeAliasAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AliasAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   auto v9 = e.Aliasee();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeAbiTagAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AbiTagAttr &e, const TokenTree *) {
+void SerializeAbiTagAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AbiTagAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeAttr &e, const TokenTree *) {
+void SerializeTypeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSPtrAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SPtrAttr &e, const TokenTree *) {
+void SerializeSPtrAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SPtrAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializePtr64Attr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Ptr64Attr &e, const TokenTree *) {
+void SerializePtr64Attr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Ptr64Attr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializePtr32Attr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Ptr32Attr &e, const TokenTree *) {
+void SerializePtr32Attr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Ptr32Attr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOpenCLPrivateAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLPrivateAddressSpaceAttr &e, const TokenTree *) {
+void SerializeOpenCLPrivateAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLPrivateAddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeOpenCLLocalAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLLocalAddressSpaceAttr &e, const TokenTree *) {
+void SerializeOpenCLLocalAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLLocalAddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeOpenCLGlobalHostAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalHostAddressSpaceAttr &e, const TokenTree *) {
+void SerializeOpenCLGlobalHostAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalHostAddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOpenCLGlobalDeviceAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalDeviceAddressSpaceAttr &e, const TokenTree *) {
+void SerializeOpenCLGlobalDeviceAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalDeviceAddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOpenCLGlobalAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalAddressSpaceAttr &e, const TokenTree *) {
+void SerializeOpenCLGlobalAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalAddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeOpenCLGenericAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGenericAddressSpaceAttr &e, const TokenTree *) {
+void SerializeOpenCLGenericAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGenericAddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeOpenCLConstantAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLConstantAddressSpaceAttr &e, const TokenTree *) {
+void SerializeOpenCLConstantAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLConstantAddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeObjCKindOfAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCKindOfAttr &e, const TokenTree *) {
+void SerializeObjCKindOfAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCKindOfAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCInertUnsafeUnretainedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCInertUnsafeUnretainedAttr &e, const TokenTree *) {
+void SerializeObjCInertUnsafeUnretainedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCInertUnsafeUnretainedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCGCAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCGCAttr &e, const TokenTree *) {
+void SerializeObjCGCAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCGCAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoDerefAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDerefAttr &e, const TokenTree *) {
+void SerializeNoDerefAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDerefAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeHLSLGroupSharedAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLGroupSharedAddressSpaceAttr &e, const TokenTree *) {
+void SerializeHLSLGroupSharedAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLGroupSharedAddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCmseNSCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CmseNSCallAttr &e, const TokenTree *) {
+void SerializeCmseNSCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CmseNSCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeBTFTypeTagAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BTFTypeTagAttr &e, const TokenTree *) {
+void SerializeBTFTypeTagAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BTFTypeTagAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
   auto v9 = e.BTFTypeTag();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeArmMveStrictPolymorphismAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArmMveStrictPolymorphismAttr &e, const TokenTree *) {
+void SerializeArmMveStrictPolymorphismAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArmMveStrictPolymorphismAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAnnotateTypeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnnotateTypeAttr &e, const TokenTree *) {
+void SerializeAnnotateTypeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnnotateTypeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
   auto v9 = e.Annotation();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeAddressSpaceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AddressSpaceAttr &e, const TokenTree *) {
+void SerializeAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AddressSpaceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeUPtrAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UPtrAttr &e, const TokenTree *) {
+void SerializeUPtrAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UPtrAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeNullableResultAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullableResultAttr &e, const TokenTree *) {
+void SerializeTypeNullableResultAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullableResultAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeNullableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullableAttr &e, const TokenTree *) {
+void SerializeTypeNullableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeNullUnspecifiedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullUnspecifiedAttr &e, const TokenTree *) {
+void SerializeTypeNullUnspecifiedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullUnspecifiedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeNonNullAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNonNullAttr &e, const TokenTree *) {
+void SerializeTypeNonNullAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNonNullAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeAttr(es, b, e, nullptr);
+  SerializeTypeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeThreadAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ThreadAttr &e, const TokenTree *) {
+void SerializeThreadAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ThreadAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftObjCMembersAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftObjCMembersAttr &e, const TokenTree *) {
+void SerializeSwiftObjCMembersAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftObjCMembersAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeStmtAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StmtAttr &e, const TokenTree *) {
+void SerializeStmtAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StmtAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOpenCLUnrollHintAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLUnrollHintAttr &e, const TokenTree *) {
+void SerializeOpenCLUnrollHintAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLUnrollHintAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeStmtAttr(es, b, e, nullptr);
+  SerializeStmtAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMustTailAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MustTailAttr &e, const TokenTree *) {
+void SerializeMustTailAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MustTailAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeStmtAttr(es, b, e, nullptr);
+  SerializeStmtAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeLikelyAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LikelyAttr &e, const TokenTree *) {
+void SerializeLikelyAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LikelyAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeStmtAttr(es, b, e, nullptr);
+  SerializeStmtAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeFallThroughAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FallThroughAttr &e, const TokenTree *) {
+void SerializeFallThroughAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FallThroughAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeStmtAttr(es, b, e, nullptr);
+  SerializeStmtAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeUnlikelyAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnlikelyAttr &e, const TokenTree *) {
+void SerializeUnlikelyAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnlikelyAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeStmtAttr(es, b, e, nullptr);
+  SerializeStmtAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSuppressAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SuppressAttr &e, const TokenTree *) {
+void SerializeSuppressAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SuppressAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeStmtAttr(es, b, e, nullptr);
+  SerializeStmtAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeRenderScriptKernelAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RenderScriptKernelAttr &e, const TokenTree *) {
+void SerializeRenderScriptKernelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RenderScriptKernelAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOverloadableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OverloadableAttr &e, const TokenTree *) {
+void SerializeOverloadableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OverloadableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOpenCLAccessAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLAccessAttr &e, const TokenTree *) {
+void SerializeOpenCLAccessAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLAccessAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal11(e.IsReadOnly());
   b.setVal12(e.IsReadWrite());
   b.setVal13(e.IsWriteOnly());
 }
 
-void SerializeObjCRuntimeVisibleAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRuntimeVisibleAttr &e, const TokenTree *) {
+void SerializeObjCRuntimeVisibleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRuntimeVisibleAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCRuntimeNameAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRuntimeNameAttr &e, const TokenTree *) {
+void SerializeObjCRuntimeNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRuntimeNameAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   auto v9 = e.MetadataName();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeObjCNonRuntimeProtocolAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNonRuntimeProtocolAttr &e, const TokenTree *) {
+void SerializeObjCNonRuntimeProtocolAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNonRuntimeProtocolAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCNonLazyClassAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNonLazyClassAttr &e, const TokenTree *) {
+void SerializeObjCNonLazyClassAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNonLazyClassAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCDirectMembersAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDirectMembersAttr &e, const TokenTree *) {
+void SerializeObjCDirectMembersAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDirectMembersAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCDirectAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDirectAttr &e, const TokenTree *) {
+void SerializeObjCDirectAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDirectAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCDesignatedInitializerAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDesignatedInitializerAttr &e, const TokenTree *) {
+void SerializeObjCDesignatedInitializerAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDesignatedInitializerAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCClassStubAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCClassStubAttr &e, const TokenTree *) {
+void SerializeObjCClassStubAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCClassStubAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCBoxableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBoxableAttr &e, const TokenTree *) {
+void SerializeObjCBoxableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBoxableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPReferencedVarAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPReferencedVarAttr &e, const TokenTree *) {
+void SerializeOMPReferencedVarAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPReferencedVarAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Reference()));
 }
 
-void SerializeOMPDeclareSimdDeclAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareSimdDeclAttr &e, const TokenTree *) {
+void SerializeOMPDeclareSimdDeclAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareSimdDeclAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.BranchState())));
   b.setVal8(es.EntityId(e.Simdlen()));
 }
 
-void SerializeOMPCaptureKindAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPCaptureKindAttr &e, const TokenTree *) {
+void SerializeOMPCaptureKindAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPCaptureKindAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoEscapeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoEscapeAttr &e, const TokenTree *) {
+void SerializeNoEscapeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoEscapeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoBuiltinAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoBuiltinAttr &e, const TokenTree *) {
+void SerializeNoBuiltinAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoBuiltinAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeModeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ModeAttr &e, const TokenTree *) {
+void SerializeModeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ModeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeLoopHintAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LoopHintAttr &e, const TokenTree *) {
+void SerializeLoopHintAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LoopHintAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Option())));
   b.setVal14(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal15(static_cast<unsigned char>(mx::FromPasta(e.State())));
@@ -1056,74 +1148,83 @@ void SerializeLoopHintAttr(const EntityMapper &es, mx::ast::Attr::Builder b, con
   }
 }
 
-void SerializeLoaderUninitializedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LoaderUninitializedAttr &e, const TokenTree *) {
+void SerializeLoaderUninitializedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LoaderUninitializedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeInitSegAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InitSegAttr &e, const TokenTree *) {
+void SerializeInitSegAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InitSegAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   auto v9 = e.Section();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeInheritableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InheritableAttr &e, const TokenTree *) {
+void SerializeInheritableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InheritableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   b.setVal11(e.ShouldInheritEvenIfAlreadyPresent());
 }
 
-void SerializeIBOutletCollectionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBOutletCollectionAttr &e, const TokenTree *) {
+void SerializeIBOutletCollectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBOutletCollectionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Interface()));
   b.setVal16(es.EntityId(e.InterfaceToken()));
 }
 
-void SerializeIBOutletAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBOutletAttr &e, const TokenTree *) {
+void SerializeIBOutletAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBOutletAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeIBActionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBActionAttr &e, const TokenTree *) {
+void SerializeIBActionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBActionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeHotAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HotAttr &e, const TokenTree *) {
+void SerializeHotAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HotAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeHLSLShaderAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLShaderAttr &e, const TokenTree *) {
+void SerializeHLSLShaderAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLShaderAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Type())));
 }
 
-void SerializeHLSLResourceBindingAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLResourceBindingAttr &e, const TokenTree *) {
+void SerializeHLSLResourceBindingAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLResourceBindingAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Slot();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
@@ -1132,129 +1233,146 @@ void SerializeHLSLResourceBindingAttr(const EntityMapper &es, mx::ast::Attr::Bui
   b.setVal17(s17);
 }
 
-void SerializeHLSLResourceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLResourceAttr &e, const TokenTree *) {
+void SerializeHLSLResourceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLResourceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ResourceShape())));
   b.setVal14(static_cast<unsigned char>(mx::FromPasta(e.ResourceType())));
 }
 
-void SerializeHLSLNumThreadsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLNumThreadsAttr &e, const TokenTree *) {
+void SerializeHLSLNumThreadsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLNumThreadsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeHLSLAnnotationAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLAnnotationAttr &e, const TokenTree *) {
+void SerializeHLSLAnnotationAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLAnnotationAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeHLSLSV_GroupIndexAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLSV_GroupIndexAttr &e, const TokenTree *) {
+void SerializeHLSLSV_GroupIndexAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLSV_GroupIndexAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeHLSLAnnotationAttr(es, b, e, nullptr);
+  SerializeHLSLAnnotationAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeHLSLSV_DispatchThreadIDAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLSV_DispatchThreadIDAttr &e, const TokenTree *) {
+void SerializeHLSLSV_DispatchThreadIDAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLSV_DispatchThreadIDAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeHLSLAnnotationAttr(es, b, e, nullptr);
+  SerializeHLSLAnnotationAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeHIPManagedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HIPManagedAttr &e, const TokenTree *) {
+void SerializeHIPManagedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HIPManagedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeGuardedVarAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GuardedVarAttr &e, const TokenTree *) {
+void SerializeGuardedVarAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GuardedVarAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeGuardedByAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GuardedByAttr &e, const TokenTree *) {
+void SerializeGuardedByAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GuardedByAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Argument()));
 }
 
-void SerializeGNUInlineAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GNUInlineAttr &e, const TokenTree *) {
+void SerializeGNUInlineAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GNUInlineAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeFunctionReturnThunksAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FunctionReturnThunksAttr &e, const TokenTree *) {
+void SerializeFunctionReturnThunksAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FunctionReturnThunksAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ThunkType())));
 }
 
-void SerializeFormatAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FormatAttr &e, const TokenTree *) {
+void SerializeFormatAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FormatAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeFormatArgAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FormatArgAttr &e, const TokenTree *) {
+void SerializeFormatArgAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FormatArgAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeFlattenAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FlattenAttr &e, const TokenTree *) {
+void SerializeFlattenAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FlattenAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeFlagEnumAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FlagEnumAttr &e, const TokenTree *) {
+void SerializeFlagEnumAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FlagEnumAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeFinalAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FinalAttr &e, const TokenTree *) {
+void SerializeFinalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FinalAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsSpelledAsSealed());
 }
 
-void SerializeFastCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FastCallAttr &e, const TokenTree *) {
+void SerializeFastCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FastCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeExternalSourceSymbolAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExternalSourceSymbolAttr &e, const TokenTree *) {
+void SerializeExternalSourceSymbolAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExternalSourceSymbolAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.DefinedIn();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
@@ -1264,26 +1382,29 @@ void SerializeExternalSourceSymbolAttr(const EntityMapper &es, mx::ast::Attr::Bu
   b.setVal17(s17);
 }
 
-void SerializeExclusiveTrylockFunctionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExclusiveTrylockFunctionAttr &e, const TokenTree *) {
+void SerializeExclusiveTrylockFunctionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExclusiveTrylockFunctionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.SuccessValue()));
 }
 
-void SerializeExcludeFromExplicitInstantiationAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExcludeFromExplicitInstantiationAttr &e, const TokenTree *) {
+void SerializeExcludeFromExplicitInstantiationAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExcludeFromExplicitInstantiationAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeErrorAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ErrorAttr &e, const TokenTree *) {
+void SerializeErrorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ErrorAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   auto v9 = e.UserDiagnostic();
   std::string s9(v9.data(), v9.size());
@@ -1292,71 +1413,79 @@ void SerializeErrorAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const 
   b.setVal13(e.IsWarning());
 }
 
-void SerializeEnumExtensibilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnumExtensibilityAttr &e, const TokenTree *) {
+void SerializeEnumExtensibilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnumExtensibilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Extensibility())));
 }
 
-void SerializeEnforceTCBLeafAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnforceTCBLeafAttr &e, const TokenTree *) {
+void SerializeEnforceTCBLeafAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnforceTCBLeafAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.TCBName();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeEnforceTCBAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnforceTCBAttr &e, const TokenTree *) {
+void SerializeEnforceTCBAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnforceTCBAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.TCBName();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeEnableIfAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnableIfAttr &e, const TokenTree *) {
+void SerializeEnableIfAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnableIfAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Condition()));
   auto v9 = e.Message();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeEmptyBasesAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EmptyBasesAttr &e, const TokenTree *) {
+void SerializeEmptyBasesAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EmptyBasesAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeDisableTailCallsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DisableTailCallsAttr &e, const TokenTree *) {
+void SerializeDisableTailCallsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DisableTailCallsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeDisableSanitizerInstrumentationAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DisableSanitizerInstrumentationAttr &e, const TokenTree *) {
+void SerializeDisableSanitizerInstrumentationAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DisableSanitizerInstrumentationAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeDiagnoseIfAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DiagnoseIfAttr &e, const TokenTree *) {
+void SerializeDiagnoseIfAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DiagnoseIfAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal12(e.ArgumentDependent());
   b.setVal8(es.EntityId(e.Condition()));
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.DiagnosticType())));
@@ -1368,26 +1497,29 @@ void SerializeDiagnoseIfAttr(const EntityMapper &es, mx::ast::Attr::Builder b, c
   b.setVal18(e.IsWarning());
 }
 
-void SerializeDiagnoseAsBuiltinAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DiagnoseAsBuiltinAttr &e, const TokenTree *) {
+void SerializeDiagnoseAsBuiltinAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DiagnoseAsBuiltinAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Function()));
 }
 
-void SerializeDestructorAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DestructorAttr &e, const TokenTree *) {
+void SerializeDestructorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DestructorAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeDeprecatedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DeprecatedAttr &e, const TokenTree *) {
+void SerializeDeprecatedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DeprecatedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Message();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
@@ -1396,168 +1528,190 @@ void SerializeDeprecatedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, c
   b.setVal17(s17);
 }
 
-void SerializeDeclOrStmtAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DeclOrStmtAttr &e, const TokenTree *) {
+void SerializeDeclOrStmtAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DeclOrStmtAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAlwaysInlineAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlwaysInlineAttr &e, const TokenTree *) {
+void SerializeAlwaysInlineAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlwaysInlineAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeclOrStmtAttr(es, b, e, nullptr);
+  SerializeDeclOrStmtAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsClangAlwaysInline());
 }
 
-void SerializeNoMergeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMergeAttr &e, const TokenTree *) {
+void SerializeNoMergeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMergeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeclOrStmtAttr(es, b, e, nullptr);
+  SerializeDeclOrStmtAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoInlineAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoInlineAttr &e, const TokenTree *) {
+void SerializeNoInlineAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoInlineAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeclOrStmtAttr(es, b, e, nullptr);
+  SerializeDeclOrStmtAttr(pf, es, b, e, nullptr);
   b.setVal12(e.IsClangNoInline());
 }
 
-void SerializeDLLImportStaticLocalAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLImportStaticLocalAttr &e, const TokenTree *) {
+void SerializeDLLImportStaticLocalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLImportStaticLocalAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeDLLImportAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLImportAttr &e, const TokenTree *) {
+void SerializeDLLImportAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLImportAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeDLLExportStaticLocalAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLExportStaticLocalAttr &e, const TokenTree *) {
+void SerializeDLLExportStaticLocalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLExportStaticLocalAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeDLLExportAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLExportAttr &e, const TokenTree *) {
+void SerializeDLLExportAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLExportAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeConvergentAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConvergentAttr &e, const TokenTree *) {
+void SerializeConvergentAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConvergentAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeConsumableSetOnReadAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableSetOnReadAttr &e, const TokenTree *) {
+void SerializeConsumableSetOnReadAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableSetOnReadAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeConsumableAutoCastAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableAutoCastAttr &e, const TokenTree *) {
+void SerializeConsumableAutoCastAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableAutoCastAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeConsumableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableAttr &e, const TokenTree *) {
+void SerializeConsumableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.DefaultState())));
 }
 
-void SerializeConstructorAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstructorAttr &e, const TokenTree *) {
+void SerializeConstructorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstructorAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeConstInitAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstInitAttr &e, const TokenTree *) {
+void SerializeConstInitAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstInitAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsConstinit());
 }
 
-void SerializeConstAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstAttr &e, const TokenTree *) {
+void SerializeConstAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCommonAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CommonAttr &e, const TokenTree *) {
+void SerializeCommonAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CommonAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeColdAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ColdAttr &e, const TokenTree *) {
+void SerializeColdAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ColdAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCodeSegAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CodeSegAttr &e, const TokenTree *) {
+void SerializeCodeSegAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CodeSegAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeCmseNSEntryAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CmseNSEntryAttr &e, const TokenTree *) {
+void SerializeCmseNSEntryAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CmseNSEntryAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCleanupAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CleanupAttr &e, const TokenTree *) {
+void SerializeCleanupAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CleanupAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.FunctionDeclaration()));
 }
 
-void SerializeCapturedRecordAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CapturedRecordAttr &e, const TokenTree *) {
+void SerializeCapturedRecordAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CapturedRecordAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCapabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CapabilityAttr &e, const TokenTree *) {
+void SerializeCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CapabilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
@@ -1565,201 +1719,228 @@ void SerializeCapabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, c
   b.setVal12(e.IsShared());
 }
 
-void SerializeCallbackAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CallbackAttr &e, const TokenTree *) {
+void SerializeCallbackAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CallbackAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCallableWhenAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CallableWhenAttr &e, const TokenTree *) {
+void SerializeCallableWhenAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CallableWhenAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCXX11NoReturnAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CXX11NoReturnAttr &e, const TokenTree *) {
+void SerializeCXX11NoReturnAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CXX11NoReturnAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeCUDASharedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDASharedAttr &e, const TokenTree *) {
+void SerializeCUDASharedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDASharedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCUDALaunchBoundsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDALaunchBoundsAttr &e, const TokenTree *) {
+void SerializeCUDALaunchBoundsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDALaunchBoundsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.MaxThreads()));
   b.setVal16(es.EntityId(e.MinBlocks()));
 }
 
-void SerializeCUDAInvalidTargetAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAInvalidTargetAttr &e, const TokenTree *) {
+void SerializeCUDAInvalidTargetAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAInvalidTargetAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCUDAHostAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAHostAttr &e, const TokenTree *) {
+void SerializeCUDAHostAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAHostAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCUDAGlobalAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAGlobalAttr &e, const TokenTree *) {
+void SerializeCUDAGlobalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAGlobalAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCUDADeviceBuiltinTextureTypeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceBuiltinTextureTypeAttr &e, const TokenTree *) {
+void SerializeCUDADeviceBuiltinTextureTypeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceBuiltinTextureTypeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCUDADeviceBuiltinSurfaceTypeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceBuiltinSurfaceTypeAttr &e, const TokenTree *) {
+void SerializeCUDADeviceBuiltinSurfaceTypeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceBuiltinSurfaceTypeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCUDADeviceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceAttr &e, const TokenTree *) {
+void SerializeCUDADeviceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCUDAConstantAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAConstantAttr &e, const TokenTree *) {
+void SerializeCUDAConstantAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAConstantAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCPUSpecificAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CPUSpecificAttr &e, const TokenTree *) {
+void SerializeCPUSpecificAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CPUSpecificAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCPUDispatchAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CPUDispatchAttr &e, const TokenTree *) {
+void SerializeCPUDispatchAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CPUDispatchAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCFUnknownTransferAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFUnknownTransferAttr &e, const TokenTree *) {
+void SerializeCFUnknownTransferAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFUnknownTransferAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCFReturnsRetainedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFReturnsRetainedAttr &e, const TokenTree *) {
+void SerializeCFReturnsRetainedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFReturnsRetainedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCFReturnsNotRetainedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFReturnsNotRetainedAttr &e, const TokenTree *) {
+void SerializeCFReturnsNotRetainedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFReturnsNotRetainedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCFICanonicalJumpTableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFICanonicalJumpTableAttr &e, const TokenTree *) {
+void SerializeCFICanonicalJumpTableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFICanonicalJumpTableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCFGuardAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFGuardAttr &e, const TokenTree *) {
+void SerializeCFGuardAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFGuardAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Guard())));
 }
 
-void SerializeCFAuditedTransferAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFAuditedTransferAttr &e, const TokenTree *) {
+void SerializeCFAuditedTransferAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFAuditedTransferAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCDeclAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CDeclAttr &e, const TokenTree *) {
+void SerializeCDeclAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CDeclAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeC11NoReturnAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::C11NoReturnAttr &e, const TokenTree *) {
+void SerializeC11NoReturnAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::C11NoReturnAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeBuiltinAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BuiltinAttr &e, const TokenTree *) {
+void SerializeBuiltinAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BuiltinAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeBlocksAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BlocksAttr &e, const TokenTree *) {
+void SerializeBlocksAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BlocksAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Type())));
 }
 
-void SerializeBTFDeclTagAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BTFDeclTagAttr &e, const TokenTree *) {
+void SerializeBTFDeclTagAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BTFDeclTagAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.BTFDeclTag();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeBPFPreserveAccessIndexAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BPFPreserveAccessIndexAttr &e, const TokenTree *) {
+void SerializeBPFPreserveAccessIndexAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BPFPreserveAccessIndexAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAvailabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AvailabilityAttr &e, const TokenTree *) {
+void SerializeAvailabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AvailabilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Message();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
@@ -1770,21 +1951,23 @@ void SerializeAvailabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b,
   b.setVal13(e.Unavailable());
 }
 
-void SerializeAssumptionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssumptionAttr &e, const TokenTree *) {
+void SerializeAssumptionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssumptionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Assumption();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeAssumeAlignedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssumeAlignedAttr &e, const TokenTree *) {
+void SerializeAssumeAlignedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssumeAlignedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Alignment()));
   auto v16 = e.Offset();
   if (v16) {
@@ -1795,124 +1978,140 @@ void SerializeAssumeAlignedAttr(const EntityMapper &es, mx::ast::Attr::Builder b
   }
 }
 
-void SerializeAssertSharedLockAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertSharedLockAttr &e, const TokenTree *) {
+void SerializeAssertSharedLockAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertSharedLockAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAssertExclusiveLockAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertExclusiveLockAttr &e, const TokenTree *) {
+void SerializeAssertExclusiveLockAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertExclusiveLockAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAssertCapabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertCapabilityAttr &e, const TokenTree *) {
+void SerializeAssertCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertCapabilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsShared());
 }
 
-void SerializeAsmLabelAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AsmLabelAttr &e, const TokenTree *) {
+void SerializeAsmLabelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AsmLabelAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal12(e.IsLiteralLabel());
   auto v9 = e.Label();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeArtificialAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArtificialAttr &e, const TokenTree *) {
+void SerializeArtificialAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArtificialAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeArmBuiltinAliasAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArmBuiltinAliasAttr &e, const TokenTree *) {
+void SerializeArmBuiltinAliasAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArmBuiltinAliasAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeArgumentWithTypeTagAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArgumentWithTypeTagAttr &e, const TokenTree *) {
+void SerializeArgumentWithTypeTagAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArgumentWithTypeTagAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal12(e.IsPointer());
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeArcWeakrefUnavailableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArcWeakrefUnavailableAttr &e, const TokenTree *) {
+void SerializeArcWeakrefUnavailableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArcWeakrefUnavailableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAnyX86NoCfCheckAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86NoCfCheckAttr &e, const TokenTree *) {
+void SerializeAnyX86NoCfCheckAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86NoCfCheckAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAnyX86NoCallerSavedRegistersAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86NoCallerSavedRegistersAttr &e, const TokenTree *) {
+void SerializeAnyX86NoCallerSavedRegistersAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86NoCallerSavedRegistersAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAnyX86InterruptAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86InterruptAttr &e, const TokenTree *) {
+void SerializeAnyX86InterruptAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86InterruptAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAnalyzerNoReturnAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnalyzerNoReturnAttr &e, const TokenTree *) {
+void SerializeAnalyzerNoReturnAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnalyzerNoReturnAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAlwaysDestroyAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlwaysDestroyAttr &e, const TokenTree *) {
+void SerializeAlwaysDestroyAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlwaysDestroyAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAllocSizeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AllocSizeAttr &e, const TokenTree *) {
+void SerializeAllocSizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AllocSizeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAllocAlignAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AllocAlignAttr &e, const TokenTree *) {
+void SerializeAllocAlignAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AllocAlignAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAlignedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignedAttr &e, const TokenTree *) {
+void SerializeAlignedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v8 = e.AlignmentExpression();
   if (v8) {
     auto id8 = es.EntityId(v8.value());
@@ -1937,226 +2136,254 @@ void SerializeAlignedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, cons
   b.setVal22(e.IsGNU());
 }
 
-void SerializeAlignNaturalAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignNaturalAttr &e, const TokenTree *) {
+void SerializeAlignNaturalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignNaturalAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAlignMac68kAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignMac68kAttr &e, const TokenTree *) {
+void SerializeAlignMac68kAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignMac68kAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAcquiredBeforeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquiredBeforeAttr &e, const TokenTree *) {
+void SerializeAcquiredBeforeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquiredBeforeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAcquiredAfterAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquiredAfterAttr &e, const TokenTree *) {
+void SerializeAcquiredAfterAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquiredAfterAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAcquireHandleAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquireHandleAttr &e, const TokenTree *) {
+void SerializeAcquireHandleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquireHandleAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.HandleType();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeAcquireCapabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquireCapabilityAttr &e, const TokenTree *) {
+void SerializeAcquireCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquireCapabilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsShared());
 }
 
-void SerializeAVRSignalAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AVRSignalAttr &e, const TokenTree *) {
+void SerializeAVRSignalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AVRSignalAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAVRInterruptAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AVRInterruptAttr &e, const TokenTree *) {
+void SerializeAVRInterruptAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AVRInterruptAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeARMInterruptAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ARMInterruptAttr &e, const TokenTree *) {
+void SerializeARMInterruptAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ARMInterruptAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
 }
 
-void SerializeAMDGPUWavesPerEUAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUWavesPerEUAttr &e, const TokenTree *) {
+void SerializeAMDGPUWavesPerEUAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUWavesPerEUAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Max()));
   b.setVal16(es.EntityId(e.Min()));
 }
 
-void SerializeAMDGPUNumVGPRAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUNumVGPRAttr &e, const TokenTree *) {
+void SerializeAMDGPUNumVGPRAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUNumVGPRAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAMDGPUNumSGPRAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUNumSGPRAttr &e, const TokenTree *) {
+void SerializeAMDGPUNumSGPRAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUNumSGPRAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAMDGPUKernelCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUKernelCallAttr &e, const TokenTree *) {
+void SerializeAMDGPUKernelCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUKernelCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAMDGPUFlatWorkGroupSizeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUFlatWorkGroupSizeAttr &e, const TokenTree *) {
+void SerializeAMDGPUFlatWorkGroupSizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUFlatWorkGroupSizeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Max()));
   b.setVal16(es.EntityId(e.Min()));
 }
 
-void SerializeAArch64VectorPcsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AArch64VectorPcsAttr &e, const TokenTree *) {
+void SerializeAArch64VectorPcsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AArch64VectorPcsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAArch64SVEPcsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AArch64SVEPcsAttr &e, const TokenTree *) {
+void SerializeAArch64SVEPcsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AArch64SVEPcsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeZeroCallUsedRegsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ZeroCallUsedRegsAttr &e, const TokenTree *) {
+void SerializeZeroCallUsedRegsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ZeroCallUsedRegsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ZeroCallUsedRegs())));
 }
 
-void SerializeXRayLogArgsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::XRayLogArgsAttr &e, const TokenTree *) {
+void SerializeXRayLogArgsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::XRayLogArgsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeXRayInstrumentAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::XRayInstrumentAttr &e, const TokenTree *) {
+void SerializeXRayInstrumentAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::XRayInstrumentAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal12(e.AlwaysXRayInstrument());
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal13(e.NeverXRayInstrument());
 }
 
-void SerializeX86ForceAlignArgPointerAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::X86ForceAlignArgPointerAttr &e, const TokenTree *) {
+void SerializeX86ForceAlignArgPointerAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::X86ForceAlignArgPointerAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeWorkGroupSizeHintAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WorkGroupSizeHintAttr &e, const TokenTree *) {
+void SerializeWorkGroupSizeHintAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WorkGroupSizeHintAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeWebAssemblyImportNameAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyImportNameAttr &e, const TokenTree *) {
+void SerializeWebAssemblyImportNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyImportNameAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.ImportName();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeWebAssemblyImportModuleAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyImportModuleAttr &e, const TokenTree *) {
+void SerializeWebAssemblyImportModuleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyImportModuleAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.ImportModule();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeWebAssemblyExportNameAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyExportNameAttr &e, const TokenTree *) {
+void SerializeWebAssemblyExportNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyExportNameAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.ExportName();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeWeakRefAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakRefAttr &e, const TokenTree *) {
+void SerializeWeakRefAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakRefAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Aliasee();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeWeakImportAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakImportAttr &e, const TokenTree *) {
+void SerializeWeakImportAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakImportAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeWeakAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakAttr &e, const TokenTree *) {
+void SerializeWeakAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeWarnUnusedResultAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WarnUnusedResultAttr &e, const TokenTree *) {
+void SerializeWarnUnusedResultAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WarnUnusedResultAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal12(e.IsCXX11NoDiscard());
   auto v9 = e.Message();
   std::string s9(v9.data(), v9.size());
@@ -2164,158 +2391,177 @@ void SerializeWarnUnusedResultAttr(const EntityMapper &es, mx::ast::Attr::Builde
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeWarnUnusedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WarnUnusedAttr &e, const TokenTree *) {
+void SerializeWarnUnusedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WarnUnusedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeVisibilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VisibilityAttr &e, const TokenTree *) {
+void SerializeVisibilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VisibilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
 }
 
-void SerializeVectorCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VectorCallAttr &e, const TokenTree *) {
+void SerializeVectorCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VectorCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeVecTypeHintAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VecTypeHintAttr &e, const TokenTree *) {
+void SerializeVecTypeHintAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VecTypeHintAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.TypeHint()));
   b.setVal16(es.EntityId(e.TypeHintToken()));
 }
 
-void SerializeVecReturnAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VecReturnAttr &e, const TokenTree *) {
+void SerializeVecReturnAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VecReturnAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeUuidAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UuidAttr &e, const TokenTree *) {
+void SerializeUuidAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UuidAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Guid();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
   b.setVal8(es.EntityId(e.GuidDeclaration()));
 }
 
-void SerializeUsingIfExistsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UsingIfExistsAttr &e, const TokenTree *) {
+void SerializeUsingIfExistsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UsingIfExistsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeUsedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UsedAttr &e, const TokenTree *) {
+void SerializeUsedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UsedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeUnusedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnusedAttr &e, const TokenTree *) {
+void SerializeUnusedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnusedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeUninitializedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UninitializedAttr &e, const TokenTree *) {
+void SerializeUninitializedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UninitializedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeUnavailableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnavailableAttr &e, const TokenTree *) {
+void SerializeUnavailableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnavailableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ImplicitReason())));
   auto v9 = e.Message();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeTypeVisibilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeVisibilityAttr &e, const TokenTree *) {
+void SerializeTypeVisibilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeVisibilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
 }
 
-void SerializeTypeTagForDatatypeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeTagForDatatypeAttr &e, const TokenTree *) {
+void SerializeTypeTagForDatatypeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeTagForDatatypeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal12(e.LayoutCompatible());
   b.setVal8(es.EntityId(e.MatchingCType()));
   b.setVal16(es.EntityId(e.MatchingCTypeToken()));
   b.setVal13(e.MustBeNull());
 }
 
-void SerializeTryAcquireCapabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TryAcquireCapabilityAttr &e, const TokenTree *) {
+void SerializeTryAcquireCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TryAcquireCapabilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal8(es.EntityId(e.SuccessValue()));
   b.setVal12(e.IsShared());
 }
 
-void SerializeTrivialABIAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TrivialABIAttr &e, const TokenTree *) {
+void SerializeTrivialABIAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TrivialABIAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeTransparentUnionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TransparentUnionAttr &e, const TokenTree *) {
+void SerializeTransparentUnionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TransparentUnionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeThisCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ThisCallAttr &e, const TokenTree *) {
+void SerializeThisCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ThisCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeTestTypestateAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TestTypestateAttr &e, const TokenTree *) {
+void SerializeTestTypestateAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TestTypestateAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.TestState())));
 }
 
-void SerializeTargetVersionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetVersionAttr &e, const TokenTree *) {
+void SerializeTargetVersionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetVersionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
@@ -2325,18 +2571,20 @@ void SerializeTargetVersionAttr(const EntityMapper &es, mx::ast::Attr::Builder b
   b.setVal12(e.IsDefaultVersion());
 }
 
-void SerializeTargetClonesAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetClonesAttr &e, const TokenTree *) {
+void SerializeTargetClonesAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetClonesAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeTargetAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetAttr &e, const TokenTree *) {
+void SerializeTargetAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Architecture();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
@@ -2346,466 +2594,524 @@ void SerializeTargetAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const
   b.setVal12(e.IsDefaultVersion());
 }
 
-void SerializeTLSModelAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TLSModelAttr &e, const TokenTree *) {
+void SerializeTLSModelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TLSModelAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Model();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeSysVABIAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SysVABIAttr &e, const TokenTree *) {
+void SerializeSysVABIAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SysVABIAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftPrivateAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftPrivateAttr &e, const TokenTree *) {
+void SerializeSwiftPrivateAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftPrivateAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftNewTypeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftNewTypeAttr &e, const TokenTree *) {
+void SerializeSwiftNewTypeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftNewTypeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.NewtypeKind())));
   b.setVal14(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeSwiftNameAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftNameAttr &e, const TokenTree *) {
+void SerializeSwiftNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftNameAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeSwiftErrorAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftErrorAttr &e, const TokenTree *) {
+void SerializeSwiftErrorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftErrorAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Convention())));
 }
 
-void SerializeSwiftCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftCallAttr &e, const TokenTree *) {
+void SerializeSwiftCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftBridgedTypedefAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftBridgedTypedefAttr &e, const TokenTree *) {
+void SerializeSwiftBridgedTypedefAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftBridgedTypedefAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftBridgeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftBridgeAttr &e, const TokenTree *) {
+void SerializeSwiftBridgeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftBridgeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.SwiftType();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeSwiftAttrAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAttrAttr &e, const TokenTree *) {
+void SerializeSwiftAttrAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAttrAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Attribute();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeSwiftAsyncNameAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncNameAttr &e, const TokenTree *) {
+void SerializeSwiftAsyncNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncNameAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeSwiftAsyncErrorAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncErrorAttr &e, const TokenTree *) {
+void SerializeSwiftAsyncErrorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncErrorAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Convention())));
 }
 
-void SerializeSwiftAsyncCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncCallAttr &e, const TokenTree *) {
+void SerializeSwiftAsyncCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftAsyncAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncAttr &e, const TokenTree *) {
+void SerializeSwiftAsyncAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.AttributeKind())));
 }
 
-void SerializeStrictGuardStackCheckAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StrictGuardStackCheckAttr &e, const TokenTree *) {
+void SerializeStrictGuardStackCheckAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StrictGuardStackCheckAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeStrictFPAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StrictFPAttr &e, const TokenTree *) {
+void SerializeStrictFPAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StrictFPAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeStdCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StdCallAttr &e, const TokenTree *) {
+void SerializeStdCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StdCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeStandaloneDebugAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StandaloneDebugAttr &e, const TokenTree *) {
+void SerializeStandaloneDebugAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StandaloneDebugAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSpeculativeLoadHardeningAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SpeculativeLoadHardeningAttr &e, const TokenTree *) {
+void SerializeSpeculativeLoadHardeningAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SpeculativeLoadHardeningAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSharedTrylockFunctionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SharedTrylockFunctionAttr &e, const TokenTree *) {
+void SerializeSharedTrylockFunctionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SharedTrylockFunctionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.SuccessValue()));
 }
 
-void SerializeSetTypestateAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SetTypestateAttr &e, const TokenTree *) {
+void SerializeSetTypestateAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SetTypestateAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.NewState())));
 }
 
-void SerializeSentinelAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SentinelAttr &e, const TokenTree *) {
+void SerializeSentinelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SentinelAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSelectAnyAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SelectAnyAttr &e, const TokenTree *) {
+void SerializeSelectAnyAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SelectAnyAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSectionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SectionAttr &e, const TokenTree *) {
+void SerializeSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SectionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeScopedLockableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ScopedLockableAttr &e, const TokenTree *) {
+void SerializeScopedLockableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ScopedLockableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSYCLSpecialClassAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SYCLSpecialClassAttr &e, const TokenTree *) {
+void SerializeSYCLSpecialClassAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SYCLSpecialClassAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSYCLKernelAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SYCLKernelAttr &e, const TokenTree *) {
+void SerializeSYCLKernelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SYCLKernelAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeReturnsTwiceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnsTwiceAttr &e, const TokenTree *) {
+void SerializeReturnsTwiceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnsTwiceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeReturnsNonNullAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnsNonNullAttr &e, const TokenTree *) {
+void SerializeReturnsNonNullAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnsNonNullAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeReturnTypestateAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnTypestateAttr &e, const TokenTree *) {
+void SerializeReturnTypestateAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnTypestateAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.State())));
 }
 
-void SerializeRetainAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RetainAttr &e, const TokenTree *) {
+void SerializeRetainAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RetainAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeRestrictAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RestrictAttr &e, const TokenTree *) {
+void SerializeRestrictAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RestrictAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeRequiresCapabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RequiresCapabilityAttr &e, const TokenTree *) {
+void SerializeRequiresCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RequiresCapabilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsShared());
 }
 
-void SerializeReqdWorkGroupSizeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReqdWorkGroupSizeAttr &e, const TokenTree *) {
+void SerializeReqdWorkGroupSizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReqdWorkGroupSizeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeReleaseCapabilityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReleaseCapabilityAttr &e, const TokenTree *) {
+void SerializeReleaseCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReleaseCapabilityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsGeneric());
   b.setVal13(e.IsShared());
 }
 
-void SerializeReinitializesAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReinitializesAttr &e, const TokenTree *) {
+void SerializeReinitializesAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReinitializesAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeRegCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RegCallAttr &e, const TokenTree *) {
+void SerializeRegCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RegCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeReadOnlyPlacementAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReadOnlyPlacementAttr &e, const TokenTree *) {
+void SerializeReadOnlyPlacementAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReadOnlyPlacementAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeRandomizeLayoutAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RandomizeLayoutAttr &e, const TokenTree *) {
+void SerializeRandomizeLayoutAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RandomizeLayoutAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeRISCVInterruptAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RISCVInterruptAttr &e, const TokenTree *) {
+void SerializeRISCVInterruptAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RISCVInterruptAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
 }
 
-void SerializePureAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PureAttr &e, const TokenTree *) {
+void SerializePureAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PureAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializePtGuardedVarAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PtGuardedVarAttr &e, const TokenTree *) {
+void SerializePtGuardedVarAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PtGuardedVarAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializePtGuardedByAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PtGuardedByAttr &e, const TokenTree *) {
+void SerializePtGuardedByAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PtGuardedByAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Argument()));
 }
 
-void SerializePreserveMostAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreserveMostAttr &e, const TokenTree *) {
+void SerializePreserveMostAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreserveMostAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializePreserveAllAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreserveAllAttr &e, const TokenTree *) {
+void SerializePreserveAllAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreserveAllAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializePreferredNameAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreferredNameAttr &e, const TokenTree *) {
+void SerializePreferredNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreferredNameAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.TypedefType()));
   b.setVal16(es.EntityId(e.TypedefTypeToken()));
 }
 
-void SerializePragmaClangTextSectionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangTextSectionAttr &e, const TokenTree *) {
+void SerializePragmaClangTextSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangTextSectionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializePragmaClangRodataSectionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangRodataSectionAttr &e, const TokenTree *) {
+void SerializePragmaClangRodataSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangRodataSectionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializePragmaClangRelroSectionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangRelroSectionAttr &e, const TokenTree *) {
+void SerializePragmaClangRelroSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangRelroSectionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializePragmaClangDataSectionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangDataSectionAttr &e, const TokenTree *) {
+void SerializePragmaClangDataSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangDataSectionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializePragmaClangBSSSectionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangBSSSectionAttr &e, const TokenTree *) {
+void SerializePragmaClangBSSSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangBSSSectionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   auto v9 = e.Name();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializePointerAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PointerAttr &e, const TokenTree *) {
+void SerializePointerAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PointerAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.DerefType()));
   b.setVal16(es.EntityId(e.DerefTypeToken()));
 }
 
-void SerializePcsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PcsAttr &e, const TokenTree *) {
+void SerializePcsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PcsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.PCS())));
 }
 
-void SerializePatchableFunctionEntryAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PatchableFunctionEntryAttr &e, const TokenTree *) {
+void SerializePatchableFunctionEntryAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PatchableFunctionEntryAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializePascalAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PascalAttr &e, const TokenTree *) {
+void SerializePascalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PascalAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeParamTypestateAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ParamTypestateAttr &e, const TokenTree *) {
+void SerializeParamTypestateAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ParamTypestateAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ParameterState())));
 }
 
-void SerializePackedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PackedAttr &e, const TokenTree *) {
+void SerializePackedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PackedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOwnershipAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OwnershipAttr &e, const TokenTree *) {
+void SerializeOwnershipAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OwnershipAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.OwnKind())));
   b.setVal14(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsHolds());
@@ -2813,766 +3119,870 @@ void SerializeOwnershipAttr(const EntityMapper &es, mx::ast::Attr::Builder b, co
   b.setVal18(e.IsTakes());
 }
 
-void SerializeOwnerAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OwnerAttr &e, const TokenTree *) {
+void SerializeOwnerAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OwnerAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.DerefType()));
   b.setVal16(es.EntityId(e.DerefTypeToken()));
 }
 
-void SerializeOverrideAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OverrideAttr &e, const TokenTree *) {
+void SerializeOverrideAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OverrideAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOptimizeNoneAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OptimizeNoneAttr &e, const TokenTree *) {
+void SerializeOptimizeNoneAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OptimizeNoneAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOpenCLKernelAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLKernelAttr &e, const TokenTree *) {
+void SerializeOpenCLKernelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLKernelAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOpenCLIntelReqdSubGroupSizeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLIntelReqdSubGroupSizeAttr &e, const TokenTree *) {
+void SerializeOpenCLIntelReqdSubGroupSizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLIntelReqdSubGroupSizeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCSubclassingRestrictedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCSubclassingRestrictedAttr &e, const TokenTree *) {
+void SerializeObjCSubclassingRestrictedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCSubclassingRestrictedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCRootClassAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRootClassAttr &e, const TokenTree *) {
+void SerializeObjCRootClassAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRootClassAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCReturnsInnerPointerAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCReturnsInnerPointerAttr &e, const TokenTree *) {
+void SerializeObjCReturnsInnerPointerAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCReturnsInnerPointerAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCRequiresSuperAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRequiresSuperAttr &e, const TokenTree *) {
+void SerializeObjCRequiresSuperAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRequiresSuperAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCRequiresPropertyDefsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRequiresPropertyDefsAttr &e, const TokenTree *) {
+void SerializeObjCRequiresPropertyDefsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRequiresPropertyDefsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCPreciseLifetimeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCPreciseLifetimeAttr &e, const TokenTree *) {
+void SerializeObjCPreciseLifetimeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCPreciseLifetimeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCOwnershipAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCOwnershipAttr &e, const TokenTree *) {
+void SerializeObjCOwnershipAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCOwnershipAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCNSObjectAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNSObjectAttr &e, const TokenTree *) {
+void SerializeObjCNSObjectAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNSObjectAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCMethodFamilyAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCMethodFamilyAttr &e, const TokenTree *) {
+void SerializeObjCMethodFamilyAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCMethodFamilyAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Family())));
 }
 
-void SerializeObjCIndependentClassAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCIndependentClassAttr &e, const TokenTree *) {
+void SerializeObjCIndependentClassAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCIndependentClassAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCExternallyRetainedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExternallyRetainedAttr &e, const TokenTree *) {
+void SerializeObjCExternallyRetainedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExternallyRetainedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCExplicitProtocolImplAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExplicitProtocolImplAttr &e, const TokenTree *) {
+void SerializeObjCExplicitProtocolImplAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExplicitProtocolImplAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCExceptionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExceptionAttr &e, const TokenTree *) {
+void SerializeObjCExceptionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExceptionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCBridgeRelatedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeRelatedAttr &e, const TokenTree *) {
+void SerializeObjCBridgeRelatedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeRelatedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCBridgeMutableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeMutableAttr &e, const TokenTree *) {
+void SerializeObjCBridgeMutableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeMutableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCBridgeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeAttr &e, const TokenTree *) {
+void SerializeObjCBridgeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOSReturnsRetainedOnZeroAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedOnZeroAttr &e, const TokenTree *) {
+void SerializeOSReturnsRetainedOnZeroAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedOnZeroAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOSReturnsRetainedOnNonZeroAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedOnNonZeroAttr &e, const TokenTree *) {
+void SerializeOSReturnsRetainedOnNonZeroAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedOnNonZeroAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOSReturnsRetainedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedAttr &e, const TokenTree *) {
+void SerializeOSReturnsRetainedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOSReturnsNotRetainedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsNotRetainedAttr &e, const TokenTree *) {
+void SerializeOSReturnsNotRetainedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsNotRetainedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOSConsumesThisAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSConsumesThisAttr &e, const TokenTree *) {
+void SerializeOSConsumesThisAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSConsumesThisAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPThreadPrivateDeclAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPThreadPrivateDeclAttr &e, const TokenTree *) {
+void SerializeOMPThreadPrivateDeclAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPThreadPrivateDeclAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPDeclareVariantAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareVariantAttr &e, const TokenTree *) {
+void SerializeOMPDeclareVariantAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareVariantAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.VariantFuncReference()));
 }
 
-void SerializeOMPDeclareTargetDeclAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareTargetDeclAttr &e, const TokenTree *) {
+void SerializeOMPDeclareTargetDeclAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareTargetDeclAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.DevType())));
   b.setVal12(e.Indirect());
   b.setVal8(es.EntityId(e.IndirectExpression()));
   b.setVal14(static_cast<unsigned char>(mx::FromPasta(e.MapType())));
 }
 
-void SerializeOMPCaptureNoInitAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPCaptureNoInitAttr &e, const TokenTree *) {
+void SerializeOMPCaptureNoInitAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPCaptureNoInitAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPAllocateDeclAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPAllocateDeclAttr &e, const TokenTree *) {
+void SerializeOMPAllocateDeclAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPAllocateDeclAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Alignment()));
   b.setVal16(es.EntityId(e.Allocator()));
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.AllocatorType())));
 }
 
-void SerializeNotTailCalledAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NotTailCalledAttr &e, const TokenTree *) {
+void SerializeNotTailCalledAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NotTailCalledAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoUwtableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoUwtableAttr &e, const TokenTree *) {
+void SerializeNoUwtableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoUwtableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoUniqueAddressAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoUniqueAddressAttr &e, const TokenTree *) {
+void SerializeNoUniqueAddressAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoUniqueAddressAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoThrowAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoThrowAttr &e, const TokenTree *) {
+void SerializeNoThrowAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoThrowAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoThreadSafetyAnalysisAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoThreadSafetyAnalysisAttr &e, const TokenTree *) {
+void SerializeNoThreadSafetyAnalysisAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoThreadSafetyAnalysisAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoStackProtectorAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoStackProtectorAttr &e, const TokenTree *) {
+void SerializeNoStackProtectorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoStackProtectorAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeNoSplitStackAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSplitStackAttr &e, const TokenTree *) {
+void SerializeNoSplitStackAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSplitStackAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoSpeculativeLoadHardeningAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSpeculativeLoadHardeningAttr &e, const TokenTree *) {
+void SerializeNoSpeculativeLoadHardeningAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSpeculativeLoadHardeningAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoSanitizeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSanitizeAttr &e, const TokenTree *) {
+void SerializeNoSanitizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSanitizeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal12(e.HasCoverage());
 }
 
-void SerializeNoReturnAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoReturnAttr &e, const TokenTree *) {
+void SerializeNoReturnAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoReturnAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoRandomizeLayoutAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoRandomizeLayoutAttr &e, const TokenTree *) {
+void SerializeNoRandomizeLayoutAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoRandomizeLayoutAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoProfileFunctionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoProfileFunctionAttr &e, const TokenTree *) {
+void SerializeNoProfileFunctionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoProfileFunctionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoMips16Attr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMips16Attr &e, const TokenTree *) {
+void SerializeNoMips16Attr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMips16Attr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoMicroMipsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMicroMipsAttr &e, const TokenTree *) {
+void SerializeNoMicroMipsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMicroMipsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoInstrumentFunctionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoInstrumentFunctionAttr &e, const TokenTree *) {
+void SerializeNoInstrumentFunctionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoInstrumentFunctionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoDuplicateAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDuplicateAttr &e, const TokenTree *) {
+void SerializeNoDuplicateAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDuplicateAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoDestroyAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDestroyAttr &e, const TokenTree *) {
+void SerializeNoDestroyAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDestroyAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoDebugAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDebugAttr &e, const TokenTree *) {
+void SerializeNoDebugAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDebugAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoCommonAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoCommonAttr &e, const TokenTree *) {
+void SerializeNoCommonAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoCommonAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNoAliasAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoAliasAttr &e, const TokenTree *) {
+void SerializeNoAliasAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoAliasAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNakedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NakedAttr &e, const TokenTree *) {
+void SerializeNakedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NakedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNSReturnsRetainedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsRetainedAttr &e, const TokenTree *) {
+void SerializeNSReturnsRetainedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsRetainedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNSReturnsNotRetainedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsNotRetainedAttr &e, const TokenTree *) {
+void SerializeNSReturnsNotRetainedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsNotRetainedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNSReturnsAutoreleasedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsAutoreleasedAttr &e, const TokenTree *) {
+void SerializeNSReturnsAutoreleasedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsAutoreleasedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNSErrorDomainAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSErrorDomainAttr &e, const TokenTree *) {
+void SerializeNSErrorDomainAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSErrorDomainAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.ErrorDomain()));
 }
 
-void SerializeNSConsumesSelfAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSConsumesSelfAttr &e, const TokenTree *) {
+void SerializeNSConsumesSelfAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSConsumesSelfAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMipsShortCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsShortCallAttr &e, const TokenTree *) {
+void SerializeMipsShortCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsShortCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeMipsLongCallAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsLongCallAttr &e, const TokenTree *) {
+void SerializeMipsLongCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsLongCallAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeMipsInterruptAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsInterruptAttr &e, const TokenTree *) {
+void SerializeMipsInterruptAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsInterruptAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
 }
 
-void SerializeMips16Attr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Mips16Attr &e, const TokenTree *) {
+void SerializeMips16Attr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Mips16Attr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMinVectorWidthAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MinVectorWidthAttr &e, const TokenTree *) {
+void SerializeMinVectorWidthAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MinVectorWidthAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMinSizeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MinSizeAttr &e, const TokenTree *) {
+void SerializeMinSizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MinSizeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMicroMipsAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MicroMipsAttr &e, const TokenTree *) {
+void SerializeMicroMipsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MicroMipsAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMaybeUndefAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MaybeUndefAttr &e, const TokenTree *) {
+void SerializeMaybeUndefAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MaybeUndefAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMayAliasAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MayAliasAttr &e, const TokenTree *) {
+void SerializeMayAliasAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MayAliasAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMaxFieldAlignmentAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MaxFieldAlignmentAttr &e, const TokenTree *) {
+void SerializeMaxFieldAlignmentAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MaxFieldAlignmentAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMSVtorDispAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSVtorDispAttr &e, const TokenTree *) {
+void SerializeMSVtorDispAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSVtorDispAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.VtorDispMode())));
 }
 
-void SerializeMSStructAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSStructAttr &e, const TokenTree *) {
+void SerializeMSStructAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSStructAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMSP430InterruptAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSP430InterruptAttr &e, const TokenTree *) {
+void SerializeMSP430InterruptAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSP430InterruptAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMSNoVTableAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSNoVTableAttr &e, const TokenTree *) {
+void SerializeMSNoVTableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSNoVTableAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMSInheritanceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSInheritanceAttr &e, const TokenTree *) {
+void SerializeMSInheritanceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSInheritanceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal12(e.BestCase());
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.InheritanceModel())));
   b.setVal14(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeMSAllocatorAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSAllocatorAttr &e, const TokenTree *) {
+void SerializeMSAllocatorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSAllocatorAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMSABIAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSABIAttr &e, const TokenTree *) {
+void SerializeMSABIAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSABIAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeMIGServerRoutineAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MIGServerRoutineAttr &e, const TokenTree *) {
+void SerializeMIGServerRoutineAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MIGServerRoutineAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeM68kInterruptAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::M68kInterruptAttr &e, const TokenTree *) {
+void SerializeM68kInterruptAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::M68kInterruptAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeLocksExcludedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LocksExcludedAttr &e, const TokenTree *) {
+void SerializeLocksExcludedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LocksExcludedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeLockReturnedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LockReturnedAttr &e, const TokenTree *) {
+void SerializeLockReturnedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LockReturnedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
   b.setVal8(es.EntityId(e.Argument()));
 }
 
-void SerializeLifetimeBoundAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LifetimeBoundAttr &e, const TokenTree *) {
+void SerializeLifetimeBoundAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LifetimeBoundAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeLeafAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LeafAttr &e, const TokenTree *) {
+void SerializeLeafAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LeafAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeLayoutVersionAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LayoutVersionAttr &e, const TokenTree *) {
+void SerializeLayoutVersionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LayoutVersionAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeLTOVisibilityPublicAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LTOVisibilityPublicAttr &e, const TokenTree *) {
+void SerializeLTOVisibilityPublicAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LTOVisibilityPublicAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeInternalLinkageAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InternalLinkageAttr &e, const TokenTree *) {
+void SerializeInternalLinkageAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InternalLinkageAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeIntelOclBiccAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IntelOclBiccAttr &e, const TokenTree *) {
+void SerializeIntelOclBiccAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IntelOclBiccAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeInitPriorityAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InitPriorityAttr &e, const TokenTree *) {
+void SerializeInitPriorityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InitPriorityAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeInheritableParamAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InheritableParamAttr &e, const TokenTree *) {
+void SerializeInheritableParamAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InheritableParamAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableAttr(es, b, e, nullptr);
+  SerializeInheritableAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCarriesDependencyAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CarriesDependencyAttr &e, const TokenTree *) {
+void SerializeCarriesDependencyAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CarriesDependencyAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeCFConsumedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFConsumedAttr &e, const TokenTree *) {
+void SerializeCFConsumedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFConsumedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeAnnotateAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnnotateAttr &e, const TokenTree *) {
+void SerializeAnnotateAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnnotateAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
   auto v9 = e.Annotation();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeUseHandleAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UseHandleAttr &e, const TokenTree *) {
+void SerializeUseHandleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UseHandleAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
   auto v9 = e.HandleType();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeReleaseHandleAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReleaseHandleAttr &e, const TokenTree *) {
+void SerializeReleaseHandleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReleaseHandleAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
   auto v9 = e.HandleType();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializePassObjectSizeAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PassObjectSizeAttr &e, const TokenTree *) {
+void SerializePassObjectSizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PassObjectSizeAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   b.setVal12(e.IsDynamic());
 }
 
-void SerializeParameterABIAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ParameterABIAttr &e, const TokenTree *) {
+void SerializeParameterABIAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ParameterABIAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ABI())));
 }
 
-void SerializeSwiftIndirectResultAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftIndirectResultAttr &e, const TokenTree *) {
+void SerializeSwiftIndirectResultAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftIndirectResultAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeParameterABIAttr(es, b, e, nullptr);
+  SerializeParameterABIAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftErrorResultAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftErrorResultAttr &e, const TokenTree *) {
+void SerializeSwiftErrorResultAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftErrorResultAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeParameterABIAttr(es, b, e, nullptr);
+  SerializeParameterABIAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftContextAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftContextAttr &e, const TokenTree *) {
+void SerializeSwiftContextAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftContextAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeParameterABIAttr(es, b, e, nullptr);
+  SerializeParameterABIAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeSwiftAsyncContextAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncContextAttr &e, const TokenTree *) {
+void SerializeSwiftAsyncContextAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncContextAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeParameterABIAttr(es, b, e, nullptr);
+  SerializeParameterABIAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeOSConsumedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSConsumedAttr &e, const TokenTree *) {
+void SerializeOSConsumedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSConsumedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNonNullAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NonNullAttr &e, const TokenTree *) {
+void SerializeNonNullAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NonNullAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeNSConsumedAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSConsumedAttr &e, const TokenTree *) {
+void SerializeNSConsumedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSConsumedAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeInheritableParamAttr(es, b, e, nullptr);
+  SerializeInheritableParamAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeIFuncAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IFuncAttr &e, const TokenTree *) {
+void SerializeIFuncAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IFuncAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   auto v9 = e.Resolver();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
 }
 
-void SerializeCalledOnceAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CalledOnceAttr &e, const TokenTree *) {
+void SerializeCalledOnceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CalledOnceAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
 }
 
-void SerializeBuiltinAliasAttr(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BuiltinAliasAttr &e, const TokenTree *) {
+void SerializeBuiltinAliasAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BuiltinAliasAttr &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAttr(es, b, e, nullptr);
+  SerializeAttr(pf, es, b, e, nullptr);
   b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
-void SerializeType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type &e, const TokenTree *) {
+void SerializeType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -3870,11 +4280,12 @@ void SerializeType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta
   b.setVal227(e.IsWideCharacterType());
 }
 
-void SerializeTemplateTypeParmType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TemplateTypeParmType &e, const TokenTree *) {
+void SerializeTemplateTypeParmType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TemplateTypeParmType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   auto v229 = e.Declaration();
   if (v229) {
@@ -3887,11 +4298,12 @@ void SerializeTemplateTypeParmType(const EntityMapper &es, mx::ast::Type::Builde
   b.setVal231(e.IsSugared());
 }
 
-void SerializeTemplateSpecializationType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TemplateSpecializationType &e, const TokenTree *) {
+void SerializeTemplateSpecializationType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TemplateSpecializationType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   auto v229 = e.AliasedType();
   if (v229) {
@@ -3914,39 +4326,43 @@ void SerializeTemplateSpecializationType(const EntityMapper &es, mx::ast::Type::
   } while (false);
 }
 
-void SerializeTagType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TagType &e, const TokenTree *) {
+void SerializeTagType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TagType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Declaration()));
   b.setVal230(e.IsBeingDefined());
 }
 
-void SerializeRecordType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::RecordType &e, const TokenTree *) {
+void SerializeRecordType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::RecordType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTagType(es, b, e, nullptr);
+  SerializeTagType(pf, es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
   b.setVal231(e.HasConstFields());
   b.setVal232(e.IsSugared());
 }
 
-void SerializeEnumType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::EnumType &e, const TokenTree *) {
+void SerializeEnumType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::EnumType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTagType(es, b, e, nullptr);
+  SerializeTagType(pf, es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
   b.setVal231(e.IsSugared());
 }
 
-void SerializeSubstTemplateTypeParmType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::SubstTemplateTypeParmType &e, const TokenTree *) {
+void SerializeSubstTemplateTypeParmType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::SubstTemplateTypeParmType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.AssociatedDeclaration()));
   auto v234 = e.PackIndex();
@@ -3961,11 +4377,12 @@ void SerializeSubstTemplateTypeParmType(const EntityMapper &es, mx::ast::Type::B
   b.setVal231(e.IsSugared());
 }
 
-void SerializeSubstTemplateTypeParmPackType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::SubstTemplateTypeParmPackType &e, const TokenTree *) {
+void SerializeSubstTemplateTypeParmPackType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::SubstTemplateTypeParmPackType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.AssociatedDeclaration()));
   b.setVal230(e.Final());
@@ -3973,39 +4390,43 @@ void SerializeSubstTemplateTypeParmPackType(const EntityMapper &es, mx::ast::Typ
   b.setVal231(e.IsSugared());
 }
 
-void SerializeReferenceType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ReferenceType &e, const TokenTree *) {
+void SerializeReferenceType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ReferenceType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.PointeeTypeAsWritten()));
   b.setVal230(e.IsInnerReference());
   b.setVal231(e.IsSpelledAsLValue());
 }
 
-void SerializeRValueReferenceType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::RValueReferenceType &e, const TokenTree *) {
+void SerializeRValueReferenceType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::RValueReferenceType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeReferenceType(es, b, e, nullptr);
+  SerializeReferenceType(pf, es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
   b.setVal232(e.IsSugared());
 }
 
-void SerializeLValueReferenceType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::LValueReferenceType &e, const TokenTree *) {
+void SerializeLValueReferenceType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::LValueReferenceType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeReferenceType(es, b, e, nullptr);
+  SerializeReferenceType(pf, es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
   b.setVal232(e.IsSugared());
 }
 
-void SerializeQualifiedType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::QualifiedType &e, const TokenTree *) {
+void SerializeQualifiedType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::QualifiedType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.AddressSpace())));
   b.setVal228(es.EntityId(e.AtomicUnqualifiedType()));
   b.setVal230(e.HasAddressSpace());
@@ -4040,61 +4461,67 @@ void SerializeQualifiedType(const EntityMapper &es, mx::ast::Type::Builder b, co
   b.setVal264(e.MayBeNotDynamicClass());
 }
 
-void SerializePointerType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::PointerType &e, const TokenTree *) {
+void SerializePointerType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::PointerType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializePipeType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::PipeType &e, const TokenTree *) {
+void SerializePipeType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::PipeType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.ElementType()));
   b.setVal230(e.IsReadOnly());
   b.setVal231(e.IsSugared());
 }
 
-void SerializeParenType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ParenType &e, const TokenTree *) {
+void SerializeParenType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ParenType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.InnerType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializePackExpansionType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::PackExpansionType &e, const TokenTree *) {
+void SerializePackExpansionType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::PackExpansionType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.Pattern()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeObjCTypeParamType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCTypeParamType &e, const TokenTree *) {
+void SerializeObjCTypeParamType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCTypeParamType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.Declaration()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeObjCObjectType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCObjectType &e, const TokenTree *) {
+void SerializeObjCObjectType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCObjectType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.BaseType()));
   b.setVal235(es.EntityId(e.Interface()));
@@ -4140,19 +4567,21 @@ void SerializeObjCObjectType(const EntityMapper &es, mx::ast::Type::Builder b, c
   b.setVal266(es.EntityId(e.StripObjCKindOfTypeAndQualifiers()));
 }
 
-void SerializeObjCInterfaceType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCInterfaceType &e, const TokenTree *) {
+void SerializeObjCInterfaceType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCInterfaceType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeObjCObjectType(es, b, e, nullptr);
+  SerializeObjCObjectType(pf, es, b, e, nullptr);
   b.setVal267(es.EntityId(e.Declaration()));
 }
 
-void SerializeObjCObjectPointerType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCObjectPointerType &e, const TokenTree *) {
+void SerializeObjCObjectPointerType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCObjectPointerType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.InterfaceDeclaration()));
   b.setVal235(es.EntityId(e.InterfaceType()));
@@ -4204,11 +4633,12 @@ void SerializeObjCObjectPointerType(const EntityMapper &es, mx::ast::Type::Build
   } while (false);
 }
 
-void SerializeMemberPointerType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::MemberPointerType &e, const TokenTree *) {
+void SerializeMemberPointerType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::MemberPointerType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.Class()));
   b.setVal235(es.EntityId(e.MostRecentCXXRecordDeclaration()));
@@ -4217,50 +4647,55 @@ void SerializeMemberPointerType(const EntityMapper &es, mx::ast::Type::Builder b
   b.setVal232(e.IsSugared());
 }
 
-void SerializeMatrixType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::MatrixType &e, const TokenTree *) {
+void SerializeMatrixType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::MatrixType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.ElementType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeDependentSizedMatrixType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentSizedMatrixType &e, const TokenTree *) {
+void SerializeDependentSizedMatrixType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentSizedMatrixType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMatrixType(es, b, e, nullptr);
-  auto t235 = e.AttributeToken();
-  b.setVal235(es.EntityId(t235));
+  SerializeMatrixType(pf, es, b, e, nullptr);
+  auto et235 = es.EntityId(e.AttributeToken());
+  b.setVal235(et235);
   b.setVal236(es.EntityId(e.ColumnExpression()));
   b.setVal266(es.EntityId(e.RowExpression()));
 }
 
-void SerializeConstantMatrixType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ConstantMatrixType &e, const TokenTree *) {
+void SerializeConstantMatrixType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ConstantMatrixType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeMatrixType(es, b, e, nullptr);
+  SerializeMatrixType(pf, es, b, e, nullptr);
 }
 
-void SerializeMacroQualifiedType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::MacroQualifiedType &e, const TokenTree *) {
+void SerializeMacroQualifiedType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::MacroQualifiedType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.ModifiedType()));
   b.setVal235(es.EntityId(e.UnderlyingType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeInjectedClassNameType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::InjectedClassNameType &e, const TokenTree *) {
+void SerializeInjectedClassNameType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::InjectedClassNameType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.Declaration()));
   b.setVal235(es.EntityId(e.InjectedSpecializationType()));
@@ -4268,11 +4703,12 @@ void SerializeInjectedClassNameType(const EntityMapper &es, mx::ast::Type::Build
   b.setVal230(e.IsSugared());
 }
 
-void SerializeFunctionType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::FunctionType &e, const TokenTree *) {
+void SerializeFunctionType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::FunctionType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.CallConv())));
   b.setVal228(es.EntityId(e.CallResultType()));
   b.setVal230(e.CmseNSCallAttribute());
@@ -4284,11 +4720,12 @@ void SerializeFunctionType(const EntityMapper &es, mx::ast::Type::Builder b, con
   b.setVal240(e.IsVolatile());
 }
 
-void SerializeFunctionProtoType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::FunctionProtoType &e, const TokenTree *) {
+void SerializeFunctionProtoType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::FunctionProtoType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeFunctionType(es, b, e, nullptr);
+  SerializeFunctionType(pf, es, b, e, nullptr);
   auto v270 = e.CanThrow();
   if (v270) {
     b.setVal270(static_cast<unsigned char>(v270.value()));
@@ -4297,8 +4734,8 @@ void SerializeFunctionProtoType(const EntityMapper &es, mx::ast::Type::Builder b
     b.setVal241(false);
   }
   b.setVal235(es.EntityId(e.Desugar()));
-  auto t236 = e.EllipsisToken();
-  b.setVal236(es.EntityId(t236));
+  auto et236 = es.EntityId(e.EllipsisToken());
+  b.setVal236(et236);
   auto v266 = e.ExceptionSpecDeclaration();
   if (v266) {
     auto id266 = es.EntityId(v266.value());
@@ -4359,47 +4796,51 @@ void SerializeFunctionProtoType(const EntityMapper &es, mx::ast::Type::Builder b
   } while (false);
 }
 
-void SerializeFunctionNoProtoType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::FunctionNoProtoType &e, const TokenTree *) {
+void SerializeFunctionNoProtoType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::FunctionNoProtoType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeFunctionType(es, b, e, nullptr);
+  SerializeFunctionType(pf, es, b, e, nullptr);
   b.setVal235(es.EntityId(e.Desugar()));
   b.setVal241(e.IsSugared());
 }
 
-void SerializeDependentVectorType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentVectorType &e, const TokenTree *) {
+void SerializeDependentVectorType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentVectorType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
-  auto t229 = e.AttributeToken();
-  b.setVal229(es.EntityId(t229));
+  auto et229 = es.EntityId(e.AttributeToken());
+  b.setVal229(et229);
   b.setVal235(es.EntityId(e.ElementType()));
   b.setVal236(es.EntityId(e.SizeExpression()));
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.VectorKind())));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeDependentSizedExtVectorType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentSizedExtVectorType &e, const TokenTree *) {
+void SerializeDependentSizedExtVectorType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentSizedExtVectorType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
-  auto t229 = e.AttributeToken();
-  b.setVal229(es.EntityId(t229));
+  auto et229 = es.EntityId(e.AttributeToken());
+  b.setVal229(et229);
   b.setVal235(es.EntityId(e.ElementType()));
   b.setVal236(es.EntityId(e.SizeExpression()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeDependentBitIntType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentBitIntType &e, const TokenTree *) {
+void SerializeDependentBitIntType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentBitIntType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.NumBitsExpression()));
   b.setVal230(e.IsSigned());
@@ -4407,23 +4848,25 @@ void SerializeDependentBitIntType(const EntityMapper &es, mx::ast::Type::Builder
   b.setVal232(e.IsUnsigned());
 }
 
-void SerializeDependentAddressSpaceType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentAddressSpaceType &e, const TokenTree *) {
+void SerializeDependentAddressSpaceType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentAddressSpaceType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.AddressSpaceExpression()));
-  auto t235 = e.AttributeToken();
-  b.setVal235(es.EntityId(t235));
+  auto et235 = es.EntityId(e.AttributeToken());
+  b.setVal235(et235);
   b.setVal230(e.IsSugared());
 }
 
-void SerializeDeducedType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DeducedType &e, const TokenTree *) {
+void SerializeDeducedType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DeducedType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   auto v229 = e.ResolvedType();
   if (v229) {
@@ -4436,18 +4879,20 @@ void SerializeDeducedType(const EntityMapper &es, mx::ast::Type::Builder b, cons
   b.setVal231(e.IsSugared());
 }
 
-void SerializeDeducedTemplateSpecializationType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DeducedTemplateSpecializationType &e, const TokenTree *) {
+void SerializeDeducedTemplateSpecializationType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DeducedTemplateSpecializationType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeducedType(es, b, e, nullptr);
+  SerializeDeducedType(pf, es, b, e, nullptr);
 }
 
-void SerializeAutoType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AutoType &e, const TokenTree *) {
+void SerializeAutoType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AutoType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeducedType(es, b, e, nullptr);
+  SerializeDeducedType(pf, es, b, e, nullptr);
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.Keyword())));
   do {
     auto v233 = e.TypeConstraintArguments();
@@ -4470,32 +4915,35 @@ void SerializeAutoType(const EntityMapper &es, mx::ast::Type::Builder b, const p
   b.setVal239(e.IsGNUAutoType());
 }
 
-void SerializeDecltypeType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DecltypeType &e, const TokenTree *) {
+void SerializeDecltypeType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DecltypeType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.UnderlyingExpression()));
   b.setVal235(es.EntityId(e.UnderlyingType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeComplexType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ComplexType &e, const TokenTree *) {
+void SerializeComplexType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ComplexType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.ElementType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeBuiltinType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::BuiltinType &e, const TokenTree *) {
+void SerializeBuiltinType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::BuiltinType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.BuiltinKind())));
   b.setVal230(e.IsFloatingPoint());
@@ -4506,42 +4954,46 @@ void SerializeBuiltinType(const EntityMapper &es, mx::ast::Type::Builder b, cons
   b.setVal240(e.IsUnsignedInteger());
 }
 
-void SerializeBlockPointerType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::BlockPointerType &e, const TokenTree *) {
+void SerializeBlockPointerType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::BlockPointerType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeBitIntType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::BitIntType &e, const TokenTree *) {
+void SerializeBitIntType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::BitIntType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal230(e.IsSigned());
   b.setVal231(e.IsSugared());
   b.setVal232(e.IsUnsigned());
 }
 
-void SerializeBTFTagAttributedType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::BTFTagAttributedType &e, const TokenTree *) {
+void SerializeBTFTagAttributedType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::BTFTagAttributedType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.Attribute()));
   b.setVal235(es.EntityId(e.WrappedType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeAttributedType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AttributedType &e, const TokenTree *) {
+void SerializeAttributedType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AttributedType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   auto v229 = e.Attribute();
   if (v229) {
@@ -4567,30 +5019,33 @@ void SerializeAttributedType(const EntityMapper &es, mx::ast::Type::Builder b, c
   b.setVal240(e.IsSugared());
 }
 
-void SerializeAtomicType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AtomicType &e, const TokenTree *) {
+void SerializeAtomicType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AtomicType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.ValueType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeArrayType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ArrayType &e, const TokenTree *) {
+void SerializeArrayType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ArrayType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.ElementType()));
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.SizeModifier())));
 }
 
-void SerializeVariableArrayType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::VariableArrayType &e, const TokenTree *) {
+void SerializeVariableArrayType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::VariableArrayType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeArrayType(es, b, e, nullptr);
+  SerializeArrayType(pf, es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
   if (auto r235 = e.BracketsRange(); auto rs235 = r235.Size()) {
     b.setVal235(es.EntityId(r235[0]));
@@ -4599,28 +5054,30 @@ void SerializeVariableArrayType(const EntityMapper &es, mx::ast::Type::Builder b
     b.setVal235(0);
     b.setVal236(0);
   }
-  auto t266 = e.LBracketToken();
-  b.setVal266(es.EntityId(t266));
-  auto t267 = e.RBracketToken();
-  b.setVal267(es.EntityId(t267));
+  auto et266 = es.EntityId(e.LBracketToken());
+  b.setVal266(et266);
+  auto et267 = es.EntityId(e.RBracketToken());
+  b.setVal267(et267);
   b.setVal272(es.EntityId(e.SizeExpression()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeIncompleteArrayType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::IncompleteArrayType &e, const TokenTree *) {
+void SerializeIncompleteArrayType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::IncompleteArrayType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeArrayType(es, b, e, nullptr);
+  SerializeArrayType(pf, es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeDependentSizedArrayType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentSizedArrayType &e, const TokenTree *) {
+void SerializeDependentSizedArrayType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentSizedArrayType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeArrayType(es, b, e, nullptr);
+  SerializeArrayType(pf, es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
   if (auto r235 = e.BracketsRange(); auto rs235 = r235.Size()) {
     b.setVal235(es.EntityId(r235[0]));
@@ -4629,19 +5086,20 @@ void SerializeDependentSizedArrayType(const EntityMapper &es, mx::ast::Type::Bui
     b.setVal235(0);
     b.setVal236(0);
   }
-  auto t266 = e.LBracketToken();
-  b.setVal266(es.EntityId(t266));
-  auto t267 = e.RBracketToken();
-  b.setVal267(es.EntityId(t267));
+  auto et266 = es.EntityId(e.LBracketToken());
+  b.setVal266(et266);
+  auto et267 = es.EntityId(e.RBracketToken());
+  b.setVal267(et267);
   b.setVal272(es.EntityId(e.SizeExpression()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeConstantArrayType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ConstantArrayType &e, const TokenTree *) {
+void SerializeConstantArrayType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ConstantArrayType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeArrayType(es, b, e, nullptr);
+  SerializeArrayType(pf, es, b, e, nullptr);
   b.setVal229(es.EntityId(e.Desugar()));
   auto v235 = e.SizeExpression();
   if (v235) {
@@ -4653,37 +5111,41 @@ void SerializeConstantArrayType(const EntityMapper &es, mx::ast::Type::Builder b
   b.setVal230(e.IsSugared());
 }
 
-void SerializeAdjustedType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AdjustedType &e, const TokenTree *) {
+void SerializeAdjustedType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::AdjustedType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.ResolvedType()));
   b.setVal235(es.EntityId(e.OriginalType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeDecayedType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DecayedType &e, const TokenTree *) {
+void SerializeDecayedType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DecayedType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeAdjustedType(es, b, e, nullptr);
+  SerializeAdjustedType(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeWithKeyword(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TypeWithKeyword &e, const TokenTree *) {
+void SerializeTypeWithKeyword(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TypeWithKeyword &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.Keyword())));
 }
 
-void SerializeElaboratedType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ElaboratedType &e, const TokenTree *) {
+void SerializeElaboratedType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ElaboratedType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeWithKeyword(es, b, e, nullptr);
+  SerializeTypeWithKeyword(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.NamedType()));
   auto v235 = e.OwnedTagDeclaration();
@@ -4696,11 +5158,12 @@ void SerializeElaboratedType(const EntityMapper &es, mx::ast::Type::Builder b, c
   b.setVal230(e.IsSugared());
 }
 
-void SerializeDependentTemplateSpecializationType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentTemplateSpecializationType &e, const TokenTree *) {
+void SerializeDependentTemplateSpecializationType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentTemplateSpecializationType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeWithKeyword(es, b, e, nullptr);
+  SerializeTypeWithKeyword(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal230(e.IsSugared());
   do {
@@ -4714,38 +5177,42 @@ void SerializeDependentTemplateSpecializationType(const EntityMapper &es, mx::as
   } while (false);
 }
 
-void SerializeDependentNameType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentNameType &e, const TokenTree *) {
+void SerializeDependentNameType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::DependentNameType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeWithKeyword(es, b, e, nullptr);
+  SerializeTypeWithKeyword(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeVectorType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::VectorType &e, const TokenTree *) {
+void SerializeVectorType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::VectorType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.ElementType()));
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.VectorKind())));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeExtVectorType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ExtVectorType &e, const TokenTree *) {
+void SerializeExtVectorType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::ExtVectorType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeVectorType(es, b, e, nullptr);
+  SerializeVectorType(pf, es, b, e, nullptr);
 }
 
-void SerializeUsingType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::UsingType &e, const TokenTree *) {
+void SerializeUsingType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::UsingType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.FoundDeclaration()));
   b.setVal235(es.EntityId(e.UnderlyingType()));
@@ -4753,21 +5220,23 @@ void SerializeUsingType(const EntityMapper &es, mx::ast::Type::Builder b, const 
   b.setVal231(e.TypeMatchesDeclaration());
 }
 
-void SerializeUnresolvedUsingType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::UnresolvedUsingType &e, const TokenTree *) {
+void SerializeUnresolvedUsingType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::UnresolvedUsingType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.Declaration()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeUnaryTransformType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::UnaryTransformType &e, const TokenTree *) {
+void SerializeUnaryTransformType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::UnaryTransformType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.BaseType()));
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.UTTKind())));
@@ -4775,40 +5244,43 @@ void SerializeUnaryTransformType(const EntityMapper &es, mx::ast::Type::Builder 
   b.setVal230(e.IsSugared());
 }
 
-void SerializeTypedefType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TypedefType &e, const TokenTree *) {
+void SerializeTypedefType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TypedefType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal229(es.EntityId(e.Declaration()));
   b.setVal230(e.IsSugared());
   b.setVal231(e.TypeMatchesDeclaration());
 }
 
-void SerializeTypeOfType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TypeOfType &e, const TokenTree *) {
+void SerializeTypeOfType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TypeOfType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.TypeKind())));
   b.setVal229(es.EntityId(e.UnmodifiedType()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeTypeOfExprType(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TypeOfExprType &e, const TokenTree *) {
+void SerializeTypeOfExprType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::TypeOfExprType &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeType(es, b, e, nullptr);
+  SerializeType(pf, es, b, e, nullptr);
   b.setVal228(es.EntityId(e.Desugar()));
   b.setVal237(static_cast<unsigned char>(mx::FromPasta(e.TypeKind())));
   b.setVal229(es.EntityId(e.UnderlyingExpression()));
   b.setVal230(e.IsSugared());
 }
 
-void SerializeStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Stmt &e, const TokenTree *) {
+void SerializeStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Stmt &e, const TokenTree *) {
   b.setVal0(es.ParentDeclId(e));
   b.setVal1(es.ParentStmtId(e));
   if (auto r2 = ReferencedDecl(e)) {
@@ -4835,40 +5307,40 @@ void SerializeStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal8(es.EntityId(e.StripLabelLikeStatements()));
 }
 
-void SerializeSEHTryStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHTryStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeSEHTryStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHTryStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.ExceptHandler()));
   b.setVal10(es.EntityId(e.FinallyHandler()));
   b.setVal11(es.EntityId(e.Handler()));
   b.setVal12(e.IsCXXTry());
   b.setVal13(es.EntityId(e.TryBlock()));
-  auto t14 = e.TryToken();
-  b.setVal14(es.EntityId(t14));
+  auto et14 = es.EntityId(e.TryToken());
+  b.setVal14(et14);
 }
 
-void SerializeSEHLeaveStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHLeaveStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.LeaveToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeSEHLeaveStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHLeaveStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.LeaveToken());
+  b.setVal9(et9);
 }
 
-void SerializeSEHFinallyStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHFinallyStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeSEHFinallyStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHFinallyStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Block()));
-  auto t10 = e.FinallyToken();
-  b.setVal10(es.EntityId(t10));
+  auto et10 = es.EntityId(e.FinallyToken());
+  b.setVal10(et10);
 }
 
-void SerializeSEHExceptStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHExceptStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeSEHExceptStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHExceptStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Block()));
-  auto t10 = e.ExceptToken();
-  b.setVal10(es.EntityId(t10));
+  auto et10 = es.EntityId(e.ExceptToken());
+  b.setVal10(et10);
   b.setVal11(es.EntityId(e.FilterExpression()));
 }
 
-void SerializeReturnStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ReturnStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeReturnStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ReturnStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   auto v9 = e.NRVOCandidate();
   if (v9) {
     auto id9 = es.EntityId(v9.value());
@@ -4883,32 +5355,32 @@ void SerializeReturnStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   } else {
     b.setVal10(mx::kInvalidEntityId);
   }
-  auto t11 = e.ReturnToken();
-  b.setVal11(es.EntityId(t11));
+  auto et11 = es.EntityId(e.ReturnToken());
+  b.setVal11(et11);
 }
 
-void SerializeObjCForCollectionStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCForCollectionStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeObjCForCollectionStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCForCollectionStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   b.setVal10(es.EntityId(e.Collection()));
   b.setVal11(es.EntityId(e.Element()));
-  auto t13 = e.ForToken();
-  b.setVal13(es.EntityId(t13));
-  auto t14 = e.RParenToken();
-  b.setVal14(es.EntityId(t14));
+  auto et13 = es.EntityId(e.ForToken());
+  b.setVal13(et13);
+  auto et14 = es.EntityId(e.RParenToken());
+  b.setVal14(et14);
 }
 
-void SerializeObjCAutoreleasePoolStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAutoreleasePoolStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.AtToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeObjCAutoreleasePoolStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAutoreleasePoolStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.AtToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.SubStatement()));
 }
 
-void SerializeObjCAtTryStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtTryStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.AtTryToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeObjCAtTryStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtTryStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.AtTryToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.FinallyStatement()));
   b.setVal11(es.EntityId(e.TryBody()));
   do {
@@ -4922,41 +5394,41 @@ void SerializeObjCAtTryStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   } while (false);
 }
 
-void SerializeObjCAtThrowStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtThrowStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeObjCAtThrowStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtThrowStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.ThrowExpression()));
-  auto t10 = e.ThrowToken();
-  b.setVal10(es.EntityId(t10));
+  auto et10 = es.EntityId(e.ThrowToken());
+  b.setVal10(et10);
 }
 
-void SerializeObjCAtSynchronizedStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtSynchronizedStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.AtSynchronizedToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeObjCAtSynchronizedStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtSynchronizedStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.AtSynchronizedToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.SynchBody()));
   b.setVal11(es.EntityId(e.SynchExpression()));
 }
 
-void SerializeObjCAtFinallyStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtFinallyStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.AtFinallyToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeObjCAtFinallyStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtFinallyStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.AtFinallyToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.FinallyBody()));
 }
 
-void SerializeObjCAtCatchStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtCatchStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.AtCatchToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeObjCAtCatchStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtCatchStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.AtCatchToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.CatchBody()));
   b.setVal11(es.EntityId(e.CatchParameterDeclaration()));
-  auto t13 = e.RParenToken();
-  b.setVal13(es.EntityId(t13));
+  auto et13 = es.EntityId(e.RParenToken());
+  b.setVal13(et13);
   b.setVal12(e.HasEllipsis());
 }
 
-void SerializeOMPExecutableDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPExecutableDirective &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeOMPExecutableDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPExecutableDirective &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.AssociatedStatement()));
   b.setVal10(es.EntityId(e.InnermostCapturedStatement()));
   b.setVal11(es.EntityId(e.RawStatement()));
@@ -4965,38 +5437,38 @@ void SerializeOMPExecutableDirective(const EntityMapper &es, mx::ast::Stmt::Buil
   b.setVal16(e.IsStandaloneDirective());
 }
 
-void SerializeOMPErrorDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPErrorDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPErrorDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPErrorDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPDispatchDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDispatchDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
-  auto t14 = e.TargetCallToken();
-  b.setVal14(es.EntityId(t14));
+void SerializeOMPDispatchDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDispatchDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
+  auto et14 = es.EntityId(e.TargetCallToken());
+  b.setVal14(et14);
 }
 
-void SerializeOMPDepobjDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDepobjDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPDepobjDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDepobjDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPCriticalDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCriticalDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPCriticalDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCriticalDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPCancellationPointDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCancellationPointDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPCancellationPointDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCancellationPointDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPCancelDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCancelDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPCancelDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCancelDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPBarrierDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPBarrierDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPBarrierDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPBarrierDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPAtomicDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPAtomicDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPAtomicDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPAtomicDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.ConditionExpression()));
   b.setVal17(es.EntityId(e.D()));
   b.setVal18(es.EntityId(e.Expression()));
@@ -5009,136 +5481,136 @@ void SerializeOMPAtomicDirective(const EntityMapper &es, mx::ast::Stmt::Builder 
   b.setVal25(e.IsXLHSInRHSPart());
 }
 
-void SerializeOMPTeamsDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTeamsDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTaskyieldDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskyieldDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTaskyieldDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskyieldDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTaskwaitDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskwaitDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTaskwaitDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskwaitDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTaskgroupDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskgroupDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTaskgroupDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskgroupDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.ReductionReference()));
 }
 
-void SerializeOMPTaskDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTaskDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPTargetUpdateDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetUpdateDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTargetUpdateDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetUpdateDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetTeamsDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTargetTeamsDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetParallelDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTargetParallelDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPTargetExitDataDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetExitDataDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTargetExitDataDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetExitDataDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetEnterDataDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetEnterDataDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTargetEnterDataDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetEnterDataDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTargetDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetDataDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetDataDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPTargetDataDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetDataDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPSingleDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSingleDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPSingleDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSingleDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPSectionsDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSectionsDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPSectionsDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSectionsDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPSectionDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSectionDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPSectionDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSectionDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPScanDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPScanDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPScanDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPScanDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPParallelSectionsDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelSectionsDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
-  b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
-  b.setVal23(e.HasCancel());
-}
-
-void SerializeOMPParallelMasterDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
-  b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
-}
-
-void SerializeOMPParallelMaskedDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
-  b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
-}
-
-void SerializeOMPParallelDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPParallelSectionsDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelSectionsDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPOrderedDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPOrderedDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPParallelMasterDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
+  b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
 }
 
-void SerializeOMPMetaDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMetaDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPParallelMaskedDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
+  b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
+}
+
+void SerializeOMPParallelDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
+  b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
+  b.setVal23(e.HasCancel());
+}
+
+void SerializeOMPOrderedDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPOrderedDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
+}
+
+void SerializeOMPMetaDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMetaDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.IfStatement()));
 }
 
-void SerializeOMPMasterDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPMasterDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPMaskedDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPMaskedDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPLoopBasedDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopBasedDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPLoopBasedDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopBasedDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPLoopTransformationDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopTransformationDirective &e, const TokenTree *) {
-  SerializeOMPLoopBasedDirective(es, b, e, nullptr);
+void SerializeOMPLoopTransformationDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopTransformationDirective &e, const TokenTree *) {
+  SerializeOMPLoopBasedDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.PreInitializers()));
   b.setVal17(es.EntityId(e.TransformedStatement()));
 }
 
-void SerializeOMPUnrollDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPUnrollDirective &e, const TokenTree *) {
-  SerializeOMPLoopTransformationDirective(es, b, e, nullptr);
+void SerializeOMPUnrollDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPUnrollDirective &e, const TokenTree *) {
+  SerializeOMPLoopTransformationDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTileDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTileDirective &e, const TokenTree *) {
-  SerializeOMPLoopTransformationDirective(es, b, e, nullptr);
+void SerializeOMPTileDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTileDirective &e, const TokenTree *) {
+  SerializeOMPLoopTransformationDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopBasedDirective(es, b, e, nullptr);
+void SerializeOMPLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopBasedDirective(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Counters();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -5242,197 +5714,197 @@ void SerializeOMPLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b,
   } while (false);
 }
 
-void SerializeOMPGenericLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPGenericLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPGenericLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPForSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPForSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPForSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPForDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPForDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPForDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPDistributeSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPDistributeSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPDistributeParallelForSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeParallelForSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPDistributeParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeParallelForSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPDistributeParallelForDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeParallelForDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPDistributeParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeParallelForDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPDistributeDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPDistributeDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTeamsGenericLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsGenericLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTeamsGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsGenericLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTeamsDistributeSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTeamsDistributeSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTeamsDistributeParallelForSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeParallelForSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTeamsDistributeParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeParallelForSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTeamsDistributeParallelForDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeParallelForDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTeamsDistributeParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeParallelForDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPTeamsDistributeDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTeamsDistributeDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTaskLoopSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskLoopSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskLoopSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTaskLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPTargetTeamsGenericLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsGenericLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetTeamsGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsGenericLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetTeamsDistributeSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetTeamsDistributeSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetTeamsDistributeParallelForSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeParallelForSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetTeamsDistributeParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeParallelForSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetTeamsDistributeParallelForDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeParallelForDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetTeamsDistributeParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeParallelForDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPTargetTeamsDistributeDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetTeamsDistributeDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetParallelGenericLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelGenericLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetParallelGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelGenericLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetParallelForSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelForSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelForSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPTargetParallelForDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelForDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPTargetParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelForDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPParallelMasterTaskLoopSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterTaskLoopSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPParallelMasterTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterTaskLoopSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPParallelMasterTaskLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterTaskLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPParallelMasterTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterTaskLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPParallelMaskedTaskLoopSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedTaskLoopSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPParallelMaskedTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedTaskLoopSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPParallelMaskedTaskLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedTaskLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPParallelMaskedTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedTaskLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPParallelGenericLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelGenericLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPParallelGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelGenericLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPParallelForSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelForSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelForSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPParallelForDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelForDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelForDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPMasterTaskLoopSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterTaskLoopSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPMasterTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterTaskLoopSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPMasterTaskLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterTaskLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPMasterTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterTaskLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPMaskedTaskLoopSimdDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedTaskLoopSimdDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPMaskedTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedTaskLoopSimdDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPMaskedTaskLoopDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedTaskLoopDirective &e, const TokenTree *) {
-  SerializeOMPLoopDirective(es, b, e, nullptr);
+void SerializeOMPMaskedTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedTaskLoopDirective &e, const TokenTree *) {
+  SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
-void SerializeOMPInteropDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPInteropDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPInteropDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPInteropDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPFlushDirective(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPFlushDirective &e, const TokenTree *) {
-  SerializeOMPExecutableDirective(es, b, e, nullptr);
+void SerializeOMPFlushDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPFlushDirective &e, const TokenTree *) {
+  SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPCanonicalLoop(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCanonicalLoop &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeOMPCanonicalLoop(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCanonicalLoop &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.DistanceFunc()));
   b.setVal10(es.EntityId(e.LoopStatement()));
   b.setVal11(es.EntityId(e.LoopVariableFunc()));
   b.setVal13(es.EntityId(e.LoopVariableReference()));
 }
 
-void SerializeNullStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::NullStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.SemiToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeNullStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::NullStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.SemiToken());
+  b.setVal9(et9);
   b.setVal12(e.HasLeadingEmptyMacro());
 }
 
-void SerializeMSDependentExistsStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSDependentExistsStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.KeywordToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeMSDependentExistsStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSDependentExistsStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.KeywordToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.SubStatement()));
   b.setVal12(e.IsIfExists());
   b.setVal16(e.IsIfNotExists());
 }
 
-void SerializeIndirectGotoStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IndirectGotoStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeIndirectGotoStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IndirectGotoStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   auto v9 = e.ConstantTarget();
   if (v9) {
     auto id9 = es.EntityId(v9.value());
@@ -5440,15 +5912,15 @@ void SerializeIndirectGotoStmt(const EntityMapper &es, mx::ast::Stmt::Builder b,
   } else {
     b.setVal9(mx::kInvalidEntityId);
   }
-  auto t10 = e.GotoToken();
-  b.setVal10(es.EntityId(t10));
-  auto t11 = e.StarToken();
-  b.setVal11(es.EntityId(t11));
+  auto et10 = es.EntityId(e.GotoToken());
+  b.setVal10(et10);
+  auto et11 = es.EntityId(e.StarToken());
+  b.setVal11(et11);
   b.setVal13(es.EntityId(e.Target()));
 }
 
-void SerializeIfStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IfStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeIfStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IfStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Condition()));
   auto v10 = e.ConditionVariable();
   if (v10) {
@@ -5471,10 +5943,10 @@ void SerializeIfStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   } else {
     b.setVal13(mx::kInvalidEntityId);
   }
-  auto t14 = e.ElseToken();
-  b.setVal14(es.EntityId(t14));
-  auto t17 = e.IfToken();
-  b.setVal17(es.EntityId(t17));
+  auto et14 = es.EntityId(e.ElseToken());
+  b.setVal14(et14);
+  auto et17 = es.EntityId(e.IfToken());
+  b.setVal17(et17);
   auto v18 = e.Initializer();
   if (v18) {
     auto id18 = es.EntityId(v18.value());
@@ -5482,8 +5954,8 @@ void SerializeIfStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   } else {
     b.setVal18(mx::kInvalidEntityId);
   }
-  auto t19 = e.LParenToken();
-  b.setVal19(es.EntityId(t19));
+  auto et19 = es.EntityId(e.LParenToken());
+  b.setVal19(et19);
   auto v20 = e.NondiscardedCase();
   if (v20) {
     auto id20 = es.EntityId(v20.value());
@@ -5491,8 +5963,8 @@ void SerializeIfStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   } else {
     b.setVal20(mx::kInvalidEntityId);
   }
-  auto t21 = e.RParenToken();
-  b.setVal21(es.EntityId(t21));
+  auto et21 = es.EntityId(e.RParenToken());
+  b.setVal21(et21);
   b.setVal56(static_cast<unsigned char>(mx::FromPasta(e.StatementKind())));
   b.setVal22(es.EntityId(e.Then()));
   b.setVal12(e.HasElseStorage());
@@ -5505,17 +5977,17 @@ void SerializeIfStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   b.setVal59(e.IsObjCAvailabilityCheck());
 }
 
-void SerializeGotoStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GotoStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.GotoToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeGotoStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GotoStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.GotoToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.Label()));
-  auto t11 = e.LabelToken();
-  b.setVal11(es.EntityId(t11));
+  auto et11 = es.EntityId(e.LabelToken());
+  b.setVal11(et11);
 }
 
-void SerializeForStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ForStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeForStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ForStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   auto v10 = e.Condition();
   if (v10) {
@@ -5538,8 +6010,8 @@ void SerializeForStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
   } else {
     b.setVal13(mx::kInvalidEntityId);
   }
-  auto t14 = e.ForToken();
-  b.setVal14(es.EntityId(t14));
+  auto et14 = es.EntityId(e.ForToken());
+  b.setVal14(et14);
   auto v17 = e.Increment();
   if (v17) {
     auto id17 = es.EntityId(v17.value());
@@ -5554,26 +6026,26 @@ void SerializeForStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
   } else {
     b.setVal18(mx::kInvalidEntityId);
   }
-  auto t19 = e.LParenToken();
-  b.setVal19(es.EntityId(t19));
-  auto t20 = e.RParenToken();
-  b.setVal20(es.EntityId(t20));
+  auto et19 = es.EntityId(e.LParenToken());
+  b.setVal19(et19);
+  auto et20 = es.EntityId(e.RParenToken());
+  b.setVal20(et20);
 }
 
-void SerializeDoStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DoStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeDoStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DoStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   b.setVal10(es.EntityId(e.Condition()));
-  auto t11 = e.DoToken();
-  b.setVal11(es.EntityId(t11));
-  auto t13 = e.RParenToken();
-  b.setVal13(es.EntityId(t13));
-  auto t14 = e.WhileToken();
-  b.setVal14(es.EntityId(t14));
+  auto et11 = es.EntityId(e.DoToken());
+  b.setVal11(et11);
+  auto et13 = es.EntityId(e.RParenToken());
+  b.setVal13(et13);
+  auto et14 = es.EntityId(e.WhileToken());
+  b.setVal14(et14);
 }
 
-void SerializeDeclStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DeclStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeDeclStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DeclStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Declarations();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -5593,8 +6065,8 @@ void SerializeDeclStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const p
   b.setVal12(e.IsSingleDeclaration());
 }
 
-void SerializeCoroutineBodyStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoroutineBodyStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeCoroutineBodyStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoroutineBodyStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Allocate()));
   b.setVal10(es.EntityId(e.Body()));
   b.setVal11(es.EntityId(e.Deallocate()));
@@ -5620,27 +6092,27 @@ void SerializeCoroutineBodyStmt(const EntityMapper &es, mx::ast::Stmt::Builder b
   b.setVal12(e.HasDependentPromiseType());
 }
 
-void SerializeCoreturnStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoreturnStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.KeywordToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeCoreturnStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoreturnStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.KeywordToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.Operand()));
   b.setVal11(es.EntityId(e.PromiseCall()));
   b.setVal12(e.IsImplicit());
 }
 
-void SerializeContinueStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ContinueStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.ContinueToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeContinueStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ContinueStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.ContinueToken());
+  b.setVal9(et9);
 }
 
-void SerializeCompoundStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.LeftBraceToken();
-  b.setVal9(es.EntityId(t9));
-  auto t10 = e.RightBraceToken();
-  b.setVal10(es.EntityId(t10));
+void SerializeCompoundStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.LeftBraceToken());
+  b.setVal9(et9);
+  auto et10 = es.EntityId(e.RightBraceToken());
+  b.setVal10(et10);
   auto v11 = e.StatementExpressionResult();
   if (v11) {
     auto id11 = es.EntityId(v11.value());
@@ -5651,19 +6123,19 @@ void SerializeCompoundStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, con
   b.setVal12(e.HasStoredFPFeatures());
 }
 
-void SerializeCapturedStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CapturedStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeCapturedStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CapturedStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.CapturedDeclaration()));
   b.setVal10(es.EntityId(e.CapturedRecordDeclaration()));
   b.setVal56(static_cast<unsigned char>(mx::FromPasta(e.CapturedRegionKind())));
   b.setVal11(es.EntityId(e.CapturedStatement()));
 }
 
-void SerializeCXXTryStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTryStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeCXXTryStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTryStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.TryBlock()));
-  auto t10 = e.TryToken();
-  b.setVal10(es.EntityId(t10));
+  auto et10 = es.EntityId(e.TryToken());
+  b.setVal10(et10);
   do {
     auto v15 = e.Handlers();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -5675,18 +6147,18 @@ void SerializeCXXTryStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   } while (false);
 }
 
-void SerializeCXXForRangeStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXForRangeStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeCXXForRangeStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXForRangeStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.BeginStatement()));
   b.setVal10(es.EntityId(e.Body()));
-  auto t11 = e.CoawaitToken();
-  b.setVal11(es.EntityId(t11));
-  auto t13 = e.ColonToken();
-  b.setVal13(es.EntityId(t13));
+  auto et11 = es.EntityId(e.CoawaitToken());
+  b.setVal11(et11);
+  auto et13 = es.EntityId(e.ColonToken());
+  b.setVal13(et13);
   b.setVal14(es.EntityId(e.Condition()));
   b.setVal17(es.EntityId(e.EndStatement()));
-  auto t18 = e.ForToken();
-  b.setVal18(es.EntityId(t18));
+  auto et18 = es.EntityId(e.ForToken());
+  b.setVal18(et18);
   b.setVal19(es.EntityId(e.Increment()));
   auto v20 = e.Initializer();
   if (v20) {
@@ -5697,16 +6169,16 @@ void SerializeCXXForRangeStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, 
   }
   b.setVal21(es.EntityId(e.LoopVariableStatement()));
   b.setVal22(es.EntityId(e.LoopVariable()));
-  auto t30 = e.RParenToken();
-  b.setVal30(es.EntityId(t30));
+  auto et30 = es.EntityId(e.RParenToken());
+  b.setVal30(et30);
   b.setVal31(es.EntityId(e.RangeInitializer()));
   b.setVal32(es.EntityId(e.RangeStatement()));
 }
 
-void SerializeCXXCatchStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXCatchStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.CatchToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeCXXCatchStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXCatchStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.CatchToken());
+  b.setVal9(et9);
   b.setVal10(es.EntityId(e.CaughtType()));
   auto v11 = e.ExceptionDeclaration();
   if (v11) {
@@ -5718,17 +6190,17 @@ void SerializeCXXCatchStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, con
   b.setVal13(es.EntityId(e.HandlerBlock()));
 }
 
-void SerializeBreakStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BreakStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.BreakToken();
-  b.setVal9(es.EntityId(t9));
+void SerializeBreakStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BreakStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.BreakToken());
+  b.setVal9(et9);
 }
 
-void SerializeAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AsmStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AsmStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal60(e.GenerateAssemblyString());
-  auto t9 = e.AssemblyToken();
-  b.setVal9(es.EntityId(t9));
+  auto et9 = es.EntityId(e.AssemblyToken());
+  b.setVal9(et9);
   do {
     auto v15 = e.Inputs();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -5799,8 +6271,8 @@ void SerializeAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pa
   } while (false);
 }
 
-void SerializeMSAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSAsmStmt &e, const TokenTree *) {
-  SerializeAsmStmt(es, b, e, nullptr);
+void SerializeMSAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSAsmStmt &e, const TokenTree *) {
+  SerializeAsmStmt(pf, es, b, e, nullptr);
   do {
     auto v64 = e.AllConstraints();
     auto sv64 = b.initVal64(static_cast<unsigned>(v64.size()));
@@ -5823,16 +6295,16 @@ void SerializeMSAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const 
   auto v65 = e.AssemblyString();
   std::string s65(v65.data(), v65.size());
   b.setVal65(s65);
-  auto t10 = e.LBraceToken();
-  b.setVal10(es.EntityId(t10));
+  auto et10 = es.EntityId(e.LBraceToken());
+  b.setVal10(et10);
   b.setVal23(e.HasBraces());
 }
 
-void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GCCAsmStmt &e, const TokenTree *) {
-  SerializeAsmStmt(es, b, e, nullptr);
+void SerializeGCCAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GCCAsmStmt &e, const TokenTree *) {
+  SerializeAsmStmt(pf, es, b, e, nullptr);
   b.setVal10(es.EntityId(e.AssemblyString()));
-  auto t11 = e.RParenToken();
-  b.setVal11(es.EntityId(t11));
+  auto et11 = es.EntityId(e.RParenToken());
+  b.setVal11(et11);
   b.setVal23(e.IsAssemblyGoto());
   do {
     auto v29 = e.Labels();
@@ -5911,8 +6383,8 @@ void SerializeGCCAsmStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   } while (false);
 }
 
-void SerializeWhileStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::WhileStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeWhileStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::WhileStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   b.setVal10(es.EntityId(e.Condition()));
   auto v11 = e.ConditionVariable();
@@ -5929,17 +6401,17 @@ void SerializeWhileStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const 
   } else {
     b.setVal13(mx::kInvalidEntityId);
   }
-  auto t14 = e.LParenToken();
-  b.setVal14(es.EntityId(t14));
-  auto t17 = e.RParenToken();
-  b.setVal17(es.EntityId(t17));
-  auto t18 = e.WhileToken();
-  b.setVal18(es.EntityId(t18));
+  auto et14 = es.EntityId(e.LParenToken());
+  b.setVal14(et14);
+  auto et17 = es.EntityId(e.RParenToken());
+  b.setVal17(et17);
+  auto et18 = es.EntityId(e.WhileToken());
+  b.setVal18(et18);
   b.setVal12(e.HasVariableStorage());
 }
 
-void SerializeValueStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ValueStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeValueStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ValueStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   auto v9 = e.ExpressionStatement();
   if (v9) {
     auto id9 = es.EntityId(v9.value());
@@ -5949,11 +6421,11 @@ void SerializeValueStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const 
   }
 }
 
-void SerializeLabelStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::LabelStmt &e, const TokenTree *) {
-  SerializeValueStmt(es, b, e, nullptr);
+void SerializeLabelStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::LabelStmt &e, const TokenTree *) {
+  SerializeValueStmt(pf, es, b, e, nullptr);
   b.setVal10(es.EntityId(e.Declaration()));
-  auto t11 = e.IdentifierToken();
-  b.setVal11(es.EntityId(t11));
+  auto et11 = es.EntityId(e.IdentifierToken());
+  b.setVal11(et11);
   auto v60 = e.Name();
   std::string s60(v60.data(), v60.size());
   b.setVal60(s60);
@@ -5961,8 +6433,8 @@ void SerializeLabelStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const 
   b.setVal12(e.IsSideEntry());
 }
 
-void SerializeExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Expr &e, const TokenTree *) {
-  SerializeValueStmt(es, b, e, nullptr);
+void SerializeExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Expr &e, const TokenTree *) {
+  SerializeValueStmt(pf, es, b, e, nullptr);
   b.setVal12(e.HasSideEffects());
   b.setVal10(es.EntityId(e.IgnoreCasts()));
   b.setVal11(es.EntityId(e.IgnoreConversionOperatorSingleStep()));
@@ -5979,8 +6451,8 @@ void SerializeExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal16(e.ContainsErrors());
   b.setVal23(e.ContainsUnexpandedParameterPack());
   b.setVal56(static_cast<unsigned char>(mx::FromPasta(e.Dependence())));
-  auto t32 = e.ExpressionToken();
-  b.setVal32(es.EntityId(t32));
+  auto et32 = es.EntityId(e.ExpressionToken());
+  b.setVal32(et32);
   auto v33 = e.ObjCProperty();
   if (v33) {
     auto id33 = es.EntityId(v33.value());
@@ -6046,14 +6518,14 @@ void SerializeExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal88(e.RefersToVectorElement());
 }
 
-void SerializeDesignatedInitUpdateExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DesignatedInitUpdateExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeDesignatedInitUpdateExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DesignatedInitUpdateExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.Updater()));
 }
 
-void SerializeDesignatedInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DesignatedInitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeDesignatedInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DesignatedInitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Designators();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -6070,8 +6542,8 @@ void SerializeDesignatedInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder 
     b.setVal37(0);
     b.setVal38(0);
   }
-  auto t39 = e.EqualOrColonToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.EqualOrColonToken());
+  b.setVal39(et39);
   b.setVal40(es.EntityId(e.Initializer()));
   b.setVal89(e.IsDirectInitializer());
   b.setVal90(e.UsesGNUSyntax());
@@ -6086,36 +6558,36 @@ void SerializeDesignatedInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder 
   } while (false);
 }
 
-void SerializeDependentScopeDeclRefExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DependentScopeDeclRefExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.LAngleToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RAngleToken();
-  b.setVal38(es.EntityId(t38));
-  auto t39 = e.TemplateKeywordToken();
-  b.setVal39(es.EntityId(t39));
+void SerializeDependentScopeDeclRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DependentScopeDeclRefExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.LAngleToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RAngleToken());
+  b.setVal38(et38);
+  auto et39 = es.EntityId(e.TemplateKeywordToken());
+  b.setVal39(et39);
   b.setVal89(e.HasExplicitTemplateArguments());
   b.setVal90(e.HasTemplateKeyword());
 }
 
-void SerializeDependentCoawaitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DependentCoawaitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.KeywordToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeDependentCoawaitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DependentCoawaitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.KeywordToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.Operand()));
   b.setVal39(es.EntityId(e.OperatorCoawaitLookup()));
 }
 
-void SerializeDeclRefExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DeclRefExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeDeclRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DeclRefExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Declaration()));
   b.setVal38(es.EntityId(e.FoundDeclaration()));
-  auto t39 = e.LAngleToken();
-  b.setVal39(es.EntityId(t39));
-  auto t40 = e.RAngleToken();
-  b.setVal40(es.EntityId(t40));
-  auto t41 = e.TemplateKeywordToken();
-  b.setVal41(es.EntityId(t41));
+  auto et39 = es.EntityId(e.LAngleToken());
+  b.setVal39(et39);
+  auto et40 = es.EntityId(e.RAngleToken());
+  b.setVal40(et40);
+  auto et41 = es.EntityId(e.TemplateKeywordToken());
+  b.setVal41(et41);
   b.setVal89(e.HadMultipleCandidates());
   b.setVal90(e.HasExplicitTemplateArguments());
   b.setVal91(e.HasQualifier());
@@ -6125,11 +6597,11 @@ void SerializeDeclRefExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, cons
   b.setVal95(e.RefersToEnclosingVariableOrCapture());
 }
 
-void SerializeCoroutineSuspendExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoroutineSuspendExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCoroutineSuspendExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoroutineSuspendExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.CommonExpression()));
-  auto t38 = e.KeywordToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.KeywordToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.OpaqueValue()));
   b.setVal40(es.EntityId(e.Operand()));
   b.setVal41(es.EntityId(e.ReadyExpression()));
@@ -6137,26 +6609,26 @@ void SerializeCoroutineSuspendExpr(const EntityMapper &es, mx::ast::Stmt::Builde
   b.setVal43(es.EntityId(e.SuspendExpression()));
 }
 
-void SerializeCoawaitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoawaitExpr &e, const TokenTree *) {
-  SerializeCoroutineSuspendExpr(es, b, e, nullptr);
+void SerializeCoawaitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoawaitExpr &e, const TokenTree *) {
+  SerializeCoroutineSuspendExpr(pf, es, b, e, nullptr);
   b.setVal89(e.IsImplicit());
 }
 
-void SerializeCoyieldExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoyieldExpr &e, const TokenTree *) {
-  SerializeCoroutineSuspendExpr(es, b, e, nullptr);
+void SerializeCoyieldExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoyieldExpr &e, const TokenTree *) {
+  SerializeCoroutineSuspendExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeConvertVectorExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConvertVectorExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.BuiltinToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeConvertVectorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConvertVectorExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.BuiltinToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.SrcExpression()));
 }
 
-void SerializeConceptSpecializationExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConceptSpecializationExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeConceptSpecializationExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConceptSpecializationExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SpecializationDeclaration()));
   do {
     auto v15 = e.TemplateArguments();
@@ -6170,37 +6642,37 @@ void SerializeConceptSpecializationExpr(const EntityMapper &es, mx::ast::Stmt::B
   b.setVal89(e.IsSatisfied());
 }
 
-void SerializeCompoundLiteralExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundLiteralExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCompoundLiteralExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundLiteralExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Initializer()));
-  auto t38 = e.LParenToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.LParenToken());
+  b.setVal38(et38);
   b.setVal89(e.IsFileScope());
 }
 
-void SerializeChooseExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ChooseExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.BuiltinToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeChooseExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ChooseExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.BuiltinToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.ChosenSubExpression()));
   b.setVal39(es.EntityId(e.Condition()));
   b.setVal40(es.EntityId(e.LHS()));
   b.setVal41(es.EntityId(e.RHS()));
-  auto t42 = e.RParenToken();
-  b.setVal42(es.EntityId(t42));
+  auto et42 = es.EntityId(e.RParenToken());
+  b.setVal42(et42);
   b.setVal89(e.IsConditionDependent());
   b.setVal90(e.IsConditionTrue());
 }
 
-void SerializeCharacterLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CharacterLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCharacterLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CharacterLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.LiteralKind())));
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
 }
 
-void SerializeCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CastExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CastExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.CastKind())));
   auto v60 = e.CastKindName();
   std::string s60(v60.data(), v60.size());
@@ -6224,18 +6696,18 @@ void SerializeCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const p
   b.setVal89(e.HasStoredFPFeatures());
 }
 
-void SerializeImplicitCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImplicitCastExpr &e, const TokenTree *) {
-  SerializeCastExpr(es, b, e, nullptr);
+void SerializeImplicitCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImplicitCastExpr &e, const TokenTree *) {
+  SerializeCastExpr(pf, es, b, e, nullptr);
   b.setVal90(e.IsPartOfExplicitCast());
 }
 
-void SerializeExplicitCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExplicitCastExpr &e, const TokenTree *) {
-  SerializeCastExpr(es, b, e, nullptr);
+void SerializeExplicitCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExplicitCastExpr &e, const TokenTree *) {
+  SerializeCastExpr(pf, es, b, e, nullptr);
   b.setVal41(es.EntityId(e.TypeAsWritten()));
 }
 
-void SerializeCXXNamedCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNamedCastExpr &e, const TokenTree *) {
-  SerializeExplicitCastExpr(es, b, e, nullptr);
+void SerializeCXXNamedCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNamedCastExpr &e, const TokenTree *) {
+  SerializeExplicitCastExpr(pf, es, b, e, nullptr);
   if (auto r42 = e.AngleBrackets(); auto rs42 = r42.Size()) {
     b.setVal42(es.EntityId(r42[0]));
     b.setVal43(es.EntityId(r42[rs42 - 1u]));
@@ -6246,68 +6718,68 @@ void SerializeCXXNamedCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b,
   auto v65 = e.CastName();
   std::string s65(v65.data(), v65.size());
   b.setVal65(s65);
-  auto t44 = e.OperatorToken();
-  b.setVal44(es.EntityId(t44));
-  auto t45 = e.RParenToken();
-  b.setVal45(es.EntityId(t45));
+  auto et44 = es.EntityId(e.OperatorToken());
+  b.setVal44(et44);
+  auto et45 = es.EntityId(e.RParenToken());
+  b.setVal45(et45);
 }
 
-void SerializeCXXDynamicCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDynamicCastExpr &e, const TokenTree *) {
-  SerializeCXXNamedCastExpr(es, b, e, nullptr);
+void SerializeCXXDynamicCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDynamicCastExpr &e, const TokenTree *) {
+  SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
   b.setVal90(e.IsAlwaysNull());
 }
 
-void SerializeCXXConstCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXConstCastExpr &e, const TokenTree *) {
-  SerializeCXXNamedCastExpr(es, b, e, nullptr);
+void SerializeCXXConstCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXConstCastExpr &e, const TokenTree *) {
+  SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeCXXAddrspaceCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXAddrspaceCastExpr &e, const TokenTree *) {
-  SerializeCXXNamedCastExpr(es, b, e, nullptr);
+void SerializeCXXAddrspaceCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXAddrspaceCastExpr &e, const TokenTree *) {
+  SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeCXXStaticCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXStaticCastExpr &e, const TokenTree *) {
-  SerializeCXXNamedCastExpr(es, b, e, nullptr);
+void SerializeCXXStaticCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXStaticCastExpr &e, const TokenTree *) {
+  SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeCXXReinterpretCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXReinterpretCastExpr &e, const TokenTree *) {
-  SerializeCXXNamedCastExpr(es, b, e, nullptr);
+void SerializeCXXReinterpretCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXReinterpretCastExpr &e, const TokenTree *) {
+  SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeCXXFunctionalCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXFunctionalCastExpr &e, const TokenTree *) {
-  SerializeExplicitCastExpr(es, b, e, nullptr);
-  auto t42 = e.LParenToken();
-  b.setVal42(es.EntityId(t42));
-  auto t43 = e.RParenToken();
-  b.setVal43(es.EntityId(t43));
+void SerializeCXXFunctionalCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXFunctionalCastExpr &e, const TokenTree *) {
+  SerializeExplicitCastExpr(pf, es, b, e, nullptr);
+  auto et42 = es.EntityId(e.LParenToken());
+  b.setVal42(et42);
+  auto et43 = es.EntityId(e.RParenToken());
+  b.setVal43(et43);
   b.setVal90(e.IsListInitialization());
 }
 
-void SerializeCStyleCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CStyleCastExpr &e, const TokenTree *) {
-  SerializeExplicitCastExpr(es, b, e, nullptr);
-  auto t42 = e.LParenToken();
-  b.setVal42(es.EntityId(t42));
-  auto t43 = e.RParenToken();
-  b.setVal43(es.EntityId(t43));
+void SerializeCStyleCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CStyleCastExpr &e, const TokenTree *) {
+  SerializeExplicitCastExpr(pf, es, b, e, nullptr);
+  auto et42 = es.EntityId(e.LParenToken());
+  b.setVal42(et42);
+  auto et43 = es.EntityId(e.RParenToken());
+  b.setVal43(et43);
 }
 
-void SerializeBuiltinBitCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BuiltinBitCastExpr &e, const TokenTree *) {
-  SerializeExplicitCastExpr(es, b, e, nullptr);
+void SerializeBuiltinBitCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BuiltinBitCastExpr &e, const TokenTree *) {
+  SerializeExplicitCastExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeObjCBridgedCastExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBridgedCastExpr &e, const TokenTree *) {
-  SerializeExplicitCastExpr(es, b, e, nullptr);
-  auto t42 = e.BridgeKeywordToken();
-  b.setVal42(es.EntityId(t42));
+void SerializeObjCBridgedCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBridgedCastExpr &e, const TokenTree *) {
+  SerializeExplicitCastExpr(pf, es, b, e, nullptr);
+  auto et42 = es.EntityId(e.BridgeKeywordToken());
+  b.setVal42(et42);
   b.setVal96(static_cast<unsigned char>(mx::FromPasta(e.BridgeKind())));
   auto v65 = e.BridgeKindName();
   std::string s65(v65.data(), v65.size());
   b.setVal65(s65);
-  auto t43 = e.LParenToken();
-  b.setVal43(es.EntityId(t43));
+  auto et43 = es.EntityId(e.LParenToken());
+  b.setVal43(et43);
 }
 
-void SerializeCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CallExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CallExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Arguments();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -6334,8 +6806,8 @@ void SerializeCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const p
   } else {
     b.setVal40(mx::kInvalidEntityId);
   }
-  auto t41 = e.RParenToken();
-  b.setVal41(es.EntityId(t41));
+  auto et41 = es.EntityId(e.RParenToken());
+  b.setVal41(et41);
   b.setVal89(e.HasStoredFPFeatures());
   b.setVal90(e.HasUnusedResultAttribute());
   b.setVal91(e.IsBuiltinAssumeFalse());
@@ -6344,18 +6816,18 @@ void SerializeCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const p
   b.setVal95(e.UsesADL());
 }
 
-void SerializeCXXOperatorCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXOperatorCallExpr &e, const TokenTree *) {
-  SerializeCallExpr(es, b, e, nullptr);
+void SerializeCXXOperatorCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXOperatorCallExpr &e, const TokenTree *) {
+  SerializeCallExpr(pf, es, b, e, nullptr);
   b.setVal96(static_cast<unsigned char>(mx::FromPasta(e.Operator())));
-  auto t42 = e.OperatorToken();
-  b.setVal42(es.EntityId(t42));
+  auto et42 = es.EntityId(e.OperatorToken());
+  b.setVal42(et42);
   b.setVal97(e.IsAssignmentOperation());
   b.setVal98(e.IsComparisonOperation());
   b.setVal99(e.IsInfixBinaryOperation());
 }
 
-void SerializeCXXMemberCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXMemberCallExpr &e, const TokenTree *) {
-  SerializeCallExpr(es, b, e, nullptr);
+void SerializeCXXMemberCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXMemberCallExpr &e, const TokenTree *) {
+  SerializeCallExpr(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.ImplicitObjectArgument()));
   auto v43 = e.MethodDeclaration();
   if (v43) {
@@ -6368,21 +6840,21 @@ void SerializeCXXMemberCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b
   b.setVal45(es.EntityId(e.RecordDeclaration()));
 }
 
-void SerializeCUDAKernelCallExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CUDAKernelCallExpr &e, const TokenTree *) {
-  SerializeCallExpr(es, b, e, nullptr);
+void SerializeCUDAKernelCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CUDAKernelCallExpr &e, const TokenTree *) {
+  SerializeCallExpr(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.Config()));
 }
 
-void SerializeUserDefinedLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UserDefinedLiteral &e, const TokenTree *) {
-  SerializeCallExpr(es, b, e, nullptr);
+void SerializeUserDefinedLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UserDefinedLiteral &e, const TokenTree *) {
+  SerializeCallExpr(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.CookedLiteral()));
   b.setVal96(static_cast<unsigned char>(mx::FromPasta(e.LiteralOperatorKind())));
-  auto t43 = e.UDSuffixToken();
-  b.setVal43(es.EntityId(t43));
+  auto et43 = es.EntityId(e.UDSuffixToken());
+  b.setVal43(et43);
 }
 
-void SerializeCXXUuidofExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXUuidofExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXUuidofExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXUuidofExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ExpressionOperand();
   if (v37) {
     auto id37 = es.EntityId(v37.value());
@@ -6396,8 +6868,8 @@ void SerializeCXXUuidofExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   b.setVal89(e.IsTypeOperand());
 }
 
-void SerializeCXXUnresolvedConstructExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXUnresolvedConstructExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXUnresolvedConstructExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXUnresolvedConstructExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Arguments();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -6407,16 +6879,16 @@ void SerializeCXXUnresolvedConstructExpr(const EntityMapper &es, mx::ast::Stmt::
       ++i15;
     }
   } while (false);
-  auto t37 = e.LParenToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+  auto et37 = es.EntityId(e.LParenToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.TypeAsWritten()));
   b.setVal89(e.IsListInitialization());
 }
 
-void SerializeCXXTypeidExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTypeidExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXTypeidExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTypeidExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ExpressionOperand();
   if (v37) {
     auto id37 = es.EntityId(v37.value());
@@ -6437,8 +6909,8 @@ void SerializeCXXTypeidExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   b.setVal92(e.IsTypeOperand());
 }
 
-void SerializeCXXThrowExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXThrowExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXThrowExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXThrowExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.SubExpression();
   if (v37) {
     auto id37 = es.EntityId(v37.value());
@@ -6446,39 +6918,39 @@ void SerializeCXXThrowExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, con
   } else {
     b.setVal37(mx::kInvalidEntityId);
   }
-  auto t38 = e.ThrowToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.ThrowToken());
+  b.setVal38(et38);
   b.setVal89(e.IsThrownVariableInScope());
 }
 
-void SerializeCXXThisExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXThisExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+void SerializeCXXThisExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXThisExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
   b.setVal89(e.IsImplicit());
 }
 
-void SerializeCXXStdInitializerListExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXStdInitializerListExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXStdInitializerListExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXStdInitializerListExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
 }
 
-void SerializeCXXScalarValueInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXScalarValueInitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.RParenToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeCXXScalarValueInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXScalarValueInitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.RParenToken());
+  b.setVal37(et37);
 }
 
-void SerializeCXXRewrittenBinaryOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXRewrittenBinaryOperator &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXRewrittenBinaryOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXRewrittenBinaryOperator &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.LHS()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Opcode())));
   auto v60 = e.OpcodeString();
   std::string s60(v60.data(), v60.size());
   b.setVal60(s60);
   b.setVal96(static_cast<unsigned char>(mx::FromPasta(e.Operator())));
-  auto t38 = e.OperatorToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.OperatorToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.RHS()));
   b.setVal40(es.EntityId(e.SemanticForm()));
   b.setVal89(e.IsAssignmentOperation());
@@ -6486,16 +6958,16 @@ void SerializeCXXRewrittenBinaryOperator(const EntityMapper &es, mx::ast::Stmt::
   b.setVal91(e.IsReversed());
 }
 
-void SerializeCXXPseudoDestructorExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXPseudoDestructorExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXPseudoDestructorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXPseudoDestructorExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
-  auto t38 = e.ColonColonToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.ColonColonToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.DestroyedType()));
-  auto t40 = e.DestroyedTypeToken();
-  b.setVal40(es.EntityId(t40));
-  auto t41 = e.OperatorToken();
-  b.setVal41(es.EntityId(t41));
+  auto et40 = es.EntityId(e.DestroyedTypeToken());
+  b.setVal40(et40);
+  auto et41 = es.EntityId(e.OperatorToken());
+  b.setVal41(et41);
   auto v42 = e.ScopeType();
   if (v42) {
     auto id42 = es.EntityId(v42.value());
@@ -6503,34 +6975,34 @@ void SerializeCXXPseudoDestructorExpr(const EntityMapper &es, mx::ast::Stmt::Bui
   } else {
     b.setVal42(mx::kInvalidEntityId);
   }
-  auto t43 = e.TildeToken();
-  b.setVal43(es.EntityId(t43));
+  auto et43 = es.EntityId(e.TildeToken());
+  b.setVal43(et43);
   b.setVal89(e.HasQualifier());
   b.setVal90(e.IsArrow());
 }
 
-void SerializeCXXParenListInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXParenListInitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXParenListInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXParenListInitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.ArrayFiller()));
-  auto t38 = e.InitializerToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.InitializerToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.InitializedFieldInUnion()));
 }
 
-void SerializeCXXNullPtrLiteralExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNullPtrLiteralExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+void SerializeCXXNullPtrLiteralExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNullPtrLiteralExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
 }
 
-void SerializeCXXNoexceptExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNoexceptExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXNoexceptExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNoexceptExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Operand()));
   b.setVal89(e.Value());
 }
 
-void SerializeCXXNewExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNewExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXNewExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNewExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.DoesUsualArrayDeleteWantSize());
   b.setVal37(es.EntityId(e.AllocatedType()));
   auto v38 = e.ArraySize();
@@ -6588,36 +7060,36 @@ void SerializeCXXNewExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   b.setVal97(e.ShouldNullCheckAllocation());
 }
 
-void SerializeCXXInheritedCtorInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXInheritedCtorInitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXInheritedCtorInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXInheritedCtorInitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.ConstructsVirtualBase());
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.ConstructionKind())));
   b.setVal37(es.EntityId(e.Constructor()));
-  auto t38 = e.Token();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.Token());
+  b.setVal38(et38);
   b.setVal90(e.InheritedFromVirtualBase());
 }
 
-void SerializeCXXFoldExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXFoldExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXFoldExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXFoldExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Callee()));
-  auto t38 = e.EllipsisToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.EllipsisToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.Initializer()));
   b.setVal40(es.EntityId(e.LHS()));
-  auto t41 = e.LParenToken();
-  b.setVal41(es.EntityId(t41));
+  auto et41 = es.EntityId(e.LParenToken());
+  b.setVal41(et41);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Operator())));
   b.setVal42(es.EntityId(e.Pattern()));
   b.setVal43(es.EntityId(e.RHS()));
-  auto t44 = e.RParenToken();
-  b.setVal44(es.EntityId(t44));
+  auto et44 = es.EntityId(e.RParenToken());
+  b.setVal44(et44);
   b.setVal89(e.IsLeftFold());
   b.setVal90(e.IsRightFold());
 }
 
-void SerializeCXXDependentScopeMemberExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDependentScopeMemberExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXDependentScopeMemberExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDependentScopeMemberExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.Base();
   if (v37) {
     auto id37 = es.EntityId(v37.value());
@@ -6633,24 +7105,24 @@ void SerializeCXXDependentScopeMemberExpr(const EntityMapper &es, mx::ast::Stmt:
   } else {
     b.setVal39(mx::kInvalidEntityId);
   }
-  auto t40 = e.LAngleToken();
-  b.setVal40(es.EntityId(t40));
-  auto t41 = e.MemberToken();
-  b.setVal41(es.EntityId(t41));
-  auto t42 = e.OperatorToken();
-  b.setVal42(es.EntityId(t42));
-  auto t43 = e.RAngleToken();
-  b.setVal43(es.EntityId(t43));
-  auto t44 = e.TemplateKeywordToken();
-  b.setVal44(es.EntityId(t44));
+  auto et40 = es.EntityId(e.LAngleToken());
+  b.setVal40(et40);
+  auto et41 = es.EntityId(e.MemberToken());
+  b.setVal41(et41);
+  auto et42 = es.EntityId(e.OperatorToken());
+  b.setVal42(et42);
+  auto et43 = es.EntityId(e.RAngleToken());
+  b.setVal43(et43);
+  auto et44 = es.EntityId(e.TemplateKeywordToken());
+  b.setVal44(et44);
   b.setVal89(e.HasExplicitTemplateArguments());
   b.setVal90(e.HasTemplateKeyword());
   b.setVal91(e.IsArrow());
   b.setVal92(e.IsImplicitAccess());
 }
 
-void SerializeCXXDeleteExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDeleteExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXDeleteExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDeleteExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.DoesUsualArrayDeleteWantSize());
   b.setVal37(es.EntityId(e.Argument()));
   b.setVal38(es.EntityId(e.DestroyedType()));
@@ -6660,8 +7132,8 @@ void SerializeCXXDeleteExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   b.setVal92(e.IsGlobalDelete());
 }
 
-void SerializeCXXDefaultInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDefaultInitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXDefaultInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDefaultInitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.Expression();
   if (v37) {
     auto id37 = es.EntityId(v37.value());
@@ -6671,24 +7143,24 @@ void SerializeCXXDefaultInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder 
   }
   b.setVal38(es.EntityId(e.Field()));
   b.setVal39(es.EntityId(e.RewrittenExpression()));
-  auto t40 = e.UsedToken();
-  b.setVal40(es.EntityId(t40));
+  auto et40 = es.EntityId(e.UsedToken());
+  b.setVal40(et40);
   b.setVal89(e.HasRewrittenInitializer());
 }
 
-void SerializeCXXDefaultArgExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDefaultArgExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXDefaultArgExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDefaultArgExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.AdjustedRewrittenExpression()));
   b.setVal38(es.EntityId(e.Expression()));
   b.setVal39(es.EntityId(e.Parameter()));
   b.setVal40(es.EntityId(e.RewrittenExpression()));
-  auto t41 = e.UsedToken();
-  b.setVal41(es.EntityId(t41));
+  auto et41 = es.EntityId(e.UsedToken());
+  b.setVal41(et41);
   b.setVal89(e.HasRewrittenInitializer());
 }
 
-void SerializeCXXConstructExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXConstructExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXConstructExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXConstructExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Arguments();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -6700,8 +7172,8 @@ void SerializeCXXConstructExpr(const EntityMapper &es, mx::ast::Stmt::Builder b,
   } while (false);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.ConstructionKind())));
   b.setVal37(es.EntityId(e.Constructor()));
-  auto t38 = e.Token();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.Token());
+  b.setVal38(et38);
   if (auto r39 = e.ParenthesisOrBraceRange(); auto rs39 = r39.Size()) {
     b.setVal39(es.EntityId(r39[0]));
     b.setVal40(es.EntityId(r39[rs39 - 1u]));
@@ -6716,40 +7188,40 @@ void SerializeCXXConstructExpr(const EntityMapper &es, mx::ast::Stmt::Builder b,
   b.setVal93(e.RequiresZeroInitialization());
 }
 
-void SerializeCXXTemporaryObjectExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTemporaryObjectExpr &e, const TokenTree *) {
-  SerializeCXXConstructExpr(es, b, e, nullptr);
+void SerializeCXXTemporaryObjectExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTemporaryObjectExpr &e, const TokenTree *) {
+  SerializeCXXConstructExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeCXXBoolLiteralExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXBoolLiteralExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+void SerializeCXXBoolLiteralExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXBoolLiteralExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
   b.setVal89(e.Value());
 }
 
-void SerializeCXXBindTemporaryExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXBindTemporaryExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeCXXBindTemporaryExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXBindTemporaryExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
 }
 
-void SerializeBlockExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BlockExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeBlockExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BlockExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.BlockDeclaration()));
   b.setVal38(es.EntityId(e.Body()));
-  auto t39 = e.CaretToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.CaretToken());
+  b.setVal39(et39);
   b.setVal40(es.EntityId(e.FunctionType()));
 }
 
-void SerializeBinaryOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BinaryOperator &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeBinaryOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BinaryOperator &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.LHS()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Opcode())));
   auto v60 = e.OpcodeString();
   std::string s60(v60.data(), v60.size());
   b.setVal60(s60);
-  auto t38 = e.OperatorToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.OperatorToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.RHS()));
   b.setVal89(e.HasStoredFPFeatures());
   b.setVal90(e.IsAdditiveOperation());
@@ -6767,16 +7239,16 @@ void SerializeBinaryOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, c
   b.setVal104(e.IsShiftOperation());
 }
 
-void SerializeCompoundAssignOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundAssignOperator &e, const TokenTree *) {
-  SerializeBinaryOperator(es, b, e, nullptr);
+void SerializeCompoundAssignOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundAssignOperator &e, const TokenTree *) {
+  SerializeBinaryOperator(pf, es, b, e, nullptr);
   b.setVal40(es.EntityId(e.ComputationLHSType()));
   b.setVal41(es.EntityId(e.ComputationResultType()));
 }
 
-void SerializeAtomicExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AtomicExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.BuiltinToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeAtomicExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AtomicExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.BuiltinToken());
+  b.setVal37(et37);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Operation())));
   b.setVal38(es.EntityId(e.Order()));
   auto v39 = e.OrderFail();
@@ -6787,8 +7259,8 @@ void SerializeAtomicExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const
     b.setVal39(mx::kInvalidEntityId);
   }
   b.setVal40(es.EntityId(e.Pointer()));
-  auto t41 = e.RParenToken();
-  b.setVal41(es.EntityId(t41));
+  auto et41 = es.EntityId(e.RParenToken());
+  b.setVal41(et41);
   auto v42 = e.Scope();
   if (v42) {
     auto id42 = es.EntityId(v42.value());
@@ -6832,91 +7304,91 @@ void SerializeAtomicExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   } while (false);
 }
 
-void SerializeAsTypeExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AsTypeExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.BuiltinToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeAsTypeExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AsTypeExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.BuiltinToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.SrcExpression()));
 }
 
-void SerializeArrayTypeTraitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayTypeTraitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeArrayTypeTraitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayTypeTraitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.DimensionExpression()));
   b.setVal38(es.EntityId(e.QueriedType()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Trait())));
 }
 
-void SerializeArraySubscriptExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArraySubscriptExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeArraySubscriptExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArraySubscriptExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.Index()));
   b.setVal39(es.EntityId(e.LHS()));
-  auto t40 = e.RBracketToken();
-  b.setVal40(es.EntityId(t40));
+  auto et40 = es.EntityId(e.RBracketToken());
+  b.setVal40(et40);
   b.setVal41(es.EntityId(e.RHS()));
 }
 
-void SerializeArrayInitLoopExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayInitLoopExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeArrayInitLoopExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayInitLoopExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.CommonExpression()));
   b.setVal38(es.EntityId(e.SubExpression()));
 }
 
-void SerializeArrayInitIndexExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayInitIndexExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeArrayInitIndexExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayInitIndexExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeAddrLabelExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AddrLabelExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.AmpAmpToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeAddrLabelExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AddrLabelExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.AmpAmpToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.Label()));
-  auto t39 = e.LabelToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.LabelToken());
+  b.setVal39(et39);
 }
 
-void SerializeAbstractConditionalOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AbstractConditionalOperator &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.ColonToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeAbstractConditionalOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AbstractConditionalOperator &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.ColonToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.Condition()));
   b.setVal39(es.EntityId(e.FalseExpression()));
-  auto t40 = e.QuestionToken();
-  b.setVal40(es.EntityId(t40));
+  auto et40 = es.EntityId(e.QuestionToken());
+  b.setVal40(et40);
   b.setVal41(es.EntityId(e.TrueExpression()));
 }
 
-void SerializeConditionalOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConditionalOperator &e, const TokenTree *) {
-  SerializeAbstractConditionalOperator(es, b, e, nullptr);
+void SerializeConditionalOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConditionalOperator &e, const TokenTree *) {
+  SerializeAbstractConditionalOperator(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.LHS()));
   b.setVal43(es.EntityId(e.RHS()));
 }
 
-void SerializeBinaryConditionalOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BinaryConditionalOperator &e, const TokenTree *) {
-  SerializeAbstractConditionalOperator(es, b, e, nullptr);
+void SerializeBinaryConditionalOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BinaryConditionalOperator &e, const TokenTree *) {
+  SerializeAbstractConditionalOperator(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.Common()));
   b.setVal43(es.EntityId(e.OpaqueValue()));
 }
 
-void SerializeVAArgExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::VAArgExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.BuiltinToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeVAArgExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::VAArgExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.BuiltinToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.SubExpression()));
   b.setVal40(es.EntityId(e.WrittenType()));
   b.setVal89(e.IsMicrosoftABI());
 }
 
-void SerializeUnaryOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnaryOperator &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeUnaryOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnaryOperator &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.CanOverflow());
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Opcode())));
-  auto t37 = e.OperatorToken();
-  b.setVal37(es.EntityId(t37));
+  auto et37 = es.EntityId(e.OperatorToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.SubExpression()));
   b.setVal90(e.HasStoredFPFeatures());
   b.setVal91(e.IsArithmeticOperation());
@@ -6927,8 +7399,8 @@ void SerializeUnaryOperator(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   b.setVal98(e.IsPrefix());
 }
 
-void SerializeUnaryExprOrTypeTraitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnaryExprOrTypeTraitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeUnaryExprOrTypeTraitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnaryExprOrTypeTraitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ArgumentExpression();
   if (v37) {
     auto id37 = es.EntityId(v37.value());
@@ -6944,20 +7416,20 @@ void SerializeUnaryExprOrTypeTraitExpr(const EntityMapper &es, mx::ast::Stmt::Bu
     b.setVal38(mx::kInvalidEntityId);
   }
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.KeywordKind())));
-  auto t39 = e.OperatorToken();
-  b.setVal39(es.EntityId(t39));
-  auto t40 = e.RParenToken();
-  b.setVal40(es.EntityId(t40));
+  auto et39 = es.EntityId(e.OperatorToken());
+  b.setVal39(et39);
+  auto et40 = es.EntityId(e.RParenToken());
+  b.setVal40(et40);
   b.setVal41(es.EntityId(e.TypeOfArgument()));
   b.setVal89(e.IsArgumentType());
 }
 
-void SerializeTypoExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::TypoExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeTypoExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::TypoExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeTraitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::TypeTraitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeTypeTraitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::TypeTraitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Trait())));
   auto v89 = e.Value();
   if (v89) {
@@ -6977,19 +7449,19 @@ void SerializeTypeTraitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   } while (false);
 }
 
-void SerializeSubstNonTypeTemplateParmPackExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SubstNonTypeTemplateParmPackExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeSubstNonTypeTemplateParmPackExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SubstNonTypeTemplateParmPackExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.AssociatedDeclaration()));
   b.setVal38(es.EntityId(e.ParameterPack()));
-  auto t39 = e.ParameterPackToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.ParameterPackToken());
+  b.setVal39(et39);
 }
 
-void SerializeSubstNonTypeTemplateParmExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SubstNonTypeTemplateParmExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeSubstNonTypeTemplateParmExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SubstNonTypeTemplateParmExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.AssociatedDeclaration()));
-  auto t38 = e.NameToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.NameToken());
+  b.setVal38(et38);
   auto v105 = e.PackIndex();
   if (v105) {
     b.setVal105(static_cast<unsigned>(v105.value()));
@@ -7003,8 +7475,8 @@ void SerializeSubstNonTypeTemplateParmExpr(const EntityMapper &es, mx::ast::Stmt
   b.setVal90(e.IsReferenceParameter());
 }
 
-void SerializeStringLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::StringLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeStringLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::StringLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v89 = e.ContainsNonAscii();
   if (v89) {
     b.setVal89(static_cast<bool>(v89.value()));
@@ -7043,30 +7515,30 @@ void SerializeStringLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   b.setVal101(e.IsWide());
 }
 
-void SerializeStmtExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::StmtExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.LParenToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeStmtExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::StmtExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.LParenToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.SubStatement()));
 }
 
-void SerializeSourceLocExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SourceLocExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeSourceLocExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SourceLocExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v60 = e.BuiltinString();
   std::string s60(v60.data(), v60.size());
   b.setVal60(s60);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.IdentifierKind())));
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
   b.setVal89(e.IsIntType());
 }
 
-void SerializeSizeOfPackExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SizeOfPackExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.OperatorToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeSizeOfPackExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SizeOfPackExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.OperatorToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.Pack()));
   auto v105 = e.PackLength();
   if (v105) {
@@ -7075,8 +7547,8 @@ void SerializeSizeOfPackExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, c
   } else {
     b.setVal89(false);
   }
-  auto t39 = e.PackToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.PackToken());
+  b.setVal39(et39);
   do {
     auto ov15 = e.PartialArguments();
     if (!ov15) {
@@ -7092,32 +7564,32 @@ void SerializeSizeOfPackExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, c
       ++i15;
     }
   } while (false);
-  auto t40 = e.RParenToken();
-  b.setVal40(es.EntityId(t40));
+  auto et40 = es.EntityId(e.RParenToken());
+  b.setVal40(et40);
   b.setVal91(e.IsPartiallySubstituted());
 }
 
-void SerializeShuffleVectorExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ShuffleVectorExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.BuiltinToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeShuffleVectorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ShuffleVectorExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.BuiltinToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
 }
 
-void SerializeSYCLUniqueStableNameExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SYCLUniqueStableNameExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeSYCLUniqueStableNameExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SYCLUniqueStableNameExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal60(e.ComputeName());
-  auto t37 = e.LParenToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.Token();
-  b.setVal38(es.EntityId(t38));
-  auto t39 = e.RParenToken();
-  b.setVal39(es.EntityId(t39));
+  auto et37 = es.EntityId(e.LParenToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.Token());
+  b.setVal38(et38);
+  auto et39 = es.EntityId(e.RParenToken());
+  b.setVal39(et39);
 }
 
-void SerializeRequiresExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::RequiresExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeRequiresExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::RequiresExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Body()));
   do {
     auto v15 = e.LocalParameters();
@@ -7128,15 +7600,15 @@ void SerializeRequiresExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, con
       ++i15;
     }
   } while (false);
-  auto t38 = e.RBraceToken();
-  b.setVal38(es.EntityId(t38));
-  auto t39 = e.RequiresKeywordToken();
-  b.setVal39(es.EntityId(t39));
+  auto et38 = es.EntityId(e.RBraceToken());
+  b.setVal38(et38);
+  auto et39 = es.EntityId(e.RequiresKeywordToken());
+  b.setVal39(et39);
   b.setVal89(e.IsSatisfied());
 }
 
-void SerializeRecoveryExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::RecoveryExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeRecoveryExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::RecoveryExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.SubExpressions();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -7148,8 +7620,8 @@ void SerializeRecoveryExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, con
   } while (false);
 }
 
-void SerializePseudoObjectExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PseudoObjectExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializePseudoObjectExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PseudoObjectExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.ResultExpression()));
   b.setVal38(es.EntityId(e.SyntacticForm()));
   do {
@@ -7172,23 +7644,23 @@ void SerializePseudoObjectExpr(const EntityMapper &es, mx::ast::Stmt::Builder b,
   } while (false);
 }
 
-void SerializePredefinedExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PredefinedExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializePredefinedExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PredefinedExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.FunctionName()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.IdentifierKind())));
   auto v60 = e.IdentifierKindName();
   std::string s60(v60.data(), v60.size());
   b.setVal60(s60);
-  auto t38 = e.Token();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.Token());
+  b.setVal38(et38);
 }
 
-void SerializeParenListExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ParenListExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.LParenToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeParenListExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ParenListExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.LParenToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
   do {
     auto v15 = e.Expressions();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -7200,28 +7672,28 @@ void SerializeParenListExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, co
   } while (false);
 }
 
-void SerializeParenExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ParenExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.LParenToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeParenExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ParenExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.LParenToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.SubExpression()));
 }
 
-void SerializePackExpansionExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PackExpansionExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.EllipsisToken();
-  b.setVal37(es.EntityId(t37));
+void SerializePackExpansionExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PackExpansionExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.EllipsisToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.Pattern()));
 }
 
-void SerializeOverloadExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OverloadExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.LAngleToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.NameToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeOverloadExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OverloadExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.LAngleToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.NameToken());
+  b.setVal38(et38);
   auto v39 = e.NamingClass();
   if (v39) {
     auto id39 = es.EntityId(v39.value());
@@ -7229,96 +7701,96 @@ void SerializeOverloadExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, con
   } else {
     b.setVal39(mx::kInvalidEntityId);
   }
-  auto t40 = e.RAngleToken();
-  b.setVal40(es.EntityId(t40));
-  auto t41 = e.TemplateKeywordToken();
-  b.setVal41(es.EntityId(t41));
+  auto et40 = es.EntityId(e.RAngleToken());
+  b.setVal40(et40);
+  auto et41 = es.EntityId(e.TemplateKeywordToken());
+  b.setVal41(et41);
   b.setVal89(e.HasExplicitTemplateArguments());
   b.setVal90(e.HasTemplateKeyword());
 }
 
-void SerializeUnresolvedMemberExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnresolvedMemberExpr &e, const TokenTree *) {
-  SerializeOverloadExpr(es, b, e, nullptr);
+void SerializeUnresolvedMemberExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnresolvedMemberExpr &e, const TokenTree *) {
+  SerializeOverloadExpr(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.Base()));
   b.setVal43(es.EntityId(e.BaseType()));
-  auto t44 = e.MemberToken();
-  b.setVal44(es.EntityId(t44));
-  auto t45 = e.OperatorToken();
-  b.setVal45(es.EntityId(t45));
+  auto et44 = es.EntityId(e.MemberToken());
+  b.setVal44(et44);
+  auto et45 = es.EntityId(e.OperatorToken());
+  b.setVal45(et45);
   b.setVal91(e.HasUnresolvedUsing());
   b.setVal92(e.IsArrow());
   b.setVal93(e.IsImplicitAccess());
 }
 
-void SerializeUnresolvedLookupExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnresolvedLookupExpr &e, const TokenTree *) {
-  SerializeOverloadExpr(es, b, e, nullptr);
+void SerializeUnresolvedLookupExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnresolvedLookupExpr &e, const TokenTree *) {
+  SerializeOverloadExpr(pf, es, b, e, nullptr);
   b.setVal91(e.IsOverloaded());
   b.setVal92(e.RequiresADL());
 }
 
-void SerializeOpaqueValueExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OpaqueValueExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+void SerializeOpaqueValueExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OpaqueValueExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.SourceExpression()));
   b.setVal89(e.IsUnique());
 }
 
-void SerializeOffsetOfExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OffsetOfExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.OperatorToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeOffsetOfExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OffsetOfExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.OperatorToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
 }
 
-void SerializeObjCSubscriptRefExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCSubscriptRefExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCSubscriptRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCSubscriptRefExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.AtIndexMethodDeclaration()));
   b.setVal38(es.EntityId(e.BaseExpression()));
   b.setVal39(es.EntityId(e.KeyExpression()));
-  auto t40 = e.RBracketToken();
-  b.setVal40(es.EntityId(t40));
+  auto et40 = es.EntityId(e.RBracketToken());
+  b.setVal40(et40);
   b.setVal89(e.IsArraySubscriptReferenceExpression());
 }
 
-void SerializeObjCStringLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCStringLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.AtToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeObjCStringLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCStringLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.AtToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.String()));
 }
 
-void SerializeObjCSelectorExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCSelectorExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.AtToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.RParenToken();
-  b.setVal38(es.EntityId(t38));
+void SerializeObjCSelectorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCSelectorExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.AtToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.RParenToken());
+  b.setVal38(et38);
 }
 
-void SerializeObjCProtocolExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCProtocolExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.AtToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeObjCProtocolExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCProtocolExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.AtToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.Protocol()));
-  auto t39 = e.ProtocolIdToken();
-  b.setVal39(es.EntityId(t39));
-  auto t40 = e.RParenToken();
-  b.setVal40(es.EntityId(t40));
+  auto et39 = es.EntityId(e.ProtocolIdToken());
+  b.setVal39(et39);
+  auto et40 = es.EntityId(e.RParenToken());
+  b.setVal40(et40);
 }
 
-void SerializeObjCPropertyRefExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCPropertyRefExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCPropertyRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCPropertyRefExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.ClassReceiver()));
   b.setVal39(es.EntityId(e.ExplicitProperty()));
   b.setVal40(es.EntityId(e.ImplicitPropertyGetter()));
   b.setVal41(es.EntityId(e.ImplicitPropertySetter()));
-  auto t42 = e.Token();
-  b.setVal42(es.EntityId(t42));
-  auto t43 = e.ReceiverToken();
-  b.setVal43(es.EntityId(t43));
+  auto et42 = es.EntityId(e.Token());
+  b.setVal42(et42);
+  auto et43 = es.EntityId(e.ReceiverToken());
+  b.setVal43(et43);
   b.setVal44(es.EntityId(e.ReceiverType()));
   b.setVal45(es.EntityId(e.SuperReceiverType()));
   b.setVal89(e.IsClassReceiver());
@@ -7330,8 +7802,8 @@ void SerializeObjCPropertyRefExpr(const EntityMapper &es, mx::ast::Stmt::Builder
   b.setVal97(e.IsSuperReceiver());
 }
 
-void SerializeObjCMessageExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCMessageExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCMessageExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCMessageExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Arguments();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -7345,8 +7817,8 @@ void SerializeObjCMessageExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, 
   b.setVal38(es.EntityId(e.ClassReceiver()));
   b.setVal39(es.EntityId(e.ClassReceiverType()));
   b.setVal40(es.EntityId(e.InstanceReceiver()));
-  auto t41 = e.LeftToken();
-  b.setVal41(es.EntityId(t41));
+  auto et41 = es.EntityId(e.LeftToken());
+  b.setVal41(et41);
   b.setVal42(es.EntityId(e.MethodDeclaration()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.MethodFamily())));
   b.setVal43(es.EntityId(e.ReceiverInterface()));
@@ -7359,12 +7831,12 @@ void SerializeObjCMessageExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, 
     b.setVal45(0);
   }
   b.setVal46(es.EntityId(e.ReceiverType()));
-  auto t47 = e.RightToken();
-  b.setVal47(es.EntityId(t47));
-  auto t48 = e.SelectorStartToken();
-  b.setVal48(es.EntityId(t48));
-  auto t49 = e.SuperToken();
-  b.setVal49(es.EntityId(t49));
+  auto et47 = es.EntityId(e.RightToken());
+  b.setVal47(et47);
+  auto et48 = es.EntityId(e.SelectorStartToken());
+  b.setVal48(et48);
+  auto et49 = es.EntityId(e.SuperToken());
+  b.setVal49(et49);
   b.setVal50(es.EntityId(e.SuperType()));
   b.setVal89(e.IsClassMessage());
   b.setVal90(e.IsDelegateInitializerCall());
@@ -7381,73 +7853,73 @@ void SerializeObjCMessageExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, 
   } while (false);
 }
 
-void SerializeObjCIvarRefExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIvarRefExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCIvarRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIvarRefExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.Declaration()));
-  auto t39 = e.Token();
-  b.setVal39(es.EntityId(t39));
-  auto t40 = e.OperationToken();
-  b.setVal40(es.EntityId(t40));
+  auto et39 = es.EntityId(e.Token());
+  b.setVal39(et39);
+  auto et40 = es.EntityId(e.OperationToken());
+  b.setVal40(et40);
   b.setVal89(e.IsArrow());
   b.setVal90(e.IsFreeInstanceVariable());
 }
 
-void SerializeObjCIsaExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIsaExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCIsaExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIsaExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
-  auto t38 = e.BaseTokenEnd();
-  b.setVal38(es.EntityId(t38));
-  auto t39 = e.IsaMemberToken();
-  b.setVal39(es.EntityId(t39));
-  auto t40 = e.OperationToken();
-  b.setVal40(es.EntityId(t40));
+  auto et38 = es.EntityId(e.BaseTokenEnd());
+  b.setVal38(et38);
+  auto et39 = es.EntityId(e.IsaMemberToken());
+  b.setVal39(et39);
+  auto et40 = es.EntityId(e.OperationToken());
+  b.setVal40(et40);
   b.setVal89(e.IsArrow());
 }
 
-void SerializeObjCIndirectCopyRestoreExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIndirectCopyRestoreExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCIndirectCopyRestoreExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIndirectCopyRestoreExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
   b.setVal89(e.ShouldCopy());
 }
 
-void SerializeObjCEncodeExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCEncodeExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.AtToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeObjCEncodeExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCEncodeExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.AtToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.EncodedType()));
-  auto t39 = e.RParenToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.RParenToken());
+  b.setVal39(et39);
 }
 
-void SerializeObjCDictionaryLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCDictionaryLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCDictionaryLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCDictionaryLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.DictionaryWithObjectsMethod()));
 }
 
-void SerializeObjCBoxedExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBoxedExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.AtToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeObjCBoxedExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBoxedExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.AtToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.BoxingMethod()));
   b.setVal39(es.EntityId(e.SubExpression()));
   b.setVal89(e.IsExpressibleAsConstantInitializer());
 }
 
-void SerializeObjCBoolLiteralExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBoolLiteralExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+void SerializeObjCBoolLiteralExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBoolLiteralExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
   b.setVal89(e.Value());
 }
 
-void SerializeObjCAvailabilityCheckExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAvailabilityCheckExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCAvailabilityCheckExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAvailabilityCheckExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.HasVersion());
 }
 
-void SerializeObjCArrayLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCArrayLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeObjCArrayLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCArrayLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.ArrayWithObjectsMethod()));
   do {
     auto v15 = e.Elements();
@@ -7460,18 +7932,18 @@ void SerializeObjCArrayLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b,
   } while (false);
 }
 
-void SerializeOMPIteratorExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPIteratorExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.IteratorKwToken();
-  b.setVal37(es.EntityId(t37));
-  auto t38 = e.LParenToken();
-  b.setVal38(es.EntityId(t38));
-  auto t39 = e.RParenToken();
-  b.setVal39(es.EntityId(t39));
+void SerializeOMPIteratorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPIteratorExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.IteratorKwToken());
+  b.setVal37(et37);
+  auto et38 = es.EntityId(e.LParenToken());
+  b.setVal38(et38);
+  auto et39 = es.EntityId(e.RParenToken());
+  b.setVal39(et39);
 }
 
-void SerializeOMPArrayShapingExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPArrayShapingExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeOMPArrayShapingExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPArrayShapingExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   do {
     auto v15 = e.Dimensions();
@@ -7482,44 +7954,44 @@ void SerializeOMPArrayShapingExpr(const EntityMapper &es, mx::ast::Stmt::Builder
       ++i15;
     }
   } while (false);
-  auto t38 = e.LParenToken();
-  b.setVal38(es.EntityId(t38));
-  auto t39 = e.RParenToken();
-  b.setVal39(es.EntityId(t39));
+  auto et38 = es.EntityId(e.LParenToken());
+  b.setVal38(et38);
+  auto et39 = es.EntityId(e.RParenToken());
+  b.setVal39(et39);
 }
 
-void SerializeOMPArraySectionExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPArraySectionExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeOMPArraySectionExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPArraySectionExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
-  auto t38 = e.FirstColonToken();
-  b.setVal38(es.EntityId(t38));
-  auto t39 = e.SecondColonToken();
-  b.setVal39(es.EntityId(t39));
+  auto et38 = es.EntityId(e.FirstColonToken());
+  b.setVal38(et38);
+  auto et39 = es.EntityId(e.SecondColonToken());
+  b.setVal39(et39);
   b.setVal40(es.EntityId(e.Length()));
   b.setVal41(es.EntityId(e.LowerBound()));
-  auto t42 = e.RBracketToken();
-  b.setVal42(es.EntityId(t42));
+  auto et42 = es.EntityId(e.RBracketToken());
+  b.setVal42(et42);
   b.setVal43(es.EntityId(e.Stride()));
 }
 
-void SerializeNoInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::NoInitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeNoInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::NoInitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeMemberExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MemberExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeMemberExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MemberExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
-  auto t38 = e.LAngleToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.LAngleToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.MemberDeclaration()));
-  auto t40 = e.MemberToken();
-  b.setVal40(es.EntityId(t40));
-  auto t41 = e.OperatorToken();
-  b.setVal41(es.EntityId(t41));
-  auto t42 = e.RAngleToken();
-  b.setVal42(es.EntityId(t42));
-  auto t43 = e.TemplateKeywordToken();
-  b.setVal43(es.EntityId(t43));
+  auto et40 = es.EntityId(e.MemberToken());
+  b.setVal40(et40);
+  auto et41 = es.EntityId(e.OperatorToken());
+  b.setVal41(et41);
+  auto et42 = es.EntityId(e.RAngleToken());
+  b.setVal42(et42);
+  auto et43 = es.EntityId(e.TemplateKeywordToken());
+  b.setVal43(et43);
   b.setVal89(e.HadMultipleCandidates());
   b.setVal90(e.HasExplicitTemplateArguments());
   b.setVal91(e.HasQualifier());
@@ -7529,18 +8001,18 @@ void SerializeMemberExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.IsNonOdrUse())));
 }
 
-void SerializeMatrixSubscriptExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MatrixSubscriptExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeMatrixSubscriptExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MatrixSubscriptExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.ColumnIndex()));
-  auto t39 = e.RBracketToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.RBracketToken());
+  b.setVal39(et39);
   b.setVal40(es.EntityId(e.RowIndex()));
   b.setVal89(e.IsIncomplete());
 }
 
-void SerializeMaterializeTemporaryExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MaterializeTemporaryExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeMaterializeTemporaryExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MaterializeTemporaryExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ExtendingDeclaration();
   if (v37) {
     auto id37 = es.EntityId(v37.value());
@@ -7561,31 +8033,31 @@ void SerializeMaterializeTemporaryExpr(const EntityMapper &es, mx::ast::Stmt::Bu
   b.setVal90(e.IsUsableInConstantExpressions());
 }
 
-void SerializeMSPropertySubscriptExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSPropertySubscriptExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeMSPropertySubscriptExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSPropertySubscriptExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.Index()));
-  auto t39 = e.RBracketToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.RBracketToken());
+  b.setVal39(et39);
 }
 
-void SerializeMSPropertyRefExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSPropertyRefExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeMSPropertyRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSPropertyRefExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.BaseExpression()));
-  auto t38 = e.MemberToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.MemberToken());
+  b.setVal38(et38);
   b.setVal39(es.EntityId(e.PropertyDeclaration()));
   b.setVal89(e.IsArrow());
   b.setVal90(e.IsImplicitAccess());
 }
 
-void SerializeLambdaExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::LambdaExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeLambdaExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::LambdaExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Body()));
   b.setVal38(es.EntityId(e.CallOperator()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.CaptureDefault())));
-  auto t39 = e.CaptureDefaultToken();
-  b.setVal39(es.EntityId(t39));
+  auto et39 = es.EntityId(e.CaptureDefaultToken());
+  b.setVal39(et39);
   b.setVal40(es.EntityId(e.CompoundStatementBody()));
   auto v41 = e.DependentCallOperator();
   if (v41) {
@@ -7631,14 +8103,14 @@ void SerializeLambdaExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   b.setVal92(e.IsMutable());
 }
 
-void SerializeIntegerLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IntegerLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+void SerializeIntegerLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IntegerLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
 }
 
-void SerializeInitListExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::InitListExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeInitListExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::InitListExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ArrayFiller();
   if (v37) {
     auto id37 = es.EntityId(v37.value());
@@ -7653,10 +8125,10 @@ void SerializeInitListExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, con
   } else {
     b.setVal38(mx::kInvalidEntityId);
   }
-  auto t39 = e.LBraceToken();
-  b.setVal39(es.EntityId(t39));
-  auto t40 = e.RBraceToken();
-  b.setVal40(es.EntityId(t40));
+  auto et39 = es.EntityId(e.LBraceToken());
+  b.setVal39(et39);
+  auto et40 = es.EntityId(e.RBraceToken());
+  b.setVal40(et40);
   auto v41 = e.SemanticForm();
   if (v41) {
     auto id41 = es.EntityId(v41.value());
@@ -7695,17 +8167,17 @@ void SerializeInitListExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, con
   }
 }
 
-void SerializeImplicitValueInitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImplicitValueInitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeImplicitValueInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImplicitValueInitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
 }
 
-void SerializeImaginaryLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImaginaryLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeImaginaryLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImaginaryLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
 }
 
-void SerializeGenericSelectionExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GenericSelectionExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeGenericSelectionExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GenericSelectionExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.AssociationExpressions();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -7716,27 +8188,27 @@ void SerializeGenericSelectionExpr(const EntityMapper &es, mx::ast::Stmt::Builde
     }
   } while (false);
   b.setVal37(es.EntityId(e.ControllingExpression()));
-  auto t38 = e.DefaultToken();
-  b.setVal38(es.EntityId(t38));
-  auto t39 = e.GenericToken();
-  b.setVal39(es.EntityId(t39));
-  auto t40 = e.RParenToken();
-  b.setVal40(es.EntityId(t40));
+  auto et38 = es.EntityId(e.DefaultToken());
+  b.setVal38(et38);
+  auto et39 = es.EntityId(e.GenericToken());
+  b.setVal39(et39);
+  auto et40 = es.EntityId(e.RParenToken());
+  b.setVal40(et40);
   b.setVal41(es.EntityId(e.ResultExpression()));
   b.setVal89(e.IsResultDependent());
 }
 
-void SerializeGNUNullExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GNUNullExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.TokenToken();
-  b.setVal37(es.EntityId(t37));
+void SerializeGNUNullExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GNUNullExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.TokenToken());
+  b.setVal37(et37);
 }
 
-void SerializeFunctionParmPackExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FunctionParmPackExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeFunctionParmPackExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FunctionParmPackExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.ParameterPack()));
-  auto t38 = e.ParameterPackToken();
-  b.setVal38(es.EntityId(t38));
+  auto et38 = es.EntityId(e.ParameterPackToken());
+  b.setVal38(et38);
   do {
     auto v15 = e.Expansions();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -7748,56 +8220,56 @@ void SerializeFunctionParmPackExpr(const EntityMapper &es, mx::ast::Stmt::Builde
   } while (false);
 }
 
-void SerializeFullExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FullExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeFullExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FullExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
 }
 
-void SerializeExprWithCleanups(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExprWithCleanups &e, const TokenTree *) {
-  SerializeFullExpr(es, b, e, nullptr);
+void SerializeExprWithCleanups(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExprWithCleanups &e, const TokenTree *) {
+  SerializeFullExpr(pf, es, b, e, nullptr);
   b.setVal89(e.CleanupsHaveSideEffects());
 }
 
-void SerializeConstantExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConstantExpr &e, const TokenTree *) {
-  SerializeFullExpr(es, b, e, nullptr);
+void SerializeConstantExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConstantExpr &e, const TokenTree *) {
+  SerializeFullExpr(pf, es, b, e, nullptr);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.ResultStorageKind())));
   b.setVal89(e.HasAPValueResult());
   b.setVal90(e.IsImmediateInvocation());
 }
 
-void SerializeFloatingLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FloatingLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+void SerializeFloatingLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FloatingLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
   b.setVal89(e.IsExact());
 }
 
-void SerializeFixedPointLiteral(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FixedPointLiteral &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
-  auto t37 = e.Token();
-  b.setVal37(es.EntityId(t37));
+void SerializeFixedPointLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FixedPointLiteral &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
+  auto et37 = es.EntityId(e.Token());
+  b.setVal37(et37);
 }
 
-void SerializeExtVectorElementExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExtVectorElementExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeExtVectorElementExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExtVectorElementExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.ContainsDuplicateElements());
-  auto t37 = e.AccessorToken();
-  b.setVal37(es.EntityId(t37));
+  auto et37 = es.EntityId(e.AccessorToken());
+  b.setVal37(et37);
   b.setVal38(es.EntityId(e.Base()));
   b.setVal90(e.IsArrow());
 }
 
-void SerializeExpressionTraitExpr(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExpressionTraitExpr &e, const TokenTree *) {
-  SerializeExpr(es, b, e, nullptr);
+void SerializeExpressionTraitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExpressionTraitExpr &e, const TokenTree *) {
+  SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.QueriedExpression()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Trait())));
   b.setVal89(e.Value());
 }
 
-void SerializeAttributedStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AttributedStmt &e, const TokenTree *) {
-  SerializeValueStmt(es, b, e, nullptr);
-  auto t10 = e.AttributeToken();
-  b.setVal10(es.EntityId(t10));
+void SerializeAttributedStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AttributedStmt &e, const TokenTree *) {
+  SerializeValueStmt(pf, es, b, e, nullptr);
+  auto et10 = es.EntityId(e.AttributeToken());
+  b.setVal10(et10);
   do {
     auto v15 = e.Attributes();
     auto sv15 = b.initVal15(static_cast<unsigned>(v15.size()));
@@ -7810,8 +8282,8 @@ void SerializeAttributedStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, c
   b.setVal11(es.EntityId(e.SubStatement()));
 }
 
-void SerializeSwitchStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SwitchStmt &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
+void SerializeSwitchStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SwitchStmt &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   b.setVal10(es.EntityId(e.Condition()));
   auto v11 = e.ConditionVariable();
@@ -7835,10 +8307,10 @@ void SerializeSwitchStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   } else {
     b.setVal14(mx::kInvalidEntityId);
   }
-  auto t17 = e.LParenToken();
-  b.setVal17(es.EntityId(t17));
-  auto t18 = e.RParenToken();
-  b.setVal18(es.EntityId(t18));
+  auto et17 = es.EntityId(e.LParenToken());
+  b.setVal17(et17);
+  auto et18 = es.EntityId(e.RParenToken());
+  b.setVal18(et18);
   auto v19 = e.FirstSwitchCase();
   if (v19) {
     auto id19 = es.EntityId(v19.value());
@@ -7846,19 +8318,19 @@ void SerializeSwitchStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   } else {
     b.setVal19(mx::kInvalidEntityId);
   }
-  auto t20 = e.SwitchToken();
-  b.setVal20(es.EntityId(t20));
+  auto et20 = es.EntityId(e.SwitchToken());
+  b.setVal20(et20);
   b.setVal12(e.HasInitializerStorage());
   b.setVal16(e.HasVariableStorage());
   b.setVal23(e.IsAllEnumCasesCovered());
 }
 
-void SerializeSwitchCase(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SwitchCase &e, const TokenTree *) {
-  SerializeStmt(es, b, e, nullptr);
-  auto t9 = e.ColonToken();
-  b.setVal9(es.EntityId(t9));
-  auto t10 = e.KeywordToken();
-  b.setVal10(es.EntityId(t10));
+void SerializeSwitchCase(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SwitchCase &e, const TokenTree *) {
+  SerializeStmt(pf, es, b, e, nullptr);
+  auto et9 = es.EntityId(e.ColonToken());
+  b.setVal9(et9);
+  auto et10 = es.EntityId(e.KeywordToken());
+  b.setVal10(et10);
   auto v11 = e.NextSwitchCase();
   if (v11) {
     auto id11 = es.EntityId(v11.value());
@@ -7869,19 +8341,19 @@ void SerializeSwitchCase(const EntityMapper &es, mx::ast::Stmt::Builder b, const
   b.setVal13(es.EntityId(e.SubStatement()));
 }
 
-void SerializeDefaultStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DefaultStmt &e, const TokenTree *) {
-  SerializeSwitchCase(es, b, e, nullptr);
-  auto t14 = e.DefaultToken();
-  b.setVal14(es.EntityId(t14));
+void SerializeDefaultStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DefaultStmt &e, const TokenTree *) {
+  SerializeSwitchCase(pf, es, b, e, nullptr);
+  auto et14 = es.EntityId(e.DefaultToken());
+  b.setVal14(et14);
 }
 
-void SerializeCaseStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CaseStmt &e, const TokenTree *) {
-  SerializeSwitchCase(es, b, e, nullptr);
+void SerializeCaseStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CaseStmt &e, const TokenTree *) {
+  SerializeSwitchCase(pf, es, b, e, nullptr);
   b.setVal12(e.CaseStatementIsGNURange());
-  auto t14 = e.CaseToken();
-  b.setVal14(es.EntityId(t14));
-  auto t17 = e.EllipsisToken();
-  b.setVal17(es.EntityId(t17));
+  auto et14 = es.EntityId(e.CaseToken());
+  b.setVal14(et14);
+  auto et17 = es.EntityId(e.EllipsisToken());
+  b.setVal17(et17);
   b.setVal18(es.EntityId(e.LHS()));
   auto v19 = e.RHS();
   if (v19) {
@@ -7892,7 +8364,8 @@ void SerializeCaseStmt(const EntityMapper &es, mx::ast::Stmt::Builder b, const p
   }
 }
 
-void SerializeDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::Decl &e, const TokenTree *) {
+void SerializeDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::Decl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -7991,8 +8464,11 @@ void SerializeDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta
   b.setVal44(e.IsWeakImported());
   b.setVal45(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
   b.setVal46(static_cast<unsigned char>(mx::FromPasta(e.Category())));
-  auto t47 = e.Token();
-  b.setVal47(es.EntityId(t47));
+  auto et47 = es.EntityId(e.Token());
+  if (!et47) {
+    et47 = pf.DeclTokenEntityId(e);
+  }
+  b.setVal47(et47);
   if (auto r48 = e.Tokens(); auto rs48 = r48.Size()) {
     b.setVal48(es.EntityId(r48[0]));
     b.setVal49(es.EntityId(r48[rs48 - 1u]));
@@ -8002,20 +8478,22 @@ void SerializeDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta
   }
 }
 
-void SerializeClassScopeFunctionSpecializationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassScopeFunctionSpecializationDecl &e, const TokenTree *) {
+void SerializeClassScopeFunctionSpecializationDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassScopeFunctionSpecializationDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   b.setVal50(es.EntityId(e.Specialization()));
   b.setVal51(e.HasExplicitTemplateArguments());
 }
 
-void SerializeCapturedDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CapturedDecl &e, const TokenTree *) {
+void SerializeCapturedDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CapturedDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   b.setVal50(es.EntityId(e.ContextParameter()));
   b.setVal51(e.IsNothrow());
   do {
@@ -8037,11 +8515,12 @@ void SerializeCapturedDecl(const EntityMapper &es, mx::ast::Decl::Builder b, con
   }
 }
 
-void SerializeBlockDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BlockDecl &e, const TokenTree *) {
+void SerializeBlockDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BlockDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   b.setVal51(e.BlockMissingReturnType());
   b.setVal54(e.CanAvoidCopyToHeap());
   b.setVal55(e.CapturesCXXThis());
@@ -8053,8 +8532,8 @@ void SerializeBlockDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const 
   } else {
     b.setVal50(mx::kInvalidEntityId);
   }
-  auto t57 = e.CaretToken();
-  b.setVal57(es.EntityId(t57));
+  auto et57 = es.EntityId(e.CaretToken());
+  b.setVal57(et57);
   b.setVal58(es.EntityId(e.CompoundBody()));
   b.setVal59(es.EntityId(e.SignatureAsWritten()));
   b.setVal60(e.HasCaptures());
@@ -8088,29 +8567,32 @@ void SerializeBlockDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const 
   }
 }
 
-void SerializeAccessSpecDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::AccessSpecDecl &e, const TokenTree *) {
+void SerializeAccessSpecDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::AccessSpecDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
-  auto t50 = e.AccessSpecifierToken();
-  b.setVal50(es.EntityId(t50));
-  auto t57 = e.ColonToken();
-  b.setVal57(es.EntityId(t57));
+  SerializeDecl(pf, es, b, e, nullptr);
+  auto et50 = es.EntityId(e.AccessSpecifierToken());
+  b.setVal50(et50);
+  auto et57 = es.EntityId(e.ColonToken());
+  b.setVal57(et57);
 }
 
-void SerializeOMPDeclarativeDirectiveDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclarativeDirectiveDecl &e, const TokenTree *) {
+void SerializeOMPDeclarativeDirectiveDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclarativeDirectiveDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPThreadPrivateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPThreadPrivateDecl &e, const TokenTree *) {
+void SerializeOMPThreadPrivateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPThreadPrivateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeOMPDeclarativeDirectiveDecl(es, b, e, nullptr);
+  SerializeOMPDeclarativeDirectiveDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.Varlists();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -8122,18 +8604,20 @@ void SerializeOMPThreadPrivateDecl(const EntityMapper &es, mx::ast::Decl::Builde
   } while (false);
 }
 
-void SerializeOMPRequiresDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPRequiresDecl &e, const TokenTree *) {
+void SerializeOMPRequiresDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPRequiresDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeOMPDeclarativeDirectiveDecl(es, b, e, nullptr);
+  SerializeOMPDeclarativeDirectiveDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPAllocateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPAllocateDecl &e, const TokenTree *) {
+void SerializeOMPAllocateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPAllocateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeOMPDeclarativeDirectiveDecl(es, b, e, nullptr);
+  SerializeOMPDeclarativeDirectiveDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.Varlists();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -8145,7 +8629,8 @@ void SerializeOMPAllocateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, 
   } while (false);
 }
 
-void SerializeTranslationUnitDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TranslationUnitDecl &e, const TokenTree *) {
+void SerializeTranslationUnitDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TranslationUnitDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -8159,31 +8644,34 @@ void SerializeTranslationUnitDecl(const EntityMapper &es, mx::ast::Decl::Builder
   }
 }
 
-void SerializeTopLevelStmtDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TopLevelStmtDecl &e, const TokenTree *) {
+void SerializeTopLevelStmtDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TopLevelStmtDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   b.setVal50(es.EntityId(e.Statement()));
 }
 
-void SerializeStaticAssertDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::StaticAssertDecl &e, const TokenTree *) {
+void SerializeStaticAssertDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::StaticAssertDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   b.setVal50(es.EntityId(e.AssertExpression()));
   b.setVal57(es.EntityId(e.Message()));
-  auto t58 = e.RParenToken();
-  b.setVal58(es.EntityId(t58));
+  auto et58 = es.EntityId(e.RParenToken());
+  b.setVal58(et58);
   b.setVal51(e.IsFailed());
 }
 
-void SerializeRequiresExprBodyDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::RequiresExprBodyDecl &e, const TokenTree *) {
+void SerializeRequiresExprBodyDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::RequiresExprBodyDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   pasta::DeclContext dc52(e);
   auto v52 = dc52.AlreadyLoadedDeclarations();
   auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -8194,11 +8682,12 @@ void SerializeRequiresExprBodyDecl(const EntityMapper &es, mx::ast::Decl::Builde
   }
 }
 
-void SerializePragmaDetectMismatchDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::PragmaDetectMismatchDecl &e, const TokenTree *) {
+void SerializePragmaDetectMismatchDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::PragmaDetectMismatchDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   auto v64 = e.Name();
   std::string s64(v64.data(), v64.size());
   b.setVal64(s64);
@@ -8207,39 +8696,42 @@ void SerializePragmaDetectMismatchDecl(const EntityMapper &es, mx::ast::Decl::Bu
   b.setVal65(s65);
 }
 
-void SerializePragmaCommentDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::PragmaCommentDecl &e, const TokenTree *) {
+void SerializePragmaCommentDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::PragmaCommentDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   auto v64 = e.Argument();
   std::string s64(v64.data(), v64.size());
   b.setVal64(s64);
   b.setVal66(static_cast<unsigned char>(mx::FromPasta(e.CommentKind())));
 }
 
-void SerializeObjCPropertyImplDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCPropertyImplDecl &e, const TokenTree *) {
+void SerializeObjCPropertyImplDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCPropertyImplDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   b.setVal50(es.EntityId(e.GetterCXXConstructor()));
   b.setVal57(es.EntityId(e.GetterMethodDeclaration()));
   b.setVal58(es.EntityId(e.PropertyDeclaration()));
   b.setVal66(static_cast<unsigned char>(mx::FromPasta(e.PropertyImplementation())));
   b.setVal59(es.EntityId(e.PropertyInstanceVariableDeclaration()));
-  auto t67 = e.PropertyInstanceVariableDeclarationToken();
-  b.setVal67(es.EntityId(t67));
+  auto et67 = es.EntityId(e.PropertyInstanceVariableDeclarationToken());
+  b.setVal67(et67);
   b.setVal68(es.EntityId(e.SetterCXXAssignment()));
   b.setVal69(es.EntityId(e.SetterMethodDeclaration()));
   b.setVal51(e.IsInstanceVariableNameSpecified());
 }
 
-void SerializeNamedDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamedDecl &e, const TokenTree *) {
+void SerializeNamedDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamedDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   b.setVal66(static_cast<unsigned char>(mx::FromPasta(e.FormalLinkage())));
   b.setVal64(e.Name());
   auto v70 = e.ObjCFStringFormattingFamily();
@@ -8262,11 +8754,12 @@ void SerializeNamedDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const 
   b.setVal73(e.IsLinkageValid());
 }
 
-void SerializeLabelDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LabelDecl &e, const TokenTree *) {
+void SerializeLabelDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LabelDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   auto v74 = e.MSAssemblyLabel();
   std::string s74(v74.data(), v74.size());
   b.setVal74(s74);
@@ -8276,25 +8769,27 @@ void SerializeLabelDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const 
   b.setVal77(e.IsResolvedMSAssemblyLabel());
 }
 
-void SerializeHLSLBufferDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::HLSLBufferDecl &e, const TokenTree *) {
+void SerializeHLSLBufferDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::HLSLBufferDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
-  auto t57 = e.LBraceToken();
-  b.setVal57(es.EntityId(t57));
-  auto t58 = e.TokenStart();
-  b.setVal58(es.EntityId(t58));
-  auto t59 = e.RBraceToken();
-  b.setVal59(es.EntityId(t59));
+  SerializeNamedDecl(pf, es, b, e, nullptr);
+  auto et57 = es.EntityId(e.LBraceToken());
+  b.setVal57(et57);
+  auto et58 = es.EntityId(e.TokenStart());
+  b.setVal58(et58);
+  auto et59 = es.EntityId(e.RBraceToken());
+  b.setVal59(et59);
   b.setVal75(e.IsCBuffer());
 }
 
-void SerializeBaseUsingDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BaseUsingDecl &e, const TokenTree *) {
+void SerializeBaseUsingDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BaseUsingDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.Shadows();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -8306,35 +8801,38 @@ void SerializeBaseUsingDecl(const EntityMapper &es, mx::ast::Decl::Builder b, co
   } while (false);
 }
 
-void SerializeUsingEnumDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingEnumDecl &e, const TokenTree *) {
+void SerializeUsingEnumDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingEnumDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeBaseUsingDecl(es, b, e, nullptr);
+  SerializeBaseUsingDecl(pf, es, b, e, nullptr);
   b.setVal57(es.EntityId(e.EnumDeclaration()));
-  auto t58 = e.EnumToken();
-  b.setVal58(es.EntityId(t58));
+  auto et58 = es.EntityId(e.EnumToken());
+  b.setVal58(et58);
   b.setVal59(es.EntityId(e.EnumType()));
-  auto t67 = e.UsingToken();
-  b.setVal67(es.EntityId(t67));
+  auto et67 = es.EntityId(e.UsingToken());
+  b.setVal67(et67);
 }
 
-void SerializeUsingDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingDecl &e, const TokenTree *) {
+void SerializeUsingDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeBaseUsingDecl(es, b, e, nullptr);
-  auto t57 = e.UsingToken();
-  b.setVal57(es.EntityId(t57));
+  SerializeBaseUsingDecl(pf, es, b, e, nullptr);
+  auto et57 = es.EntityId(e.UsingToken());
+  b.setVal57(et57);
   b.setVal75(e.HasTypename());
   b.setVal76(e.IsAccessDeclaration());
 }
 
-void SerializeValueDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ValueDecl &e, const TokenTree *) {
+void SerializeValueDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ValueDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   auto v57 = e.PotentiallyDecomposedVariableDeclaration();
   if (v57) {
     auto id57 = es.EntityId(v57.value());
@@ -8347,38 +8845,42 @@ void SerializeValueDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const 
   b.setVal76(e.IsWeak());
 }
 
-void SerializeUnresolvedUsingValueDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingValueDecl &e, const TokenTree *) {
+void SerializeUnresolvedUsingValueDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingValueDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
-  auto t59 = e.EllipsisToken();
-  b.setVal59(es.EntityId(t59));
-  auto t67 = e.UsingToken();
-  b.setVal67(es.EntityId(t67));
+  SerializeValueDecl(pf, es, b, e, nullptr);
+  auto et59 = es.EntityId(e.EllipsisToken());
+  b.setVal59(et59);
+  auto et67 = es.EntityId(e.UsingToken());
+  b.setVal67(et67);
   b.setVal77(e.IsAccessDeclaration());
   b.setVal78(e.IsPackExpansion());
 }
 
-void SerializeUnnamedGlobalConstantDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnnamedGlobalConstantDecl &e, const TokenTree *) {
+void SerializeUnnamedGlobalConstantDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnnamedGlobalConstantDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
+  SerializeValueDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeTemplateParamObjectDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateParamObjectDecl &e, const TokenTree *) {
+void SerializeTemplateParamObjectDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateParamObjectDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
+  SerializeValueDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPDeclareReductionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclareReductionDecl &e, const TokenTree *) {
+void SerializeOMPDeclareReductionDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclareReductionDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
+  SerializeValueDecl(pf, es, b, e, nullptr);
   b.setVal59(es.EntityId(e.Combiner()));
   b.setVal67(es.EntityId(e.CombinerIn()));
   b.setVal68(es.EntityId(e.CombinerOut()));
@@ -8396,18 +8898,20 @@ void SerializeOMPDeclareReductionDecl(const EntityMapper &es, mx::ast::Decl::Bui
   }
 }
 
-void SerializeMSGuidDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::MSGuidDecl &e, const TokenTree *) {
+void SerializeMSGuidDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::MSGuidDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
+  SerializeValueDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeIndirectFieldDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::IndirectFieldDecl &e, const TokenTree *) {
+void SerializeIndirectFieldDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::IndirectFieldDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
+  SerializeValueDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.Chain();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -8433,11 +8937,12 @@ void SerializeIndirectFieldDecl(const EntityMapper &es, mx::ast::Decl::Builder b
   }
 }
 
-void SerializeEnumConstantDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::EnumConstantDecl &e, const TokenTree *) {
+void SerializeEnumConstantDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::EnumConstantDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
+  SerializeValueDecl(pf, es, b, e, nullptr);
   auto v59 = e.InitializerExpression();
   if (v59) {
     auto id59 = es.EntityId(v59.value());
@@ -8447,15 +8952,16 @@ void SerializeEnumConstantDecl(const EntityMapper &es, mx::ast::Decl::Builder b,
   }
 }
 
-void SerializeDeclaratorDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::DeclaratorDecl &e, const TokenTree *) {
+void SerializeDeclaratorDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::DeclaratorDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
-  auto t59 = e.FirstInnerToken();
-  b.setVal59(es.EntityId(t59));
-  auto t67 = e.FirstOuterToken();
-  b.setVal67(es.EntityId(t67));
+  SerializeValueDecl(pf, es, b, e, nullptr);
+  auto et59 = es.EntityId(e.FirstInnerToken());
+  b.setVal59(et59);
+  auto et67 = es.EntityId(e.FirstOuterToken());
+  b.setVal67(et67);
   auto v68 = e.TrailingRequiresClause();
   if (v68) {
     auto id68 = es.EntityId(v68.value());
@@ -8463,10 +8969,10 @@ void SerializeDeclaratorDecl(const EntityMapper &es, mx::ast::Decl::Builder b, c
   } else {
     b.setVal68(mx::kInvalidEntityId);
   }
-  auto t69 = e.TypeSpecEndToken();
-  b.setVal69(es.EntityId(t69));
-  auto t79 = e.TypeSpecStartToken();
-  b.setVal79(es.EntityId(t79));
+  auto et69 = es.EntityId(e.TypeSpecEndToken());
+  b.setVal69(et69);
+  auto et79 = es.EntityId(e.TypeSpecStartToken());
+  b.setVal79(et79);
   do {
     auto v52 = e.TemplateParameterLists();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -8478,11 +8984,12 @@ void SerializeDeclaratorDecl(const EntityMapper &es, mx::ast::Decl::Builder b, c
   } while (false);
 }
 
-void SerializeVarDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarDecl &e, const TokenTree *) {
+void SerializeVarDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeclaratorDecl(es, b, e, nullptr);
+  SerializeDeclaratorDecl(pf, es, b, e, nullptr);
   auto v80 = e.ActingDefinition();
   if (v80) {
     auto id80 = es.EntityId(v80.value());
@@ -8520,8 +9027,8 @@ void SerializeVarDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pa
     b.setVal85(mx::kInvalidEntityId);
   }
   b.setVal86(static_cast<unsigned char>(mx::FromPasta(e.LanguageLinkage())));
-  auto t87 = e.PointOfInstantiation();
-  b.setVal87(es.EntityId(t87));
+  auto et87 = es.EntityId(e.PointOfInstantiation());
+  b.setVal87(et87);
   b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.StorageClass())));
   b.setVal89(static_cast<unsigned char>(mx::FromPasta(e.StorageDuration())));
   b.setVal90(static_cast<unsigned char>(mx::FromPasta(e.TLSKind())));
@@ -8583,11 +9090,12 @@ void SerializeVarDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pa
   b.setVal128(e.MightBeUsableInConstantExpressions());
 }
 
-void SerializeParmVarDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ParmVarDecl &e, const TokenTree *) {
+void SerializeParmVarDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ParmVarDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeVarDecl(es, b, e, nullptr);
+  SerializeVarDecl(pf, es, b, e, nullptr);
   auto v129 = e.DefaultArgument();
   if (v129) {
     auto id129 = es.EntityId(v129.value());
@@ -8620,26 +9128,29 @@ void SerializeParmVarDecl(const EntityMapper &es, mx::ast::Decl::Builder b, cons
   b.setVal141(e.IsObjCMethodParameter());
 }
 
-void SerializeOMPCapturedExprDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPCapturedExprDecl &e, const TokenTree *) {
+void SerializeOMPCapturedExprDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPCapturedExprDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeVarDecl(es, b, e, nullptr);
+  SerializeVarDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeImplicitParamDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ImplicitParamDecl &e, const TokenTree *) {
+void SerializeImplicitParamDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ImplicitParamDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeVarDecl(es, b, e, nullptr);
+  SerializeVarDecl(pf, es, b, e, nullptr);
   b.setVal132(static_cast<unsigned char>(mx::FromPasta(e.ParameterKind())));
 }
 
-void SerializeDecompositionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::DecompositionDecl &e, const TokenTree *) {
+void SerializeDecompositionDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::DecompositionDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeVarDecl(es, b, e, nullptr);
+  SerializeVarDecl(pf, es, b, e, nullptr);
   do {
     auto v53 = e.Bindings();
     auto sv53 = b.initVal53(static_cast<unsigned>(v53.size()));
@@ -8651,13 +9162,14 @@ void SerializeDecompositionDecl(const EntityMapper &es, mx::ast::Decl::Builder b
   } while (false);
 }
 
-void SerializeVarTemplateSpecializationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarTemplateSpecializationDecl &e, const TokenTree *) {
+void SerializeVarTemplateSpecializationDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarTemplateSpecializationDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeVarDecl(es, b, e, nullptr);
-  auto t129 = e.ExternToken();
-  b.setVal129(es.EntityId(t129));
+  SerializeVarDecl(pf, es, b, e, nullptr);
+  auto et129 = es.EntityId(e.ExternToken());
+  b.setVal129(et129);
   b.setVal132(static_cast<unsigned char>(mx::FromPasta(e.SpecializationKind())));
   b.setVal130(es.EntityId(e.SpecializedTemplate()));
   do {
@@ -8678,29 +9190,31 @@ void SerializeVarTemplateSpecializationDecl(const EntityMapper &es, mx::ast::Dec
       ++i63;
     }
   } while (false);
-  auto t131 = e.TemplateKeywordToken();
-  b.setVal131(es.EntityId(t131));
+  auto et131 = es.EntityId(e.TemplateKeywordToken());
+  b.setVal131(et131);
   b.setVal133(es.EntityId(e.TypeAsWritten()));
   b.setVal135(e.IsClassScopeExplicitSpecialization());
   b.setVal136(e.IsExplicitInstantiationOrSpecialization());
   b.setVal137(e.IsExplicitSpecialization());
 }
 
-void SerializeVarTemplatePartialSpecializationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarTemplatePartialSpecializationDecl &e, const TokenTree *) {
+void SerializeVarTemplatePartialSpecializationDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarTemplatePartialSpecializationDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeVarTemplateSpecializationDecl(es, b, e, nullptr);
+  SerializeVarTemplateSpecializationDecl(pf, es, b, e, nullptr);
   b.setVal134(es.EntityId(e.InstantiatedFromMember()));
   b.setVal142(es.EntityId(e.TemplateParameters()));
   b.setVal138(e.HasAssociatedConstraints());
 }
 
-void SerializeNonTypeTemplateParmDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NonTypeTemplateParmDecl &e, const TokenTree *) {
+void SerializeNonTypeTemplateParmDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NonTypeTemplateParmDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeclaratorDecl(es, b, e, nullptr);
+  SerializeDeclaratorDecl(pf, es, b, e, nullptr);
   b.setVal77(e.DefaultArgumentWasInherited());
   auto v80 = e.DefaultArgument();
   if (v80) {
@@ -8709,8 +9223,8 @@ void SerializeNonTypeTemplateParmDecl(const EntityMapper &es, mx::ast::Decl::Bui
   } else {
     b.setVal80(mx::kInvalidEntityId);
   }
-  auto t82 = e.DefaultArgumentToken();
-  b.setVal82(es.EntityId(t82));
+  auto et82 = es.EntityId(e.DefaultArgumentToken());
+  b.setVal82(et82);
   auto v83 = e.PlaceholderTypeConstraint();
   if (v83) {
     auto id83 = es.EntityId(v83.value());
@@ -8733,20 +9247,22 @@ void SerializeNonTypeTemplateParmDecl(const EntityMapper &es, mx::ast::Decl::Bui
   } while (false);
 }
 
-void SerializeMSPropertyDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::MSPropertyDecl &e, const TokenTree *) {
+void SerializeMSPropertyDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::MSPropertyDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeclaratorDecl(es, b, e, nullptr);
+  SerializeDeclaratorDecl(pf, es, b, e, nullptr);
   b.setVal77(e.HasGetter());
   b.setVal78(e.HasSetter());
 }
 
-void SerializeFunctionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FunctionDecl &e, const TokenTree *) {
+void SerializeFunctionDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FunctionDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeclaratorDecl(es, b, e, nullptr);
+  SerializeDeclaratorDecl(pf, es, b, e, nullptr);
   b.setVal77(e.FriendConstraintRefersToEnclosingTemplate());
   b.setVal78(e.UsesFPIntrin());
   auto v95 = e.DoesDeclarationForceExternallyVisibleDefinition();
@@ -8760,8 +9276,8 @@ void SerializeFunctionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, con
   b.setVal80(es.EntityId(e.CallResultType()));
   b.setVal81(static_cast<unsigned char>(mx::FromPasta(e.ConstexprKind())));
   b.setVal82(es.EntityId(e.DeclaredReturnType()));
-  auto t83 = e.DefaultToken();
-  b.setVal83(es.EntityId(t83));
+  auto et83 = es.EntityId(e.DefaultToken());
+  b.setVal83(et83);
   auto v84 = e.DescribedFunctionTemplate();
   if (v84) {
     auto id84 = es.EntityId(v84.value());
@@ -8769,8 +9285,8 @@ void SerializeFunctionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, con
   } else {
     b.setVal84(mx::kInvalidEntityId);
   }
-  auto t85 = e.EllipsisToken();
-  b.setVal85(es.EntityId(t85));
+  auto et85 = es.EntityId(e.EllipsisToken());
+  b.setVal85(et85);
   if (auto r87 = e.ExceptionSpecTokens(); auto rs87 = r87.Size()) {
     b.setVal87(es.EntityId(r87[0]));
     b.setVal92(es.EntityId(r87[rs87 - 1u]));
@@ -8810,8 +9326,8 @@ void SerializeFunctionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, con
     b.setVal131(0);
     b.setVal133(0);
   }
-  auto t134 = e.PointOfInstantiation();
-  b.setVal134(es.EntityId(t134));
+  auto et134 = es.EntityId(e.PointOfInstantiation());
+  b.setVal134(et134);
   auto v142 = e.PrimaryTemplate();
   if (v142) {
     auto id142 = es.EntityId(v142.value());
@@ -8927,11 +9443,12 @@ void SerializeFunctionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, con
   }
 }
 
-void SerializeCXXMethodDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXMethodDecl &e, const TokenTree *) {
+void SerializeCXXMethodDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXMethodDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeFunctionDecl(es, b, e, nullptr);
+  SerializeFunctionDecl(pf, es, b, e, nullptr);
   b.setVal165(static_cast<unsigned char>(mx::FromPasta(e.ReferenceQualifier())));
   auto v166 = e.ThisObjectType();
   if (v166) {
@@ -8966,11 +9483,12 @@ void SerializeCXXMethodDecl(const EntityMapper &es, mx::ast::Decl::Builder b, co
   } while (false);
 }
 
-void SerializeCXXDestructorDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXDestructorDecl &e, const TokenTree *) {
+void SerializeCXXDestructorDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXDestructorDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeCXXMethodDecl(es, b, e, nullptr);
+  SerializeCXXMethodDecl(pf, es, b, e, nullptr);
   auto v177 = e.OperatorDelete();
   if (v177) {
     auto id177 = es.EntityId(v177.value());
@@ -8987,21 +9505,23 @@ void SerializeCXXDestructorDecl(const EntityMapper &es, mx::ast::Decl::Builder b
   }
 }
 
-void SerializeCXXConversionDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXConversionDecl &e, const TokenTree *) {
+void SerializeCXXConversionDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXConversionDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeCXXMethodDecl(es, b, e, nullptr);
+  SerializeCXXMethodDecl(pf, es, b, e, nullptr);
   b.setVal177(es.EntityId(e.ConversionType()));
   b.setVal179(e.IsExplicit());
   b.setVal180(e.IsLambdaToBlockPointerConversion());
 }
 
-void SerializeCXXConstructorDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXConstructorDecl &e, const TokenTree *) {
+void SerializeCXXConstructorDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXConstructorDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeCXXMethodDecl(es, b, e, nullptr);
+  SerializeCXXMethodDecl(pf, es, b, e, nullptr);
   auto v177 = e.TargetConstructor();
   if (v177) {
     auto id177 = es.EntityId(v177.value());
@@ -9016,22 +9536,24 @@ void SerializeCXXConstructorDecl(const EntityMapper &es, mx::ast::Decl::Builder 
   b.setVal183(e.IsSpecializationCopyingObject());
 }
 
-void SerializeCXXDeductionGuideDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXDeductionGuideDecl &e, const TokenTree *) {
+void SerializeCXXDeductionGuideDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXDeductionGuideDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeFunctionDecl(es, b, e, nullptr);
+  SerializeFunctionDecl(pf, es, b, e, nullptr);
   b.setVal166(es.EntityId(e.CorrespondingConstructor()));
   b.setVal167(es.EntityId(e.DeducedTemplate()));
   b.setVal168(e.IsCopyDeductionCandidate());
   b.setVal169(e.IsExplicit());
 }
 
-void SerializeFieldDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FieldDecl &e, const TokenTree *) {
+void SerializeFieldDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FieldDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDeclaratorDecl(es, b, e, nullptr);
+  SerializeDeclaratorDecl(pf, es, b, e, nullptr);
   auto v80 = e.BitWidth();
   if (v80) {
     auto id80 = es.EntityId(v80.value());
@@ -9064,11 +9586,12 @@ void SerializeFieldDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const 
   b.setVal100(e.IsZeroSize());
 }
 
-void SerializeObjCIvarDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCIvarDecl &e, const TokenTree *) {
+void SerializeObjCIvarDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCIvarDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeFieldDecl(es, b, e, nullptr);
+  SerializeFieldDecl(pf, es, b, e, nullptr);
   b.setVal86(static_cast<unsigned char>(mx::FromPasta(e.AccessControl())));
   b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.CanonicalAccessControl())));
   b.setVal84(es.EntityId(e.ContainingInterface()));
@@ -9076,35 +9599,39 @@ void SerializeObjCIvarDecl(const EntityMapper &es, mx::ast::Decl::Builder b, con
   b.setVal101(e.Synthesize());
 }
 
-void SerializeObjCAtDefsFieldDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCAtDefsFieldDecl &e, const TokenTree *) {
+void SerializeObjCAtDefsFieldDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCAtDefsFieldDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeFieldDecl(es, b, e, nullptr);
+  SerializeFieldDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeBindingDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BindingDecl &e, const TokenTree *) {
+void SerializeBindingDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BindingDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
+  SerializeValueDecl(pf, es, b, e, nullptr);
   b.setVal59(es.EntityId(e.Binding()));
   b.setVal67(es.EntityId(e.DecomposedDeclaration()));
   b.setVal68(es.EntityId(e.HoldingVariable()));
 }
 
-void SerializeOMPDeclarativeDirectiveValueDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclarativeDirectiveValueDecl &e, const TokenTree *) {
+void SerializeOMPDeclarativeDirectiveValueDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclarativeDirectiveValueDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeValueDecl(es, b, e, nullptr);
+  SerializeValueDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeOMPDeclareMapperDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclareMapperDecl &e, const TokenTree *) {
+void SerializeOMPDeclareMapperDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclareMapperDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeOMPDeclarativeDirectiveValueDecl(es, b, e, nullptr);
+  SerializeOMPDeclarativeDirectiveValueDecl(pf, es, b, e, nullptr);
   b.setVal59(es.EntityId(e.MapperVariableReference()));
   pasta::DeclContext dc52(e);
   auto v52 = dc52.AlreadyLoadedDeclarations();
@@ -9116,11 +9643,12 @@ void SerializeOMPDeclareMapperDecl(const EntityMapper &es, mx::ast::Decl::Builde
   }
 }
 
-void SerializeUsingShadowDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingShadowDecl &e, const TokenTree *) {
+void SerializeUsingShadowDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingShadowDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   b.setVal57(es.EntityId(e.Introducer()));
   auto v58 = e.NextUsingShadowDeclaration();
   if (v58) {
@@ -9132,11 +9660,12 @@ void SerializeUsingShadowDecl(const EntityMapper &es, mx::ast::Decl::Builder b, 
   b.setVal59(es.EntityId(e.TargetDeclaration()));
 }
 
-void SerializeConstructorUsingShadowDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ConstructorUsingShadowDecl &e, const TokenTree *) {
+void SerializeConstructorUsingShadowDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ConstructorUsingShadowDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeUsingShadowDecl(es, b, e, nullptr);
+  SerializeUsingShadowDecl(pf, es, b, e, nullptr);
   b.setVal75(e.ConstructsVirtualBase());
   b.setVal67(es.EntityId(e.ConstructedBaseClass()));
   auto v68 = e.ConstructedBaseClassShadowDeclaration();
@@ -9156,11 +9685,12 @@ void SerializeConstructorUsingShadowDecl(const EntityMapper &es, mx::ast::Decl::
   }
 }
 
-void SerializeUsingPackDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingPackDecl &e, const TokenTree *) {
+void SerializeUsingPackDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingPackDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.Expansions();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -9173,32 +9703,35 @@ void SerializeUsingPackDecl(const EntityMapper &es, mx::ast::Decl::Builder b, co
   b.setVal57(es.EntityId(e.InstantiatedFromUsingDeclaration()));
 }
 
-void SerializeUsingDirectiveDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingDirectiveDecl &e, const TokenTree *) {
+void SerializeUsingDirectiveDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingDirectiveDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
-  auto t57 = e.IdentifierToken();
-  b.setVal57(es.EntityId(t57));
-  auto t58 = e.NamespaceKeyToken();
-  b.setVal58(es.EntityId(t58));
+  SerializeNamedDecl(pf, es, b, e, nullptr);
+  auto et57 = es.EntityId(e.IdentifierToken());
+  b.setVal57(et57);
+  auto et58 = es.EntityId(e.NamespaceKeyToken());
+  b.setVal58(et58);
   b.setVal59(es.EntityId(e.NominatedNamespaceAsWritten()));
-  auto t67 = e.UsingToken();
-  b.setVal67(es.EntityId(t67));
+  auto et67 = es.EntityId(e.UsingToken());
+  b.setVal67(et67);
 }
 
-void SerializeUnresolvedUsingIfExistsDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingIfExistsDecl &e, const TokenTree *) {
+void SerializeUnresolvedUsingIfExistsDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingIfExistsDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypeDecl &e, const TokenTree *) {
+void SerializeTypeDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypeDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   auto v57 = e.TypeForDeclaration();
   if (v57) {
     auto id57 = es.EntityId(v57.value());
@@ -9208,11 +9741,12 @@ void SerializeTypeDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const p
   }
 }
 
-void SerializeTemplateTypeParmDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateTypeParmDecl &e, const TokenTree *) {
+void SerializeTemplateTypeParmDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateTypeParmDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeDecl(es, b, e, nullptr);
+  SerializeTypeDecl(pf, es, b, e, nullptr);
   b.setVal75(e.DefaultArgumentWasInherited());
   auto v58 = e.DefaultArgument();
   if (v58) {
@@ -9228,8 +9762,8 @@ void SerializeTemplateTypeParmDecl(const EntityMapper &es, mx::ast::Decl::Builde
   } else {
     b.setVal59(mx::kInvalidEntityId);
   }
-  auto t67 = e.DefaultArgumentToken();
-  b.setVal67(es.EntityId(t67));
+  auto et67 = es.EntityId(e.DefaultArgumentToken());
+  b.setVal67(et67);
   b.setVal76(e.HasDefaultArgument());
   b.setVal77(e.HasTypeConstraint());
   b.setVal78(e.IsExpandedParameterPack());
@@ -9237,11 +9771,12 @@ void SerializeTemplateTypeParmDecl(const EntityMapper &es, mx::ast::Decl::Builde
   b.setVal96(e.WasDeclaredWithTypename());
 }
 
-void SerializeTagDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TagDecl &e, const TokenTree *) {
+void SerializeTagDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TagDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeDecl(es, b, e, nullptr);
+  SerializeTypeDecl(pf, es, b, e, nullptr);
   if (auto r58 = e.BraceRange(); auto rs58 = r58.Size()) {
     b.setVal58(es.EntityId(r58[0]));
     b.setVal59(es.EntityId(r58[rs58 - 1u]));
@@ -9249,10 +9784,10 @@ void SerializeTagDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pa
     b.setVal58(0);
     b.setVal59(0);
   }
-  auto t67 = e.FirstInnerToken();
-  b.setVal67(es.EntityId(t67));
-  auto t68 = e.FirstOuterToken();
-  b.setVal68(es.EntityId(t68));
+  auto et67 = es.EntityId(e.FirstInnerToken());
+  b.setVal67(et67);
+  auto et68 = es.EntityId(e.FirstOuterToken());
+  b.setVal68(et68);
   b.setVal81(static_cast<unsigned char>(mx::FromPasta(e.TagKind())));
   auto v69 = e.TypedefNameForAnonymousDeclaration();
   if (v69) {
@@ -9294,11 +9829,12 @@ void SerializeTagDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pa
   }
 }
 
-void SerializeRecordDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::RecordDecl &e, const TokenTree *) {
+void SerializeRecordDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::RecordDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTagDecl(es, b, e, nullptr);
+  SerializeTagDecl(pf, es, b, e, nullptr);
   b.setVal105(e.CanPassInRegisters());
   do {
     auto v63 = e.Fields();
@@ -9331,11 +9867,12 @@ void SerializeRecordDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const
   b.setVal124(e.MayInsertExtraPadding());
 }
 
-void SerializeCXXRecordDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXRecordDecl &e, const TokenTree *) {
+void SerializeCXXRecordDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXRecordDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeRecordDecl(es, b, e, nullptr);
+  SerializeRecordDecl(pf, es, b, e, nullptr);
   auto v125 = e.AllowConstDefaultInitializer();
   if (v125) {
     b.setVal125(static_cast<bool>(v125.value()));
@@ -10197,15 +10734,16 @@ void SerializeCXXRecordDecl(const EntityMapper &es, mx::ast::Decl::Builder b, co
   }
 }
 
-void SerializeClassTemplateSpecializationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplateSpecializationDecl &e, const TokenTree *) {
+void SerializeClassTemplateSpecializationDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplateSpecializationDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeCXXRecordDecl(es, b, e, nullptr);
-  auto t133 = e.ExternToken();
-  b.setVal133(es.EntityId(t133));
-  auto t134 = e.PointOfInstantiation();
-  b.setVal134(es.EntityId(t134));
+  SerializeCXXRecordDecl(pf, es, b, e, nullptr);
+  auto et133 = es.EntityId(e.ExternToken());
+  b.setVal133(et133);
+  auto et134 = es.EntityId(e.PointOfInstantiation());
+  b.setVal134(et134);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.SpecializationKind())));
   b.setVal142(es.EntityId(e.SpecializedTemplate()));
   do {
@@ -10226,8 +10764,8 @@ void SerializeClassTemplateSpecializationDecl(const EntityMapper &es, mx::ast::D
       ++i350;
     }
   } while (false);
-  auto t144 = e.TemplateKeywordToken();
-  b.setVal144(es.EntityId(t144));
+  auto et144 = es.EntityId(e.TemplateKeywordToken());
+  b.setVal144(et144);
   auto v145 = e.TypeAsWritten();
   if (v145) {
     auto id145 = es.EntityId(v145.value());
@@ -10240,11 +10778,12 @@ void SerializeClassTemplateSpecializationDecl(const EntityMapper &es, mx::ast::D
   b.setVal353(e.IsExplicitSpecialization());
 }
 
-void SerializeClassTemplatePartialSpecializationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplatePartialSpecializationDecl &e, const TokenTree *) {
+void SerializeClassTemplatePartialSpecializationDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplatePartialSpecializationDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeClassTemplateSpecializationDecl(es, b, e, nullptr);
+  SerializeClassTemplateSpecializationDecl(pf, es, b, e, nullptr);
   b.setVal164(es.EntityId(e.InjectedSpecializationType()));
   b.setVal166(es.EntityId(e.InstantiatedFromMember()));
   b.setVal167(es.EntityId(e.InstantiatedFromMemberTemplate()));
@@ -10252,11 +10791,12 @@ void SerializeClassTemplatePartialSpecializationDecl(const EntityMapper &es, mx:
   b.setVal354(e.HasAssociatedConstraints());
 }
 
-void SerializeEnumDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::EnumDecl &e, const TokenTree *) {
+void SerializeEnumDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::EnumDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTagDecl(es, b, e, nullptr);
+  SerializeTagDecl(pf, es, b, e, nullptr);
   do {
     auto v63 = e.Enumerators();
     auto sv63 = b.initVal63(static_cast<unsigned>(v63.size()));
@@ -10318,25 +10858,27 @@ void SerializeEnumDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const p
   b.setVal112(e.IsScopedUsingClassTag());
 }
 
-void SerializeUnresolvedUsingTypenameDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingTypenameDecl &e, const TokenTree *) {
+void SerializeUnresolvedUsingTypenameDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingTypenameDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeDecl(es, b, e, nullptr);
-  auto t58 = e.EllipsisToken();
-  b.setVal58(es.EntityId(t58));
-  auto t59 = e.TypenameToken();
-  b.setVal59(es.EntityId(t59));
-  auto t67 = e.UsingToken();
-  b.setVal67(es.EntityId(t67));
+  SerializeTypeDecl(pf, es, b, e, nullptr);
+  auto et58 = es.EntityId(e.EllipsisToken());
+  b.setVal58(et58);
+  auto et59 = es.EntityId(e.TypenameToken());
+  b.setVal59(et59);
+  auto et67 = es.EntityId(e.UsingToken());
+  b.setVal67(et67);
   b.setVal75(e.IsPackExpansion());
 }
 
-void SerializeTypedefNameDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypedefNameDecl &e, const TokenTree *) {
+void SerializeTypedefNameDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypedefNameDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypeDecl(es, b, e, nullptr);
+  SerializeTypeDecl(pf, es, b, e, nullptr);
   auto v58 = e.AnonymousDeclarationWithTypedefName();
   if (v58) {
     auto id58 = es.EntityId(v58.value());
@@ -10350,18 +10892,20 @@ void SerializeTypedefNameDecl(const EntityMapper &es, mx::ast::Decl::Builder b, 
   b.setVal76(e.IsTransparentTag());
 }
 
-void SerializeTypedefDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypedefDecl &e, const TokenTree *) {
+void SerializeTypedefDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypedefDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypedefNameDecl(es, b, e, nullptr);
+  SerializeTypedefNameDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeTypeAliasDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypeAliasDecl &e, const TokenTree *) {
+void SerializeTypeAliasDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypeAliasDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypedefNameDecl(es, b, e, nullptr);
+  SerializeTypedefNameDecl(pf, es, b, e, nullptr);
   auto v68 = e.DescribedAliasTemplate();
   if (v68) {
     auto id68 = es.EntityId(v68.value());
@@ -10371,119 +10915,130 @@ void SerializeTypeAliasDecl(const EntityMapper &es, mx::ast::Decl::Builder b, co
   }
 }
 
-void SerializeObjCTypeParamDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCTypeParamDecl &e, const TokenTree *) {
+void SerializeObjCTypeParamDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCTypeParamDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTypedefNameDecl(es, b, e, nullptr);
-  auto t68 = e.ColonToken();
-  b.setVal68(es.EntityId(t68));
+  SerializeTypedefNameDecl(pf, es, b, e, nullptr);
+  auto et68 = es.EntityId(e.ColonToken());
+  b.setVal68(et68);
   b.setVal81(static_cast<unsigned char>(mx::FromPasta(e.Variance())));
-  auto t69 = e.VarianceToken();
-  b.setVal69(es.EntityId(t69));
+  auto et69 = es.EntityId(e.VarianceToken());
+  b.setVal69(et69);
   b.setVal77(e.HasExplicitBound());
 }
 
-void SerializeTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateDecl &e, const TokenTree *) {
+void SerializeTemplateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   b.setVal57(es.EntityId(e.TemplateParameters()));
   b.setVal58(es.EntityId(e.TemplatedDeclaration()));
   b.setVal75(e.HasAssociatedConstraints());
   b.setVal76(e.IsTypeAlias());
 }
 
-void SerializeRedeclarableTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::RedeclarableTemplateDecl &e, const TokenTree *) {
+void SerializeRedeclarableTemplateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::RedeclarableTemplateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTemplateDecl(es, b, e, nullptr);
+  SerializeTemplateDecl(pf, es, b, e, nullptr);
   b.setVal59(es.EntityId(e.InstantiatedFromMemberTemplate()));
   b.setVal77(e.IsMemberSpecialization());
 }
 
-void SerializeFunctionTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FunctionTemplateDecl &e, const TokenTree *) {
+void SerializeFunctionTemplateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FunctionTemplateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeRedeclarableTemplateDecl(es, b, e, nullptr);
+  SerializeRedeclarableTemplateDecl(pf, es, b, e, nullptr);
   b.setVal78(e.IsAbbreviated());
   b.setVal95(e.IsThisDeclarationADefinition());
 }
 
-void SerializeClassTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplateDecl &e, const TokenTree *) {
+void SerializeClassTemplateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeRedeclarableTemplateDecl(es, b, e, nullptr);
+  SerializeRedeclarableTemplateDecl(pf, es, b, e, nullptr);
   b.setVal78(e.IsThisDeclarationADefinition());
 }
 
-void SerializeVarTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarTemplateDecl &e, const TokenTree *) {
+void SerializeVarTemplateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarTemplateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeRedeclarableTemplateDecl(es, b, e, nullptr);
+  SerializeRedeclarableTemplateDecl(pf, es, b, e, nullptr);
   b.setVal78(e.IsThisDeclarationADefinition());
 }
 
-void SerializeTypeAliasTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypeAliasTemplateDecl &e, const TokenTree *) {
+void SerializeTypeAliasTemplateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypeAliasTemplateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeRedeclarableTemplateDecl(es, b, e, nullptr);
+  SerializeRedeclarableTemplateDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeConceptDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ConceptDecl &e, const TokenTree *) {
+void SerializeConceptDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ConceptDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTemplateDecl(es, b, e, nullptr);
+  SerializeTemplateDecl(pf, es, b, e, nullptr);
   b.setVal59(es.EntityId(e.ConstraintExpression()));
   b.setVal77(e.IsTypeConcept());
 }
 
-void SerializeBuiltinTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BuiltinTemplateDecl &e, const TokenTree *) {
+void SerializeBuiltinTemplateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BuiltinTemplateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTemplateDecl(es, b, e, nullptr);
+  SerializeTemplateDecl(pf, es, b, e, nullptr);
 }
 
-void SerializeTemplateTemplateParmDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateTemplateParmDecl &e, const TokenTree *) {
+void SerializeTemplateTemplateParmDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateTemplateParmDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeTemplateDecl(es, b, e, nullptr);
+  SerializeTemplateDecl(pf, es, b, e, nullptr);
   b.setVal77(e.DefaultArgumentWasInherited());
-  auto t59 = e.DefaultArgumentToken();
-  b.setVal59(es.EntityId(t59));
+  auto et59 = es.EntityId(e.DefaultArgumentToken());
+  b.setVal59(et59);
   b.setVal78(e.HasDefaultArgument());
   b.setVal95(e.IsExpandedParameterPack());
   b.setVal96(e.IsPackExpansion());
 }
 
-void SerializeObjCPropertyDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCPropertyDecl &e, const TokenTree *) {
+void SerializeObjCPropertyDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCPropertyDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
-  auto t57 = e.AtToken();
-  b.setVal57(es.EntityId(t57));
+  SerializeNamedDecl(pf, es, b, e, nullptr);
+  auto et57 = es.EntityId(e.AtToken());
+  b.setVal57(et57);
   b.setVal58(es.EntityId(e.GetterMethodDeclaration()));
-  auto t59 = e.GetterNameToken();
-  b.setVal59(es.EntityId(t59));
-  auto t67 = e.LParenToken();
-  b.setVal67(es.EntityId(t67));
+  auto et59 = es.EntityId(e.GetterNameToken());
+  b.setVal59(et59);
+  auto et67 = es.EntityId(e.LParenToken());
+  b.setVal67(et67);
   b.setVal81(static_cast<unsigned char>(mx::FromPasta(e.PropertyImplementation())));
   b.setVal68(es.EntityId(e.PropertyInstanceVariableDeclaration()));
   b.setVal86(static_cast<unsigned char>(mx::FromPasta(e.QueryKind())));
   b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.SetterKind())));
   b.setVal69(es.EntityId(e.SetterMethodDeclaration()));
-  auto t79 = e.SetterNameToken();
-  b.setVal79(es.EntityId(t79));
+  auto et79 = es.EntityId(e.SetterNameToken());
+  b.setVal79(et79);
   b.setVal80(es.EntityId(e.Type()));
   b.setVal75(e.IsAtomic());
   b.setVal76(e.IsClassProperty());
@@ -10494,17 +11049,18 @@ void SerializeObjCPropertyDecl(const EntityMapper &es, mx::ast::Decl::Builder b,
   b.setVal97(e.IsRetaining());
 }
 
-void SerializeObjCMethodDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCMethodDecl &e, const TokenTree *) {
+void SerializeObjCMethodDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCMethodDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   b.setVal75(e.DefinedInNSObject());
   b.setVal57(es.EntityId(e.FindPropertyDeclaration()));
   b.setVal58(es.EntityId(e.ClassInterface()));
   b.setVal59(es.EntityId(e.CommandDeclaration()));
-  auto t67 = e.DeclaratorEndToken();
-  b.setVal67(es.EntityId(t67));
+  auto et67 = es.EntityId(e.DeclaratorEndToken());
+  b.setVal67(et67);
   b.setVal81(static_cast<unsigned char>(mx::FromPasta(e.ImplementationControl())));
   b.setVal86(static_cast<unsigned char>(mx::FromPasta(e.MethodFamily())));
   b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.ObjCDeclQualifier())));
@@ -10516,8 +11072,8 @@ void SerializeObjCMethodDecl(const EntityMapper &es, mx::ast::Decl::Builder b, c
     b.setVal69(0);
     b.setVal79(0);
   }
-  auto t80 = e.SelectorStartToken();
-  b.setVal80(es.EntityId(t80));
+  auto et80 = es.EntityId(e.SelectorStartToken());
+  b.setVal80(et80);
   b.setVal82(es.EntityId(e.SelfDeclaration()));
   b.setVal76(e.HasParameterDestroyedInCallee());
   b.setVal77(e.HasRedeclaration());
@@ -10564,11 +11120,12 @@ void SerializeObjCMethodDecl(const EntityMapper &es, mx::ast::Decl::Builder b, c
   }
 }
 
-void SerializeObjCContainerDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCContainerDecl &e, const TokenTree *) {
+void SerializeObjCContainerDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCContainerDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.ClassMethods();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -10594,8 +11151,8 @@ void SerializeObjCContainerDecl(const EntityMapper &es, mx::ast::Decl::Builder b
     b.setVal57(0);
     b.setVal58(0);
   }
-  auto t59 = e.AtStartToken();
-  b.setVal59(es.EntityId(t59));
+  auto et59 = es.EntityId(e.AtStartToken());
+  b.setVal59(et59);
   do {
     auto v63 = e.InstanceMethods();
     auto sv63 = b.initVal63(static_cast<unsigned>(v63.size()));
@@ -10642,20 +11199,21 @@ void SerializeObjCContainerDecl(const EntityMapper &es, mx::ast::Decl::Builder b
   }
 }
 
-void SerializeObjCCategoryDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCCategoryDecl &e, const TokenTree *) {
+void SerializeObjCCategoryDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCCategoryDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeObjCContainerDecl(es, b, e, nullptr);
+  SerializeObjCContainerDecl(pf, es, b, e, nullptr);
   b.setVal75(e.IsClassExtension());
-  auto t67 = e.CategoryNameToken();
-  b.setVal67(es.EntityId(t67));
+  auto et67 = es.EntityId(e.CategoryNameToken());
+  b.setVal67(et67);
   b.setVal68(es.EntityId(e.ClassInterface()));
   b.setVal69(es.EntityId(e.Implementation()));
-  auto t79 = e.InstanceVariableLBraceToken();
-  b.setVal79(es.EntityId(t79));
-  auto t80 = e.InstanceVariableRBraceToken();
-  b.setVal80(es.EntityId(t80));
+  auto et79 = es.EntityId(e.InstanceVariableLBraceToken());
+  b.setVal79(et79);
+  auto et80 = es.EntityId(e.InstanceVariableRBraceToken());
+  b.setVal80(et80);
   b.setVal82(es.EntityId(e.NextClassCategory()));
   do {
     auto v313 = e.InstanceVariables();
@@ -10686,11 +11244,12 @@ void SerializeObjCCategoryDecl(const EntityMapper &es, mx::ast::Decl::Builder b,
   } while (false);
 }
 
-void SerializeObjCProtocolDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCProtocolDecl &e, const TokenTree *) {
+void SerializeObjCProtocolDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCProtocolDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeObjCContainerDecl(es, b, e, nullptr);
+  SerializeObjCContainerDecl(pf, es, b, e, nullptr);
   auto v74 = e.ObjCRuntimeNameAsString();
   std::string s74(v74.data(), v74.size());
   b.setVal74(s74);
@@ -10717,11 +11276,12 @@ void SerializeObjCProtocolDecl(const EntityMapper &es, mx::ast::Decl::Builder b,
   } while (false);
 }
 
-void SerializeObjCInterfaceDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCInterfaceDecl &e, const TokenTree *) {
+void SerializeObjCInterfaceDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCInterfaceDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeObjCContainerDecl(es, b, e, nullptr);
+  SerializeObjCContainerDecl(pf, es, b, e, nullptr);
   do {
     auto v313 = e.AllReferencedProtocols();
     auto sv313 = b.initVal313(static_cast<unsigned>(v313.size()));
@@ -10732,8 +11292,8 @@ void SerializeObjCInterfaceDecl(const EntityMapper &es, mx::ast::Decl::Builder b
     }
   } while (false);
   b.setVal75(e.DeclaresOrInheritsDesignatedInitializers());
-  auto t67 = e.EndOfDefinitionToken();
-  b.setVal67(es.EntityId(t67));
+  auto et67 = es.EntityId(e.EndOfDefinitionToken());
+  b.setVal67(et67);
   b.setVal68(es.EntityId(e.Implementation()));
   auto v74 = e.ObjCRuntimeNameAsString();
   std::string s74(v74.data(), v74.size());
@@ -10745,8 +11305,8 @@ void SerializeObjCInterfaceDecl(const EntityMapper &es, mx::ast::Decl::Builder b
   } else {
     b.setVal69(mx::kInvalidEntityId);
   }
-  auto t79 = e.SuperClassToken();
-  b.setVal79(es.EntityId(t79));
+  auto et79 = es.EntityId(e.SuperClassToken());
+  b.setVal79(et79);
   auto v80 = e.SuperClassTypeInfo();
   if (v80) {
     auto id80 = es.EntityId(v80.value());
@@ -10826,11 +11386,12 @@ void SerializeObjCInterfaceDecl(const EntityMapper &es, mx::ast::Decl::Builder b
   } while (false);
 }
 
-void SerializeObjCImplDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCImplDecl &e, const TokenTree *) {
+void SerializeObjCImplDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCImplDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeObjCContainerDecl(es, b, e, nullptr);
+  SerializeObjCContainerDecl(pf, es, b, e, nullptr);
   b.setVal67(es.EntityId(e.ClassInterface()));
   do {
     auto v313 = e.PropertyImplementations();
@@ -10843,31 +11404,33 @@ void SerializeObjCImplDecl(const EntityMapper &es, mx::ast::Decl::Builder b, con
   } while (false);
 }
 
-void SerializeObjCCategoryImplDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCCategoryImplDecl &e, const TokenTree *) {
+void SerializeObjCCategoryImplDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCCategoryImplDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeObjCImplDecl(es, b, e, nullptr);
+  SerializeObjCImplDecl(pf, es, b, e, nullptr);
   b.setVal68(es.EntityId(e.CategoryDeclaration()));
-  auto t69 = e.CategoryNameToken();
-  b.setVal69(es.EntityId(t69));
+  auto et69 = es.EntityId(e.CategoryNameToken());
+  b.setVal69(et69);
 }
 
-void SerializeObjCImplementationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCImplementationDecl &e, const TokenTree *) {
+void SerializeObjCImplementationDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCImplementationDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeObjCImplDecl(es, b, e, nullptr);
-  auto t68 = e.InstanceVariableLBraceToken();
-  b.setVal68(es.EntityId(t68));
-  auto t69 = e.InstanceVariableRBraceToken();
-  b.setVal69(es.EntityId(t69));
+  SerializeObjCImplDecl(pf, es, b, e, nullptr);
+  auto et68 = es.EntityId(e.InstanceVariableLBraceToken());
+  b.setVal68(et68);
+  auto et69 = es.EntityId(e.InstanceVariableRBraceToken());
+  b.setVal69(et69);
   auto v74 = e.ObjCRuntimeNameAsString();
   std::string s74(v74.data(), v74.size());
   b.setVal74(s74);
   b.setVal79(es.EntityId(e.SuperClass()));
-  auto t80 = e.SuperClassToken();
-  b.setVal80(es.EntityId(t80));
+  auto et80 = es.EntityId(e.SuperClassToken());
+  b.setVal80(et80);
   b.setVal75(e.HasDestructors());
   b.setVal76(e.HasNonZeroConstructors());
   do {
@@ -10881,15 +11444,17 @@ void SerializeObjCImplementationDecl(const EntityMapper &es, mx::ast::Decl::Buil
   } while (false);
 }
 
-void SerializeObjCCompatibleAliasDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCCompatibleAliasDecl &e, const TokenTree *) {
+void SerializeObjCCompatibleAliasDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCCompatibleAliasDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
+  SerializeNamedDecl(pf, es, b, e, nullptr);
   b.setVal57(es.EntityId(e.ClassInterface()));
 }
 
-void SerializeNamespaceDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamespaceDecl &e, const TokenTree *) {
+void SerializeNamespaceDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamespaceDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -10903,21 +11468,23 @@ void SerializeNamespaceDecl(const EntityMapper &es, mx::ast::Decl::Builder b, co
   }
 }
 
-void SerializeNamespaceAliasDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamespaceAliasDecl &e, const TokenTree *) {
+void SerializeNamespaceAliasDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamespaceAliasDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeNamedDecl(es, b, e, nullptr);
-  auto t57 = e.AliasToken();
-  b.setVal57(es.EntityId(t57));
+  SerializeNamedDecl(pf, es, b, e, nullptr);
+  auto et57 = es.EntityId(e.AliasToken());
+  b.setVal57(et57);
   b.setVal58(es.EntityId(e.AliasedNamespace()));
-  auto t59 = e.NamespaceToken();
-  b.setVal59(es.EntityId(t59));
-  auto t67 = e.TargetNameToken();
-  b.setVal67(es.EntityId(t67));
+  auto et59 = es.EntityId(e.NamespaceToken());
+  b.setVal59(et59);
+  auto et67 = es.EntityId(e.TargetNameToken());
+  b.setVal67(et67);
 }
 
-void SerializeLinkageSpecDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LinkageSpecDecl &e, const TokenTree *) {
+void SerializeLinkageSpecDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LinkageSpecDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -10931,11 +11498,12 @@ void SerializeLinkageSpecDecl(const EntityMapper &es, mx::ast::Decl::Builder b, 
   }
 }
 
-void SerializeLifetimeExtendedTemporaryDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LifetimeExtendedTemporaryDecl &e, const TokenTree *) {
+void SerializeLifetimeExtendedTemporaryDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LifetimeExtendedTemporaryDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.Children();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -10950,11 +11518,12 @@ void SerializeLifetimeExtendedTemporaryDecl(const EntityMapper &es, mx::ast::Dec
   b.setVal57(es.EntityId(e.TemporaryExpression()));
 }
 
-void SerializeImportDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ImportDecl &e, const TokenTree *) {
+void SerializeImportDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ImportDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.IdentifierTokens();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -10966,11 +11535,12 @@ void SerializeImportDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const
   } while (false);
 }
 
-void SerializeImplicitConceptSpecializationDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ImplicitConceptSpecializationDecl &e, const TokenTree *) {
+void SerializeImplicitConceptSpecializationDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ImplicitConceptSpecializationDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   do {
     auto v52 = e.TemplateArguments();
     auto sv52 = b.initVal52(static_cast<unsigned>(v52.size()));
@@ -10982,14 +11552,15 @@ void SerializeImplicitConceptSpecializationDecl(const EntityMapper &es, mx::ast:
   } while (false);
 }
 
-void SerializeFriendTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FriendTemplateDecl &e, const TokenTree *) {
+void SerializeFriendTemplateDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FriendTemplateDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   b.setVal50(es.EntityId(e.FriendDeclaration()));
-  auto t57 = e.FriendToken();
-  b.setVal57(es.EntityId(t57));
+  auto et57 = es.EntityId(e.FriendToken());
+  b.setVal57(et57);
   b.setVal58(es.EntityId(e.FriendType()));
   do {
     auto v52 = e.TemplateParameterLists();
@@ -11002,11 +11573,12 @@ void SerializeFriendTemplateDecl(const EntityMapper &es, mx::ast::Decl::Builder 
   } while (false);
 }
 
-void SerializeFriendDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FriendDecl &e, const TokenTree *) {
+void SerializeFriendDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FriendDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
   auto v50 = e.FriendDeclaration();
   if (v50) {
     auto id50 = es.EntityId(v50.value());
@@ -11014,8 +11586,8 @@ void SerializeFriendDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const
   } else {
     b.setVal50(mx::kInvalidEntityId);
   }
-  auto t57 = e.FriendToken();
-  b.setVal57(es.EntityId(t57));
+  auto et57 = es.EntityId(e.FriendToken());
+  b.setVal57(et57);
   auto v58 = e.FriendType();
   if (v58) {
     auto id58 = es.EntityId(v58.value());
@@ -11035,19 +11607,21 @@ void SerializeFriendDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const
   } while (false);
 }
 
-void SerializeFileScopeAsmDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FileScopeAsmDecl &e, const TokenTree *) {
+void SerializeFileScopeAsmDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FileScopeAsmDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
-  auto t50 = e.AssemblyToken();
-  b.setVal50(es.EntityId(t50));
+  SerializeDecl(pf, es, b, e, nullptr);
+  auto et50 = es.EntityId(e.AssemblyToken());
+  b.setVal50(et50);
   b.setVal57(es.EntityId(e.AssemblyString()));
-  auto t58 = e.RParenToken();
-  b.setVal58(es.EntityId(t58));
+  auto et58 = es.EntityId(e.RParenToken());
+  b.setVal58(et58);
 }
 
-void SerializeExternCContextDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ExternCContextDecl &e, const TokenTree *) {
+void SerializeExternCContextDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ExternCContextDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
@@ -11061,15 +11635,16 @@ void SerializeExternCContextDecl(const EntityMapper &es, mx::ast::Decl::Builder 
   }
 }
 
-void SerializeExportDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ExportDecl &e, const TokenTree *) {
+void SerializeExportDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ExportDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
-  auto t50 = e.ExportToken();
-  b.setVal50(es.EntityId(t50));
-  auto t57 = e.RBraceToken();
-  b.setVal57(es.EntityId(t57));
+  SerializeDecl(pf, es, b, e, nullptr);
+  auto et50 = es.EntityId(e.ExportToken());
+  b.setVal50(et50);
+  auto et57 = es.EntityId(e.RBraceToken());
+  b.setVal57(et57);
   b.setVal51(e.HasBraces());
   pasta::DeclContext dc52(e);
   auto v52 = dc52.AlreadyLoadedDeclarations();
@@ -11081,11 +11656,12 @@ void SerializeExportDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const
   }
 }
 
-void SerializeEmptyDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::EmptyDecl &e, const TokenTree *) {
+void SerializeEmptyDecl(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::EmptyDecl &e, const TokenTree *) {
+  (void) pf;
   (void) es;
   (void) b;
   (void) e;
-  SerializeDecl(es, b, e, nullptr);
+  SerializeDecl(pf, es, b, e, nullptr);
 }
 
 #pragma GCC diagnostic pop
