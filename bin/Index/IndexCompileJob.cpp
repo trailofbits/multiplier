@@ -71,6 +71,9 @@ class TLDFinder final : public pasta::DeclVisitor {
   // to prevent us from double-adding specializations.
   std::unordered_set<pasta::Decl> seen_specs;
 
+  // Depth of a decl context.
+  std::unordered_map<const void *, unsigned> dc_depth;
+
   unsigned order{0u};
   unsigned depth{0u};
 
@@ -80,7 +83,9 @@ class TLDFinder final : public pasta::DeclVisitor {
   explicit TLDFinder(std::vector<OrderedDecl> &tlds_)
       : tlds(tlds_) {}
 
-  void VisitDeclContext(const pasta::DeclContext &dc) {;
+  void VisitDeclContext(const pasta::DeclContext &dc) {
+    dc_depth.emplace(dc.RawDeclContext(), depth);
+
     for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
       if (!decl.IsInvalidDeclaration()) {
         Accept(decl);
@@ -158,11 +163,11 @@ class TLDFinder final : public pasta::DeclVisitor {
   void VisitClassTemplateSpecializationDecl(
       const pasta::ClassTemplateSpecializationDecl &decl) final {
 
-    tlds.emplace_back(decl, order++);
-
     ++depth;
     VisitDeclContext(decl);
     --depth;
+
+    tlds.emplace_back(decl, order++);
   }
 
   // void VisitVarTemplatePartialSpecializationDecl(
@@ -241,9 +246,26 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDecl(decl);
   }
 
+  void VisitRecordDecl(const pasta::RecordDecl &decl) final {
+
+    // Forward declarations embedded in declarators within a record may have
+    // a semantic decl context that is at the top level.
+    ++depth;
+    VisitDeclContext(decl);
+    --depth;
+
+    VisitDecl(decl);
+  }
+
   void VisitDecl(const pasta::Decl &decl) final {
     if (!depth) {
       tlds.emplace_back(decl, order++);
+    
+    // Check if we found something that is semantically at the top level.
+    } else if (auto sema_dc = decl.DeclarationContext()) {
+      if (!dc_depth[sema_dc->RawDeclContext()]) {
+        tlds.emplace_back(decl, order++);
+      }
     }
   }
 };

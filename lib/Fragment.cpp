@@ -254,7 +254,6 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
   for (RawEntityId eid : macro_ids) {
     VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
-      MacroId macro_id = std::get<MacroId>(vid);
       MacroImplPtr eptr = ep->MacroFor(ep, eid);
       
       // NOTE(pag): We don't check for fragments matching as we might have
@@ -267,19 +266,19 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
       }
 
     } else if (std::holds_alternative<MacroTokenId>(vid)) {
-      MacroTokenId macro_id = std::get<MacroTokenId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id &&
-          macro_id.offset < impl->num_tokens) {
-        co_yield Token(impl->MacroTokenReader(impl), macro_id.offset);
+      MacroTokenId tid = std::get<MacroTokenId>(vid);
+      if (tid.fragment_id == impl->fragment_id &&
+          tid.offset < impl->num_tokens) {
+        co_yield Token(impl->MacroTokenReader(impl), tid.offset);
       } else {
         assert(false);
       }
 
     } else if (std::holds_alternative<ParsedTokenId>(vid)) {
-      ParsedTokenId macro_id = std::get<ParsedTokenId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id &&
-          macro_id.offset < impl->num_parsed_tokens) {
-        co_yield Token(impl->ParsedTokenReader(impl), macro_id.offset);
+      ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+      if (tid.fragment_id == impl->fragment_id &&
+          tid.offset < impl->num_parsed_tokens) {
+        co_yield Token(impl->ParsedTokenReader(impl), tid.offset);
       } else {
         assert(false);
       }
