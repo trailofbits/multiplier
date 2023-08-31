@@ -6,6 +6,7 @@
 
 #include "Hash.h"
 
+#include <cctype>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
@@ -25,7 +26,6 @@
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wcast-align"
-#include <llvm/ADT/FoldingSet.h>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/SHA256.h>
 #pragma clang diagnostic pop
@@ -48,8 +48,8 @@ class HashVisitor final : public pasta::DeclVisitor {
  public:
   virtual ~HashVisitor(void) = default;
 
-  explicit HashVisitor(llvm::FoldingSetNodeID &fs_)
-      : fs(fs_) {}
+  explicit HashVisitor(std::stringstream &ss_)
+      : ss(ss_) {}
 
   void VisitDeclContext(const pasta::DeclContext &dc) {
     for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
@@ -79,8 +79,7 @@ class HashVisitor final : public pasta::DeclVisitor {
     //            definition.
     if (IsDefinition(decl)) {
       if (auto hash = decl.ODRHash()) {
-        D( std::cerr << "\t4 odr=" << hash.value() << '\n'; )
-        fs.AddInteger(hash.value());
+        ss << " o" << hash.value();
       }
     }
     VisitDeclContext(decl);
@@ -89,8 +88,7 @@ class HashVisitor final : public pasta::DeclVisitor {
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
     if (IsDefinition(decl)) {
       if (auto hash = decl.ODRHash()) {
-        D( std::cerr << "\t5 odr=" << hash.value() << '\n'; )
-        fs.AddInteger(hash.value());
+        ss << " o" << hash.value();
       }
       VisitDeclContext(decl);
     }
@@ -99,8 +97,7 @@ class HashVisitor final : public pasta::DeclVisitor {
   void VisitEnumDecl(const pasta::EnumDecl &decl) final {
     if (IsDefinition(decl)) {
       if (auto hash = decl.ODRHash()) {
-        D( std::cerr << "\t6 odr=" << hash.value() << '\n'; )
-        fs.AddInteger(hash.value());
+        ss << " o" << hash.value();
       }
     }
   }
@@ -110,7 +107,7 @@ class HashVisitor final : public pasta::DeclVisitor {
   void VisitDecl(const pasta::Decl &) final {}
 
  private:
-  llvm::FoldingSetNodeID &fs;
+  std::stringstream &ss;
 };
 
 }  // namespace
@@ -175,42 +172,45 @@ std::string HashFragment(
     const pasta::TokenRange *frag_tok_range,
     const pasta::PrintedTokenRange &decl_tok_range) {
 
+  std::stringstream ss;
+
   D( std::cerr
         << "begin_index=" << begin_index << " end_index=" << end_index
         << " entities.size()=" << entities.size() << '\n'; )
 
-  llvm::FoldingSetNodeID fs;
-
   uint64_t end_index = 0u;
 
-  auto mixin_token = [&fs] (mx::TokenKind kind, pasta::TokenRole role,
+  auto mixin_token = [&ss] (mx::TokenKind kind, pasta::TokenRole role,
                             std::string_view data) {
     if (data.empty()) {
       return;
     }
 
-    static constexpr std::hash<std::string_view> kHasher;
-
     // Mix in generic token/structure/context information.
     switch (role) {
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
+        ss << " e" << int(kind);
+        break;
       case pasta::TokenRole::kInitialMacroUseToken:
-        D( std::cerr << "\t1 kind=" << int(kind) << " data="
-                     << token.Data() << '\n'; )
-        fs.AddInteger(static_cast<uint16_t>(kind));
-        fs.AddInteger(kHasher(data));
+        ss << " u" << int(kind);
         break;
 
       case pasta::TokenRole::kFileToken:
+        ss << " f" << int(kind);
+        break;
       case pasta::TokenRole::kFinalMacroExpansionToken:
-        D( std::cerr << "\t2 kind=" << int(kind) << " data="
-                     << token.Data() << '\n'; )
-        fs.AddInteger(static_cast<uint16_t>(kind));
-        fs.AddInteger(kHasher(data));
+        ss << " p" << int(kind);
         break;
 
       default:
-        break;
+        return;
+    }
+
+    static constexpr std::hash<std::string_view> kHasher;
+    if (data.size() >= 8u) {
+      ss << kHasher(data);
+    } else if (data[0] != '_' && !isalpha(data[0])) {
+      ss << data;
     }
   };
 
@@ -225,24 +225,47 @@ std::string HashFragment(
     for (pasta::PrintedToken token : decl_tok_range) {
       mixin_token(mx::FromPasta(token.Kind()), pasta::TokenRole::kFileToken,
                   token.Data());
+
+      std::stringstream tc;
+      static constexpr std::hash<std::string> kHasher;
+
+      for (auto context = token.Context(); context;
+           context = context->Parent()) {
+
+        switch (context->Kind()) {
+          case pasta::TokenContextKind::kDecl:
+            tc << " d" << int(pasta::Decl::From(*context)->Kind());
+            break;
+          case pasta::TokenContextKind::kStmt:
+            tc << " s" << int(pasta::Stmt::From(*context)->Kind());
+            break;
+          case pasta::TokenContextKind::kType:
+            tc << " t" << int(pasta::Type::From(*context)->Kind());
+            break;
+          case pasta::TokenContextKind::kAttr:
+            tc << " a" << int(pasta::Attr::From(*context)->Kind());
+            break;
+          default:
+            break;
+        }
+      }
+
+      ss << " c" << kHasher(tc.str());
     }
   }
 
-  uint64_t base_hash = fs.ComputeHash();
-  fs.clear();
-
-  HashVisitor visitor(fs);
+  HashVisitor visitor(ss);
 
   // Mix in ODR hashes, decl kinds, and offsets of the decls. We need to mix
   // in decl kinds and offsets because not all decls have ODR hashes, and so
   // these extra bits of data add variability to help distinguish between things
   // that might only manifest as nested fragments.
   for (const pasta::Decl &decl : decls) {
-    fs.AddInteger(static_cast<uint16_t>(decl.Kind()));
+    ss << " D" << int(decl.Kind());
 
     pasta::Token decl_token = decl.Token();
     if (frag_tok_range && frag_tok_range->Contains(decl_token)) {
-      fs.AddInteger(end_index - decl_token.Index());
+      ss << " o" << (end_index - decl_token.Index());
     }
 
     visitor.Accept(decl);
@@ -257,20 +280,10 @@ std::string HashFragment(
   //            the parsed and intermediate tokens, which is a good enough
   //            proxy.
   for (const pasta::Macro &macro : macros) {
-    D( std::cerr << "\t3 kind=" << int(macro.Kind()) << " num_children="
-                 << macro.Children().Size() << '\n'; )
-    fs.AddInteger(static_cast<uint16_t>(macro.Kind()));
-    fs.AddInteger(macro.Children().Size());
+    ss << " M" << int(macro.Kind()) << "/" << macro.Children().Size();
   }
 
-  base_hash <<= 32u;
-  base_hash |= fs.ComputeHash();
-
-  std::string hash_data;
-  hash_data.resize(sizeof(base_hash));
-  memcpy(hash_data.data(), &base_hash, sizeof(base_hash));
-
-  return hash_data;
+  return ss.str();
 }
 
 }  // namespace indexer

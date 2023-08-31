@@ -93,8 +93,8 @@ class WriterThreadState {
       RawEntityId proposed_id, RawEntityId context_id, std::string hash);
 
   RawEntityId GetOrCreateId(
-      RawEntityId proposed_id, RawEntityId context_id, RawEntityId hash,
-      size_t table);
+      RawEntityId proposed_id, RawEntityId hash_a, RawEntityId hash_b,
+      RawEntityId hash_c, size_t table);
 
  public:
   std::optional<RawEntityId> available_file_index;
@@ -127,8 +127,8 @@ class WriterThreadState {
 };
 
 RawEntityId WriterThreadState::GetOrCreateId(
-    RawEntityId proposed_id, RawEntityId context_id, RawEntityId hash,
-    size_t table) {
+    RawEntityId proposed_id, RawEntityId hash_a, RawEntityId hash_b,
+    RawEntityId hash_c, size_t table) {
 
   std::optional<sqlite::Statement> &get = get_index[table];
   std::optional<sqlite::Statement> &set = set_index[table];
@@ -137,12 +137,12 @@ RawEntityId WriterThreadState::GetOrCreateId(
   if (!get) {
     get.emplace(db.Prepare(
         "SELECT index_ FROM " + gIndexToHashTableName[table] +
-        " WHERE hash = ?1 AND context_id = ?2")),
+        " WHERE hash_a = ?1 AND hash_b = ?2 AND hash_c = ?3")),
 
     set.emplace(db.Prepare(
         "INSERT INTO " + gIndexToHashTableName[table] +
-        " (index_, hash, context_id) "
-        "VALUES (?1, ?2, ?3) "
+        " (index_, hash_a, hash_b, hash_c) "
+        "VALUES (?1, ?2, ?3, ?4) "
         "ON CONFLICT DO UPDATE SET index_ = index_ "
         "RETURNING index_"));
   }
@@ -153,7 +153,7 @@ RawEntityId WriterThreadState::GetOrCreateId(
   //            hashes.
 
   // Racy read.
-  get->BindValues(hash, context_id);
+  get->BindValues(hash_a, hash_b, hash_c);
   if (get->ExecuteStep()) {
     get->Row().Columns(id_out);
   }
@@ -161,7 +161,7 @@ RawEntityId WriterThreadState::GetOrCreateId(
 
   // Transactional get/set.
   while (id_out == kInvalidEntityId) {
-    set->BindValues(proposed_id, hash, context_id);
+    set->BindValues(proposed_id, hash_a, hash_b, hash_c);
     if (set->ExecuteStep()) {
       set->Row().Columns(id_out);
     }
@@ -186,7 +186,12 @@ RawEntityId WriterThreadState::GetOrCreateId(
   uint64_t real_hash = ((base_hash / kNumIdShards) * kNumIdShards) +
                        (rev_hash % kNumIdShards);
 
-  return GetOrCreateId(proposed_id, context_id, real_hash, table);
+  for (auto &c : hash) {
+    c = ~c;
+  }
+
+  auto inv_hash = kStringHasher(hash);
+  return GetOrCreateId(proposed_id, context_id, real_hash, inv_hash, table);
 }
 
 RawEntityId WriterThreadState::GetOrCreateFileId(
@@ -892,9 +897,10 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
     db.Execute(
         "CREATE TABLE IF NOT EXISTS " + name + " ("
         "  index_ INT NOT NULL,"
-        "  context_id INT NOT NULL,"
-        "  hash INT NOT NULL,"
-        "  PRIMARY KEY(context_id, hash)"
+        "  hash_a INT NOT NULL,"
+        "  hash_b INT NOT NULL,"
+        "  hash_c INT NOT NULL,"
+        "  PRIMARY KEY(hash_a, hash_b, hash_c)"
         ") WITHOUT rowid");
 
 

@@ -1366,7 +1366,7 @@ static PendingFragmentPtr CreatePendingFragment(
 // Create a printed token range for a sequence of declarations, and make it
 // represent the parsed tokens.
 static pasta::PrintedTokenRange CreateParsedTokenRange(
-    const pasta::PrintedTokenRange &parsed_tokens,
+    pasta::PrintedTokenRange parsed_tokens,
     const std::vector<pasta::Decl> &root_decls,
     const std::vector<pasta::Decl> &child_decls,
     const pasta::PrintingPolicy &pp) {
@@ -1375,7 +1375,8 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
     if (child_decls.empty()) {
       return parsed_tokens;
     } else {
-      return CreateParsedTokenRange(parsed_tokens, child_decls, root_decls, pp);
+      return CreateParsedTokenRange(std::move(parsed_tokens), child_decls,
+                                    root_decls, pp);
     }
   }
 
@@ -1416,19 +1417,14 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
 
   // If the alignment algorithm succeeds, then we will have token contexts
   // for each of the parsed tokens.
-  auto maybe_aligned_tokens = pasta::PrintedTokenRange::Align(
-      parsed_tokens, printed_tokens);
-
-  if (maybe_aligned_tokens.Succeeded()) {
-    return maybe_aligned_tokens.TakeValue();
+  auto err = pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
 
   // It's not fatal if we can't match them here, because this is really a
   // kind of implicit fragment anyway.
-  } else {
-    LOG(ERROR)
-        << "Unable to align tokens: " << maybe_aligned_tokens.TakeError();
-    return parsed_tokens;
-  }
+  LOG_IF(ERROR, err.has_value())
+      << "Unable to align tokens: " << err.value();
+
+  return parsed_tokens;
 }
 
 // NOTE(pag): Left here for niftiness of debugging issues, e.g. where some
@@ -1505,18 +1501,7 @@ static void CreateFreestandingDeclFragment(
 
   // Align against the parsed tokens, if we can. 
   if (parsed_tokens) {
-    auto maybe_aligned_tokens = pasta::PrintedTokenRange::Align(
-        parsed_tokens, printed_tokens);
-
-    if (maybe_aligned_tokens.Succeeded()) {
-      (void) maybe_aligned_tokens.TakeValue();  // Drop it.
-
-      // NOTE(pag): PASTA mutates the printed tokens in place when doing the
-      //            alignment, so that they also now have token locations.
-
-    } else {
-      (void) maybe_aligned_tokens.TakeError();  // Drop it.
-    }
+    (void) pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
 
   } else {
     LOG_IF(ERROR, !is_builtin)
@@ -1524,6 +1509,11 @@ static void CreateFreestandingDeclFragment(
         << " declaration: " << DeclToString(decl)
         << PrefixedLocation(decl, " at or near ")
         << " on main job file " << main_file_path;
+  }
+
+  std::cout << "\n---- freestanding fragment\n";
+  for (pasta::PrintedToken pt : printed_tokens) {
+    std::cout << pt.DerivedLocation().has_value() << '\t' << pt.Data() << '\n';
   }
 
   // NOTE(pag): We pass `nullptr` as the parsed tokens, because we can't
@@ -1667,15 +1657,14 @@ static void CreatePendingFragments(
   }
 
   pasta::PrintingPolicy pp;
-  pasta::PrintedTokenRange parsed_tokens =
-      pasta::PrintedTokenRange::Adopt(frag_tok_range);
-
   // Create the root fragment.
   auto has_top_level_macros = !top_level_macros.empty();
   if (!root_decls.empty() || (nested_decls.empty() && has_top_level_macros)) {
 
     pasta::PrintedTokenRange aligned_tokens =
-        CreateParsedTokenRange(parsed_tokens, root_decls, empty_decls, pp);
+        CreateParsedTokenRange(
+            pasta::PrintedTokenRange::Adopt(frag_tok_range),
+            root_decls, empty_decls, pp);
 
     CHECK(!aligned_tokens.empty() || has_top_level_macros);
 
@@ -1749,7 +1738,9 @@ static void CreatePendingFragments(
     CHECK(root_fragment_id.has_value());
 
     pasta::PrintedTokenRange aligned_tokens =
-        CreateParsedTokenRange(parsed_tokens, root_decls, decls, pp);
+        CreateParsedTokenRange(
+            pasta::PrintedTokenRange::Adopt(frag_tok_range),
+            root_decls, decls, pp);
 
     CHECK(!aligned_tokens.empty());
 
