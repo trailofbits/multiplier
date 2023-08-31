@@ -1499,7 +1499,12 @@ static void CreateFreestandingDeclFragment(
     floc.reset();
   }
 
-  // Align against the parsed tokens, if we can. 
+  // Align against the parsed tokens, if we can.
+  //
+  // NOTE(pag): Alignment mutates both `parsed_tokens` and `printed_tokens`
+  //            in place, making `printed_tokens` have source locations from
+  //            `parsed_tokens`, and `parsed_tokens` have contexts from
+  //            `printed_tokens`.
   if (parsed_tokens) {
     (void) pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
 
@@ -1509,11 +1514,6 @@ static void CreateFreestandingDeclFragment(
         << " declaration: " << DeclToString(decl)
         << PrefixedLocation(decl, " at or near ")
         << " on main job file " << main_file_path;
-  }
-
-  std::cout << "\n---- freestanding fragment\n";
-  for (pasta::PrintedToken pt : printed_tokens) {
-    std::cout << pt.DerivedLocation().has_value() << '\t' << pt.Data() << '\n';
   }
 
   // NOTE(pag): We pass `nullptr` as the parsed tokens, because we can't
