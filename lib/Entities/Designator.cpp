@@ -93,11 +93,11 @@ Token Designator::ellipsis_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
-std::optional<unsigned> Designator::first_expression_index(void) const {
+std::optional<uint32_t> Designator::first_expression_index(void) const {
   if (!impl->reader.getVal12()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal11());
+    return static_cast<uint32_t>(impl->reader.getVal11());
   }
   return std::nullopt;
 }

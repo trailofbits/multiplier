@@ -810,20 +810,45 @@ void CodeGenerator::RunOnOptional(
     cxx_element_name = "bool";
     cxx_underlying_name = cxx_element_name;
 
-  } else if (*element_name == "unsigned") {
-    capn_element_name = "UInt32";
-    cxx_element_name = "unsigned";
-    cxx_underlying_name = cxx_element_name;
-
   } else if (*element_name == "uint64_t") {
     capn_element_name = "UInt64";
-    cxx_element_name = "uint64_t";
+    cxx_element_name = std::move(element_name.value());
     cxx_underlying_name = cxx_element_name;
 
-  } else if (*element_name == "int") {
-    capn_element_name = "Int32";
-    cxx_element_name = "int";
+  } else if (*element_name == "int64_t") {
+    capn_element_name = "Int64";
+    cxx_element_name = std::move(element_name.value());
     cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "uint32_t") {
+    capn_element_name = "UInt32";
+    cxx_element_name = std::move(element_name.value());
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "int32_t") {
+    capn_element_name = "Int32";
+    cxx_element_name = std::move(element_name.value());
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "uint8_t") {
+    capn_element_name = "UInt8";
+    cxx_element_name = std::move(element_name.value());
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "int8_t") {
+    capn_element_name = "Int8";
+    cxx_element_name = std::move(element_name.value());
+    cxx_underlying_name = cxx_element_name;
+
+  // } else if (*element_name == "double") {
+  //   capn_element_name = "Float64";
+  //   cxx_element_name = std::move(element_name.value());
+  //   cxx_underlying_name = cxx_element_name;
+
+  // } else if (*element_name == "float") {
+  //   capn_element_name = "Float32";
+  //   cxx_element_name = std::move(element_name.value());
+  //   cxx_underlying_name = cxx_element_name;
 
   } else if (enum_names.count(*element_name)) {
     auto &types = enum_type[*element_name];
@@ -3243,7 +3268,6 @@ MethodListPtr CodeGenerator::RunOnClass(
       auto [getter_name, setter_name, init_name] = NamesFor(i);
 
       if (cxx_int_type == "bool") {
-
         serialize_inc_os
             << "  MX_VISIT_BOOL(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
@@ -3595,6 +3619,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
+      << "#include <cstdint>\n"
       << "#include <multiplier/AST.capnp.h>\n"
       << "#include <optional>\n\n"
       << "namespace pasta {\n";
@@ -3645,6 +3670,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
+      << "#include <cstdint>\n\n"
       << "namespace pasta {\n"
       << "class File;\n";
 

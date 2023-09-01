@@ -165,11 +165,11 @@ Token SubstNonTypeTemplateParmExpr::name_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
-std::optional<unsigned> SubstNonTypeTemplateParmExpr::pack_index(void) const {
+std::optional<uint32_t> SubstNonTypeTemplateParmExpr::pack_index(void) const {
   if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal105());
+    return static_cast<uint32_t>(impl->reader.getVal105());
   }
   return std::nullopt;
 }

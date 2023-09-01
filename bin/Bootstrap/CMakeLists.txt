@@ -48,7 +48,7 @@ if(MX_BOOTSTRAP_PASTA)
       "mx-bootstrap"
   )
   
-  set(generated_files
+  set(generated_pasta_files
     "${MX_BOOTSTRAP_LIB_AST_CAPNP}"
     "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}"
     "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}"
@@ -65,13 +65,13 @@ if(MX_BOOTSTRAP_PASTA)
       "mx-bootstrap-pasta"
     POST_BUILD
     BYPRODUCTS
-      ${generated_files}
+      ${generated_pasta_files}
     COMMAND
       "mx-bootstrap-pasta"
       "${install_include_dir}"
       "${dependencies_include_dir}"
       "${LLVM_INCLUDE_DIR}"
-      ${generated_files}
+      ${generated_pasta_files}
     COMMENT
       "Bootstrapping Multiplier"
   )
@@ -125,8 +125,6 @@ if(MX_BOOTSTRAP_VAST)
     TARGET
       "mx-bootstrap-vast"
     POST_BUILD
-    BYPRODUCTS
-      ${generated_files}
     COMMAND
       "mx-bootstrap-vast"
       "${install_include_dir}"

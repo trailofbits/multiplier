@@ -78,132 +78,132 @@ std::optional<QualifiedType> QualifiedType::from(const TokenContext &t) {
 }
 
 LangAS QualifiedType::address_space(void) const {
-  return static_cast<LangAS>(impl->reader.getVal237());
+  return static_cast<LangAS>(impl->reader.getVal241());
 }
 
 Type QualifiedType::atomic_unqualified_type(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal232();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool QualifiedType::has_address_space(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal234();
 }
 
 bool QualifiedType::has_non_trivial_obj_c_lifetime(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal235();
 }
 
 bool QualifiedType::has_non_trivial_to_primitive_copy_c_union(void) const {
-  return impl->reader.getVal232();
+  return impl->reader.getVal236();
 }
 
 bool QualifiedType::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
-  return impl->reader.getVal238();
-}
-
-bool QualifiedType::has_non_trivial_to_primitive_destruct_c_union(void) const {
-  return impl->reader.getVal239();
-}
-
-bool QualifiedType::has_qualifiers(void) const {
-  return impl->reader.getVal240();
-}
-
-bool QualifiedType::has_strong_or_weak_obj_c_lifetime(void) const {
-  return impl->reader.getVal241();
-}
-
-bool QualifiedType::is_c_forbidden_l_value_type(void) const {
   return impl->reader.getVal242();
 }
 
-bool QualifiedType::is_cxx11_pod_type(void) const {
+bool QualifiedType::has_non_trivial_to_primitive_destruct_c_union(void) const {
   return impl->reader.getVal243();
 }
 
-bool QualifiedType::is_cxx98_pod_type(void) const {
+bool QualifiedType::has_qualifiers(void) const {
   return impl->reader.getVal244();
 }
 
-bool QualifiedType::is_canonical(void) const {
+bool QualifiedType::has_strong_or_weak_obj_c_lifetime(void) const {
   return impl->reader.getVal245();
 }
 
-bool QualifiedType::is_canonical_as_parameter(void) const {
+bool QualifiedType::is_c_forbidden_l_value_type(void) const {
   return impl->reader.getVal246();
 }
 
-bool QualifiedType::is_const_qualified(void) const {
+bool QualifiedType::is_cxx11_pod_type(void) const {
   return impl->reader.getVal247();
 }
 
-bool QualifiedType::is_constant(void) const {
+bool QualifiedType::is_cxx98_pod_type(void) const {
   return impl->reader.getVal248();
 }
 
-bool QualifiedType::is_local_const_qualified(void) const {
+bool QualifiedType::is_canonical(void) const {
   return impl->reader.getVal249();
 }
 
-bool QualifiedType::is_local_restrict_qualified(void) const {
+bool QualifiedType::is_canonical_as_parameter(void) const {
   return impl->reader.getVal250();
 }
 
-bool QualifiedType::is_local_volatile_qualified(void) const {
+bool QualifiedType::is_const_qualified(void) const {
   return impl->reader.getVal251();
 }
 
-bool QualifiedType::is_non_weak_in_mrr_with_obj_c_weak(void) const {
+bool QualifiedType::is_constant(void) const {
   return impl->reader.getVal252();
 }
 
-bool QualifiedType::is_null(void) const {
+bool QualifiedType::is_local_const_qualified(void) const {
   return impl->reader.getVal253();
 }
 
-bool QualifiedType::is_obj_cgc_strong(void) const {
+bool QualifiedType::is_local_restrict_qualified(void) const {
   return impl->reader.getVal254();
 }
 
-bool QualifiedType::is_obj_cgc_weak(void) const {
+bool QualifiedType::is_local_volatile_qualified(void) const {
   return impl->reader.getVal255();
 }
 
-bool QualifiedType::is_pod_type(void) const {
+bool QualifiedType::is_non_weak_in_mrr_with_obj_c_weak(void) const {
   return impl->reader.getVal256();
 }
 
-bool QualifiedType::is_referenceable(void) const {
+bool QualifiedType::is_null(void) const {
   return impl->reader.getVal257();
 }
 
-bool QualifiedType::is_restrict_qualified(void) const {
+bool QualifiedType::is_obj_cgc_strong(void) const {
   return impl->reader.getVal258();
 }
 
-bool QualifiedType::is_trivial_type(void) const {
+bool QualifiedType::is_obj_cgc_weak(void) const {
   return impl->reader.getVal259();
 }
 
-bool QualifiedType::is_trivially_copyable_type(void) const {
+bool QualifiedType::is_pod_type(void) const {
   return impl->reader.getVal260();
 }
 
-bool QualifiedType::is_trivially_relocatable_type(void) const {
+bool QualifiedType::is_referenceable(void) const {
   return impl->reader.getVal261();
 }
 
-bool QualifiedType::is_volatile_qualified(void) const {
+bool QualifiedType::is_restrict_qualified(void) const {
   return impl->reader.getVal262();
 }
 
-bool QualifiedType::may_be_dynamic_class(void) const {
+bool QualifiedType::is_trivial_type(void) const {
   return impl->reader.getVal263();
 }
 
-bool QualifiedType::may_be_not_dynamic_class(void) const {
+bool QualifiedType::is_trivially_copyable_type(void) const {
   return impl->reader.getVal264();
+}
+
+bool QualifiedType::is_trivially_relocatable_type(void) const {
+  return impl->reader.getVal265();
+}
+
+bool QualifiedType::is_volatile_qualified(void) const {
+  return impl->reader.getVal266();
+}
+
+bool QualifiedType::may_be_dynamic_class(void) const {
+  return impl->reader.getVal267();
+}
+
+bool QualifiedType::may_be_not_dynamic_class(void) const {
+  return impl->reader.getVal268();
 }
 
 #pragma GCC diagnostic pop

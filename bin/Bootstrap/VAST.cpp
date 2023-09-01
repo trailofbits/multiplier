@@ -14,14 +14,18 @@
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
 #include <vast/Dialect/Dialects.hpp>
+#include <vast/Dialect/Core/CoreDialect.hpp>
 #include <vast/Dialect/Core/CoreOps.hpp>
 #include <vast/Dialect/Core/CoreTypes.hpp>
+#include <vast/Dialect/HighLevel/HighLevelDialect.hpp>
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/HighLevel/HighLevelTypes.hpp>
-#include <vast/Dialect/HighLevel/HighLevelLinkage.hpp>
+#include <vast/Dialect/LowLevel/LowLevelDialect.hpp>
 #include <vast/Dialect/LowLevel/LowLevelOps.hpp>
+#include <vast/Dialect/Meta/MetaDialect.hpp>
 #include <vast/Dialect/Meta/MetaAttributes.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedDialect.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedOps.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedTypes.hpp>
 
@@ -249,7 +253,9 @@ void CodeGenerator::FillIncludePathsFor(const pasta::CXXRecordDecl &cls) {
 
   ordered_paths.emplace(cls.Token().Index(), cls_path);
 
-  for (pasta::Token tok : cls.Tokens()) {
+  auto pt = pasta::PrintedTokenRange::Create(cls);
+
+  for (pasta::PrintedToken tok : pt) {
     for (std::optional<pasta::TokenContext> tc = tok.Context();
          tc; tc = tc->Parent()) {
       std::optional<pasta::Decl> tcd = pasta::Decl::From(tc.value());

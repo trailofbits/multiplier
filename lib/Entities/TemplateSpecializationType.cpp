@@ -79,13 +79,13 @@ std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const
 }
 
 Type TemplateSpecializationType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal232();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Type> TemplateSpecializationType::aliased_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal229();
+    RawEntityId eid = impl->reader.getVal233();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -97,23 +97,23 @@ std::optional<Type> TemplateSpecializationType::aliased_type(void) const {
 }
 
 bool TemplateSpecializationType::is_current_instantiation(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal234();
 }
 
 bool TemplateSpecializationType::is_sugared(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal235();
 }
 
 bool TemplateSpecializationType::is_type_alias(void) const {
-  return impl->reader.getVal232();
+  return impl->reader.getVal236();
 }
 
 unsigned TemplateSpecializationType::num_template_arguments(void) const {
-  return impl->reader.getVal233().size();
+  return impl->reader.getVal237().size();
 }
 
 std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal233();
+  auto list = impl->reader.getVal237();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -127,12 +127,12 @@ std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argumen
 }
 
 gap::generator<TemplateArgument> TemplateSpecializationType::template_arguments(void) const & {
-  auto list = impl->reader.getVal233();
+  auto list = impl->reader.getVal237();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d233 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d233));
+    if (auto d237 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d237));
     }
   }
   co_return;

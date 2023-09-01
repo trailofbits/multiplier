@@ -299,11 +299,11 @@ MultiVersionKind FunctionDecl::multi_version_kind(void) const {
   return static_cast<MultiVersionKind>(impl->reader.getVal89());
 }
 
-std::optional<unsigned> FunctionDecl::odr_hash(void) const {
+std::optional<uint32_t> FunctionDecl::odr_hash(void) const {
   if (!impl->reader.getVal98()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal143());
+    return static_cast<uint32_t>(impl->reader.getVal143());
   }
   return std::nullopt;
 }

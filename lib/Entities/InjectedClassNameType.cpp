@@ -80,27 +80,27 @@ std::optional<InjectedClassNameType> InjectedClassNameType::from(const TokenCont
 }
 
 Type InjectedClassNameType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal232();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 CXXRecordDecl InjectedClassNameType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal233();
   return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type InjectedClassNameType::injected_specialization_type(void) const {
-  RawEntityId eid = impl->reader.getVal235();
+  RawEntityId eid = impl->reader.getVal239();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TemplateSpecializationType InjectedClassNameType::injected_tst(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal240();
   return TemplateSpecializationType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 bool InjectedClassNameType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal234();
 }
 
 #pragma GCC diagnostic pop

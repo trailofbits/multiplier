@@ -88,12 +88,12 @@ std::optional<ArrayType> ArrayType::from(const TokenContext &t) {
 }
 
 Type ArrayType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal232();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ArrayTypeArraySizeModifier ArrayType::size_modifier(void) const {
-  return static_cast<ArrayTypeArraySizeModifier>(impl->reader.getVal237());
+  return static_cast<ArrayTypeArraySizeModifier>(impl->reader.getVal241());
 }
 
 #pragma GCC diagnostic pop

@@ -246,11 +246,11 @@ TokenRange EnumDecl::integer_type_range(void) const {
   return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal82(), impl->reader.getVal83());
 }
 
-std::optional<unsigned> EnumDecl::odr_hash(void) const {
+std::optional<uint32_t> EnumDecl::odr_hash(void) const {
   if (!impl->reader.getVal105()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal143());
+    return static_cast<uint32_t>(impl->reader.getVal143());
   }
   return std::nullopt;
 }

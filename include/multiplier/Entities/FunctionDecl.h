@@ -104,7 +104,7 @@ class FunctionDecl : public DeclaratorDecl {
   std::optional<FunctionDecl> instantiated_from_member_function(void) const;
   LanguageLinkage language_linkage(void) const;
   MultiVersionKind multi_version_kind(void) const;
-  std::optional<unsigned> odr_hash(void) const;
+  std::optional<uint32_t> odr_hash(void) const;
   OverloadedOperatorKind overloaded_operator(void) const;
   TokenRange parameters_tokens(void) const;
   Token point_of_instantiation(void) const;

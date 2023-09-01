@@ -230,18 +230,18 @@ const char *CxxIntType(const pasta::Type &type) {
   if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
     switch (bt->BuiltinKind()) {
       case pasta::BuiltinTypeKind::kBoolean: return "bool";
-      case pasta::BuiltinTypeKind::kCharacterS: return "char";  // `char`.
-      case pasta::BuiltinTypeKind::kCharacterU: return "char";  // `char`.
-      case pasta::BuiltinTypeKind::kSChar: return "signed char";  // `signed char`.
-      case pasta::BuiltinTypeKind::kUChar: return "unsigned char";  // `unsigned char`.
-      case pasta::BuiltinTypeKind::kShort: return "short";
-      case pasta::BuiltinTypeKind::kUShort: return "unsigned short";
-      case pasta::BuiltinTypeKind::kInt: return "int";
-      case pasta::BuiltinTypeKind::kUInt: return "unsigned";
-      case pasta::BuiltinTypeKind::kLong: return "long";
-      case pasta::BuiltinTypeKind::kULong: return "unsigned long";
-      case pasta::BuiltinTypeKind::kLongLong: return "long long";
-      case pasta::BuiltinTypeKind::kULongLong: return "unsigned long long";
+      case pasta::BuiltinTypeKind::kCharacterS: return "int8_t";  // `char`.
+      case pasta::BuiltinTypeKind::kCharacterU: return "uint8_t";  // `char`.
+      case pasta::BuiltinTypeKind::kSChar: return "int8_t";  // `signed char`.
+      case pasta::BuiltinTypeKind::kUChar: return "uint8_t";  // `unsigned char`.
+      case pasta::BuiltinTypeKind::kShort: return "int16_t";
+      case pasta::BuiltinTypeKind::kUShort: return "uint16_t";
+      case pasta::BuiltinTypeKind::kInt: return "int32_t";
+      case pasta::BuiltinTypeKind::kUInt: return "uint32_t";
+      case pasta::BuiltinTypeKind::kLong: return "int64_t";
+      case pasta::BuiltinTypeKind::kULong: return "uint64_t";
+      case pasta::BuiltinTypeKind::kLongLong: return "int64_t";
+      case pasta::BuiltinTypeKind::kULongLong: return "uint64_t";
       default: break;
     }
   } else if (type.IsTypedefNameType()) {

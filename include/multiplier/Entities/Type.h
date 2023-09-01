@@ -109,6 +109,8 @@ class Type {
   Type canonical_type(void) const;
   bool is_qualified(void) const;
   Type unqualified_type(void) const;
+  std::optional<uint64_t> size_in_bits(void) const;
+  std::optional<uint64_t> alignment(void) const;
   bool accepts_obj_c_type_parameters(void) const;
   bool can_decay_to_pointer_type(void) const;
   bool can_have_nullability(void) const;

@@ -80,18 +80,18 @@ std::optional<ElaboratedType> ElaboratedType::from(const TokenContext &t) {
 }
 
 Type ElaboratedType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal232();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ElaboratedType::named_type(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal233();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<TagDecl> ElaboratedType::owned_tag_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal235();
+    RawEntityId eid = impl->reader.getVal239();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -103,7 +103,7 @@ std::optional<TagDecl> ElaboratedType::owned_tag_declaration(void) const {
 }
 
 bool ElaboratedType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal234();
 }
 
 #pragma GCC diagnostic pop

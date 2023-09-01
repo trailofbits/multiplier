@@ -80,16 +80,16 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Tok
 }
 
 Token DependentSizedMatrixType::attribute_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal235());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal239());
 }
 
 Expr DependentSizedMatrixType::column_expression(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal240();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr DependentSizedMatrixType::row_expression(void) const {
-  RawEntityId eid = impl->reader.getVal266();
+  RawEntityId eid = impl->reader.getVal270();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

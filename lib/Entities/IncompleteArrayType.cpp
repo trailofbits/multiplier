@@ -79,12 +79,12 @@ std::optional<IncompleteArrayType> IncompleteArrayType::from(const TokenContext 
 }
 
 Type IncompleteArrayType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal233();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool IncompleteArrayType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal234();
 }
 
 #pragma GCC diagnostic pop

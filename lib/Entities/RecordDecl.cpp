@@ -307,6 +307,33 @@ bool RecordDecl::may_insert_extra_padding(void) const {
   return impl->reader.getVal124();
 }
 
+std::optional<uint64_t> RecordDecl::size(void) const {
+  if (!impl->reader.getVal125()) {
+    return std::nullopt;
+  } else {
+    return static_cast<uint64_t>(impl->reader.getVal79());
+  }
+  return std::nullopt;
+}
+
+std::optional<uint64_t> RecordDecl::alignment(void) const {
+  if (!impl->reader.getVal126()) {
+    return std::nullopt;
+  } else {
+    return static_cast<uint64_t>(impl->reader.getVal80());
+  }
+  return std::nullopt;
+}
+
+std::optional<uint64_t> RecordDecl::size_without_trailing_padding(void) const {
+  if (!impl->reader.getVal127()) {
+    return std::nullopt;
+  } else {
+    return static_cast<uint64_t>(impl->reader.getVal82());
+  }
+  return std::nullopt;
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

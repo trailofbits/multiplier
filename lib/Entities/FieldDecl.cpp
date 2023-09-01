@@ -264,6 +264,15 @@ bool FieldDecl::is_zero_size(void) const {
   return impl->reader.getVal100();
 }
 
+std::optional<uint64_t> FieldDecl::offset_in_bits(void) const {
+  if (!impl->reader.getVal101()) {
+    return std::nullopt;
+  } else {
+    return static_cast<uint64_t>(impl->reader.getVal84());
+  }
+  return std::nullopt;
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

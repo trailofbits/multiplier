@@ -282,6 +282,7 @@ enum class OperationKind : unsigned {
   LL_EXTRACT,
   LL_INITIALIZE,
   LL_INLINE_SCOPE,
+  LL_FUNC,
   LL_GEP,
   LL_RETURN,
   LL_SCOPE,
@@ -334,7 +335,6 @@ enum class OperationKind : unsigned {
   HL_GNU_EXTENSION,
   HL_FCMP,
   HL_FIELD,
-  HL_FUNC,
   HL_FUNCREF,
   HL_GLOBREF,
   HL_BREAK,
@@ -346,6 +346,7 @@ enum class OperationKind : unsigned {
   HL_DO,
   HL_EMPTY_DECL,
   HL_FOR,
+  HL_FUNC,
   HL_GOTO,
   HL_IF,
   HL_LABEL_DECL,
@@ -380,7 +381,6 @@ enum class OperationKind : unsigned {
   HL_ASSIGN_UREM,
   HL_UREM,
   HL_RETURN,
-  HL_SCOPE,
   HL_SIZEOF_EXPR,
   HL_SIZEOF_TYPE,
   HL_STMT_EXPR,
@@ -402,6 +402,7 @@ enum class OperationKind : unsigned {
   CORE_BIN_LOR,
   CORE_LAZY_OP,
   CORE_SELECT,
+  CORE_SCOPE,
   UNSUP_DECL,
   UNSUP_STMT,
 };
@@ -413,7 +414,7 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 391;
+  return 392;
 }
 
 const char *EnumeratorName(ir::OperationKind);

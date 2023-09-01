@@ -102,7 +102,7 @@ class Designator {
   Token left_bracket_token(void) const;
   Token right_bracket_token(void) const;
   Token ellipsis_token(void) const;
-  std::optional<unsigned> first_expression_index(void) const;
+  std::optional<uint32_t> first_expression_index(void) const;
 };
 
 #endif

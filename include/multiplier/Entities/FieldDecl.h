@@ -87,6 +87,7 @@ class FieldDecl : public DeclaratorDecl {
   bool is_unnamed_bitfield(void) const;
   bool is_zero_length_bit_field(void) const;
   bool is_zero_size(void) const;
+  std::optional<uint64_t> offset_in_bits(void) const;
 };
 
 static_assert(sizeof(FieldDecl) == sizeof(DeclaratorDecl));

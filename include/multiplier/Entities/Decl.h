@@ -138,7 +138,7 @@ class Decl {
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   std::optional<ExternalSourceSymbolAttr> external_source_symbol_attribute(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
-  std::optional<unsigned> max_alignment(void) const;
+  std::optional<uint32_t> max_alignment(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
   std::optional<Decl> non_closure_context(void) const;
   bool has_attributes(void) const;

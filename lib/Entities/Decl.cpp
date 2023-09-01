@@ -302,11 +302,11 @@ DeclFriendObjectKind Decl::friend_object_kind(void) const {
   return static_cast<DeclFriendObjectKind>(impl->reader.getVal10());
 }
 
-std::optional<unsigned> Decl::max_alignment(void) const {
+std::optional<uint32_t> Decl::max_alignment(void) const {
   if (!impl->reader.getVal12()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal11());
+    return static_cast<uint32_t>(impl->reader.getVal11());
   }
   return std::nullopt;
 }

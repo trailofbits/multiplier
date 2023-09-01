@@ -53,7 +53,7 @@ class SubstTemplateTypeParmType : public Type {
 
   Type desugar(void) const;
   Decl associated_declaration(void) const;
-  std::optional<unsigned> pack_index(void) const;
+  std::optional<uint32_t> pack_index(void) const;
   TemplateTypeParmDecl replaced_parameter(void) const;
   Type replacement_type(void) const;
   bool is_sugared(void) const;

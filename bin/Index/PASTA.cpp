@@ -12,7 +12,7 @@
 
 namespace mx {
 DeclKind FromPasta(pasta::DeclKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DeclKind::ACCESS_SPEC;
     case 1: return DeclKind::BINDING;
     case 2: return DeclKind::BLOCK;
@@ -105,7 +105,7 @@ DeclKind FromPasta(pasta::DeclKind e) {
 }
 
 AttrKind FromPasta(pasta::AttrKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AttrKind::A_ARCH64_SVE_PCS;
     case 1: return AttrKind::A_ARCH64_VECTOR_PCS;
     case 2: return AttrKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
@@ -478,7 +478,7 @@ AttrKind FromPasta(pasta::AttrKind e) {
 }
 
 AArch64SVEPcsAttrSpelling FromPasta(pasta::AArch64SVEPcsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AArch64SVEPcsAttrSpelling::GNU_AARCH64_SVE_PCS;
     case 1: return AArch64SVEPcsAttrSpelling::CXX11_CLANG_AARCH64_SVE_PCS;
     case 2: return AArch64SVEPcsAttrSpelling::C2X_CLANG_AARCH64_SVE_PCS;
@@ -488,7 +488,7 @@ AArch64SVEPcsAttrSpelling FromPasta(pasta::AArch64SVEPcsAttrSpelling e) {
 }
 
 AArch64VectorPcsAttrSpelling FromPasta(pasta::AArch64VectorPcsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AArch64VectorPcsAttrSpelling::GNU_AARCH64_VECTOR_PCS;
     case 1: return AArch64VectorPcsAttrSpelling::CXX11_CLANG_AARCH64_VECTOR_PCS;
     case 2: return AArch64VectorPcsAttrSpelling::C2X_CLANG_AARCH64_VECTOR_PCS;
@@ -498,7 +498,7 @@ AArch64VectorPcsAttrSpelling FromPasta(pasta::AArch64VectorPcsAttrSpelling e) {
 }
 
 AMDGPUFlatWorkGroupSizeAttrSpelling FromPasta(pasta::AMDGPUFlatWorkGroupSizeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AMDGPUFlatWorkGroupSizeAttrSpelling::GNU_AMDGPU_FLAT_WORK_GROUP_SIZE;
     case 1: return AMDGPUFlatWorkGroupSizeAttrSpelling::CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE;
     case 15: return AMDGPUFlatWorkGroupSizeAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -507,7 +507,7 @@ AMDGPUFlatWorkGroupSizeAttrSpelling FromPasta(pasta::AMDGPUFlatWorkGroupSizeAttr
 }
 
 AMDGPUKernelCallAttrSpelling FromPasta(pasta::AMDGPUKernelCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AMDGPUKernelCallAttrSpelling::GNU_AMDGPU_KERNEL;
     case 1: return AMDGPUKernelCallAttrSpelling::CXX11_CLANG_AMDGPU_KERNEL;
     case 2: return AMDGPUKernelCallAttrSpelling::C2X_CLANG_AMDGPU_KERNEL;
@@ -517,7 +517,7 @@ AMDGPUKernelCallAttrSpelling FromPasta(pasta::AMDGPUKernelCallAttrSpelling e) {
 }
 
 AMDGPUNumSGPRAttrSpelling FromPasta(pasta::AMDGPUNumSGPRAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AMDGPUNumSGPRAttrSpelling::GNU_AMDGPU_NUM_SGPR;
     case 1: return AMDGPUNumSGPRAttrSpelling::CXX11_CLANG_AMDGPU_NUM_SGPR;
     case 15: return AMDGPUNumSGPRAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -526,7 +526,7 @@ AMDGPUNumSGPRAttrSpelling FromPasta(pasta::AMDGPUNumSGPRAttrSpelling e) {
 }
 
 AMDGPUNumVGPRAttrSpelling FromPasta(pasta::AMDGPUNumVGPRAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AMDGPUNumVGPRAttrSpelling::GNU_AMDGPU_NUM_VGPR;
     case 1: return AMDGPUNumVGPRAttrSpelling::CXX11_CLANG_AMDGPU_NUM_VGPR;
     case 15: return AMDGPUNumVGPRAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -535,7 +535,7 @@ AMDGPUNumVGPRAttrSpelling FromPasta(pasta::AMDGPUNumVGPRAttrSpelling e) {
 }
 
 AMDGPUWavesPerEUAttrSpelling FromPasta(pasta::AMDGPUWavesPerEUAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AMDGPUWavesPerEUAttrSpelling::GNU_AMDGPU_WAVES_PER_EU;
     case 1: return AMDGPUWavesPerEUAttrSpelling::CXX11_CLANG_AMDGPU_WAVES_PER_EU;
     case 15: return AMDGPUWavesPerEUAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -544,7 +544,7 @@ AMDGPUWavesPerEUAttrSpelling FromPasta(pasta::AMDGPUWavesPerEUAttrSpelling e) {
 }
 
 ARMInterruptAttrInterruptType FromPasta(pasta::ARMInterruptAttrInterruptType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ARMInterruptAttrInterruptType::IRQ;
     case 1: return ARMInterruptAttrInterruptType::FIQ;
     case 2: return ARMInterruptAttrInterruptType::SWI;
@@ -556,7 +556,7 @@ ARMInterruptAttrInterruptType FromPasta(pasta::ARMInterruptAttrInterruptType e) 
 }
 
 ARMInterruptAttrSpelling FromPasta(pasta::ARMInterruptAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ARMInterruptAttrSpelling::GNU_INTERRUPT;
     case 1: return ARMInterruptAttrSpelling::CXX11_GNU_INTERRUPT;
     case 2: return ARMInterruptAttrSpelling::C2X_GNU_INTERRUPT;
@@ -566,7 +566,7 @@ ARMInterruptAttrSpelling FromPasta(pasta::ARMInterruptAttrSpelling e) {
 }
 
 AVRInterruptAttrSpelling FromPasta(pasta::AVRInterruptAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AVRInterruptAttrSpelling::GNU_INTERRUPT;
     case 1: return AVRInterruptAttrSpelling::CXX11_GNU_INTERRUPT;
     case 2: return AVRInterruptAttrSpelling::C2X_GNU_INTERRUPT;
@@ -576,7 +576,7 @@ AVRInterruptAttrSpelling FromPasta(pasta::AVRInterruptAttrSpelling e) {
 }
 
 AVRSignalAttrSpelling FromPasta(pasta::AVRSignalAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AVRSignalAttrSpelling::GNU_SIGNAL;
     case 1: return AVRSignalAttrSpelling::CXX11_GNU_SIGNAL;
     case 2: return AVRSignalAttrSpelling::C2X_GNU_SIGNAL;
@@ -586,7 +586,7 @@ AVRSignalAttrSpelling FromPasta(pasta::AVRSignalAttrSpelling e) {
 }
 
 AbiTagAttrSpelling FromPasta(pasta::AbiTagAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AbiTagAttrSpelling::GNU_ABI_TAG;
     case 1: return AbiTagAttrSpelling::CXX11_GNU_ABI_TAG;
     case 15: return AbiTagAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -595,7 +595,7 @@ AbiTagAttrSpelling FromPasta(pasta::AbiTagAttrSpelling e) {
 }
 
 AcquireCapabilityAttrSpelling FromPasta(pasta::AcquireCapabilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AcquireCapabilityAttrSpelling::GNU_ACQUIRE_CAPABILITY;
     case 1: return AcquireCapabilityAttrSpelling::CXX11_CLANG_ACQUIRE_CAPABILITY;
     case 2: return AcquireCapabilityAttrSpelling::GNU_ACQUIRE_SHARED_CAPABILITY;
@@ -608,7 +608,7 @@ AcquireCapabilityAttrSpelling FromPasta(pasta::AcquireCapabilityAttrSpelling e) 
 }
 
 AcquireHandleAttrSpelling FromPasta(pasta::AcquireHandleAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AcquireHandleAttrSpelling::GNU_ACQUIRE_HANDLE;
     case 1: return AcquireHandleAttrSpelling::CXX11_CLANG_ACQUIRE_HANDLE;
     case 2: return AcquireHandleAttrSpelling::C2X_CLANG_ACQUIRE_HANDLE;
@@ -618,7 +618,7 @@ AcquireHandleAttrSpelling FromPasta(pasta::AcquireHandleAttrSpelling e) {
 }
 
 AddressSpaceAttrSpelling FromPasta(pasta::AddressSpaceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AddressSpaceAttrSpelling::GNU_ADDRESS_SPACE;
     case 1: return AddressSpaceAttrSpelling::CXX11_CLANG_ADDRESS_SPACE;
     case 2: return AddressSpaceAttrSpelling::C2X_CLANG_ADDRESS_SPACE;
@@ -628,7 +628,7 @@ AddressSpaceAttrSpelling FromPasta(pasta::AddressSpaceAttrSpelling e) {
 }
 
 AliasAttrSpelling FromPasta(pasta::AliasAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AliasAttrSpelling::GNU_ALIAS;
     case 1: return AliasAttrSpelling::CXX11_GNU_ALIAS;
     case 2: return AliasAttrSpelling::C2X_GNU_ALIAS;
@@ -638,7 +638,7 @@ AliasAttrSpelling FromPasta(pasta::AliasAttrSpelling e) {
 }
 
 AlignedAttrSpelling FromPasta(pasta::AlignedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AlignedAttrSpelling::GNU_ALIGNED;
     case 1: return AlignedAttrSpelling::CXX11_GNU_ALIGNED;
     case 2: return AlignedAttrSpelling::C2X_GNU_ALIGNED;
@@ -651,7 +651,7 @@ AlignedAttrSpelling FromPasta(pasta::AlignedAttrSpelling e) {
 }
 
 AllocAlignAttrSpelling FromPasta(pasta::AllocAlignAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AllocAlignAttrSpelling::GNU_ALLOC_ALIGN;
     case 1: return AllocAlignAttrSpelling::CXX11_GNU_ALLOC_ALIGN;
     case 2: return AllocAlignAttrSpelling::C2X_GNU_ALLOC_ALIGN;
@@ -661,7 +661,7 @@ AllocAlignAttrSpelling FromPasta(pasta::AllocAlignAttrSpelling e) {
 }
 
 AllocSizeAttrSpelling FromPasta(pasta::AllocSizeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AllocSizeAttrSpelling::GNU_ALLOC_SIZE;
     case 1: return AllocSizeAttrSpelling::CXX11_GNU_ALLOC_SIZE;
     case 2: return AllocSizeAttrSpelling::C2X_GNU_ALLOC_SIZE;
@@ -671,7 +671,7 @@ AllocSizeAttrSpelling FromPasta(pasta::AllocSizeAttrSpelling e) {
 }
 
 AlwaysDestroyAttrSpelling FromPasta(pasta::AlwaysDestroyAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AlwaysDestroyAttrSpelling::GNU_ALWAYS_DESTROY;
     case 1: return AlwaysDestroyAttrSpelling::CXX11_CLANG_ALWAYS_DESTROY;
     case 15: return AlwaysDestroyAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -680,7 +680,7 @@ AlwaysDestroyAttrSpelling FromPasta(pasta::AlwaysDestroyAttrSpelling e) {
 }
 
 AlwaysInlineAttrSpelling FromPasta(pasta::AlwaysInlineAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AlwaysInlineAttrSpelling::GNU_ALWAYS_INLINE;
     case 1: return AlwaysInlineAttrSpelling::CXX11_GNU_ALWAYS_INLINE;
     case 2: return AlwaysInlineAttrSpelling::C2X_GNU_ALWAYS_INLINE;
@@ -693,7 +693,7 @@ AlwaysInlineAttrSpelling FromPasta(pasta::AlwaysInlineAttrSpelling e) {
 }
 
 AnnotateAttrSpelling FromPasta(pasta::AnnotateAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AnnotateAttrSpelling::GNU_ANNOTATE;
     case 1: return AnnotateAttrSpelling::CXX11_CLANG_ANNOTATE;
     case 2: return AnnotateAttrSpelling::C2X_CLANG_ANNOTATE;
@@ -703,7 +703,7 @@ AnnotateAttrSpelling FromPasta(pasta::AnnotateAttrSpelling e) {
 }
 
 AnnotateTypeAttrSpelling FromPasta(pasta::AnnotateTypeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AnnotateTypeAttrSpelling::CXX11_CLANG_ANNOTATE_TYPE;
     case 1: return AnnotateTypeAttrSpelling::C2X_CLANG_ANNOTATE_TYPE;
     case 15: return AnnotateTypeAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -712,7 +712,7 @@ AnnotateTypeAttrSpelling FromPasta(pasta::AnnotateTypeAttrSpelling e) {
 }
 
 AnyX86InterruptAttrSpelling FromPasta(pasta::AnyX86InterruptAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AnyX86InterruptAttrSpelling::GNU_INTERRUPT;
     case 1: return AnyX86InterruptAttrSpelling::CXX11_GNU_INTERRUPT;
     case 2: return AnyX86InterruptAttrSpelling::C2X_GNU_INTERRUPT;
@@ -722,7 +722,7 @@ AnyX86InterruptAttrSpelling FromPasta(pasta::AnyX86InterruptAttrSpelling e) {
 }
 
 AnyX86NoCallerSavedRegistersAttrSpelling FromPasta(pasta::AnyX86NoCallerSavedRegistersAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AnyX86NoCallerSavedRegistersAttrSpelling::GNU_NO_CALLER_SAVED_REGISTERS;
     case 1: return AnyX86NoCallerSavedRegistersAttrSpelling::CXX11_GNU_NO_CALLER_SAVED_REGISTERS;
     case 2: return AnyX86NoCallerSavedRegistersAttrSpelling::C2X_GNU_NO_CALLER_SAVED_REGISTERS;
@@ -732,7 +732,7 @@ AnyX86NoCallerSavedRegistersAttrSpelling FromPasta(pasta::AnyX86NoCallerSavedReg
 }
 
 AnyX86NoCfCheckAttrSpelling FromPasta(pasta::AnyX86NoCfCheckAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AnyX86NoCfCheckAttrSpelling::GNU_NOCF_CHECK;
     case 1: return AnyX86NoCfCheckAttrSpelling::CXX11_GNU_NOCF_CHECK;
     case 2: return AnyX86NoCfCheckAttrSpelling::C2X_GNU_NOCF_CHECK;
@@ -742,7 +742,7 @@ AnyX86NoCfCheckAttrSpelling FromPasta(pasta::AnyX86NoCfCheckAttrSpelling e) {
 }
 
 ArcWeakrefUnavailableAttrSpelling FromPasta(pasta::ArcWeakrefUnavailableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ArcWeakrefUnavailableAttrSpelling::GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE;
     case 1: return ArcWeakrefUnavailableAttrSpelling::CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE;
     case 2: return ArcWeakrefUnavailableAttrSpelling::C2X_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE;
@@ -752,7 +752,7 @@ ArcWeakrefUnavailableAttrSpelling FromPasta(pasta::ArcWeakrefUnavailableAttrSpel
 }
 
 ArgumentWithTypeTagAttrSpelling FromPasta(pasta::ArgumentWithTypeTagAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ArgumentWithTypeTagAttrSpelling::GNU_ARGUMENT_WITH_TYPE_TAG;
     case 1: return ArgumentWithTypeTagAttrSpelling::CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG;
     case 2: return ArgumentWithTypeTagAttrSpelling::C2X_CLANG_ARGUMENT_WITH_TYPE_TAG;
@@ -765,7 +765,7 @@ ArgumentWithTypeTagAttrSpelling FromPasta(pasta::ArgumentWithTypeTagAttrSpelling
 }
 
 ArmBuiltinAliasAttrSpelling FromPasta(pasta::ArmBuiltinAliasAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ArmBuiltinAliasAttrSpelling::GNU_CLANG_ARM_BUILTIN_ALIAS;
     case 1: return ArmBuiltinAliasAttrSpelling::CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS;
     case 2: return ArmBuiltinAliasAttrSpelling::C2X_CLANG_CLANG_ARM_BUILTIN_ALIAS;
@@ -775,7 +775,7 @@ ArmBuiltinAliasAttrSpelling FromPasta(pasta::ArmBuiltinAliasAttrSpelling e) {
 }
 
 ArmMveStrictPolymorphismAttrSpelling FromPasta(pasta::ArmMveStrictPolymorphismAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ArmMveStrictPolymorphismAttrSpelling::GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM;
     case 1: return ArmMveStrictPolymorphismAttrSpelling::CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM;
     case 2: return ArmMveStrictPolymorphismAttrSpelling::C2X_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM;
@@ -785,7 +785,7 @@ ArmMveStrictPolymorphismAttrSpelling FromPasta(pasta::ArmMveStrictPolymorphismAt
 }
 
 ArrayTypeArraySizeModifier FromPasta(pasta::ArrayTypeArraySizeModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ArrayTypeArraySizeModifier::NORMAL;
     case 1: return ArrayTypeArraySizeModifier::STATIC;
     case 2: return ArrayTypeArraySizeModifier::STAR;
@@ -794,7 +794,7 @@ ArrayTypeArraySizeModifier FromPasta(pasta::ArrayTypeArraySizeModifier e) {
 }
 
 ArtificialAttrSpelling FromPasta(pasta::ArtificialAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ArtificialAttrSpelling::GNU_ARTIFICIAL;
     case 1: return ArtificialAttrSpelling::CXX11_GNU_ARTIFICIAL;
     case 2: return ArtificialAttrSpelling::C2X_GNU_ARTIFICIAL;
@@ -804,7 +804,7 @@ ArtificialAttrSpelling FromPasta(pasta::ArtificialAttrSpelling e) {
 }
 
 AsmLabelAttrSpelling FromPasta(pasta::AsmLabelAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AsmLabelAttrSpelling::KEYWORD_ASSEMBLY;
     case 15: return AsmLabelAttrSpelling::SPELLING_NOT_CALCULATED;
     default: __builtin_unreachable();
@@ -812,7 +812,7 @@ AsmLabelAttrSpelling FromPasta(pasta::AsmLabelAttrSpelling e) {
 }
 
 AssertCapabilityAttrSpelling FromPasta(pasta::AssertCapabilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AssertCapabilityAttrSpelling::GNU_ASSERT_CAPABILITY;
     case 1: return AssertCapabilityAttrSpelling::CXX11_CLANG_ASSERT_CAPABILITY;
     case 2: return AssertCapabilityAttrSpelling::GNU_ASSERT_SHARED_CAPABILITY;
@@ -823,7 +823,7 @@ AssertCapabilityAttrSpelling FromPasta(pasta::AssertCapabilityAttrSpelling e) {
 }
 
 AssumeAlignedAttrSpelling FromPasta(pasta::AssumeAlignedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AssumeAlignedAttrSpelling::GNU_ASSUME_ALIGNED;
     case 1: return AssumeAlignedAttrSpelling::CXX11_GNU_ASSUME_ALIGNED;
     case 2: return AssumeAlignedAttrSpelling::C2X_GNU_ASSUME_ALIGNED;
@@ -833,7 +833,7 @@ AssumeAlignedAttrSpelling FromPasta(pasta::AssumeAlignedAttrSpelling e) {
 }
 
 AssumptionAttrSpelling FromPasta(pasta::AssumptionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AssumptionAttrSpelling::GNU_ASSUME;
     case 1: return AssumptionAttrSpelling::CXX11_CLANG_ASSUME;
     case 2: return AssumptionAttrSpelling::C2X_CLANG_ASSUME;
@@ -843,7 +843,7 @@ AssumptionAttrSpelling FromPasta(pasta::AssumptionAttrSpelling e) {
 }
 
 AtomicExprAtomicOp FromPasta(pasta::AtomicExprAtomicOp e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AtomicExprAtomicOp::C11_ATOMIC_INITIALIZER;
     case 1: return AtomicExprAtomicOp::C11_ATOMIC_LOAD;
     case 2: return AtomicExprAtomicOp::C11_ATOMIC_STORE;
@@ -911,7 +911,7 @@ AtomicExprAtomicOp FromPasta(pasta::AtomicExprAtomicOp e) {
 }
 
 AvailabilityAttrSpelling FromPasta(pasta::AvailabilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AvailabilityAttrSpelling::GNU_AVAILABILITY;
     case 1: return AvailabilityAttrSpelling::CXX11_CLANG_AVAILABILITY;
     case 2: return AvailabilityAttrSpelling::C2X_CLANG_AVAILABILITY;
@@ -921,7 +921,7 @@ AvailabilityAttrSpelling FromPasta(pasta::AvailabilityAttrSpelling e) {
 }
 
 BPFPreserveAccessIndexAttrSpelling FromPasta(pasta::BPFPreserveAccessIndexAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return BPFPreserveAccessIndexAttrSpelling::GNU_PRESERVE_ACCESS_INDEX;
     case 1: return BPFPreserveAccessIndexAttrSpelling::CXX11_CLANG_PRESERVE_ACCESS_INDEX;
     case 2: return BPFPreserveAccessIndexAttrSpelling::C2X_CLANG_PRESERVE_ACCESS_INDEX;
@@ -931,7 +931,7 @@ BPFPreserveAccessIndexAttrSpelling FromPasta(pasta::BPFPreserveAccessIndexAttrSp
 }
 
 BTFDeclTagAttrSpelling FromPasta(pasta::BTFDeclTagAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return BTFDeclTagAttrSpelling::GNU_BTF_DECLARATION_TAG;
     case 1: return BTFDeclTagAttrSpelling::CXX11_CLANG_BTF_DECLARATION_TAG;
     case 2: return BTFDeclTagAttrSpelling::C2X_CLANG_BTF_DECLARATION_TAG;
@@ -941,7 +941,7 @@ BTFDeclTagAttrSpelling FromPasta(pasta::BTFDeclTagAttrSpelling e) {
 }
 
 BTFTypeTagAttrSpelling FromPasta(pasta::BTFTypeTagAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return BTFTypeTagAttrSpelling::GNU_BTF_TYPE_TAG;
     case 1: return BTFTypeTagAttrSpelling::CXX11_CLANG_BTF_TYPE_TAG;
     case 2: return BTFTypeTagAttrSpelling::C2X_CLANG_BTF_TYPE_TAG;
@@ -951,14 +951,14 @@ BTFTypeTagAttrSpelling FromPasta(pasta::BTFTypeTagAttrSpelling e) {
 }
 
 BlocksAttrBlockType FromPasta(pasta::BlocksAttrBlockType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return BlocksAttrBlockType::BY_REFERENCE;
     default: __builtin_unreachable();
   }
 }
 
 BlocksAttrSpelling FromPasta(pasta::BlocksAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return BlocksAttrSpelling::GNU_BLOCKS;
     case 1: return BlocksAttrSpelling::CXX11_CLANG_BLOCKS;
     case 2: return BlocksAttrSpelling::C2X_CLANG_BLOCKS;
@@ -968,7 +968,7 @@ BlocksAttrSpelling FromPasta(pasta::BlocksAttrSpelling e) {
 }
 
 BuiltinAliasAttrSpelling FromPasta(pasta::BuiltinAliasAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return BuiltinAliasAttrSpelling::CXX11_CLANG_BUILTIN_ALIAS;
     case 1: return BuiltinAliasAttrSpelling::C2X_CLANG_BUILTIN_ALIAS;
     case 2: return BuiltinAliasAttrSpelling::GNU_CLANG_BUILTIN_ALIAS;
@@ -978,7 +978,7 @@ BuiltinAliasAttrSpelling FromPasta(pasta::BuiltinAliasAttrSpelling e) {
 }
 
 BuiltinTypeKind FromPasta(pasta::BuiltinTypeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return BuiltinTypeKind::OCL_IMAGE_1D_RO;
     case 1: return BuiltinTypeKind::OCL_IMAGE_1D_ARRAY_RO;
     case 2: return BuiltinTypeKind::OCL_IMAGE_1D_BUFFER_RO;
@@ -1222,7 +1222,7 @@ BuiltinTypeKind FromPasta(pasta::BuiltinTypeKind e) {
 }
 
 CDeclAttrSpelling FromPasta(pasta::CDeclAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CDeclAttrSpelling::GNU_CDECL;
     case 1: return CDeclAttrSpelling::CXX11_GNU_CDECL;
     case 2: return CDeclAttrSpelling::C2X_GNU_CDECL;
@@ -1233,7 +1233,7 @@ CDeclAttrSpelling FromPasta(pasta::CDeclAttrSpelling e) {
 }
 
 CFAuditedTransferAttrSpelling FromPasta(pasta::CFAuditedTransferAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CFAuditedTransferAttrSpelling::GNU_CF_AUDITED_TRANSFER;
     case 1: return CFAuditedTransferAttrSpelling::CXX11_CLANG_CF_AUDITED_TRANSFER;
     case 2: return CFAuditedTransferAttrSpelling::C2X_CLANG_CF_AUDITED_TRANSFER;
@@ -1243,7 +1243,7 @@ CFAuditedTransferAttrSpelling FromPasta(pasta::CFAuditedTransferAttrSpelling e) 
 }
 
 CFConsumedAttrSpelling FromPasta(pasta::CFConsumedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CFConsumedAttrSpelling::GNU_CF_CONSUMED;
     case 1: return CFConsumedAttrSpelling::CXX11_CLANG_CF_CONSUMED;
     case 2: return CFConsumedAttrSpelling::C2X_CLANG_CF_CONSUMED;
@@ -1253,14 +1253,14 @@ CFConsumedAttrSpelling FromPasta(pasta::CFConsumedAttrSpelling e) {
 }
 
 CFGuardAttrGuardArg FromPasta(pasta::CFGuardAttrGuardArg e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CFGuardAttrGuardArg::NOCF;
     default: __builtin_unreachable();
   }
 }
 
 CFGuardAttrSpelling FromPasta(pasta::CFGuardAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CFGuardAttrSpelling::DECLSPEC_GUARD;
     case 1: return CFGuardAttrSpelling::GNU_GUARD;
     case 2: return CFGuardAttrSpelling::CXX11_CLANG_GUARD;
@@ -1271,7 +1271,7 @@ CFGuardAttrSpelling FromPasta(pasta::CFGuardAttrSpelling e) {
 }
 
 CFICanonicalJumpTableAttrSpelling FromPasta(pasta::CFICanonicalJumpTableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CFICanonicalJumpTableAttrSpelling::GNU_CFI_CANONICAL_JUMP_TABLE;
     case 1: return CFICanonicalJumpTableAttrSpelling::CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE;
     case 2: return CFICanonicalJumpTableAttrSpelling::C2X_CLANG_CFI_CANONICAL_JUMP_TABLE;
@@ -1281,7 +1281,7 @@ CFICanonicalJumpTableAttrSpelling FromPasta(pasta::CFICanonicalJumpTableAttrSpel
 }
 
 CFReturnsNotRetainedAttrSpelling FromPasta(pasta::CFReturnsNotRetainedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CFReturnsNotRetainedAttrSpelling::GNU_CF_RETURNS_NOT_RETAINED;
     case 1: return CFReturnsNotRetainedAttrSpelling::CXX11_CLANG_CF_RETURNS_NOT_RETAINED;
     case 2: return CFReturnsNotRetainedAttrSpelling::C2X_CLANG_CF_RETURNS_NOT_RETAINED;
@@ -1291,7 +1291,7 @@ CFReturnsNotRetainedAttrSpelling FromPasta(pasta::CFReturnsNotRetainedAttrSpelli
 }
 
 CFReturnsRetainedAttrSpelling FromPasta(pasta::CFReturnsRetainedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CFReturnsRetainedAttrSpelling::GNU_CF_RETURNS_RETAINED;
     case 1: return CFReturnsRetainedAttrSpelling::CXX11_CLANG_CF_RETURNS_RETAINED;
     case 2: return CFReturnsRetainedAttrSpelling::C2X_CLANG_CF_RETURNS_RETAINED;
@@ -1301,7 +1301,7 @@ CFReturnsRetainedAttrSpelling FromPasta(pasta::CFReturnsRetainedAttrSpelling e) 
 }
 
 CFUnknownTransferAttrSpelling FromPasta(pasta::CFUnknownTransferAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CFUnknownTransferAttrSpelling::GNU_CF_UNKNOWN_TRANSFER;
     case 1: return CFUnknownTransferAttrSpelling::CXX11_CLANG_CF_UNKNOWN_TRANSFER;
     case 2: return CFUnknownTransferAttrSpelling::C2X_CLANG_CF_UNKNOWN_TRANSFER;
@@ -1311,7 +1311,7 @@ CFUnknownTransferAttrSpelling FromPasta(pasta::CFUnknownTransferAttrSpelling e) 
 }
 
 CPUDispatchAttrSpelling FromPasta(pasta::CPUDispatchAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CPUDispatchAttrSpelling::GNU_CPU_DISPATCH;
     case 1: return CPUDispatchAttrSpelling::CXX11_CLANG_CPU_DISPATCH;
     case 2: return CPUDispatchAttrSpelling::C2X_CLANG_CPU_DISPATCH;
@@ -1322,7 +1322,7 @@ CPUDispatchAttrSpelling FromPasta(pasta::CPUDispatchAttrSpelling e) {
 }
 
 CPUSpecificAttrSpelling FromPasta(pasta::CPUSpecificAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CPUSpecificAttrSpelling::GNU_CPU_SPECIFIC;
     case 1: return CPUSpecificAttrSpelling::CXX11_CLANG_CPU_SPECIFIC;
     case 2: return CPUSpecificAttrSpelling::C2X_CLANG_CPU_SPECIFIC;
@@ -1333,7 +1333,7 @@ CPUSpecificAttrSpelling FromPasta(pasta::CPUSpecificAttrSpelling e) {
 }
 
 CUDAConstantAttrSpelling FromPasta(pasta::CUDAConstantAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CUDAConstantAttrSpelling::GNU_CONSTANT;
     case 1: return CUDAConstantAttrSpelling::DECLSPEC_CONSTANT;
     case 15: return CUDAConstantAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1342,7 +1342,7 @@ CUDAConstantAttrSpelling FromPasta(pasta::CUDAConstantAttrSpelling e) {
 }
 
 CUDADeviceAttrSpelling FromPasta(pasta::CUDADeviceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CUDADeviceAttrSpelling::GNU_DEVICE;
     case 1: return CUDADeviceAttrSpelling::DECLSPEC_DEVICE;
     case 15: return CUDADeviceAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1351,7 +1351,7 @@ CUDADeviceAttrSpelling FromPasta(pasta::CUDADeviceAttrSpelling e) {
 }
 
 CUDADeviceBuiltinSurfaceTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinSurfaceTypeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CUDADeviceBuiltinSurfaceTypeAttrSpelling::GNU_DEVICE_BUILTIN_SURFACE_TYPE;
     case 1: return CUDADeviceBuiltinSurfaceTypeAttrSpelling::DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE;
     case 15: return CUDADeviceBuiltinSurfaceTypeAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1360,7 +1360,7 @@ CUDADeviceBuiltinSurfaceTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinSurfa
 }
 
 CUDADeviceBuiltinTextureTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinTextureTypeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CUDADeviceBuiltinTextureTypeAttrSpelling::GNU_DEVICE_BUILTIN_TEXTURE_TYPE;
     case 1: return CUDADeviceBuiltinTextureTypeAttrSpelling::DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE;
     case 15: return CUDADeviceBuiltinTextureTypeAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1369,7 +1369,7 @@ CUDADeviceBuiltinTextureTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinTextu
 }
 
 CUDAGlobalAttrSpelling FromPasta(pasta::CUDAGlobalAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CUDAGlobalAttrSpelling::GNU_GLOBAL;
     case 1: return CUDAGlobalAttrSpelling::DECLSPEC_GLOBAL;
     case 15: return CUDAGlobalAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1378,7 +1378,7 @@ CUDAGlobalAttrSpelling FromPasta(pasta::CUDAGlobalAttrSpelling e) {
 }
 
 CUDAHostAttrSpelling FromPasta(pasta::CUDAHostAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CUDAHostAttrSpelling::GNU_HOST;
     case 1: return CUDAHostAttrSpelling::DECLSPEC_HOST;
     case 15: return CUDAHostAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1387,7 +1387,7 @@ CUDAHostAttrSpelling FromPasta(pasta::CUDAHostAttrSpelling e) {
 }
 
 CUDALaunchBoundsAttrSpelling FromPasta(pasta::CUDALaunchBoundsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CUDALaunchBoundsAttrSpelling::GNU_LAUNCH_BOUNDS;
     case 1: return CUDALaunchBoundsAttrSpelling::DECLSPEC_LAUNCH_BOUNDS;
     case 15: return CUDALaunchBoundsAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1396,7 +1396,7 @@ CUDALaunchBoundsAttrSpelling FromPasta(pasta::CUDALaunchBoundsAttrSpelling e) {
 }
 
 CUDASharedAttrSpelling FromPasta(pasta::CUDASharedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CUDASharedAttrSpelling::GNU_SHARED;
     case 1: return CUDASharedAttrSpelling::DECLSPEC_SHARED;
     case 15: return CUDASharedAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1405,7 +1405,7 @@ CUDASharedAttrSpelling FromPasta(pasta::CUDASharedAttrSpelling e) {
 }
 
 CXX11NoReturnAttrSpelling FromPasta(pasta::CXX11NoReturnAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CXX11NoReturnAttrSpelling::CXX11_NORETURN;
     case 1: return CXX11NoReturnAttrSpelling::C2XNORETURN;
     case 2: return CXX11NoReturnAttrSpelling::C2X_NORETURN;
@@ -1415,7 +1415,7 @@ CXX11NoReturnAttrSpelling FromPasta(pasta::CXX11NoReturnAttrSpelling e) {
 }
 
 CXXConstructExprConstructionKind FromPasta(pasta::CXXConstructExprConstructionKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CXXConstructExprConstructionKind::COMPLETE;
     case 1: return CXXConstructExprConstructionKind::NON_VIRTUAL_BASE;
     case 2: return CXXConstructExprConstructionKind::VIRTUAL_BASE;
@@ -1425,7 +1425,7 @@ CXXConstructExprConstructionKind FromPasta(pasta::CXXConstructExprConstructionKi
 }
 
 CXXNewExprInitializationStyle FromPasta(pasta::CXXNewExprInitializationStyle e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CXXNewExprInitializationStyle::NO_INITIALIZER;
     case 1: return CXXNewExprInitializationStyle::CALL_INITIALIZER;
     case 2: return CXXNewExprInitializationStyle::LIST_INITIALIZER;
@@ -1434,7 +1434,7 @@ CXXNewExprInitializationStyle FromPasta(pasta::CXXNewExprInitializationStyle e) 
 }
 
 CXXRecordDeclLambdaDependencyKind FromPasta(pasta::CXXRecordDeclLambdaDependencyKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CXXRecordDeclLambdaDependencyKind::UNKNOWN;
     case 1: return CXXRecordDeclLambdaDependencyKind::ALWAYS_DEPENDENT;
     case 2: return CXXRecordDeclLambdaDependencyKind::NEVER_DEPENDENT;
@@ -1451,7 +1451,7 @@ CallExprADLCallKind FromPasta(pasta::CallExprADLCallKind e) {
 }
 
 CallableWhenAttrConsumedState FromPasta(pasta::CallableWhenAttrConsumedState e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CallableWhenAttrConsumedState::UNKNOWN;
     case 1: return CallableWhenAttrConsumedState::CONSUMED;
     case 2: return CallableWhenAttrConsumedState::UNCONSUMED;
@@ -1460,7 +1460,7 @@ CallableWhenAttrConsumedState FromPasta(pasta::CallableWhenAttrConsumedState e) 
 }
 
 CallableWhenAttrSpelling FromPasta(pasta::CallableWhenAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CallableWhenAttrSpelling::GNU_CALLABLE_WHEN;
     case 1: return CallableWhenAttrSpelling::CXX11_CLANG_CALLABLE_WHEN;
     case 15: return CallableWhenAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1469,7 +1469,7 @@ CallableWhenAttrSpelling FromPasta(pasta::CallableWhenAttrSpelling e) {
 }
 
 CallbackAttrSpelling FromPasta(pasta::CallbackAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CallbackAttrSpelling::GNU_CALLBACK;
     case 1: return CallbackAttrSpelling::CXX11_CLANG_CALLBACK;
     case 2: return CallbackAttrSpelling::C2X_CLANG_CALLBACK;
@@ -1479,7 +1479,7 @@ CallbackAttrSpelling FromPasta(pasta::CallbackAttrSpelling e) {
 }
 
 CalledOnceAttrSpelling FromPasta(pasta::CalledOnceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CalledOnceAttrSpelling::GNU_CALLED_ONCE;
     case 1: return CalledOnceAttrSpelling::CXX11_CLANG_CALLED_ONCE;
     case 2: return CalledOnceAttrSpelling::C2X_CLANG_CALLED_ONCE;
@@ -1489,7 +1489,7 @@ CalledOnceAttrSpelling FromPasta(pasta::CalledOnceAttrSpelling e) {
 }
 
 CapabilityAttrSpelling FromPasta(pasta::CapabilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CapabilityAttrSpelling::GNU_CAPABILITY;
     case 1: return CapabilityAttrSpelling::CXX11_CLANG_CAPABILITY;
     case 2: return CapabilityAttrSpelling::GNU_SHARED_CAPABILITY;
@@ -1500,7 +1500,7 @@ CapabilityAttrSpelling FromPasta(pasta::CapabilityAttrSpelling e) {
 }
 
 CapturedStmtVariableCaptureKind FromPasta(pasta::CapturedStmtVariableCaptureKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CapturedStmtVariableCaptureKind::THIS;
     case 1: return CapturedStmtVariableCaptureKind::BY_REFERENCE;
     case 2: return CapturedStmtVariableCaptureKind::BY_COPY;
@@ -1510,7 +1510,7 @@ CapturedStmtVariableCaptureKind FromPasta(pasta::CapturedStmtVariableCaptureKind
 }
 
 CarriesDependencyAttrSpelling FromPasta(pasta::CarriesDependencyAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CarriesDependencyAttrSpelling::GNU_CARRIES_DEPENDENCY;
     case 1: return CarriesDependencyAttrSpelling::CXX11_CARRIES_DEPENDENCY;
     case 15: return CarriesDependencyAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1519,7 +1519,7 @@ CarriesDependencyAttrSpelling FromPasta(pasta::CarriesDependencyAttrSpelling e) 
 }
 
 CharacterLiteralCharacterKind FromPasta(pasta::CharacterLiteralCharacterKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CharacterLiteralCharacterKind::ASCII;
     case 1: return CharacterLiteralCharacterKind::WIDE;
     case 2: return CharacterLiteralCharacterKind::UTF8;
@@ -1530,7 +1530,7 @@ CharacterLiteralCharacterKind FromPasta(pasta::CharacterLiteralCharacterKind e) 
 }
 
 CleanupAttrSpelling FromPasta(pasta::CleanupAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CleanupAttrSpelling::GNU_CLEANUP;
     case 1: return CleanupAttrSpelling::CXX11_GNU_CLEANUP;
     case 2: return CleanupAttrSpelling::C2X_GNU_CLEANUP;
@@ -1540,7 +1540,7 @@ CleanupAttrSpelling FromPasta(pasta::CleanupAttrSpelling e) {
 }
 
 ColdAttrSpelling FromPasta(pasta::ColdAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ColdAttrSpelling::GNU_COLD;
     case 1: return ColdAttrSpelling::CXX11_GNU_COLD;
     case 2: return ColdAttrSpelling::C2X_GNU_COLD;
@@ -1550,7 +1550,7 @@ ColdAttrSpelling FromPasta(pasta::ColdAttrSpelling e) {
 }
 
 CommonAttrSpelling FromPasta(pasta::CommonAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CommonAttrSpelling::GNU_COMMON;
     case 1: return CommonAttrSpelling::CXX11_GNU_COMMON;
     case 2: return CommonAttrSpelling::C2X_GNU_COMMON;
@@ -1560,7 +1560,7 @@ CommonAttrSpelling FromPasta(pasta::CommonAttrSpelling e) {
 }
 
 ConstAttrSpelling FromPasta(pasta::ConstAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConstAttrSpelling::GNU_CONST;
     case 1: return ConstAttrSpelling::CXX11_GNU_CONST;
     case 2: return ConstAttrSpelling::C2X_GNU_CONST;
@@ -1570,7 +1570,7 @@ ConstAttrSpelling FromPasta(pasta::ConstAttrSpelling e) {
 }
 
 ConstInitAttrSpelling FromPasta(pasta::ConstInitAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConstInitAttrSpelling::KEYWORD_CONSTINIT;
     case 1: return ConstInitAttrSpelling::GNU_REQUIRE_CONSTANT_INITIALIZATION;
     case 2: return ConstInitAttrSpelling::CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION;
@@ -1580,7 +1580,7 @@ ConstInitAttrSpelling FromPasta(pasta::ConstInitAttrSpelling e) {
 }
 
 ConstantExprResultStorageKind FromPasta(pasta::ConstantExprResultStorageKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConstantExprResultStorageKind::NONE;
     case 1: return ConstantExprResultStorageKind::INT64;
     case 2: return ConstantExprResultStorageKind::AP_VALUE;
@@ -1589,7 +1589,7 @@ ConstantExprResultStorageKind FromPasta(pasta::ConstantExprResultStorageKind e) 
 }
 
 ConstructorAttrSpelling FromPasta(pasta::ConstructorAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConstructorAttrSpelling::GNU_CONSTRUCTOR;
     case 1: return ConstructorAttrSpelling::CXX11_GNU_CONSTRUCTOR;
     case 2: return ConstructorAttrSpelling::C2X_GNU_CONSTRUCTOR;
@@ -1599,7 +1599,7 @@ ConstructorAttrSpelling FromPasta(pasta::ConstructorAttrSpelling e) {
 }
 
 ConsumableAttrConsumedState FromPasta(pasta::ConsumableAttrConsumedState e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConsumableAttrConsumedState::UNKNOWN;
     case 1: return ConsumableAttrConsumedState::CONSUMED;
     case 2: return ConsumableAttrConsumedState::UNCONSUMED;
@@ -1608,7 +1608,7 @@ ConsumableAttrConsumedState FromPasta(pasta::ConsumableAttrConsumedState e) {
 }
 
 ConsumableAttrSpelling FromPasta(pasta::ConsumableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConsumableAttrSpelling::GNU_CONSUMABLE;
     case 1: return ConsumableAttrSpelling::CXX11_CLANG_CONSUMABLE;
     case 15: return ConsumableAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1617,7 +1617,7 @@ ConsumableAttrSpelling FromPasta(pasta::ConsumableAttrSpelling e) {
 }
 
 ConsumableAutoCastAttrSpelling FromPasta(pasta::ConsumableAutoCastAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConsumableAutoCastAttrSpelling::GNU_CONSUMABLE_AUTO_CAST_STATE;
     case 1: return ConsumableAutoCastAttrSpelling::CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE;
     case 15: return ConsumableAutoCastAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1626,7 +1626,7 @@ ConsumableAutoCastAttrSpelling FromPasta(pasta::ConsumableAutoCastAttrSpelling e
 }
 
 ConsumableSetOnReadAttrSpelling FromPasta(pasta::ConsumableSetOnReadAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConsumableSetOnReadAttrSpelling::GNU_CONSUMABLE_STATE_ON_READ;
     case 1: return ConsumableSetOnReadAttrSpelling::CXX11_CLANG_CONSUMABLE_STATE_ON_READ;
     case 15: return ConsumableSetOnReadAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1635,7 +1635,7 @@ ConsumableSetOnReadAttrSpelling FromPasta(pasta::ConsumableSetOnReadAttrSpelling
 }
 
 ConvergentAttrSpelling FromPasta(pasta::ConvergentAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ConvergentAttrSpelling::GNU_CONVERGENT;
     case 1: return ConvergentAttrSpelling::CXX11_CLANG_CONVERGENT;
     case 2: return ConvergentAttrSpelling::C2X_CLANG_CONVERGENT;
@@ -1645,7 +1645,7 @@ ConvergentAttrSpelling FromPasta(pasta::ConvergentAttrSpelling e) {
 }
 
 DLLExportAttrSpelling FromPasta(pasta::DLLExportAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DLLExportAttrSpelling::DECLSPEC_DLLEXPORT;
     case 1: return DLLExportAttrSpelling::GNU_DLLEXPORT;
     case 2: return DLLExportAttrSpelling::CXX11_GNU_DLLEXPORT;
@@ -1656,7 +1656,7 @@ DLLExportAttrSpelling FromPasta(pasta::DLLExportAttrSpelling e) {
 }
 
 DLLImportAttrSpelling FromPasta(pasta::DLLImportAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DLLImportAttrSpelling::DECLSPEC_DLLIMPORT;
     case 1: return DLLImportAttrSpelling::GNU_DLLIMPORT;
     case 2: return DLLImportAttrSpelling::CXX11_GNU_DLLIMPORT;
@@ -1667,7 +1667,7 @@ DLLImportAttrSpelling FromPasta(pasta::DLLImportAttrSpelling e) {
 }
 
 DeclFriendObjectKind FromPasta(pasta::DeclFriendObjectKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DeclFriendObjectKind::NONE;
     case 1: return DeclFriendObjectKind::DECLARED;
     case 2: return DeclFriendObjectKind::UNDECLARED;
@@ -1676,7 +1676,7 @@ DeclFriendObjectKind FromPasta(pasta::DeclFriendObjectKind e) {
 }
 
 DeclIdentifierNamespace FromPasta(pasta::DeclIdentifierNamespace e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return DeclIdentifierNamespace::LABEL;
     case 2: return DeclIdentifierNamespace::TAG;
     case 4: return DeclIdentifierNamespace::TYPE;
@@ -1696,7 +1696,7 @@ DeclIdentifierNamespace FromPasta(pasta::DeclIdentifierNamespace e) {
 }
 
 DeclModuleOwnershipKind FromPasta(pasta::DeclModuleOwnershipKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DeclModuleOwnershipKind::UNOWNED;
     case 1: return DeclModuleOwnershipKind::VISIBLE;
     case 2: return DeclModuleOwnershipKind::VISIBLE_WHEN_IMPORTED;
@@ -1707,7 +1707,7 @@ DeclModuleOwnershipKind FromPasta(pasta::DeclModuleOwnershipKind e) {
 }
 
 DeclObjCDeclQualifier FromPasta(pasta::DeclObjCDeclQualifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DeclObjCDeclQualifier::NONE;
     case 1: return DeclObjCDeclQualifier::IN;
     case 2: return DeclObjCDeclQualifier::INOUT;
@@ -1721,7 +1721,7 @@ DeclObjCDeclQualifier FromPasta(pasta::DeclObjCDeclQualifier e) {
 }
 
 DeprecatedAttrSpelling FromPasta(pasta::DeprecatedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DeprecatedAttrSpelling::GNU_DEPRECATED;
     case 1: return DeprecatedAttrSpelling::CXX11_GNU_DEPRECATED;
     case 2: return DeprecatedAttrSpelling::C2X_GNU_DEPRECATED;
@@ -1734,7 +1734,7 @@ DeprecatedAttrSpelling FromPasta(pasta::DeprecatedAttrSpelling e) {
 }
 
 DestructorAttrSpelling FromPasta(pasta::DestructorAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DestructorAttrSpelling::GNU_DESTRUCTOR;
     case 1: return DestructorAttrSpelling::CXX11_GNU_DESTRUCTOR;
     case 2: return DestructorAttrSpelling::C2X_GNU_DESTRUCTOR;
@@ -1744,7 +1744,7 @@ DestructorAttrSpelling FromPasta(pasta::DestructorAttrSpelling e) {
 }
 
 DiagnoseAsBuiltinAttrSpelling FromPasta(pasta::DiagnoseAsBuiltinAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DiagnoseAsBuiltinAttrSpelling::GNU_DIAGNOSE_AS_BUILTIN;
     case 1: return DiagnoseAsBuiltinAttrSpelling::CXX11_CLANG_DIAGNOSE_AS_BUILTIN;
     case 2: return DiagnoseAsBuiltinAttrSpelling::C2X_CLANG_DIAGNOSE_AS_BUILTIN;
@@ -1754,7 +1754,7 @@ DiagnoseAsBuiltinAttrSpelling FromPasta(pasta::DiagnoseAsBuiltinAttrSpelling e) 
 }
 
 DiagnoseIfAttrDiagnosticType FromPasta(pasta::DiagnoseIfAttrDiagnosticType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DiagnoseIfAttrDiagnosticType::ERROR;
     case 1: return DiagnoseIfAttrDiagnosticType::WARNING;
     default: __builtin_unreachable();
@@ -1762,7 +1762,7 @@ DiagnoseIfAttrDiagnosticType FromPasta(pasta::DiagnoseIfAttrDiagnosticType e) {
 }
 
 DisableSanitizerInstrumentationAttrSpelling FromPasta(pasta::DisableSanitizerInstrumentationAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DisableSanitizerInstrumentationAttrSpelling::GNU_DISABLE_SANITIZER_INSTRUMENTATION;
     case 1: return DisableSanitizerInstrumentationAttrSpelling::CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION;
     case 2: return DisableSanitizerInstrumentationAttrSpelling::C2X_CLANG_DISABLE_SANITIZER_INSTRUMENTATION;
@@ -1772,7 +1772,7 @@ DisableSanitizerInstrumentationAttrSpelling FromPasta(pasta::DisableSanitizerIns
 }
 
 DisableTailCallsAttrSpelling FromPasta(pasta::DisableTailCallsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DisableTailCallsAttrSpelling::GNU_DISABLE_TAIL_CALLS;
     case 1: return DisableTailCallsAttrSpelling::CXX11_CLANG_DISABLE_TAIL_CALLS;
     case 2: return DisableTailCallsAttrSpelling::C2X_CLANG_DISABLE_TAIL_CALLS;
@@ -1782,7 +1782,7 @@ DisableTailCallsAttrSpelling FromPasta(pasta::DisableTailCallsAttrSpelling e) {
 }
 
 EnforceTCBAttrSpelling FromPasta(pasta::EnforceTCBAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return EnforceTCBAttrSpelling::GNU_ENFORCE_TCB;
     case 1: return EnforceTCBAttrSpelling::CXX11_CLANG_ENFORCE_TCB;
     case 2: return EnforceTCBAttrSpelling::C2X_CLANG_ENFORCE_TCB;
@@ -1792,7 +1792,7 @@ EnforceTCBAttrSpelling FromPasta(pasta::EnforceTCBAttrSpelling e) {
 }
 
 EnforceTCBLeafAttrSpelling FromPasta(pasta::EnforceTCBLeafAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return EnforceTCBLeafAttrSpelling::GNU_ENFORCE_TCB_LEAF;
     case 1: return EnforceTCBLeafAttrSpelling::CXX11_CLANG_ENFORCE_TCB_LEAF;
     case 2: return EnforceTCBLeafAttrSpelling::C2X_CLANG_ENFORCE_TCB_LEAF;
@@ -1802,7 +1802,7 @@ EnforceTCBLeafAttrSpelling FromPasta(pasta::EnforceTCBLeafAttrSpelling e) {
 }
 
 EnumExtensibilityAttrKind FromPasta(pasta::EnumExtensibilityAttrKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return EnumExtensibilityAttrKind::CLOSED;
     case 1: return EnumExtensibilityAttrKind::OPEN;
     default: __builtin_unreachable();
@@ -1810,7 +1810,7 @@ EnumExtensibilityAttrKind FromPasta(pasta::EnumExtensibilityAttrKind e) {
 }
 
 EnumExtensibilityAttrSpelling FromPasta(pasta::EnumExtensibilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return EnumExtensibilityAttrSpelling::GNU_ENUM_EXTENSIBILITY;
     case 1: return EnumExtensibilityAttrSpelling::CXX11_CLANG_ENUM_EXTENSIBILITY;
     case 2: return EnumExtensibilityAttrSpelling::C2X_CLANG_ENUM_EXTENSIBILITY;
@@ -1820,7 +1820,7 @@ EnumExtensibilityAttrSpelling FromPasta(pasta::EnumExtensibilityAttrSpelling e) 
 }
 
 ErrorAttrSpelling FromPasta(pasta::ErrorAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ErrorAttrSpelling::GNU_ERROR;
     case 1: return ErrorAttrSpelling::CXX11_GNU_ERROR;
     case 2: return ErrorAttrSpelling::C2X_GNU_ERROR;
@@ -1833,7 +1833,7 @@ ErrorAttrSpelling FromPasta(pasta::ErrorAttrSpelling e) {
 }
 
 ExcludeFromExplicitInstantiationAttrSpelling FromPasta(pasta::ExcludeFromExplicitInstantiationAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExcludeFromExplicitInstantiationAttrSpelling::GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
     case 1: return ExcludeFromExplicitInstantiationAttrSpelling::CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
     case 2: return ExcludeFromExplicitInstantiationAttrSpelling::C2X_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
@@ -1843,7 +1843,7 @@ ExcludeFromExplicitInstantiationAttrSpelling FromPasta(pasta::ExcludeFromExplici
 }
 
 ExprConstantExprKind FromPasta(pasta::ExprConstantExprKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ExprConstantExprKind::NORMAL;
     case 1: return ExprConstantExprKind::NON_CLASS_TEMPLATE_ARGUMENT;
     case 2: return ExprConstantExprKind::CLASS_TEMPLATE_ARGUMENT;
@@ -1853,7 +1853,7 @@ ExprConstantExprKind FromPasta(pasta::ExprConstantExprKind e) {
 }
 
 ExprLValueClassification FromPasta(pasta::ExprLValueClassification e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExprLValueClassification::VALID;
     case 1: return ExprLValueClassification::NOT_OBJECT_TYPE;
     case 2: return ExprLValueClassification::INCOMPLETE_VOID_TYPE;
@@ -1869,7 +1869,7 @@ ExprLValueClassification FromPasta(pasta::ExprLValueClassification e) {
 }
 
 ExprNullPointerConstantKind FromPasta(pasta::ExprNullPointerConstantKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExprNullPointerConstantKind::NOT_NULL;
     case 1: return ExprNullPointerConstantKind::ZERO_EXPRESSION;
     case 2: return ExprNullPointerConstantKind::ZERO_LITERAL;
@@ -1880,7 +1880,7 @@ ExprNullPointerConstantKind FromPasta(pasta::ExprNullPointerConstantKind e) {
 }
 
 ExprNullPointerConstantValueDependence FromPasta(pasta::ExprNullPointerConstantValueDependence e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExprNullPointerConstantValueDependence::NEVER_VALUE_DEPENDENT;
     case 1: return ExprNullPointerConstantValueDependence::VALUE_DEPENDENT_IS_NULL;
     case 2: return ExprNullPointerConstantValueDependence::VALUE_DEPENDENT_IS_NOT_NULL;
@@ -1889,7 +1889,7 @@ ExprNullPointerConstantValueDependence FromPasta(pasta::ExprNullPointerConstantV
 }
 
 ExprSideEffectsKind FromPasta(pasta::ExprSideEffectsKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExprSideEffectsKind::NO_SIDE_EFFECTS;
     case 1: return ExprSideEffectsKind::ALLOW_UNDEFINED_BEHAVIOR;
     case 2: return ExprSideEffectsKind::ALLOW_SIDE_EFFECTS;
@@ -1898,7 +1898,7 @@ ExprSideEffectsKind FromPasta(pasta::ExprSideEffectsKind e) {
 }
 
 ExprisModifiableLvalueResult FromPasta(pasta::ExprisModifiableLvalueResult e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExprisModifiableLvalueResult::VALID;
     case 1: return ExprisModifiableLvalueResult::NOT_OBJECT_TYPE;
     case 2: return ExprisModifiableLvalueResult::INCOMPLETE_VOID_TYPE;
@@ -1921,7 +1921,7 @@ ExprisModifiableLvalueResult FromPasta(pasta::ExprisModifiableLvalueResult e) {
 }
 
 ExternalSourceSymbolAttrSpelling FromPasta(pasta::ExternalSourceSymbolAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExternalSourceSymbolAttrSpelling::GNU_EXTERNAL_SOURCE_SYMBOL;
     case 1: return ExternalSourceSymbolAttrSpelling::CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL;
     case 2: return ExternalSourceSymbolAttrSpelling::C2X_CLANG_EXTERNAL_SOURCE_SYMBOL;
@@ -1931,7 +1931,7 @@ ExternalSourceSymbolAttrSpelling FromPasta(pasta::ExternalSourceSymbolAttrSpelli
 }
 
 FallThroughAttrSpelling FromPasta(pasta::FallThroughAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FallThroughAttrSpelling::CXX11_FALLTHROUGH;
     case 1: return FallThroughAttrSpelling::C2X_FALLTHROUGH;
     case 2: return FallThroughAttrSpelling::CXX11_CLANG_FALLTHROUGH;
@@ -1944,7 +1944,7 @@ FallThroughAttrSpelling FromPasta(pasta::FallThroughAttrSpelling e) {
 }
 
 FastCallAttrSpelling FromPasta(pasta::FastCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FastCallAttrSpelling::GNU_FASTCALL;
     case 1: return FastCallAttrSpelling::CXX11_GNU_FASTCALL;
     case 2: return FastCallAttrSpelling::C2X_GNU_FASTCALL;
@@ -1955,7 +1955,7 @@ FastCallAttrSpelling FromPasta(pasta::FastCallAttrSpelling e) {
 }
 
 FinalAttrSpelling FromPasta(pasta::FinalAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FinalAttrSpelling::KEYWORD_FINAL;
     case 1: return FinalAttrSpelling::KEYWORD_SEALED;
     case 15: return FinalAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -1964,7 +1964,7 @@ FinalAttrSpelling FromPasta(pasta::FinalAttrSpelling e) {
 }
 
 FlagEnumAttrSpelling FromPasta(pasta::FlagEnumAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FlagEnumAttrSpelling::GNU_FLAG_ENUM;
     case 1: return FlagEnumAttrSpelling::CXX11_CLANG_FLAG_ENUM;
     case 2: return FlagEnumAttrSpelling::C2X_CLANG_FLAG_ENUM;
@@ -1974,7 +1974,7 @@ FlagEnumAttrSpelling FromPasta(pasta::FlagEnumAttrSpelling e) {
 }
 
 FlattenAttrSpelling FromPasta(pasta::FlattenAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FlattenAttrSpelling::GNU_FLATTEN;
     case 1: return FlattenAttrSpelling::CXX11_GNU_FLATTEN;
     case 2: return FlattenAttrSpelling::C2X_GNU_FLATTEN;
@@ -1984,7 +1984,7 @@ FlattenAttrSpelling FromPasta(pasta::FlattenAttrSpelling e) {
 }
 
 FormatArgAttrSpelling FromPasta(pasta::FormatArgAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FormatArgAttrSpelling::GNU_FORMAT_ARGUMENT;
     case 1: return FormatArgAttrSpelling::CXX11_GNU_FORMAT_ARGUMENT;
     case 2: return FormatArgAttrSpelling::C2X_GNU_FORMAT_ARGUMENT;
@@ -1994,7 +1994,7 @@ FormatArgAttrSpelling FromPasta(pasta::FormatArgAttrSpelling e) {
 }
 
 FormatAttrSpelling FromPasta(pasta::FormatAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FormatAttrSpelling::GNU_FORMAT;
     case 1: return FormatAttrSpelling::CXX11_GNU_FORMAT;
     case 2: return FormatAttrSpelling::C2X_GNU_FORMAT;
@@ -2004,7 +2004,7 @@ FormatAttrSpelling FromPasta(pasta::FormatAttrSpelling e) {
 }
 
 FunctionDeclTemplatedKind FromPasta(pasta::FunctionDeclTemplatedKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FunctionDeclTemplatedKind::NON_TEMPLATE;
     case 1: return FunctionDeclTemplatedKind::FUNCTION_TEMPLATE;
     case 2: return FunctionDeclTemplatedKind::MEMBER_SPECIALIZATION;
@@ -2016,7 +2016,7 @@ FunctionDeclTemplatedKind FromPasta(pasta::FunctionDeclTemplatedKind e) {
 }
 
 FunctionReturnThunksAttrKind FromPasta(pasta::FunctionReturnThunksAttrKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FunctionReturnThunksAttrKind::KEEP;
     case 1: return FunctionReturnThunksAttrKind::EXTERN;
     default: __builtin_unreachable();
@@ -2024,7 +2024,7 @@ FunctionReturnThunksAttrKind FromPasta(pasta::FunctionReturnThunksAttrKind e) {
 }
 
 FunctionReturnThunksAttrSpelling FromPasta(pasta::FunctionReturnThunksAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FunctionReturnThunksAttrSpelling::GNU_FUNCTION_RETURN;
     case 1: return FunctionReturnThunksAttrSpelling::CXX11_GNU_FUNCTION_RETURN;
     case 2: return FunctionReturnThunksAttrSpelling::C2X_GNU_FUNCTION_RETURN;
@@ -2034,7 +2034,7 @@ FunctionReturnThunksAttrSpelling FromPasta(pasta::FunctionReturnThunksAttrSpelli
 }
 
 GNUInlineAttrSpelling FromPasta(pasta::GNUInlineAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return GNUInlineAttrSpelling::GNU_GNU_INLINE;
     case 1: return GNUInlineAttrSpelling::CXX11_GNU_GNU_INLINE;
     case 2: return GNUInlineAttrSpelling::C2X_GNU_GNU_INLINE;
@@ -2044,7 +2044,7 @@ GNUInlineAttrSpelling FromPasta(pasta::GNUInlineAttrSpelling e) {
 }
 
 GuardedVarAttrSpelling FromPasta(pasta::GuardedVarAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return GuardedVarAttrSpelling::GNU_GUARDED_VARIABLE;
     case 1: return GuardedVarAttrSpelling::CXX11_CLANG_GUARDED_VARIABLE;
     case 15: return GuardedVarAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -2053,7 +2053,7 @@ GuardedVarAttrSpelling FromPasta(pasta::GuardedVarAttrSpelling e) {
 }
 
 HIPManagedAttrSpelling FromPasta(pasta::HIPManagedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return HIPManagedAttrSpelling::GNU_MANAGED;
     case 1: return HIPManagedAttrSpelling::DECLSPEC_MANAGED;
     case 15: return HIPManagedAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -2062,7 +2062,7 @@ HIPManagedAttrSpelling FromPasta(pasta::HIPManagedAttrSpelling e) {
 }
 
 HLSLResourceAttrResourceClass FromPasta(pasta::HLSLResourceAttrResourceClass e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return HLSLResourceAttrResourceClass::SRV;
     case 1: return HLSLResourceAttrResourceClass::UAV;
     case 2: return HLSLResourceAttrResourceClass::C_BUFFER;
@@ -2072,7 +2072,7 @@ HLSLResourceAttrResourceClass FromPasta(pasta::HLSLResourceAttrResourceClass e) 
 }
 
 HLSLResourceAttrResourceKind FromPasta(pasta::HLSLResourceAttrResourceKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return HLSLResourceAttrResourceKind::TEXTURE1_D;
     case 1: return HLSLResourceAttrResourceKind::TEXTURE2_D;
     case 2: return HLSLResourceAttrResourceKind::TEXTURE2_DMS;
@@ -2096,7 +2096,7 @@ HLSLResourceAttrResourceKind FromPasta(pasta::HLSLResourceAttrResourceKind e) {
 }
 
 HLSLShaderAttrShaderType FromPasta(pasta::HLSLShaderAttrShaderType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return HLSLShaderAttrShaderType::PIXEL;
     case 1: return HLSLShaderAttrShaderType::VERTEX;
     case 2: return HLSLShaderAttrShaderType::GEOMETRY;
@@ -2117,7 +2117,7 @@ HLSLShaderAttrShaderType FromPasta(pasta::HLSLShaderAttrShaderType e) {
 }
 
 HotAttrSpelling FromPasta(pasta::HotAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return HotAttrSpelling::GNU_HOT;
     case 1: return HotAttrSpelling::CXX11_GNU_HOT;
     case 2: return HotAttrSpelling::C2X_GNU_HOT;
@@ -2127,7 +2127,7 @@ HotAttrSpelling FromPasta(pasta::HotAttrSpelling e) {
 }
 
 IBActionAttrSpelling FromPasta(pasta::IBActionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return IBActionAttrSpelling::GNU_IBACTION;
     case 1: return IBActionAttrSpelling::CXX11_CLANG_IBACTION;
     case 2: return IBActionAttrSpelling::C2X_CLANG_IBACTION;
@@ -2137,7 +2137,7 @@ IBActionAttrSpelling FromPasta(pasta::IBActionAttrSpelling e) {
 }
 
 IBOutletAttrSpelling FromPasta(pasta::IBOutletAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return IBOutletAttrSpelling::GNU_IBOUTLET;
     case 1: return IBOutletAttrSpelling::CXX11_CLANG_IBOUTLET;
     case 2: return IBOutletAttrSpelling::C2X_CLANG_IBOUTLET;
@@ -2147,7 +2147,7 @@ IBOutletAttrSpelling FromPasta(pasta::IBOutletAttrSpelling e) {
 }
 
 IBOutletCollectionAttrSpelling FromPasta(pasta::IBOutletCollectionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return IBOutletCollectionAttrSpelling::GNU_IBOUTLETCOLLECTION;
     case 1: return IBOutletCollectionAttrSpelling::CXX11_CLANG_IBOUTLETCOLLECTION;
     case 2: return IBOutletCollectionAttrSpelling::C2X_CLANG_IBOUTLETCOLLECTION;
@@ -2157,7 +2157,7 @@ IBOutletCollectionAttrSpelling FromPasta(pasta::IBOutletCollectionAttrSpelling e
 }
 
 IFuncAttrSpelling FromPasta(pasta::IFuncAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return IFuncAttrSpelling::GNU_IFUNC;
     case 1: return IFuncAttrSpelling::CXX11_GNU_IFUNC;
     case 2: return IFuncAttrSpelling::C2X_GNU_IFUNC;
@@ -2167,14 +2167,14 @@ IFuncAttrSpelling FromPasta(pasta::IFuncAttrSpelling e) {
 }
 
 ImplicitCastExprOnStack FromPasta(pasta::ImplicitCastExprOnStack e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ImplicitCastExprOnStack::ON_STACK;
     default: __builtin_unreachable();
   }
 }
 
 ImplicitParamDeclImplicitParamKind FromPasta(pasta::ImplicitParamDeclImplicitParamKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ImplicitParamDeclImplicitParamKind::OBJ_C_SELF;
     case 1: return ImplicitParamDeclImplicitParamKind::OBJ_C_CMD;
     case 2: return ImplicitParamDeclImplicitParamKind::CXX_THIS;
@@ -2187,7 +2187,7 @@ ImplicitParamDeclImplicitParamKind FromPasta(pasta::ImplicitParamDeclImplicitPar
 }
 
 InitPriorityAttrSpelling FromPasta(pasta::InitPriorityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return InitPriorityAttrSpelling::GNU_INITIALIZER_PRIORITY;
     case 1: return InitPriorityAttrSpelling::CXX11_GNU_INITIALIZER_PRIORITY;
     case 15: return InitPriorityAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -2196,7 +2196,7 @@ InitPriorityAttrSpelling FromPasta(pasta::InitPriorityAttrSpelling e) {
 }
 
 IntelOclBiccAttrSpelling FromPasta(pasta::IntelOclBiccAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return IntelOclBiccAttrSpelling::GNU_INTEL_OCL_BICC;
     case 1: return IntelOclBiccAttrSpelling::CXX11_CLANG_INTEL_OCL_BICC;
     case 15: return IntelOclBiccAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -2205,7 +2205,7 @@ IntelOclBiccAttrSpelling FromPasta(pasta::IntelOclBiccAttrSpelling e) {
 }
 
 InternalLinkageAttrSpelling FromPasta(pasta::InternalLinkageAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return InternalLinkageAttrSpelling::GNU_INTERNAL_LINKAGE;
     case 1: return InternalLinkageAttrSpelling::CXX11_CLANG_INTERNAL_LINKAGE;
     case 2: return InternalLinkageAttrSpelling::C2X_CLANG_INTERNAL_LINKAGE;
@@ -2215,7 +2215,7 @@ InternalLinkageAttrSpelling FromPasta(pasta::InternalLinkageAttrSpelling e) {
 }
 
 LTOVisibilityPublicAttrSpelling FromPasta(pasta::LTOVisibilityPublicAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LTOVisibilityPublicAttrSpelling::GNU_LTO_VISIBILITY_PUBLIC;
     case 1: return LTOVisibilityPublicAttrSpelling::CXX11_CLANG_LTO_VISIBILITY_PUBLIC;
     case 2: return LTOVisibilityPublicAttrSpelling::C2X_CLANG_LTO_VISIBILITY_PUBLIC;
@@ -2225,7 +2225,7 @@ LTOVisibilityPublicAttrSpelling FromPasta(pasta::LTOVisibilityPublicAttrSpelling
 }
 
 LeafAttrSpelling FromPasta(pasta::LeafAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LeafAttrSpelling::GNU_LEAF;
     case 1: return LeafAttrSpelling::CXX11_GNU_LEAF;
     case 2: return LeafAttrSpelling::C2X_GNU_LEAF;
@@ -2235,7 +2235,7 @@ LeafAttrSpelling FromPasta(pasta::LeafAttrSpelling e) {
 }
 
 LifetimeBoundAttrSpelling FromPasta(pasta::LifetimeBoundAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LifetimeBoundAttrSpelling::GNU_LIFETIMEBOUND;
     case 1: return LifetimeBoundAttrSpelling::CXX11_CLANG_LIFETIMEBOUND;
     case 15: return LifetimeBoundAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -2244,7 +2244,7 @@ LifetimeBoundAttrSpelling FromPasta(pasta::LifetimeBoundAttrSpelling e) {
 }
 
 LikelyAttrSpelling FromPasta(pasta::LikelyAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LikelyAttrSpelling::CXX11_LIKELY;
     case 1: return LikelyAttrSpelling::C2X_CLANG_LIKELY;
     case 15: return LikelyAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -2253,7 +2253,7 @@ LikelyAttrSpelling FromPasta(pasta::LikelyAttrSpelling e) {
 }
 
 LinkageSpecDeclLanguageIDs FromPasta(pasta::LinkageSpecDeclLanguageIDs e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return LinkageSpecDeclLanguageIDs::C;
     case 2: return LinkageSpecDeclLanguageIDs::CXX;
     default: __builtin_unreachable();
@@ -2261,7 +2261,7 @@ LinkageSpecDeclLanguageIDs FromPasta(pasta::LinkageSpecDeclLanguageIDs e) {
 }
 
 LoaderUninitializedAttrSpelling FromPasta(pasta::LoaderUninitializedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LoaderUninitializedAttrSpelling::GNU_LOADER_UNINITIALIZED;
     case 1: return LoaderUninitializedAttrSpelling::CXX11_CLANG_LOADER_UNINITIALIZED;
     case 2: return LoaderUninitializedAttrSpelling::C2X_CLANG_LOADER_UNINITIALIZED;
@@ -2271,7 +2271,7 @@ LoaderUninitializedAttrSpelling FromPasta(pasta::LoaderUninitializedAttrSpelling
 }
 
 LoopHintAttrLoopHintState FromPasta(pasta::LoopHintAttrLoopHintState e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LoopHintAttrLoopHintState::ENABLE;
     case 1: return LoopHintAttrLoopHintState::DISABLE;
     case 2: return LoopHintAttrLoopHintState::NUMERIC;
@@ -2284,7 +2284,7 @@ LoopHintAttrLoopHintState FromPasta(pasta::LoopHintAttrLoopHintState e) {
 }
 
 LoopHintAttrOptionType FromPasta(pasta::LoopHintAttrOptionType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LoopHintAttrOptionType::VECTORIZE;
     case 1: return LoopHintAttrOptionType::VECTORIZE_WIDTH;
     case 2: return LoopHintAttrOptionType::INTERLEAVE;
@@ -2302,7 +2302,7 @@ LoopHintAttrOptionType FromPasta(pasta::LoopHintAttrOptionType e) {
 }
 
 LoopHintAttrSpelling FromPasta(pasta::LoopHintAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LoopHintAttrSpelling::PRAGMA_CLANG_LOOP;
     case 1: return LoopHintAttrSpelling::PRAGMA_UNROLL;
     case 2: return LoopHintAttrSpelling::PRAGMA_NOUNROLL;
@@ -2314,7 +2314,7 @@ LoopHintAttrSpelling FromPasta(pasta::LoopHintAttrSpelling e) {
 }
 
 MIGServerRoutineAttrSpelling FromPasta(pasta::MIGServerRoutineAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MIGServerRoutineAttrSpelling::GNU_MIG_SERVER_ROUTINE;
     case 1: return MIGServerRoutineAttrSpelling::CXX11_CLANG_MIG_SERVER_ROUTINE;
     case 2: return MIGServerRoutineAttrSpelling::C2X_CLANG_MIG_SERVER_ROUTINE;
@@ -2324,7 +2324,7 @@ MIGServerRoutineAttrSpelling FromPasta(pasta::MIGServerRoutineAttrSpelling e) {
 }
 
 MSABIAttrSpelling FromPasta(pasta::MSABIAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MSABIAttrSpelling::GNU_MS_ABI;
     case 1: return MSABIAttrSpelling::CXX11_GNU_MS_ABI;
     case 2: return MSABIAttrSpelling::C2X_GNU_MS_ABI;
@@ -2334,7 +2334,7 @@ MSABIAttrSpelling FromPasta(pasta::MSABIAttrSpelling e) {
 }
 
 MSInheritanceAttrSpelling FromPasta(pasta::MSInheritanceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MSInheritanceAttrSpelling::KEYWORD_SINGLE_INHERITANCE;
     case 1: return MSInheritanceAttrSpelling::KEYWORD_MULTIPLE_INHERITANCE;
     case 2: return MSInheritanceAttrSpelling::KEYWORD_VIRTUAL_INHERITANCE;
@@ -2345,7 +2345,7 @@ MSInheritanceAttrSpelling FromPasta(pasta::MSInheritanceAttrSpelling e) {
 }
 
 MSP430InterruptAttrSpelling FromPasta(pasta::MSP430InterruptAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MSP430InterruptAttrSpelling::GNU_INTERRUPT;
     case 1: return MSP430InterruptAttrSpelling::CXX11_GNU_INTERRUPT;
     case 2: return MSP430InterruptAttrSpelling::C2X_GNU_INTERRUPT;
@@ -2355,7 +2355,7 @@ MSP430InterruptAttrSpelling FromPasta(pasta::MSP430InterruptAttrSpelling e) {
 }
 
 MSStructAttrSpelling FromPasta(pasta::MSStructAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MSStructAttrSpelling::GNU_MS_STRUCT;
     case 1: return MSStructAttrSpelling::CXX11_GNU_MS_STRUCT;
     case 2: return MSStructAttrSpelling::C2X_GNU_MS_STRUCT;
@@ -2365,7 +2365,7 @@ MSStructAttrSpelling FromPasta(pasta::MSStructAttrSpelling e) {
 }
 
 MayAliasAttrSpelling FromPasta(pasta::MayAliasAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MayAliasAttrSpelling::GNU_MAY_ALIAS;
     case 1: return MayAliasAttrSpelling::CXX11_GNU_MAY_ALIAS;
     case 2: return MayAliasAttrSpelling::C2X_GNU_MAY_ALIAS;
@@ -2375,7 +2375,7 @@ MayAliasAttrSpelling FromPasta(pasta::MayAliasAttrSpelling e) {
 }
 
 MaybeUndefAttrSpelling FromPasta(pasta::MaybeUndefAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MaybeUndefAttrSpelling::GNU_MAYBE_UNDEF;
     case 1: return MaybeUndefAttrSpelling::CXX11_CLANG_MAYBE_UNDEF;
     case 2: return MaybeUndefAttrSpelling::C2X_CLANG_MAYBE_UNDEF;
@@ -2385,7 +2385,7 @@ MaybeUndefAttrSpelling FromPasta(pasta::MaybeUndefAttrSpelling e) {
 }
 
 MicroMipsAttrSpelling FromPasta(pasta::MicroMipsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MicroMipsAttrSpelling::GNU_MICROMIPS;
     case 1: return MicroMipsAttrSpelling::CXX11_GNU_MICROMIPS;
     case 2: return MicroMipsAttrSpelling::C2X_GNU_MICROMIPS;
@@ -2395,7 +2395,7 @@ MicroMipsAttrSpelling FromPasta(pasta::MicroMipsAttrSpelling e) {
 }
 
 MinSizeAttrSpelling FromPasta(pasta::MinSizeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MinSizeAttrSpelling::GNU_MINSIZE;
     case 1: return MinSizeAttrSpelling::CXX11_CLANG_MINSIZE;
     case 2: return MinSizeAttrSpelling::C2X_CLANG_MINSIZE;
@@ -2405,7 +2405,7 @@ MinSizeAttrSpelling FromPasta(pasta::MinSizeAttrSpelling e) {
 }
 
 MinVectorWidthAttrSpelling FromPasta(pasta::MinVectorWidthAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MinVectorWidthAttrSpelling::GNU_MIN_VECTOR_WIDTH;
     case 1: return MinVectorWidthAttrSpelling::CXX11_CLANG_MIN_VECTOR_WIDTH;
     case 2: return MinVectorWidthAttrSpelling::C2X_CLANG_MIN_VECTOR_WIDTH;
@@ -2415,7 +2415,7 @@ MinVectorWidthAttrSpelling FromPasta(pasta::MinVectorWidthAttrSpelling e) {
 }
 
 Mips16AttrSpelling FromPasta(pasta::Mips16AttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return Mips16AttrSpelling::GNU_MIPS16;
     case 1: return Mips16AttrSpelling::CXX11_GNU_MIPS16;
     case 2: return Mips16AttrSpelling::C2X_GNU_MIPS16;
@@ -2425,7 +2425,7 @@ Mips16AttrSpelling FromPasta(pasta::Mips16AttrSpelling e) {
 }
 
 MipsInterruptAttrInterruptType FromPasta(pasta::MipsInterruptAttrInterruptType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MipsInterruptAttrInterruptType::SW0;
     case 1: return MipsInterruptAttrInterruptType::SW1;
     case 2: return MipsInterruptAttrInterruptType::HW0;
@@ -2440,7 +2440,7 @@ MipsInterruptAttrInterruptType FromPasta(pasta::MipsInterruptAttrInterruptType e
 }
 
 MipsInterruptAttrSpelling FromPasta(pasta::MipsInterruptAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MipsInterruptAttrSpelling::GNU_INTERRUPT;
     case 1: return MipsInterruptAttrSpelling::CXX11_GNU_INTERRUPT;
     case 2: return MipsInterruptAttrSpelling::C2X_GNU_INTERRUPT;
@@ -2450,7 +2450,7 @@ MipsInterruptAttrSpelling FromPasta(pasta::MipsInterruptAttrSpelling e) {
 }
 
 MipsLongCallAttrSpelling FromPasta(pasta::MipsLongCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MipsLongCallAttrSpelling::GNU_LONG_CALL;
     case 1: return MipsLongCallAttrSpelling::CXX11_GNU_LONG_CALL;
     case 2: return MipsLongCallAttrSpelling::C2X_GNU_LONG_CALL;
@@ -2463,7 +2463,7 @@ MipsLongCallAttrSpelling FromPasta(pasta::MipsLongCallAttrSpelling e) {
 }
 
 MipsShortCallAttrSpelling FromPasta(pasta::MipsShortCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MipsShortCallAttrSpelling::GNU_SHORT_CALL;
     case 1: return MipsShortCallAttrSpelling::CXX11_GNU_SHORT_CALL;
     case 2: return MipsShortCallAttrSpelling::C2X_GNU_SHORT_CALL;
@@ -2476,7 +2476,7 @@ MipsShortCallAttrSpelling FromPasta(pasta::MipsShortCallAttrSpelling e) {
 }
 
 ModeAttrSpelling FromPasta(pasta::ModeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ModeAttrSpelling::GNU_MODE;
     case 1: return ModeAttrSpelling::CXX11_GNU_MODE;
     case 2: return ModeAttrSpelling::C2X_GNU_MODE;
@@ -2486,7 +2486,7 @@ ModeAttrSpelling FromPasta(pasta::ModeAttrSpelling e) {
 }
 
 MustTailAttrSpelling FromPasta(pasta::MustTailAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MustTailAttrSpelling::GNU_MUSTTAIL;
     case 1: return MustTailAttrSpelling::CXX11_CLANG_MUSTTAIL;
     case 2: return MustTailAttrSpelling::C2X_CLANG_MUSTTAIL;
@@ -2496,7 +2496,7 @@ MustTailAttrSpelling FromPasta(pasta::MustTailAttrSpelling e) {
 }
 
 NSConsumedAttrSpelling FromPasta(pasta::NSConsumedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NSConsumedAttrSpelling::GNU_NS_CONSUMED;
     case 1: return NSConsumedAttrSpelling::CXX11_CLANG_NS_CONSUMED;
     case 2: return NSConsumedAttrSpelling::C2X_CLANG_NS_CONSUMED;
@@ -2506,7 +2506,7 @@ NSConsumedAttrSpelling FromPasta(pasta::NSConsumedAttrSpelling e) {
 }
 
 NSConsumesSelfAttrSpelling FromPasta(pasta::NSConsumesSelfAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NSConsumesSelfAttrSpelling::GNU_NS_CONSUMES_SELF;
     case 1: return NSConsumesSelfAttrSpelling::CXX11_CLANG_NS_CONSUMES_SELF;
     case 2: return NSConsumesSelfAttrSpelling::C2X_CLANG_NS_CONSUMES_SELF;
@@ -2516,7 +2516,7 @@ NSConsumesSelfAttrSpelling FromPasta(pasta::NSConsumesSelfAttrSpelling e) {
 }
 
 NSReturnsAutoreleasedAttrSpelling FromPasta(pasta::NSReturnsAutoreleasedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NSReturnsAutoreleasedAttrSpelling::GNU_NS_RETURNS_AUTORELEASED;
     case 1: return NSReturnsAutoreleasedAttrSpelling::CXX11_CLANG_NS_RETURNS_AUTORELEASED;
     case 2: return NSReturnsAutoreleasedAttrSpelling::C2X_CLANG_NS_RETURNS_AUTORELEASED;
@@ -2526,7 +2526,7 @@ NSReturnsAutoreleasedAttrSpelling FromPasta(pasta::NSReturnsAutoreleasedAttrSpel
 }
 
 NSReturnsNotRetainedAttrSpelling FromPasta(pasta::NSReturnsNotRetainedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NSReturnsNotRetainedAttrSpelling::GNU_NS_RETURNS_NOT_RETAINED;
     case 1: return NSReturnsNotRetainedAttrSpelling::CXX11_CLANG_NS_RETURNS_NOT_RETAINED;
     case 2: return NSReturnsNotRetainedAttrSpelling::C2X_CLANG_NS_RETURNS_NOT_RETAINED;
@@ -2536,7 +2536,7 @@ NSReturnsNotRetainedAttrSpelling FromPasta(pasta::NSReturnsNotRetainedAttrSpelli
 }
 
 NSReturnsRetainedAttrSpelling FromPasta(pasta::NSReturnsRetainedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NSReturnsRetainedAttrSpelling::GNU_NS_RETURNS_RETAINED;
     case 1: return NSReturnsRetainedAttrSpelling::CXX11_CLANG_NS_RETURNS_RETAINED;
     case 2: return NSReturnsRetainedAttrSpelling::C2X_CLANG_NS_RETURNS_RETAINED;
@@ -2546,7 +2546,7 @@ NSReturnsRetainedAttrSpelling FromPasta(pasta::NSReturnsRetainedAttrSpelling e) 
 }
 
 NakedAttrSpelling FromPasta(pasta::NakedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NakedAttrSpelling::GNU_NAKED;
     case 1: return NakedAttrSpelling::CXX11_GNU_NAKED;
     case 2: return NakedAttrSpelling::C2X_GNU_NAKED;
@@ -2557,7 +2557,7 @@ NakedAttrSpelling FromPasta(pasta::NakedAttrSpelling e) {
 }
 
 NamedDeclExplicitVisibilityKind FromPasta(pasta::NamedDeclExplicitVisibilityKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NamedDeclExplicitVisibilityKind::VISIBILITY_FOR_TYPE;
     case 1: return NamedDeclExplicitVisibilityKind::VISIBILITY_FOR_VALUE;
     default: __builtin_unreachable();
@@ -2565,7 +2565,7 @@ NamedDeclExplicitVisibilityKind FromPasta(pasta::NamedDeclExplicitVisibilityKind
 }
 
 NoBuiltinAttrSpelling FromPasta(pasta::NoBuiltinAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoBuiltinAttrSpelling::GNU_NO_BUILTIN;
     case 1: return NoBuiltinAttrSpelling::CXX11_CLANG_NO_BUILTIN;
     case 2: return NoBuiltinAttrSpelling::C2X_CLANG_NO_BUILTIN;
@@ -2575,7 +2575,7 @@ NoBuiltinAttrSpelling FromPasta(pasta::NoBuiltinAttrSpelling e) {
 }
 
 NoCommonAttrSpelling FromPasta(pasta::NoCommonAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoCommonAttrSpelling::GNU_NOCOMMON;
     case 1: return NoCommonAttrSpelling::CXX11_GNU_NOCOMMON;
     case 2: return NoCommonAttrSpelling::C2X_GNU_NOCOMMON;
@@ -2585,7 +2585,7 @@ NoCommonAttrSpelling FromPasta(pasta::NoCommonAttrSpelling e) {
 }
 
 NoDebugAttrSpelling FromPasta(pasta::NoDebugAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoDebugAttrSpelling::GNU_NODEBUG;
     case 1: return NoDebugAttrSpelling::CXX11_GNU_NODEBUG;
     case 2: return NoDebugAttrSpelling::C2X_GNU_NODEBUG;
@@ -2595,7 +2595,7 @@ NoDebugAttrSpelling FromPasta(pasta::NoDebugAttrSpelling e) {
 }
 
 NoDerefAttrSpelling FromPasta(pasta::NoDerefAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoDerefAttrSpelling::GNU_NODEREF;
     case 1: return NoDerefAttrSpelling::CXX11_CLANG_NODEREF;
     case 2: return NoDerefAttrSpelling::C2X_CLANG_NODEREF;
@@ -2605,7 +2605,7 @@ NoDerefAttrSpelling FromPasta(pasta::NoDerefAttrSpelling e) {
 }
 
 NoDestroyAttrSpelling FromPasta(pasta::NoDestroyAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoDestroyAttrSpelling::GNU_NO_DESTROY;
     case 1: return NoDestroyAttrSpelling::CXX11_CLANG_NO_DESTROY;
     case 15: return NoDestroyAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -2614,7 +2614,7 @@ NoDestroyAttrSpelling FromPasta(pasta::NoDestroyAttrSpelling e) {
 }
 
 NoDuplicateAttrSpelling FromPasta(pasta::NoDuplicateAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoDuplicateAttrSpelling::GNU_NODUPLICATE;
     case 1: return NoDuplicateAttrSpelling::CXX11_CLANG_NODUPLICATE;
     case 2: return NoDuplicateAttrSpelling::C2X_CLANG_NODUPLICATE;
@@ -2624,7 +2624,7 @@ NoDuplicateAttrSpelling FromPasta(pasta::NoDuplicateAttrSpelling e) {
 }
 
 NoEscapeAttrSpelling FromPasta(pasta::NoEscapeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoEscapeAttrSpelling::GNU_NOESCAPE;
     case 1: return NoEscapeAttrSpelling::CXX11_CLANG_NOESCAPE;
     case 2: return NoEscapeAttrSpelling::C2X_CLANG_NOESCAPE;
@@ -2634,7 +2634,7 @@ NoEscapeAttrSpelling FromPasta(pasta::NoEscapeAttrSpelling e) {
 }
 
 NoInlineAttrSpelling FromPasta(pasta::NoInlineAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoInlineAttrSpelling::KEYWORD_NOINLINE;
     case 1: return NoInlineAttrSpelling::GNU_NOINLINE;
     case 2: return NoInlineAttrSpelling::CXX11_GNU_NOINLINE;
@@ -2648,7 +2648,7 @@ NoInlineAttrSpelling FromPasta(pasta::NoInlineAttrSpelling e) {
 }
 
 NoInstrumentFunctionAttrSpelling FromPasta(pasta::NoInstrumentFunctionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoInstrumentFunctionAttrSpelling::GNU_NO_INSTRUMENT_FUNCTION;
     case 1: return NoInstrumentFunctionAttrSpelling::CXX11_GNU_NO_INSTRUMENT_FUNCTION;
     case 2: return NoInstrumentFunctionAttrSpelling::C2X_GNU_NO_INSTRUMENT_FUNCTION;
@@ -2658,7 +2658,7 @@ NoInstrumentFunctionAttrSpelling FromPasta(pasta::NoInstrumentFunctionAttrSpelli
 }
 
 NoMergeAttrSpelling FromPasta(pasta::NoMergeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoMergeAttrSpelling::GNU_NOMERGE;
     case 1: return NoMergeAttrSpelling::CXX11_CLANG_NOMERGE;
     case 2: return NoMergeAttrSpelling::C2X_CLANG_NOMERGE;
@@ -2668,7 +2668,7 @@ NoMergeAttrSpelling FromPasta(pasta::NoMergeAttrSpelling e) {
 }
 
 NoMicroMipsAttrSpelling FromPasta(pasta::NoMicroMipsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoMicroMipsAttrSpelling::GNU_NOMICROMIPS;
     case 1: return NoMicroMipsAttrSpelling::CXX11_GNU_NOMICROMIPS;
     case 2: return NoMicroMipsAttrSpelling::C2X_GNU_NOMICROMIPS;
@@ -2678,7 +2678,7 @@ NoMicroMipsAttrSpelling FromPasta(pasta::NoMicroMipsAttrSpelling e) {
 }
 
 NoMips16AttrSpelling FromPasta(pasta::NoMips16AttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoMips16AttrSpelling::GNU_NOMIPS16;
     case 1: return NoMips16AttrSpelling::CXX11_GNU_NOMIPS16;
     case 2: return NoMips16AttrSpelling::C2X_GNU_NOMIPS16;
@@ -2688,7 +2688,7 @@ NoMips16AttrSpelling FromPasta(pasta::NoMips16AttrSpelling e) {
 }
 
 NoProfileFunctionAttrSpelling FromPasta(pasta::NoProfileFunctionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoProfileFunctionAttrSpelling::GNU_NO_PROFILE_INSTRUMENT_FUNCTION;
     case 1: return NoProfileFunctionAttrSpelling::CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION;
     case 2: return NoProfileFunctionAttrSpelling::C2X_GNU_NO_PROFILE_INSTRUMENT_FUNCTION;
@@ -2698,7 +2698,7 @@ NoProfileFunctionAttrSpelling FromPasta(pasta::NoProfileFunctionAttrSpelling e) 
 }
 
 NoRandomizeLayoutAttrSpelling FromPasta(pasta::NoRandomizeLayoutAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoRandomizeLayoutAttrSpelling::GNU_NO_RANDOMIZE_LAYOUT;
     case 1: return NoRandomizeLayoutAttrSpelling::CXX11_GNU_NO_RANDOMIZE_LAYOUT;
     case 2: return NoRandomizeLayoutAttrSpelling::C2X_GNU_NO_RANDOMIZE_LAYOUT;
@@ -2708,7 +2708,7 @@ NoRandomizeLayoutAttrSpelling FromPasta(pasta::NoRandomizeLayoutAttrSpelling e) 
 }
 
 NoReturnAttrSpelling FromPasta(pasta::NoReturnAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoReturnAttrSpelling::GNU_NORETURN;
     case 1: return NoReturnAttrSpelling::CXX11_GNU_NORETURN;
     case 2: return NoReturnAttrSpelling::C2X_GNU_NORETURN;
@@ -2719,7 +2719,7 @@ NoReturnAttrSpelling FromPasta(pasta::NoReturnAttrSpelling e) {
 }
 
 NoSanitizeAttrSpelling FromPasta(pasta::NoSanitizeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoSanitizeAttrSpelling::GNU_NO_SANITIZE;
     case 1: return NoSanitizeAttrSpelling::CXX11_CLANG_NO_SANITIZE;
     case 2: return NoSanitizeAttrSpelling::C2X_CLANG_NO_SANITIZE;
@@ -2729,7 +2729,7 @@ NoSanitizeAttrSpelling FromPasta(pasta::NoSanitizeAttrSpelling e) {
 }
 
 NoSpeculativeLoadHardeningAttrSpelling FromPasta(pasta::NoSpeculativeLoadHardeningAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoSpeculativeLoadHardeningAttrSpelling::GNU_NO_SPECULATIVE_LOAD_HARDENING;
     case 1: return NoSpeculativeLoadHardeningAttrSpelling::CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING;
     case 2: return NoSpeculativeLoadHardeningAttrSpelling::C2X_CLANG_NO_SPECULATIVE_LOAD_HARDENING;
@@ -2739,7 +2739,7 @@ NoSpeculativeLoadHardeningAttrSpelling FromPasta(pasta::NoSpeculativeLoadHardeni
 }
 
 NoSplitStackAttrSpelling FromPasta(pasta::NoSplitStackAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoSplitStackAttrSpelling::GNU_NO_SPLIT_STACK;
     case 1: return NoSplitStackAttrSpelling::CXX11_GNU_NO_SPLIT_STACK;
     case 2: return NoSplitStackAttrSpelling::C2X_GNU_NO_SPLIT_STACK;
@@ -2749,7 +2749,7 @@ NoSplitStackAttrSpelling FromPasta(pasta::NoSplitStackAttrSpelling e) {
 }
 
 NoStackProtectorAttrSpelling FromPasta(pasta::NoStackProtectorAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoStackProtectorAttrSpelling::GNU_NO_STACK_PROTECTOR;
     case 1: return NoStackProtectorAttrSpelling::CXX11_CLANG_NO_STACK_PROTECTOR;
     case 2: return NoStackProtectorAttrSpelling::C2X_CLANG_NO_STACK_PROTECTOR;
@@ -2760,7 +2760,7 @@ NoStackProtectorAttrSpelling FromPasta(pasta::NoStackProtectorAttrSpelling e) {
 }
 
 NoThreadSafetyAnalysisAttrSpelling FromPasta(pasta::NoThreadSafetyAnalysisAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoThreadSafetyAnalysisAttrSpelling::GNU_NO_THREAD_SAFETY_ANALYSIS;
     case 1: return NoThreadSafetyAnalysisAttrSpelling::CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS;
     case 2: return NoThreadSafetyAnalysisAttrSpelling::C2X_CLANG_NO_THREAD_SAFETY_ANALYSIS;
@@ -2770,7 +2770,7 @@ NoThreadSafetyAnalysisAttrSpelling FromPasta(pasta::NoThreadSafetyAnalysisAttrSp
 }
 
 NoThrowAttrSpelling FromPasta(pasta::NoThrowAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoThrowAttrSpelling::GNU_NOTHROW;
     case 1: return NoThrowAttrSpelling::CXX11_GNU_NOTHROW;
     case 2: return NoThrowAttrSpelling::C2X_GNU_NOTHROW;
@@ -2781,7 +2781,7 @@ NoThrowAttrSpelling FromPasta(pasta::NoThrowAttrSpelling e) {
 }
 
 NoUwtableAttrSpelling FromPasta(pasta::NoUwtableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NoUwtableAttrSpelling::GNU_NOUWTABLE;
     case 1: return NoUwtableAttrSpelling::CXX11_CLANG_NOUWTABLE;
     case 2: return NoUwtableAttrSpelling::C2X_CLANG_NOUWTABLE;
@@ -2791,7 +2791,7 @@ NoUwtableAttrSpelling FromPasta(pasta::NoUwtableAttrSpelling e) {
 }
 
 NonNullAttrSpelling FromPasta(pasta::NonNullAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NonNullAttrSpelling::GNU_NONNULL;
     case 1: return NonNullAttrSpelling::CXX11_GNU_NONNULL;
     case 2: return NonNullAttrSpelling::C2X_GNU_NONNULL;
@@ -2801,7 +2801,7 @@ NonNullAttrSpelling FromPasta(pasta::NonNullAttrSpelling e) {
 }
 
 NotTailCalledAttrSpelling FromPasta(pasta::NotTailCalledAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NotTailCalledAttrSpelling::GNU_NOT_TAIL_CALLED;
     case 1: return NotTailCalledAttrSpelling::CXX11_CLANG_NOT_TAIL_CALLED;
     case 2: return NotTailCalledAttrSpelling::C2X_CLANG_NOT_TAIL_CALLED;
@@ -2811,7 +2811,7 @@ NotTailCalledAttrSpelling FromPasta(pasta::NotTailCalledAttrSpelling e) {
 }
 
 OMPAllocateDeclAttrAllocatorTypeTy FromPasta(pasta::OMPAllocateDeclAttrAllocatorTypeTy e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_NULL_MEMORY_ALLOC;
     case 1: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_DEFAULT_MEMORY_ALLOC;
     case 2: return OMPAllocateDeclAttrAllocatorTypeTy::OMP_LARGE_CAP_MEMORY_ALLOC;
@@ -2827,7 +2827,7 @@ OMPAllocateDeclAttrAllocatorTypeTy FromPasta(pasta::OMPAllocateDeclAttrAllocator
 }
 
 OMPDeclareReductionDeclInitKind FromPasta(pasta::OMPDeclareReductionDeclInitKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OMPDeclareReductionDeclInitKind::CALL_INITIALIZER;
     case 1: return OMPDeclareReductionDeclInitKind::DIRECT_INITIALIZER;
     case 2: return OMPDeclareReductionDeclInitKind::COPY_INITIALIZER;
@@ -2836,7 +2836,7 @@ OMPDeclareReductionDeclInitKind FromPasta(pasta::OMPDeclareReductionDeclInitKind
 }
 
 OMPDeclareSimdDeclAttrBranchStateTy FromPasta(pasta::OMPDeclareSimdDeclAttrBranchStateTy e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OMPDeclareSimdDeclAttrBranchStateTy::UNDEFINED;
     case 1: return OMPDeclareSimdDeclAttrBranchStateTy::INBRANCH;
     case 2: return OMPDeclareSimdDeclAttrBranchStateTy::NOTINBRANCH;
@@ -2845,7 +2845,7 @@ OMPDeclareSimdDeclAttrBranchStateTy FromPasta(pasta::OMPDeclareSimdDeclAttrBranc
 }
 
 OMPDeclareTargetDeclAttrDevTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrDevTypeTy e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OMPDeclareTargetDeclAttrDevTypeTy::HOST;
     case 1: return OMPDeclareTargetDeclAttrDevTypeTy::NO_HOST;
     case 2: return OMPDeclareTargetDeclAttrDevTypeTy::ANY;
@@ -2854,7 +2854,7 @@ OMPDeclareTargetDeclAttrDevTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrDevTy
 }
 
 OMPDeclareTargetDeclAttrMapTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrMapTypeTy e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OMPDeclareTargetDeclAttrMapTypeTy::TO;
     case 1: return OMPDeclareTargetDeclAttrMapTypeTy::ENTER;
     case 2: return OMPDeclareTargetDeclAttrMapTypeTy::LINK;
@@ -2863,7 +2863,7 @@ OMPDeclareTargetDeclAttrMapTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrMapTy
 }
 
 OSConsumedAttrSpelling FromPasta(pasta::OSConsumedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OSConsumedAttrSpelling::GNU_OS_CONSUMED;
     case 1: return OSConsumedAttrSpelling::CXX11_CLANG_OS_CONSUMED;
     case 2: return OSConsumedAttrSpelling::C2X_CLANG_OS_CONSUMED;
@@ -2873,7 +2873,7 @@ OSConsumedAttrSpelling FromPasta(pasta::OSConsumedAttrSpelling e) {
 }
 
 OSConsumesThisAttrSpelling FromPasta(pasta::OSConsumesThisAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OSConsumesThisAttrSpelling::GNU_OS_CONSUMES_THIS;
     case 1: return OSConsumesThisAttrSpelling::CXX11_CLANG_OS_CONSUMES_THIS;
     case 2: return OSConsumesThisAttrSpelling::C2X_CLANG_OS_CONSUMES_THIS;
@@ -2883,7 +2883,7 @@ OSConsumesThisAttrSpelling FromPasta(pasta::OSConsumesThisAttrSpelling e) {
 }
 
 OSReturnsNotRetainedAttrSpelling FromPasta(pasta::OSReturnsNotRetainedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OSReturnsNotRetainedAttrSpelling::GNU_OS_RETURNS_NOT_RETAINED;
     case 1: return OSReturnsNotRetainedAttrSpelling::CXX11_CLANG_OS_RETURNS_NOT_RETAINED;
     case 2: return OSReturnsNotRetainedAttrSpelling::C2X_CLANG_OS_RETURNS_NOT_RETAINED;
@@ -2893,7 +2893,7 @@ OSReturnsNotRetainedAttrSpelling FromPasta(pasta::OSReturnsNotRetainedAttrSpelli
 }
 
 OSReturnsRetainedAttrSpelling FromPasta(pasta::OSReturnsRetainedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OSReturnsRetainedAttrSpelling::GNU_OS_RETURNS_RETAINED;
     case 1: return OSReturnsRetainedAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED;
     case 2: return OSReturnsRetainedAttrSpelling::C2X_CLANG_OS_RETURNS_RETAINED;
@@ -2903,7 +2903,7 @@ OSReturnsRetainedAttrSpelling FromPasta(pasta::OSReturnsRetainedAttrSpelling e) 
 }
 
 OSReturnsRetainedOnNonZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnNonZeroAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OSReturnsRetainedOnNonZeroAttrSpelling::GNU_OS_RETURNS_RETAINED_ON_NON_ZERO;
     case 1: return OSReturnsRetainedOnNonZeroAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO;
     case 2: return OSReturnsRetainedOnNonZeroAttrSpelling::C2X_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO;
@@ -2913,7 +2913,7 @@ OSReturnsRetainedOnNonZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnNonZe
 }
 
 OSReturnsRetainedOnZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnZeroAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OSReturnsRetainedOnZeroAttrSpelling::GNU_OS_RETURNS_RETAINED_ON_ZERO;
     case 1: return OSReturnsRetainedOnZeroAttrSpelling::CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO;
     case 2: return OSReturnsRetainedOnZeroAttrSpelling::C2X_CLANG_OS_RETURNS_RETAINED_ON_ZERO;
@@ -2923,7 +2923,7 @@ OSReturnsRetainedOnZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnZeroAttr
 }
 
 ObjCBoxableAttrSpelling FromPasta(pasta::ObjCBoxableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCBoxableAttrSpelling::GNU_OBJC_BOXABLE;
     case 1: return ObjCBoxableAttrSpelling::CXX11_CLANG_OBJC_BOXABLE;
     case 2: return ObjCBoxableAttrSpelling::C2X_CLANG_OBJC_BOXABLE;
@@ -2933,7 +2933,7 @@ ObjCBoxableAttrSpelling FromPasta(pasta::ObjCBoxableAttrSpelling e) {
 }
 
 ObjCBridgeAttrSpelling FromPasta(pasta::ObjCBridgeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCBridgeAttrSpelling::GNU_OBJC_BRIDGE;
     case 1: return ObjCBridgeAttrSpelling::CXX11_CLANG_OBJC_BRIDGE;
     case 2: return ObjCBridgeAttrSpelling::C2X_CLANG_OBJC_BRIDGE;
@@ -2943,7 +2943,7 @@ ObjCBridgeAttrSpelling FromPasta(pasta::ObjCBridgeAttrSpelling e) {
 }
 
 ObjCBridgeMutableAttrSpelling FromPasta(pasta::ObjCBridgeMutableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCBridgeMutableAttrSpelling::GNU_OBJC_BRIDGE_MUTABLE;
     case 1: return ObjCBridgeMutableAttrSpelling::CXX11_CLANG_OBJC_BRIDGE_MUTABLE;
     case 2: return ObjCBridgeMutableAttrSpelling::C2X_CLANG_OBJC_BRIDGE_MUTABLE;
@@ -2953,7 +2953,7 @@ ObjCBridgeMutableAttrSpelling FromPasta(pasta::ObjCBridgeMutableAttrSpelling e) 
 }
 
 ObjCBridgeRelatedAttrSpelling FromPasta(pasta::ObjCBridgeRelatedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCBridgeRelatedAttrSpelling::GNU_OBJC_BRIDGE_RELATED;
     case 1: return ObjCBridgeRelatedAttrSpelling::CXX11_CLANG_OBJC_BRIDGE_RELATED;
     case 2: return ObjCBridgeRelatedAttrSpelling::C2X_CLANG_OBJC_BRIDGE_RELATED;
@@ -2963,7 +2963,7 @@ ObjCBridgeRelatedAttrSpelling FromPasta(pasta::ObjCBridgeRelatedAttrSpelling e) 
 }
 
 ObjCClassStubAttrSpelling FromPasta(pasta::ObjCClassStubAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCClassStubAttrSpelling::GNU_OBJC_CLASS_STUB;
     case 1: return ObjCClassStubAttrSpelling::CXX11_CLANG_OBJC_CLASS_STUB;
     case 2: return ObjCClassStubAttrSpelling::C2X_CLANG_OBJC_CLASS_STUB;
@@ -2973,7 +2973,7 @@ ObjCClassStubAttrSpelling FromPasta(pasta::ObjCClassStubAttrSpelling e) {
 }
 
 ObjCDesignatedInitializerAttrSpelling FromPasta(pasta::ObjCDesignatedInitializerAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCDesignatedInitializerAttrSpelling::GNU_OBJC_DESIGNATED_INITIALIZER;
     case 1: return ObjCDesignatedInitializerAttrSpelling::CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER;
     case 2: return ObjCDesignatedInitializerAttrSpelling::C2X_CLANG_OBJC_DESIGNATED_INITIALIZER;
@@ -2983,7 +2983,7 @@ ObjCDesignatedInitializerAttrSpelling FromPasta(pasta::ObjCDesignatedInitializer
 }
 
 ObjCDirectAttrSpelling FromPasta(pasta::ObjCDirectAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCDirectAttrSpelling::GNU_OBJC_DIRECT;
     case 1: return ObjCDirectAttrSpelling::CXX11_CLANG_OBJC_DIRECT;
     case 2: return ObjCDirectAttrSpelling::C2X_CLANG_OBJC_DIRECT;
@@ -2993,7 +2993,7 @@ ObjCDirectAttrSpelling FromPasta(pasta::ObjCDirectAttrSpelling e) {
 }
 
 ObjCDirectMembersAttrSpelling FromPasta(pasta::ObjCDirectMembersAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCDirectMembersAttrSpelling::GNU_OBJC_DIRECT_MEMBERS;
     case 1: return ObjCDirectMembersAttrSpelling::CXX11_CLANG_OBJC_DIRECT_MEMBERS;
     case 2: return ObjCDirectMembersAttrSpelling::C2X_CLANG_OBJC_DIRECT_MEMBERS;
@@ -3003,7 +3003,7 @@ ObjCDirectMembersAttrSpelling FromPasta(pasta::ObjCDirectMembersAttrSpelling e) 
 }
 
 ObjCExceptionAttrSpelling FromPasta(pasta::ObjCExceptionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCExceptionAttrSpelling::GNU_OBJC_EXCEPTION;
     case 1: return ObjCExceptionAttrSpelling::CXX11_CLANG_OBJC_EXCEPTION;
     case 2: return ObjCExceptionAttrSpelling::C2X_CLANG_OBJC_EXCEPTION;
@@ -3013,7 +3013,7 @@ ObjCExceptionAttrSpelling FromPasta(pasta::ObjCExceptionAttrSpelling e) {
 }
 
 ObjCExplicitProtocolImplAttrSpelling FromPasta(pasta::ObjCExplicitProtocolImplAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCExplicitProtocolImplAttrSpelling::GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION;
     case 1: return ObjCExplicitProtocolImplAttrSpelling::CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION;
     case 2: return ObjCExplicitProtocolImplAttrSpelling::C2X_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION;
@@ -3023,7 +3023,7 @@ ObjCExplicitProtocolImplAttrSpelling FromPasta(pasta::ObjCExplicitProtocolImplAt
 }
 
 ObjCExternallyRetainedAttrSpelling FromPasta(pasta::ObjCExternallyRetainedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCExternallyRetainedAttrSpelling::GNU_OBJC_EXTERNALLY_RETAINED;
     case 1: return ObjCExternallyRetainedAttrSpelling::CXX11_CLANG_OBJC_EXTERNALLY_RETAINED;
     case 2: return ObjCExternallyRetainedAttrSpelling::C2X_CLANG_OBJC_EXTERNALLY_RETAINED;
@@ -3033,7 +3033,7 @@ ObjCExternallyRetainedAttrSpelling FromPasta(pasta::ObjCExternallyRetainedAttrSp
 }
 
 ObjCGCAttrSpelling FromPasta(pasta::ObjCGCAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCGCAttrSpelling::GNU_OBJC_GC;
     case 1: return ObjCGCAttrSpelling::CXX11_CLANG_OBJC_GC;
     case 2: return ObjCGCAttrSpelling::C2X_CLANG_OBJC_GC;
@@ -3043,7 +3043,7 @@ ObjCGCAttrSpelling FromPasta(pasta::ObjCGCAttrSpelling e) {
 }
 
 ObjCIndependentClassAttrSpelling FromPasta(pasta::ObjCIndependentClassAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCIndependentClassAttrSpelling::GNU_OBJC_INDEPENDENT_CLASS;
     case 1: return ObjCIndependentClassAttrSpelling::CXX11_CLANG_OBJC_INDEPENDENT_CLASS;
     case 2: return ObjCIndependentClassAttrSpelling::C2X_CLANG_OBJC_INDEPENDENT_CLASS;
@@ -3053,7 +3053,7 @@ ObjCIndependentClassAttrSpelling FromPasta(pasta::ObjCIndependentClassAttrSpelli
 }
 
 ObjCIvarDeclAccessControl FromPasta(pasta::ObjCIvarDeclAccessControl e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCIvarDeclAccessControl::NONE;
     case 1: return ObjCIvarDeclAccessControl::PRIVATE;
     case 2: return ObjCIvarDeclAccessControl::PROTECTED;
@@ -3064,7 +3064,7 @@ ObjCIvarDeclAccessControl FromPasta(pasta::ObjCIvarDeclAccessControl e) {
 }
 
 ObjCMessageExprReceiverKind FromPasta(pasta::ObjCMessageExprReceiverKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCMessageExprReceiverKind::CLASS;
     case 1: return ObjCMessageExprReceiverKind::INSTANCE;
     case 2: return ObjCMessageExprReceiverKind::SUPER_CLASS;
@@ -3074,7 +3074,7 @@ ObjCMessageExprReceiverKind FromPasta(pasta::ObjCMessageExprReceiverKind e) {
 }
 
 ObjCMethodDeclImplementationControl FromPasta(pasta::ObjCMethodDeclImplementationControl e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCMethodDeclImplementationControl::NONE;
     case 1: return ObjCMethodDeclImplementationControl::REQUIRED;
     case 2: return ObjCMethodDeclImplementationControl::OPTIONAL;
@@ -3083,7 +3083,7 @@ ObjCMethodDeclImplementationControl FromPasta(pasta::ObjCMethodDeclImplementatio
 }
 
 ObjCMethodFamilyAttrFamilyKind FromPasta(pasta::ObjCMethodFamilyAttrFamilyKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCMethodFamilyAttrFamilyKind::NONE;
     case 1: return ObjCMethodFamilyAttrFamilyKind::ALLOC;
     case 2: return ObjCMethodFamilyAttrFamilyKind::COPY;
@@ -3095,7 +3095,7 @@ ObjCMethodFamilyAttrFamilyKind FromPasta(pasta::ObjCMethodFamilyAttrFamilyKind e
 }
 
 ObjCMethodFamilyAttrSpelling FromPasta(pasta::ObjCMethodFamilyAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCMethodFamilyAttrSpelling::GNU_OBJC_METHOD_FAMILY;
     case 1: return ObjCMethodFamilyAttrSpelling::CXX11_CLANG_OBJC_METHOD_FAMILY;
     case 2: return ObjCMethodFamilyAttrSpelling::C2X_CLANG_OBJC_METHOD_FAMILY;
@@ -3105,7 +3105,7 @@ ObjCMethodFamilyAttrSpelling FromPasta(pasta::ObjCMethodFamilyAttrSpelling e) {
 }
 
 ObjCNSObjectAttrSpelling FromPasta(pasta::ObjCNSObjectAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCNSObjectAttrSpelling::GNUNS_OBJECT;
     case 1: return ObjCNSObjectAttrSpelling::CXX11_CLANG_NS_OBJECT;
     case 2: return ObjCNSObjectAttrSpelling::C2X_CLANG_NS_OBJECT;
@@ -3115,7 +3115,7 @@ ObjCNSObjectAttrSpelling FromPasta(pasta::ObjCNSObjectAttrSpelling e) {
 }
 
 ObjCNonLazyClassAttrSpelling FromPasta(pasta::ObjCNonLazyClassAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCNonLazyClassAttrSpelling::GNU_OBJC_NONLAZY_CLASS;
     case 1: return ObjCNonLazyClassAttrSpelling::CXX11_CLANG_OBJC_NONLAZY_CLASS;
     case 2: return ObjCNonLazyClassAttrSpelling::C2X_CLANG_OBJC_NONLAZY_CLASS;
@@ -3125,7 +3125,7 @@ ObjCNonLazyClassAttrSpelling FromPasta(pasta::ObjCNonLazyClassAttrSpelling e) {
 }
 
 ObjCNonRuntimeProtocolAttrSpelling FromPasta(pasta::ObjCNonRuntimeProtocolAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCNonRuntimeProtocolAttrSpelling::GNU_OBJC_NON_RUNTIME_PROTOCOL;
     case 1: return ObjCNonRuntimeProtocolAttrSpelling::CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL;
     case 2: return ObjCNonRuntimeProtocolAttrSpelling::C2X_CLANG_OBJC_NON_RUNTIME_PROTOCOL;
@@ -3135,7 +3135,7 @@ ObjCNonRuntimeProtocolAttrSpelling FromPasta(pasta::ObjCNonRuntimeProtocolAttrSp
 }
 
 ObjCOwnershipAttrSpelling FromPasta(pasta::ObjCOwnershipAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCOwnershipAttrSpelling::GNU_OBJC_OWNERSHIP;
     case 1: return ObjCOwnershipAttrSpelling::CXX11_CLANG_OBJC_OWNERSHIP;
     case 2: return ObjCOwnershipAttrSpelling::C2X_CLANG_OBJC_OWNERSHIP;
@@ -3145,7 +3145,7 @@ ObjCOwnershipAttrSpelling FromPasta(pasta::ObjCOwnershipAttrSpelling e) {
 }
 
 ObjCPreciseLifetimeAttrSpelling FromPasta(pasta::ObjCPreciseLifetimeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCPreciseLifetimeAttrSpelling::GNU_OBJC_PRECISE_LIFETIME;
     case 1: return ObjCPreciseLifetimeAttrSpelling::CXX11_CLANG_OBJC_PRECISE_LIFETIME;
     case 2: return ObjCPreciseLifetimeAttrSpelling::C2X_CLANG_OBJC_PRECISE_LIFETIME;
@@ -3155,7 +3155,7 @@ ObjCPreciseLifetimeAttrSpelling FromPasta(pasta::ObjCPreciseLifetimeAttrSpelling
 }
 
 ObjCPropertyDeclPropertyControl FromPasta(pasta::ObjCPropertyDeclPropertyControl e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCPropertyDeclPropertyControl::NONE;
     case 1: return ObjCPropertyDeclPropertyControl::REQUIRED;
     case 2: return ObjCPropertyDeclPropertyControl::OPTIONAL;
@@ -3164,7 +3164,7 @@ ObjCPropertyDeclPropertyControl FromPasta(pasta::ObjCPropertyDeclPropertyControl
 }
 
 ObjCPropertyDeclSetterKind FromPasta(pasta::ObjCPropertyDeclSetterKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCPropertyDeclSetterKind::ASSIGN;
     case 1: return ObjCPropertyDeclSetterKind::RETAIN;
     case 2: return ObjCPropertyDeclSetterKind::COPY;
@@ -3174,7 +3174,7 @@ ObjCPropertyDeclSetterKind FromPasta(pasta::ObjCPropertyDeclSetterKind e) {
 }
 
 ObjCPropertyImplDeclKind FromPasta(pasta::ObjCPropertyImplDeclKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCPropertyImplDeclKind::SYNTHESIZE;
     case 1: return ObjCPropertyImplDeclKind::DYNAMIC;
     default: __builtin_unreachable();
@@ -3182,7 +3182,7 @@ ObjCPropertyImplDeclKind FromPasta(pasta::ObjCPropertyImplDeclKind e) {
 }
 
 ObjCRequiresPropertyDefsAttrSpelling FromPasta(pasta::ObjCRequiresPropertyDefsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCRequiresPropertyDefsAttrSpelling::GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS;
     case 1: return ObjCRequiresPropertyDefsAttrSpelling::CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS;
     case 2: return ObjCRequiresPropertyDefsAttrSpelling::C2X_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS;
@@ -3192,7 +3192,7 @@ ObjCRequiresPropertyDefsAttrSpelling FromPasta(pasta::ObjCRequiresPropertyDefsAt
 }
 
 ObjCRequiresSuperAttrSpelling FromPasta(pasta::ObjCRequiresSuperAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCRequiresSuperAttrSpelling::GNU_OBJC_REQUIRES_SUPER;
     case 1: return ObjCRequiresSuperAttrSpelling::CXX11_CLANG_OBJC_REQUIRES_SUPER;
     case 2: return ObjCRequiresSuperAttrSpelling::C2X_CLANG_OBJC_REQUIRES_SUPER;
@@ -3202,7 +3202,7 @@ ObjCRequiresSuperAttrSpelling FromPasta(pasta::ObjCRequiresSuperAttrSpelling e) 
 }
 
 ObjCReturnsInnerPointerAttrSpelling FromPasta(pasta::ObjCReturnsInnerPointerAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCReturnsInnerPointerAttrSpelling::GNU_OBJC_RETURNS_INNER_POINTER;
     case 1: return ObjCReturnsInnerPointerAttrSpelling::CXX11_CLANG_OBJC_RETURNS_INNER_POINTER;
     case 2: return ObjCReturnsInnerPointerAttrSpelling::C2X_CLANG_OBJC_RETURNS_INNER_POINTER;
@@ -3212,7 +3212,7 @@ ObjCReturnsInnerPointerAttrSpelling FromPasta(pasta::ObjCReturnsInnerPointerAttr
 }
 
 ObjCRootClassAttrSpelling FromPasta(pasta::ObjCRootClassAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCRootClassAttrSpelling::GNU_OBJC_ROOT_CLASS;
     case 1: return ObjCRootClassAttrSpelling::CXX11_CLANG_OBJC_ROOT_CLASS;
     case 2: return ObjCRootClassAttrSpelling::C2X_CLANG_OBJC_ROOT_CLASS;
@@ -3222,7 +3222,7 @@ ObjCRootClassAttrSpelling FromPasta(pasta::ObjCRootClassAttrSpelling e) {
 }
 
 ObjCRuntimeNameAttrSpelling FromPasta(pasta::ObjCRuntimeNameAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCRuntimeNameAttrSpelling::GNU_OBJC_RUNTIME_NAME;
     case 1: return ObjCRuntimeNameAttrSpelling::CXX11_CLANG_OBJC_RUNTIME_NAME;
     case 2: return ObjCRuntimeNameAttrSpelling::C2X_CLANG_OBJC_RUNTIME_NAME;
@@ -3232,7 +3232,7 @@ ObjCRuntimeNameAttrSpelling FromPasta(pasta::ObjCRuntimeNameAttrSpelling e) {
 }
 
 ObjCRuntimeVisibleAttrSpelling FromPasta(pasta::ObjCRuntimeVisibleAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCRuntimeVisibleAttrSpelling::GNU_OBJC_RUNTIME_VISIBLE;
     case 1: return ObjCRuntimeVisibleAttrSpelling::CXX11_CLANG_OBJC_RUNTIME_VISIBLE;
     case 2: return ObjCRuntimeVisibleAttrSpelling::C2X_CLANG_OBJC_RUNTIME_VISIBLE;
@@ -3242,7 +3242,7 @@ ObjCRuntimeVisibleAttrSpelling FromPasta(pasta::ObjCRuntimeVisibleAttrSpelling e
 }
 
 ObjCSubclassingRestrictedAttrSpelling FromPasta(pasta::ObjCSubclassingRestrictedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCSubclassingRestrictedAttrSpelling::GNU_OBJC_SUBCLASSING_RESTRICTED;
     case 1: return ObjCSubclassingRestrictedAttrSpelling::CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED;
     case 2: return ObjCSubclassingRestrictedAttrSpelling::C2X_CLANG_OBJC_SUBCLASSING_RESTRICTED;
@@ -3252,7 +3252,7 @@ ObjCSubclassingRestrictedAttrSpelling FromPasta(pasta::ObjCSubclassingRestricted
 }
 
 OpenCLAccessAttrSpelling FromPasta(pasta::OpenCLAccessAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLAccessAttrSpelling::KEYWORD_READ_ONLY;
     case 2: return OpenCLAccessAttrSpelling::KEYWORD_WRITE_ONLY;
     case 4: return OpenCLAccessAttrSpelling::KEYWORD_READ_WRITE;
@@ -3262,7 +3262,7 @@ OpenCLAccessAttrSpelling FromPasta(pasta::OpenCLAccessAttrSpelling e) {
 }
 
 OpenCLConstantAddressSpaceAttrSpelling FromPasta(pasta::OpenCLConstantAddressSpaceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLConstantAddressSpaceAttrSpelling::KEYWORD_CONSTANT;
     case 2: return OpenCLConstantAddressSpaceAttrSpelling::GNU_OPENCL_CONSTANT;
     case 3: return OpenCLConstantAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_CONSTANT;
@@ -3273,7 +3273,7 @@ OpenCLConstantAddressSpaceAttrSpelling FromPasta(pasta::OpenCLConstantAddressSpa
 }
 
 OpenCLGenericAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGenericAddressSpaceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLGenericAddressSpaceAttrSpelling::KEYWORD_GENERIC;
     case 2: return OpenCLGenericAddressSpaceAttrSpelling::GNU_OPENCL_GENERIC;
     case 3: return OpenCLGenericAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GENERIC;
@@ -3284,7 +3284,7 @@ OpenCLGenericAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGenericAddressSpace
 }
 
 OpenCLGlobalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalAddressSpaceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLGlobalAddressSpaceAttrSpelling::KEYWORD_GLOBAL;
     case 2: return OpenCLGlobalAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL;
     case 3: return OpenCLGlobalAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL;
@@ -3295,7 +3295,7 @@ OpenCLGlobalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalAddressSpaceAt
 }
 
 OpenCLGlobalDeviceAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalDeviceAddressSpaceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLGlobalDeviceAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL_DEVICE;
     case 1: return OpenCLGlobalDeviceAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL_DEVICE;
     case 2: return OpenCLGlobalDeviceAddressSpaceAttrSpelling::C2X_CLANG_OPENCL_GLOBAL_DEVICE;
@@ -3305,7 +3305,7 @@ OpenCLGlobalDeviceAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalDeviceAd
 }
 
 OpenCLGlobalHostAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalHostAddressSpaceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLGlobalHostAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL_HOST;
     case 1: return OpenCLGlobalHostAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL_HOST;
     case 2: return OpenCLGlobalHostAddressSpaceAttrSpelling::C2X_CLANG_OPENCL_GLOBAL_HOST;
@@ -3315,7 +3315,7 @@ OpenCLGlobalHostAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalHostAddres
 }
 
 OpenCLKernelAttrSpelling FromPasta(pasta::OpenCLKernelAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLKernelAttrSpelling::KEYWORD_KERNEL;
     case 15: return OpenCLKernelAttrSpelling::SPELLING_NOT_CALCULATED;
     default: __builtin_unreachable();
@@ -3323,7 +3323,7 @@ OpenCLKernelAttrSpelling FromPasta(pasta::OpenCLKernelAttrSpelling e) {
 }
 
 OpenCLLocalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLLocalAddressSpaceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLLocalAddressSpaceAttrSpelling::KEYWORD_LOCAL;
     case 2: return OpenCLLocalAddressSpaceAttrSpelling::GNU_OPENCL_LOCAL;
     case 3: return OpenCLLocalAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_LOCAL;
@@ -3334,7 +3334,7 @@ OpenCLLocalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLLocalAddressSpaceAttr
 }
 
 OpenCLPrivateAddressSpaceAttrSpelling FromPasta(pasta::OpenCLPrivateAddressSpaceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenCLPrivateAddressSpaceAttrSpelling::KEYWORD_PRIVATE;
     case 2: return OpenCLPrivateAddressSpaceAttrSpelling::GNU_OPENCL_PRIVATE;
     case 3: return OpenCLPrivateAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_PRIVATE;
@@ -3345,7 +3345,7 @@ OpenCLPrivateAddressSpaceAttrSpelling FromPasta(pasta::OpenCLPrivateAddressSpace
 }
 
 OptimizeNoneAttrSpelling FromPasta(pasta::OptimizeNoneAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OptimizeNoneAttrSpelling::GNU_OPTNONE;
     case 1: return OptimizeNoneAttrSpelling::CXX11_CLANG_OPTNONE;
     case 2: return OptimizeNoneAttrSpelling::C2X_CLANG_OPTNONE;
@@ -3355,7 +3355,7 @@ OptimizeNoneAttrSpelling FromPasta(pasta::OptimizeNoneAttrSpelling e) {
 }
 
 OverloadableAttrSpelling FromPasta(pasta::OverloadableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OverloadableAttrSpelling::GNU_OVERLOADABLE;
     case 1: return OverloadableAttrSpelling::CXX11_CLANG_OVERLOADABLE;
     case 2: return OverloadableAttrSpelling::C2X_CLANG_OVERLOADABLE;
@@ -3365,7 +3365,7 @@ OverloadableAttrSpelling FromPasta(pasta::OverloadableAttrSpelling e) {
 }
 
 OwnershipAttrOwnershipKind FromPasta(pasta::OwnershipAttrOwnershipKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OwnershipAttrOwnershipKind::HOLDS;
     case 1: return OwnershipAttrOwnershipKind::RETURNS;
     case 2: return OwnershipAttrOwnershipKind::TAKES;
@@ -3374,7 +3374,7 @@ OwnershipAttrOwnershipKind FromPasta(pasta::OwnershipAttrOwnershipKind e) {
 }
 
 OwnershipAttrSpelling FromPasta(pasta::OwnershipAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OwnershipAttrSpelling::GNU_OWNERSHIP_HOLDS;
     case 1: return OwnershipAttrSpelling::CXX11_CLANG_OWNERSHIP_HOLDS;
     case 2: return OwnershipAttrSpelling::C2X_CLANG_OWNERSHIP_HOLDS;
@@ -3390,7 +3390,7 @@ OwnershipAttrSpelling FromPasta(pasta::OwnershipAttrSpelling e) {
 }
 
 PackedAttrSpelling FromPasta(pasta::PackedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PackedAttrSpelling::GNU_PACKED;
     case 1: return PackedAttrSpelling::CXX11_GNU_PACKED;
     case 2: return PackedAttrSpelling::C2X_GNU_PACKED;
@@ -3400,7 +3400,7 @@ PackedAttrSpelling FromPasta(pasta::PackedAttrSpelling e) {
 }
 
 ParamTypestateAttrConsumedState FromPasta(pasta::ParamTypestateAttrConsumedState e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ParamTypestateAttrConsumedState::UNKNOWN;
     case 1: return ParamTypestateAttrConsumedState::CONSUMED;
     case 2: return ParamTypestateAttrConsumedState::UNCONSUMED;
@@ -3409,7 +3409,7 @@ ParamTypestateAttrConsumedState FromPasta(pasta::ParamTypestateAttrConsumedState
 }
 
 ParamTypestateAttrSpelling FromPasta(pasta::ParamTypestateAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ParamTypestateAttrSpelling::GNU_PARAMETER_TYPESTATE;
     case 1: return ParamTypestateAttrSpelling::CXX11_CLANG_PARAMETER_TYPESTATE;
     case 15: return ParamTypestateAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -3418,7 +3418,7 @@ ParamTypestateAttrSpelling FromPasta(pasta::ParamTypestateAttrSpelling e) {
 }
 
 PascalAttrSpelling FromPasta(pasta::PascalAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PascalAttrSpelling::GNU_PASCAL;
     case 1: return PascalAttrSpelling::CXX11_CLANG_PASCAL;
     case 2: return PascalAttrSpelling::C2X_CLANG_PASCAL;
@@ -3429,7 +3429,7 @@ PascalAttrSpelling FromPasta(pasta::PascalAttrSpelling e) {
 }
 
 PassObjectSizeAttrSpelling FromPasta(pasta::PassObjectSizeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PassObjectSizeAttrSpelling::GNU_PASS_OBJECT_SIZE;
     case 1: return PassObjectSizeAttrSpelling::CXX11_CLANG_PASS_OBJECT_SIZE;
     case 2: return PassObjectSizeAttrSpelling::C2X_CLANG_PASS_OBJECT_SIZE;
@@ -3442,7 +3442,7 @@ PassObjectSizeAttrSpelling FromPasta(pasta::PassObjectSizeAttrSpelling e) {
 }
 
 PatchableFunctionEntryAttrSpelling FromPasta(pasta::PatchableFunctionEntryAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PatchableFunctionEntryAttrSpelling::GNU_PATCHABLE_FUNCTION_ENTRY;
     case 1: return PatchableFunctionEntryAttrSpelling::CXX11_GNU_PATCHABLE_FUNCTION_ENTRY;
     case 2: return PatchableFunctionEntryAttrSpelling::C2X_GNU_PATCHABLE_FUNCTION_ENTRY;
@@ -3452,7 +3452,7 @@ PatchableFunctionEntryAttrSpelling FromPasta(pasta::PatchableFunctionEntryAttrSp
 }
 
 PcsAttrPCSType FromPasta(pasta::PcsAttrPCSType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PcsAttrPCSType::AAPCS;
     case 1: return PcsAttrPCSType::VFP;
     default: __builtin_unreachable();
@@ -3460,7 +3460,7 @@ PcsAttrPCSType FromPasta(pasta::PcsAttrPCSType e) {
 }
 
 PcsAttrSpelling FromPasta(pasta::PcsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PcsAttrSpelling::GNU_PCS;
     case 1: return PcsAttrSpelling::CXX11_GNU_PCS;
     case 2: return PcsAttrSpelling::C2X_GNU_PCS;
@@ -3470,7 +3470,7 @@ PcsAttrSpelling FromPasta(pasta::PcsAttrSpelling e) {
 }
 
 PredefinedExprIdentKind FromPasta(pasta::PredefinedExprIdentKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PredefinedExprIdentKind::FUNC;
     case 1: return PredefinedExprIdentKind::FUNCTION;
     case 2: return PredefinedExprIdentKind::L_FUNCTION;
@@ -3484,7 +3484,7 @@ PredefinedExprIdentKind FromPasta(pasta::PredefinedExprIdentKind e) {
 }
 
 PreferredNameAttrSpelling FromPasta(pasta::PreferredNameAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PreferredNameAttrSpelling::GNU_PREFERRED_NAME;
     case 1: return PreferredNameAttrSpelling::CXX11_CLANG_PREFERRED_NAME;
     case 15: return PreferredNameAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -3493,7 +3493,7 @@ PreferredNameAttrSpelling FromPasta(pasta::PreferredNameAttrSpelling e) {
 }
 
 PreserveAllAttrSpelling FromPasta(pasta::PreserveAllAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PreserveAllAttrSpelling::GNU_PRESERVE_ALL;
     case 1: return PreserveAllAttrSpelling::CXX11_CLANG_PRESERVE_ALL;
     case 2: return PreserveAllAttrSpelling::C2X_CLANG_PRESERVE_ALL;
@@ -3503,7 +3503,7 @@ PreserveAllAttrSpelling FromPasta(pasta::PreserveAllAttrSpelling e) {
 }
 
 PreserveMostAttrSpelling FromPasta(pasta::PreserveMostAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PreserveMostAttrSpelling::GNU_PRESERVE_MOST;
     case 1: return PreserveMostAttrSpelling::CXX11_CLANG_PRESERVE_MOST;
     case 2: return PreserveMostAttrSpelling::C2X_CLANG_PRESERVE_MOST;
@@ -3513,7 +3513,7 @@ PreserveMostAttrSpelling FromPasta(pasta::PreserveMostAttrSpelling e) {
 }
 
 PtGuardedVarAttrSpelling FromPasta(pasta::PtGuardedVarAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PtGuardedVarAttrSpelling::GNU_PT_GUARDED_VARIABLE;
     case 1: return PtGuardedVarAttrSpelling::CXX11_CLANG_PT_GUARDED_VARIABLE;
     case 15: return PtGuardedVarAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -3522,7 +3522,7 @@ PtGuardedVarAttrSpelling FromPasta(pasta::PtGuardedVarAttrSpelling e) {
 }
 
 PureAttrSpelling FromPasta(pasta::PureAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PureAttrSpelling::GNU_PURE;
     case 1: return PureAttrSpelling::CXX11_GNU_PURE;
     case 2: return PureAttrSpelling::C2X_GNU_PURE;
@@ -3532,7 +3532,7 @@ PureAttrSpelling FromPasta(pasta::PureAttrSpelling e) {
 }
 
 QualifiedTypeDestructionKind FromPasta(pasta::QualifiedTypeDestructionKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return QualifiedTypeDestructionKind::NONE;
     case 1: return QualifiedTypeDestructionKind::CXX_DESTRUCTOR;
     case 2: return QualifiedTypeDestructionKind::OBJC_STRONG_LIFETIME;
@@ -3543,7 +3543,7 @@ QualifiedTypeDestructionKind FromPasta(pasta::QualifiedTypeDestructionKind e) {
 }
 
 QualifiedTypePrimitiveCopyKind FromPasta(pasta::QualifiedTypePrimitiveCopyKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return QualifiedTypePrimitiveCopyKind::TRIVIAL;
     case 1: return QualifiedTypePrimitiveCopyKind::VOLATILE_TRIVIAL;
     case 2: return QualifiedTypePrimitiveCopyKind::ARC_STRONG;
@@ -3554,7 +3554,7 @@ QualifiedTypePrimitiveCopyKind FromPasta(pasta::QualifiedTypePrimitiveCopyKind e
 }
 
 QualifiedTypePrimitiveDefaultInitializeKind FromPasta(pasta::QualifiedTypePrimitiveDefaultInitializeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return QualifiedTypePrimitiveDefaultInitializeKind::TRIVIAL;
     case 1: return QualifiedTypePrimitiveDefaultInitializeKind::ARC_STRONG;
     case 2: return QualifiedTypePrimitiveDefaultInitializeKind::ARC_WEAK;
@@ -3564,7 +3564,7 @@ QualifiedTypePrimitiveDefaultInitializeKind FromPasta(pasta::QualifiedTypePrimit
 }
 
 RISCVInterruptAttrInterruptType FromPasta(pasta::RISCVInterruptAttrInterruptType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RISCVInterruptAttrInterruptType::USER;
     case 1: return RISCVInterruptAttrInterruptType::SUPERVISOR;
     case 2: return RISCVInterruptAttrInterruptType::MACHINE;
@@ -3573,7 +3573,7 @@ RISCVInterruptAttrInterruptType FromPasta(pasta::RISCVInterruptAttrInterruptType
 }
 
 RISCVInterruptAttrSpelling FromPasta(pasta::RISCVInterruptAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RISCVInterruptAttrSpelling::GNU_INTERRUPT;
     case 1: return RISCVInterruptAttrSpelling::CXX11_GNU_INTERRUPT;
     case 2: return RISCVInterruptAttrSpelling::C2X_GNU_INTERRUPT;
@@ -3583,7 +3583,7 @@ RISCVInterruptAttrSpelling FromPasta(pasta::RISCVInterruptAttrSpelling e) {
 }
 
 RandomizeLayoutAttrSpelling FromPasta(pasta::RandomizeLayoutAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RandomizeLayoutAttrSpelling::GNU_RANDOMIZE_LAYOUT;
     case 1: return RandomizeLayoutAttrSpelling::CXX11_GNU_RANDOMIZE_LAYOUT;
     case 2: return RandomizeLayoutAttrSpelling::C2X_GNU_RANDOMIZE_LAYOUT;
@@ -3593,7 +3593,7 @@ RandomizeLayoutAttrSpelling FromPasta(pasta::RandomizeLayoutAttrSpelling e) {
 }
 
 ReadOnlyPlacementAttrSpelling FromPasta(pasta::ReadOnlyPlacementAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ReadOnlyPlacementAttrSpelling::GNU_ENFORCE_READ_ONLY_PLACEMENT;
     case 1: return ReadOnlyPlacementAttrSpelling::CXX11_CLANG_ENFORCE_READ_ONLY_PLACEMENT;
     case 2: return ReadOnlyPlacementAttrSpelling::C2X_CLANG_ENFORCE_READ_ONLY_PLACEMENT;
@@ -3603,7 +3603,7 @@ ReadOnlyPlacementAttrSpelling FromPasta(pasta::ReadOnlyPlacementAttrSpelling e) 
 }
 
 RecordDeclArgPassingKind FromPasta(pasta::RecordDeclArgPassingKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RecordDeclArgPassingKind::CAN_PASS_IN_REGS;
     case 1: return RecordDeclArgPassingKind::CANNOT_PASS_IN_REGS;
     case 2: return RecordDeclArgPassingKind::CAN_NEVER_PASS_IN_REGS;
@@ -3612,7 +3612,7 @@ RecordDeclArgPassingKind FromPasta(pasta::RecordDeclArgPassingKind e) {
 }
 
 RegCallAttrSpelling FromPasta(pasta::RegCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RegCallAttrSpelling::GNU_REGCALL;
     case 1: return RegCallAttrSpelling::CXX11_GNU_REGCALL;
     case 2: return RegCallAttrSpelling::C2X_GNU_REGCALL;
@@ -3623,7 +3623,7 @@ RegCallAttrSpelling FromPasta(pasta::RegCallAttrSpelling e) {
 }
 
 ReinitializesAttrSpelling FromPasta(pasta::ReinitializesAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ReinitializesAttrSpelling::GNU_REINITIALIZES;
     case 1: return ReinitializesAttrSpelling::CXX11_CLANG_REINITIALIZES;
     case 15: return ReinitializesAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -3632,7 +3632,7 @@ ReinitializesAttrSpelling FromPasta(pasta::ReinitializesAttrSpelling e) {
 }
 
 ReleaseCapabilityAttrSpelling FromPasta(pasta::ReleaseCapabilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ReleaseCapabilityAttrSpelling::GNU_RELEASE_CAPABILITY;
     case 1: return ReleaseCapabilityAttrSpelling::CXX11_CLANG_RELEASE_CAPABILITY;
     case 2: return ReleaseCapabilityAttrSpelling::GNU_RELEASE_SHARED_CAPABILITY;
@@ -3647,7 +3647,7 @@ ReleaseCapabilityAttrSpelling FromPasta(pasta::ReleaseCapabilityAttrSpelling e) 
 }
 
 ReleaseHandleAttrSpelling FromPasta(pasta::ReleaseHandleAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ReleaseHandleAttrSpelling::GNU_RELEASE_HANDLE;
     case 1: return ReleaseHandleAttrSpelling::CXX11_CLANG_RELEASE_HANDLE;
     case 2: return ReleaseHandleAttrSpelling::C2X_CLANG_RELEASE_HANDLE;
@@ -3657,7 +3657,7 @@ ReleaseHandleAttrSpelling FromPasta(pasta::ReleaseHandleAttrSpelling e) {
 }
 
 RequiresCapabilityAttrSpelling FromPasta(pasta::RequiresCapabilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RequiresCapabilityAttrSpelling::GNU_REQUIRES_CAPABILITY;
     case 1: return RequiresCapabilityAttrSpelling::CXX11_CLANG_REQUIRES_CAPABILITY;
     case 2: return RequiresCapabilityAttrSpelling::GNU_EXCLUSIVE_LOCKS_REQUIRED;
@@ -3672,7 +3672,7 @@ RequiresCapabilityAttrSpelling FromPasta(pasta::RequiresCapabilityAttrSpelling e
 }
 
 RestrictAttrSpelling FromPasta(pasta::RestrictAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RestrictAttrSpelling::DECLSPEC_RESTRICT;
     case 1: return RestrictAttrSpelling::GNU_MALLOC;
     case 2: return RestrictAttrSpelling::CXX11_GNU_MALLOC;
@@ -3683,7 +3683,7 @@ RestrictAttrSpelling FromPasta(pasta::RestrictAttrSpelling e) {
 }
 
 RetainAttrSpelling FromPasta(pasta::RetainAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RetainAttrSpelling::GNU_RETAIN;
     case 1: return RetainAttrSpelling::CXX11_GNU_RETAIN;
     case 2: return RetainAttrSpelling::C2X_GNU_RETAIN;
@@ -3693,7 +3693,7 @@ RetainAttrSpelling FromPasta(pasta::RetainAttrSpelling e) {
 }
 
 ReturnTypestateAttrConsumedState FromPasta(pasta::ReturnTypestateAttrConsumedState e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ReturnTypestateAttrConsumedState::UNKNOWN;
     case 1: return ReturnTypestateAttrConsumedState::CONSUMED;
     case 2: return ReturnTypestateAttrConsumedState::UNCONSUMED;
@@ -3702,7 +3702,7 @@ ReturnTypestateAttrConsumedState FromPasta(pasta::ReturnTypestateAttrConsumedSta
 }
 
 ReturnTypestateAttrSpelling FromPasta(pasta::ReturnTypestateAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ReturnTypestateAttrSpelling::GNU_RETURN_TYPESTATE;
     case 1: return ReturnTypestateAttrSpelling::CXX11_CLANG_RETURN_TYPESTATE;
     case 15: return ReturnTypestateAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -3711,7 +3711,7 @@ ReturnTypestateAttrSpelling FromPasta(pasta::ReturnTypestateAttrSpelling e) {
 }
 
 ReturnsNonNullAttrSpelling FromPasta(pasta::ReturnsNonNullAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ReturnsNonNullAttrSpelling::GNU_RETURNS_NONNULL;
     case 1: return ReturnsNonNullAttrSpelling::CXX11_GNU_RETURNS_NONNULL;
     case 2: return ReturnsNonNullAttrSpelling::C2X_GNU_RETURNS_NONNULL;
@@ -3721,7 +3721,7 @@ ReturnsNonNullAttrSpelling FromPasta(pasta::ReturnsNonNullAttrSpelling e) {
 }
 
 ReturnsTwiceAttrSpelling FromPasta(pasta::ReturnsTwiceAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ReturnsTwiceAttrSpelling::GNU_RETURNS_TWICE;
     case 1: return ReturnsTwiceAttrSpelling::CXX11_GNU_RETURNS_TWICE;
     case 2: return ReturnsTwiceAttrSpelling::C2X_GNU_RETURNS_TWICE;
@@ -3731,7 +3731,7 @@ ReturnsTwiceAttrSpelling FromPasta(pasta::ReturnsTwiceAttrSpelling e) {
 }
 
 SYCLKernelAttrSpelling FromPasta(pasta::SYCLKernelAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SYCLKernelAttrSpelling::GNU_SYCL_KERNEL;
     case 1: return SYCLKernelAttrSpelling::CXX11_CLANG_SYCL_KERNEL;
     case 2: return SYCLKernelAttrSpelling::C2X_CLANG_SYCL_KERNEL;
@@ -3741,7 +3741,7 @@ SYCLKernelAttrSpelling FromPasta(pasta::SYCLKernelAttrSpelling e) {
 }
 
 SYCLSpecialClassAttrSpelling FromPasta(pasta::SYCLSpecialClassAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SYCLSpecialClassAttrSpelling::GNU_SYCL_SPECIAL_CLASS;
     case 1: return SYCLSpecialClassAttrSpelling::CXX11_CLANG_SYCL_SPECIAL_CLASS;
     case 2: return SYCLSpecialClassAttrSpelling::C2X_CLANG_SYCL_SPECIAL_CLASS;
@@ -3751,7 +3751,7 @@ SYCLSpecialClassAttrSpelling FromPasta(pasta::SYCLSpecialClassAttrSpelling e) {
 }
 
 ScopedLockableAttrSpelling FromPasta(pasta::ScopedLockableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ScopedLockableAttrSpelling::GNU_SCOPED_LOCKABLE;
     case 1: return ScopedLockableAttrSpelling::CXX11_CLANG_SCOPED_LOCKABLE;
     case 15: return ScopedLockableAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -3760,7 +3760,7 @@ ScopedLockableAttrSpelling FromPasta(pasta::ScopedLockableAttrSpelling e) {
 }
 
 SectionAttrSpelling FromPasta(pasta::SectionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SectionAttrSpelling::GNU_SECTION;
     case 1: return SectionAttrSpelling::CXX11_GNU_SECTION;
     case 2: return SectionAttrSpelling::C2X_GNU_SECTION;
@@ -3771,7 +3771,7 @@ SectionAttrSpelling FromPasta(pasta::SectionAttrSpelling e) {
 }
 
 SelectAnyAttrSpelling FromPasta(pasta::SelectAnyAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SelectAnyAttrSpelling::DECLSPEC_SELECTANY;
     case 1: return SelectAnyAttrSpelling::GNU_SELECTANY;
     case 2: return SelectAnyAttrSpelling::CXX11_GNU_SELECTANY;
@@ -3782,7 +3782,7 @@ SelectAnyAttrSpelling FromPasta(pasta::SelectAnyAttrSpelling e) {
 }
 
 SentinelAttrSpelling FromPasta(pasta::SentinelAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SentinelAttrSpelling::GNU_SENTINEL;
     case 1: return SentinelAttrSpelling::CXX11_GNU_SENTINEL;
     case 2: return SentinelAttrSpelling::C2X_GNU_SENTINEL;
@@ -3792,7 +3792,7 @@ SentinelAttrSpelling FromPasta(pasta::SentinelAttrSpelling e) {
 }
 
 SetTypestateAttrConsumedState FromPasta(pasta::SetTypestateAttrConsumedState e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SetTypestateAttrConsumedState::UNKNOWN;
     case 1: return SetTypestateAttrConsumedState::CONSUMED;
     case 2: return SetTypestateAttrConsumedState::UNCONSUMED;
@@ -3801,7 +3801,7 @@ SetTypestateAttrConsumedState FromPasta(pasta::SetTypestateAttrConsumedState e) 
 }
 
 SetTypestateAttrSpelling FromPasta(pasta::SetTypestateAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SetTypestateAttrSpelling::GNU_TYPESTATE;
     case 1: return SetTypestateAttrSpelling::CXX11_CLANG_TYPESTATE;
     case 15: return SetTypestateAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -3810,7 +3810,7 @@ SetTypestateAttrSpelling FromPasta(pasta::SetTypestateAttrSpelling e) {
 }
 
 SourceLocExprIdentKind FromPasta(pasta::SourceLocExprIdentKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SourceLocExprIdentKind::FUNCTION;
     case 1: return SourceLocExprIdentKind::FILE;
     case 2: return SourceLocExprIdentKind::LINE;
@@ -3821,7 +3821,7 @@ SourceLocExprIdentKind FromPasta(pasta::SourceLocExprIdentKind e) {
 }
 
 SpeculativeLoadHardeningAttrSpelling FromPasta(pasta::SpeculativeLoadHardeningAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SpeculativeLoadHardeningAttrSpelling::GNU_SPECULATIVE_LOAD_HARDENING;
     case 1: return SpeculativeLoadHardeningAttrSpelling::CXX11_CLANG_SPECULATIVE_LOAD_HARDENING;
     case 2: return SpeculativeLoadHardeningAttrSpelling::C2X_CLANG_SPECULATIVE_LOAD_HARDENING;
@@ -3831,7 +3831,7 @@ SpeculativeLoadHardeningAttrSpelling FromPasta(pasta::SpeculativeLoadHardeningAt
 }
 
 StandaloneDebugAttrSpelling FromPasta(pasta::StandaloneDebugAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StandaloneDebugAttrSpelling::GNU_STANDALONE_DEBUG;
     case 1: return StandaloneDebugAttrSpelling::CXX11_CLANG_STANDALONE_DEBUG;
     case 15: return StandaloneDebugAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -3840,7 +3840,7 @@ StandaloneDebugAttrSpelling FromPasta(pasta::StandaloneDebugAttrSpelling e) {
 }
 
 StdCallAttrSpelling FromPasta(pasta::StdCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StdCallAttrSpelling::GNU_STDCALL;
     case 1: return StdCallAttrSpelling::CXX11_GNU_STDCALL;
     case 2: return StdCallAttrSpelling::C2X_GNU_STDCALL;
@@ -3851,7 +3851,7 @@ StdCallAttrSpelling FromPasta(pasta::StdCallAttrSpelling e) {
 }
 
 StmtLikelihood FromPasta(pasta::StmtLikelihood e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case -1: return StmtLikelihood::UNLIKELY;
     case 0: return StmtLikelihood::NONE;
     case 1: return StmtLikelihood::LIKELY;
@@ -3860,7 +3860,7 @@ StmtLikelihood FromPasta(pasta::StmtLikelihood e) {
 }
 
 StmtKind FromPasta(pasta::StmtKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return StmtKind::GCC_ASM_STMT;
     case 2: return StmtKind::MS_ASM_STMT;
     case 3: return StmtKind::BREAK_STMT;
@@ -4099,7 +4099,7 @@ StmtKind FromPasta(pasta::StmtKind e) {
 }
 
 StringLiteralStringKind FromPasta(pasta::StringLiteralStringKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StringLiteralStringKind::ORDINARY;
     case 1: return StringLiteralStringKind::WIDE;
     case 2: return StringLiteralStringKind::UTF8;
@@ -4110,7 +4110,7 @@ StringLiteralStringKind FromPasta(pasta::StringLiteralStringKind e) {
 }
 
 SwiftAsyncAttrKind FromPasta(pasta::SwiftAsyncAttrKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftAsyncAttrKind::NONE;
     case 1: return SwiftAsyncAttrKind::SWIFT_PRIVATE;
     case 2: return SwiftAsyncAttrKind::NOT_SWIFT_PRIVATE;
@@ -4119,7 +4119,7 @@ SwiftAsyncAttrKind FromPasta(pasta::SwiftAsyncAttrKind e) {
 }
 
 SwiftAsyncAttrSpelling FromPasta(pasta::SwiftAsyncAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftAsyncAttrSpelling::GNU_SWIFT_ASYNC;
     case 1: return SwiftAsyncAttrSpelling::CXX11_CLANG_SWIFT_ASYNC;
     case 2: return SwiftAsyncAttrSpelling::C2X_CLANG_SWIFT_ASYNC;
@@ -4129,7 +4129,7 @@ SwiftAsyncAttrSpelling FromPasta(pasta::SwiftAsyncAttrSpelling e) {
 }
 
 SwiftAsyncCallAttrSpelling FromPasta(pasta::SwiftAsyncCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftAsyncCallAttrSpelling::GNU_SWIFTASYNCCALL;
     case 1: return SwiftAsyncCallAttrSpelling::CXX11_CLANG_SWIFTASYNCCALL;
     case 2: return SwiftAsyncCallAttrSpelling::C2X_CLANG_SWIFTASYNCCALL;
@@ -4139,7 +4139,7 @@ SwiftAsyncCallAttrSpelling FromPasta(pasta::SwiftAsyncCallAttrSpelling e) {
 }
 
 SwiftAsyncContextAttrSpelling FromPasta(pasta::SwiftAsyncContextAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftAsyncContextAttrSpelling::GNU_SWIFT_ASYNC_CONTEXT;
     case 1: return SwiftAsyncContextAttrSpelling::CXX11_CLANG_SWIFT_ASYNC_CONTEXT;
     case 2: return SwiftAsyncContextAttrSpelling::C2X_CLANG_SWIFT_ASYNC_CONTEXT;
@@ -4149,7 +4149,7 @@ SwiftAsyncContextAttrSpelling FromPasta(pasta::SwiftAsyncContextAttrSpelling e) 
 }
 
 SwiftAsyncErrorAttrConventionKind FromPasta(pasta::SwiftAsyncErrorAttrConventionKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftAsyncErrorAttrConventionKind::NONE;
     case 1: return SwiftAsyncErrorAttrConventionKind::NON_NULL_ERROR;
     case 2: return SwiftAsyncErrorAttrConventionKind::ZERO_ARGUMENT;
@@ -4159,7 +4159,7 @@ SwiftAsyncErrorAttrConventionKind FromPasta(pasta::SwiftAsyncErrorAttrConvention
 }
 
 SwiftAsyncErrorAttrSpelling FromPasta(pasta::SwiftAsyncErrorAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftAsyncErrorAttrSpelling::GNU_SWIFT_ASYNC_ERROR;
     case 1: return SwiftAsyncErrorAttrSpelling::CXX11_CLANG_SWIFT_ASYNC_ERROR;
     case 2: return SwiftAsyncErrorAttrSpelling::C2X_CLANG_SWIFT_ASYNC_ERROR;
@@ -4169,7 +4169,7 @@ SwiftAsyncErrorAttrSpelling FromPasta(pasta::SwiftAsyncErrorAttrSpelling e) {
 }
 
 SwiftCallAttrSpelling FromPasta(pasta::SwiftCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftCallAttrSpelling::GNU_SWIFTCALL;
     case 1: return SwiftCallAttrSpelling::CXX11_CLANG_SWIFTCALL;
     case 2: return SwiftCallAttrSpelling::C2X_CLANG_SWIFTCALL;
@@ -4179,7 +4179,7 @@ SwiftCallAttrSpelling FromPasta(pasta::SwiftCallAttrSpelling e) {
 }
 
 SwiftContextAttrSpelling FromPasta(pasta::SwiftContextAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftContextAttrSpelling::GNU_SWIFT_CONTEXT;
     case 1: return SwiftContextAttrSpelling::CXX11_CLANG_SWIFT_CONTEXT;
     case 2: return SwiftContextAttrSpelling::C2X_CLANG_SWIFT_CONTEXT;
@@ -4189,7 +4189,7 @@ SwiftContextAttrSpelling FromPasta(pasta::SwiftContextAttrSpelling e) {
 }
 
 SwiftErrorAttrConventionKind FromPasta(pasta::SwiftErrorAttrConventionKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftErrorAttrConventionKind::NONE;
     case 1: return SwiftErrorAttrConventionKind::NON_NULL_ERROR;
     case 2: return SwiftErrorAttrConventionKind::NULL_RESULT;
@@ -4200,7 +4200,7 @@ SwiftErrorAttrConventionKind FromPasta(pasta::SwiftErrorAttrConventionKind e) {
 }
 
 SwiftErrorResultAttrSpelling FromPasta(pasta::SwiftErrorResultAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftErrorResultAttrSpelling::GNU_SWIFT_ERROR_RESULT;
     case 1: return SwiftErrorResultAttrSpelling::CXX11_CLANG_SWIFT_ERROR_RESULT;
     case 2: return SwiftErrorResultAttrSpelling::C2X_CLANG_SWIFT_ERROR_RESULT;
@@ -4210,7 +4210,7 @@ SwiftErrorResultAttrSpelling FromPasta(pasta::SwiftErrorResultAttrSpelling e) {
 }
 
 SwiftIndirectResultAttrSpelling FromPasta(pasta::SwiftIndirectResultAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftIndirectResultAttrSpelling::GNU_SWIFT_INDIRECT_RESULT;
     case 1: return SwiftIndirectResultAttrSpelling::CXX11_CLANG_SWIFT_INDIRECT_RESULT;
     case 2: return SwiftIndirectResultAttrSpelling::C2X_CLANG_SWIFT_INDIRECT_RESULT;
@@ -4220,7 +4220,7 @@ SwiftIndirectResultAttrSpelling FromPasta(pasta::SwiftIndirectResultAttrSpelling
 }
 
 SwiftNewTypeAttrNewtypeKind FromPasta(pasta::SwiftNewTypeAttrNewtypeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftNewTypeAttrNewtypeKind::STRUCT;
     case 1: return SwiftNewTypeAttrNewtypeKind::ENUM;
     default: __builtin_unreachable();
@@ -4228,7 +4228,7 @@ SwiftNewTypeAttrNewtypeKind FromPasta(pasta::SwiftNewTypeAttrNewtypeKind e) {
 }
 
 SwiftNewTypeAttrSpelling FromPasta(pasta::SwiftNewTypeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SwiftNewTypeAttrSpelling::GNU_SWIFT_NEWTYPE;
     case 1: return SwiftNewTypeAttrSpelling::GNU_SWIFT_WRAPPER;
     case 15: return SwiftNewTypeAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -4237,7 +4237,7 @@ SwiftNewTypeAttrSpelling FromPasta(pasta::SwiftNewTypeAttrSpelling e) {
 }
 
 SysVABIAttrSpelling FromPasta(pasta::SysVABIAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SysVABIAttrSpelling::GNU_SYSV_ABI;
     case 1: return SysVABIAttrSpelling::CXX11_GNU_SYSV_ABI;
     case 2: return SysVABIAttrSpelling::C2X_GNU_SYSV_ABI;
@@ -4247,7 +4247,7 @@ SysVABIAttrSpelling FromPasta(pasta::SysVABIAttrSpelling e) {
 }
 
 TLSModelAttrSpelling FromPasta(pasta::TLSModelAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TLSModelAttrSpelling::GNU_TLS_MODEL;
     case 1: return TLSModelAttrSpelling::CXX11_GNU_TLS_MODEL;
     case 2: return TLSModelAttrSpelling::C2X_GNU_TLS_MODEL;
@@ -4257,7 +4257,7 @@ TLSModelAttrSpelling FromPasta(pasta::TLSModelAttrSpelling e) {
 }
 
 TargetAttrSpelling FromPasta(pasta::TargetAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TargetAttrSpelling::GNU_TARGET;
     case 1: return TargetAttrSpelling::CXX11_GNU_TARGET;
     case 2: return TargetAttrSpelling::C2X_GNU_TARGET;
@@ -4267,7 +4267,7 @@ TargetAttrSpelling FromPasta(pasta::TargetAttrSpelling e) {
 }
 
 TargetClonesAttrSpelling FromPasta(pasta::TargetClonesAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TargetClonesAttrSpelling::GNU_TARGET_CLONES;
     case 1: return TargetClonesAttrSpelling::CXX11_GNU_TARGET_CLONES;
     case 2: return TargetClonesAttrSpelling::C2X_GNU_TARGET_CLONES;
@@ -4277,7 +4277,7 @@ TargetClonesAttrSpelling FromPasta(pasta::TargetClonesAttrSpelling e) {
 }
 
 TargetVersionAttrSpelling FromPasta(pasta::TargetVersionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TargetVersionAttrSpelling::GNU_TARGET_VERSION;
     case 1: return TargetVersionAttrSpelling::CXX11_GNU_TARGET_VERSION;
     case 2: return TargetVersionAttrSpelling::C2X_GNU_TARGET_VERSION;
@@ -4287,7 +4287,7 @@ TargetVersionAttrSpelling FromPasta(pasta::TargetVersionAttrSpelling e) {
 }
 
 TemplateArgumentKind FromPasta(pasta::TemplateArgumentKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TemplateArgumentKind::EMPTY;
     case 1: return TemplateArgumentKind::TYPE;
     case 2: return TemplateArgumentKind::DECLARATION;
@@ -4302,7 +4302,7 @@ TemplateArgumentKind FromPasta(pasta::TemplateArgumentKind e) {
 }
 
 TestTypestateAttrConsumedState FromPasta(pasta::TestTypestateAttrConsumedState e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TestTypestateAttrConsumedState::CONSUMED;
     case 1: return TestTypestateAttrConsumedState::UNCONSUMED;
     default: __builtin_unreachable();
@@ -4310,7 +4310,7 @@ TestTypestateAttrConsumedState FromPasta(pasta::TestTypestateAttrConsumedState e
 }
 
 TestTypestateAttrSpelling FromPasta(pasta::TestTypestateAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TestTypestateAttrSpelling::GNU_TEST_TYPESTATE;
     case 1: return TestTypestateAttrSpelling::CXX11_CLANG_TEST_TYPESTATE;
     case 15: return TestTypestateAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -4319,7 +4319,7 @@ TestTypestateAttrSpelling FromPasta(pasta::TestTypestateAttrSpelling e) {
 }
 
 ThisCallAttrSpelling FromPasta(pasta::ThisCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ThisCallAttrSpelling::GNU_THISCALL;
     case 1: return ThisCallAttrSpelling::CXX11_GNU_THISCALL;
     case 2: return ThisCallAttrSpelling::C2X_GNU_THISCALL;
@@ -4330,7 +4330,7 @@ ThisCallAttrSpelling FromPasta(pasta::ThisCallAttrSpelling e) {
 }
 
 TransparentUnionAttrSpelling FromPasta(pasta::TransparentUnionAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TransparentUnionAttrSpelling::GNU_TRANSPARENT_UNION;
     case 1: return TransparentUnionAttrSpelling::CXX11_GNU_TRANSPARENT_UNION;
     case 2: return TransparentUnionAttrSpelling::C2X_GNU_TRANSPARENT_UNION;
@@ -4340,7 +4340,7 @@ TransparentUnionAttrSpelling FromPasta(pasta::TransparentUnionAttrSpelling e) {
 }
 
 TrivialABIAttrSpelling FromPasta(pasta::TrivialABIAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TrivialABIAttrSpelling::GNU_TRIVIAL_ABI;
     case 1: return TrivialABIAttrSpelling::CXX11_CLANG_TRIVIAL_ABI;
     case 15: return TrivialABIAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -4349,7 +4349,7 @@ TrivialABIAttrSpelling FromPasta(pasta::TrivialABIAttrSpelling e) {
 }
 
 TryAcquireCapabilityAttrSpelling FromPasta(pasta::TryAcquireCapabilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TryAcquireCapabilityAttrSpelling::GNU_TRY_ACQUIRE_CAPABILITY;
     case 1: return TryAcquireCapabilityAttrSpelling::CXX11_CLANG_TRY_ACQUIRE_CAPABILITY;
     case 2: return TryAcquireCapabilityAttrSpelling::GNU_TRY_ACQUIRE_SHARED_CAPABILITY;
@@ -4360,7 +4360,7 @@ TryAcquireCapabilityAttrSpelling FromPasta(pasta::TryAcquireCapabilityAttrSpelli
 }
 
 TypeScalarTypeKind FromPasta(pasta::TypeScalarTypeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TypeScalarTypeKind::C_POINTER;
     case 1: return TypeScalarTypeKind::BLOCK_POINTER;
     case 2: return TypeScalarTypeKind::OBJ_C_OBJECT_POINTER;
@@ -4376,7 +4376,7 @@ TypeScalarTypeKind FromPasta(pasta::TypeScalarTypeKind e) {
 }
 
 TypeKind FromPasta(pasta::TypeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TypeKind::ADJUSTED;
     case 1: return TypeKind::DECAYED;
     case 2: return TypeKind::CONSTANT_ARRAY;
@@ -4437,7 +4437,7 @@ TypeKind FromPasta(pasta::TypeKind e) {
 }
 
 TypeTagForDatatypeAttrSpelling FromPasta(pasta::TypeTagForDatatypeAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TypeTagForDatatypeAttrSpelling::GNU_TYPE_TAG_FOR_DATATYPE;
     case 1: return TypeTagForDatatypeAttrSpelling::CXX11_CLANG_TYPE_TAG_FOR_DATATYPE;
     case 2: return TypeTagForDatatypeAttrSpelling::C2X_CLANG_TYPE_TAG_FOR_DATATYPE;
@@ -4447,7 +4447,7 @@ TypeTagForDatatypeAttrSpelling FromPasta(pasta::TypeTagForDatatypeAttrSpelling e
 }
 
 TypeVisibilityAttrSpelling FromPasta(pasta::TypeVisibilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TypeVisibilityAttrSpelling::GNU_TYPE_VISIBILITY;
     case 1: return TypeVisibilityAttrSpelling::CXX11_CLANG_TYPE_VISIBILITY;
     case 2: return TypeVisibilityAttrSpelling::C2X_CLANG_TYPE_VISIBILITY;
@@ -4457,7 +4457,7 @@ TypeVisibilityAttrSpelling FromPasta(pasta::TypeVisibilityAttrSpelling e) {
 }
 
 TypeVisibilityAttrVisibilityType FromPasta(pasta::TypeVisibilityAttrVisibilityType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TypeVisibilityAttrVisibilityType::DEFAULT;
     case 1: return TypeVisibilityAttrVisibilityType::HIDDEN;
     case 2: return TypeVisibilityAttrVisibilityType::PROTECTED;
@@ -4466,7 +4466,7 @@ TypeVisibilityAttrVisibilityType FromPasta(pasta::TypeVisibilityAttrVisibilityTy
 }
 
 UnaryTransformTypeUTTKind FromPasta(pasta::UnaryTransformTypeUTTKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UnaryTransformTypeUTTKind::ADD_LVALUE_REFERENCE;
     case 1: return UnaryTransformTypeUTTKind::ADD_POINTER;
     case 2: return UnaryTransformTypeUTTKind::ADD_RVALUE_REFERENCE;
@@ -4488,7 +4488,7 @@ UnaryTransformTypeUTTKind FromPasta(pasta::UnaryTransformTypeUTTKind e) {
 }
 
 UnavailableAttrImplicitReason FromPasta(pasta::UnavailableAttrImplicitReason e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UnavailableAttrImplicitReason::NONE;
     case 1: return UnavailableAttrImplicitReason::ARC_FORBIDDEN_TYPE;
     case 2: return UnavailableAttrImplicitReason::FORBIDDEN_WEAK;
@@ -4500,7 +4500,7 @@ UnavailableAttrImplicitReason FromPasta(pasta::UnavailableAttrImplicitReason e) 
 }
 
 UnavailableAttrSpelling FromPasta(pasta::UnavailableAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UnavailableAttrSpelling::GNU_UNAVAILABLE;
     case 1: return UnavailableAttrSpelling::CXX11_CLANG_UNAVAILABLE;
     case 2: return UnavailableAttrSpelling::C2X_CLANG_UNAVAILABLE;
@@ -4510,7 +4510,7 @@ UnavailableAttrSpelling FromPasta(pasta::UnavailableAttrSpelling e) {
 }
 
 UninitializedAttrSpelling FromPasta(pasta::UninitializedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UninitializedAttrSpelling::GNU_UNINITIALIZED;
     case 1: return UninitializedAttrSpelling::CXX11_CLANG_UNINITIALIZED;
     case 15: return UninitializedAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -4519,7 +4519,7 @@ UninitializedAttrSpelling FromPasta(pasta::UninitializedAttrSpelling e) {
 }
 
 UnlikelyAttrSpelling FromPasta(pasta::UnlikelyAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UnlikelyAttrSpelling::CXX11_UNLIKELY;
     case 1: return UnlikelyAttrSpelling::C2X_CLANG_UNLIKELY;
     case 15: return UnlikelyAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -4528,7 +4528,7 @@ UnlikelyAttrSpelling FromPasta(pasta::UnlikelyAttrSpelling e) {
 }
 
 UnusedAttrSpelling FromPasta(pasta::UnusedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UnusedAttrSpelling::CXX11_MAYBE_UNUSED;
     case 1: return UnusedAttrSpelling::GNU_UNUSED;
     case 2: return UnusedAttrSpelling::CXX11_GNU_UNUSED;
@@ -4540,7 +4540,7 @@ UnusedAttrSpelling FromPasta(pasta::UnusedAttrSpelling e) {
 }
 
 UseHandleAttrSpelling FromPasta(pasta::UseHandleAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UseHandleAttrSpelling::GNU_USE_HANDLE;
     case 1: return UseHandleAttrSpelling::CXX11_CLANG_USE_HANDLE;
     case 2: return UseHandleAttrSpelling::C2X_CLANG_USE_HANDLE;
@@ -4550,7 +4550,7 @@ UseHandleAttrSpelling FromPasta(pasta::UseHandleAttrSpelling e) {
 }
 
 UsedAttrSpelling FromPasta(pasta::UsedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UsedAttrSpelling::GNU_USED;
     case 1: return UsedAttrSpelling::CXX11_GNU_USED;
     case 2: return UsedAttrSpelling::C2X_GNU_USED;
@@ -4560,7 +4560,7 @@ UsedAttrSpelling FromPasta(pasta::UsedAttrSpelling e) {
 }
 
 UserDefinedLiteralLiteralOperatorKind FromPasta(pasta::UserDefinedLiteralLiteralOperatorKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UserDefinedLiteralLiteralOperatorKind::RAW;
     case 1: return UserDefinedLiteralLiteralOperatorKind::TEMPLATE;
     case 2: return UserDefinedLiteralLiteralOperatorKind::INTEGER;
@@ -4572,7 +4572,7 @@ UserDefinedLiteralLiteralOperatorKind FromPasta(pasta::UserDefinedLiteralLiteral
 }
 
 UsingIfExistsAttrSpelling FromPasta(pasta::UsingIfExistsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UsingIfExistsAttrSpelling::GNU_USING_IF_EXISTS;
     case 1: return UsingIfExistsAttrSpelling::CXX11_CLANG_USING_IF_EXISTS;
     case 15: return UsingIfExistsAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -4581,7 +4581,7 @@ UsingIfExistsAttrSpelling FromPasta(pasta::UsingIfExistsAttrSpelling e) {
 }
 
 UuidAttrSpelling FromPasta(pasta::UuidAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UuidAttrSpelling::DECLSPEC_UUID;
     case 1: return UuidAttrSpelling::MICROSOFT_UUID;
     case 15: return UuidAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -4590,7 +4590,7 @@ UuidAttrSpelling FromPasta(pasta::UuidAttrSpelling e) {
 }
 
 VarDeclDefinitionKind FromPasta(pasta::VarDeclDefinitionKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VarDeclDefinitionKind::DECLARATION_ONLY;
     case 1: return VarDeclDefinitionKind::TENTATIVE_DEFINITION;
     case 2: return VarDeclDefinitionKind::DEFINITION;
@@ -4599,7 +4599,7 @@ VarDeclDefinitionKind FromPasta(pasta::VarDeclDefinitionKind e) {
 }
 
 VarDeclInitializationStyle FromPasta(pasta::VarDeclInitializationStyle e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VarDeclInitializationStyle::C_INIT;
     case 1: return VarDeclInitializationStyle::CALL_INITIALIZER;
     case 2: return VarDeclInitializationStyle::LIST_INITIALIZER;
@@ -4609,7 +4609,7 @@ VarDeclInitializationStyle FromPasta(pasta::VarDeclInitializationStyle e) {
 }
 
 VarDeclTLSKind FromPasta(pasta::VarDeclTLSKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VarDeclTLSKind::NONE;
     case 1: return VarDeclTLSKind::STATIC;
     case 2: return VarDeclTLSKind::DYNAMIC;
@@ -4618,7 +4618,7 @@ VarDeclTLSKind FromPasta(pasta::VarDeclTLSKind e) {
 }
 
 VecReturnAttrSpelling FromPasta(pasta::VecReturnAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VecReturnAttrSpelling::GNU_VECRETURN;
     case 1: return VecReturnAttrSpelling::CXX11_CLANG_VECRETURN;
     case 15: return VecReturnAttrSpelling::SPELLING_NOT_CALCULATED;
@@ -4627,7 +4627,7 @@ VecReturnAttrSpelling FromPasta(pasta::VecReturnAttrSpelling e) {
 }
 
 VectorCallAttrSpelling FromPasta(pasta::VectorCallAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VectorCallAttrSpelling::GNU_VECTORCALL;
     case 1: return VectorCallAttrSpelling::CXX11_CLANG_VECTORCALL;
     case 2: return VectorCallAttrSpelling::C2X_CLANG_VECTORCALL;
@@ -4638,7 +4638,7 @@ VectorCallAttrSpelling FromPasta(pasta::VectorCallAttrSpelling e) {
 }
 
 VectorTypeVectorKind FromPasta(pasta::VectorTypeVectorKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VectorTypeVectorKind::GENERIC_VECTOR;
     case 1: return VectorTypeVectorKind::ALTI_VEC_VECTOR;
     case 2: return VectorTypeVectorKind::ALTI_VEC_PIXEL;
@@ -4652,7 +4652,7 @@ VectorTypeVectorKind FromPasta(pasta::VectorTypeVectorKind e) {
 }
 
 VisibilityAttrSpelling FromPasta(pasta::VisibilityAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VisibilityAttrSpelling::GNU_VISIBILITY;
     case 1: return VisibilityAttrSpelling::CXX11_GNU_VISIBILITY;
     case 2: return VisibilityAttrSpelling::C2X_GNU_VISIBILITY;
@@ -4662,7 +4662,7 @@ VisibilityAttrSpelling FromPasta(pasta::VisibilityAttrSpelling e) {
 }
 
 VisibilityAttrVisibilityType FromPasta(pasta::VisibilityAttrVisibilityType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VisibilityAttrVisibilityType::DEFAULT;
     case 1: return VisibilityAttrVisibilityType::HIDDEN;
     case 2: return VisibilityAttrVisibilityType::PROTECTED;
@@ -4671,7 +4671,7 @@ VisibilityAttrVisibilityType FromPasta(pasta::VisibilityAttrVisibilityType e) {
 }
 
 WarnUnusedAttrSpelling FromPasta(pasta::WarnUnusedAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return WarnUnusedAttrSpelling::GNU_WARN_UNUSED;
     case 1: return WarnUnusedAttrSpelling::CXX11_GNU_WARN_UNUSED;
     case 2: return WarnUnusedAttrSpelling::C2X_GNU_WARN_UNUSED;
@@ -4681,7 +4681,7 @@ WarnUnusedAttrSpelling FromPasta(pasta::WarnUnusedAttrSpelling e) {
 }
 
 WarnUnusedResultAttrSpelling FromPasta(pasta::WarnUnusedResultAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return WarnUnusedResultAttrSpelling::CXX11_NODISCARD;
     case 1: return WarnUnusedResultAttrSpelling::C2X_NODISCARD;
     case 2: return WarnUnusedResultAttrSpelling::CXX11_CLANG_WARN_UNUSED_RESULT;
@@ -4694,7 +4694,7 @@ WarnUnusedResultAttrSpelling FromPasta(pasta::WarnUnusedResultAttrSpelling e) {
 }
 
 WeakAttrSpelling FromPasta(pasta::WeakAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return WeakAttrSpelling::GNU_WEAK;
     case 1: return WeakAttrSpelling::CXX11_GNU_WEAK;
     case 2: return WeakAttrSpelling::C2X_GNU_WEAK;
@@ -4704,7 +4704,7 @@ WeakAttrSpelling FromPasta(pasta::WeakAttrSpelling e) {
 }
 
 WeakImportAttrSpelling FromPasta(pasta::WeakImportAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return WeakImportAttrSpelling::GNU_WEAK_IMPORT;
     case 1: return WeakImportAttrSpelling::CXX11_CLANG_WEAK_IMPORT;
     case 2: return WeakImportAttrSpelling::C2X_CLANG_WEAK_IMPORT;
@@ -4714,7 +4714,7 @@ WeakImportAttrSpelling FromPasta(pasta::WeakImportAttrSpelling e) {
 }
 
 WeakRefAttrSpelling FromPasta(pasta::WeakRefAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return WeakRefAttrSpelling::GNU_WEAKREF;
     case 1: return WeakRefAttrSpelling::CXX11_GNU_WEAKREF;
     case 2: return WeakRefAttrSpelling::C2X_GNU_WEAKREF;
@@ -4724,7 +4724,7 @@ WeakRefAttrSpelling FromPasta(pasta::WeakRefAttrSpelling e) {
 }
 
 WebAssemblyExportNameAttrSpelling FromPasta(pasta::WebAssemblyExportNameAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return WebAssemblyExportNameAttrSpelling::GNU_EXPORT_NAME;
     case 1: return WebAssemblyExportNameAttrSpelling::CXX11_CLANG_EXPORT_NAME;
     case 2: return WebAssemblyExportNameAttrSpelling::C2X_CLANG_EXPORT_NAME;
@@ -4734,7 +4734,7 @@ WebAssemblyExportNameAttrSpelling FromPasta(pasta::WebAssemblyExportNameAttrSpel
 }
 
 WebAssemblyImportModuleAttrSpelling FromPasta(pasta::WebAssemblyImportModuleAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return WebAssemblyImportModuleAttrSpelling::GNU_IMPORT_MODULE;
     case 1: return WebAssemblyImportModuleAttrSpelling::CXX11_CLANG_IMPORT_MODULE;
     case 2: return WebAssemblyImportModuleAttrSpelling::C2X_CLANG_IMPORT_MODULE;
@@ -4744,7 +4744,7 @@ WebAssemblyImportModuleAttrSpelling FromPasta(pasta::WebAssemblyImportModuleAttr
 }
 
 WebAssemblyImportNameAttrSpelling FromPasta(pasta::WebAssemblyImportNameAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return WebAssemblyImportNameAttrSpelling::GNU_IMPORT_NAME;
     case 1: return WebAssemblyImportNameAttrSpelling::CXX11_CLANG_IMPORT_NAME;
     case 2: return WebAssemblyImportNameAttrSpelling::C2X_CLANG_IMPORT_NAME;
@@ -4754,7 +4754,7 @@ WebAssemblyImportNameAttrSpelling FromPasta(pasta::WebAssemblyImportNameAttrSpel
 }
 
 X86ForceAlignArgPointerAttrSpelling FromPasta(pasta::X86ForceAlignArgPointerAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return X86ForceAlignArgPointerAttrSpelling::GNU_FORCE_ALIGN_ARGUMENT_POINTER;
     case 1: return X86ForceAlignArgPointerAttrSpelling::CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER;
     case 2: return X86ForceAlignArgPointerAttrSpelling::C2X_GNU_FORCE_ALIGN_ARGUMENT_POINTER;
@@ -4764,7 +4764,7 @@ X86ForceAlignArgPointerAttrSpelling FromPasta(pasta::X86ForceAlignArgPointerAttr
 }
 
 XRayInstrumentAttrSpelling FromPasta(pasta::XRayInstrumentAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return XRayInstrumentAttrSpelling::GNU_XRAY_ALWAYS_INSTRUMENT;
     case 1: return XRayInstrumentAttrSpelling::CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT;
     case 2: return XRayInstrumentAttrSpelling::C2X_CLANG_XRAY_ALWAYS_INSTRUMENT;
@@ -4777,7 +4777,7 @@ XRayInstrumentAttrSpelling FromPasta(pasta::XRayInstrumentAttrSpelling e) {
 }
 
 XRayLogArgsAttrSpelling FromPasta(pasta::XRayLogArgsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return XRayLogArgsAttrSpelling::GNU_XRAY_LOG_ARGUMENTS;
     case 1: return XRayLogArgsAttrSpelling::CXX11_CLANG_XRAY_LOG_ARGUMENTS;
     case 2: return XRayLogArgsAttrSpelling::C2X_CLANG_XRAY_LOG_ARGUMENTS;
@@ -4787,7 +4787,7 @@ XRayLogArgsAttrSpelling FromPasta(pasta::XRayLogArgsAttrSpelling e) {
 }
 
 ZeroCallUsedRegsAttrSpelling FromPasta(pasta::ZeroCallUsedRegsAttrSpelling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ZeroCallUsedRegsAttrSpelling::GNU_ZERO_CALL_USED_REGS;
     case 1: return ZeroCallUsedRegsAttrSpelling::CXX11_GNU_ZERO_CALL_USED_REGS;
     case 2: return ZeroCallUsedRegsAttrSpelling::C2X_GNU_ZERO_CALL_USED_REGS;
@@ -4797,7 +4797,7 @@ ZeroCallUsedRegsAttrSpelling FromPasta(pasta::ZeroCallUsedRegsAttrSpelling e) {
 }
 
 ZeroCallUsedRegsAttrZeroCallUsedRegsKind FromPasta(pasta::ZeroCallUsedRegsAttrZeroCallUsedRegsKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ZeroCallUsedRegsAttrZeroCallUsedRegsKind::SKIP;
     case 1: return ZeroCallUsedRegsAttrZeroCallUsedRegsKind::USED_GPR_ARG;
     case 2: return ZeroCallUsedRegsAttrZeroCallUsedRegsKind::USED_GPR;
@@ -4812,7 +4812,7 @@ ZeroCallUsedRegsAttrZeroCallUsedRegsKind FromPasta(pasta::ZeroCallUsedRegsAttrZe
 }
 
 ASTDumpOutputFormat FromPasta(pasta::ASTDumpOutputFormat e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ASTDumpOutputFormat::DEFAULT;
     case 1: return ASTDumpOutputFormat::JSON;
     default: __builtin_unreachable();
@@ -4820,7 +4820,7 @@ ASTDumpOutputFormat FromPasta(pasta::ASTDumpOutputFormat e) {
 }
 
 AccessSpecifier FromPasta(pasta::AccessSpecifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AccessSpecifier::PUBLIC;
     case 1: return AccessSpecifier::PROTECTED;
     case 2: return AccessSpecifier::PRIVATE;
@@ -4830,7 +4830,7 @@ AccessSpecifier FromPasta(pasta::AccessSpecifier e) {
 }
 
 AddrSpaceMapMangling FromPasta(pasta::AddrSpaceMapMangling e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AddrSpaceMapMangling::TARGET;
     case 1: return AddrSpaceMapMangling::ON;
     case 2: return AddrSpaceMapMangling::OFF;
@@ -4839,7 +4839,7 @@ AddrSpaceMapMangling FromPasta(pasta::AddrSpaceMapMangling e) {
 }
 
 AlignRequirementKind FromPasta(pasta::AlignRequirementKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return AlignRequirementKind::NONE;
     case 1: return AlignRequirementKind::REQUIRED_BY_TYPEDEF;
     case 2: return AlignRequirementKind::REQUIRED_BY_RECORD;
@@ -4849,7 +4849,7 @@ AlignRequirementKind FromPasta(pasta::AlignRequirementKind e) {
 }
 
 AltivecSrcCompatKind FromPasta(pasta::AltivecSrcCompatKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return AltivecSrcCompatKind::MIXED;
     case 1: return AltivecSrcCompatKind::GCC;
     case 2: return AltivecSrcCompatKind::XL;
@@ -4858,7 +4858,7 @@ AltivecSrcCompatKind FromPasta(pasta::AltivecSrcCompatKind e) {
 }
 
 ArgumentKind FromPasta(pasta::ArgumentKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ArgumentKind::STD_STRING;
     case 1: return ArgumentKind::C_STRING;
     case 2: return ArgumentKind::SINT;
@@ -4879,7 +4879,7 @@ ArgumentKind FromPasta(pasta::ArgumentKind e) {
 }
 
 ArrayTypeTrait FromPasta(pasta::ArrayTypeTrait e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ArrayTypeTrait::ARRAY_RANK;
     case 1: return ArrayTypeTrait::ARRAY_EXTENT;
     default: __builtin_unreachable();
@@ -4887,7 +4887,7 @@ ArrayTypeTrait FromPasta(pasta::ArrayTypeTrait e) {
 }
 
 AtomicScopeModelKind FromPasta(pasta::AtomicScopeModelKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return AtomicScopeModelKind::NONE;
     case 1: return AtomicScopeModelKind::OPEN_CL;
     case 2: return AtomicScopeModelKind::HIP;
@@ -4896,7 +4896,7 @@ AtomicScopeModelKind FromPasta(pasta::AtomicScopeModelKind e) {
 }
 
 AutoTypeKeyword FromPasta(pasta::AutoTypeKeyword e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return AutoTypeKeyword::AUTO;
     case 1: return AutoTypeKeyword::DECLTYPE_AUTO;
     case 2: return AutoTypeKeyword::GNU_AUTO_TYPE;
@@ -4905,7 +4905,7 @@ AutoTypeKeyword FromPasta(pasta::AutoTypeKeyword e) {
 }
 
 AvailabilityResult FromPasta(pasta::AvailabilityResult e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AvailabilityResult::AVAILABLE;
     case 1: return AvailabilityResult::NOT_YET_INTRODUCED;
     case 2: return AvailabilityResult::DEPRECATED;
@@ -4915,7 +4915,7 @@ AvailabilityResult FromPasta(pasta::AvailabilityResult e) {
 }
 
 BinaryOperatorKind FromPasta(pasta::BinaryOperatorKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return BinaryOperatorKind::POINTER_MEMORY_D;
     case 1: return BinaryOperatorKind::POINTER_MEMORY_I;
     case 2: return BinaryOperatorKind::MUL;
@@ -4954,7 +4954,7 @@ BinaryOperatorKind FromPasta(pasta::BinaryOperatorKind e) {
 }
 
 Bits FromPasta(pasta::Bits e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return Bits::NONE;
     case 1: return Bits::UNEXPANDED_PACK;
     case 2: return Bits::INSTANTIATION;
@@ -4970,7 +4970,7 @@ Bits FromPasta(pasta::Bits e) {
 }
 
 CallingConv FromPasta(pasta::CallingConv e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CallingConv::C;
     case 1: return CallingConv::X86_STD_CALL;
     case 2: return CallingConv::X86_FAST_CALL;
@@ -4997,7 +4997,7 @@ CallingConv FromPasta(pasta::CallingConv e) {
 }
 
 CanThrowResult FromPasta(pasta::CanThrowResult e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CanThrowResult::CANNOT;
     case 1: return CanThrowResult::DEPENDENT;
     case 2: return CanThrowResult::CAN;
@@ -5006,7 +5006,7 @@ CanThrowResult FromPasta(pasta::CanThrowResult e) {
 }
 
 CapturedRegionKind FromPasta(pasta::CapturedRegionKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CapturedRegionKind::DEFAULT;
     case 1: return CapturedRegionKind::OBJ_C_AT_FINALLY;
     case 2: return CapturedRegionKind::OPEN_MP;
@@ -5015,7 +5015,7 @@ CapturedRegionKind FromPasta(pasta::CapturedRegionKind e) {
 }
 
 CastKind FromPasta(pasta::CastKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CastKind::DEPENDENT;
     case 1: return CastKind::BIT_CAST;
     case 2: return CastKind::L_VALUE_BIT_CAST;
@@ -5086,7 +5086,7 @@ CastKind FromPasta(pasta::CastKind e) {
 }
 
 ClangABI FromPasta(pasta::ClangABI e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ClangABI::VER38;
     case 1: return ClangABI::VER4;
     case 2: return ClangABI::VER6;
@@ -5102,7 +5102,7 @@ ClangABI FromPasta(pasta::ClangABI e) {
 }
 
 CommentKind FromPasta(pasta::CommentKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CommentKind::INVALID;
     case 1: return CommentKind::ORDINARY_BCPL;
     case 2: return CommentKind::ORDINARY_C;
@@ -5116,7 +5116,7 @@ CommentKind FromPasta(pasta::CommentKind e) {
 }
 
 ComparisonCategoryResult FromPasta(pasta::ComparisonCategoryResult e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return ComparisonCategoryResult::EQUAL;
     case 1: return ComparisonCategoryResult::EQUIVALENT;
     case 2: return ComparisonCategoryResult::LESS;
@@ -5127,7 +5127,7 @@ ComparisonCategoryResult FromPasta(pasta::ComparisonCategoryResult e) {
 }
 
 ComparisonCategoryType FromPasta(pasta::ComparisonCategoryType e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return ComparisonCategoryType::PARTIAL_ORDERING;
     case 1: return ComparisonCategoryType::WEAK_ORDERING;
     case 2: return ComparisonCategoryType::STRONG_ORDERING;
@@ -5136,7 +5136,7 @@ ComparisonCategoryType FromPasta(pasta::ComparisonCategoryType e) {
 }
 
 CompilingModuleKind FromPasta(pasta::CompilingModuleKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CompilingModuleKind::NONE;
     case 1: return CompilingModuleKind::MODULE_MAP;
     case 2: return CompilingModuleKind::HEADER_UNIT;
@@ -5146,7 +5146,7 @@ CompilingModuleKind FromPasta(pasta::CompilingModuleKind e) {
 }
 
 ConstexprSpecKind FromPasta(pasta::ConstexprSpecKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ConstexprSpecKind::UNSPECIFIED;
     case 1: return ConstexprSpecKind::CONSTEXPR;
     case 2: return ConstexprSpecKind::CONSTEVAL;
@@ -5156,7 +5156,7 @@ ConstexprSpecKind FromPasta(pasta::ConstexprSpecKind e) {
 }
 
 CoreFoundationABI FromPasta(pasta::CoreFoundationABI e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return CoreFoundationABI::UNSPECIFIED;
     case 1: return CoreFoundationABI::STANDALONE;
     case 2: return CoreFoundationABI::OBJECTIVE_C;
@@ -5169,7 +5169,7 @@ CoreFoundationABI FromPasta(pasta::CoreFoundationABI e) {
 }
 
 DataPositionTy FromPasta(pasta::DataPositionTy e) {
-  switch (static_cast<unsigned long>(e)) {
+  switch (static_cast<uint64_t>(e)) {
     case 0: return DataPositionTy::POSX;
     case 1: return DataPositionTy::POSV;
     case 2: return DataPositionTy::POSE;
@@ -5182,7 +5182,7 @@ DataPositionTy FromPasta(pasta::DataPositionTy e) {
 }
 
 DebugSrcHashKind FromPasta(pasta::DebugSrcHashKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DebugSrcHashKind::DSHMD5;
     case 1: return DebugSrcHashKind::DSHSHA1;
     case 2: return DebugSrcHashKind::DSHSHA256;
@@ -5191,7 +5191,7 @@ DebugSrcHashKind FromPasta(pasta::DebugSrcHashKind e) {
 }
 
 DefaultArgKind FromPasta(pasta::DefaultArgKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DefaultArgKind::NONE;
     case 1: return DefaultArgKind::UNPARSED;
     case 2: return DefaultArgKind::UNINSTANTIATED;
@@ -5201,7 +5201,7 @@ DefaultArgKind FromPasta(pasta::DefaultArgKind e) {
 }
 
 DefaultCallingConvention FromPasta(pasta::DefaultCallingConvention e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DefaultCallingConvention::NONE;
     case 1: return DefaultCallingConvention::C_DECL;
     case 2: return DefaultCallingConvention::FAST_CALL;
@@ -5213,7 +5213,7 @@ DefaultCallingConvention FromPasta(pasta::DefaultCallingConvention e) {
 }
 
 DefaultVisiblityExportMapping FromPasta(pasta::DefaultVisiblityExportMapping e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return DefaultVisiblityExportMapping::NONE;
     case 1: return DefaultVisiblityExportMapping::EXPLICIT;
     case 2: return DefaultVisiblityExportMapping::ALL;
@@ -5222,7 +5222,7 @@ DefaultVisiblityExportMapping FromPasta(pasta::DefaultVisiblityExportMapping e) 
 }
 
 DiagnosticLevelMask FromPasta(pasta::DiagnosticLevelMask e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DiagnosticLevelMask::NONE;
     case 1: return DiagnosticLevelMask::NOTE;
     case 2: return DiagnosticLevelMask::REMARK;
@@ -5234,7 +5234,7 @@ DiagnosticLevelMask FromPasta(pasta::DiagnosticLevelMask e) {
 }
 
 ElaboratedTypeKeyword FromPasta(pasta::ElaboratedTypeKeyword e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ElaboratedTypeKeyword::STRUCT;
     case 1: return ElaboratedTypeKeyword::INTERFACE;
     case 2: return ElaboratedTypeKeyword::UNION;
@@ -5247,7 +5247,7 @@ ElaboratedTypeKeyword FromPasta(pasta::ElaboratedTypeKeyword e) {
 }
 
 EmbedBitcodeKind FromPasta(pasta::EmbedBitcodeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return EmbedBitcodeKind::EMBED_OFF;
     case 1: return EmbedBitcodeKind::EMBED_ALL;
     case 2: return EmbedBitcodeKind::EMBED_BITCODE;
@@ -5257,7 +5257,7 @@ EmbedBitcodeKind FromPasta(pasta::EmbedBitcodeKind e) {
 }
 
 EscapeChar FromPasta(pasta::EscapeChar e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 1: return EscapeChar::SINGLE;
     case 2: return EscapeChar::DOUBLE;
     case 3: return EscapeChar::SINGLE_AND_DOUBLE;
@@ -5266,7 +5266,7 @@ EscapeChar FromPasta(pasta::EscapeChar e) {
 }
 
 ExceptionHandlingKind FromPasta(pasta::ExceptionHandlingKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ExceptionHandlingKind::NONE;
     case 1: return ExceptionHandlingKind::SJ_LJ;
     case 2: return ExceptionHandlingKind::WIN_EH;
@@ -5277,7 +5277,7 @@ ExceptionHandlingKind FromPasta(pasta::ExceptionHandlingKind e) {
 }
 
 ExceptionSpecificationType FromPasta(pasta::ExceptionSpecificationType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExceptionSpecificationType::NONE;
     case 1: return ExceptionSpecificationType::DYNAMIC_NONE;
     case 2: return ExceptionSpecificationType::DYNAMIC;
@@ -5295,7 +5295,7 @@ ExceptionSpecificationType FromPasta(pasta::ExceptionSpecificationType e) {
 }
 
 ExcessPrecisionKind FromPasta(pasta::ExcessPrecisionKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExcessPrecisionKind::FPP_STANDARD;
     case 1: return ExcessPrecisionKind::FPP_FAST;
     case 2: return ExcessPrecisionKind::FPP_NONE;
@@ -5304,7 +5304,7 @@ ExcessPrecisionKind FromPasta(pasta::ExcessPrecisionKind e) {
 }
 
 ExclusionType FromPasta(pasta::ExclusionType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExclusionType::ALLOW;
     case 1: return ExclusionType::SKIP;
     case 2: return ExclusionType::FORBID;
@@ -5313,7 +5313,7 @@ ExclusionType FromPasta(pasta::ExclusionType e) {
 }
 
 ExplicitSpecKind FromPasta(pasta::ExplicitSpecKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExplicitSpecKind::RESOLVED_FALSE;
     case 1: return ExplicitSpecKind::RESOLVED_TRUE;
     case 2: return ExplicitSpecKind::UNRESOLVED;
@@ -5322,7 +5322,7 @@ ExplicitSpecKind FromPasta(pasta::ExplicitSpecKind e) {
 }
 
 ExprDependence FromPasta(pasta::ExprDependence e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 1: return ExprDependence::UNEXPANDED_PACK;
     case 2: return ExprDependence::INSTANTIATION;
     case 4: return ExprDependence::TYPE;
@@ -5340,7 +5340,7 @@ ExprDependence FromPasta(pasta::ExprDependence e) {
 }
 
 ExprObjectKind FromPasta(pasta::ExprObjectKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExprObjectKind::ORDINARY;
     case 1: return ExprObjectKind::BIT_FIELD;
     case 2: return ExprObjectKind::VECTOR_COMPONENT;
@@ -5352,7 +5352,7 @@ ExprObjectKind FromPasta(pasta::ExprObjectKind e) {
 }
 
 ExprOffsets FromPasta(pasta::ExprOffsets e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ExprOffsets::ALLOCATOR;
     case 1: return ExprOffsets::ALLOCATOR_TRAITS;
     case 2: return ExprOffsets::TOTAL;
@@ -5361,7 +5361,7 @@ ExprOffsets FromPasta(pasta::ExprOffsets e) {
 }
 
 ExprValueKind FromPasta(pasta::ExprValueKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExprValueKind::PR_VALUE;
     case 1: return ExprValueKind::L_VALUE;
     case 2: return ExprValueKind::X_VALUE;
@@ -5370,7 +5370,7 @@ ExprValueKind FromPasta(pasta::ExprValueKind e) {
 }
 
 ExpressionTrait FromPasta(pasta::ExpressionTrait e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExpressionTrait::IS_L_VALUE_EXPRESSION;
     case 1: return ExpressionTrait::IS_R_VALUE_EXPRESSION;
     default: __builtin_unreachable();
@@ -5378,7 +5378,7 @@ ExpressionTrait FromPasta(pasta::ExpressionTrait e) {
 }
 
 ExtKind FromPasta(pasta::ExtKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ExtKind::ALWAYS;
     case 1: return ExtKind::NEVER;
     case 2: return ExtKind::REPLY_HAZY;
@@ -5387,7 +5387,7 @@ ExtKind FromPasta(pasta::ExtKind e) {
 }
 
 ExtendArgsKind FromPasta(pasta::ExtendArgsKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ExtendArgsKind::EXTEND_TO32;
     case 1: return ExtendArgsKind::EXTEND_TO64;
     default: __builtin_unreachable();
@@ -5395,7 +5395,7 @@ ExtendArgsKind FromPasta(pasta::ExtendArgsKind e) {
 }
 
 FPEvalMethodKind FromPasta(pasta::FPEvalMethodKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case -1: return FPEvalMethodKind::FEM_INDETERMINABLE;
     case 0: return FPEvalMethodKind::FEM_SOURCE;
     case 1: return FPEvalMethodKind::FEM_DOUBLE;
@@ -5406,7 +5406,7 @@ FPEvalMethodKind FromPasta(pasta::FPEvalMethodKind e) {
 }
 
 FPExceptionModeKind FromPasta(pasta::FPExceptionModeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FPExceptionModeKind::IGNORE;
     case 1: return FPExceptionModeKind::MAY_TRAP;
     case 2: return FPExceptionModeKind::STRICT;
@@ -5416,7 +5416,7 @@ FPExceptionModeKind FromPasta(pasta::FPExceptionModeKind e) {
 }
 
 FPModeKind FromPasta(pasta::FPModeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FPModeKind::OFF;
     case 1: return FPModeKind::ON;
     case 2: return FPModeKind::FAST;
@@ -5426,7 +5426,7 @@ FPModeKind FromPasta(pasta::FPModeKind e) {
 }
 
 FiniteLoopsKind FromPasta(pasta::FiniteLoopsKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return FiniteLoopsKind::LANGUAGE;
     case 1: return FiniteLoopsKind::ALWAYS;
     case 2: return FiniteLoopsKind::NEVER;
@@ -5435,7 +5435,7 @@ FiniteLoopsKind FromPasta(pasta::FiniteLoopsKind e) {
 }
 
 Flags FromPasta(pasta::Flags e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return Flags::F_INLINE;
     case 2: return Flags::F_NESTED;
     default: __builtin_unreachable();
@@ -5443,7 +5443,7 @@ Flags FromPasta(pasta::Flags e) {
 }
 
 FramePointerKind FromPasta(pasta::FramePointerKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return FramePointerKind::NONE;
     case 1: return FramePointerKind::NON_LEAF;
     case 2: return FramePointerKind::ALL;
@@ -5452,7 +5452,7 @@ FramePointerKind FromPasta(pasta::FramePointerKind e) {
 }
 
 GC FromPasta(pasta::GC e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return GC::GC_NONE;
     case 1: return GC::WEAK;
     case 2: return GC::STRONG;
@@ -5461,7 +5461,7 @@ GC FromPasta(pasta::GC e) {
 }
 
 GCMode FromPasta(pasta::GCMode e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return GCMode::NON_GC;
     case 1: return GCMode::GC_ONLY;
     case 2: return GCMode::HYBRID_GC;
@@ -5470,7 +5470,7 @@ GCMode FromPasta(pasta::GCMode e) {
 }
 
 GPUDefaultStreamKind FromPasta(pasta::GPUDefaultStreamKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return GPUDefaultStreamKind::LEGACY;
     case 1: return GPUDefaultStreamKind::PER_THREAD;
     default: __builtin_unreachable();
@@ -5478,7 +5478,7 @@ GPUDefaultStreamKind FromPasta(pasta::GPUDefaultStreamKind e) {
 }
 
 GVALinkage FromPasta(pasta::GVALinkage e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return GVALinkage::INTERNAL;
     case 1: return GVALinkage::AVAILABLE_EXTERNALLY;
     case 2: return GVALinkage::DISCARDABLE_ODR;
@@ -5489,7 +5489,7 @@ GVALinkage FromPasta(pasta::GVALinkage e) {
 }
 
 GetBuiltinTypeError FromPasta(pasta::GetBuiltinTypeError e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return GetBuiltinTypeError::NONE;
     case 1: return GetBuiltinTypeError::MISSING_TYPE;
     case 2: return GetBuiltinTypeError::MISSING_STDIO;
@@ -5500,7 +5500,7 @@ GetBuiltinTypeError FromPasta(pasta::GetBuiltinTypeError e) {
 }
 
 HLSLLangStd FromPasta(pasta::HLSLLangStd e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return HLSLLangStd::HLSL_UNSET;
     case 2015: return HLSLLangStd::HLSL2015;
     case 2016: return HLSLLangStd::HLSL2016;
@@ -5513,7 +5513,7 @@ HLSLLangStd FromPasta(pasta::HLSLLangStd e) {
 }
 
 ID FromPasta(pasta::ID e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return ID::WORK_GROUP;
     case 2: return ID::DEVICE;
     case 3: return ID::ALL_SVM_DEVICES;
@@ -5523,7 +5523,7 @@ ID FromPasta(pasta::ID e) {
 }
 
 IdentifierInfoFlag FromPasta(pasta::IdentifierInfoFlag e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return IdentifierInfoFlag::ZERO_ARGUMENT;
     case 2: return IdentifierInfoFlag::ONE_ARGUMENT;
     case 7: return IdentifierInfoFlag::MULTI_ARGUMENT;
@@ -5532,7 +5532,7 @@ IdentifierInfoFlag FromPasta(pasta::IdentifierInfoFlag e) {
 }
 
 IfStatementKind FromPasta(pasta::IfStatementKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return IfStatementKind::ORDINARY;
     case 1: return IfStatementKind::CONSTEXPR;
     case 2: return IfStatementKind::CONSTEVAL_NON_NEGATED;
@@ -5542,7 +5542,7 @@ IfStatementKind FromPasta(pasta::IfStatementKind e) {
 }
 
 ImbueAttribute FromPasta(pasta::ImbueAttribute e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ImbueAttribute::NONE;
     case 1: return ImbueAttribute::ALWAYS;
     case 2: return ImbueAttribute::NEVER;
@@ -5552,7 +5552,7 @@ ImbueAttribute FromPasta(pasta::ImbueAttribute e) {
 }
 
 InClassInitStyle FromPasta(pasta::InClassInitStyle e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return InClassInitStyle::NO_INITIALIZER;
     case 1: return InClassInitStyle::COPY_INITIALIZER;
     case 2: return InClassInitStyle::LIST_INITIALIZER;
@@ -5561,7 +5561,7 @@ InClassInitStyle FromPasta(pasta::InClassInitStyle e) {
 }
 
 InheritedDesignatedInitializersState FromPasta(pasta::InheritedDesignatedInitializersState e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return InheritedDesignatedInitializersState::UNKNOWN;
     case 1: return InheritedDesignatedInitializersState::INHERITED;
     case 2: return InheritedDesignatedInitializersState::NOT_INHERITED;
@@ -5570,7 +5570,7 @@ InheritedDesignatedInitializersState FromPasta(pasta::InheritedDesignatedInitial
 }
 
 InitStorageKind FromPasta(pasta::InitStorageKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return InitStorageKind::NO_INITIALIZER;
     case 1: return InitStorageKind::IN_CLASS_COPY_INITIALIZER;
     case 2: return InitStorageKind::IN_CLASS_LIST_INITIALIZER;
@@ -5580,7 +5580,7 @@ InitStorageKind FromPasta(pasta::InitStorageKind e) {
 }
 
 InlineAsmDialectKind FromPasta(pasta::InlineAsmDialectKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return InlineAsmDialectKind::IADATT;
     case 1: return InlineAsmDialectKind::IAD_INTEL;
     default: __builtin_unreachable();
@@ -5588,7 +5588,7 @@ InlineAsmDialectKind FromPasta(pasta::InlineAsmDialectKind e) {
 }
 
 InlineVariableDefinitionKind FromPasta(pasta::InlineVariableDefinitionKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return InlineVariableDefinitionKind::NONE;
     case 1: return InlineVariableDefinitionKind::WEAK;
     case 2: return InlineVariableDefinitionKind::WEAK_UNKNOWN;
@@ -5598,7 +5598,7 @@ InlineVariableDefinitionKind FromPasta(pasta::InlineVariableDefinitionKind e) {
 }
 
 InliningMethod FromPasta(pasta::InliningMethod e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return InliningMethod::NORMAL_INLINING;
     case 1: return InliningMethod::ONLY_HINT_INLINING;
     case 2: return InliningMethod::ONLY_ALWAYS_INLINING;
@@ -5607,7 +5607,7 @@ InliningMethod FromPasta(pasta::InliningMethod e) {
 }
 
 Kinds FromPasta(pasta::Kinds e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return Kinds::L_VALUE;
     case 1: return Kinds::X_VALUE;
     case 2: return Kinds::FUNCTION;
@@ -5625,7 +5625,7 @@ Kinds FromPasta(pasta::Kinds e) {
 }
 
 LambdaCaptureDefault FromPasta(pasta::LambdaCaptureDefault e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LambdaCaptureDefault::NONE;
     case 1: return LambdaCaptureDefault::BY_COPY;
     case 2: return LambdaCaptureDefault::BY_REFERENCE;
@@ -5634,7 +5634,7 @@ LambdaCaptureDefault FromPasta(pasta::LambdaCaptureDefault e) {
 }
 
 LambdaCaptureKind FromPasta(pasta::LambdaCaptureKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LambdaCaptureKind::THIS;
     case 1: return LambdaCaptureKind::STAR_THIS;
     case 2: return LambdaCaptureKind::BY_COPY;
@@ -5645,7 +5645,7 @@ LambdaCaptureKind FromPasta(pasta::LambdaCaptureKind e) {
 }
 
 LangAS FromPasta(pasta::LangAS e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LangAS::DEFAULT;
     case 1: return LangAS::OPENCL_GLOBAL;
     case 2: return LangAS::OPENCL_LOCAL;
@@ -5671,7 +5671,7 @@ LangAS FromPasta(pasta::LangAS e) {
 }
 
 LangFeatures FromPasta(pasta::LangFeatures e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return LangFeatures::LINE_COMMENT;
     case 2: return LangFeatures::C99;
     case 4: return LangFeatures::C11;
@@ -5693,7 +5693,7 @@ LangFeatures FromPasta(pasta::LangFeatures e) {
 }
 
 Language FromPasta(pasta::Language e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return Language::UNKNOWN;
     case 1: return Language::ASSEMBLY;
     case 2: return Language::LLVMIR;
@@ -5712,7 +5712,7 @@ Language FromPasta(pasta::Language e) {
 }
 
 LanguageLinkage FromPasta(pasta::LanguageLinkage e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return LanguageLinkage::C_LANGUAGE_LINKAGE;
     case 1: return LanguageLinkage::CXX_LANGUAGE_LINKAGE;
     case 2: return LanguageLinkage::NO_LANGUAGE_LINKAGE;
@@ -5721,7 +5721,7 @@ LanguageLinkage FromPasta(pasta::LanguageLinkage e) {
 }
 
 LaxVectorConversionKind FromPasta(pasta::LaxVectorConversionKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return LaxVectorConversionKind::NONE;
     case 1: return LaxVectorConversionKind::INTEGER;
     case 2: return LaxVectorConversionKind::ALL;
@@ -5730,7 +5730,7 @@ LaxVectorConversionKind FromPasta(pasta::LaxVectorConversionKind e) {
 }
 
 Level FromPasta(pasta::Level e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return Level::IGNORED;
     case 1: return Level::NOTE;
     case 2: return Level::REMARK;
@@ -5742,7 +5742,7 @@ Level FromPasta(pasta::Level e) {
 }
 
 Linkage FromPasta(pasta::Linkage e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return Linkage::NO_LINKAGE;
     case 1: return Linkage::INTERNAL_LINKAGE;
     case 2: return Linkage::UNIQUE_EXTERNAL_LINKAGE;
@@ -5755,7 +5755,7 @@ Linkage FromPasta(pasta::Linkage e) {
 }
 
 MSInheritanceModel FromPasta(pasta::MSInheritanceModel e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return MSInheritanceModel::SINGLE;
     case 1: return MSInheritanceModel::MULTIPLE;
     case 2: return MSInheritanceModel::VIRTUAL;
@@ -5765,7 +5765,7 @@ MSInheritanceModel FromPasta(pasta::MSInheritanceModel e) {
 }
 
 MSVCMajorVersion FromPasta(pasta::MSVCMajorVersion e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1600: return MSVCMajorVersion::MSVC2010;
     case 1700: return MSVCMajorVersion::MSVC2012;
     case 1800: return MSVCMajorVersion::MSVC2013;
@@ -5781,7 +5781,7 @@ MSVCMajorVersion FromPasta(pasta::MSVCMajorVersion e) {
 }
 
 MSVtorDispMode FromPasta(pasta::MSVtorDispMode e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return MSVtorDispMode::NEVER;
     case 1: return MSVtorDispMode::FOR_VIRTUAL_BASE_OVERRIDE;
     case 2: return MSVtorDispMode::FOR_VF_TABLE;
@@ -5790,7 +5790,7 @@ MSVtorDispMode FromPasta(pasta::MSVtorDispMode e) {
 }
 
 MethodRefFlags FromPasta(pasta::MethodRefFlags e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return MethodRefFlags::METHOD_REFERENCE_NONE;
     case 1: return MethodRefFlags::METHOD_REFERENCE_GETTER;
     case 2: return MethodRefFlags::METHOD_REFERENCE_SETTER;
@@ -5799,7 +5799,7 @@ MethodRefFlags FromPasta(pasta::MethodRefFlags e) {
 }
 
 ModifiableType FromPasta(pasta::ModifiableType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ModifiableType::UNTESTED;
     case 1: return ModifiableType::MODIFIABLE;
     case 2: return ModifiableType::R_VALUE;
@@ -5816,7 +5816,7 @@ ModifiableType FromPasta(pasta::ModifiableType e) {
 }
 
 MultiVersionKind FromPasta(pasta::MultiVersionKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return MultiVersionKind::NONE;
     case 1: return MultiVersionKind::TARGET;
     case 2: return MultiVersionKind::CPU_SPECIFIC;
@@ -5828,7 +5828,7 @@ MultiVersionKind FromPasta(pasta::MultiVersionKind e) {
 }
 
 NameKind FromPasta(pasta::NameKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NameKind::TEMPLATE;
     case 1: return NameKind::OVERLOADED_TEMPLATE;
     case 2: return NameKind::ASSUMED_TEMPLATE;
@@ -5842,14 +5842,14 @@ NameKind FromPasta(pasta::NameKind e) {
 }
 
 NeedExtraManglingDecl FromPasta(pasta::NeedExtraManglingDecl e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NeedExtraManglingDecl::NEED_EXTRA_MANGLING_DECLARATION;
     default: __builtin_unreachable();
   }
 }
 
 NestedNameSpecifierDependence FromPasta(pasta::NestedNameSpecifierDependence e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 1: return NestedNameSpecifierDependence::UNEXPANDED_PACK;
     case 2: return NestedNameSpecifierDependence::INSTANTIATION;
     case 4: return NestedNameSpecifierDependence::DEPENDENT;
@@ -5862,7 +5862,7 @@ NestedNameSpecifierDependence FromPasta(pasta::NestedNameSpecifierDependence e) 
 }
 
 NonOdrUseReason FromPasta(pasta::NonOdrUseReason e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NonOdrUseReason::NONE;
     case 1: return NonOdrUseReason::UNEVALUATED;
     case 2: return NonOdrUseReason::CONSTANT;
@@ -5872,14 +5872,14 @@ NonOdrUseReason FromPasta(pasta::NonOdrUseReason e) {
 }
 
 NonceObjCInterface FromPasta(pasta::NonceObjCInterface e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return NonceObjCInterface::OBJ_C_INTERFACE;
     default: __builtin_unreachable();
   }
 }
 
 NullabilityKind FromPasta(pasta::NullabilityKind e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return NullabilityKind::NON_NULL;
     case 1: return NullabilityKind::NULLABLE;
     case 2: return NullabilityKind::UNSPECIFIED;
@@ -5889,7 +5889,7 @@ NullabilityKind FromPasta(pasta::NullabilityKind e) {
 }
 
 ObjCBridgeCastKind FromPasta(pasta::ObjCBridgeCastKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCBridgeCastKind::BRIDGE;
     case 1: return ObjCBridgeCastKind::BRIDGE_TRANSFER;
     case 2: return ObjCBridgeCastKind::BRIDGE_RETAINED;
@@ -5898,7 +5898,7 @@ ObjCBridgeCastKind FromPasta(pasta::ObjCBridgeCastKind e) {
 }
 
 ObjCDispatchMethodKind FromPasta(pasta::ObjCDispatchMethodKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCDispatchMethodKind::LEGACY;
     case 1: return ObjCDispatchMethodKind::NON_LEGACY;
     case 2: return ObjCDispatchMethodKind::MIXED;
@@ -5907,7 +5907,7 @@ ObjCDispatchMethodKind FromPasta(pasta::ObjCDispatchMethodKind e) {
 }
 
 ObjCInstanceTypeFamily FromPasta(pasta::ObjCInstanceTypeFamily e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCInstanceTypeFamily::NONE;
     case 1: return ObjCInstanceTypeFamily::ARRAY;
     case 2: return ObjCInstanceTypeFamily::DICTIONARY;
@@ -5919,7 +5919,7 @@ ObjCInstanceTypeFamily FromPasta(pasta::ObjCInstanceTypeFamily e) {
 }
 
 ObjCLifetime FromPasta(pasta::ObjCLifetime e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCLifetime::NONE;
     case 1: return ObjCLifetime::EXPLICIT_NONE;
     case 2: return ObjCLifetime::STRONG;
@@ -5930,7 +5930,7 @@ ObjCLifetime FromPasta(pasta::ObjCLifetime e) {
 }
 
 ObjCMethodFamily FromPasta(pasta::ObjCMethodFamily e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCMethodFamily::NONE;
     case 1: return ObjCMethodFamily::ALLOC;
     case 2: return ObjCMethodFamily::COPY;
@@ -5951,7 +5951,7 @@ ObjCMethodFamily FromPasta(pasta::ObjCMethodFamily e) {
 }
 
 ObjCPropertyQueryKind FromPasta(pasta::ObjCPropertyQueryKind e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return ObjCPropertyQueryKind::QUERY_UNKNOWN;
     case 1: return ObjCPropertyQueryKind::QUERY_INSTANCE;
     case 2: return ObjCPropertyQueryKind::QUERY_CLASS;
@@ -5960,7 +5960,7 @@ ObjCPropertyQueryKind FromPasta(pasta::ObjCPropertyQueryKind e) {
 }
 
 ObjCStringFormatFamily FromPasta(pasta::ObjCStringFormatFamily e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ObjCStringFormatFamily::NONE;
     case 1: return ObjCStringFormatFamily::NS_STRING;
     case 2: return ObjCStringFormatFamily::CF_STRING;
@@ -5969,7 +5969,7 @@ ObjCStringFormatFamily FromPasta(pasta::ObjCStringFormatFamily e) {
 }
 
 ObjCSubstitutionContext FromPasta(pasta::ObjCSubstitutionContext e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ObjCSubstitutionContext::ORDINARY;
     case 1: return ObjCSubstitutionContext::RESULT;
     case 2: return ObjCSubstitutionContext::PARAMETER;
@@ -5980,7 +5980,7 @@ ObjCSubstitutionContext FromPasta(pasta::ObjCSubstitutionContext e) {
 }
 
 ObjCTypeParamVariance FromPasta(pasta::ObjCTypeParamVariance e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return ObjCTypeParamVariance::INVARIANT;
     case 1: return ObjCTypeParamVariance::COVARIANT;
     case 2: return ObjCTypeParamVariance::CONTRAVARIANT;
@@ -5989,7 +5989,7 @@ ObjCTypeParamVariance FromPasta(pasta::ObjCTypeParamVariance e) {
 }
 
 OnOffSwitch FromPasta(pasta::OnOffSwitch e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OnOffSwitch::ON;
     case 1: return OnOffSwitch::OFF;
     case 2: return OnOffSwitch::DEFAULT;
@@ -5998,14 +5998,14 @@ OnOffSwitch FromPasta(pasta::OnOffSwitch e) {
 }
 
 OnStackType FromPasta(pasta::OnStackType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OnStackType::ON_STACK;
     default: __builtin_unreachable();
   }
 }
 
 OpenMPAdjustArgsOpKind FromPasta(pasta::OpenMPAdjustArgsOpKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPAdjustArgsOpKind::ADJUSTARGS_NOTHING;
     case 1: return OpenMPAdjustArgsOpKind::ADJUSTARGS_NEED_DEVICE_POINTER;
     case 2: return OpenMPAdjustArgsOpKind::ADJUSTARGS_UNKNOWN;
@@ -6014,7 +6014,7 @@ OpenMPAdjustArgsOpKind FromPasta(pasta::OpenMPAdjustArgsOpKind e) {
 }
 
 OpenMPAtClauseKind FromPasta(pasta::OpenMPAtClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPAtClauseKind::AT_COMPILATION;
     case 1: return OpenMPAtClauseKind::AT_EXECUTION;
     case 2: return OpenMPAtClauseKind::AT_UNKNOWN;
@@ -6023,7 +6023,7 @@ OpenMPAtClauseKind FromPasta(pasta::OpenMPAtClauseKind e) {
 }
 
 OpenMPAtomicDefaultMemOrderClauseKind FromPasta(pasta::OpenMPAtomicDefaultMemOrderClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPAtomicDefaultMemOrderClauseKind::SEQ_CST;
     case 1: return OpenMPAtomicDefaultMemOrderClauseKind::ACQ_REL;
     case 2: return OpenMPAtomicDefaultMemOrderClauseKind::RELAXED;
@@ -6033,7 +6033,7 @@ OpenMPAtomicDefaultMemOrderClauseKind FromPasta(pasta::OpenMPAtomicDefaultMemOrd
 }
 
 OpenMPBindClauseKind FromPasta(pasta::OpenMPBindClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPBindClauseKind::BIND_TEAMS;
     case 1: return OpenMPBindClauseKind::BIND_PARALLEL;
     case 2: return OpenMPBindClauseKind::BIND_THREAD;
@@ -6043,7 +6043,7 @@ OpenMPBindClauseKind FromPasta(pasta::OpenMPBindClauseKind e) {
 }
 
 OpenMPDefaultmapClauseKind FromPasta(pasta::OpenMPDefaultmapClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPDefaultmapClauseKind::SCALAR;
     case 1: return OpenMPDefaultmapClauseKind::AGGREGATE;
     case 2: return OpenMPDefaultmapClauseKind::POINTER;
@@ -6053,7 +6053,7 @@ OpenMPDefaultmapClauseKind FromPasta(pasta::OpenMPDefaultmapClauseKind e) {
 }
 
 OpenMPDefaultmapClauseModifier FromPasta(pasta::OpenMPDefaultmapClauseModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 3: return OpenMPDefaultmapClauseModifier::UNKNOWN;
     case 4: return OpenMPDefaultmapClauseModifier::ALLOC;
     case 5: return OpenMPDefaultmapClauseModifier::TO;
@@ -6067,7 +6067,7 @@ OpenMPDefaultmapClauseModifier FromPasta(pasta::OpenMPDefaultmapClauseModifier e
 }
 
 OpenMPDependClauseKind FromPasta(pasta::OpenMPDependClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPDependClauseKind::IN;
     case 1: return OpenMPDependClauseKind::OUT;
     case 2: return OpenMPDependClauseKind::INOUT;
@@ -6084,7 +6084,7 @@ OpenMPDependClauseKind FromPasta(pasta::OpenMPDependClauseKind e) {
 }
 
 OpenMPDeviceClauseModifier FromPasta(pasta::OpenMPDeviceClauseModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPDeviceClauseModifier::ANCESTOR;
     case 1: return OpenMPDeviceClauseModifier::DEVICE_NUM;
     case 2: return OpenMPDeviceClauseModifier::UNKNOWN;
@@ -6093,7 +6093,7 @@ OpenMPDeviceClauseModifier FromPasta(pasta::OpenMPDeviceClauseModifier e) {
 }
 
 OpenMPDeviceType FromPasta(pasta::OpenMPDeviceType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPDeviceType::HOST;
     case 1: return OpenMPDeviceType::NOHOST;
     case 2: return OpenMPDeviceType::ANY;
@@ -6103,7 +6103,7 @@ OpenMPDeviceType FromPasta(pasta::OpenMPDeviceType e) {
 }
 
 OpenMPDistScheduleClauseKind FromPasta(pasta::OpenMPDistScheduleClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPDistScheduleClauseKind::STATIC;
     case 1: return OpenMPDistScheduleClauseKind::UNKNOWN;
     default: __builtin_unreachable();
@@ -6111,7 +6111,7 @@ OpenMPDistScheduleClauseKind FromPasta(pasta::OpenMPDistScheduleClauseKind e) {
 }
 
 OpenMPGrainsizeClauseModifier FromPasta(pasta::OpenMPGrainsizeClauseModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPGrainsizeClauseModifier::GRAINSIZE_STRICT;
     case 1: return OpenMPGrainsizeClauseModifier::GRAINSIZE_UNKNOWN;
     default: __builtin_unreachable();
@@ -6119,7 +6119,7 @@ OpenMPGrainsizeClauseModifier FromPasta(pasta::OpenMPGrainsizeClauseModifier e) 
 }
 
 OpenMPLastprivateModifier FromPasta(pasta::OpenMPLastprivateModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPLastprivateModifier::CONDITIONAL;
     case 1: return OpenMPLastprivateModifier::UNKNOWN;
     default: __builtin_unreachable();
@@ -6127,7 +6127,7 @@ OpenMPLastprivateModifier FromPasta(pasta::OpenMPLastprivateModifier e) {
 }
 
 OpenMPLinearClauseKind FromPasta(pasta::OpenMPLinearClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPLinearClauseKind::VALUE;
     case 1: return OpenMPLinearClauseKind::REFERENCE;
     case 2: return OpenMPLinearClauseKind::UVAL;
@@ -6137,7 +6137,7 @@ OpenMPLinearClauseKind FromPasta(pasta::OpenMPLinearClauseKind e) {
 }
 
 OpenMPMapClauseKind FromPasta(pasta::OpenMPMapClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPMapClauseKind::ALLOC;
     case 1: return OpenMPMapClauseKind::TO;
     case 2: return OpenMPMapClauseKind::FROM;
@@ -6150,7 +6150,7 @@ OpenMPMapClauseKind FromPasta(pasta::OpenMPMapClauseKind e) {
 }
 
 OpenMPMapModifierKind FromPasta(pasta::OpenMPMapModifierKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 6: return OpenMPMapModifierKind::UNKNOWN;
     case 7: return OpenMPMapModifierKind::ALWAYS;
     case 8: return OpenMPMapModifierKind::CLOSE;
@@ -6163,7 +6163,7 @@ OpenMPMapModifierKind FromPasta(pasta::OpenMPMapModifierKind e) {
 }
 
 OpenMPMotionModifierKind FromPasta(pasta::OpenMPMotionModifierKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPMotionModifierKind::MOTIONMODIFIER_MAPPER;
     case 1: return OpenMPMotionModifierKind::MOTIONMODIFIER_PRESENT;
     case 2: return OpenMPMotionModifierKind::MOTIONMODIFIER_UNKNOWN;
@@ -6172,7 +6172,7 @@ OpenMPMotionModifierKind FromPasta(pasta::OpenMPMotionModifierKind e) {
 }
 
 OpenMPNumTasksClauseModifier FromPasta(pasta::OpenMPNumTasksClauseModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPNumTasksClauseModifier::NUMTASKS_STRICT;
     case 1: return OpenMPNumTasksClauseModifier::NUMTASKS_UNKNOWN;
     default: __builtin_unreachable();
@@ -6180,7 +6180,7 @@ OpenMPNumTasksClauseModifier FromPasta(pasta::OpenMPNumTasksClauseModifier e) {
 }
 
 OpenMPOrderClauseKind FromPasta(pasta::OpenMPOrderClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPOrderClauseKind::CONCURRENT;
     case 1: return OpenMPOrderClauseKind::UNKNOWN;
     default: __builtin_unreachable();
@@ -6188,7 +6188,7 @@ OpenMPOrderClauseKind FromPasta(pasta::OpenMPOrderClauseKind e) {
 }
 
 OpenMPOrderClauseModifier FromPasta(pasta::OpenMPOrderClauseModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return OpenMPOrderClauseModifier::MODIFIER_UNKNOWN;
     case 2: return OpenMPOrderClauseModifier::MODIFIER_REPRODUCIBLE;
     case 3: return OpenMPOrderClauseModifier::MODIFIER_UNCONSTRAINED;
@@ -6198,7 +6198,7 @@ OpenMPOrderClauseModifier FromPasta(pasta::OpenMPOrderClauseModifier e) {
 }
 
 OpenMPReductionClauseModifier FromPasta(pasta::OpenMPReductionClauseModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPReductionClauseModifier::DEFAULT;
     case 1: return OpenMPReductionClauseModifier::INSCAN;
     case 2: return OpenMPReductionClauseModifier::TASK;
@@ -6208,7 +6208,7 @@ OpenMPReductionClauseModifier FromPasta(pasta::OpenMPReductionClauseModifier e) 
 }
 
 OpenMPScheduleClauseKind FromPasta(pasta::OpenMPScheduleClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPScheduleClauseKind::STATIC;
     case 1: return OpenMPScheduleClauseKind::DYNAMIC;
     case 2: return OpenMPScheduleClauseKind::GUIDED;
@@ -6220,7 +6220,7 @@ OpenMPScheduleClauseKind FromPasta(pasta::OpenMPScheduleClauseKind e) {
 }
 
 OpenMPScheduleClauseModifier FromPasta(pasta::OpenMPScheduleClauseModifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 5: return OpenMPScheduleClauseModifier::UNKNOWN;
     case 6: return OpenMPScheduleClauseModifier::MONOTONIC;
     case 7: return OpenMPScheduleClauseModifier::NONMONOTONIC;
@@ -6230,7 +6230,7 @@ OpenMPScheduleClauseModifier FromPasta(pasta::OpenMPScheduleClauseModifier e) {
 }
 
 OpenMPSeverityClauseKind FromPasta(pasta::OpenMPSeverityClauseKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OpenMPSeverityClauseKind::SEVERITY_FATAL;
     case 1: return OpenMPSeverityClauseKind::SEVERITY_WARNING;
     case 2: return OpenMPSeverityClauseKind::SEVERITY_UNKNOWN;
@@ -6239,7 +6239,7 @@ OpenMPSeverityClauseKind FromPasta(pasta::OpenMPSeverityClauseKind e) {
 }
 
 OverloadedOperatorKind FromPasta(pasta::OverloadedOperatorKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return OverloadedOperatorKind::NONE;
     case 1: return OverloadedOperatorKind::NEW;
     case 2: return OverloadedOperatorKind::DELETE;
@@ -6291,7 +6291,7 @@ OverloadedOperatorKind FromPasta(pasta::OverloadedOperatorKind e) {
 }
 
 OverloadsShown FromPasta(pasta::OverloadsShown e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return OverloadsShown::ALL;
     case 1: return OverloadsShown::BEST;
     default: __builtin_unreachable();
@@ -6299,7 +6299,7 @@ OverloadsShown FromPasta(pasta::OverloadsShown e) {
 }
 
 ParameterABI FromPasta(pasta::ParameterABI e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ParameterABI::ORDINARY;
     case 1: return ParameterABI::SWIFT_INDIRECT_RESULT;
     case 2: return ParameterABI::SWIFT_ERROR_RESULT;
@@ -6310,7 +6310,7 @@ ParameterABI FromPasta(pasta::ParameterABI e) {
 }
 
 ParenLocsOffsets FromPasta(pasta::ParenLocsOffsets e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ParenLocsOffsets::L_PAREN_TOKEN;
     case 1: return ParenLocsOffsets::R_PAREN_TOKEN;
     case 2: return ParenLocsOffsets::TOTAL;
@@ -6319,7 +6319,7 @@ ParenLocsOffsets FromPasta(pasta::ParenLocsOffsets e) {
 }
 
 PragmaFloatControlKind FromPasta(pasta::PragmaFloatControlKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PragmaFloatControlKind::UNKNOWN;
     case 1: return PragmaFloatControlKind::PRECISE;
     case 2: return PragmaFloatControlKind::NO_PRECISE;
@@ -6332,7 +6332,7 @@ PragmaFloatControlKind FromPasta(pasta::PragmaFloatControlKind e) {
 }
 
 PragmaMSCommentKind FromPasta(pasta::PragmaMSCommentKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PragmaMSCommentKind::UNKNOWN;
     case 1: return PragmaMSCommentKind::LINKER;
     case 2: return PragmaMSCommentKind::LIB;
@@ -6344,7 +6344,7 @@ PragmaMSCommentKind FromPasta(pasta::PragmaMSCommentKind e) {
 }
 
 PragmaMSPointersToMembersKind FromPasta(pasta::PragmaMSPointersToMembersKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PragmaMSPointersToMembersKind::BEST_CASE;
     case 1: return PragmaMSPointersToMembersKind::FULL_GENERALITY_SINGLE_INHERITANCE;
     case 2: return PragmaMSPointersToMembersKind::FULL_GENERALITY_MULTIPLE_INHERITANCE;
@@ -6354,7 +6354,7 @@ PragmaMSPointersToMembersKind FromPasta(pasta::PragmaMSPointersToMembersKind e) 
 }
 
 PragmaMSStructKind FromPasta(pasta::PragmaMSStructKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PragmaMSStructKind::OFF;
     case 1: return PragmaMSStructKind::ON;
     default: __builtin_unreachable();
@@ -6362,7 +6362,7 @@ PragmaMSStructKind FromPasta(pasta::PragmaMSStructKind e) {
 }
 
 PragmaSectionFlag FromPasta(pasta::PragmaSectionFlag e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return PragmaSectionFlag::NONE;
     case 1: return PragmaSectionFlag::READ;
     case 2: return PragmaSectionFlag::WRITE;
@@ -6375,7 +6375,7 @@ PragmaSectionFlag FromPasta(pasta::PragmaSectionFlag e) {
 }
 
 ProfileInstrKind FromPasta(pasta::ProfileInstrKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ProfileInstrKind::PROFILE_NONE;
     case 1: return ProfileInstrKind::PROFILE_CLANG_INSTR;
     case 2: return ProfileInstrKind::PROFILE_IR_INSTR;
@@ -6385,7 +6385,7 @@ ProfileInstrKind FromPasta(pasta::ProfileInstrKind e) {
 }
 
 Qualified FromPasta(pasta::Qualified e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return Qualified::NONE;
     case 1: return Qualified::AS_WRITTEN;
     case 2: return Qualified::FULLY;
@@ -6394,7 +6394,7 @@ Qualified FromPasta(pasta::Qualified e) {
 }
 
 RangeExprOffset FromPasta(pasta::RangeExprOffset e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return RangeExprOffset::BEGIN;
     case 1: return RangeExprOffset::END;
     case 2: return RangeExprOffset::STEP;
@@ -6404,7 +6404,7 @@ RangeExprOffset FromPasta(pasta::RangeExprOffset e) {
 }
 
 RangeLocOffset FromPasta(pasta::RangeLocOffset e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return RangeLocOffset::ASSIGN_TOKEN;
     case 2: return RangeLocOffset::SECOND_COLON_TOKEN;
     case 3: return RangeLocOffset::TOTAL;
@@ -6413,7 +6413,7 @@ RangeLocOffset FromPasta(pasta::RangeLocOffset e) {
 }
 
 RefQualifierKind FromPasta(pasta::RefQualifierKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RefQualifierKind::NONE;
     case 1: return RefQualifierKind::L_VALUE;
     case 2: return RefQualifierKind::R_VALUE;
@@ -6422,7 +6422,7 @@ RefQualifierKind FromPasta(pasta::RefQualifierKind e) {
 }
 
 RemarkKind FromPasta(pasta::RemarkKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return RemarkKind::MISSING;
     case 1: return RemarkKind::ENABLED;
     case 2: return RemarkKind::ENABLED_EVERYTHING;
@@ -6434,7 +6434,7 @@ RemarkKind FromPasta(pasta::RemarkKind e) {
 }
 
 ReservedIdentifierStatus FromPasta(pasta::ReservedIdentifierStatus e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ReservedIdentifierStatus::NOT_RESERVED;
     case 1: return ReservedIdentifierStatus::STARTS_WITH_UNDERSCORE_AT_GLOBAL_SCOPE;
     case 2: return ReservedIdentifierStatus::STARTS_WITH_UNDERSCORE_AND_IS_EXTERN_C;
@@ -6446,7 +6446,7 @@ ReservedIdentifierStatus FromPasta(pasta::ReservedIdentifierStatus e) {
 }
 
 SFINAEResponse FromPasta(pasta::SFINAEResponse e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SFINAEResponse::SUBSTITUTION_FAILURE;
     case 1: return SFINAEResponse::SUPPRESS;
     case 2: return SFINAEResponse::REPORT;
@@ -6456,7 +6456,7 @@ SFINAEResponse FromPasta(pasta::SFINAEResponse e) {
 }
 
 SYCLMajorVersion FromPasta(pasta::SYCLMajorVersion e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SYCLMajorVersion::VERSION_NONE;
     case 1: return SYCLMajorVersion::VERSION2017;
     case 2: return SYCLMajorVersion::VERSION2020;
@@ -6465,7 +6465,7 @@ SYCLMajorVersion FromPasta(pasta::SYCLMajorVersion e) {
 }
 
 SanitizerOrdinal FromPasta(pasta::SanitizerOrdinal e) {
-  switch (static_cast<unsigned long>(e)) {
+  switch (static_cast<uint64_t>(e)) {
     case 0: return SanitizerOrdinal::ADDRESS;
     case 1: return SanitizerOrdinal::POINTER_COMPARE;
     case 2: return SanitizerOrdinal::POINTER_SUBTRACT;
@@ -6542,7 +6542,7 @@ SanitizerOrdinal FromPasta(pasta::SanitizerOrdinal e) {
 }
 
 SelectorLocationsKind FromPasta(pasta::SelectorLocationsKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SelectorLocationsKind::NON_STANDARD;
     case 1: return SelectorLocationsKind::STANDARD_NO_SPACE;
     case 2: return SelectorLocationsKind::STANDARD_WITH_SPACE;
@@ -6551,7 +6551,7 @@ SelectorLocationsKind FromPasta(pasta::SelectorLocationsKind e) {
 }
 
 ShaderStage FromPasta(pasta::ShaderStage e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ShaderStage::PIXEL;
     case 1: return ShaderStage::VERTEX;
     case 2: return ShaderStage::GEOMETRY;
@@ -6573,7 +6573,7 @@ ShaderStage FromPasta(pasta::ShaderStage e) {
 }
 
 SignReturnAddressKeyKind FromPasta(pasta::SignReturnAddressKeyKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return SignReturnAddressKeyKind::A_KEY;
     case 1: return SignReturnAddressKeyKind::B_KEY;
     default: __builtin_unreachable();
@@ -6581,7 +6581,7 @@ SignReturnAddressKeyKind FromPasta(pasta::SignReturnAddressKeyKind e) {
 }
 
 SignReturnAddressScopeKind FromPasta(pasta::SignReturnAddressScopeKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return SignReturnAddressScopeKind::NONE;
     case 1: return SignReturnAddressScopeKind::NON_LEAF;
     case 2: return SignReturnAddressScopeKind::ALL;
@@ -6590,7 +6590,7 @@ SignReturnAddressScopeKind FromPasta(pasta::SignReturnAddressScopeKind e) {
 }
 
 SignedOverflowBehaviorTy FromPasta(pasta::SignedOverflowBehaviorTy e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SignedOverflowBehaviorTy::UNDEFINED;
     case 1: return SignedOverflowBehaviorTy::DEFINED;
     case 2: return SignedOverflowBehaviorTy::TRAPPING;
@@ -6599,7 +6599,7 @@ SignedOverflowBehaviorTy FromPasta(pasta::SignedOverflowBehaviorTy e) {
 }
 
 SpecialMemberFlags FromPasta(pasta::SpecialMemberFlags e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return SpecialMemberFlags::DEFAULT_CONSTRUCTOR;
     case 2: return SpecialMemberFlags::COPY_CONSTRUCTOR;
     case 4: return SpecialMemberFlags::MOVE_CONSTRUCTOR;
@@ -6612,7 +6612,7 @@ SpecialMemberFlags FromPasta(pasta::SpecialMemberFlags e) {
 }
 
 SpecifierKind FromPasta(pasta::SpecifierKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SpecifierKind::IDENTIFIER;
     case 1: return SpecifierKind::NAMESPACE;
     case 2: return SpecifierKind::NAMESPACE_ALIAS;
@@ -6625,7 +6625,7 @@ SpecifierKind FromPasta(pasta::SpecifierKind e) {
 }
 
 StackProtectorMode FromPasta(pasta::StackProtectorMode e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StackProtectorMode::OFF;
     case 1: return StackProtectorMode::ON;
     case 2: return StackProtectorMode::STRONG;
@@ -6635,7 +6635,7 @@ StackProtectorMode FromPasta(pasta::StackProtectorMode e) {
 }
 
 StorageClass FromPasta(pasta::StorageClass e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StorageClass::NONE;
     case 1: return StorageClass::EXTERN;
     case 2: return StorageClass::STATIC;
@@ -6647,7 +6647,7 @@ StorageClass FromPasta(pasta::StorageClass e) {
 }
 
 StorageDuration FromPasta(pasta::StorageDuration e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StorageDuration::FULL_EXPRESSION;
     case 1: return StorageDuration::AUTOMATIC;
     case 2: return StorageDuration::THREAD;
@@ -6658,7 +6658,7 @@ StorageDuration FromPasta(pasta::StorageDuration e) {
 }
 
 StoredNameKind FromPasta(pasta::StoredNameKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StoredNameKind::STORED_IDENTIFIER;
     case 1: return StoredNameKind::STORED_OBJ_C_ZERO_ARGUMENT_SELECTOR;
     case 2: return StoredNameKind::STORED_OBJ_C_ONE_ARGUMENT_SELECTOR;
@@ -6673,7 +6673,7 @@ StoredNameKind FromPasta(pasta::StoredNameKind e) {
 }
 
 StoredSpecifierKind FromPasta(pasta::StoredSpecifierKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StoredSpecifierKind::STORED_IDENTIFIER;
     case 1: return StoredSpecifierKind::STORED_DECLARATION;
     case 2: return StoredSpecifierKind::STORED_TYPE_SPEC;
@@ -6683,7 +6683,7 @@ StoredSpecifierKind FromPasta(pasta::StoredSpecifierKind e) {
 }
 
 StrictFlexArraysLevelKind FromPasta(pasta::StrictFlexArraysLevelKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return StrictFlexArraysLevelKind::DEFAULT;
     case 1: return StrictFlexArraysLevelKind::ONE_ZERO_OR_INCOMPLETE;
     case 2: return StrictFlexArraysLevelKind::ZERO_OR_INCOMPLETE;
@@ -6693,7 +6693,7 @@ StrictFlexArraysLevelKind FromPasta(pasta::StrictFlexArraysLevelKind e) {
 }
 
 StructReturnConventionKind FromPasta(pasta::StructReturnConventionKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return StructReturnConventionKind::DEFAULT;
     case 1: return StructReturnConventionKind::ON_STACK;
     case 2: return StructReturnConventionKind::IN_REGS;
@@ -6702,7 +6702,7 @@ StructReturnConventionKind FromPasta(pasta::StructReturnConventionKind e) {
 }
 
 SubExpr FromPasta(pasta::SubExpr e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SubExpr::CALLEE;
     case 1: return SubExpr::LHS;
     case 2: return SubExpr::RHS;
@@ -6712,7 +6712,7 @@ SubExpr FromPasta(pasta::SubExpr e) {
 }
 
 SubStmt FromPasta(pasta::SubStmt e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return SubStmt::BODY;
     case 1: return SubStmt::PROMISE;
     case 2: return SubStmt::INITIALIZER_SUSPEND;
@@ -6729,7 +6729,7 @@ SubStmt FromPasta(pasta::SubStmt e) {
 }
 
 SwiftAsyncFramePointerKind FromPasta(pasta::SwiftAsyncFramePointerKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return SwiftAsyncFramePointerKind::AUTO;
     case 1: return SwiftAsyncFramePointerKind::ALWAYS;
     case 2: return SwiftAsyncFramePointerKind::NEVER;
@@ -6738,7 +6738,7 @@ SwiftAsyncFramePointerKind FromPasta(pasta::SwiftAsyncFramePointerKind e) {
 }
 
 SyncScope FromPasta(pasta::SyncScope e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return SyncScope::HIP_SINGLE_THREAD;
     case 1: return SyncScope::HIP_WAVEFRONT;
     case 2: return SyncScope::HIP_WORKGROUP;
@@ -6753,7 +6753,7 @@ SyncScope FromPasta(pasta::SyncScope e) {
 }
 
 Syntax FromPasta(pasta::Syntax e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return Syntax::GNU;
     case 1: return Syntax::CXX11;
     case 2: return Syntax::C2X;
@@ -6768,7 +6768,7 @@ Syntax FromPasta(pasta::Syntax e) {
 }
 
 TLSModel FromPasta(pasta::TLSModel e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TLSModel::GENERAL_DYNAMIC_TLS_MODEL;
     case 1: return TLSModel::LOCAL_DYNAMIC_TLS_MODEL;
     case 2: return TLSModel::INITIAL_EXEC_TLS_MODEL;
@@ -6778,7 +6778,7 @@ TLSModel FromPasta(pasta::TLSModel e) {
 }
 
 TQ FromPasta(pasta::TQ e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return TQ::CONST;
     case 2: return TQ::RESTRICT;
     case 4: return TQ::VOLATILE;
@@ -6788,7 +6788,7 @@ TQ FromPasta(pasta::TQ e) {
 }
 
 TagTypeKind FromPasta(pasta::TagTypeKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TagTypeKind::STRUCT;
     case 1: return TagTypeKind::INTERFACE;
     case 2: return TagTypeKind::UNION;
@@ -6799,7 +6799,7 @@ TagTypeKind FromPasta(pasta::TagTypeKind e) {
 }
 
 TailPaddingUseRules FromPasta(pasta::TailPaddingUseRules e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TailPaddingUseRules::ALWAYS_USE_TAIL_PADDING;
     case 1: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_POD03;
     case 2: return TailPaddingUseRules::USE_TAIL_PADDING_UNLESS_POD11;
@@ -6808,7 +6808,7 @@ TailPaddingUseRules FromPasta(pasta::TailPaddingUseRules e) {
 }
 
 TemplateArgumentDependence FromPasta(pasta::TemplateArgumentDependence e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 1: return TemplateArgumentDependence::UNEXPANDED_PACK;
     case 2: return TemplateArgumentDependence::INSTANTIATION;
     case 4: return TemplateArgumentDependence::DEPENDENT;
@@ -6821,7 +6821,7 @@ TemplateArgumentDependence FromPasta(pasta::TemplateArgumentDependence e) {
 }
 
 TemplateNameDependence FromPasta(pasta::TemplateNameDependence e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 1: return TemplateNameDependence::UNEXPANDED_PACK;
     case 2: return TemplateNameDependence::INSTANTIATION;
     case 4: return TemplateNameDependence::DEPENDENT;
@@ -6834,7 +6834,7 @@ TemplateNameDependence FromPasta(pasta::TemplateNameDependence e) {
 }
 
 TemplateSpecializationKind FromPasta(pasta::TemplateSpecializationKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TemplateSpecializationKind::UNDECLARED;
     case 1: return TemplateSpecializationKind::IMPLICIT_INSTANTIATION;
     case 2: return TemplateSpecializationKind::EXPLICIT_SPECIALIZATION;
@@ -6845,7 +6845,7 @@ TemplateSpecializationKind FromPasta(pasta::TemplateSpecializationKind e) {
 }
 
 TextDiagnosticFormat FromPasta(pasta::TextDiagnosticFormat e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TextDiagnosticFormat::CLANG;
     case 1: return TextDiagnosticFormat::MSVC;
     case 2: return TextDiagnosticFormat::VI;
@@ -6855,7 +6855,7 @@ TextDiagnosticFormat FromPasta(pasta::TextDiagnosticFormat e) {
 }
 
 ThreadModelKind FromPasta(pasta::ThreadModelKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return ThreadModelKind::POSIX;
     case 1: return ThreadModelKind::SINGLE;
     default: __builtin_unreachable();
@@ -6863,7 +6863,7 @@ ThreadModelKind FromPasta(pasta::ThreadModelKind e) {
 }
 
 ThreadStorageClassSpecifier FromPasta(pasta::ThreadStorageClassSpecifier e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return ThreadStorageClassSpecifier::UNSPECIFIED;
     case 1: return ThreadStorageClassSpecifier::__THREAD;
     case 2: return ThreadStorageClassSpecifier::THREAD_LOCAL;
@@ -6873,7 +6873,7 @@ ThreadStorageClassSpecifier FromPasta(pasta::ThreadStorageClassSpecifier e) {
 }
 
 TokenKind FromPasta(pasta::TokenKind e) {
-  switch (static_cast<unsigned short>(e)) {
+  switch (static_cast<uint16_t>(e)) {
     case 0: return TokenKind::UNKNOWN;
     case 1: return TokenKind::END_OF_FILE;
     case 2: return TokenKind::END_OF_DIRECTIVE;
@@ -7304,7 +7304,7 @@ TokenKind FromPasta(pasta::TokenKind e) {
 }
 
 TrailingAllocKind FromPasta(pasta::TrailingAllocKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 1: return TrailingAllocKind::TAK_INHERITS_CONSTRUCTOR;
     case 2: return TrailingAllocKind::TAK_HAS_TAIL_EXPLICIT;
     default: __builtin_unreachable();
@@ -7312,7 +7312,7 @@ TrailingAllocKind FromPasta(pasta::TrailingAllocKind e) {
 }
 
 TranslationUnitKind FromPasta(pasta::TranslationUnitKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TranslationUnitKind::COMPLETE;
     case 1: return TranslationUnitKind::PREFIX;
     case 2: return TranslationUnitKind::MODULE;
@@ -7322,7 +7322,7 @@ TranslationUnitKind FromPasta(pasta::TranslationUnitKind e) {
 }
 
 TrivialAutoVarInitKind FromPasta(pasta::TrivialAutoVarInitKind e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return TrivialAutoVarInitKind::UNINITIALIZED;
     case 1: return TrivialAutoVarInitKind::ZERO;
     case 2: return TrivialAutoVarInitKind::PATTERN;
@@ -7331,7 +7331,7 @@ TrivialAutoVarInitKind FromPasta(pasta::TrivialAutoVarInitKind e) {
 }
 
 TypeDependence FromPasta(pasta::TypeDependence e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 1: return TypeDependence::UNEXPANDED_PACK;
     case 2: return TypeDependence::INSTANTIATION;
     case 4: return TypeDependence::DEPENDENT;
@@ -7345,7 +7345,7 @@ TypeDependence FromPasta(pasta::TypeDependence e) {
 }
 
 TypeLocClass FromPasta(pasta::TypeLocClass e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TypeLocClass::ADJUSTED;
     case 1: return TypeLocClass::DECAYED;
     case 2: return TypeLocClass::CONSTANT_ARRAY;
@@ -7406,7 +7406,7 @@ TypeLocClass FromPasta(pasta::TypeLocClass e) {
 }
 
 TypeOfKind FromPasta(pasta::TypeOfKind e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return TypeOfKind::QUALIFIED;
     case 1: return TypeOfKind::UNQUALIFIED;
     default: __builtin_unreachable();
@@ -7414,7 +7414,7 @@ TypeOfKind FromPasta(pasta::TypeOfKind e) {
 }
 
 TypeSpecifierSign FromPasta(pasta::TypeSpecifierSign e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return TypeSpecifierSign::UNSPECIFIED;
     case 1: return TypeSpecifierSign::SIGNED;
     case 2: return TypeSpecifierSign::UNSIGNED;
@@ -7423,7 +7423,7 @@ TypeSpecifierSign FromPasta(pasta::TypeSpecifierSign e) {
 }
 
 TypeSpecifierType FromPasta(pasta::TypeSpecifierType e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TypeSpecifierType::UNSPECIFIED;
     case 1: return TypeSpecifierType::VOID;
     case 2: return TypeSpecifierType::CHARACTER;
@@ -7497,7 +7497,7 @@ TypeSpecifierType FromPasta(pasta::TypeSpecifierType e) {
 }
 
 TypeSpecifierWidth FromPasta(pasta::TypeSpecifierWidth e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return TypeSpecifierWidth::UNSPECIFIED;
     case 1: return TypeSpecifierWidth::SHORT;
     case 2: return TypeSpecifierWidth::LONG;
@@ -7507,7 +7507,7 @@ TypeSpecifierWidth FromPasta(pasta::TypeSpecifierWidth e) {
 }
 
 TypeSpecifiersPipe FromPasta(pasta::TypeSpecifiersPipe e) {
-  switch (static_cast<int>(e)) {
+  switch (static_cast<int32_t>(e)) {
     case 0: return TypeSpecifiersPipe::UNSPECIFIED;
     case 1: return TypeSpecifiersPipe::PIPE;
     default: __builtin_unreachable();
@@ -7515,7 +7515,7 @@ TypeSpecifiersPipe FromPasta(pasta::TypeSpecifiersPipe e) {
 }
 
 TypeTrait FromPasta(pasta::TypeTrait e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TypeTrait::IS_INTERFACE_CLASS;
     case 1: return TypeTrait::IS_SEALED;
     case 2: return TypeTrait::IS_DESTRUCTIBLE;
@@ -7592,7 +7592,7 @@ TypeTrait FromPasta(pasta::TypeTrait e) {
 }
 
 UnaryExprOrTypeTrait FromPasta(pasta::UnaryExprOrTypeTrait e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UnaryExprOrTypeTrait::SIZE_OF;
     case 1: return UnaryExprOrTypeTrait::ALIGN_OF;
     case 2: return UnaryExprOrTypeTrait::PREFERRED_ALIGN_OF;
@@ -7607,7 +7607,7 @@ UnaryExprOrTypeTrait FromPasta(pasta::UnaryExprOrTypeTrait e) {
 }
 
 UnaryOperatorKind FromPasta(pasta::UnaryOperatorKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return UnaryOperatorKind::POST_INCREMENT;
     case 1: return UnaryOperatorKind::POST_DEC;
     case 2: return UnaryOperatorKind::PRE_INCREMENT;
@@ -7627,7 +7627,7 @@ UnaryOperatorKind FromPasta(pasta::UnaryOperatorKind e) {
 }
 
 APValueKind FromPasta(pasta::APValueKind e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return APValueKind::NONE;
     case 1: return APValueKind::INDETERMINATE;
     case 2: return APValueKind::INT;
@@ -7647,7 +7647,7 @@ APValueKind FromPasta(pasta::APValueKind e) {
 }
 
 VectorLibrary FromPasta(pasta::VectorLibrary e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return VectorLibrary::NO_LIBRARY;
     case 1: return VectorLibrary::ACCELERATE;
     case 2: return VectorLibrary::LIBMVEC;
@@ -7660,7 +7660,7 @@ VectorLibrary FromPasta(pasta::VectorLibrary e) {
 }
 
 Visibility FromPasta(pasta::Visibility e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return Visibility::HIDDEN_VISIBILITY;
     case 1: return Visibility::PROTECTED_VISIBILITY;
     case 2: return Visibility::DEFAULT_VISIBILITY;
@@ -7669,7 +7669,7 @@ Visibility FromPasta(pasta::Visibility e) {
 }
 
 AttributeSyntax FromPasta(pasta::AttributeSyntax e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return AttributeSyntax::GNU;
     case 1: return AttributeSyntax::CXX11;
     case 2: return AttributeSyntax::C2X;
@@ -7683,7 +7683,7 @@ AttributeSyntax FromPasta(pasta::AttributeSyntax e) {
 }
 
 DeclCategory FromPasta(pasta::DeclCategory e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return DeclCategory::UNKNOWN;
     case 1: return DeclCategory::LOCAL_VARIABLE;
     case 2: return DeclCategory::GLOBAL_VARIABLE;
@@ -7711,7 +7711,7 @@ DeclCategory FromPasta(pasta::DeclCategory e) {
 }
 
 MacroKind FromPasta(pasta::MacroKind e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 1: return MacroKind::SUBSTITUTION;
     case 2: return MacroKind::EXPANSION;
     case 3: return MacroKind::ARGUMENT;
@@ -7742,7 +7742,7 @@ MacroKind FromPasta(pasta::MacroKind e) {
 }
 
 PathKind FromPasta(pasta::PathKind e) {
-  switch (static_cast<signed char>(e)) {
+  switch (static_cast<int8_t>(e)) {
     case 47: return PathKind::UNIX;
     case 92: return PathKind::WINDOWS;
     default: __builtin_unreachable();
@@ -7750,7 +7750,7 @@ PathKind FromPasta(pasta::PathKind e) {
 }
 
 FileType FromPasta(pasta::FileType e) {
-  switch (static_cast<signed char>(e)) {
+  switch (static_cast<int8_t>(e)) {
     case 0: return FileType::NONE;
     case -1: return FileType::NOT_FOUND;
     case 1: return FileType::REGULAR;
@@ -7766,7 +7766,7 @@ FileType FromPasta(pasta::FileType e) {
 }
 
 CompilerName FromPasta(pasta::CompilerName e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return CompilerName::UNKNOWN;
     case 1: return CompilerName::CLANG;
     case 2: return CompilerName::APPLE_CLANG;
@@ -7778,7 +7778,7 @@ CompilerName FromPasta(pasta::CompilerName e) {
 }
 
 IncludePathLocation FromPasta(pasta::IncludePathLocation e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return IncludePathLocation::ABSOLUTE;
     case 1: return IncludePathLocation::SYSROOT_RELATIVE;
     default: __builtin_unreachable();
@@ -7786,7 +7786,7 @@ IncludePathLocation FromPasta(pasta::IncludePathLocation e) {
 }
 
 TargetLanguage FromPasta(pasta::TargetLanguage e) {
-  switch (static_cast<unsigned>(e)) {
+  switch (static_cast<uint32_t>(e)) {
     case 0: return TargetLanguage::C;
     case 1: return TargetLanguage::CXX;
     default: __builtin_unreachable();
@@ -7794,7 +7794,7 @@ TargetLanguage FromPasta(pasta::TargetLanguage e) {
 }
 
 PseudoKind FromPasta(pasta::PseudoKind e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return PseudoKind::TEMPLATE_ARGUMENT;
     case 1: return PseudoKind::TEMPLATE_PARAMETER_LIST;
     case 2: return PseudoKind::CXX_BASE_SPECIFIER;
@@ -7804,7 +7804,7 @@ PseudoKind FromPasta(pasta::PseudoKind e) {
 }
 
 TokenCategory FromPasta(pasta::TokenCategory e) {
-  switch (static_cast<unsigned char>(e)) {
+  switch (static_cast<uint8_t>(e)) {
     case 0: return TokenCategory::UNKNOWN;
     case 1: return TokenCategory::IDENTIFIER;
     case 2: return TokenCategory::MACRO_NAME;

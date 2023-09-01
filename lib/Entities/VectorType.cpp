@@ -81,21 +81,21 @@ std::optional<VectorType> VectorType::from(const TokenContext &t) {
 }
 
 Type VectorType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal228();
+  RawEntityId eid = impl->reader.getVal232();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type VectorType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal233();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 VectorTypeVectorKind VectorType::vector_kind(void) const {
-  return static_cast<VectorTypeVectorKind>(impl->reader.getVal237());
+  return static_cast<VectorTypeVectorKind>(impl->reader.getVal241());
 }
 
 bool VectorType::is_sugared(void) const {
-  return impl->reader.getVal230();
+  return impl->reader.getVal234();
 }
 
 #pragma GCC diagnostic pop

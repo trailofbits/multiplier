@@ -165,11 +165,11 @@ NamedDecl SizeOfPackExpr::pack(void) const {
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
-std::optional<unsigned> SizeOfPackExpr::pack_length(void) const {
+std::optional<uint32_t> SizeOfPackExpr::pack_length(void) const {
   if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal105());
+    return static_cast<uint32_t>(impl->reader.getVal105());
   }
   return std::nullopt;
 }

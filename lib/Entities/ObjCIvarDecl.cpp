@@ -192,17 +192,17 @@ ObjCIvarDeclAccessControl ObjCIvarDecl::canonical_access_control(void) const {
 }
 
 ObjCInterfaceDecl ObjCIvarDecl::containing_interface(void) const {
-  RawEntityId eid = impl->reader.getVal84();
+  RawEntityId eid = impl->reader.getVal85();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCIvarDecl ObjCIvarDecl::next_instance_variable(void) const {
-  RawEntityId eid = impl->reader.getVal85();
+  RawEntityId eid = impl->reader.getVal87();
   return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ObjCIvarDecl::synthesize(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal102();
 }
 
 #pragma GCC diagnostic pop

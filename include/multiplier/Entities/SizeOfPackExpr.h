@@ -69,7 +69,7 @@ class SizeOfPackExpr : public Expr {
 
   Token operator_token(void) const;
   NamedDecl pack(void) const;
-  std::optional<unsigned> pack_length(void) const;
+  std::optional<uint32_t> pack_length(void) const;
   Token pack_token(void) const;
   std::optional<std::vector<TemplateArgument>> partial_arguments(void) const;
   Token r_paren_token(void) const;

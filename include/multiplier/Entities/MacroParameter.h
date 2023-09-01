@@ -58,7 +58,7 @@ class MacroParameter : public Macro {
 
   Token variadic_dots(void) const;
   Token name(void) const;
-  unsigned index(void) const;
+  uint32_t index(void) const;
 };
 
 static_assert(sizeof(MacroParameter) == sizeof(Macro));
