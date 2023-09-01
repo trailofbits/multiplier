@@ -5295,6 +5295,7 @@ void SerializeTypeOfExprType(const PendingFragment &pf, const EntityMapper &es, 
 }
 
 void SerializeStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Stmt &e, const TokenTree *) {
+  (void) pf;
   b.setVal0(es.ParentDeclId(e));
   b.setVal1(es.ParentStmtId(e));
   if (auto r2 = ReferencedDecl(e)) {

@@ -553,7 +553,8 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
   auto enumerators = enum_decl.Enumerators();
   auto num_enumerators = enumerators.size();
-  auto itype = CxxIntType(enum_decl.IntegerType());
+  auto enum_underlying_type = enum_decl.IntegerType();
+  auto itype = CxxIntType(enum_underlying_type);
 
   auto &types = enum_type[enum_name];
 
@@ -1742,7 +1743,8 @@ MethodListPtr CodeGenerator::RunOnClass(
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
-        << class_name << " &e, const TokenTree *) {\n";
+        << class_name << " &e, const TokenTree *) {\n"
+        << "  (void) pf;\n";
 
     if (is_concrete) {
       serialize_inc_os
@@ -3684,11 +3686,19 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 #undef DECLARE_ENTITY_CLASSES
 
   for (const pasta::EnumDecl &tag : enums) {
-    if (auto itype = CxxIntType(tag.IntegerType())) {
-      serialize_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
-      lib_pasta_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
+    if (auto itype = tag.IntegerType()) {
+      auto ptr = pasta::PrintedTokenRange::Create(itype.value());
+      serialize_h_os << "enum class " << tag.Name() << " :";
+      lib_pasta_h_os << "enum class " << tag.Name() << " :";
+      for (auto tok : ptr) {
+        serialize_h_os << ' ' << tok.Data();
+        lib_pasta_h_os << ' ' << tok.Data();    
+      }
+      serialize_h_os << ";\n";
+      lib_pasta_h_os << ";\n";
     } else {
-      std::cerr << "??? " << tag.Name() << "\n";
+      serialize_h_os << "enum class " << tag.Name() << " : int;\n";
+      lib_pasta_h_os << "enum class " << tag.Name() << " : int;\n";
     }
   }
   serialize_h_os
