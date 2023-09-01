@@ -690,6 +690,10 @@ void CodeGenerator::RunOnOps(void) {
   std::filesystem::path mx_inc = mx_root / "include" / "multiplier";
   std::filesystem::path mx_lib = mx_root / "lib";
 
+  std::error_code ec;
+  (void) std::filesystem::create_directory(mx_inc / "IR", ec);
+  (void) std::filesystem::create_directory(mx_lib / "IR", ec);
+
   std::ofstream hpp(mx_inc / "IR" / "OperationKind.h");
   std::ofstream cpp(mx_lib / "IR" / "Operation.h");  // In lib.
 
@@ -787,6 +791,11 @@ void CodeGenerator::RunOnOps(void) {
     }
 
     hpp.close();
+
+    std::error_code ec;
+    (void) std::filesystem::create_directories(mx_inc / "IR" / dialect.our_dir_name, ec);
+    (void) std::filesystem::create_directories(mx_lib / "IR" / dialect.our_dir_name, ec);
+    
     hpp.open(mx_inc / "IR" / dialect.our_dir_name / "Operation.h");
 
     cpp.close();
