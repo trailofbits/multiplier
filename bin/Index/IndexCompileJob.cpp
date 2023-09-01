@@ -1489,8 +1489,8 @@ static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/396
 static void CreateFreestandingDeclFragment(
     mx::DatabaseWriter &database,
-    EntityMapper &em, 
-    std::optional<FileLocationOfFragment> floc, 
+    EntityMapper &em,
+    std::optional<FileLocationOfFragment> floc,
     mx::PackedCompilationId tu_id,
     uint64_t begin_index,
     uint64_t end_index,
