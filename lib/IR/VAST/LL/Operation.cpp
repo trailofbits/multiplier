@@ -19,6 +19,7 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::LL_EXTRACT:
     case mx::ir::OperationKind::LL_INITIALIZE:
     case mx::ir::OperationKind::LL_INLINE_SCOPE:
+    case mx::ir::OperationKind::LL_FUNC:
     case mx::ir::OperationKind::LL_GEP:
     case mx::ir::OperationKind::LL_RETURN:
     case mx::ir::OperationKind::LL_SCOPE:

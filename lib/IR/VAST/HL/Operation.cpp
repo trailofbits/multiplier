@@ -58,7 +58,6 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_GNU_EXTENSION:
     case mx::ir::OperationKind::HL_FCMP:
     case mx::ir::OperationKind::HL_FIELD:
-    case mx::ir::OperationKind::HL_FUNC:
     case mx::ir::OperationKind::HL_FUNCREF:
     case mx::ir::OperationKind::HL_GLOBREF:
     case mx::ir::OperationKind::HL_BREAK:
@@ -70,6 +69,7 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_DO:
     case mx::ir::OperationKind::HL_EMPTY_DECL:
     case mx::ir::OperationKind::HL_FOR:
+    case mx::ir::OperationKind::HL_FUNC:
     case mx::ir::OperationKind::HL_GOTO:
     case mx::ir::OperationKind::HL_IF:
     case mx::ir::OperationKind::HL_LABEL_DECL:
@@ -104,7 +104,6 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_ASSIGN_UREM:
     case mx::ir::OperationKind::HL_UREM:
     case mx::ir::OperationKind::HL_RETURN:
-    case mx::ir::OperationKind::HL_SCOPE:
     case mx::ir::OperationKind::HL_SIZEOF_EXPR:
     case mx::ir::OperationKind::HL_SIZEOF_TYPE:
     case mx::ir::OperationKind::HL_STMT_EXPR:

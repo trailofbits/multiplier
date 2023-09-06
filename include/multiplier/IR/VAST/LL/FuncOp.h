@@ -10,20 +10,20 @@
 
 #include "Operation.h"
 
-namespace vast::hl {
+namespace vast::ll {
 class FuncOp;
-}  // namespace vast::hl
-namespace mx::ir::hl {
+}  // namespace vast::ll
+namespace mx::ir::ll {
 class FuncOp final : public Operation {
  public:
   inline static OperationKind static_kind(void) {
-    return OperationKind::HL_FUNC;
+    return OperationKind::LL_FUNC;
   }
 
   static std::optional<FuncOp> from(const ::mx::ir::Operation &that);
   static std::optional<FuncOp> producing(const ::mx::ir::Value &val);
 
-  ::vast::hl::FuncOp underlying_op(void) const noexcept;
+  ::vast::ll::FuncOp underlying_op(void) const noexcept;
 
   // Imported methods:
   ::mx::ir::Region body(void) const;
@@ -41,4 +41,4 @@ class FuncOp final : public Operation {
 };
 static_assert(sizeof(FuncOp) == sizeof(Operation));
 
-}  // namespace mx::ir::hl
+}  // namespace mx::ir::ll

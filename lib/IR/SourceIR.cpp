@@ -41,7 +41,6 @@
 #include <vast/Dialect/Dialects.hpp>
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/HighLevel/HighLevelTypes.hpp>
-#include <vast/Dialect/HighLevel/HighLevelLinkage.hpp>
 #include <vast/Dialect/LowLevel/LowLevelOps.hpp>
 #include <vast/Dialect/Meta/MetaAttributes.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
