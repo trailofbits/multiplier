@@ -278,6 +278,7 @@
    _ll("ll.extract", OperationKind::LL_EXTRACT, vast::ll::Extract) \
    _ll("ll.initialize", OperationKind::LL_INITIALIZE, vast::ll::InitializeVar) \
    _ll("ll.inline_scope", OperationKind::LL_INLINE_SCOPE, vast::ll::InlineScope) \
+   _ll("ll.func", OperationKind::LL_FUNC, vast::ll::FuncOp) \
    _ll("ll.gep", OperationKind::LL_GEP, vast::ll::StructGEPOp) \
    _ll("ll.return", OperationKind::LL_RETURN, vast::ll::ReturnOp) \
    _ll("ll.scope", OperationKind::LL_SCOPE, vast::ll::Scope) \
@@ -330,7 +331,6 @@
    _hl("hl.gnu.extension", OperationKind::HL_GNU_EXTENSION, vast::hl::ExtensionOp) \
    _hl("hl.fcmp", OperationKind::HL_FCMP, vast::hl::FCmpOp) \
    _hl("hl.field", OperationKind::HL_FIELD, vast::hl::FieldDeclOp) \
-   _hl("hl.func", OperationKind::HL_FUNC, vast::hl::FuncOp) \
    _hl("hl.funcref", OperationKind::HL_FUNCREF, vast::hl::FuncRefOp) \
    _hl("hl.globref", OperationKind::HL_GLOBREF, vast::hl::GlobalRefOp) \
    _hl("hl.break", OperationKind::HL_BREAK, vast::hl::BreakOp) \
@@ -342,6 +342,7 @@
    _hl("hl.do", OperationKind::HL_DO, vast::hl::DoOp) \
    _hl("hl.empty.decl", OperationKind::HL_EMPTY_DECL, vast::hl::EmptyDeclOp) \
    _hl("hl.for", OperationKind::HL_FOR, vast::hl::ForOp) \
+   _hl("hl.func", OperationKind::HL_FUNC, vast::hl::FuncOp) \
    _hl("hl.goto", OperationKind::HL_GOTO, vast::hl::GotoStmt) \
    _hl("hl.if", OperationKind::HL_IF, vast::hl::IfOp) \
    _hl("hl.label.decl", OperationKind::HL_LABEL_DECL, vast::hl::LabelDeclOp) \
@@ -376,7 +377,6 @@
    _hl("hl.assign.urem", OperationKind::HL_ASSIGN_UREM, vast::hl::RemUAssignOp) \
    _hl("hl.urem", OperationKind::HL_UREM, vast::hl::RemUOp) \
    _hl("hl.return", OperationKind::HL_RETURN, vast::hl::ReturnOp) \
-   _hl("hl.scope", OperationKind::HL_SCOPE, vast::hl::ScopeOp) \
    _hl("hl.sizeof.expr", OperationKind::HL_SIZEOF_EXPR, vast::hl::SizeOfExprOp) \
    _hl("hl.sizeof.type", OperationKind::HL_SIZEOF_TYPE, vast::hl::SizeOfTypeOp) \
    _hl("hl.stmt.expr", OperationKind::HL_STMT_EXPR, vast::hl::StmtExprOp) \
@@ -398,8 +398,9 @@
    _core("core.bin.lor", OperationKind::CORE_BIN_LOR, vast::core::BinLOrOp) \
    _core("core.lazy.op", OperationKind::CORE_LAZY_OP, vast::core::LazyOp) \
    _core("core.select", OperationKind::CORE_SELECT, vast::core::SelectOp) \
+   _core("core.scope", OperationKind::CORE_SCOPE, vast::core::ScopeOp) \
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 391
+#define MX_IR_NUM_MLIR_OPS 392
 

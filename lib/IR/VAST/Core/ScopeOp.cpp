@@ -6,7 +6,7 @@
 
 // Auto-generated file; do not modify!
 
-#include <multiplier/IR/VAST/HL/ScopeOp.h>
+#include <multiplier/IR/VAST/Core/ScopeOp.h>
 #include <multiplier/IR/Attribute.h>
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Region.h>
@@ -15,11 +15,11 @@
 #include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
-#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
+#include <vast/Dialect/Core/CoreOps.hpp>
 
-namespace mx::ir::hl {
+namespace mx::ir::core {
 std::optional<ScopeOp> ScopeOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_SCOPE) {
+  if (that.kind() == OperationKind::CORE_SCOPE) {
     return reinterpret_cast<const ScopeOp &>(that);
   }
   return std::nullopt;
@@ -32,8 +32,8 @@ std::optional<ScopeOp> ScopeOp::producing(const ::mx::ir::Value &that) {
   return std::nullopt;
 }
 
-::vast::hl::ScopeOp ScopeOp::underlying_op(void) const noexcept {
-  return ::vast::hl::ScopeOp(this->Operation::op_);
+::vast::core::ScopeOp ScopeOp::underlying_op(void) const noexcept {
+  return ::vast::core::ScopeOp(this->Operation::op_);
 }
 
 ::mx::ir::Region ScopeOp::body(void) const {
@@ -41,4 +41,4 @@ std::optional<ScopeOp> ScopeOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Region(module_, val);
 }
 
-}  // namespace mx::ir::hl
+}  // namespace mx::ir::core

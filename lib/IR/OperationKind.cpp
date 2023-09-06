@@ -282,6 +282,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::LL_EXTRACT: return "LL_EXTRACT";
     case ir::OperationKind::LL_INITIALIZE: return "LL_INITIALIZE";
     case ir::OperationKind::LL_INLINE_SCOPE: return "LL_INLINE_SCOPE";
+    case ir::OperationKind::LL_FUNC: return "LL_FUNC";
     case ir::OperationKind::LL_GEP: return "LL_GEP";
     case ir::OperationKind::LL_RETURN: return "LL_RETURN";
     case ir::OperationKind::LL_SCOPE: return "LL_SCOPE";
@@ -334,7 +335,6 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_GNU_EXTENSION: return "HL_GNU_EXTENSION";
     case ir::OperationKind::HL_FCMP: return "HL_FCMP";
     case ir::OperationKind::HL_FIELD: return "HL_FIELD";
-    case ir::OperationKind::HL_FUNC: return "HL_FUNC";
     case ir::OperationKind::HL_FUNCREF: return "HL_FUNCREF";
     case ir::OperationKind::HL_GLOBREF: return "HL_GLOBREF";
     case ir::OperationKind::HL_BREAK: return "HL_BREAK";
@@ -346,6 +346,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_DO: return "HL_DO";
     case ir::OperationKind::HL_EMPTY_DECL: return "HL_EMPTY_DECL";
     case ir::OperationKind::HL_FOR: return "HL_FOR";
+    case ir::OperationKind::HL_FUNC: return "HL_FUNC";
     case ir::OperationKind::HL_GOTO: return "HL_GOTO";
     case ir::OperationKind::HL_IF: return "HL_IF";
     case ir::OperationKind::HL_LABEL_DECL: return "HL_LABEL_DECL";
@@ -380,7 +381,6 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_ASSIGN_UREM: return "HL_ASSIGN_UREM";
     case ir::OperationKind::HL_UREM: return "HL_UREM";
     case ir::OperationKind::HL_RETURN: return "HL_RETURN";
-    case ir::OperationKind::HL_SCOPE: return "HL_SCOPE";
     case ir::OperationKind::HL_SIZEOF_EXPR: return "HL_SIZEOF_EXPR";
     case ir::OperationKind::HL_SIZEOF_TYPE: return "HL_SIZEOF_TYPE";
     case ir::OperationKind::HL_STMT_EXPR: return "HL_STMT_EXPR";
@@ -402,6 +402,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::CORE_BIN_LOR: return "CORE_BIN_LOR";
     case ir::OperationKind::CORE_LAZY_OP: return "CORE_LAZY_OP";
     case ir::OperationKind::CORE_SELECT: return "CORE_SELECT";
+    case ir::OperationKind::CORE_SCOPE: return "CORE_SCOPE";
     case ir::OperationKind::UNSUP_DECL: return "UNSUP_DECL";
     case ir::OperationKind::UNSUP_STMT: return "UNSUP_STMT";
   }
