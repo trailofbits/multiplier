@@ -227,6 +227,39 @@ struct NamedEntityRecord {
 // A reference has a to-entity-specific meaning, and so we don't need an
 // edge label.
 struct ReferenceRecord {
+  enum class Kind {
+    NoReferenceKind = 0,
+    AddressOf,
+    AssignedTos,
+    Assignments,
+    Caller,
+    CallArguments,
+    Definitions,
+    Declarations,
+    DeclarationUses,
+    Dereferences,
+    DefinedMacros,
+    Enumerations,
+    Expansions,
+    Functions,
+    Members,
+    Includes,
+    IncludedBy,
+    InfluencingCondition,
+    TopLevelEntity,
+    Types,
+    TypeCasts,
+    Variables,
+    LocalVariables,
+    GlobalVariables,
+    ThreadLocalVariables,
+    StaticLocalVariables,
+    ParameterVariables,
+    GenericUses,
+    StatementUses,
+    TypeTraitUses,
+  };
+
   static constexpr const char *kTableName = "reference";
 
   static constexpr const char *kInitStatements[] =
@@ -242,17 +275,48 @@ struct ReferenceRecord {
           ))",
 
        R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
-          VALUES (0, "Explicit code reference"))"};
+          VALUES (0, "No reference kind"),
+                 (1, "Address ofs"),
+                 (2, "Assigned Tos"),
+                 (3, "Assignments"),
+                 (4, "Caller"),
+                 (5, "Call Arguments"),
+                 (6, "Definitions"),
+                 (7, "Declarations"),
+                 (8, "Declaration Uses"),
+                 (9, "Dereferences"),
+                 (10, "Defined Macros"),
+                 (11, "Enumerations"),
+                 (12, "Expansions"),
+                 (13, "Functions"),
+                 (14, "Members"),
+                 (15, "Includes"),
+                 (16, "Included By"),
+                 (17, "Influencing Condition"),
+                 (18, "Top Level Entity"),
+                 (19, "Types"),
+                 (20, "Type Casts"),
+                 (21, "Variables"),
+                 (22, "Local Variables"),
+                 (23, "Global Variables"),
+                 (24, "Thread Local Variables"),
+                 (25, "Static Local Variables"),
+                 (26, "Parameter Variables"),
+                 (27, "Uses"),
+                 (28, "Statement Uses"),
+                 (29, "Type Trait Uses")
+          )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
   // NOTE(pag): Reference id `0` is the id of an "explicit code reference."
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id, kind_id)
-         VALUES (?1, ?2, 0))";
+      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id, kind)
+         VALUES (?1, ?2, ?3))";
 
   RawEntityId from_entity_id;
   RawEntityId to_entity_id;
+  Kind kind;
 };
 
 // Records a ZSTD dictionary for a category of entities into the database.

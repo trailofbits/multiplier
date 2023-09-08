@@ -1063,7 +1063,9 @@ bool BulkInserterState::InsertAsync(
     const ReferenceRecord &record, sqlite::Statement &insert) {
   if (record.from_entity_id != kInvalidEntityId &&
       record.to_entity_id != kInvalidEntityId) {
-    insert.BindValuesWithoutCopying(record.from_entity_id, record.to_entity_id);
+    insert.BindValuesWithoutCopying(record.from_entity_id,
+                                    record.to_entity_id,
+                                    static_cast<unsigned>(record.kind));
     return true;
   }
   return false;

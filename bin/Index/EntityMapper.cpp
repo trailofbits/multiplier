@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <glog/logging.h>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
@@ -257,6 +258,50 @@ mx::RawEntityId EntityMapper::EntityId(
 mx::RawEntityId EntityMapper::EntityIdOfType(
     const void *type, uint32_t quals) const {
   return tm.EntityId(type, quals);
+}
+
+std::optional<const pasta::Decl> EntityMapper::EntityDecl(
+    const pasta::AST &ast, mx::RawEntityId id) const {
+  for (auto [key, value] : entity_ids) {
+    if (value == id) {
+      return ast.Adopt(static_cast<const clang::Decl*>(key));
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<const pasta::Stmt> EntityMapper::EntityStmt(
+    const pasta::AST &ast, mx::RawEntityId id) const {
+  for (auto [key, value] : entity_ids) {
+    if (value == id) {
+      return ast.Adopt(static_cast<const clang::Stmt*>(key));
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<const pasta::Decl> EntityMapper::ParentDecl(
+    const pasta::AST &ast, const pasta::Decl &decl) const {
+  mx::RawEntityId id = EntityId(decl);
+  return EntityDecl(ast, id);
+}
+
+std::optional<const pasta::Decl> EntityMapper::ParentDecl(
+    const pasta::AST &ast, const pasta::Stmt &stmt) const {
+  mx::RawEntityId id = EntityId(stmt);
+  return EntityDecl(ast, id);
+}
+
+std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
+    const pasta::AST &ast, const pasta::Decl &decl) const {
+  mx::RawEntityId id = ParentDeclId(decl);
+  return EntityStmt(ast, id);
+}
+
+std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
+    const pasta::AST &ast, const pasta::Stmt &stmt) const {
+  mx::RawEntityId id = ParentStmtId(stmt);
+  return EntityStmt(ast, id);
 }
 
 void EntityMapper::ResetForFragment(void) {

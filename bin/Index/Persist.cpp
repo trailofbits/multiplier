@@ -91,7 +91,8 @@ extern void LinkEntitiesAcrossFragments(
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 extern void LinkExternalReferencesInFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf);
+    const pasta::AST &ast, mx::DatabaseWriter &database,
+    const PendingFragment &pf);
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
 extern void SerializePendingFragment(mx::DatabaseWriter &database,
@@ -887,7 +888,7 @@ void GlobalIndexingState::PersistFragment(
 
   PersistTokenContexts(em, pf.parsed_tokens, pf.fragment_index, fb);
   LinkEntitiesAcrossFragments(database, pf, mangler);
-  LinkExternalReferencesInFragment(database, pf);
+  LinkExternalReferencesInFragment(ast, database, pf);
   LinkEntityNamesToFragment(database, pf);
 
   // Add the fragment to the database.
