@@ -260,48 +260,40 @@ mx::RawEntityId EntityMapper::EntityIdOfType(
   return tm.EntityId(type, quals);
 }
 
-std::optional<const pasta::Decl> EntityMapper::EntityDecl(
-    const pasta::AST &ast, mx::RawEntityId id) const {
-  for (auto [key, value] : entity_ids) {
-    if (value == id) {
-      return ast.Adopt(static_cast<const clang::Decl*>(key));
-    }
-  }
-  return std::nullopt;
-}
-
-std::optional<const pasta::Stmt> EntityMapper::EntityStmt(
-    const pasta::AST &ast, mx::RawEntityId id) const {
-  for (auto [key, value] : entity_ids) {
-    if (value == id) {
-      return ast.Adopt(static_cast<const clang::Stmt*>(key));
-    }
+std::optional<const pasta::Decl> EntityMapper::ParentDecl(
+    const pasta::AST &ast, const pasta::Decl &entity) const {
+  if (auto it = parent_decls.find(entity.RawDecl());
+      it != parent_decls.end()) {
+    return ast.Adopt(static_cast<const clang::Decl*>(it->second));
   }
   return std::nullopt;
 }
 
 std::optional<const pasta::Decl> EntityMapper::ParentDecl(
-    const pasta::AST &ast, const pasta::Decl &decl) const {
-  mx::RawEntityId id = EntityId(decl);
-  return EntityDecl(ast, id);
-}
-
-std::optional<const pasta::Decl> EntityMapper::ParentDecl(
-    const pasta::AST &ast, const pasta::Stmt &stmt) const {
-  mx::RawEntityId id = EntityId(stmt);
-  return EntityDecl(ast, id);
+    const pasta::AST &ast, const pasta::Stmt &entity) const {
+  if (auto it = parent_decls.find(entity.RawStmt());
+      it != parent_decls.end()) {
+    return ast.Adopt(static_cast<const clang::Decl*>(it->second));
+  }
+  return std::nullopt;
 }
 
 std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
-    const pasta::AST &ast, const pasta::Decl &decl) const {
-  mx::RawEntityId id = ParentDeclId(decl);
-  return EntityStmt(ast, id);
+    const pasta::AST &ast, const pasta::Decl &entity) const {
+  if (auto it = parent_stmts.find(entity.RawDecl());
+      it != parent_stmts.end()) {
+    return ast.Adopt(static_cast<const clang::Stmt*>(it->second));
+  }
+  return std::nullopt;
 }
 
 std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
-    const pasta::AST &ast, const pasta::Stmt &stmt) const {
-  mx::RawEntityId id = ParentStmtId(stmt);
-  return EntityStmt(ast, id);
+    const pasta::AST &ast, const pasta::Stmt &entity) const {
+  if (auto it = parent_stmts.find(entity.RawStmt());
+      it != parent_stmts.end()) {
+    return ast.Adopt(static_cast<const clang::Stmt*>(it->second));
+  }
+  return std::nullopt;
 }
 
 void EntityMapper::ResetForFragment(void) {

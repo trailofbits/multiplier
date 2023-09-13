@@ -19,19 +19,24 @@
 namespace indexer {
 namespace {
 
-struct SaveRestoreEntityId {
+struct SaveRestoreEntity {
  public:
   mx::RawEntityId &ref;
+  const void *&ref_ptr;
   const mx::RawEntityId old_val;
+  const void *oldval_ptr;
 
-  SaveRestoreEntityId(mx::RawEntityId &ref_, mx::RawEntityId new_val)
-      : ref(ref_),
-        old_val(ref) {
+  SaveRestoreEntity(mx::RawEntityId &ref_, const void *&ptr_,
+                    mx::RawEntityId new_val, const void *newval_ptr)
+      : ref(ref_), ref_ptr(ptr_),
+        old_val(ref), oldval_ptr(ref_ptr) {
     ref = new_val;
+    ref_ptr = newval_ptr;
   }
 
-  ~SaveRestoreEntityId(void) {
+  ~SaveRestoreEntity(void) {
     ref = old_val;
+    ref_ptr = oldval_ptr;
   }
 };
 
@@ -42,6 +47,9 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   mx::RawEntityId parent_decl_id{mx::kInvalidEntityId};
   mx::RawEntityId parent_stmt_id{mx::kInvalidEntityId};
+
+  const void *parent_decl{nullptr};
+  const void *parent_stmt{nullptr};
 
   std::unordered_set<const void *> not_yet_seen;
 
@@ -54,10 +62,12 @@ class ParentTrackerVisitor : public EntityVisitor {
   void AddToMaps(const void *entity) {
     if (parent_decl_id != mx::kInvalidEntityId) {
       em.parent_decl_ids.emplace(entity, parent_decl_id);
+      em.parent_decls.emplace(entity, parent_decl);
     }
 
     if (parent_stmt_id != mx::kInvalidEntityId) {
       em.parent_stmt_ids.emplace(entity, parent_stmt_id);
+      em.parent_stmts.emplace(entity, parent_stmt);
     }
   }
 
@@ -76,17 +86,10 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    if (parent_decl_id != mx::kInvalidEntityId) {
-      em.parent_decl_ids.emplace(entity.RawDecl(), parent_decl_id);
-    }
-
-    if (parent_stmt_id != mx::kInvalidEntityId) {
-      em.parent_stmt_ids.emplace(entity.RawDecl(), parent_stmt_id);
-    }
-
     AddToMaps(entity.RawDecl());
 
-    SaveRestoreEntityId save_parent_decl(parent_decl_id, rid);
+    SaveRestoreEntity save_parent_decl(
+        parent_decl_id, parent_decl, rid, entity.RawDecl());
     this->EntityVisitor::Accept(entity);
   }
 
@@ -107,7 +110,8 @@ class ParentTrackerVisitor : public EntityVisitor {
 
     AddToMaps(entity.RawStmt());
 
-    SaveRestoreEntityId save_parent_stmt(parent_stmt_id, rid);
+    SaveRestoreEntity save_parent_stmt(
+        parent_stmt_id, parent_stmt, rid, entity.RawStmt());
     this->EntityVisitor::Accept(entity);
   }
 

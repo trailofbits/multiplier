@@ -21,11 +21,9 @@ namespace {
 static mx::ReferenceRecord::Kind FunctionReferences(
     const pasta::AST &ast, EntityMapper &em, const pasta::Stmt &stmt,
     const pasta::FunctionDecl &func) {
-
-  auto maybe_stmt = std::make_optional<pasta::Stmt>(stmt);
-  while (maybe_stmt.has_value()) {
-    auto parent = maybe_stmt.value();
-    maybe_stmt.emplace(em.ParentStmt(ast, parent).value());
+  auto valid_parent = true;
+  auto parent = stmt;
+  while (valid_parent) {
     switch (parent.Kind()) {
       case pasta::StmtKind::kCallExpr:
         if (auto call = pasta::CallExpr::From(parent)) {
@@ -33,9 +31,14 @@ static mx::ReferenceRecord::Kind FunctionReferences(
             return mx::ReferenceRecord::Kind::Caller;
           }
         }
-        continue;
       default: break;
     }
+
+    if (auto maybe_next = em.ParentStmt(ast, parent)) {
+      parent = maybe_next.value();
+      continue;
+    }
+    valid_parent = false;
   }
 
   return mx::ReferenceRecord::Kind::AddressOf;
@@ -62,12 +65,9 @@ static mx::ReferenceRecord::Kind VariableReferences(
 static mx::ReferenceRecord::Kind VariableReferences(
     const pasta::AST &ast, EntityMapper &em, const pasta::Stmt &stmt,
     const pasta::Decl&) {
-
-  auto maybe_stmt = std::make_optional<pasta::Stmt>(stmt);
-  while (maybe_stmt.has_value()) {
-    auto parent = maybe_stmt.value();
-    maybe_stmt.emplace(em.ParentStmt(ast, parent).value());
-
+  auto valid_parent = true;
+  auto parent = stmt;
+  while (valid_parent) {
     switch (parent.Kind()) {
       case pasta::StmtKind::kSwitchStmt:
         if (auto switch_ = pasta::SwitchStmt::From(parent);
@@ -129,7 +129,6 @@ static mx::ReferenceRecord::Kind VariableReferences(
             } else if (bin->RHS() == stmt) {
               return mx::ReferenceRecord::Kind::Assignments;
             }
-            break;
           }
         }
         break;
@@ -138,18 +137,18 @@ static mx::ReferenceRecord::Kind VariableReferences(
             cond && cond->Condition() == stmt) {
           return mx::ReferenceRecord::Kind::InfluencingCondition;
         }
-        continue;
+        break;
       case pasta::StmtKind::kMemberExpr:
         if (auto member = pasta::MemberExpr::From(parent);
             member && member->Base() == stmt && member->IsArrow()) {
           return mx::ReferenceRecord::Kind::Dereferences;
         }
-        continue;
+        break;
       case pasta::StmtKind::kArraySubscriptExpr:
         if (auto arr = pasta::ArraySubscriptExpr::From(parent)) {
           return mx::ReferenceRecord::Kind::Dereferences;
         }
-        continue;
+        break;
       case pasta::StmtKind::kCallExpr:
         if (auto call = pasta::CallExpr::From(parent)) {
           if (call->Callee() == stmt) {
@@ -161,7 +160,7 @@ static mx::ReferenceRecord::Kind VariableReferences(
             }
           }
         }
-        continue;
+        break;
       case pasta::StmtKind::kDeclStmt:
       case pasta::StmtKind::kDesignatedInitExpr:
       case pasta::StmtKind::kDesignatedInitUpdateExpr:
@@ -172,8 +171,13 @@ static mx::ReferenceRecord::Kind VariableReferences(
         }
         return mx::ReferenceRecord::Kind::AssignedTos;
       default: break;
-
     }
+
+    if (auto maybe_next = em.ParentStmt(ast, parent)) {
+      parent = maybe_next.value();
+      continue;
+    }
+    valid_parent = false;
   }
 
   return mx::ReferenceRecord::Kind::GenericUses;
@@ -182,16 +186,21 @@ static mx::ReferenceRecord::Kind VariableReferences(
 // Get the reference kind for types if referenced by a statement
 static mx::ReferenceRecord::Kind TypeReferences(
     const pasta::AST &ast, EntityMapper &em, const pasta::Stmt &stmt) {
-  auto maybe_stmt = std::make_optional<pasta::Stmt>(stmt);
-  while (maybe_stmt.has_value()) {
-    auto parent = maybe_stmt.value();
-    maybe_stmt.emplace(em.ParentStmt(ast, parent).value());
+  auto valid_parent = true;
+  auto parent = stmt;
+  while (valid_parent) {
     if (pasta::CastExpr::From(parent)) {
       return mx::ReferenceRecord::Kind::TypeCasts;
     } else if (pasta::TypeTraitExpr::From(parent) ||
         pasta::UnaryExprOrTypeTraitExpr::From(parent)) {
       return mx::ReferenceRecord::Kind::TypeTraitUses;
     }
+
+    if (auto maybe_next = em.ParentStmt(ast, parent)) {
+      parent = maybe_next.value();
+      continue;
+    }
+    valid_parent = false;
   }
 
   return mx::ReferenceRecord::Kind::StatementUses;

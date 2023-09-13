@@ -311,7 +311,7 @@ struct ReferenceRecord {
 
   // NOTE(pag): Reference id `0` is the id of an "explicit code reference."
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id, kind)
+      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id, kind_id)
          VALUES (?1, ?2, ?3))";
 
   RawEntityId from_entity_id;

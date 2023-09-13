@@ -47,6 +47,10 @@ class EntityMapper final {
   EntityIdMap parent_decl_ids;
   EntityIdMap parent_stmt_ids;
 
+  // Entities map for tracking parent pointers
+  EntityParentMap parent_decls;
+  EntityParentMap parent_stmts;
+
   inline explicit EntityMapper(TypeMapper &tm_)
       : tm(tm_) {}
 
@@ -86,20 +90,14 @@ class EntityMapper final {
 
   mx::RawEntityId EntityIdOfType(const void *type, uint32_t quals=0u) const;
 
-  std::optional<const pasta::Decl> EntityDecl(
-      const pasta::AST &ast, mx::RawEntityId id) const;
-  std::optional<const pasta::Stmt> EntityStmt(
-      const pasta::AST &ast, mx::RawEntityId id) const;
-
   std::optional<const pasta::Decl> ParentDecl(
-      const pasta::AST &ast, const pasta::Decl &decl) const;
+      const pasta::AST &ast, const pasta::Decl &entity) const;
   std::optional<const pasta::Decl> ParentDecl(
-      const pasta::AST &ast, const pasta::Stmt &stmt) const;
-
+      const pasta::AST &ast, const pasta::Stmt &entity) const;
   std::optional<const pasta::Stmt> ParentStmt(
-      const pasta::AST &ast, const pasta::Decl &decl) const;
+      const pasta::AST &ast, const pasta::Decl &entity) const;
   std::optional<const pasta::Stmt> ParentStmt(
-      const pasta::AST &ast, const pasta::Stmt &stmt) const;
+      const pasta::AST &ast, const pasta::Stmt &entity) const;
 
   void ResetForFragment(void);
 };
