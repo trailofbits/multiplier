@@ -5323,6 +5323,7 @@ void SerializeStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::S
 }
 
 void SerializeSEHTryStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHTryStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.ExceptHandler()));
   b.setVal10(es.EntityId(e.FinallyHandler()));
@@ -5334,12 +5335,14 @@ void SerializeSEHTryStmt(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeSEHLeaveStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHLeaveStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.LeaveToken());
   b.setVal9(et9);
 }
 
 void SerializeSEHFinallyStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHFinallyStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Block()));
   auto et10 = es.EntityId(e.FinallyToken());
@@ -5347,6 +5350,7 @@ void SerializeSEHFinallyStmt(const PendingFragment &pf, const EntityMapper &es, 
 }
 
 void SerializeSEHExceptStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SEHExceptStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Block()));
   auto et10 = es.EntityId(e.ExceptToken());
@@ -5355,6 +5359,7 @@ void SerializeSEHExceptStmt(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeReturnStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ReturnStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto v9 = e.NRVOCandidate();
   if (v9) {
@@ -5375,6 +5380,7 @@ void SerializeReturnStmt(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeObjCForCollectionStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCForCollectionStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   b.setVal10(es.EntityId(e.Collection()));
@@ -5386,6 +5392,7 @@ void SerializeObjCForCollectionStmt(const PendingFragment &pf, const EntityMappe
 }
 
 void SerializeObjCAutoreleasePoolStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAutoreleasePoolStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.AtToken());
   b.setVal9(et9);
@@ -5393,6 +5400,7 @@ void SerializeObjCAutoreleasePoolStmt(const PendingFragment &pf, const EntityMap
 }
 
 void SerializeObjCAtTryStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtTryStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.AtTryToken());
   b.setVal9(et9);
@@ -5410,6 +5418,7 @@ void SerializeObjCAtTryStmt(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeObjCAtThrowStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtThrowStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.ThrowExpression()));
   auto et10 = es.EntityId(e.ThrowToken());
@@ -5417,6 +5426,7 @@ void SerializeObjCAtThrowStmt(const PendingFragment &pf, const EntityMapper &es,
 }
 
 void SerializeObjCAtSynchronizedStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtSynchronizedStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.AtSynchronizedToken());
   b.setVal9(et9);
@@ -5425,6 +5435,7 @@ void SerializeObjCAtSynchronizedStmt(const PendingFragment &pf, const EntityMapp
 }
 
 void SerializeObjCAtFinallyStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtFinallyStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.AtFinallyToken());
   b.setVal9(et9);
@@ -5432,6 +5443,7 @@ void SerializeObjCAtFinallyStmt(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeObjCAtCatchStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAtCatchStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.AtCatchToken());
   b.setVal9(et9);
@@ -5443,6 +5455,7 @@ void SerializeObjCAtCatchStmt(const PendingFragment &pf, const EntityMapper &es,
 }
 
 void SerializeOMPExecutableDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPExecutableDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.AssociatedStatement()));
   b.setVal10(es.EntityId(e.InnermostCapturedStatement()));
@@ -5453,36 +5466,44 @@ void SerializeOMPExecutableDirective(const PendingFragment &pf, const EntityMapp
 }
 
 void SerializeOMPErrorDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPErrorDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPDispatchDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDispatchDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   auto et14 = es.EntityId(e.TargetCallToken());
   b.setVal14(et14);
 }
 
 void SerializeOMPDepobjDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDepobjDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPCriticalDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCriticalDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPCancellationPointDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCancellationPointDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPCancelDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCancelDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPBarrierDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPBarrierDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPAtomicDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPAtomicDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.ConditionExpression()));
   b.setVal17(es.EntityId(e.D()));
@@ -5497,134 +5518,163 @@ void SerializeOMPAtomicDirective(const PendingFragment &pf, const EntityMapper &
 }
 
 void SerializeOMPTeamsDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTaskyieldDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskyieldDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTaskwaitDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskwaitDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTaskgroupDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskgroupDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.ReductionReference()));
 }
 
 void SerializeOMPTaskDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPTargetUpdateDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetUpdateDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetTeamsDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetParallelDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPTargetExitDataDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetExitDataDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetEnterDataDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetEnterDataDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetDataDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetDataDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPSingleDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSingleDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPSectionsDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSectionsDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPSectionDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSectionDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPScanDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPScanDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPParallelSectionsDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelSectionsDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPParallelMasterDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
 }
 
 void SerializeOMPParallelMaskedDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
 }
 
 void SerializeOMPParallelDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPOrderedDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPOrderedDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPMetaDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMetaDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.IfStatement()));
 }
 
 void SerializeOMPMasterDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPMaskedDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPLoopBasedDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopBasedDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPLoopTransformationDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopTransformationDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopBasedDirective(pf, es, b, e, nullptr);
   b.setVal14(es.EntityId(e.PreInitializers()));
   b.setVal17(es.EntityId(e.TransformedStatement()));
 }
 
 void SerializeOMPUnrollDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPUnrollDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopTransformationDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTileDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTileDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopTransformationDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopBasedDirective(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Counters();
@@ -5730,171 +5780,209 @@ void SerializeOMPLoopDirective(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeOMPGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPGenericLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPForSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPForDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPDistributeSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPDistributeParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeParallelForSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPDistributeParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeParallelForDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPDistributeDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPDistributeDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTeamsGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsGenericLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTeamsDistributeSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTeamsDistributeParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeParallelForSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTeamsDistributeParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeParallelForDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPTeamsDistributeDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTeamsDistributeDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskLoopSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTaskLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPTargetTeamsGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsGenericLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetTeamsDistributeSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetTeamsDistributeParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeParallelForSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetTeamsDistributeParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeParallelForDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPTargetTeamsDistributeDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetTeamsDistributeDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetParallelGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelGenericLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelForSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPTargetParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPTargetParallelForDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPParallelMasterTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterTaskLoopSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPParallelMasterTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMasterTaskLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPParallelMaskedTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedTaskLoopSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPParallelMaskedTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelMaskedTaskLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPParallelGenericLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelGenericLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPParallelForSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelForSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPParallelForDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPParallelForDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal55(es.EntityId(e.TaskReductionReferenceExpression()));
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPMasterTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterTaskLoopSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPMasterTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMasterTaskLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPMaskedTaskLoopSimdDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedTaskLoopSimdDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPMaskedTaskLoopDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPMaskedTaskLoopDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPLoopDirective(pf, es, b, e, nullptr);
   b.setVal23(e.HasCancel());
 }
 
 void SerializeOMPInteropDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPInteropDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPFlushDirective(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPFlushDirective &e, const TokenTree *) {
+  (void) pf;
   SerializeOMPExecutableDirective(pf, es, b, e, nullptr);
 }
 
 void SerializeOMPCanonicalLoop(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPCanonicalLoop &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.DistanceFunc()));
   b.setVal10(es.EntityId(e.LoopStatement()));
@@ -5903,6 +5991,7 @@ void SerializeOMPCanonicalLoop(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeNullStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::NullStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.SemiToken());
   b.setVal9(et9);
@@ -5910,6 +5999,7 @@ void SerializeNullStmt(const PendingFragment &pf, const EntityMapper &es, mx::as
 }
 
 void SerializeMSDependentExistsStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSDependentExistsStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.KeywordToken());
   b.setVal9(et9);
@@ -5919,6 +6009,7 @@ void SerializeMSDependentExistsStmt(const PendingFragment &pf, const EntityMappe
 }
 
 void SerializeIndirectGotoStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IndirectGotoStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto v9 = e.ConstantTarget();
   if (v9) {
@@ -5935,6 +6026,7 @@ void SerializeIndirectGotoStmt(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeIfStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IfStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Condition()));
   auto v10 = e.ConditionVariable();
@@ -5993,6 +6085,7 @@ void SerializeIfStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast:
 }
 
 void SerializeGotoStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GotoStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.GotoToken());
   b.setVal9(et9);
@@ -6002,6 +6095,7 @@ void SerializeGotoStmt(const PendingFragment &pf, const EntityMapper &es, mx::as
 }
 
 void SerializeForStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ForStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   auto v10 = e.Condition();
@@ -6048,6 +6142,7 @@ void SerializeForStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast
 }
 
 void SerializeDoStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DoStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   b.setVal10(es.EntityId(e.Condition()));
@@ -6060,6 +6155,7 @@ void SerializeDoStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast:
 }
 
 void SerializeDeclStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DeclStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Declarations();
@@ -6081,6 +6177,7 @@ void SerializeDeclStmt(const PendingFragment &pf, const EntityMapper &es, mx::as
 }
 
 void SerializeCoroutineBodyStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoroutineBodyStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Allocate()));
   b.setVal10(es.EntityId(e.Body()));
@@ -6108,6 +6205,7 @@ void SerializeCoroutineBodyStmt(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeCoreturnStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoreturnStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.KeywordToken());
   b.setVal9(et9);
@@ -6117,12 +6215,14 @@ void SerializeCoreturnStmt(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeContinueStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ContinueStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.ContinueToken());
   b.setVal9(et9);
 }
 
 void SerializeCompoundStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.LeftBraceToken());
   b.setVal9(et9);
@@ -6139,6 +6239,7 @@ void SerializeCompoundStmt(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeCapturedStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CapturedStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.CapturedDeclaration()));
   b.setVal10(es.EntityId(e.CapturedRecordDeclaration()));
@@ -6147,6 +6248,7 @@ void SerializeCapturedStmt(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeCXXTryStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTryStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.TryBlock()));
   auto et10 = es.EntityId(e.TryToken());
@@ -6163,6 +6265,7 @@ void SerializeCXXTryStmt(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeCXXForRangeStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXForRangeStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.BeginStatement()));
   b.setVal10(es.EntityId(e.Body()));
@@ -6191,6 +6294,7 @@ void SerializeCXXForRangeStmt(const PendingFragment &pf, const EntityMapper &es,
 }
 
 void SerializeCXXCatchStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXCatchStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.CatchToken());
   b.setVal9(et9);
@@ -6206,12 +6310,14 @@ void SerializeCXXCatchStmt(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeBreakStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BreakStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.BreakToken());
   b.setVal9(et9);
 }
 
 void SerializeAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AsmStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal60(e.GenerateAssemblyString());
   auto et9 = es.EntityId(e.AssemblyToken());
@@ -6287,6 +6393,7 @@ void SerializeAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast
 }
 
 void SerializeMSAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSAsmStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeAsmStmt(pf, es, b, e, nullptr);
   do {
     auto v64 = e.AllConstraints();
@@ -6316,6 +6423,7 @@ void SerializeMSAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::a
 }
 
 void SerializeGCCAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GCCAsmStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeAsmStmt(pf, es, b, e, nullptr);
   b.setVal10(es.EntityId(e.AssemblyString()));
   auto et11 = es.EntityId(e.RParenToken());
@@ -6399,6 +6507,7 @@ void SerializeGCCAsmStmt(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeWhileStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::WhileStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   b.setVal10(es.EntityId(e.Condition()));
@@ -6426,6 +6535,7 @@ void SerializeWhileStmt(const PendingFragment &pf, const EntityMapper &es, mx::a
 }
 
 void SerializeValueStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ValueStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto v9 = e.ExpressionStatement();
   if (v9) {
@@ -6437,6 +6547,7 @@ void SerializeValueStmt(const PendingFragment &pf, const EntityMapper &es, mx::a
 }
 
 void SerializeLabelStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::LabelStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeValueStmt(pf, es, b, e, nullptr);
   b.setVal10(es.EntityId(e.Declaration()));
   auto et11 = es.EntityId(e.IdentifierToken());
@@ -6449,6 +6560,7 @@ void SerializeLabelStmt(const PendingFragment &pf, const EntityMapper &es, mx::a
 }
 
 void SerializeExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Expr &e, const TokenTree *) {
+  (void) pf;
   SerializeValueStmt(pf, es, b, e, nullptr);
   b.setVal12(e.HasSideEffects());
   b.setVal10(es.EntityId(e.IgnoreCasts()));
@@ -6534,12 +6646,14 @@ void SerializeExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::S
 }
 
 void SerializeDesignatedInitUpdateExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DesignatedInitUpdateExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.Updater()));
 }
 
 void SerializeDesignatedInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DesignatedInitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Designators();
@@ -6574,6 +6688,7 @@ void SerializeDesignatedInitExpr(const PendingFragment &pf, const EntityMapper &
 }
 
 void SerializeDependentScopeDeclRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DependentScopeDeclRefExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.LAngleToken());
   b.setVal37(et37);
@@ -6586,6 +6701,7 @@ void SerializeDependentScopeDeclRefExpr(const PendingFragment &pf, const EntityM
 }
 
 void SerializeDependentCoawaitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DependentCoawaitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.KeywordToken());
   b.setVal37(et37);
@@ -6594,6 +6710,7 @@ void SerializeDependentCoawaitExpr(const PendingFragment &pf, const EntityMapper
 }
 
 void SerializeDeclRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DeclRefExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Declaration()));
   b.setVal38(es.EntityId(e.FoundDeclaration()));
@@ -6613,6 +6730,7 @@ void SerializeDeclRefExpr(const PendingFragment &pf, const EntityMapper &es, mx:
 }
 
 void SerializeCoroutineSuspendExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoroutineSuspendExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.CommonExpression()));
   auto et38 = es.EntityId(e.KeywordToken());
@@ -6625,15 +6743,18 @@ void SerializeCoroutineSuspendExpr(const PendingFragment &pf, const EntityMapper
 }
 
 void SerializeCoawaitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoawaitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCoroutineSuspendExpr(pf, es, b, e, nullptr);
   b.setVal89(e.IsImplicit());
 }
 
 void SerializeCoyieldExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CoyieldExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCoroutineSuspendExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeConvertVectorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConvertVectorExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.BuiltinToken());
   b.setVal37(et37);
@@ -6643,6 +6764,7 @@ void SerializeConvertVectorExpr(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeConceptSpecializationExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConceptSpecializationExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SpecializationDeclaration()));
   do {
@@ -6658,6 +6780,7 @@ void SerializeConceptSpecializationExpr(const PendingFragment &pf, const EntityM
 }
 
 void SerializeCompoundLiteralExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundLiteralExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Initializer()));
   auto et38 = es.EntityId(e.LParenToken());
@@ -6666,6 +6789,7 @@ void SerializeCompoundLiteralExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeChooseExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ChooseExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.BuiltinToken());
   b.setVal37(et37);
@@ -6680,6 +6804,7 @@ void SerializeChooseExpr(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeCharacterLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CharacterLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.LiteralKind())));
   auto et37 = es.EntityId(e.Token());
@@ -6687,6 +6812,7 @@ void SerializeCharacterLiteral(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.CastKind())));
   auto v60 = e.CastKindName();
@@ -6712,16 +6838,19 @@ void SerializeCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::as
 }
 
 void SerializeImplicitCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImplicitCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCastExpr(pf, es, b, e, nullptr);
   b.setVal90(e.IsPartOfExplicitCast());
 }
 
 void SerializeExplicitCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExplicitCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCastExpr(pf, es, b, e, nullptr);
   b.setVal41(es.EntityId(e.TypeAsWritten()));
 }
 
 void SerializeCXXNamedCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNamedCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExplicitCastExpr(pf, es, b, e, nullptr);
   if (auto r42 = e.AngleBrackets(); auto rs42 = r42.Size()) {
     b.setVal42(es.EntityId(r42[0]));
@@ -6740,27 +6869,33 @@ void SerializeCXXNamedCastExpr(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeCXXDynamicCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDynamicCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
   b.setVal90(e.IsAlwaysNull());
 }
 
 void SerializeCXXConstCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXConstCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeCXXAddrspaceCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXAddrspaceCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeCXXStaticCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXStaticCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeCXXReinterpretCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXReinterpretCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCXXNamedCastExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeCXXFunctionalCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXFunctionalCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExplicitCastExpr(pf, es, b, e, nullptr);
   auto et42 = es.EntityId(e.LParenToken());
   b.setVal42(et42);
@@ -6770,6 +6905,7 @@ void SerializeCXXFunctionalCastExpr(const PendingFragment &pf, const EntityMappe
 }
 
 void SerializeCStyleCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CStyleCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExplicitCastExpr(pf, es, b, e, nullptr);
   auto et42 = es.EntityId(e.LParenToken());
   b.setVal42(et42);
@@ -6778,10 +6914,12 @@ void SerializeCStyleCastExpr(const PendingFragment &pf, const EntityMapper &es, 
 }
 
 void SerializeBuiltinBitCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BuiltinBitCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExplicitCastExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeObjCBridgedCastExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBridgedCastExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExplicitCastExpr(pf, es, b, e, nullptr);
   auto et42 = es.EntityId(e.BridgeKeywordToken());
   b.setVal42(et42);
@@ -6794,6 +6932,7 @@ void SerializeObjCBridgedCastExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CallExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Arguments();
@@ -6832,6 +6971,7 @@ void SerializeCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::as
 }
 
 void SerializeCXXOperatorCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXOperatorCallExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCallExpr(pf, es, b, e, nullptr);
   b.setVal96(static_cast<unsigned char>(mx::FromPasta(e.Operator())));
   auto et42 = es.EntityId(e.OperatorToken());
@@ -6842,6 +6982,7 @@ void SerializeCXXOperatorCallExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeCXXMemberCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXMemberCallExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCallExpr(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.ImplicitObjectArgument()));
   auto v43 = e.MethodDeclaration();
@@ -6856,11 +6997,13 @@ void SerializeCXXMemberCallExpr(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeCUDAKernelCallExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CUDAKernelCallExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCallExpr(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.Config()));
 }
 
 void SerializeUserDefinedLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UserDefinedLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeCallExpr(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.CookedLiteral()));
   b.setVal96(static_cast<unsigned char>(mx::FromPasta(e.LiteralOperatorKind())));
@@ -6869,6 +7012,7 @@ void SerializeUserDefinedLiteral(const PendingFragment &pf, const EntityMapper &
 }
 
 void SerializeCXXUuidofExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXUuidofExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ExpressionOperand();
   if (v37) {
@@ -6884,6 +7028,7 @@ void SerializeCXXUuidofExpr(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeCXXUnresolvedConstructExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXUnresolvedConstructExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Arguments();
@@ -6903,6 +7048,7 @@ void SerializeCXXUnresolvedConstructExpr(const PendingFragment &pf, const Entity
 }
 
 void SerializeCXXTypeidExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTypeidExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ExpressionOperand();
   if (v37) {
@@ -6925,6 +7071,7 @@ void SerializeCXXTypeidExpr(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeCXXThrowExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXThrowExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.SubExpression();
   if (v37) {
@@ -6939,6 +7086,7 @@ void SerializeCXXThrowExpr(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeCXXThisExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXThisExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.Token());
   b.setVal37(et37);
@@ -6946,17 +7094,20 @@ void SerializeCXXThisExpr(const PendingFragment &pf, const EntityMapper &es, mx:
 }
 
 void SerializeCXXStdInitializerListExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXStdInitializerListExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
 }
 
 void SerializeCXXScalarValueInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXScalarValueInitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.RParenToken());
   b.setVal37(et37);
 }
 
 void SerializeCXXRewrittenBinaryOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXRewrittenBinaryOperator &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.LHS()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Opcode())));
@@ -6974,6 +7125,7 @@ void SerializeCXXRewrittenBinaryOperator(const PendingFragment &pf, const Entity
 }
 
 void SerializeCXXPseudoDestructorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXPseudoDestructorExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   auto et38 = es.EntityId(e.ColonColonToken());
@@ -6997,6 +7149,7 @@ void SerializeCXXPseudoDestructorExpr(const PendingFragment &pf, const EntityMap
 }
 
 void SerializeCXXParenListInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXParenListInitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.ArrayFiller()));
   auto et38 = es.EntityId(e.InitializerToken());
@@ -7005,18 +7158,21 @@ void SerializeCXXParenListInitExpr(const PendingFragment &pf, const EntityMapper
 }
 
 void SerializeCXXNullPtrLiteralExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNullPtrLiteralExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.Token());
   b.setVal37(et37);
 }
 
 void SerializeCXXNoexceptExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNoexceptExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Operand()));
   b.setVal89(e.Value());
 }
 
 void SerializeCXXNewExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXNewExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.DoesUsualArrayDeleteWantSize());
   b.setVal37(es.EntityId(e.AllocatedType()));
@@ -7076,6 +7232,7 @@ void SerializeCXXNewExpr(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeCXXInheritedCtorInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXInheritedCtorInitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.ConstructsVirtualBase());
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.ConstructionKind())));
@@ -7086,6 +7243,7 @@ void SerializeCXXInheritedCtorInitExpr(const PendingFragment &pf, const EntityMa
 }
 
 void SerializeCXXFoldExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXFoldExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Callee()));
   auto et38 = es.EntityId(e.EllipsisToken());
@@ -7104,6 +7262,7 @@ void SerializeCXXFoldExpr(const PendingFragment &pf, const EntityMapper &es, mx:
 }
 
 void SerializeCXXDependentScopeMemberExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDependentScopeMemberExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.Base();
   if (v37) {
@@ -7137,6 +7296,7 @@ void SerializeCXXDependentScopeMemberExpr(const PendingFragment &pf, const Entit
 }
 
 void SerializeCXXDeleteExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDeleteExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.DoesUsualArrayDeleteWantSize());
   b.setVal37(es.EntityId(e.Argument()));
@@ -7148,6 +7308,7 @@ void SerializeCXXDeleteExpr(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeCXXDefaultInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDefaultInitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.Expression();
   if (v37) {
@@ -7164,6 +7325,7 @@ void SerializeCXXDefaultInitExpr(const PendingFragment &pf, const EntityMapper &
 }
 
 void SerializeCXXDefaultArgExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXDefaultArgExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.AdjustedRewrittenExpression()));
   b.setVal38(es.EntityId(e.Expression()));
@@ -7175,6 +7337,7 @@ void SerializeCXXDefaultArgExpr(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeCXXConstructExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXConstructExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Arguments();
@@ -7204,10 +7367,12 @@ void SerializeCXXConstructExpr(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeCXXTemporaryObjectExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXTemporaryObjectExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeCXXConstructExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeCXXBoolLiteralExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXBoolLiteralExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.Token());
   b.setVal37(et37);
@@ -7215,11 +7380,13 @@ void SerializeCXXBoolLiteralExpr(const PendingFragment &pf, const EntityMapper &
 }
 
 void SerializeCXXBindTemporaryExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXBindTemporaryExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
 }
 
 void SerializeBlockExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BlockExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.BlockDeclaration()));
   b.setVal38(es.EntityId(e.Body()));
@@ -7229,6 +7396,7 @@ void SerializeBlockExpr(const PendingFragment &pf, const EntityMapper &es, mx::a
 }
 
 void SerializeBinaryOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BinaryOperator &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.LHS()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Opcode())));
@@ -7255,12 +7423,14 @@ void SerializeBinaryOperator(const PendingFragment &pf, const EntityMapper &es, 
 }
 
 void SerializeCompoundAssignOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CompoundAssignOperator &e, const TokenTree *) {
+  (void) pf;
   SerializeBinaryOperator(pf, es, b, e, nullptr);
   b.setVal40(es.EntityId(e.ComputationLHSType()));
   b.setVal41(es.EntityId(e.ComputationResultType()));
 }
 
 void SerializeAtomicExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AtomicExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.BuiltinToken());
   b.setVal37(et37);
@@ -7320,6 +7490,7 @@ void SerializeAtomicExpr(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeAsTypeExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AsTypeExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.BuiltinToken());
   b.setVal37(et37);
@@ -7329,6 +7500,7 @@ void SerializeAsTypeExpr(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeArrayTypeTraitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayTypeTraitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.DimensionExpression()));
   b.setVal38(es.EntityId(e.QueriedType()));
@@ -7336,6 +7508,7 @@ void SerializeArrayTypeTraitExpr(const PendingFragment &pf, const EntityMapper &
 }
 
 void SerializeArraySubscriptExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArraySubscriptExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.Index()));
@@ -7346,16 +7519,19 @@ void SerializeArraySubscriptExpr(const PendingFragment &pf, const EntityMapper &
 }
 
 void SerializeArrayInitLoopExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayInitLoopExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.CommonExpression()));
   b.setVal38(es.EntityId(e.SubExpression()));
 }
 
 void SerializeArrayInitIndexExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ArrayInitIndexExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeAddrLabelExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AddrLabelExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.AmpAmpToken());
   b.setVal37(et37);
@@ -7365,6 +7541,7 @@ void SerializeAddrLabelExpr(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeAbstractConditionalOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AbstractConditionalOperator &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.ColonToken());
   b.setVal37(et37);
@@ -7376,18 +7553,21 @@ void SerializeAbstractConditionalOperator(const PendingFragment &pf, const Entit
 }
 
 void SerializeConditionalOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConditionalOperator &e, const TokenTree *) {
+  (void) pf;
   SerializeAbstractConditionalOperator(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.LHS()));
   b.setVal43(es.EntityId(e.RHS()));
 }
 
 void SerializeBinaryConditionalOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::BinaryConditionalOperator &e, const TokenTree *) {
+  (void) pf;
   SerializeAbstractConditionalOperator(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.Common()));
   b.setVal43(es.EntityId(e.OpaqueValue()));
 }
 
 void SerializeVAArgExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::VAArgExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.BuiltinToken());
   b.setVal37(et37);
@@ -7399,6 +7579,7 @@ void SerializeVAArgExpr(const PendingFragment &pf, const EntityMapper &es, mx::a
 }
 
 void SerializeUnaryOperator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnaryOperator &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.CanOverflow());
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Opcode())));
@@ -7415,6 +7596,7 @@ void SerializeUnaryOperator(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeUnaryExprOrTypeTraitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnaryExprOrTypeTraitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ArgumentExpression();
   if (v37) {
@@ -7440,10 +7622,12 @@ void SerializeUnaryExprOrTypeTraitExpr(const PendingFragment &pf, const EntityMa
 }
 
 void SerializeTypoExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::TypoExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeTypeTraitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::TypeTraitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Trait())));
   auto v89 = e.Value();
@@ -7465,6 +7649,7 @@ void SerializeTypeTraitExpr(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeSubstNonTypeTemplateParmPackExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SubstNonTypeTemplateParmPackExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.AssociatedDeclaration()));
   b.setVal38(es.EntityId(e.ParameterPack()));
@@ -7473,6 +7658,7 @@ void SerializeSubstNonTypeTemplateParmPackExpr(const PendingFragment &pf, const 
 }
 
 void SerializeSubstNonTypeTemplateParmExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SubstNonTypeTemplateParmExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.AssociatedDeclaration()));
   auto et38 = es.EntityId(e.NameToken());
@@ -7491,6 +7677,7 @@ void SerializeSubstNonTypeTemplateParmExpr(const PendingFragment &pf, const Enti
 }
 
 void SerializeStringLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::StringLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v89 = e.ContainsNonAscii();
   if (v89) {
@@ -7531,6 +7718,7 @@ void SerializeStringLiteral(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeStmtExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::StmtExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.LParenToken());
   b.setVal37(et37);
@@ -7540,6 +7728,7 @@ void SerializeStmtExpr(const PendingFragment &pf, const EntityMapper &es, mx::as
 }
 
 void SerializeSourceLocExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SourceLocExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v60 = e.BuiltinString();
   std::string s60(v60.data(), v60.size());
@@ -7551,6 +7740,7 @@ void SerializeSourceLocExpr(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeSizeOfPackExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SizeOfPackExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.OperatorToken());
   b.setVal37(et37);
@@ -7585,6 +7775,7 @@ void SerializeSizeOfPackExpr(const PendingFragment &pf, const EntityMapper &es, 
 }
 
 void SerializeShuffleVectorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ShuffleVectorExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.BuiltinToken());
   b.setVal37(et37);
@@ -7593,6 +7784,7 @@ void SerializeShuffleVectorExpr(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeSYCLUniqueStableNameExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SYCLUniqueStableNameExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal60(e.ComputeName());
   auto et37 = es.EntityId(e.LParenToken());
@@ -7604,6 +7796,7 @@ void SerializeSYCLUniqueStableNameExpr(const PendingFragment &pf, const EntityMa
 }
 
 void SerializeRequiresExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::RequiresExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Body()));
   do {
@@ -7623,6 +7816,7 @@ void SerializeRequiresExpr(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeRecoveryExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::RecoveryExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.SubExpressions();
@@ -7636,6 +7830,7 @@ void SerializeRecoveryExpr(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializePseudoObjectExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PseudoObjectExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.ResultExpression()));
   b.setVal38(es.EntityId(e.SyntacticForm()));
@@ -7660,6 +7855,7 @@ void SerializePseudoObjectExpr(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializePredefinedExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PredefinedExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.FunctionName()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.IdentifierKind())));
@@ -7671,6 +7867,7 @@ void SerializePredefinedExpr(const PendingFragment &pf, const EntityMapper &es, 
 }
 
 void SerializeParenListExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ParenListExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.LParenToken());
   b.setVal37(et37);
@@ -7688,6 +7885,7 @@ void SerializeParenListExpr(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeParenExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ParenExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.LParenToken());
   b.setVal37(et37);
@@ -7697,6 +7895,7 @@ void SerializeParenExpr(const PendingFragment &pf, const EntityMapper &es, mx::a
 }
 
 void SerializePackExpansionExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::PackExpansionExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.EllipsisToken());
   b.setVal37(et37);
@@ -7704,6 +7903,7 @@ void SerializePackExpansionExpr(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeOverloadExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OverloadExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.LAngleToken());
   b.setVal37(et37);
@@ -7725,6 +7925,7 @@ void SerializeOverloadExpr(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeUnresolvedMemberExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnresolvedMemberExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeOverloadExpr(pf, es, b, e, nullptr);
   b.setVal42(es.EntityId(e.Base()));
   b.setVal43(es.EntityId(e.BaseType()));
@@ -7738,12 +7939,14 @@ void SerializeUnresolvedMemberExpr(const PendingFragment &pf, const EntityMapper
 }
 
 void SerializeUnresolvedLookupExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UnresolvedLookupExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeOverloadExpr(pf, es, b, e, nullptr);
   b.setVal91(e.IsOverloaded());
   b.setVal92(e.RequiresADL());
 }
 
 void SerializeOpaqueValueExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OpaqueValueExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.Token());
   b.setVal37(et37);
@@ -7752,6 +7955,7 @@ void SerializeOpaqueValueExpr(const PendingFragment &pf, const EntityMapper &es,
 }
 
 void SerializeOffsetOfExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OffsetOfExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.OperatorToken());
   b.setVal37(et37);
@@ -7760,6 +7964,7 @@ void SerializeOffsetOfExpr(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeObjCSubscriptRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCSubscriptRefExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.AtIndexMethodDeclaration()));
   b.setVal38(es.EntityId(e.BaseExpression()));
@@ -7770,6 +7975,7 @@ void SerializeObjCSubscriptRefExpr(const PendingFragment &pf, const EntityMapper
 }
 
 void SerializeObjCStringLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCStringLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.AtToken());
   b.setVal37(et37);
@@ -7777,6 +7983,7 @@ void SerializeObjCStringLiteral(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeObjCSelectorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCSelectorExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.AtToken());
   b.setVal37(et37);
@@ -7785,6 +7992,7 @@ void SerializeObjCSelectorExpr(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeObjCProtocolExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCProtocolExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.AtToken());
   b.setVal37(et37);
@@ -7796,6 +8004,7 @@ void SerializeObjCProtocolExpr(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeObjCPropertyRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCPropertyRefExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.ClassReceiver()));
@@ -7818,6 +8027,7 @@ void SerializeObjCPropertyRefExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeObjCMessageExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCMessageExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.Arguments();
@@ -7869,6 +8079,7 @@ void SerializeObjCMessageExpr(const PendingFragment &pf, const EntityMapper &es,
 }
 
 void SerializeObjCIvarRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIvarRefExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.Declaration()));
@@ -7881,6 +8092,7 @@ void SerializeObjCIvarRefExpr(const PendingFragment &pf, const EntityMapper &es,
 }
 
 void SerializeObjCIsaExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIsaExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   auto et38 = es.EntityId(e.BaseTokenEnd());
@@ -7893,12 +8105,14 @@ void SerializeObjCIsaExpr(const PendingFragment &pf, const EntityMapper &es, mx:
 }
 
 void SerializeObjCIndirectCopyRestoreExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCIndirectCopyRestoreExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
   b.setVal89(e.ShouldCopy());
 }
 
 void SerializeObjCEncodeExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCEncodeExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.AtToken());
   b.setVal37(et37);
@@ -7908,11 +8122,13 @@ void SerializeObjCEncodeExpr(const PendingFragment &pf, const EntityMapper &es, 
 }
 
 void SerializeObjCDictionaryLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCDictionaryLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.DictionaryWithObjectsMethod()));
 }
 
 void SerializeObjCBoxedExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBoxedExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.AtToken());
   b.setVal37(et37);
@@ -7922,6 +8138,7 @@ void SerializeObjCBoxedExpr(const PendingFragment &pf, const EntityMapper &es, m
 }
 
 void SerializeObjCBoolLiteralExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCBoolLiteralExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.Token());
   b.setVal37(et37);
@@ -7929,11 +8146,13 @@ void SerializeObjCBoolLiteralExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeObjCAvailabilityCheckExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCAvailabilityCheckExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.HasVersion());
 }
 
 void SerializeObjCArrayLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ObjCArrayLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.ArrayWithObjectsMethod()));
   do {
@@ -7948,6 +8167,7 @@ void SerializeObjCArrayLiteral(const PendingFragment &pf, const EntityMapper &es
 }
 
 void SerializeOMPIteratorExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPIteratorExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.IteratorKwToken());
   b.setVal37(et37);
@@ -7958,6 +8178,7 @@ void SerializeOMPIteratorExpr(const PendingFragment &pf, const EntityMapper &es,
 }
 
 void SerializeOMPArrayShapingExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPArrayShapingExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   do {
@@ -7976,6 +8197,7 @@ void SerializeOMPArrayShapingExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeOMPArraySectionExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::OMPArraySectionExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   auto et38 = es.EntityId(e.FirstColonToken());
@@ -7990,10 +8212,12 @@ void SerializeOMPArraySectionExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeNoInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::NoInitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeMemberExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MemberExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   auto et38 = es.EntityId(e.LAngleToken());
@@ -8017,6 +8241,7 @@ void SerializeMemberExpr(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeMatrixSubscriptExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MatrixSubscriptExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.ColumnIndex()));
@@ -8027,6 +8252,7 @@ void SerializeMatrixSubscriptExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeMaterializeTemporaryExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MaterializeTemporaryExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ExtendingDeclaration();
   if (v37) {
@@ -8049,6 +8275,7 @@ void SerializeMaterializeTemporaryExpr(const PendingFragment &pf, const EntityMa
 }
 
 void SerializeMSPropertySubscriptExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSPropertySubscriptExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Base()));
   b.setVal38(es.EntityId(e.Index()));
@@ -8057,6 +8284,7 @@ void SerializeMSPropertySubscriptExpr(const PendingFragment &pf, const EntityMap
 }
 
 void SerializeMSPropertyRefExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::MSPropertyRefExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.BaseExpression()));
   auto et38 = es.EntityId(e.MemberToken());
@@ -8067,6 +8295,7 @@ void SerializeMSPropertyRefExpr(const PendingFragment &pf, const EntityMapper &e
 }
 
 void SerializeLambdaExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::LambdaExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.Body()));
   b.setVal38(es.EntityId(e.CallOperator()));
@@ -8119,12 +8348,14 @@ void SerializeLambdaExpr(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeIntegerLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::IntegerLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.Token());
   b.setVal37(et37);
 }
 
 void SerializeInitListExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::InitListExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto v37 = e.ArrayFiller();
   if (v37) {
@@ -8183,15 +8414,18 @@ void SerializeInitListExpr(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeImplicitValueInitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImplicitValueInitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
 }
 
 void SerializeImaginaryLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ImaginaryLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
 }
 
 void SerializeGenericSelectionExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GenericSelectionExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   do {
     auto v15 = e.AssociationExpressions();
@@ -8214,12 +8448,14 @@ void SerializeGenericSelectionExpr(const PendingFragment &pf, const EntityMapper
 }
 
 void SerializeGNUNullExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::GNUNullExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.TokenToken());
   b.setVal37(et37);
 }
 
 void SerializeFunctionParmPackExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FunctionParmPackExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.ParameterPack()));
   auto et38 = es.EntityId(e.ParameterPackToken());
@@ -8236,16 +8472,19 @@ void SerializeFunctionParmPackExpr(const PendingFragment &pf, const EntityMapper
 }
 
 void SerializeFullExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FullExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.SubExpression()));
 }
 
 void SerializeExprWithCleanups(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExprWithCleanups &e, const TokenTree *) {
+  (void) pf;
   SerializeFullExpr(pf, es, b, e, nullptr);
   b.setVal89(e.CleanupsHaveSideEffects());
 }
 
 void SerializeConstantExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ConstantExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeFullExpr(pf, es, b, e, nullptr);
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.ResultStorageKind())));
   b.setVal89(e.HasAPValueResult());
@@ -8253,6 +8492,7 @@ void SerializeConstantExpr(const PendingFragment &pf, const EntityMapper &es, mx
 }
 
 void SerializeFloatingLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FloatingLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.Token());
   b.setVal37(et37);
@@ -8260,12 +8500,14 @@ void SerializeFloatingLiteral(const PendingFragment &pf, const EntityMapper &es,
 }
 
 void SerializeFixedPointLiteral(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::FixedPointLiteral &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   auto et37 = es.EntityId(e.Token());
   b.setVal37(et37);
 }
 
 void SerializeExtVectorElementExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExtVectorElementExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal89(e.ContainsDuplicateElements());
   auto et37 = es.EntityId(e.AccessorToken());
@@ -8275,6 +8517,7 @@ void SerializeExtVectorElementExpr(const PendingFragment &pf, const EntityMapper
 }
 
 void SerializeExpressionTraitExpr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::ExpressionTraitExpr &e, const TokenTree *) {
+  (void) pf;
   SerializeExpr(pf, es, b, e, nullptr);
   b.setVal37(es.EntityId(e.QueriedExpression()));
   b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.Trait())));
@@ -8282,6 +8525,7 @@ void SerializeExpressionTraitExpr(const PendingFragment &pf, const EntityMapper 
 }
 
 void SerializeAttributedStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::AttributedStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeValueStmt(pf, es, b, e, nullptr);
   auto et10 = es.EntityId(e.AttributeToken());
   b.setVal10(et10);
@@ -8298,6 +8542,7 @@ void SerializeAttributedStmt(const PendingFragment &pf, const EntityMapper &es, 
 }
 
 void SerializeSwitchStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SwitchStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   b.setVal9(es.EntityId(e.Body()));
   b.setVal10(es.EntityId(e.Condition()));
@@ -8341,6 +8586,7 @@ void SerializeSwitchStmt(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeSwitchCase(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::SwitchCase &e, const TokenTree *) {
+  (void) pf;
   SerializeStmt(pf, es, b, e, nullptr);
   auto et9 = es.EntityId(e.ColonToken());
   b.setVal9(et9);
@@ -8357,12 +8603,14 @@ void SerializeSwitchCase(const PendingFragment &pf, const EntityMapper &es, mx::
 }
 
 void SerializeDefaultStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::DefaultStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeSwitchCase(pf, es, b, e, nullptr);
   auto et14 = es.EntityId(e.DefaultToken());
   b.setVal14(et14);
 }
 
 void SerializeCaseStmt(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CaseStmt &e, const TokenTree *) {
+  (void) pf;
   SerializeSwitchCase(pf, es, b, e, nullptr);
   b.setVal12(e.CaseStatementIsGNURange());
   auto et14 = es.EntityId(e.CaseToken());

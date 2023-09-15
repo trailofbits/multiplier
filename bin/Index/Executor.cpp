@@ -200,7 +200,6 @@ Executor::Executor(const ExecutorOptions &options)
     }
   };
 
-  Signal::AddAsyncObserver(SIGINT, stop_work);
   Signal::AddAsyncObserver(SIGQUIT, stop_work);
   Signal::AddAsyncObserver(SIGTERM, stop_work);
 }

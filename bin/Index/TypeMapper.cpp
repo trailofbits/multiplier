@@ -19,6 +19,7 @@
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wcast-align"
+#include <clang/AST/ASTContext.h>
 #include <clang/AST/Decl.h>
 #include <clang/AST/Type.h>
 #include <llvm/Support/Casting.h>
@@ -55,11 +56,7 @@ static clang::Type *BasicTypeDeduplication(clang::Type *type,
 
 static clang::Type *BasicTypeDeduplication(clang::QualType type,
                                            uint32_t &up_quals) {
-  if (type.isNull()) {
-    return nullptr;
-  }
-
-  clang::Type *tp = const_cast<clang::Type *>(type.getTypePtr());
+  clang::Type *tp = const_cast<clang::Type *>(type.getTypePtrOrNull());
   if (!tp) {
     return tp;
   }
@@ -184,6 +181,20 @@ bool TypePrintingPolicy::ShouldPrintOriginalTypeOfAdjustedType(void) const {
 
 bool TypePrintingPolicy::ShouldPrintOriginalTypeOfDecayedType(void) const {
   return false;
+}
+
+clang::QualType TypeMapper::Compress(clang::ASTContext &context,
+                                     const clang::QualType &type) {
+  uint32_t qualifiers = 0u;
+  clang::Type *type_ptr = BasicTypeDeduplication(type, qualifiers);
+  clang::QualType fast_qtype(type_ptr, qualifiers & clang::Qualifiers::FastMask);
+  return context.getQualifiedType(
+      fast_qtype, clang::Qualifiers::fromOpaqueValue(qualifiers));
+}
+
+clang::QualType TypeMapper::Compress(clang::ASTContext &context,
+                                     const clang::Type *type) {
+  return Compress(context, clang::QualType(type, 0u));
 }
 
 // Hash a type.

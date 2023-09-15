@@ -14,7 +14,6 @@
 
 #include <mlir/Dialect/SCF/IR/SCF.h>
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
-#include <vast/Dialect/Dialects.hpp>
 #include <vast/Dialect/Core/CoreOps.hpp>
 
 namespace mx::ir::core {

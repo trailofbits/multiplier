@@ -42,7 +42,7 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index(mx::Index::in_memory_cache(
       mx::Index::from_database(FLAGS_db)));
 
-  for (const mx::NamedEntity &ent : index.query_entities(FLAGS_name)) {
+  for (mx::NamedEntity ent : index.query_entities(FLAGS_name)) {
     if (std::holds_alternative<mx::NamedDecl>(ent)) {
       mx::NamedDecl decl = std::get<mx::NamedDecl>(ent);
       if (FLAGS_exact && decl.name() != FLAGS_name) {

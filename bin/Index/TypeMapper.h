@@ -14,6 +14,12 @@
 #include "Entity.h"
 #include "Util.h"
 
+namespace clang {
+class ASTContext;
+class QualType;
+class Type;
+}  // namespace clang
+
 namespace mx {
 class DatabaseWriter;
 } // namespace mx
@@ -82,6 +88,10 @@ class TypeMapper final {
   bool AddEntityId(const EntityMapper &em, pasta::Type *entity);
 
   mx::PackedTypeId TypeId(const pasta::Type &entity) const;
+
+  static clang::QualType Compress(clang::ASTContext &,
+                                  const clang::QualType &type);
+  static clang::QualType Compress(clang::ASTContext &, const clang::Type *type);
 };
 
 }  // namespace indexer
