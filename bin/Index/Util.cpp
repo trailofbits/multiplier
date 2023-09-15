@@ -307,6 +307,35 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
   return kind;
 }
 
+namespace {
+
+// Look for `asm("asm" : [identifier] "constraint" (input_or_output))` and
+// try to make `identifier` into a `STRING_LITERAL` token kind, because
+// logically it refers to to something inside of `"asm"`.
+static mx::TokenKind ClassifyIdentifierToken(const pasta::PrintedToken &token,
+                                             const pasta::Stmt &stmt) {
+  auto gcc_asm = pasta::GCCAsmStmt::From(stmt);
+  if (!gcc_asm) {
+    return mx::TokenKind::IDENTIFIER;
+  }
+
+  for (auto name : gcc_asm->InputNames()) {
+    if (token.Data() == name) {
+      return mx::TokenKind::STRING_LITERAL;
+    }
+  }
+
+  for (auto name : gcc_asm->OutputNames()) {
+    if (token.Data() == name) {
+      return mx::TokenKind::STRING_LITERAL;
+    }
+  }
+
+  return mx::TokenKind::IDENTIFIER;
+}
+
+}  // namespace
+
 // Return the token kind from printed token
 mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
   auto kind = mx::FromPasta(entity.Kind());
@@ -316,7 +345,19 @@ mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
       return mx::TokenKind::WHITESPACE;
     }
   }
-  return kind;
+
+  if (mx::TokenKind::IDENTIFIER != kind) {
+    return kind;
+  }
+
+  // Try to do some context-specific specialization of token kinds.
+  if (auto context = entity.Context()) {
+    if (auto stmt = pasta::Stmt::From(context.value())) {
+      return ClassifyIdentifierToken(entity, stmt.value());
+    }
+  }
+
+  return mx::TokenKind::IDENTIFIER;
 }
 
 // Return the token kind.

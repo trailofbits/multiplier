@@ -206,6 +206,18 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     return VisitStmt(me->Base(), raw_token, token_data, token_kind,
                      is_identifier);
 
+  // The label name in an `asm goto`.
+  } else if (auto addr = pasta::AddrLabelExpr::From(stmt)) {
+    auto lt = addr->LabelToken();
+    auto ld = addr->Label().RawDecl();
+    if (raw_token) {
+      if (lt.RawToken() == raw_token) {
+        return ld;
+      }
+    } else if (lt.Data() == token_data) {
+      return ld;
+    }
+
   } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
     pasta::CXXConstructorDecl cd = ce->Constructor();
     auto ct = ce->Token();
