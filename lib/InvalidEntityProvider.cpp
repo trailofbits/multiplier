@@ -60,7 +60,8 @@ InvalidEntityProvider::ReferenceKindFor(const Ptr &, std::string_view) {
 }
 
 bool InvalidEntityProvider::AddReference(const Ptr &, RawEntityId,
-                                         RawEntityId, RawEntityId) {
+                                         RawEntityId, RawEntityId,
+                                         RawEntityId) {
   return false;
 }
 
@@ -69,7 +70,7 @@ gap::generator<RawEntityId> InvalidEntityProvider::Redeclarations(
   co_return;
 }
 
-gap::generator<std::pair<RawEntityId, RawEntityId>>
+gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 InvalidEntityProvider::References(const Ptr &, RawEntityId) & {
   co_return;
 }

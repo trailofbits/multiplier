@@ -178,9 +178,11 @@ gap::generator<Decl> Decl::redeclarations(void) const & {
 // Return references to this declaration.
 gap::generator<Reference> Decl::references(void) const & {
   const EntityProviderPtr &ep = impl->ep;
-  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
-    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
-      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+  for (auto ref : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
+      auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));
+      co_yield Reference(std::move(eptr), std::move(context),
+                         std::get<0>(ref), category, std::get<2>(ref));
     }
   }
 }

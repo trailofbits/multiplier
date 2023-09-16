@@ -24,6 +24,16 @@ class ReferenceKindImpl {
         kind_data(std::move(kind_data_)) {}
 };
 
+class ReferenceContextImpl {
+ public:
+  const EntityProviderPtr ep;
+  const RawEntityId eid;
+
+  inline ReferenceContextImpl(EntityProviderPtr ep_, RawEntityId eid_)
+      : ep(std::move(ep_)),
+        eid(eid_) {}
+};
+
 std::pair<OpaqueImplPtr, EntityCategory> ReferencedEntity(
     const EntityProviderPtr &ep, RawEntityId raw_id);
 

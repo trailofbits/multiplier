@@ -303,6 +303,8 @@ void EntityMapper::ResetForFragment(void) {
   token_tree_ids.clear();
   parent_decl_ids.clear();
   parent_stmt_ids.clear();
+  parent_decls.clear();
+  parent_stmts.clear();
 }
 
 }  // namespace indexer
