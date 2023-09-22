@@ -6,11 +6,16 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(NOT MX_USE_VENDORED_REPROC)
-  find_package(reproc++ CONFIG QUIET)
-  if(reproc++_FOUND)
+if(NOT MX_USE_VENDORED_GLOG)
+  find_package(glog CONFIG QUIET)
+  if(glog_FOUND)
     return()
   endif()
+endif()
+
+find_package(gflags CONFIG)
+if(NOT gflags_FOUND)
+  message(FATAL_ERROR "Could not find gflags depedency for glog.")
 endif()
 
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
@@ -25,7 +30,7 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
 endif()
 
 # This is the main build, setup and execute the nested build
-# to ensure the reproc library exists before continuing
+# to ensure the glog library exists before continuing
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${install_dir}")
@@ -39,17 +44,16 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
                         "-G${CMAKE_GENERATOR}"
-                        -DREPROC_MULTITHREADED=ON
-                        "-DREPROC++=ON"
-                        -DREPROC_DEVELOP=OFF
-                        -DREPROC_TEST=OFF
-                        -DREPROC_EXAMPLES=OFF
-                        -DREPROC_WARNINGS=$<CONFIG:Debug>
-                        -DREPROC_TIDY=OFF
-                        -DREPROC_WARNINGS_AS_ERRORS=OFF
-                        -DREPROC_OBJECT_LIBRARIES=ON
-                        -DREPROC_INSTALL=ON
-                        -DREPROC_INSTALL_PKGCONFIG=ON
+                        -DBUILD_SHARED_LIBS=OFF
+                        -DPRINT_UNSYMBOLIZED_STACK_TRACES=OFF
+                        -DWITH_GFLAGS=ON
+                        -DWITH_GTEST=OFF
+                        -DWITH_GMOCK=OFF
+                        -DWITH_SYMBOLIZE=OFF
+                        -DWITH_THREADS=ON
+                        -DWITH_TLS=ON
+                        -DWITH_UNWIND=OFF
+                        "-Dgflags_DIR=${gflags_DIR}"
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
@@ -60,5 +64,4 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(reproc CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
-find_package(reproc++ CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
+find_package(glog CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)

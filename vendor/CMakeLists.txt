@@ -17,6 +17,12 @@ list(PREPEND CMAKE_MODULE_PATH
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" PARENT_SCOPE)
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" PARENT_SCOPE)
 
+find_package(Git REQUIRED)
+
+add_subdirectory(capnproto)
+add_subdirectory(gflags)
+add_subdirectory(glog)
 add_subdirectory(concurrentqueue)
 add_subdirectory(reproc)
 add_subdirectory(sqlite)
+add_subdirectory(gap)

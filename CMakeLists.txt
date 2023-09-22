@@ -44,33 +44,16 @@ if(MX_ENABLE_INSTALL)
 endif(MX_ENABLE_INSTALL)
 
 add_subdirectory("vendor")
+return()
 
 find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
-find_package(CapnProto CONFIG REQUIRED)
-find_package(zstd CONFIG REQUIRED)
-find_package(gflags CONFIG REQUIRED)
-
-if(NOT TARGET gflags::gflags)
-  if(TARGET gflags::gflags_static)
-    add_library(gflags::gflags ALIAS gflags::gflags_static)
-  elseif(TARGET gflags_static)
-    add_library(gflags::gflags_static ALIAS gflags_static)
-    add_library(gflags::gflags ALIAS gflags_static)
-  else()
-    message(FATAL_ERROR "Cannot find appropriate gflags target; known targets are ${gflags_LIBRARIES}")
-  endif()
-endif()
-
-find_package(glog CONFIG REQUIRED)
-find_package(Z3 CONFIG REQUIRED)
+find_package(pasta CONFIG REQUIRED)
 find_package(LLVM CONFIG REQUIRED)
 find_package(Clang CONFIG REQUIRED)
+
 find_package(MLIR CONFIG REQUIRED)
-find_package(gap CONFIG REQUIRED)
 find_package(VAST CONFIG REQUIRED)
 
-find_package(reproc++ REQUIRED)
-find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 if(PLATFORM_MACOS)

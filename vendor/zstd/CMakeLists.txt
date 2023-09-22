@@ -6,14 +6,14 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(NOT MX_USE_VENDORED_REPROC)
-  find_package(reproc++ CONFIG QUIET)
-  if(reproc++_FOUND)
+if(NOT MX_USE_VENDORED_ZSTD)
+  find_package(zstd CONFIG QUIET)
+  if(zstd_FOUND)
     return()
   endif()
 endif()
 
-set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
+set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src/build/cmake")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
 set(install_dir "${CMAKE_CURRENT_BINARY_DIR}/install")
 
@@ -25,7 +25,7 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
 endif()
 
 # This is the main build, setup and execute the nested build
-# to ensure the reproc library exists before continuing
+# to ensure the zstd library exists before continuing
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${install_dir}")
@@ -39,17 +39,14 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
                         "-G${CMAKE_GENERATOR}"
-                        -DREPROC_MULTITHREADED=ON
-                        "-DREPROC++=ON"
-                        -DREPROC_DEVELOP=OFF
-                        -DREPROC_TEST=OFF
-                        -DREPROC_EXAMPLES=OFF
-                        -DREPROC_WARNINGS=$<CONFIG:Debug>
-                        -DREPROC_TIDY=OFF
-                        -DREPROC_WARNINGS_AS_ERRORS=OFF
-                        -DREPROC_OBJECT_LIBRARIES=ON
-                        -DREPROC_INSTALL=ON
-                        -DREPROC_INSTALL_PKGCONFIG=ON
+                        -DZSTD_LEGACY_SUPPORT=OFF
+                        -DZSTD_MULTITHREAD_SUPPORT_DEFAULT=ON
+                        -DZSTD_BUILD_PROGRAMS=OFF
+                        -DZSTD_BUILD_CONTRIB=OFF
+                        -DZSTD_BUILD_TESTS=OFF
+                        -DZSTD_USE_STATIC_RUNTIME=ON
+                        -DZSTD_PROGRAMS_LINK_SHARED=OFF
+                        -DBUILD_TESTING=OFF
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
@@ -60,5 +57,4 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(reproc CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
-find_package(reproc++ CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
+find_package(zstd CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)

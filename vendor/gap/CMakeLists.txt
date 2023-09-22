@@ -6,9 +6,9 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(NOT MX_USE_VENDORED_REPROC)
-  find_package(reproc++ CONFIG QUIET)
-  if(reproc++_FOUND)
+if(NOT MX_USE_VENDORED_GAP)
+  find_package(gap CONFIG QUIET)
+  if(gap_FOUND)
     return()
   endif()
 endif()
@@ -25,7 +25,7 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
 endif()
 
 # This is the main build, setup and execute the nested build
-# to ensure the reproc library exists before continuing
+# to ensure the gap library exists before continuing
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${install_dir}")
@@ -39,17 +39,9 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
                         "-G${CMAKE_GENERATOR}"
-                        -DREPROC_MULTITHREADED=ON
-                        "-DREPROC++=ON"
-                        -DREPROC_DEVELOP=OFF
-                        -DREPROC_TEST=OFF
-                        -DREPROC_EXAMPLES=OFF
-                        -DREPROC_WARNINGS=$<CONFIG:Debug>
-                        -DREPROC_TIDY=OFF
-                        -DREPROC_WARNINGS_AS_ERRORS=OFF
-                        -DREPROC_OBJECT_LIBRARIES=ON
-                        -DREPROC_INSTALL=ON
-                        -DREPROC_INSTALL_PKGCONFIG=ON
+                        -DGAP_ENABLE_TESTING=OFF
+                        -DGAP_ENABLE_EXAMPLES=OFF
+                        -DGAP_ENABLE_COROUTINES=ON
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
@@ -60,5 +52,4 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(reproc CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
-find_package(reproc++ CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
+find_package(gap CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)

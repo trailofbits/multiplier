@@ -6,9 +6,21 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(NOT MX_USE_VENDORED_REPROC)
-  find_package(reproc++ CONFIG QUIET)
-  if(reproc++_FOUND)
+if(NOT MX_USE_VENDORED_GFLAGS)
+  find_package(gflags CONFIG QUIET)
+  if(gflags_FOUND)
+
+    if(NOT TARGET gflags::gflags)
+      if(TARGET gflags::gflags_static)
+        add_library(gflags::gflags ALIAS gflags::gflags_static)
+      elseif(TARGET gflags_static)
+        add_library(gflags::gflags_static ALIAS gflags_static)
+        add_library(gflags::gflags ALIAS gflags_static)
+      else()
+        message(FATAL_ERROR "Cannot find appropriate gflags target; known targets are ${gflags_LIBRARIES}")
+      endif()
+    endif()
+
     return()
   endif()
 endif()
@@ -25,7 +37,7 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
 endif()
 
 # This is the main build, setup and execute the nested build
-# to ensure the reproc library exists before continuing
+# to ensure the gflags library exists before continuing
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${install_dir}")
@@ -39,17 +51,17 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
                         "-G${CMAKE_GENERATOR}"
-                        -DREPROC_MULTITHREADED=ON
-                        "-DREPROC++=ON"
-                        -DREPROC_DEVELOP=OFF
-                        -DREPROC_TEST=OFF
-                        -DREPROC_EXAMPLES=OFF
-                        -DREPROC_WARNINGS=$<CONFIG:Debug>
-                        -DREPROC_TIDY=OFF
-                        -DREPROC_WARNINGS_AS_ERRORS=OFF
-                        -DREPROC_OBJECT_LIBRARIES=ON
-                        -DREPROC_INSTALL=ON
-                        -DREPROC_INSTALL_PKGCONFIG=ON
+                        -DBUILD_SHARED_LIBS=OFF
+                        -DBUILD_STATIC_LIBS=ON
+                        -DBUILD_gflags_LIB=ON
+                        -DBUILD_gflags_nothreads_LIB=OFF
+                        -DBUILD_PACKAGING=ON
+                        -DBUILD_TESTING=OFF
+                        -DINSTALL_HEADERS=ON
+                        -DINSTALL_SHARED_LIBS=OFF
+                        -DINSTALL_STATIC_LIBS=ON
+                        -DREGISTER_BUILD_DIR=OFF
+                        -DREGISTER_INSTALL_PREFIX=OFF
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
@@ -60,5 +72,4 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(reproc CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
-find_package(reproc++ CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
+find_package(gflags CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
