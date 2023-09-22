@@ -195,9 +195,4 @@ class File {
   }
 };
 
-class FileManager {
- private:
-  std::shared_ptr<EntityProvider> ep;
-};
-
 }  // namespace mx
