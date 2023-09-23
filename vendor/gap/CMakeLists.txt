@@ -38,9 +38,12 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
-                        -DGAP_ENABLE_TESTING=OFF
-                        -DGAP_ENABLE_EXAMPLES=OFF
-                        -DGAP_ENABLE_COROUTINES=ON
+                        -DGAP_ENABLE_TESTING:BOOL=OFF
+                        -DGAP_ENABLE_EXAMPLES:BOOL=OFF
+                        -DGAP_ENABLE_COROUTINES:BOOL=ON
+                        -DGAP_ENABLE_VCPKG:BOOL=OFF
+                        -DGAP_ENABLE_WARNINGS:BOOL=OFF
+                        -DGAP_INSTALL:BOOL=ON
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 

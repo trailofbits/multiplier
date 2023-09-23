@@ -1,8 +1,6 @@
 ARG IMAGE=ubuntu:22.04
 FROM --platform=linux/amd64 ${IMAGE} as builder
-ENV CXX_COMMON_URL=https://github.com/lifting-bits/cxx-common/releases/download/v0.4.2/vcpkg_ubuntu-22.04_llvm-16-pasta_amd64.tar.xz \
-    VCPKG_ROOT=/work/vcpkg_ubuntu-22.04_llvm-16-pasta_amd64 \
-    INSTALL_DIR=/work/install
+ENV INSTALL_DIR=/work/install
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Install dependencies
@@ -26,9 +24,6 @@ RUN mkdir src build
 # Install Rust stable
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
 ENV PATH="/root/.cargo/bin:${PATH}"
-
-# Download cxx-common
-RUN curl -sSL "${CXX_COMMON_URL}" | tar xJ
 
 COPY . /work/src/multiplier
 RUN cmake \
