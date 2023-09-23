@@ -49,11 +49,12 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
-                        -DPASTA_BOOTSTRAP_MACROS=OFF
-                        -DPASTA_BOOTSTRAP_TYPES=OFF
-                        -DPASTA_ENABLE_TESTING=OFF
-                        -DPASTA_ENABLE_PY_BINDINGS=OFF
-                        -DPASTA_ENABLE_INSTALL=ON
+                        -DPASTA_BOOTSTRAP_MACROS:BOOL=OFF
+                        -DPASTA_BOOTSTRAP_TYPES:BOOL=OFF
+                        -DPASTA_ENABLE_TESTING:BOOL=OFF
+                        -DPASTA_ENABLE_PY_BINDINGS:BOOL=OFF
+                        -DPASTA_USE_VENDORED_CLANG:BOOL=OFF
+                        -DPASTA_ENABLE_INSTALL:BOOL=ON
                         "-DLLVM_DIR=${LLVM_DIR}"
                         "-DClang_DIR=${Clang_DIR}"
                         "${src_dir}"
