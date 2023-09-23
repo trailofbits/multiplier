@@ -17,7 +17,7 @@ const char *EnumeratorName(LTOVisibilityPublicAttrSpelling e) {
   switch (e) {
     case LTOVisibilityPublicAttrSpelling::GNU_LTO_VISIBILITY_PUBLIC: return "GNU_LTO_VISIBILITY_PUBLIC";
     case LTOVisibilityPublicAttrSpelling::CXX11_CLANG_LTO_VISIBILITY_PUBLIC: return "CXX11_CLANG_LTO_VISIBILITY_PUBLIC";
-    case LTOVisibilityPublicAttrSpelling::C2X_CLANG_LTO_VISIBILITY_PUBLIC: return "C2X_CLANG_LTO_VISIBILITY_PUBLIC";
+    case LTOVisibilityPublicAttrSpelling::C23_CLANG_LTO_VISIBILITY_PUBLIC: return "C23_CLANG_LTO_VISIBILITY_PUBLIC";
     case LTOVisibilityPublicAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

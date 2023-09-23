@@ -8,13 +8,19 @@
 
 set(exe_name "mx-index")
 
+if(MX_ENABLE_VAST)
+  set(mlir_codegen_sources
+    "Codegen.cpp"
+    "Codegen.h"
+    "CodegenMetaGenerator.h"
+  )
+endif()
+
 add_executable("${exe_name}"
   "Action.cpp"
   "Action.h"
   "BuildPendingFragment.cpp"
-  "Codegen.cpp"
-  "Codegen.h"
-  "CodegenMetaGenerator.h"
+  ${mlir_codegen_sources}
   "Context.cpp"
   "Context.h"
   "Entity.h"
@@ -71,6 +77,7 @@ target_link_libraries("${exe_name}"
   PRIVATE
     ${MX_BEGIN_FORCE_LOAD_GROUP}
     "mx-api"
+    clangIndex
     glog::glog
     gflags::gflags
     concurrentqueue

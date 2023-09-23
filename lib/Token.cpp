@@ -1177,7 +1177,7 @@ Token Token::parsed_token(void) const {
     return TokenReader::TokenFor(impl, eid.Pack());
 
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
-    assert(std::get<MacroTokenId>(vid) == id());
+    assert(eid == id());
     assert(false);  // Really, this is unreasonable.
     return Token();
 

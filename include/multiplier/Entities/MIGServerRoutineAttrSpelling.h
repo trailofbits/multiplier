@@ -14,7 +14,7 @@ namespace mx {
 enum class MIGServerRoutineAttrSpelling : unsigned char {
   GNU_MIG_SERVER_ROUTINE,
   CXX11_CLANG_MIG_SERVER_ROUTINE,
-  C2X_CLANG_MIG_SERVER_ROUTINE,
+  C23_CLANG_MIG_SERVER_ROUTINE,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -18,7 +18,7 @@ const char *EnumeratorName(OpenCLGlobalAddressSpaceAttrSpelling e) {
     case OpenCLGlobalAddressSpaceAttrSpelling::KEYWORD_GLOBAL: return "KEYWORD_GLOBAL";
     case OpenCLGlobalAddressSpaceAttrSpelling::GNU_OPENCL_GLOBAL: return "GNU_OPENCL_GLOBAL";
     case OpenCLGlobalAddressSpaceAttrSpelling::CXX11_CLANG_OPENCL_GLOBAL: return "CXX11_CLANG_OPENCL_GLOBAL";
-    case OpenCLGlobalAddressSpaceAttrSpelling::C2X_CLANG_OPENCL_GLOBAL: return "C2X_CLANG_OPENCL_GLOBAL";
+    case OpenCLGlobalAddressSpaceAttrSpelling::C23_CLANG_OPENCL_GLOBAL: return "C23_CLANG_OPENCL_GLOBAL";
     case OpenCLGlobalAddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

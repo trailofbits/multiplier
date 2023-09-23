@@ -17,7 +17,7 @@ const char *EnumeratorName(CFReturnsNotRetainedAttrSpelling e) {
   switch (e) {
     case CFReturnsNotRetainedAttrSpelling::GNU_CF_RETURNS_NOT_RETAINED: return "GNU_CF_RETURNS_NOT_RETAINED";
     case CFReturnsNotRetainedAttrSpelling::CXX11_CLANG_CF_RETURNS_NOT_RETAINED: return "CXX11_CLANG_CF_RETURNS_NOT_RETAINED";
-    case CFReturnsNotRetainedAttrSpelling::C2X_CLANG_CF_RETURNS_NOT_RETAINED: return "C2X_CLANG_CF_RETURNS_NOT_RETAINED";
+    case CFReturnsNotRetainedAttrSpelling::C23_CLANG_CF_RETURNS_NOT_RETAINED: return "C23_CLANG_CF_RETURNS_NOT_RETAINED";
     case CFReturnsNotRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

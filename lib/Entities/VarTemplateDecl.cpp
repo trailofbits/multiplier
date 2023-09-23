@@ -182,7 +182,7 @@ std::optional<VarTemplateDecl> VarTemplateDecl::from(const TokenContext &t) {
 }
 
 bool VarTemplateDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal80();
 }
 
 #pragma GCC diagnostic pop

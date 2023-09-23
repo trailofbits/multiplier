@@ -23,6 +23,7 @@ const char *EnumeratorName(SubStmt e) {
     case SubStmt::ON_FALLTHROUGH: return "ON_FALLTHROUGH";
     case SubStmt::ALLOCATE: return "ALLOCATE";
     case SubStmt::DEALLOCATE: return "DEALLOCATE";
+    case SubStmt::RESULT_DECLARATION: return "RESULT_DECLARATION";
     case SubStmt::RETURN_VALUE: return "RETURN_VALUE";
     case SubStmt::RETURN_STATEMENT: return "RETURN_STATEMENT";
     case SubStmt::RETURN_STATEMENT_ON_ALLOC_FAILURE: return "RETURN_STATEMENT_ON_ALLOC_FAILURE";

@@ -46,7 +46,13 @@ enum class AttrKind : unsigned short {
   ARC_WEAKREF_UNAVAILABLE,
   ARGUMENT_WITH_TYPE_TAG,
   ARM_BUILTIN_ALIAS,
+  ARM_LOCALLY_STREAMING,
   ARM_MVE_STRICT_POLYMORPHISM,
+  ARM_NEW_ZA,
+  ARM_PRESERVES_ZA,
+  ARM_SHARED_ZA,
+  ARM_STREAMING,
+  ARM_STREAMING_COMPATIBLE,
   ARTIFICIAL,
   ASM_LABEL,
   ASSERT_CAPABILITY,
@@ -55,6 +61,7 @@ enum class AttrKind : unsigned short {
   ASSUME_ALIGNED,
   ASSUMPTION,
   AVAILABILITY,
+  AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD,
   BPF_PRESERVE_ACCESS_INDEX,
   BTF_DECL_TAG,
   BTF_TYPE_TAG,
@@ -184,6 +191,7 @@ enum class AttrKind : unsigned short {
   NS_RETURNS_AUTORELEASED,
   NS_RETURNS_NOT_RETAINED,
   NS_RETURNS_RETAINED,
+  NVPTX_KERNEL,
   NAKED,
   NO_ALIAS,
   NO_BUILTIN,
@@ -357,6 +365,7 @@ enum class AttrKind : unsigned short {
   UNAVAILABLE,
   UNINITIALIZED,
   UNLIKELY,
+  UNSAFE_BUFFER_USAGE,
   UNUSED,
   USE_HANDLE,
   USED,
@@ -372,6 +381,7 @@ enum class AttrKind : unsigned short {
   WEAK_IMPORT,
   WEAK_REF,
   WEB_ASSEMBLY_EXPORT_NAME,
+  WEB_ASSEMBLY_FUNCREF,
   WEB_ASSEMBLY_IMPORT_MODULE,
   WEB_ASSEMBLY_IMPORT_NAME,
   WORK_GROUP_SIZE_HINT,
@@ -386,7 +396,7 @@ inline static const char *EnumerationName(AttrKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(AttrKind) {
-  return 367;
+  return 377;
 }
 
 const char *EnumeratorName(AttrKind);

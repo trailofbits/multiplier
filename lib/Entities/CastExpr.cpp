@@ -185,7 +185,7 @@ std::optional<CastExpr> CastExpr::from(const TokenContext &t) {
 }
 
 CastKind CastExpr::cast_kind(void) const {
-  return static_cast<CastKind>(impl->reader.getVal94());
+  return static_cast<CastKind>(impl->reader.getVal95());
 }
 
 std::string_view CastExpr::cast_kind_name(void) const {

@@ -17,7 +17,7 @@ const char *EnumeratorName(AMDGPUKernelCallAttrSpelling e) {
   switch (e) {
     case AMDGPUKernelCallAttrSpelling::GNU_AMDGPU_KERNEL: return "GNU_AMDGPU_KERNEL";
     case AMDGPUKernelCallAttrSpelling::CXX11_CLANG_AMDGPU_KERNEL: return "CXX11_CLANG_AMDGPU_KERNEL";
-    case AMDGPUKernelCallAttrSpelling::C2X_CLANG_AMDGPU_KERNEL: return "C2X_CLANG_AMDGPU_KERNEL";
+    case AMDGPUKernelCallAttrSpelling::C23_CLANG_AMDGPU_KERNEL: return "C23_CLANG_AMDGPU_KERNEL";
     case AMDGPUKernelCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

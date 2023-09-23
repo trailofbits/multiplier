@@ -76,6 +76,7 @@ class StringLiteral : public Expr {
   bool is_utf16(void) const;
   bool is_utf32(void) const;
   bool is_utf8(void) const;
+  bool is_unevaluated(void) const;
   bool is_wide(void) const;
 };
 

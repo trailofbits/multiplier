@@ -17,7 +17,7 @@ const char *EnumeratorName(InternalLinkageAttrSpelling e) {
   switch (e) {
     case InternalLinkageAttrSpelling::GNU_INTERNAL_LINKAGE: return "GNU_INTERNAL_LINKAGE";
     case InternalLinkageAttrSpelling::CXX11_CLANG_INTERNAL_LINKAGE: return "CXX11_CLANG_INTERNAL_LINKAGE";
-    case InternalLinkageAttrSpelling::C2X_CLANG_INTERNAL_LINKAGE: return "C2X_CLANG_INTERNAL_LINKAGE";
+    case InternalLinkageAttrSpelling::C23_CLANG_INTERNAL_LINKAGE: return "C23_CLANG_INTERNAL_LINKAGE";
     case InternalLinkageAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

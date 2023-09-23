@@ -182,19 +182,19 @@ std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const TokenContext &t) 
 }
 
 Token ObjCTypeParamDecl::colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal70());
 }
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
-  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal81());
+  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal83());
 }
 
 Token ObjCTypeParamDecl::variance_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal69());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal71());
 }
 
 bool ObjCTypeParamDecl::has_explicit_bound(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal79();
 }
 
 #pragma GCC diagnostic pop

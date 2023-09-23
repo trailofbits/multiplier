@@ -17,7 +17,7 @@ const char *EnumeratorName(NakedAttrSpelling e) {
   switch (e) {
     case NakedAttrSpelling::GNU_NAKED: return "GNU_NAKED";
     case NakedAttrSpelling::CXX11_GNU_NAKED: return "CXX11_GNU_NAKED";
-    case NakedAttrSpelling::C2X_GNU_NAKED: return "C2X_GNU_NAKED";
+    case NakedAttrSpelling::C23_GNU_NAKED: return "C23_GNU_NAKED";
     case NakedAttrSpelling::DECLSPEC_NAKED: return "DECLSPEC_NAKED";
     case NakedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

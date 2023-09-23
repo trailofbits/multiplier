@@ -14,7 +14,7 @@ namespace mx {
 enum class TypeVisibilityAttrSpelling : unsigned char {
   GNU_TYPE_VISIBILITY,
   CXX11_CLANG_TYPE_VISIBILITY,
-  C2X_CLANG_TYPE_VISIBILITY,
+  C23_CLANG_TYPE_VISIBILITY,
   SPELLING_NOT_CALCULATED,
 };
 

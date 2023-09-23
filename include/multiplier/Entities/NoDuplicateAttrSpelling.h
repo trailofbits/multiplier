@@ -14,7 +14,7 @@ namespace mx {
 enum class NoDuplicateAttrSpelling : unsigned char {
   GNU_NODUPLICATE,
   CXX11_CLANG_NODUPLICATE,
-  C2X_CLANG_NODUPLICATE,
+  C23_CLANG_NODUPLICATE,
   SPELLING_NOT_CALCULATED,
 };
 

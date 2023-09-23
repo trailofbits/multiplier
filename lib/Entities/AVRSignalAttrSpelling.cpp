@@ -17,7 +17,7 @@ const char *EnumeratorName(AVRSignalAttrSpelling e) {
   switch (e) {
     case AVRSignalAttrSpelling::GNU_SIGNAL: return "GNU_SIGNAL";
     case AVRSignalAttrSpelling::CXX11_GNU_SIGNAL: return "CXX11_GNU_SIGNAL";
-    case AVRSignalAttrSpelling::C2X_GNU_SIGNAL: return "C2X_GNU_SIGNAL";
+    case AVRSignalAttrSpelling::C23_GNU_SIGNAL: return "C23_GNU_SIGNAL";
     case AVRSignalAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

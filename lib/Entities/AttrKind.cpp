@@ -49,7 +49,13 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::ARC_WEAKREF_UNAVAILABLE: return "ARC_WEAKREF_UNAVAILABLE";
     case AttrKind::ARGUMENT_WITH_TYPE_TAG: return "ARGUMENT_WITH_TYPE_TAG";
     case AttrKind::ARM_BUILTIN_ALIAS: return "ARM_BUILTIN_ALIAS";
+    case AttrKind::ARM_LOCALLY_STREAMING: return "ARM_LOCALLY_STREAMING";
     case AttrKind::ARM_MVE_STRICT_POLYMORPHISM: return "ARM_MVE_STRICT_POLYMORPHISM";
+    case AttrKind::ARM_NEW_ZA: return "ARM_NEW_ZA";
+    case AttrKind::ARM_PRESERVES_ZA: return "ARM_PRESERVES_ZA";
+    case AttrKind::ARM_SHARED_ZA: return "ARM_SHARED_ZA";
+    case AttrKind::ARM_STREAMING: return "ARM_STREAMING";
+    case AttrKind::ARM_STREAMING_COMPATIBLE: return "ARM_STREAMING_COMPATIBLE";
     case AttrKind::ARTIFICIAL: return "ARTIFICIAL";
     case AttrKind::ASM_LABEL: return "ASM_LABEL";
     case AttrKind::ASSERT_CAPABILITY: return "ASSERT_CAPABILITY";
@@ -58,6 +64,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::ASSUME_ALIGNED: return "ASSUME_ALIGNED";
     case AttrKind::ASSUMPTION: return "ASSUMPTION";
     case AttrKind::AVAILABILITY: return "AVAILABILITY";
+    case AttrKind::AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD: return "AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD";
     case AttrKind::BPF_PRESERVE_ACCESS_INDEX: return "BPF_PRESERVE_ACCESS_INDEX";
     case AttrKind::BTF_DECL_TAG: return "BTF_DECL_TAG";
     case AttrKind::BTF_TYPE_TAG: return "BTF_TYPE_TAG";
@@ -187,6 +194,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::NS_RETURNS_AUTORELEASED: return "NS_RETURNS_AUTORELEASED";
     case AttrKind::NS_RETURNS_NOT_RETAINED: return "NS_RETURNS_NOT_RETAINED";
     case AttrKind::NS_RETURNS_RETAINED: return "NS_RETURNS_RETAINED";
+    case AttrKind::NVPTX_KERNEL: return "NVPTX_KERNEL";
     case AttrKind::NAKED: return "NAKED";
     case AttrKind::NO_ALIAS: return "NO_ALIAS";
     case AttrKind::NO_BUILTIN: return "NO_BUILTIN";
@@ -360,6 +368,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::UNAVAILABLE: return "UNAVAILABLE";
     case AttrKind::UNINITIALIZED: return "UNINITIALIZED";
     case AttrKind::UNLIKELY: return "UNLIKELY";
+    case AttrKind::UNSAFE_BUFFER_USAGE: return "UNSAFE_BUFFER_USAGE";
     case AttrKind::UNUSED: return "UNUSED";
     case AttrKind::USE_HANDLE: return "USE_HANDLE";
     case AttrKind::USED: return "USED";
@@ -375,6 +384,7 @@ const char *EnumeratorName(AttrKind e) {
     case AttrKind::WEAK_IMPORT: return "WEAK_IMPORT";
     case AttrKind::WEAK_REF: return "WEAK_REF";
     case AttrKind::WEB_ASSEMBLY_EXPORT_NAME: return "WEB_ASSEMBLY_EXPORT_NAME";
+    case AttrKind::WEB_ASSEMBLY_FUNCREF: return "WEB_ASSEMBLY_FUNCREF";
     case AttrKind::WEB_ASSEMBLY_IMPORT_MODULE: return "WEB_ASSEMBLY_IMPORT_MODULE";
     case AttrKind::WEB_ASSEMBLY_IMPORT_NAME: return "WEB_ASSEMBLY_IMPORT_NAME";
     case AttrKind::WORK_GROUP_SIZE_HINT: return "WORK_GROUP_SIZE_HINT";

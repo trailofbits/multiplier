@@ -179,7 +179,7 @@ Token CXXFoldExpr::l_paren_token(void) const {
 }
 
 BinaryOperatorKind CXXFoldExpr::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal95());
 }
 
 Expr CXXFoldExpr::pattern(void) const {

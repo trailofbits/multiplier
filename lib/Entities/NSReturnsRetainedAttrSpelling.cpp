@@ -17,7 +17,7 @@ const char *EnumeratorName(NSReturnsRetainedAttrSpelling e) {
   switch (e) {
     case NSReturnsRetainedAttrSpelling::GNU_NS_RETURNS_RETAINED: return "GNU_NS_RETURNS_RETAINED";
     case NSReturnsRetainedAttrSpelling::CXX11_CLANG_NS_RETURNS_RETAINED: return "CXX11_CLANG_NS_RETURNS_RETAINED";
-    case NSReturnsRetainedAttrSpelling::C2X_CLANG_NS_RETURNS_RETAINED: return "C2X_CLANG_NS_RETURNS_RETAINED";
+    case NSReturnsRetainedAttrSpelling::C23_CLANG_NS_RETURNS_RETAINED: return "C23_CLANG_NS_RETURNS_RETAINED";
     case NSReturnsRetainedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

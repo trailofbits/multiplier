@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCGCAttrSpelling e) {
   switch (e) {
     case ObjCGCAttrSpelling::GNU_OBJC_GC: return "GNU_OBJC_GC";
     case ObjCGCAttrSpelling::CXX11_CLANG_OBJC_GC: return "CXX11_CLANG_OBJC_GC";
-    case ObjCGCAttrSpelling::C2X_CLANG_OBJC_GC: return "C2X_CLANG_OBJC_GC";
+    case ObjCGCAttrSpelling::C23_CLANG_OBJC_GC: return "C23_CLANG_OBJC_GC";
     case ObjCGCAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

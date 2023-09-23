@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCRuntimeVisibleAttrSpelling e) {
   switch (e) {
     case ObjCRuntimeVisibleAttrSpelling::GNU_OBJC_RUNTIME_VISIBLE: return "GNU_OBJC_RUNTIME_VISIBLE";
     case ObjCRuntimeVisibleAttrSpelling::CXX11_CLANG_OBJC_RUNTIME_VISIBLE: return "CXX11_CLANG_OBJC_RUNTIME_VISIBLE";
-    case ObjCRuntimeVisibleAttrSpelling::C2X_CLANG_OBJC_RUNTIME_VISIBLE: return "C2X_CLANG_OBJC_RUNTIME_VISIBLE";
+    case ObjCRuntimeVisibleAttrSpelling::C23_CLANG_OBJC_RUNTIME_VISIBLE: return "C23_CLANG_OBJC_RUNTIME_VISIBLE";
     case ObjCRuntimeVisibleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

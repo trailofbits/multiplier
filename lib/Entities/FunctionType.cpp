@@ -82,41 +82,41 @@ std::optional<FunctionType> FunctionType::from(const TokenContext &t) {
 }
 
 CallingConv FunctionType::call_conv(void) const {
-  return static_cast<CallingConv>(impl->reader.getVal241());
+  return static_cast<CallingConv>(impl->reader.getVal245());
 }
 
 Type FunctionType::call_result_type(void) const {
-  RawEntityId eid = impl->reader.getVal232();
+  RawEntityId eid = impl->reader.getVal236();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionType::cmse_ns_call_attribute(void) const {
-  return impl->reader.getVal234();
+  return impl->reader.getVal238();
 }
 
 bool FunctionType::has_reg_parm(void) const {
-  return impl->reader.getVal235();
+  return impl->reader.getVal239();
 }
 
 bool FunctionType::no_return_attribute(void) const {
-  return impl->reader.getVal236();
+  return impl->reader.getVal240();
 }
 
 Type FunctionType::return_type(void) const {
-  RawEntityId eid = impl->reader.getVal233();
+  RawEntityId eid = impl->reader.getVal237();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionType::is_const(void) const {
-  return impl->reader.getVal242();
+  return impl->reader.getVal246();
 }
 
 bool FunctionType::is_restrict(void) const {
-  return impl->reader.getVal243();
+  return impl->reader.getVal247();
 }
 
 bool FunctionType::is_volatile(void) const {
-  return impl->reader.getVal244();
+  return impl->reader.getVal248();
 }
 
 #pragma GCC diagnostic pop

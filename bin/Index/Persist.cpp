@@ -41,7 +41,10 @@
 #include <llvm/Support/JSON.h>
 #pragma clang diagnostic pop
 
-#include "Codegen.h"
+#ifndef MX_DISABLE_VAST
+# include "Codegen.h"
+#endif
+
 #include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
@@ -1240,6 +1243,7 @@ void GlobalIndexingState::PersistCompilation(
     sourceir_progress->AddWork(1u);
   }
 
+#ifndef MX_DISABLE_VAST
   if (std::string mlir = codegen.GenerateSourceIR(ast, em);
       !mlir.empty()) {
     cb.setMlir(mlir);
@@ -1249,6 +1253,9 @@ void GlobalIndexingState::PersistCompilation(
   } else {
     cb.initMlir(0u);
   }
+#else
+  cb.initMlir(0u);
+#endif
 
   // Add the compilation to the database.
   database.AddAsync(

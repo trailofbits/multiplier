@@ -220,7 +220,7 @@ ObjCMethodDecl ObjCMessageExpr::method_declaration(void) const {
 }
 
 ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
-  return static_cast<ObjCMethodFamily>(impl->reader.getVal94());
+  return static_cast<ObjCMethodFamily>(impl->reader.getVal95());
 }
 
 ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
@@ -229,7 +229,7 @@ ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
 }
 
 ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {
-  return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal96());
+  return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal97());
 }
 
 TokenRange ObjCMessageExpr::receiver_range(void) const {

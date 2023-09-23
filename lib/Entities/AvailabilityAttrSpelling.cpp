@@ -17,7 +17,7 @@ const char *EnumeratorName(AvailabilityAttrSpelling e) {
   switch (e) {
     case AvailabilityAttrSpelling::GNU_AVAILABILITY: return "GNU_AVAILABILITY";
     case AvailabilityAttrSpelling::CXX11_CLANG_AVAILABILITY: return "CXX11_CLANG_AVAILABILITY";
-    case AvailabilityAttrSpelling::C2X_CLANG_AVAILABILITY: return "C2X_CLANG_AVAILABILITY";
+    case AvailabilityAttrSpelling::C23_CLANG_AVAILABILITY: return "C23_CLANG_AVAILABILITY";
     case AvailabilityAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

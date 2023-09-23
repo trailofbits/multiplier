@@ -14,7 +14,7 @@ namespace mx {
 enum class NotTailCalledAttrSpelling : unsigned char {
   GNU_NOT_TAIL_CALLED,
   CXX11_CLANG_NOT_TAIL_CALLED,
-  C2X_CLANG_NOT_TAIL_CALLED,
+  C23_CLANG_NOT_TAIL_CALLED,
   SPELLING_NOT_CALCULATED,
 };
 

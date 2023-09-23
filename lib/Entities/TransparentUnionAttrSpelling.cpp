@@ -17,7 +17,7 @@ const char *EnumeratorName(TransparentUnionAttrSpelling e) {
   switch (e) {
     case TransparentUnionAttrSpelling::GNU_TRANSPARENT_UNION: return "GNU_TRANSPARENT_UNION";
     case TransparentUnionAttrSpelling::CXX11_GNU_TRANSPARENT_UNION: return "CXX11_GNU_TRANSPARENT_UNION";
-    case TransparentUnionAttrSpelling::C2X_GNU_TRANSPARENT_UNION: return "C2X_GNU_TRANSPARENT_UNION";
+    case TransparentUnionAttrSpelling::C23_GNU_TRANSPARENT_UNION: return "C23_GNU_TRANSPARENT_UNION";
     case TransparentUnionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

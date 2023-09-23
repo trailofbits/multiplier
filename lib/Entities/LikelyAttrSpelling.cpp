@@ -16,7 +16,7 @@ namespace mx {
 const char *EnumeratorName(LikelyAttrSpelling e) {
   switch (e) {
     case LikelyAttrSpelling::CXX11_LIKELY: return "CXX11_LIKELY";
-    case LikelyAttrSpelling::C2X_CLANG_LIKELY: return "C2X_CLANG_LIKELY";
+    case LikelyAttrSpelling::C23_CLANG_LIKELY: return "C23_CLANG_LIKELY";
     case LikelyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -17,7 +17,7 @@ const char *EnumeratorName(ARMInterruptAttrSpelling e) {
   switch (e) {
     case ARMInterruptAttrSpelling::GNU_INTERRUPT: return "GNU_INTERRUPT";
     case ARMInterruptAttrSpelling::CXX11_GNU_INTERRUPT: return "CXX11_GNU_INTERRUPT";
-    case ARMInterruptAttrSpelling::C2X_GNU_INTERRUPT: return "C2X_GNU_INTERRUPT";
+    case ARMInterruptAttrSpelling::C23_GNU_INTERRUPT: return "C23_GNU_INTERRUPT";
     case ARMInterruptAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

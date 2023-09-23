@@ -16,7 +16,6 @@ enum class Linkage : unsigned char {
   INTERNAL_LINKAGE,
   UNIQUE_EXTERNAL_LINKAGE,
   VISIBLE_NO_LINKAGE,
-  MODULE_INTERNAL_LINKAGE,
   MODULE_LINKAGE,
   EXTERNAL_LINKAGE,
 };
@@ -26,7 +25,7 @@ inline static const char *EnumerationName(Linkage) {
 }
 
 inline static constexpr unsigned NumEnumerators(Linkage) {
-  return 7;
+  return 6;
 }
 
 const char *EnumeratorName(Linkage);

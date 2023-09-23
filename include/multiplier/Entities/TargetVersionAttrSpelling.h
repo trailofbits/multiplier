@@ -14,7 +14,7 @@ namespace mx {
 enum class TargetVersionAttrSpelling : unsigned char {
   GNU_TARGET_VERSION,
   CXX11_GNU_TARGET_VERSION,
-  C2X_GNU_TARGET_VERSION,
+  C23_GNU_TARGET_VERSION,
   SPELLING_NOT_CALCULATED,
 };
 

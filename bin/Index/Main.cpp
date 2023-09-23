@@ -63,11 +63,13 @@ DEFINE_string(target, "", "Path to the binary or JSON (compile commands) file to
 
 DEFINE_string(env, "", "Path to the file listing environment variables to import");
 
-DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
-
 DEFINE_bool(attach, false, "Print out the process ID for attaching gdb/lldb.");
 
 DEFINE_string(max_queue_size, "24G", "The maximum queue size. Use a K suffix for KiB, M suffix for MiB, or a G suffix for GiB.");
+
+#ifndef MX_DISABLE_VAST
+DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
+#endif
 
 namespace {
 
@@ -220,9 +222,11 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);
 
+#ifndef MX_DISABLE_VAST
   if (!FLAGS_generate_sourceir) {
     ic->codegen.Disable();
   }
+#endif
 
   std::filesystem::path path(FLAGS_target);
 

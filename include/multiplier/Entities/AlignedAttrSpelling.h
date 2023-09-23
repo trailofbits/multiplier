@@ -14,7 +14,7 @@ namespace mx {
 enum class AlignedAttrSpelling : unsigned char {
   GNU_ALIGNED,
   CXX11_GNU_ALIGNED,
-  C2X_GNU_ALIGNED,
+  C23_GNU_ALIGNED,
   DECLSPEC_ALIGN,
   KEYWORD_ALIGNAS,
   KEYWORD__ALIGNAS,

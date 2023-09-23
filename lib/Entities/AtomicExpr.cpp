@@ -160,7 +160,12 @@ Token AtomicExpr::builtin_token(void) const {
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const {
-  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal94());
+  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal95());
+}
+
+std::string_view AtomicExpr::operation_as_string(void) const {
+  capnp::Text::Reader data = impl->reader.getVal60();
+  return std::string_view(data.cStr(), data.size());
 }
 
 Expr AtomicExpr::order(void) const {

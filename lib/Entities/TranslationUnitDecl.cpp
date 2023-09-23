@@ -180,7 +180,7 @@ std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const TokenContext 
 
 gap::generator<Decl> TranslationUnitDecl::declarations_in_context(void) const & {
   EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal54();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

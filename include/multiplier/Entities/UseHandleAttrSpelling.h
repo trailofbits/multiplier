@@ -14,7 +14,7 @@ namespace mx {
 enum class UseHandleAttrSpelling : unsigned char {
   GNU_USE_HANDLE,
   CXX11_CLANG_USE_HANDLE,
-  C2X_CLANG_USE_HANDLE,
+  C23_CLANG_USE_HANDLE,
   SPELLING_NOT_CALCULATED,
 };
 

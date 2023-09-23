@@ -121,6 +121,7 @@ class Type {
   std::optional<CXXRecordDecl> pointee_cxx_record_declaration(void) const;
   std::optional<Type> pointee_or_array_element_type(void) const;
   std::optional<Type> pointee_type(void) const;
+  Type rvv_elt_type(void) const;
   std::optional<TypeScalarTypeKind> scalar_type_kind(void) const;
   std::optional<Type> sve_element_type(void) const;
   TypeKind kind(void) const;
@@ -286,7 +287,8 @@ class Type {
   bool is_placeholder_type(void) const;
   bool is_pointer_type(void) const;
   bool is_queue_t(void) const;
-  bool is_rvv_type(void) const;
+  bool is_rvv_sizeless_builtin_type(void) const;
+  bool is_rvvvls_builtin_type(void) const;
   bool is_r_value_reference_type(void) const;
   bool is_real_floating_type(void) const;
   bool is_real_type(void) const;
@@ -309,6 +311,7 @@ class Type {
   std::optional<bool> is_structural_type(void) const;
   bool is_structure_or_class_type(void) const;
   bool is_structure_type(void) const;
+  bool is_sve_vls_builtin_type(void) const;
   bool is_template_type_parm_type(void) const;
   bool is_typedef_name_type(void) const;
   bool is_undeduced_auto_type(void) const;
@@ -319,13 +322,14 @@ class Type {
   bool is_unsigned_fixed_point_type(void) const;
   bool is_unsigned_integer_or_enumeration_type(void) const;
   bool is_unsigned_integer_type(void) const;
-  bool is_vlst_builtin_type(void) const;
   bool is_variable_array_type(void) const;
   bool is_variably_modified_type(void) const;
   bool is_vector_type(void) const;
   bool is_visibility_explicit(void) const;
   bool is_void_pointer_type(void) const;
   bool is_void_type(void) const;
+  bool is_web_assembly_externref_type(void) const;
+  bool is_web_assembly_table_type(void) const;
   bool is_wide_character_type(void) const;
 };
 

@@ -14,7 +14,7 @@ namespace mx {
 enum class EnforceTCBLeafAttrSpelling : unsigned char {
   GNU_ENFORCE_TCB_LEAF,
   CXX11_CLANG_ENFORCE_TCB_LEAF,
-  C2X_CLANG_ENFORCE_TCB_LEAF,
+  C23_CLANG_ENFORCE_TCB_LEAF,
   SPELLING_NOT_CALCULATED,
 };
 

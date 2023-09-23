@@ -69,6 +69,7 @@ enum class AtomicExprAtomicOp : unsigned char {
   HIP_ATOMIC_COMPARE_EXCHANGE_STRONG,
   HIP_ATOMIC_EXCHANGE,
   HIP_ATOMIC_FETCH_ADD,
+  HIP_ATOMIC_FETCH_SUB,
   HIP_ATOMIC_FETCH_AND,
   HIP_ATOMIC_FETCH_OR,
   HIP_ATOMIC_FETCH_XOR,
@@ -81,7 +82,7 @@ inline static const char *EnumerationName(AtomicExprAtomicOp) {
 }
 
 inline static constexpr unsigned NumEnumerators(AtomicExprAtomicOp) {
-  return 62;
+  return 63;
 }
 
 const char *EnumeratorName(AtomicExprAtomicOp);

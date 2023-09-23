@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCExceptionAttrSpelling : unsigned char {
   GNU_OBJC_EXCEPTION,
   CXX11_CLANG_OBJC_EXCEPTION,
-  C2X_CLANG_OBJC_EXCEPTION,
+  C23_CLANG_OBJC_EXCEPTION,
   SPELLING_NOT_CALCULATED,
 };
 

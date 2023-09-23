@@ -34,3 +34,9 @@
 	path = vendor/llvm-project/src
 	url = https://github.com/trail-of-forks/llvm-project.git
 	branch = pasta
+[submodule "vendor/abseil/src"]
+	path = vendor/abseil/src
+	url = https://github.com/abseil/abseil-cpp.git
+[submodule "vendor/re2/src"]
+	path = vendor/re2/src
+	url = https://github.com/google/re2.git

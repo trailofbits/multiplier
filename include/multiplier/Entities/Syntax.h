@@ -14,13 +14,14 @@ namespace mx {
 enum class Syntax : unsigned char {
   GNU,
   CXX11,
-  C2X,
+  C23,
   DECLSPEC,
   MICROSOFT,
   KEYWORD,
   PRAGMA,
   CONTEXT_SENSITIVE_KEYWORD,
   HLSL_SEMANTIC,
+  IMPLICIT,
 };
 
 inline static const char *EnumerationName(Syntax) {
@@ -28,7 +29,7 @@ inline static const char *EnumerationName(Syntax) {
 }
 
 inline static constexpr unsigned NumEnumerators(Syntax) {
-  return 9;
+  return 10;
 }
 
 const char *EnumeratorName(Syntax);

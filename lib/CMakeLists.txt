@@ -168,23 +168,35 @@ add_dependencies("mx-api"
 target_link_libraries("mx-api"
   PUBLIC
     "mx-sqlite"
-    $<$<BOOL:MX_ENABLE_VAST>:mx-mlir>
+    "gap::gap"
+    "gap::gap-core"
+    "std::coroutines"
+    "gap::gap-settings"
     $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
   PRIVATE
-    "CapnProto::capnp-rpc"
+    "CapnProto::capnp"
     $<BUILD_INTERFACE:concurrentqueue>
 )
+
+if(MX_ENABLE_VAST)
+  target_link_libraries("mx-api"
+    PUBLIC
+      "mx-mlir")
+else()
+  target_compile_definitions("mx-api"
+    PUBLIC
+      "MX_DISABLE_VAST")
+endif()
 
 if(MX_ENABLE_RE2)
   target_link_libraries("mx-api"
     PRIVATE
-      "re2::re2"
-  )
-else(MX_ENABLE_RE2)
+      re2::re2)
+else()
   target_compile_definitions("mx-api"
     PUBLIC
       "MX_DISABLE_RE2")
-endif(MX_ENABLE_RE2)
+endif()
 
 target_compile_options("mx-api"
   PRIVATE

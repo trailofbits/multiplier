@@ -28,6 +28,15 @@ endif()
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 
+# set(REPROC_MULTITHREADED ON)
+# set(REPROC_DEVELOP OFF)
+# set(REPROC++ ON)
+# set(REPROC_TEST OFF)
+# set(REPROC_EXAMPLES OFF)
+# set(REPROC_WARNINGS $<CONFIG:Debug>)
+# set(REPROC_TIDY OFF)
+# set(REPROC_WARNINGS_AS_ERRORS OFF)
+
 # (b) Nested CMake run. May need more -D... options than shown here.
 execute_process(COMMAND ${CMAKE_COMMAND}
                         -G "${CMAKE_GENERATOR}"
@@ -46,7 +55,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DREPROC_WARNINGS=$<CONFIG:Debug>
                         -DREPROC_TIDY=OFF
                         -DREPROC_WARNINGS_AS_ERRORS=OFF
-                        -DREPROC_OBJECT_LIBRARIES=ON
+                        -DREPROC_OBJECT_LIBRARIES=OFF
                         -DREPROC_INSTALL=ON
                         -DREPROC_INSTALL_PKGCONFIG=ON
                         "${src_dir}"

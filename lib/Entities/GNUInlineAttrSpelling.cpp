@@ -17,7 +17,7 @@ const char *EnumeratorName(GNUInlineAttrSpelling e) {
   switch (e) {
     case GNUInlineAttrSpelling::GNU_GNU_INLINE: return "GNU_GNU_INLINE";
     case GNUInlineAttrSpelling::CXX11_GNU_GNU_INLINE: return "CXX11_GNU_GNU_INLINE";
-    case GNUInlineAttrSpelling::C2X_GNU_GNU_INLINE: return "C2X_GNU_GNU_INLINE";
+    case GNUInlineAttrSpelling::C23_GNU_GNU_INLINE: return "C23_GNU_GNU_INLINE";
     case GNUInlineAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

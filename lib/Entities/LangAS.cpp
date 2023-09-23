@@ -35,6 +35,7 @@ const char *EnumeratorName(LangAS e) {
     case LangAS::PTR32_UPTR: return "PTR32_UPTR";
     case LangAS::PTR64: return "PTR64";
     case LangAS::HLSL_GROUPSHARED: return "HLSL_GROUPSHARED";
+    case LangAS::WASM_FUNCREF: return "WASM_FUNCREF";
     default: return "<invalid>";
   }
 }

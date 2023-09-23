@@ -69,6 +69,7 @@ class AtomicExpr : public Expr {
 
   Token builtin_token(void) const;
   AtomicExprAtomicOp operation(void) const;
+  std::string_view operation_as_string(void) const;
   Expr order(void) const;
   std::optional<Expr> order_fail(void) const;
   Expr pointer(void) const;

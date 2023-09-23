@@ -17,10 +17,10 @@ const char *EnumeratorName(MipsShortCallAttrSpelling e) {
   switch (e) {
     case MipsShortCallAttrSpelling::GNU_SHORT_CALL: return "GNU_SHORT_CALL";
     case MipsShortCallAttrSpelling::CXX11_GNU_SHORT_CALL: return "CXX11_GNU_SHORT_CALL";
-    case MipsShortCallAttrSpelling::C2X_GNU_SHORT_CALL: return "C2X_GNU_SHORT_CALL";
+    case MipsShortCallAttrSpelling::C23_GNU_SHORT_CALL: return "C23_GNU_SHORT_CALL";
     case MipsShortCallAttrSpelling::GNU_NEAR: return "GNU_NEAR";
     case MipsShortCallAttrSpelling::CXX11_GNU_NEAR: return "CXX11_GNU_NEAR";
-    case MipsShortCallAttrSpelling::C2X_GNU_NEAR: return "C2X_GNU_NEAR";
+    case MipsShortCallAttrSpelling::C23_GNU_NEAR: return "C23_GNU_NEAR";
     case MipsShortCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -17,7 +17,6 @@ class Decl;
 class Expr;
 class StaticAssertDecl;
 class Stmt;
-class StringLiteral;
 class Token;
 namespace ir {
 class Operation;
@@ -67,7 +66,7 @@ class StaticAssertDecl : public Decl {
   static std::optional<StaticAssertDecl> from(const TokenContext &t);
 
   Expr assert_expression(void) const;
-  StringLiteral message(void) const;
+  Expr message(void) const;
   Token r_paren_token(void) const;
   bool is_failed(void) const;
 };

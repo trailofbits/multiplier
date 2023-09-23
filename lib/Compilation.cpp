@@ -9,7 +9,7 @@
 #include <multiplier/Entities/IncludePathLocation.h>
 #include <multiplier/Fragment.h>
 
-#ifndef __CDT_PARSER__
+#if !defined(MX_DISABLE_VAST) && !defined(__CDT_PARSER__)
 #include <multiplier/IR/MLIR/Builtin/ModuleOp.h>
 #include "IR/SourceIR.h"
 #endif
@@ -273,7 +273,7 @@ Compilation::framework_directories(void) const & noexcept {
 
 // Returns source IR for the compilation.
 std::optional<ir::builtin::ModuleOp> Compilation::ir(void) const noexcept {
-#ifndef __CDT_PARSER__
+#if !defined(MX_DISABLE_VAST) && !defined(__CDT_PARSER__)
   if (auto mlir = impl->SourceIR(); !mlir.empty()) {
     auto ir_obj = std::make_shared<const ir::SourceIRImpl>(
         id(), impl->ep, mlir);
@@ -283,6 +283,7 @@ std::optional<ir::builtin::ModuleOp> Compilation::ir(void) const noexcept {
     }
   }
 #endif
+
   return std::nullopt;
 }
 

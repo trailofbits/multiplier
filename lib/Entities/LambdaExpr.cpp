@@ -172,7 +172,7 @@ CXXMethodDecl LambdaExpr::call_operator(void) const {
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const {
-  return static_cast<LambdaCaptureDefault>(impl->reader.getVal94());
+  return static_cast<LambdaCaptureDefault>(impl->reader.getVal95());
 }
 
 Token LambdaExpr::capture_default_token(void) const {

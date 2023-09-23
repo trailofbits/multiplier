@@ -14,7 +14,7 @@ namespace mx {
 enum class AliasAttrSpelling : unsigned char {
   GNU_ALIAS,
   CXX11_GNU_ALIAS,
-  C2X_GNU_ALIAS,
+  C23_GNU_ALIAS,
   SPELLING_NOT_CALCULATED,
 };
 

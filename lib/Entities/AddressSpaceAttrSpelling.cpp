@@ -17,7 +17,7 @@ const char *EnumeratorName(AddressSpaceAttrSpelling e) {
   switch (e) {
     case AddressSpaceAttrSpelling::GNU_ADDRESS_SPACE: return "GNU_ADDRESS_SPACE";
     case AddressSpaceAttrSpelling::CXX11_CLANG_ADDRESS_SPACE: return "CXX11_CLANG_ADDRESS_SPACE";
-    case AddressSpaceAttrSpelling::C2X_CLANG_ADDRESS_SPACE: return "C2X_CLANG_ADDRESS_SPACE";
+    case AddressSpaceAttrSpelling::C23_CLANG_ADDRESS_SPACE: return "C23_CLANG_ADDRESS_SPACE";
     case AddressSpaceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -79,17 +79,17 @@ std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const TokenContext &t) 
 }
 
 Type ObjCTypeParamType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal232();
+  RawEntityId eid = impl->reader.getVal236();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ObjCTypeParamDecl ObjCTypeParamType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal233();
+  RawEntityId eid = impl->reader.getVal237();
   return ObjCTypeParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ObjCTypeParamType::is_sugared(void) const {
-  return impl->reader.getVal234();
+  return impl->reader.getVal238();
 }
 
 #pragma GCC diagnostic pop

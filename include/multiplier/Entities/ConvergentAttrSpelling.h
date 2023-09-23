@@ -14,7 +14,7 @@ namespace mx {
 enum class ConvergentAttrSpelling : unsigned char {
   GNU_CONVERGENT,
   CXX11_CLANG_CONVERGENT,
-  C2X_CLANG_CONVERGENT,
+  C23_CLANG_CONVERGENT,
   SPELLING_NOT_CALCULATED,
 };
 

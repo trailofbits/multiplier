@@ -159,7 +159,7 @@ bool UnaryOperator::can_overflow(void) const {
 }
 
 UnaryOperatorKind UnaryOperator::opcode(void) const {
-  return static_cast<UnaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<UnaryOperatorKind>(impl->reader.getVal95());
 }
 
 Token UnaryOperator::operator_token(void) const {
@@ -188,11 +188,11 @@ bool UnaryOperator::is_increment_decrement_operation(void) const {
 }
 
 bool UnaryOperator::is_increment_operation(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool UnaryOperator::is_postfix(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool UnaryOperator::is_prefix(void) const {

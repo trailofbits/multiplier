@@ -149,8 +149,10 @@ class Decl {
   bool is_discarded_in_global_module_fragment(void) const;
   bool is_file_context_declaration(void) const;
   bool is_function_or_function_template(void) const;
+  bool is_function_pointer_type(void) const;
   bool is_implicit(void) const;
   bool is_in_anonymous_namespace(void) const;
+  bool is_in_another_module_unit(void) const;
   bool is_in_export_declaration_context(void) const;
   std::optional<bool> is_in_local_scope_for_instantiation(void) const;
   bool is_in_std_namespace(void) const;

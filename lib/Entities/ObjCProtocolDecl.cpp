@@ -182,28 +182,28 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const TokenContext &t) {
 }
 
 std::string_view ObjCProtocolDecl::obj_c_runtime_name_as_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal74();
+  capnp::Text::Reader data = impl->reader.getVal76();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool ObjCProtocolDecl::has_definition(void) const {
-  return impl->reader.getVal75();
-}
-
-bool ObjCProtocolDecl::is_non_runtime_protocol(void) const {
-  return impl->reader.getVal76();
-}
-
-bool ObjCProtocolDecl::is_this_declaration_a_definition(void) const {
   return impl->reader.getVal77();
 }
 
+bool ObjCProtocolDecl::is_non_runtime_protocol(void) const {
+  return impl->reader.getVal78();
+}
+
+bool ObjCProtocolDecl::is_this_declaration_a_definition(void) const {
+  return impl->reader.getVal79();
+}
+
 unsigned ObjCProtocolDecl::num_protocol_tokens(void) const {
-  return impl->reader.getVal316().size();
+  return impl->reader.getVal318().size();
 }
 
 std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
-  auto list = impl->reader.getVal316();
+  auto list = impl->reader.getVal318();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -217,7 +217,7 @@ std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const & {
-  auto list = impl->reader.getVal316();
+  auto list = impl->reader.getVal318();
   EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
@@ -227,19 +227,19 @@ gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t316 = ep->TokenFor(ep, tok_reader, v)) {
-      co_yield t316;
+    if (auto t318 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t318;
     }
   }
   co_return;
 }
 
 unsigned ObjCProtocolDecl::num_protocols(void) const {
-  return impl->reader.getVal342().size();
+  return impl->reader.getVal344().size();
 }
 
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const {
-  auto list = impl->reader.getVal342();
+  auto list = impl->reader.getVal344();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -253,12 +253,12 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const & {
-  auto list = impl->reader.getVal342();
+  auto list = impl->reader.getVal344();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d342 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d342)))) {
+    if (auto d344 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(std::move(d344)))) {
         co_yield std::move(*e);
       }
     }

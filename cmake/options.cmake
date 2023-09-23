@@ -20,10 +20,10 @@ option(MX_USE_VENDORED_GLOG "Set to OFF to disable default building of Google gl
 option(MX_USE_VENDORED_GFLAGS "Set to OFF to disable default building of gflags as a vendored library." ON)
 option(MX_USE_VENDORED_ZSTD "Set to OFF to disable default building of ZStandard as a vendored library." ON)
 option(MX_USE_VENDORED_REPROC "Set to OFF to disable default building of reproc/reproc++ as a vendored library." ON)
-option(MX_USE_VENDORED_CONCURRENTQUEUE "Set to OFF to disable default building of ZStandard as a vendored library." ON)
 option(MX_USE_VENDORED_GAP "Set to OFF to disable default building of gap as a vendored library." ON)
 option(MX_USE_VENDORED_CLANG "Set to OFF to disable default building of Clang/LLVM as a vendored library." ON)
 option(MX_USE_VENDORED_PASTA "Set to OFF to disable default building of PASTA as a vendored library." ON)
+option(MX_USE_VENDORED_RE2 "Set to OFF to disable default building of RE2 as a vendored library." ON)
 
 option(MX_ENABLE_BOOTSTRAP "Set to ON to enable re-bootstrapping of some auto-generated files." OFF)
 option(MX_ENABLE_INSTALL "Set to ON to enable the install target" ON)

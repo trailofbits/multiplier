@@ -16,6 +16,10 @@ class Index;
 class AddressSpaceAttr;
 class AnnotateTypeAttr;
 class ArmMveStrictPolymorphismAttr;
+class ArmPreservesZAAttr;
+class ArmSharedZAAttr;
+class ArmStreamingAttr;
+class ArmStreamingCompatibleAttr;
 class Attr;
 class BTFTypeTagAttr;
 class CmseNSCallAttr;
@@ -41,6 +45,7 @@ class TypeNullUnspecifiedAttr;
 class TypeNullableAttr;
 class TypeNullableResultAttr;
 class UPtrAttr;
+class WebAssemblyFuncrefAttr;
 namespace ir {
 class Operation;
 class Value;

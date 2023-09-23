@@ -91,7 +91,7 @@ std::string DeclToString(const pasta::Decl &decl) {
     for (auto i = 0u, max_i = ptok.NumLeadingNewLines(); i < max_i; ++i) {
       ss << '\n';
     }
-    for (auto i = 0u, max_i = ptok.NumleadingSpaces(); i < max_i; ++i) {
+    for (auto i = 0u, max_i = ptok.NumLeadingSpaces(); i < max_i; ++i) {
       ss << ' ';
     }
     ss << ptok.Data();

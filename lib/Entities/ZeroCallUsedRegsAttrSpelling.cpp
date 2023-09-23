@@ -17,7 +17,7 @@ const char *EnumeratorName(ZeroCallUsedRegsAttrSpelling e) {
   switch (e) {
     case ZeroCallUsedRegsAttrSpelling::GNU_ZERO_CALL_USED_REGS: return "GNU_ZERO_CALL_USED_REGS";
     case ZeroCallUsedRegsAttrSpelling::CXX11_GNU_ZERO_CALL_USED_REGS: return "CXX11_GNU_ZERO_CALL_USED_REGS";
-    case ZeroCallUsedRegsAttrSpelling::C2X_GNU_ZERO_CALL_USED_REGS: return "C2X_GNU_ZERO_CALL_USED_REGS";
+    case ZeroCallUsedRegsAttrSpelling::C23_GNU_ZERO_CALL_USED_REGS: return "C23_GNU_ZERO_CALL_USED_REGS";
     case ZeroCallUsedRegsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

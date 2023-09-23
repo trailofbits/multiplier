@@ -78,6 +78,7 @@ class CXXConstructExpr : public Expr {
   TokenRange parenthesis_or_brace_range(void) const;
   bool had_multiple_candidates(void) const;
   bool is_elidable(void) const;
+  bool is_immediate_escalating(void) const;
   bool is_list_initialization(void) const;
   bool is_std_initializer_list_initialization(void) const;
   bool requires_zero_initialization(void) const;

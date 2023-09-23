@@ -36,3 +36,8 @@ add_subdirectory(gap)
 add_subdirectory(zstd)
 add_subdirectory(llvm-project)  # Depends on zstd
 add_subdirectory(pasta)  # Depends on llvm-project
+
+if(MX_ENABLE_RE2)
+  add_subdirectory(abseil)
+  add_subdirectory(re2)  # Depends on abseil
+endif()

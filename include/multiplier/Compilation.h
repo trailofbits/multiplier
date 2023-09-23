@@ -19,7 +19,11 @@ namespace mx {
 namespace ir {
 class SourceIRImpl;
 namespace builtin {
+#ifdef MX_DISABLE_VAST
+class ModuleOp {};
+#else
 class ModuleOp;
+#endif  // MX_DISABLE_VAST
 }  // namespace builtin
 }  // namespace ir
 

@@ -88,6 +88,9 @@ target_link_libraries("mx-dump-json"
     LLVMCore LLVMSupport
 )
 
-define_example("mx-count-sourceir" "CountSourceIR.cpp")
+if(MX_ENABLE_VAST)
+  define_example("mx-count-sourceir" "CountSourceIR.cpp")
+endif()
+
 # define_example("mx-print-sourceir" "PrintSourceIR.cpp")
 # define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")

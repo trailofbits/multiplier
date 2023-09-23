@@ -17,7 +17,7 @@ const char *EnumeratorName(CallbackAttrSpelling e) {
   switch (e) {
     case CallbackAttrSpelling::GNU_CALLBACK: return "GNU_CALLBACK";
     case CallbackAttrSpelling::CXX11_CLANG_CALLBACK: return "CXX11_CLANG_CALLBACK";
-    case CallbackAttrSpelling::C2X_CLANG_CALLBACK: return "C2X_CLANG_CALLBACK";
+    case CallbackAttrSpelling::C23_CLANG_CALLBACK: return "C23_CLANG_CALLBACK";
     case CallbackAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

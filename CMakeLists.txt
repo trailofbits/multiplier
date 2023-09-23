@@ -66,7 +66,7 @@ find_package(zstd CONFIG REQUIRED)
 find_package(gap CONFIG REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)
-find_package(reproc CONFIG REQUIRED)
+find_package(reproc++ CONFIG REQUIRED)
 
 # find_package(VAST CONFIG REQUIRED)
 

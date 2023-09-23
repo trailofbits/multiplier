@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCRootClassAttrSpelling e) {
   switch (e) {
     case ObjCRootClassAttrSpelling::GNU_OBJC_ROOT_CLASS: return "GNU_OBJC_ROOT_CLASS";
     case ObjCRootClassAttrSpelling::CXX11_CLANG_OBJC_ROOT_CLASS: return "CXX11_CLANG_OBJC_ROOT_CLASS";
-    case ObjCRootClassAttrSpelling::C2X_CLANG_OBJC_ROOT_CLASS: return "C2X_CLANG_OBJC_ROOT_CLASS";
+    case ObjCRootClassAttrSpelling::C23_CLANG_OBJC_ROOT_CLASS: return "C23_CLANG_OBJC_ROOT_CLASS";
     case ObjCRootClassAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

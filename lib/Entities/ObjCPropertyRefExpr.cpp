@@ -222,11 +222,11 @@ bool ObjCPropertyRefExpr::is_messaging_setter(void) const {
 }
 
 bool ObjCPropertyRefExpr::is_object_receiver(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool ObjCPropertyRefExpr::is_super_receiver(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 #pragma GCC diagnostic pop

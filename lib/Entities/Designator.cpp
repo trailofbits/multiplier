@@ -93,15 +93,6 @@ Token Designator::ellipsis_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
-std::optional<uint32_t> Designator::first_expression_index(void) const {
-  if (!impl->reader.getVal12()) {
-    return std::nullopt;
-  } else {
-    return static_cast<uint32_t>(impl->reader.getVal11());
-  }
-  return std::nullopt;
-}
-
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

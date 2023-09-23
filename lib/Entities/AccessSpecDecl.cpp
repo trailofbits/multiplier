@@ -179,11 +179,11 @@ std::optional<AccessSpecDecl> AccessSpecDecl::from(const TokenContext &t) {
 }
 
 Token AccessSpecDecl::access_specifier_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal50());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }
 
 Token AccessSpecDecl::colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal59());
 }
 
 #pragma GCC diagnostic pop

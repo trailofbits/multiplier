@@ -192,7 +192,7 @@ gap::generator<Expr> CXXConstructExpr::arguments(void) const & {
 }
 
 CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const {
-  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal94());
+  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal95());
 }
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
@@ -216,16 +216,20 @@ bool CXXConstructExpr::is_elidable(void) const {
   return impl->reader.getVal90();
 }
 
-bool CXXConstructExpr::is_list_initialization(void) const {
+bool CXXConstructExpr::is_immediate_escalating(void) const {
   return impl->reader.getVal91();
 }
 
-bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
+bool CXXConstructExpr::is_list_initialization(void) const {
   return impl->reader.getVal92();
 }
 
-bool CXXConstructExpr::requires_zero_initialization(void) const {
+bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
   return impl->reader.getVal93();
+}
+
+bool CXXConstructExpr::requires_zero_initialization(void) const {
+  return impl->reader.getVal94();
 }
 
 #pragma GCC diagnostic pop

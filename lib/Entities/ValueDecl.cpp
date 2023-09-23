@@ -261,7 +261,7 @@ std::optional<ValueDecl> ValueDecl::from(const TokenContext &t) {
 
 std::optional<VarDecl> ValueDecl::potentially_decomposed_variable_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal57();
+    RawEntityId eid = impl->reader.getVal59();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -273,16 +273,16 @@ std::optional<VarDecl> ValueDecl::potentially_decomposed_variable_declaration(vo
 }
 
 Type ValueDecl::type(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal60();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ValueDecl::is_initializer_capture(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal77();
 }
 
 bool ValueDecl::is_weak(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal78();
 }
 
 #pragma GCC diagnostic pop

@@ -196,11 +196,11 @@ std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const TokenContext &t) 
 }
 
 unsigned ObjCContainerDecl::num_class_methods(void) const {
-  return impl->reader.getVal52().size();
+  return impl->reader.getVal54().size();
 }
 
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_class_method(unsigned n) const {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal54();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -214,12 +214,12 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_class_method(unsigned n) co
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const & {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal54();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d52 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(std::move(d52)))) {
+    if (auto d54 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCMethodDecl::from(Decl(std::move(d54)))) {
         co_yield std::move(*e);
       }
     }
@@ -228,11 +228,11 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const & {
 }
 
 unsigned ObjCContainerDecl::num_class_properties(void) const {
-  return impl->reader.getVal53().size();
+  return impl->reader.getVal55().size();
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_class_propertie(unsigned n) const {
-  auto list = impl->reader.getVal53();
+  auto list = impl->reader.getVal55();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -246,12 +246,12 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_class_propertie(unsigned 
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const & {
-  auto list = impl->reader.getVal53();
+  auto list = impl->reader.getVal55();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d53 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d53)))) {
+    if (auto d55 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d55)))) {
         co_yield std::move(*e);
       }
     }
@@ -260,19 +260,19 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const
 }
 
 TokenRange ObjCContainerDecl::at_end_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal57(), impl->reader.getVal58());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal59(), impl->reader.getVal60());
 }
 
 Token ObjCContainerDecl::at_start_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal59());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 unsigned ObjCContainerDecl::num_instance_methods(void) const {
-  return impl->reader.getVal63().size();
+  return impl->reader.getVal65().size();
 }
 
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_instance_method(unsigned n) const {
-  auto list = impl->reader.getVal63();
+  auto list = impl->reader.getVal65();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -286,12 +286,12 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_instance_method(unsigned n)
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const & {
-  auto list = impl->reader.getVal63();
+  auto list = impl->reader.getVal65();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d63 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(std::move(d63)))) {
+    if (auto d65 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCMethodDecl::from(Decl(std::move(d65)))) {
         co_yield std::move(*e);
       }
     }
@@ -300,11 +300,11 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const &
 }
 
 unsigned ObjCContainerDecl::num_instance_properties(void) const {
-  return impl->reader.getVal176().size();
+  return impl->reader.getVal182().size();
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_instance_propertie(unsigned n) const {
-  auto list = impl->reader.getVal176();
+  auto list = impl->reader.getVal182();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -318,12 +318,12 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_instance_propertie(unsign
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const & {
-  auto list = impl->reader.getVal176();
+  auto list = impl->reader.getVal182();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d176 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d176)))) {
+    if (auto d182 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d182)))) {
         co_yield std::move(*e);
       }
     }
@@ -332,11 +332,11 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) co
 }
 
 unsigned ObjCContainerDecl::num_methods(void) const {
-  return impl->reader.getVal184().size();
+  return impl->reader.getVal190().size();
 }
 
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_method(unsigned n) const {
-  auto list = impl->reader.getVal184();
+  auto list = impl->reader.getVal190();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -350,12 +350,12 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_method(unsigned n) const {
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const & {
-  auto list = impl->reader.getVal184();
+  auto list = impl->reader.getVal190();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d184 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(std::move(d184)))) {
+    if (auto d190 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCMethodDecl::from(Decl(std::move(d190)))) {
         co_yield std::move(*e);
       }
     }
@@ -364,11 +364,11 @@ gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const & {
 }
 
 unsigned ObjCContainerDecl::num_properties(void) const {
-  return impl->reader.getVal185().size();
+  return impl->reader.getVal191().size();
 }
 
 std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_propertie(unsigned n) const {
-  auto list = impl->reader.getVal185();
+  auto list = impl->reader.getVal191();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -382,12 +382,12 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_propertie(unsigned n) con
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const & {
-  auto list = impl->reader.getVal185();
+  auto list = impl->reader.getVal191();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d185 = ep->DeclFor(ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d185)))) {
+    if (auto d191 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCPropertyDecl::from(Decl(std::move(d191)))) {
         co_yield std::move(*e);
       }
     }
@@ -397,7 +397,7 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const & {
 
 gap::generator<Decl> ObjCContainerDecl::declarations_in_context(void) const & {
   EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal186();
+  auto list = impl->reader.getVal192();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

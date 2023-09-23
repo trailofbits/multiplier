@@ -63,6 +63,7 @@ class AttributedType : public Type {
   bool is_ms_type_spec(void) const;
   bool is_qualifier(void) const;
   bool is_sugared(void) const;
+  bool is_web_assembly_funcref_spec(void) const;
 };
 
 static_assert(sizeof(AttributedType) == sizeof(Type));

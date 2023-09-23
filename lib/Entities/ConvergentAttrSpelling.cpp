@@ -17,7 +17,7 @@ const char *EnumeratorName(ConvergentAttrSpelling e) {
   switch (e) {
     case ConvergentAttrSpelling::GNU_CONVERGENT: return "GNU_CONVERGENT";
     case ConvergentAttrSpelling::CXX11_CLANG_CONVERGENT: return "CXX11_CLANG_CONVERGENT";
-    case ConvergentAttrSpelling::C2X_CLANG_CONVERGENT: return "C2X_CLANG_CONVERGENT";
+    case ConvergentAttrSpelling::C23_CLANG_CONVERGENT: return "C23_CLANG_CONVERGENT";
     case ConvergentAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

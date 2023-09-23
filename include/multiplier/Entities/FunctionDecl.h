@@ -88,6 +88,7 @@ class FunctionDecl : public DeclaratorDecl {
   static std::optional<FunctionDecl> from(const Reference &r);
   static std::optional<FunctionDecl> from(const TokenContext &t);
 
+  bool body_contains_immediate_escalating_expressions(void) const;
   bool friend_constraint_refers_to_enclosing_template(void) const;
   bool uses_fp_intrin(void) const;
   std::optional<bool> does_declaration_force_externally_visible_definition(void) const;
@@ -136,6 +137,8 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_extern_c(void) const;
   bool is_function_template_specialization(void) const;
   bool is_global(void) const;
+  bool is_immediate_escalating(void) const;
+  bool is_immediate_function(void) const;
   bool is_implicitly_instantiable(void) const;
   bool is_in_extern_c_context(void) const;
   bool is_in_extern_cxx_context(void) const;
@@ -148,6 +151,7 @@ class FunctionDecl : public DeclaratorDecl {
   std::optional<bool> is_ms_extern_inline(void) const;
   bool is_msvcrt_entry_point(void) const;
   bool is_main(void) const;
+  bool is_member_like_constrained_friend(void) const;
   bool is_multi_version(void) const;
   bool is_no_return(void) const;
   bool is_overloaded_operator(void) const;

@@ -157,7 +157,7 @@ std::optional<Token> TypeImpl::TokenFor(
     TypeId tid(ttid);
 
     // It's a token inside of the current type.
-    if (tid.type_id == self->type_id) {
+    if (tid.type_id == self->type_id.Unpack().type_id) {
       Token tok(self->TypeTokenReader(self), ttid.offset);
       if (tok.id() == eid) {
         return tok;

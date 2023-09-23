@@ -17,7 +17,7 @@ const char *EnumeratorName(ArmMveStrictPolymorphismAttrSpelling e) {
   switch (e) {
     case ArmMveStrictPolymorphismAttrSpelling::GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM: return "GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM";
     case ArmMveStrictPolymorphismAttrSpelling::CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM: return "CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM";
-    case ArmMveStrictPolymorphismAttrSpelling::C2X_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM: return "C2X_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM";
+    case ArmMveStrictPolymorphismAttrSpelling::C23_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM: return "C23_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM";
     case ArmMveStrictPolymorphismAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

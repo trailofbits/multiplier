@@ -163,7 +163,7 @@ Expr BinaryOperator::lhs(void) const {
 }
 
 BinaryOperatorKind BinaryOperator::opcode(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal95());
 }
 
 std::string_view BinaryOperator::opcode_string(void) const {
@@ -201,11 +201,11 @@ bool BinaryOperator::is_comma_operation(void) const {
 }
 
 bool BinaryOperator::is_comparison_operation(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool BinaryOperator::is_compound_assignment_operation(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool BinaryOperator::is_equality_operation(void) const {

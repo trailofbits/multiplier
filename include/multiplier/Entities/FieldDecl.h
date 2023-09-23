@@ -81,9 +81,11 @@ class FieldDecl : public DeclaratorDecl {
   std::optional<Expr> in_class_initializer(void) const;
   bool has_captured_vla_type(void) const;
   bool has_in_class_initializer(void) const;
+  bool has_non_null_in_class_initializer(void) const;
   bool is_anonymous_struct_or_union(void) const;
   bool is_bit_field(void) const;
   bool is_mutable(void) const;
+  bool is_potentially_overlapping(void) const;
   bool is_unnamed_bitfield(void) const;
   bool is_zero_length_bit_field(void) const;
   bool is_zero_size(void) const;

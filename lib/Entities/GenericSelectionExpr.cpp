@@ -12,6 +12,7 @@
 #include <multiplier/Entities/Expr.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
+#include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
 #include "../EntityProvider.h"
@@ -191,25 +192,38 @@ Expr GenericSelectionExpr::controlling_expression(void) const {
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Token GenericSelectionExpr::default_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+Type GenericSelectionExpr::controlling_type(void) const {
+  RawEntityId eid = impl->reader.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-Token GenericSelectionExpr::generic_token(void) const {
+Token GenericSelectionExpr::default_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
-Token GenericSelectionExpr::r_paren_token(void) const {
+Token GenericSelectionExpr::generic_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
+Token GenericSelectionExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+}
+
 Expr GenericSelectionExpr::result_expression(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-bool GenericSelectionExpr::is_result_dependent(void) const {
+bool GenericSelectionExpr::is_expression_predicate(void) const {
   return impl->reader.getVal89();
+}
+
+bool GenericSelectionExpr::is_result_dependent(void) const {
+  return impl->reader.getVal90();
+}
+
+bool GenericSelectionExpr::is_type_predicate(void) const {
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

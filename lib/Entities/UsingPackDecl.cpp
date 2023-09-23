@@ -180,11 +180,11 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const TokenContext &t) {
 }
 
 unsigned UsingPackDecl::num_expansions(void) const {
-  return impl->reader.getVal52().size();
+  return impl->reader.getVal54().size();
 }
 
 std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal54();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -198,12 +198,12 @@ std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
 }
 
 gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal54();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d52 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d52)))) {
+    if (auto d54 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from(Decl(std::move(d54)))) {
         co_yield std::move(*e);
       }
     }
@@ -212,7 +212,7 @@ gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
 }
 
 NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal57();
+  RawEntityId eid = impl->reader.getVal59();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 

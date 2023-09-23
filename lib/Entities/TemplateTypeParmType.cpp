@@ -79,13 +79,13 @@ std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const TokenContex
 }
 
 Type TemplateTypeParmType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal232();
+  RawEntityId eid = impl->reader.getVal236();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<TemplateTypeParmDecl> TemplateTypeParmType::declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal233();
+    RawEntityId eid = impl->reader.getVal237();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -97,11 +97,11 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmType::declaration(void) cons
 }
 
 bool TemplateTypeParmType::is_parameter_pack(void) const {
-  return impl->reader.getVal234();
+  return impl->reader.getVal238();
 }
 
 bool TemplateTypeParmType::is_sugared(void) const {
-  return impl->reader.getVal235();
+  return impl->reader.getVal239();
 }
 
 #pragma GCC diagnostic pop
