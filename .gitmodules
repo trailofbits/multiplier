@@ -8,19 +8,19 @@
 	shallow = true
 [submodule "vendor/capnproto/src"]
 	path = vendor/capnproto/src
-	url = https://github.com/github.com/capnproto/capnproto.git
+	url = https://github.com/capnproto/capnproto.git
 	shallow = true
 [submodule "vendor/glog/src"]
 	path = vendor/glog/src
-	url = https://github.com/github.com/google/glog.git
+	url = https://github.com/google/glog.git
 	shallow = true
 [submodule "vendor/gflags/src"]
 	path = vendor/gflags/src
-	url = https://github.com/github.com/gflags/gflags.git
+	url = https://github.com/gflags/gflags.git
 	shallow = true
 [submodule "vendor/zstd/src"]
 	path = vendor/zstd/src
-	url = https://github.com/github.com/facebook/zstd.git
+	url = https://github.com/facebook/zstd.git
 	shallow = true
 [submodule "vendor/gap/src"]
 	path = vendor/gap/src
