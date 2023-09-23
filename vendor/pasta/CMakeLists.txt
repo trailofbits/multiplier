@@ -28,6 +28,10 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/pasta/src
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+
+  execute_process(
+    COMMAND "${GIT_EXECUTABLE}" submodule set-branch --branch llvm17 vendor/pasta/src
+    WORKING_DIRECTORY "${PASTA_SOURCE_DIR}")
 endif()
 
 # This is the main build, setup and execute the nested build
@@ -53,7 +57,8 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DLLVM_DIR=${LLVM_DIR}"
                         "-DClang_DIR=${Clang_DIR}"
                         "${src_dir}"
-               WORKING_DIRECTORY "${build_dir}")
+               WORKING_DIRECTORY "${build_dir}"
+               COMMAND_ECHO STDOUT)
 
 # (c) Build just mycomp in the nested build. Don't specify a --config
 #     because we cannot know what config the developer will be using

@@ -28,13 +28,17 @@ endif()
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 
+
+# NOTE(pag): This causes some issues.
+# "-DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH}"
+
+
 # (b) Nested CMake run. May need more -D... options than shown here.
 execute_process(COMMAND ${CMAKE_COMMAND}
                         -G "${CMAKE_GENERATOR}"
                         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
                         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
                         "-DCMAKE_INSTALL_PREFIX=${MX_VENDOR_INSTALL_DIR}"
-                        "-DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH}"
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
