@@ -31,10 +31,6 @@ list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
 
-if(MX_ENABLE_RE2)
-  find_package(re2 CONFIG REQUIRED)
-endif(MX_ENABLE_RE2)
-
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")
 endif(MX_ENABLE_INSTALL)
@@ -46,6 +42,10 @@ elseif(PLATFORM_LINUX)
 endif()
 
 add_subdirectory("vendor")
+
+if(MX_ENABLE_RE2)
+  find_package(re2 CONFIG REQUIRED)
+endif(MX_ENABLE_RE2)
 
 find_package(gflags CONFIG REQUIRED)
 if(NOT TARGET gflags::gflags)

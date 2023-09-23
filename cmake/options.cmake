@@ -23,6 +23,7 @@ option(MX_USE_VENDORED_REPROC "Set to OFF to disable default building of reproc/
 option(MX_USE_VENDORED_GAP "Set to OFF to disable default building of gap as a vendored library." ON)
 option(MX_USE_VENDORED_CLANG "Set to OFF to disable default building of Clang/LLVM as a vendored library." ON)
 option(MX_USE_VENDORED_PASTA "Set to OFF to disable default building of PASTA as a vendored library." ON)
+option(MX_USE_VENDORED_ABSEIL "Set to OFF to disable default building of Abseil as a vendored library." ON)
 option(MX_USE_VENDORED_RE2 "Set to OFF to disable default building of RE2 as a vendored library." ON)
 
 option(MX_ENABLE_BOOTSTRAP "Set to ON to enable re-bootstrapping of some auto-generated files." OFF)
