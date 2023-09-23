@@ -79,17 +79,17 @@ std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const TokenContext 
 }
 
 Type UnresolvedUsingType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal235();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 UnresolvedUsingTypenameDecl UnresolvedUsingType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal237();
+  RawEntityId eid = impl->reader.getVal236();
   return UnresolvedUsingTypenameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool UnresolvedUsingType::is_sugared(void) const {
-  return impl->reader.getVal238();
+  return impl->reader.getVal237();
 }
 
 #pragma GCC diagnostic pop

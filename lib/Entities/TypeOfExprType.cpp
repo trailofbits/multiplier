@@ -79,21 +79,21 @@ std::optional<TypeOfExprType> TypeOfExprType::from(const TokenContext &t) {
 }
 
 Type TypeOfExprType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal235();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TypeOfKind TypeOfExprType::type_kind(void) const {
-  return static_cast<TypeOfKind>(impl->reader.getVal245());
+  return static_cast<TypeOfKind>(impl->reader.getVal244());
 }
 
 Expr TypeOfExprType::underlying_expression(void) const {
-  RawEntityId eid = impl->reader.getVal237();
+  RawEntityId eid = impl->reader.getVal236();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool TypeOfExprType::is_sugared(void) const {
-  return impl->reader.getVal238();
+  return impl->reader.getVal237();
 }
 
 #pragma GCC diagnostic pop

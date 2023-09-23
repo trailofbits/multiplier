@@ -400,6 +400,8 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Type", "AsUnionType"},
   {"Type", "LocallyUnqualifiedSingleStepDesugaredType"},
 
+  {"Type", "RVVEltType"},
+
   {"Type", "CanonicalTypeInternal"},
   {"Type", "ContainedAutoType"},
   {"Type", "ContainedDeducedType"},

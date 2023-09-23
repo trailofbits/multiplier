@@ -81,26 +81,26 @@ std::optional<FunctionProtoType> FunctionProtoType::from(const TokenContext &t) 
 }
 
 std::optional<CanThrowResult> FunctionProtoType::can_throw(void) const {
-  if (!impl->reader.getVal249()) {
+  if (!impl->reader.getVal248()) {
     return std::nullopt;
   } else {
-    return static_cast<CanThrowResult>(impl->reader.getVal281());
+    return static_cast<CanThrowResult>(impl->reader.getVal280());
   }
   return std::nullopt;
 }
 
 Type FunctionProtoType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal243();
+  RawEntityId eid = impl->reader.getVal242();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token FunctionProtoType::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal244());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal243());
 }
 
 std::optional<FunctionDecl> FunctionProtoType::exception_spec_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal277();
+    RawEntityId eid = impl->reader.getVal276();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -113,7 +113,7 @@ std::optional<FunctionDecl> FunctionProtoType::exception_spec_declaration(void) 
 
 std::optional<FunctionDecl> FunctionProtoType::exception_spec_template(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal278();
+    RawEntityId eid = impl->reader.getVal277();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -125,12 +125,12 @@ std::optional<FunctionDecl> FunctionProtoType::exception_spec_template(void) con
 }
 
 ExceptionSpecificationType FunctionProtoType::exception_spec_type(void) const {
-  return static_cast<ExceptionSpecificationType>(impl->reader.getVal282());
+  return static_cast<ExceptionSpecificationType>(impl->reader.getVal281());
 }
 
 std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal283();
+    RawEntityId eid = impl->reader.getVal282();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -142,11 +142,11 @@ std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
 }
 
 unsigned FunctionProtoType::num_parameter_types(void) const {
-  return impl->reader.getVal241().size();
+  return impl->reader.getVal240().size();
 }
 
 std::optional<Type> FunctionProtoType::nth_parameter_type(unsigned n) const {
-  auto list = impl->reader.getVal241();
+  auto list = impl->reader.getVal240();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -160,76 +160,76 @@ std::optional<Type> FunctionProtoType::nth_parameter_type(unsigned n) const {
 }
 
 gap::generator<Type> FunctionProtoType::parameter_types(void) const & {
-  auto list = impl->reader.getVal241();
+  auto list = impl->reader.getVal240();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d241 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d241));
+    if (auto d240 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d240));
     }
   }
   co_return;
 }
 
 RefQualifierKind FunctionProtoType::reference_qualifier(void) const {
-  return static_cast<RefQualifierKind>(impl->reader.getVal284());
+  return static_cast<RefQualifierKind>(impl->reader.getVal283());
 }
 
 bool FunctionProtoType::has_dependent_exception_spec(void) const {
-  return impl->reader.getVal250();
+  return impl->reader.getVal249();
 }
 
 bool FunctionProtoType::has_dynamic_exception_spec(void) const {
-  return impl->reader.getVal251();
+  return impl->reader.getVal250();
 }
 
 bool FunctionProtoType::has_exception_spec(void) const {
-  return impl->reader.getVal252();
+  return impl->reader.getVal251();
 }
 
 bool FunctionProtoType::has_ext_parameter_infos(void) const {
-  return impl->reader.getVal253();
+  return impl->reader.getVal252();
 }
 
 bool FunctionProtoType::has_instantiation_dependent_exception_spec(void) const {
-  return impl->reader.getVal254();
+  return impl->reader.getVal253();
 }
 
 bool FunctionProtoType::has_noexcept_exception_spec(void) const {
-  return impl->reader.getVal255();
+  return impl->reader.getVal254();
 }
 
 bool FunctionProtoType::has_trailing_return(void) const {
-  return impl->reader.getVal256();
+  return impl->reader.getVal255();
 }
 
 std::optional<bool> FunctionProtoType::is_nothrow(void) const {
-  if (!impl->reader.getVal258()) {
+  if (!impl->reader.getVal257()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal257());
+    return static_cast<bool>(impl->reader.getVal256());
   }
   return std::nullopt;
 }
 
 bool FunctionProtoType::is_sugared(void) const {
-  return impl->reader.getVal259();
+  return impl->reader.getVal258();
 }
 
 bool FunctionProtoType::is_template_variadic(void) const {
-  return impl->reader.getVal260();
+  return impl->reader.getVal259();
 }
 
 bool FunctionProtoType::is_variadic(void) const {
-  return impl->reader.getVal261();
+  return impl->reader.getVal260();
 }
 
 unsigned FunctionProtoType::num_exception_types(void) const {
-  return impl->reader.getVal276().size();
+  return impl->reader.getVal275().size();
 }
 
 std::optional<Type> FunctionProtoType::nth_exception_type(unsigned n) const {
-  auto list = impl->reader.getVal276();
+  auto list = impl->reader.getVal275();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -243,12 +243,12 @@ std::optional<Type> FunctionProtoType::nth_exception_type(unsigned n) const {
 }
 
 gap::generator<Type> FunctionProtoType::exception_types(void) const & {
-  auto list = impl->reader.getVal276();
+  auto list = impl->reader.getVal275();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d276 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d276));
+    if (auto d275 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d275));
     }
   }
   co_return;

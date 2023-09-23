@@ -82,13 +82,13 @@ std::optional<DeducedType> DeducedType::from(const TokenContext &t) {
 }
 
 Type DeducedType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal235();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Type> DeducedType::resolved_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal237();
+    RawEntityId eid = impl->reader.getVal236();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -100,11 +100,11 @@ std::optional<Type> DeducedType::resolved_type(void) const {
 }
 
 bool DeducedType::is_deduced(void) const {
-  return impl->reader.getVal238();
+  return impl->reader.getVal237();
 }
 
 bool DeducedType::is_sugared(void) const {
-  return impl->reader.getVal239();
+  return impl->reader.getVal238();
 }
 
 #pragma GCC diagnostic pop

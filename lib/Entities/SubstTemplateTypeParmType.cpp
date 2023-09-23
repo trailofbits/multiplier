@@ -80,36 +80,36 @@ std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const T
 }
 
 Type SubstTemplateTypeParmType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal235();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Decl SubstTemplateTypeParmType::associated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal237();
+  RawEntityId eid = impl->reader.getVal236();
   return Decl(impl->ep->DeclFor(impl->ep, eid));
 }
 
 std::optional<uint32_t> SubstTemplateTypeParmType::pack_index(void) const {
-  if (!impl->reader.getVal238()) {
+  if (!impl->reader.getVal237()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal242());
+    return static_cast<uint32_t>(impl->reader.getVal241());
   }
   return std::nullopt;
 }
 
 TemplateTypeParmDecl SubstTemplateTypeParmType::replaced_parameter(void) const {
-  RawEntityId eid = impl->reader.getVal243();
+  RawEntityId eid = impl->reader.getVal242();
   return TemplateTypeParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type SubstTemplateTypeParmType::replacement_type(void) const {
-  RawEntityId eid = impl->reader.getVal244();
+  RawEntityId eid = impl->reader.getVal243();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool SubstTemplateTypeParmType::is_sugared(void) const {
-  return impl->reader.getVal239();
+  return impl->reader.getVal238();
 }
 
 #pragma GCC diagnostic pop

@@ -81,29 +81,29 @@ std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const Token
 }
 
 Type DependentSizedArrayType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal237();
+  RawEntityId eid = impl->reader.getVal236();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange DependentSizedArrayType::brackets_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal243(), impl->reader.getVal244());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal242(), impl->reader.getVal243());
 }
 
 Token DependentSizedArrayType::l_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal277());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal276());
 }
 
 Token DependentSizedArrayType::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal278());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal277());
 }
 
 Expr DependentSizedArrayType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal283();
+  RawEntityId eid = impl->reader.getVal282();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentSizedArrayType::is_sugared(void) const {
-  return impl->reader.getVal238();
+  return impl->reader.getVal237();
 }
 
 #pragma GCC diagnostic pop

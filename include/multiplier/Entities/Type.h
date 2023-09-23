@@ -121,7 +121,6 @@ class Type {
   std::optional<CXXRecordDecl> pointee_cxx_record_declaration(void) const;
   std::optional<Type> pointee_or_array_element_type(void) const;
   std::optional<Type> pointee_type(void) const;
-  Type rvv_elt_type(void) const;
   std::optional<TypeScalarTypeKind> scalar_type_kind(void) const;
   std::optional<Type> sve_element_type(void) const;
   TypeKind kind(void) const;

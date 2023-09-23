@@ -492,20 +492,20 @@ struct Stmt @0x91127d30fade9a32{
 }
 
 struct Type @0xd739e808bc1b3fd7{
-  val285 @0 :UInt16;
+  val284 @0 :UInt16;
   val13 @1 :UInt8;
   val14 @2 :UInt8;
-  val20 @3 :UInt8;
-  val23 @4 :UInt8;
-  val25 @5 :UInt8;
-  val245 @6 :UInt8;
-  val281 @7 :UInt8;
-  val282 @8 :UInt8;
-  val284 @9 :UInt8;
-  val241 @10 :List(UInt64);
-  val276 @11 :List(UInt64);
-  val279 @12 :List(UInt64);
-  val280 @13 :List(UInt64);
+  val19 @3 :UInt8;
+  val22 @4 :UInt8;
+  val24 @5 :UInt8;
+  val244 @6 :UInt8;
+  val280 @7 :UInt8;
+  val281 @8 :UInt8;
+  val283 @9 :UInt8;
+  val240 @10 :List(UInt64);
+  val275 @11 :List(UInt64);
+  val278 @12 :List(UInt64);
+  val279 @13 :List(UInt64);
   val0 @14 :UInt64;
   val1 @15 :UInt64;
   val3 @16 :UInt64;
@@ -514,26 +514,26 @@ struct Type @0xd739e808bc1b3fd7{
   val16 @19 :UInt64;
   val17 @20 :UInt64;
   val18 @21 :UInt64;
-  val19 @22 :UInt64;
-  val22 @23 :UInt64;
-  val24 @24 :UInt64;
+  val21 @22 :UInt64;
+  val23 @23 :UInt64;
+  val235 @24 :UInt64;
   val236 @25 :UInt64;
-  val237 @26 :UInt64;
+  val242 @26 :UInt64;
   val243 @27 :UInt64;
-  val244 @28 :UInt64;
+  val276 @28 :UInt64;
   val277 @29 :UInt64;
-  val278 @30 :UInt64;
-  val283 @31 :UInt64;
-  val2 @32 :Bool;
-  val5 @33 :Bool;
-  val7 @34 :Bool;
-  val8 @35 :Bool;
-  val9 @36 :Bool;
-  val10 @37 :Bool;
-  val11 @38 :Bool;
-  val12 @39 :Bool;
-  val15 @40 :Bool;
-  val21 @41 :Bool;
+  val282 @30 :UInt64;
+  val2 @31 :Bool;
+  val5 @32 :Bool;
+  val7 @33 :Bool;
+  val8 @34 :Bool;
+  val9 @35 :Bool;
+  val10 @36 :Bool;
+  val11 @37 :Bool;
+  val12 @38 :Bool;
+  val15 @39 :Bool;
+  val20 @40 :Bool;
+  val25 @41 :Bool;
   val26 @42 :Bool;
   val27 @43 :Bool;
   val28 @44 :Bool;
@@ -743,10 +743,10 @@ struct Type @0xd739e808bc1b3fd7{
   val232 @248 :Bool;
   val233 @249 :Bool;
   val234 @250 :Bool;
-  val235 @251 :Bool;
+  val237 @251 :Bool;
   val238 @252 :Bool;
   val239 @253 :Bool;
-  val240 @254 :Bool;
+  val245 @254 :Bool;
   val246 @255 :Bool;
   val247 @256 :Bool;
   val248 @257 :Bool;
@@ -776,8 +776,7 @@ struct Type @0xd739e808bc1b3fd7{
   val272 @281 :Bool;
   val273 @282 :Bool;
   val274 @283 :Bool;
-  val275 @284 :Bool;
-  val242 @285 :UInt32;
+  val241 @284 :UInt32;
 }
 
 struct Attr @0xe5b70746662da9f3{

@@ -78,40 +78,40 @@ std::optional<BuiltinType> BuiltinType::from(const TokenContext &t) {
 }
 
 Type BuiltinType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal235();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 BuiltinTypeKind BuiltinType::builtin_kind(void) const {
-  return static_cast<BuiltinTypeKind>(impl->reader.getVal285());
+  return static_cast<BuiltinTypeKind>(impl->reader.getVal284());
 }
 
 bool BuiltinType::is_floating_point(void) const {
-  return impl->reader.getVal238();
+  return impl->reader.getVal237();
 }
 
 bool BuiltinType::is_integer(void) const {
-  return impl->reader.getVal239();
+  return impl->reader.getVal238();
 }
 
 bool BuiltinType::is_sve_bool(void) const {
-  return impl->reader.getVal240();
+  return impl->reader.getVal239();
 }
 
 bool BuiltinType::is_sve_count(void) const {
-  return impl->reader.getVal246();
+  return impl->reader.getVal245();
 }
 
 bool BuiltinType::is_signed_integer(void) const {
-  return impl->reader.getVal247();
+  return impl->reader.getVal246();
 }
 
 bool BuiltinType::is_sugared(void) const {
-  return impl->reader.getVal248();
+  return impl->reader.getVal247();
 }
 
 bool BuiltinType::is_unsigned_integer(void) const {
-  return impl->reader.getVal249();
+  return impl->reader.getVal248();
 }
 
 #pragma GCC diagnostic pop
