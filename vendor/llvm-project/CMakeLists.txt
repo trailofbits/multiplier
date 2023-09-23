@@ -38,7 +38,10 @@ if(NOT EXISTS "${src_dir}/llvm/CMakeLists.txt")
 endif()
 
 # This is the main build, setup and execute the nested build
-# to ensure the Cap'n Proto library exists before continuing
+# to ensure the Clang and MLIR libraries exist before continuing
+
+# NOTE(pag): C++17 seems to be needed when building Clang on Linux, due to uses
+#            of `__is_constructible`.
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 
@@ -52,7 +55,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         "-DCMAKE_ASM_COMPILER=${CMAKE_C_COMPILER}"
-                        "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+                        "-DCMAKE_CXX_STANDARD=17"
                         "-DLLVM_ENABLE_PROJECTS=clang;mlir;lld"
                         "-DLLVM_TARGETS_TO_BUILD=AArch64;X86;ARM"
                         "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=ARM"
