@@ -27,12 +27,6 @@ class ReferenceIteratorImpl;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
-class WeggliQuery;
-class WeggliQueryMatch;
-class WeggliQueryResult;
-class WeggliQueryResultImpl;
-class WeggliQueryResultIterator;
-class WeggliQueryResultIterator;
 
 #define MX_FORWARD_DECLARE(type_name, ln, e, c) \
     class type_name;
@@ -64,8 +58,6 @@ class Fragment {
   friend class RegexQueryResultImpl;
   friend class TokenTree;
   friend class TokenTreeImpl;
-  friend class WeggliQuery;
-  friend class WeggliQueryResultImpl;
 
 #define MX_FRIEND(type_name, ln, e, c) \
     friend class type_name;
@@ -97,7 +89,6 @@ class Fragment {
   static Fragment containing(const Fragment &);
 
   // Return the fragment containing a query match.
-  static Fragment containing(const WeggliQueryMatch &);
   static Fragment containing(const RegexQueryMatch &);
 
   // Return the fragment containing a token tree.
@@ -151,9 +142,6 @@ class Fragment {
   inline bool operator!=(const Fragment &that) const noexcept {
     return id() != that.id();
   }
-
-  // Run a Weggli search over this fragment.
-  gap::generator<WeggliQueryMatch> query(const WeggliQuery &query) const &;
 
   // Run a regular expression search over this fragment.
   gap::generator<RegexQueryMatch> query(const RegexQuery &query) const &;

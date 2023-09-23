@@ -28,7 +28,6 @@ class Reference;
 class RegexQueryMatch;
 class TokenRange;
 class TokenTree;
-class WeggliQueryMatch;
 
 #define MX_FORWARD_DECLARE(type_name, ln, e, c) \
     class type_name;
@@ -99,7 +98,6 @@ class File {
   friend class TokenRange;
   friend class TokenTree;
   friend class TokenTreeImpl;
-  friend class WeggliQuery;
 
 #define MX_FRIEND(type_name, ln, e, c) \
     friend class type_name;
@@ -122,9 +120,6 @@ class File {
 
   // Return the file containing a regex query match.
   static std::optional<File> containing(const RegexQueryMatch &match);
-
-  // Return the file containing a specific weggli query match.
-  static std::optional<File> containing(const WeggliQueryMatch &match);
 
   inline static File containing(const File &file) {
     return file;

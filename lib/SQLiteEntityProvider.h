@@ -27,8 +27,6 @@ class FileImpl;
 class FragmentImpl;
 class RegexQuery;
 class RegexQueryResultImpl;
-class WeggliQueryResultImpl;
-
 class SQLiteEntityProviderImpl;
 class SQLiteDecompressionDictionary;
 

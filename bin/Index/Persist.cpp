@@ -164,9 +164,9 @@ void GlobalIndexingState::PersistFile(
   fb.setData(utf8_file_data);
 
   // Build up and serialize a mapping of offsets of the last byte in a line to
-  // line numbers. This mapping is used during regular expression matches and
-  // Weggli matches over file contents to help us map to fragments whose code
-  // is derived from those files.
+  // line numbers. This mapping is used during regular expression matches over
+  // file contents to help us map to fragments whose code is derived from those
+  // files.
   std::map<unsigned, unsigned> eol_offset_to_line_num;
   auto line = 1u;
   auto offset = 0u;
@@ -1102,8 +1102,7 @@ void GlobalIndexingState::PersistFragment(
         mx::FragmentFileRecord{pf.fragment_id, pf.file_location->file_id});
 
     // Associate the range of file tokens with the fragment. This helps with
-    // implementing things like regular expression (via RE2) and Weggli searches
-    // over code.
+    // implementing things like regular expression (via RE2) searches over code.
     database.AddAsync(
         mx::FragmentFileRangeRecord{
             pf.fragment_id,

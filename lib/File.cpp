@@ -23,7 +23,6 @@
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
-#include "WeggliImpl.h"
 
 namespace mx {
 
@@ -215,16 +214,6 @@ std::optional<File> File::containing(const TokenRange &tokens) {
 
 // Return the file containing a regex match.
 std::optional<File> File::containing(const RegexQueryMatch &match) {
-  if (auto file = match.impl->OwningFile()) {
-    return File(FileImplPtr(match.impl, file));
-
-  } else {
-    return File::containing(Fragment::containing(match));
-  }
-}
-
-// Return the file containing a specific fragment.
-std::optional<File> File::containing(const WeggliQueryMatch &match) {
   if (auto file = match.impl->OwningFile()) {
     return File(FileImplPtr(match.impl, file));
 

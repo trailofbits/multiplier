@@ -243,10 +243,6 @@ PASTA_NAME=pasta
 PASTA_REPO="${GITHUB_ORG}/${PASTA_NAME}.git"
 PASTA_BRANCH="master"
 
-WEGGLI_NATIVE_NAME=weggli-native
-WEGGLI_NATIVE_REPO="https://github.com/trailofbits/${WEGGLI_NATIVE_NAME}"
-WEGGLI_NATIVE_BRANCH="main"
-
 MULTIPLIER_NAME=multiplier
 MULTIPLIER_REPO="${GITHUB_ORG}/${MULTIPLIER_NAME}.git"
 MULTIPLIER_BRANCH="main"
@@ -255,7 +251,7 @@ MULTIPLIER_BRANCH="main"
 function BuildMultiplierOSX
 {
   if !(ConfigureAndBuild "${MULTIPLIER_NAME}" \
-    -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
+    -DMX_ENABLE_VAST=OFF \
     -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
     -Dpasta_ROOT="${WORKSPACE_DIR}/install"); then
     echo "[!] Failed to configure and build multiplier."
@@ -267,7 +263,7 @@ function BuildMultiplierOSX
 function BuildMultiplierLinux
 {
   ConfigureAndBuild "${MULTIPLIER_NAME}" \
-    -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
+    -DMX_ENABLE_VAST=OFF \
     -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
     -Dpasta_ROOT="${WORKSPACE_DIR}/install"
 }
@@ -315,11 +311,6 @@ function main
     exit 1
   fi
 
-  if ! GetOrUpdateRepo "${WEGGLI_NATIVE_NAME}" "${WEGGLI_NATIVE_REPO}" "${WEGGLI_NATIVE_BRANCH}"; then
-    echo "[!] Failed to clone weggli-native repository"
-    exit 1
-  fi
-
   if ! GetOrUpdateRepo "${MULTIPLIER_NAME}" "${MULTIPLIER_REPO}" "${MULTIPLIER_BRANCH}"; then
     echo "[!] Failed to clone multiplier repository"
   fi
@@ -328,11 +319,6 @@ function main
     -DPASTA_BOOTSTRAP_TYPES=OFF -DPASTA_ENABLE_TESTING=OFF \
     -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}); then
     echo "[!] Failed to configure and build pasta"
-    exit 1
-  fi
-  
-  if !(ConfigureAndBuild "${WEGGLI_NATIVE_NAME}"); then
-    echo "[!] Failed to configure and build weggli-native"
     exit 1
   fi
     

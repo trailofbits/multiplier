@@ -26,65 +26,6 @@ class RegexQuery;
 class RegexQueryImpl;
 class RegexQueryMatch;
 class InvalidEntityProvider;
-class WeggliQuery;
-class WeggliQueryMatch;
-
-// The range of tokens of a match.
-class WeggliQueryMatch : public TokenRange {
- private:
-  friend class File;
-  friend class Fragment;
-  friend class WeggliQueryResultImpl;
-
-  // Fragment with the match
-  std::shared_ptr<const FragmentImpl> frag;
-  
-  // The whole match.
-  std::string_view match_data;
-
-  // Map variables with token range.
-  std::vector<std::string> variables;
-  std::vector<std::string_view> matched_data;
-  std::vector<TokenRange> matched_tokens;
-
-  WeggliQueryMatch(void) = delete;
-
- public:
-  WeggliQueryMatch(
-      std::shared_ptr<const FragmentImpl> frag_,
-      std::shared_ptr<const TokenReader> impl_,
-      unsigned index_, unsigned num_tokens_,
-      std::string_view match_data_,
-      std::vector<std::string> variables_,
-      std::vector<std::string_view> matched_data_,
-      std::vector<TokenRange> matched_tokens_);
-
-  // Return the captured tokens for a given named capture group.
-  std::optional<TokenRange> captured_tokens(const std::string &var) const;
-
-  // Return the captured data for a given named capture group.
-  std::optional<std::string_view> captured_data(const std::string &var) const;
-
-  // Return the captured tokens for a given indexed capture group.
-  std::optional<TokenRange> captured_tokens(size_t capture_index) const;
-
-  // Return the captured data for a given indexed capture group.
-  std::optional<std::string_view> captured_data(size_t capture_index) const;
-
-  // Return a list of matched variables.
-  inline const std::vector<std::string> &captured_variables(void) const & {
-    return variables;
-  }
-
-  // Return the index of a captured variable.
-  std::optional<size_t> index_of_captured_variable(
-    const std::string &var) const;
-
-  // Return the number of capture groups.
-  inline size_t num_captures(void) const {
-    return 1u + matched_tokens.size();
-  }
-};
 
 // The range of tokens that matches a regular expression.
 class RegexQueryMatch : public TokenRange {

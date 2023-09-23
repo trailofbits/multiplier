@@ -52,8 +52,6 @@ class EntityProvider {
   friend class Token;
   friend class TokenReader;
   friend class TokenContext;
-  friend class WeggliQuery;
-  friend class WeggliQueryResultImpl;
 
  public:
 

@@ -35,26 +35,9 @@ if(MX_ENABLE_RE2)
   find_package(re2 CONFIG REQUIRED)
 endif(MX_ENABLE_RE2)
 
-if(MX_ENABLE_WEGGLI)
-  find_package(weggli_native CONFIG REQUIRED)
-endif(MX_ENABLE_WEGGLI)
-
 if(MX_ENABLE_INSTALL)
   include("cmake/packaging.cmake")
 endif(MX_ENABLE_INSTALL)
-
-add_subdirectory("vendor")
-return()
-
-find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
-find_package(pasta CONFIG REQUIRED)
-find_package(LLVM CONFIG REQUIRED)
-find_package(Clang CONFIG REQUIRED)
-
-find_package(MLIR CONFIG REQUIRED)
-find_package(VAST CONFIG REQUIRED)
-
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 if(PLATFORM_MACOS)
   set(CMAKE_INSTALL_RPATH "@executable_path/../${MX_INSTALL_LIB_DIR}")
@@ -62,6 +45,30 @@ elseif(PLATFORM_LINUX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/../${MX_INSTALL_LIB_DIR}")
 endif()
 
+add_subdirectory("vendor")
+
+find_package(gflags CONFIG REQUIRED)
+if(NOT TARGET gflags::gflags)
+  if(TARGET gflags::gflags_static)
+    add_library(gflags::gflags ALIAS gflags::gflags_static)
+  elseif(TARGET gflags_static)
+    add_library(gflags::gflags_static ALIAS gflags_static)
+    add_library(gflags::gflags ALIAS gflags_static)
+  else()
+    message(FATAL_ERROR "Cannot find appropriate gflags target; known targets are ${gflags_LIBRARIES}")
+  endif()
+endif()
+
+find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+find_package(CapnProto CONFIG REQUIRED)
+find_package(zstd CONFIG REQUIRED)
+find_package(gap CONFIG REQUIRED)
+find_package(pasta CONFIG REQUIRED)
+find_package(glog CONFIG REQUIRED)
+find_package(reproc CONFIG REQUIRED)
+
+# find_package(VAST CONFIG REQUIRED)
 
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")

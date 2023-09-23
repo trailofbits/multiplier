@@ -24,7 +24,6 @@
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
-#include "WeggliImpl.h"
 
 namespace mx {
 namespace ir {
@@ -58,11 +57,6 @@ std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
     }
   }
   return std::nullopt;
-}
-
-// Return the fragment containing a query match.
-Fragment Fragment::containing(const WeggliQueryMatch &match) {
-  return Fragment(match.frag);
 }
 
 // Return the fragment containing a query match.
@@ -302,15 +296,6 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
     } else {
       assert(false);
     }
-  }
-}
-
-// Run a Weggli search over this fragment.
-gap::generator<WeggliQueryMatch> Fragment::query(
-    const WeggliQuery &query) const & {
-  WeggliQueryResultImpl res(query, impl);
-  for (auto match : res.Enumerate()) {
-    co_yield match;
   }
 }
 

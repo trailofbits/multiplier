@@ -6,16 +6,18 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(NOT MX_USE_VENDORED_GLOG)
-  find_package(glog CONFIG QUIET)
-  if(glog_FOUND)
+if(NOT MX_USE_VENDORED_PASTA)
+  find_package(pasta CONFIG QUIET)
+  if(pasta_FOUND)
     return()
   endif()
 endif()
 
-find_package(gflags CONFIG)
-if(NOT gflags_FOUND)
-  message(FATAL_ERROR "Could not find gflags depedency for glog.")
+find_package(LLVM CONFIG QUIET)
+find_package(Clang CONFIG QUIET)
+
+if(NOT LLVM_FOUND OR NOT Clang_FOUND)
+  message(FATAL_ERROR "Could not find Clang/LLVM")
 endif()
 
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
@@ -24,12 +26,12 @@ set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
 # Fetch the submodule if we don't yet have it.
 if(NOT EXISTS "${src_dir}/CMakeLists.txt")
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/glog/src
+    COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/pasta/src
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 endif()
 
 # This is the main build, setup and execute the nested build
-# to ensure the glog library exists before continuing
+# to ensure the pasta library exists before continuing
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 
@@ -43,16 +45,13 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
-                        -DBUILD_SHARED_LIBS=OFF
-                        -DPRINT_UNSYMBOLIZED_STACK_TRACES=OFF
-                        -DWITH_GFLAGS=ON
-                        -DWITH_GTEST=OFF
-                        -DWITH_GMOCK=OFF
-                        -DWITH_SYMBOLIZE=OFF
-                        -DWITH_THREADS=ON
-                        -DWITH_TLS=ON
-                        -DWITH_UNWIND=OFF
-                        "-Dgflags_DIR=${gflags_DIR}"
+                        -DPASTA_BOOTSTRAP_MACROS=OFF
+                        -DPASTA_BOOTSTRAP_TYPES=OFF
+                        -DPASTA_ENABLE_TESTING=OFF
+                        -DPASTA_ENABLE_PY_BINDINGS=OFF
+                        -DPASTA_ENABLE_INSTALL=ON
+                        "-DLLVM_DIR=${LLVM_DIR}"
+                        "-DClang_DIR=${Clang_DIR}"
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
@@ -63,4 +62,4 @@ execute_process(COMMAND ${CMAKE_COMMAND}
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(glog CONFIG REQUIRED PATHS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
+find_package(pasta CONFIG REQUIRED PATHS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)

@@ -64,7 +64,6 @@ define_example("mx-list-structures" "ListStructures.cpp")
 # define_example("mx-list-uses" "ListUses.cpp")  # TODO(pag): Make this list-references.
 define_example("mx-dump-json" "DumpJSON.cpp")
 
-define_example("mx-weggli-query" "WeggliQuery.cpp")
 define_example("mx-regex-query" "RegexQuery.cpp")
 define_example("mx-find-flexible-user-copies" "FindFlexibleUserCopies.cpp")
 define_example("mx-find-calls-in-macro-expansions" "FindCallsInMacroExpansions.cpp")

@@ -26,3 +26,11 @@
 	path = vendor/gap/src
 	url = https://github.com/lifting-bits/gap.git
 	shallow = true
+[submodule "vendor/pasta/src"]
+	path = vendor/pasta/src
+	url = https://github.com/trailofbits/pasta.git
+	branch = llvm17
+[submodule "vendor/llvm-project/src"]
+	path = vendor/llvm-project/src
+	url = https://github.com/trail-of-forks/llvm-project.git
+	branch = pasta

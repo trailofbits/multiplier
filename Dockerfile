@@ -52,17 +52,6 @@ RUN git clone --depth 1 https://github.com/lifting-bits/gap.git /work/src/gap \
         -DUSE_SYSTEM_DEPENDENCIES=OFF \
     && cmake --build '/work/build/gap' --target install
 
-# Build and install weggli-native
-RUN git clone --depth 1 https://github.com/trailofbits/weggli-native /work/src/weggli-native \
-    && cargo install --force cbindgen \
-    && cmake \
-        -S '/work/src/weggli-native' \
-        -B '/work/build/weggli-native' \
-        -G Ninja \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-    && cmake --build '/work/build/weggli-native' --target install
-
 # Build and install VAST
 RUN git clone --depth 1 https://github.com/trailofbits/vast --branch vspell-future /work/src/vast \
     && cmake \
@@ -124,7 +113,6 @@ RUN cmake \
     -DVCPKG_TARGET_TRIPLET=x64-linux-rel \
     -DLLVM_ENABLE_LLD:BOOL=TRUE \
     -DMX_ENABLE_BOOTSTRAP=OFF \
-    -DMX_ENABLE_WEGGLI=ON \
     -DMX_ENABLE_INSTALL=ON
 
 RUN cmake --build '/work/build/multiplier' --target install

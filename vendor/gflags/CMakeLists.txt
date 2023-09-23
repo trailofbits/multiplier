@@ -27,30 +27,29 @@ endif()
 
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
-set(install_dir "${CMAKE_CURRENT_BINARY_DIR}/install")
 
 # Fetch the submodule if we don't yet have it.
 if(NOT EXISTS "${src_dir}/CMakeLists.txt")
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" submodule update --init src
-    WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+    COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/gflags/src
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 endif()
 
 # This is the main build, setup and execute the nested build
 # to ensure the gflags library exists before continuing
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${install_dir}")
 
 # (b) Nested CMake run. May need more -D... options than shown here.
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
-                        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                        -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-                        "-DCMAKE_INSTALL_PREFIX=${install_dir}"
+execute_process(COMMAND ${CMAKE_COMMAND}
+                        -G "${CMAKE_GENERATOR}"
+                        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+                        "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+                        "-DCMAKE_INSTALL_PREFIX=${MX_VENDOR_INSTALL_DIR}"
+                        "-DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH}"
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
-                        "-G${CMAKE_GENERATOR}"
                         -DBUILD_SHARED_LIBS=OFF
                         -DBUILD_STATIC_LIBS=ON
                         -DBUILD_gflags_LIB=ON
@@ -72,4 +71,4 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(gflags CONFIG REQUIRED PATHS "${install_dir}" NO_DEFAULT_PATH)
+find_package(gflags CONFIG REQUIRED PATHS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
