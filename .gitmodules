@@ -30,13 +30,17 @@
 	path = vendor/pasta/src
 	url = https://github.com/trailofbits/pasta.git
 	branch = llvm17
+	shallow = true
 [submodule "vendor/llvm-project/src"]
 	path = vendor/llvm-project/src
 	url = https://github.com/trail-of-forks/llvm-project.git
 	branch = pasta
+	shallow = true
 [submodule "vendor/abseil/src"]
 	path = vendor/abseil/src
 	url = https://github.com/abseil/abseil-cpp.git
+	shallow = true
 [submodule "vendor/re2/src"]
 	path = vendor/re2/src
 	url = https://github.com/google/re2.git
+	shallow = true
