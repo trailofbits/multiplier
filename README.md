@@ -101,7 +101,7 @@ fi
 source "${WORKSPACE_DIR}/install/bin/activate"
 ```
 
-### Step 4: Download and build Multiplier
+### Step 3: Download and build Multiplier
 
 **Note:** Multiplier will download and build most/all of its dependencies during
 CMake's configuration stage, unless you specify otherwise.
