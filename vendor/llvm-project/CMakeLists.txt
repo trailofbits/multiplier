@@ -30,11 +30,11 @@ set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
 if(NOT EXISTS "${src_dir}/llvm/CMakeLists.txt")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/llvm-project/src
-    WORKING_DIRECTORY "${PASTA_SOURCE_DIR}")
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" submodule set-branch --branch pasta vendor/llvm-project/src
-    WORKING_DIRECTORY "${PASTA_SOURCE_DIR}")
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 endif()
 
 # This is the main build, setup and execute the nested build
@@ -55,6 +55,9 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         "-DCMAKE_ASM_COMPILER=${CMAKE_C_COMPILER}"
+                        "-DCMAKE_EXE_LINKER_FLAGS_INIT=${CMAKE_EXE_LINKER_FLAGS_INIT}"
+                        "-DCMAKE_MODULE_LINKER_FLAGS_INIT=${CMAKE_MODULE_LINKER_FLAGS_INIT}"
+                        "-DCMAKE_SHARED_LINKER_FLAGS_INIT=${CMAKE_SHARED_LINKER_FLAGS_INIT}"
                         "-DCMAKE_CXX_STANDARD=17"
                         "-DLLVM_ENABLE_PROJECTS=clang;mlir;lld"
                         "-DLLVM_TARGETS_TO_BUILD=AArch64;X86;ARM"

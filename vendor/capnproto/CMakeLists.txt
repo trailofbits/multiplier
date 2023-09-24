@@ -41,6 +41,9 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_INSTALL_PREFIX=${MX_VENDOR_INSTALL_DIR}"
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                        "-DCMAKE_EXE_LINKER_FLAGS_INIT=${CMAKE_EXE_LINKER_FLAGS_INIT}"
+                        "-DCMAKE_MODULE_LINKER_FLAGS_INIT=${CMAKE_MODULE_LINKER_FLAGS_INIT}"
+                        "-DCMAKE_SHARED_LINKER_FLAGS_INIT=${CMAKE_SHARED_LINKER_FLAGS_INIT}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
                         -DCAPNP_LITE:BOOL=OFF
                         -DEXTERNAL_CAPNP:BOOL=OFF
