@@ -80,13 +80,13 @@ std::optional<ConstantArrayType> ConstantArrayType::from(const TokenContext &t) 
 }
 
 Type ConstantArrayType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> ConstantArrayType::size_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal242();
+    RawEntityId eid = impl->reader.getVal24();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -98,7 +98,7 @@ std::optional<Expr> ConstantArrayType::size_expression(void) const {
 }
 
 bool ConstantArrayType::is_sugared(void) const {
-  return impl->reader.getVal237();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

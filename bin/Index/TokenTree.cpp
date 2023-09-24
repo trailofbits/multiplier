@@ -2570,11 +2570,11 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
   uint64_t bi = ~0u;
   uint64_t ai = 0u;
 
-  if (nodes.prev) {
+  if (nodes.prev && nodes.prev->file_tok) {
     bi = nodes.prev->file_tok->Index();
   }
 
-  if (nodes.next) {
+  if (nodes.next && nodes.next->file_tok) {
     ai = nodes.next->file_tok->Index();
   }
 

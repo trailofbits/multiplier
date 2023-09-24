@@ -81,17 +81,22 @@ std::optional<ReferenceType> ReferenceType::from(const TokenContext &t) {
   return ReferenceType::from(t.as_type());
 }
 
+Type ReferenceType::pointee_type(void) const {
+  RawEntityId eid = impl->reader.getVal17();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 Type ReferenceType::pointee_type_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal235();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ReferenceType::is_inner_reference(void) const {
-  return impl->reader.getVal237();
+  return impl->reader.getVal19();
 }
 
 bool ReferenceType::is_spelled_as_l_value(void) const {
-  return impl->reader.getVal238();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

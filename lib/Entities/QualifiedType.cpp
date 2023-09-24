@@ -78,144 +78,144 @@ std::optional<QualifiedType> QualifiedType::from(const TokenContext &t) {
 }
 
 LangAS QualifiedType::address_space(void) const {
-  return static_cast<LangAS>(impl->reader.getVal244());
+  return static_cast<LangAS>(impl->reader.getVal26());
 }
 
 Type QualifiedType::atomic_unqualified_type(void) const {
-  RawEntityId eid = impl->reader.getVal235();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool QualifiedType::has_address_space(void) const {
-  return impl->reader.getVal237();
+  return impl->reader.getVal19();
 }
 
 bool QualifiedType::has_non_trivial_obj_c_lifetime(void) const {
-  return impl->reader.getVal238();
+  return impl->reader.getVal20();
 }
 
 bool QualifiedType::has_non_trivial_to_primitive_copy_c_union(void) const {
-  return impl->reader.getVal239();
+  return impl->reader.getVal21();
 }
 
 bool QualifiedType::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
-  return impl->reader.getVal245();
+  return impl->reader.getVal27();
 }
 
 bool QualifiedType::has_non_trivial_to_primitive_destruct_c_union(void) const {
-  return impl->reader.getVal246();
+  return impl->reader.getVal28();
 }
 
 bool QualifiedType::has_qualifiers(void) const {
-  return impl->reader.getVal247();
+  return impl->reader.getVal29();
 }
 
 bool QualifiedType::has_strong_or_weak_obj_c_lifetime(void) const {
-  return impl->reader.getVal248();
+  return impl->reader.getVal30();
 }
 
 bool QualifiedType::is_c_forbidden_l_value_type(void) const {
-  return impl->reader.getVal249();
+  return impl->reader.getVal31();
 }
 
 bool QualifiedType::is_cxx11_pod_type(void) const {
-  return impl->reader.getVal250();
+  return impl->reader.getVal32();
 }
 
 bool QualifiedType::is_cxx98_pod_type(void) const {
-  return impl->reader.getVal251();
+  return impl->reader.getVal33();
 }
 
 bool QualifiedType::is_canonical(void) const {
-  return impl->reader.getVal252();
+  return impl->reader.getVal34();
 }
 
 bool QualifiedType::is_canonical_as_parameter(void) const {
-  return impl->reader.getVal253();
+  return impl->reader.getVal35();
 }
 
 bool QualifiedType::is_const_qualified(void) const {
-  return impl->reader.getVal254();
+  return impl->reader.getVal36();
 }
 
 bool QualifiedType::is_constant(void) const {
-  return impl->reader.getVal255();
+  return impl->reader.getVal37();
 }
 
 bool QualifiedType::is_local_const_qualified(void) const {
-  return impl->reader.getVal256();
+  return impl->reader.getVal38();
 }
 
 bool QualifiedType::is_local_restrict_qualified(void) const {
-  return impl->reader.getVal257();
+  return impl->reader.getVal39();
 }
 
 bool QualifiedType::is_local_volatile_qualified(void) const {
-  return impl->reader.getVal258();
+  return impl->reader.getVal40();
 }
 
 bool QualifiedType::is_non_weak_in_mrr_with_obj_c_weak(void) const {
-  return impl->reader.getVal259();
+  return impl->reader.getVal41();
 }
 
 bool QualifiedType::is_null(void) const {
-  return impl->reader.getVal260();
+  return impl->reader.getVal42();
 }
 
 bool QualifiedType::is_obj_cgc_strong(void) const {
-  return impl->reader.getVal261();
+  return impl->reader.getVal43();
 }
 
 bool QualifiedType::is_obj_cgc_weak(void) const {
-  return impl->reader.getVal262();
+  return impl->reader.getVal44();
 }
 
 bool QualifiedType::is_pod_type(void) const {
-  return impl->reader.getVal263();
+  return impl->reader.getVal45();
 }
 
 bool QualifiedType::is_referenceable(void) const {
-  return impl->reader.getVal264();
+  return impl->reader.getVal46();
 }
 
 bool QualifiedType::is_restrict_qualified(void) const {
-  return impl->reader.getVal265();
+  return impl->reader.getVal47();
 }
 
 bool QualifiedType::is_trivial_type(void) const {
-  return impl->reader.getVal266();
+  return impl->reader.getVal48();
 }
 
 bool QualifiedType::is_trivially_copyable_type(void) const {
-  return impl->reader.getVal267();
+  return impl->reader.getVal49();
 }
 
 bool QualifiedType::is_trivially_equality_comparable_type(void) const {
-  return impl->reader.getVal268();
+  return impl->reader.getVal50();
 }
 
 bool QualifiedType::is_trivially_relocatable_type(void) const {
-  return impl->reader.getVal269();
+  return impl->reader.getVal51();
 }
 
 bool QualifiedType::is_volatile_qualified(void) const {
-  return impl->reader.getVal270();
+  return impl->reader.getVal52();
 }
 
 bool QualifiedType::is_web_assembly_funcref_type(void) const {
-  return impl->reader.getVal271();
+  return impl->reader.getVal53();
 }
 
 bool QualifiedType::is_web_assembly_reference_type(void) const {
-  return impl->reader.getVal272();
+  return impl->reader.getVal54();
 }
 
 bool QualifiedType::may_be_dynamic_class(void) const {
-  return impl->reader.getVal273();
+  return impl->reader.getVal55();
 }
 
 bool QualifiedType::may_be_not_dynamic_class(void) const {
-  return impl->reader.getVal274();
+  return impl->reader.getVal56();
 }
 
 #pragma GCC diagnostic pop

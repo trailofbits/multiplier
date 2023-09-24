@@ -210,7 +210,7 @@ std::optional<TypeDecl> TypeDecl::from(const TokenContext &t) {
 
 std::optional<Type> TypeDecl::type_for_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal59();
+    RawEntityId eid = impl->reader.getVal56();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

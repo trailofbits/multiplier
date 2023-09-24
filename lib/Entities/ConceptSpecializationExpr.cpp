@@ -212,11 +212,11 @@ Token ConceptSpecializationExpr::template_keyword_token(void) const {
 }
 
 bool ConceptSpecializationExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool ConceptSpecializationExpr::is_satisfied(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

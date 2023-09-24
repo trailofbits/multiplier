@@ -156,18 +156,15 @@ class Decl {
   bool is_in_export_declaration_context(void) const;
   std::optional<bool> is_in_local_scope_for_instantiation(void) const;
   bool is_in_std_namespace(void) const;
-  bool is_invalid_declaration(void) const;
   bool is_invisible_outside_the_owning_module(void) const;
   bool is_local_extern_declaration(void) const;
   bool is_module_private(void) const;
   bool is_out_of_line(void) const;
   bool is_parameter_pack(void) const;
-  bool is_reachable(void) const;
   bool is_template_declaration(void) const;
   bool is_template_parameter(void) const;
   bool is_template_parameter_pack(void) const;
   bool is_templated(void) const;
-  bool is_this_declaration_referenced(void) const;
   bool is_top_level_declaration_in_obj_c_container(void) const;
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;

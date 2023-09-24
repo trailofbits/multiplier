@@ -160,11 +160,11 @@ Expr ExpressionTraitExpr::queried_expression(void) const {
 }
 
 ExpressionTrait ExpressionTraitExpr::trait(void) const {
-  return static_cast<ExpressionTrait>(impl->reader.getVal95());
+  return static_cast<ExpressionTrait>(impl->reader.getVal93());
 }
 
 bool ExpressionTraitExpr::value(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 #pragma GCC diagnostic pop

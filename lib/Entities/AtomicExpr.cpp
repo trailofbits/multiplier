@@ -160,7 +160,7 @@ Token AtomicExpr::builtin_token(void) const {
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const {
-  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal95());
+  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal93());
 }
 
 std::string_view AtomicExpr::operation_as_string(void) const {
@@ -253,15 +253,15 @@ std::optional<Expr> AtomicExpr::weak(void) const {
 }
 
 bool AtomicExpr::is_cmp_x_chg(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool AtomicExpr::is_open_cl(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool AtomicExpr::is_volatile(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal89();
 }
 
 unsigned AtomicExpr::num_sub_expressions(void) const {

@@ -193,12 +193,12 @@ std::optional<CXXMethodDecl> CXXMethodDecl::from(const TokenContext &t) {
 }
 
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
-  return static_cast<RefQualifierKind>(impl->reader.getVal171());
+  return static_cast<RefQualifierKind>(impl->reader.getVal168());
 }
 
 std::optional<Type> CXXMethodDecl::this_object_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal172();
+    RawEntityId eid = impl->reader.getVal169();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -211,7 +211,7 @@ std::optional<Type> CXXMethodDecl::this_object_type(void) const {
 
 std::optional<Type> CXXMethodDecl::this_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal173();
+    RawEntityId eid = impl->reader.getVal170();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -223,43 +223,43 @@ std::optional<Type> CXXMethodDecl::this_type(void) const {
 }
 
 bool CXXMethodDecl::has_inline_body(void) const {
-  return impl->reader.getVal174();
+  return impl->reader.getVal171();
 }
 
 bool CXXMethodDecl::is_const(void) const {
-  return impl->reader.getVal175();
+  return impl->reader.getVal172();
 }
 
 bool CXXMethodDecl::is_copy_assignment_operator(void) const {
-  return impl->reader.getVal176();
+  return impl->reader.getVal173();
 }
 
 bool CXXMethodDecl::is_instance(void) const {
-  return impl->reader.getVal177();
+  return impl->reader.getVal174();
 }
 
 bool CXXMethodDecl::is_lambda_static_invoker(void) const {
-  return impl->reader.getVal178();
+  return impl->reader.getVal175();
 }
 
 bool CXXMethodDecl::is_move_assignment_operator(void) const {
-  return impl->reader.getVal179();
+  return impl->reader.getVal176();
 }
 
 bool CXXMethodDecl::is_virtual(void) const {
-  return impl->reader.getVal180();
+  return impl->reader.getVal177();
 }
 
 bool CXXMethodDecl::is_volatile(void) const {
-  return impl->reader.getVal181();
+  return impl->reader.getVal178();
 }
 
 unsigned CXXMethodDecl::num_overridden_methods(void) const {
-  return impl->reader.getVal182().size();
+  return impl->reader.getVal179().size();
 }
 
 std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) const {
-  auto list = impl->reader.getVal182();
+  auto list = impl->reader.getVal179();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -273,12 +273,12 @@ std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) co
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const & {
-  auto list = impl->reader.getVal182();
+  auto list = impl->reader.getVal179();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d182 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXMethodDecl::from(Decl(std::move(d182)))) {
+    if (auto d179 = ep->DeclFor(ep, v)) {
+      if (auto e = CXXMethodDecl::from(Decl(std::move(d179)))) {
         co_yield std::move(*e);
       }
     }

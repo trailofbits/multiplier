@@ -184,10 +184,27 @@ std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Token
 }
 
 bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const {
-  return impl->reader.getVal79();
+  return impl->reader.getVal76();
 }
 
 std::optional<Expr> NonTypeTemplateParmDecl::default_argument(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal79();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr)));
+    }
+  }
+  return std::nullopt;
+}
+
+Token NonTypeTemplateParmDecl::default_argument_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal81());
+}
+
+std::optional<Expr> NonTypeTemplateParmDecl::placeholder_type_constraint(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal82();
     if (eid == kInvalidEntityId) {
@@ -200,45 +217,28 @@ std::optional<Expr> NonTypeTemplateParmDecl::default_argument(void) const {
   return std::nullopt;
 }
 
-Token NonTypeTemplateParmDecl::default_argument_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal84());
-}
-
-std::optional<Expr> NonTypeTemplateParmDecl::placeholder_type_constraint(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal85();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr)));
-    }
-  }
-  return std::nullopt;
-}
-
 bool NonTypeTemplateParmDecl::has_default_argument(void) const {
-  return impl->reader.getVal80();
+  return impl->reader.getVal77();
 }
 
 bool NonTypeTemplateParmDecl::has_placeholder_type_constraint(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal94();
 }
 
 bool NonTypeTemplateParmDecl::is_expanded_parameter_pack(void) const {
-  return impl->reader.getVal98();
+  return impl->reader.getVal95();
 }
 
 bool NonTypeTemplateParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal99();
+  return impl->reader.getVal96();
 }
 
 unsigned NonTypeTemplateParmDecl::num_expansion_types(void) const {
-  return impl->reader.getVal55().size();
+  return impl->reader.getVal52().size();
 }
 
 std::optional<Type> NonTypeTemplateParmDecl::nth_expansion_type(unsigned n) const {
-  auto list = impl->reader.getVal55();
+  auto list = impl->reader.getVal52();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -252,12 +252,12 @@ std::optional<Type> NonTypeTemplateParmDecl::nth_expansion_type(unsigned n) cons
 }
 
 gap::generator<Type> NonTypeTemplateParmDecl::expansion_types(void) const & {
-  auto list = impl->reader.getVal55();
+  auto list = impl->reader.getVal52();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d55 = ep->TypeFor(ep, v)) {
-      co_yield Type(std::move(d55));
+    if (auto d52 = ep->TypeFor(ep, v)) {
+      co_yield Type(std::move(d52));
     }
   }
   co_return;

@@ -60,9 +60,8 @@ static void DumpPointerTypeToJSON(llvm::json::Object &obj,
                                   mx::PointerType type,
                                   WorkList &wl) {
   llvm::json::Object pointee_o;
-  if (auto pt = type.pointee_type()) {
-    DumpTypeToJSON(pointee_o, std::move(pt.value()), wl);
-  }
+  auto pt = type.pointee_type();
+  DumpTypeToJSON(pointee_o, pt, wl);
   llvm::json::Value pointee_v(std::move(pointee_o));
   obj["pointee_type"] = std::move(pointee_v);
 }
@@ -102,10 +101,6 @@ static void DumpQualifiedTypeToJSON(llvm::json::Object &obj,
 
   if (type.is_restrict_qualified()) {
     qualifiers_a.push_back("restrict");
-  }
-
-  if (type.is_atomic_type()) {
-    qualifiers_a.push_back("_Atomic");
   }
 
   if (!qualifiers_a.empty()) {

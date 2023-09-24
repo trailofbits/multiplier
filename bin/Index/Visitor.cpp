@@ -285,8 +285,10 @@ bool EntityVisitor::EnterTagDecl(const pasta::TagDecl &decl) {
 
 bool EntityVisitor::EnterRecordDecl(const pasta::RecordDecl &decl) {
   if (EnterTagDecl(decl)) {
-    for (const pasta::FieldDecl &field : decl.Fields()) {
-      Accept(field);
+    if (decl.IsThisDeclarationADefinition()) {
+      for (const pasta::FieldDecl &field : decl.Fields()) {
+        Accept(field);
+      }
     }
     return true;
   } else {

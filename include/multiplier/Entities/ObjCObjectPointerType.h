@@ -57,6 +57,7 @@ class ObjCObjectPointerType : public Type {
   ObjCInterfaceDecl interface_declaration(void) const;
   ObjCInterfaceType interface_type(void) const;
   ObjCObjectType object_type(void) const;
+  Type pointee_type(void) const;
   Type super_class_type(void) const;
   std::optional<Type> nth_type_argument(unsigned n) const;
   unsigned num_type_arguments(void) const;

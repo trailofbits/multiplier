@@ -180,21 +180,21 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const TokenContext &t) {
 }
 
 Expr StaticAssertDecl::assert_expression(void) const {
-  RawEntityId eid = impl->reader.getVal52();
+  RawEntityId eid = impl->reader.getVal49();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr StaticAssertDecl::message(void) const {
-  RawEntityId eid = impl->reader.getVal59();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token StaticAssertDecl::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal60());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 bool StaticAssertDecl::is_failed(void) const {
-  return impl->reader.getVal53();
+  return impl->reader.getVal50();
 }
 
 #pragma GCC diagnostic pop

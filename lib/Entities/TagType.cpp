@@ -83,12 +83,12 @@ std::optional<TagType> TagType::from(const TokenContext &t) {
 }
 
 TagDecl TagType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal235();
+  RawEntityId eid = impl->reader.getVal17();
   return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool TagType::is_being_defined(void) const {
-  return impl->reader.getVal237();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

@@ -81,29 +81,29 @@ std::optional<VariableArrayType> VariableArrayType::from(const TokenContext &t) 
 }
 
 Type VariableArrayType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange VariableArrayType::brackets_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal242(), impl->reader.getVal243());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal24(), impl->reader.getVal25());
 }
 
 Token VariableArrayType::l_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal276());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
 }
 
 Token VariableArrayType::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal277());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal59());
 }
 
 Expr VariableArrayType::size_expression(void) const {
-  RawEntityId eid = impl->reader.getVal282();
+  RawEntityId eid = impl->reader.getVal61();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool VariableArrayType::is_sugared(void) const {
-  return impl->reader.getVal237();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

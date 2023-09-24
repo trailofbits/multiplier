@@ -185,11 +185,11 @@ std::optional<EnumDecl> EnumDecl::from(const TokenContext &t) {
 }
 
 unsigned EnumDecl::num_enumerators(void) const {
-  return impl->reader.getVal65().size();
+  return impl->reader.getVal62().size();
 }
 
 std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
-  auto list = impl->reader.getVal65();
+  auto list = impl->reader.getVal62();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -203,12 +203,12 @@ std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
 }
 
 gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
-  auto list = impl->reader.getVal65();
+  auto list = impl->reader.getVal62();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d65 = ep->DeclFor(ep, v)) {
-      if (auto e = EnumConstantDecl::from(Decl(std::move(d65)))) {
+    if (auto d62 = ep->DeclFor(ep, v)) {
+      if (auto e = EnumConstantDecl::from(Decl(std::move(d62)))) {
         co_yield std::move(*e);
       }
     }
@@ -218,7 +218,7 @@ gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
 
 std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal81();
+    RawEntityId eid = impl->reader.getVal78();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -231,7 +231,7 @@ std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
 
 std::optional<Type> EnumDecl::integer_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal82();
+    RawEntityId eid = impl->reader.getVal79();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -243,21 +243,21 @@ std::optional<Type> EnumDecl::integer_type(void) const {
 }
 
 TokenRange EnumDecl::integer_type_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal84(), impl->reader.getVal85());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal81(), impl->reader.getVal82());
 }
 
 std::optional<uint32_t> EnumDecl::odr_hash(void) const {
-  if (!impl->reader.getVal107()) {
+  if (!impl->reader.getVal104()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal145());
+    return static_cast<uint32_t>(impl->reader.getVal142());
   }
   return std::nullopt;
 }
 
 std::optional<Type> EnumDecl::promotion_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal86();
+    RawEntityId eid = impl->reader.getVal83();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -270,7 +270,7 @@ std::optional<Type> EnumDecl::promotion_type(void) const {
 
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal87();
+    RawEntityId eid = impl->reader.getVal84();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -282,35 +282,35 @@ std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
 }
 
 TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal88());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal85());
 }
 
 bool EnumDecl::is_closed(void) const {
-  return impl->reader.getVal108();
+  return impl->reader.getVal105();
 }
 
 bool EnumDecl::is_closed_flag(void) const {
-  return impl->reader.getVal109();
+  return impl->reader.getVal106();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const {
-  return impl->reader.getVal110();
+  return impl->reader.getVal107();
 }
 
 bool EnumDecl::is_complete(void) const {
-  return impl->reader.getVal111();
+  return impl->reader.getVal108();
 }
 
 bool EnumDecl::is_fixed(void) const {
-  return impl->reader.getVal112();
+  return impl->reader.getVal109();
 }
 
 bool EnumDecl::is_scoped(void) const {
-  return impl->reader.getVal113();
+  return impl->reader.getVal110();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const {
-  return impl->reader.getVal114();
+  return impl->reader.getVal111();
 }
 
 #pragma GCC diagnostic pop

@@ -180,11 +180,11 @@ std::optional<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDe
 }
 
 unsigned ImplicitConceptSpecializationDecl::num_template_arguments(void) const {
-  return impl->reader.getVal54().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<TemplateArgument> ImplicitConceptSpecializationDecl::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal54();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -198,12 +198,12 @@ std::optional<TemplateArgument> ImplicitConceptSpecializationDecl::nth_template_
 }
 
 gap::generator<TemplateArgument> ImplicitConceptSpecializationDecl::template_arguments(void) const & {
-  auto list = impl->reader.getVal54();
+  auto list = impl->reader.getVal51();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d54 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d54));
+    if (auto d51 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d51));
     }
   }
   co_return;

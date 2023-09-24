@@ -185,7 +185,7 @@ Type CXXUuidofExpr::type_operand_source_info(void) const {
 }
 
 bool CXXUuidofExpr::is_type_operand(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 #pragma GCC diagnostic pop

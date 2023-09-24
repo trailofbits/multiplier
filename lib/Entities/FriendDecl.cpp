@@ -183,7 +183,7 @@ std::optional<FriendDecl> FriendDecl::from(const TokenContext &t) {
 
 std::optional<NamedDecl> FriendDecl::friend_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal52();
+    RawEntityId eid = impl->reader.getVal49();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -195,12 +195,12 @@ std::optional<NamedDecl> FriendDecl::friend_declaration(void) const {
 }
 
 Token FriendDecl::friend_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal59());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 std::optional<Type> FriendDecl::friend_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal60();
+    RawEntityId eid = impl->reader.getVal57();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -212,15 +212,15 @@ std::optional<Type> FriendDecl::friend_type(void) const {
 }
 
 bool FriendDecl::is_unsupported_friend(void) const {
-  return impl->reader.getVal53();
+  return impl->reader.getVal50();
 }
 
 unsigned FriendDecl::num_friend_type_template_parameter_lists(void) const {
-  return impl->reader.getVal54().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parameter_list(unsigned n) const {
-  auto list = impl->reader.getVal54();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -234,12 +234,12 @@ std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parame
 }
 
 gap::generator<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const & {
-  auto list = impl->reader.getVal54();
+  auto list = impl->reader.getVal51();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d54 = ep->TemplateParameterListFor(ep, v)) {
-      co_yield TemplateParameterList(std::move(d54));
+    if (auto d51 = ep->TemplateParameterListFor(ep, v)) {
+      co_yield TemplateParameterList(std::move(d51));
     }
   }
   co_return;

@@ -78,21 +78,21 @@ std::optional<PipeType> PipeType::from(const TokenContext &t) {
 }
 
 Type PipeType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal235();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type PipeType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool PipeType::is_read_only(void) const {
-  return impl->reader.getVal237();
+  return impl->reader.getVal19();
 }
 
 bool PipeType::is_sugared(void) const {
-  return impl->reader.getVal238();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

@@ -212,7 +212,6 @@ class Expr : public ValueStmt {
   std::optional<Type> type(void) const;
   ExprValueKind value_kind(void) const;
   bool has_non_trivial_call(void) const;
-  std::optional<bool> is_cxx98_integral_constant_expression(void) const;
   bool is_default_argument(void) const;
   bool is_gl_value(void) const;
   bool is_implicit_cxx_this(void) const;

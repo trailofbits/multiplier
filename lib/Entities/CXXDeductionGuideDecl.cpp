@@ -185,21 +185,21 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const TokenCont
 }
 
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
-  RawEntityId eid = impl->reader.getVal172();
+  RawEntityId eid = impl->reader.getVal169();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
-  RawEntityId eid = impl->reader.getVal173();
+  RawEntityId eid = impl->reader.getVal170();
   return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 DeductionCandidate CXXDeductionGuideDecl::deduction_candidate_kind(void) const {
-  return static_cast<DeductionCandidate>(impl->reader.getVal171());
+  return static_cast<DeductionCandidate>(impl->reader.getVal168());
 }
 
 bool CXXDeductionGuideDecl::is_explicit(void) const {
-  return impl->reader.getVal174();
+  return impl->reader.getVal171();
 }
 
 #pragma GCC diagnostic pop

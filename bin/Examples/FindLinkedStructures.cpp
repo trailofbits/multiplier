@@ -9,6 +9,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <multiplier/Entities/FieldDecl.h>
+#include <multiplier/Entities/PointerType.h>
 #include <multiplier/Entities/RecordDecl.h>
 #include <multiplier/Entities/RecordType.h>
 #include <sstream>
@@ -55,23 +56,20 @@ extern "C" int main(int argc, char *argv[]) {
 
   int level = 0;
 
-  std::optional<mx::Type> pointee_type;
-  std::optional<mx::RecordType> record_type;
-  std::optional<mx::RecordDecl> record;
-
   // Identify directly self-linking structures, e.g. `list_head`.
   for (mx::FieldDecl field : mx::FieldDecl::in(index)) {
-    pointee_type = field.type().pointee_type();
-    if (!pointee_type) {
+    auto pointer_type = mx::PointerType::from(field.type());
+    if (!pointer_type) {
       continue;
     }
 
-    record_type = mx::RecordType::from(pointee_type->desugared_type());
+    auto pointee_type = pointer_type->pointee_type();
+    auto record_type = mx::RecordType::from(pointee_type.desugared_type());
     if (!record_type) {
       continue;
     }
 
-    record = mx::RecordDecl::from(field.parent_declaration());
+    auto record = mx::RecordDecl::from(field.parent_declaration());
     if (!record) {
       continue;
     }
@@ -86,8 +84,6 @@ extern "C" int main(int argc, char *argv[]) {
     self_referencing.insert(record->id());
   }
 
-  std::optional<mx::TagDecl> byval_record;
-
   // Identify indirectly self-linking structures, e.g. users of `list_head`.
   for (size_t prev_size = 0u; prev_size < self_referencing.size(); ) {
     prev_size = self_referencing.size();
@@ -98,17 +94,17 @@ extern "C" int main(int argc, char *argv[]) {
         continue;
       }
 
-      record_type = mx::RecordType::from(field.type().desugared_type());
+      auto record_type = mx::RecordType::from(field.type().desugared_type());
       if (!record_type) {
         continue;
       }
 
-      byval_record = record_type->declaration();
-      if (!self_referencing.contains(byval_record->id())) {
+      auto byval_record = record_type->declaration();
+      if (!self_referencing.contains(byval_record.id())) {
         continue;
       }
 
-      record = mx::RecordDecl::from(field.parent_declaration());
+      auto record = mx::RecordDecl::from(field.parent_declaration());
       if (!record) {
         continue;
       }
