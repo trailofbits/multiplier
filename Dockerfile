@@ -11,19 +11,16 @@ RUN apt-get update \
     && echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main" | tee -a /etc/apt/sources.list \
     && add-apt-repository ppa:ubuntu-toolchain-r/test \
     && apt-get install --no-install-recommends -y \
-        cmake gpg zip unzip tar git pkg-config \
-        ninja-build clang-tidy cppcheck ccache build-essential \
-        doctest-dev clang-16 lld-16 python3.12 python3.12-dev \
-    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 \
-    && python3 -m pip install nanobind \
+        gpg zip unzip tar git \
+        pkg-config ninja-build ccache cmake build-essential \
+        doctest-dev \
+        clang-16 lld-16 \
+        python3.11 python3.11-dev \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /work
 RUN mkdir src build
-
-# Install Rust stable
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
-ENV PATH="/root/.cargo/bin:${PATH}"
 
 COPY . /work/src/multiplier
 RUN cmake \
@@ -44,7 +41,6 @@ RUN cmake \
 RUN cmake --build '/work/build/multiplier' --target install
 RUN chmod +x /work/install/bin/*
 ENV PATH="/work/install/bin:${PATH}"
-
 
 FROM --platform=linux/amd64 ${IMAGE} as release
 COPY --from=builder /work/install /work/install
