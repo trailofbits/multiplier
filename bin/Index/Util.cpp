@@ -1132,4 +1132,13 @@ std::string DiagnosePrintedTokens(
   return ss.str();
 }
 
+// Generate the token contexts associated with a printed token.
+gap::generator<pasta::TokenContext> TokenContexts(
+    const pasta::PrintedToken &tok) {
+  for (auto context = tok.Context(); context;
+       context = context->Parent()) {
+    co_yield context.value();
+  }
+}
+
 }  // namespace indexer

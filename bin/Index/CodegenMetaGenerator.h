@@ -36,12 +36,12 @@ class MetaGenerator {
   const EntityMapper &em;
 
   // MLIR context for generating the mlir location from source loc
-  mlir::MLIRContext *mctx;
+  _Nonnull mlir::MLIRContext * const mctx;
 
   const mlir::Location unknown_location;
 
  public:
-  MetaGenerator(const pasta::AST &ast, mlir::MLIRContext *mctx,
+  MetaGenerator(const pasta::AST &ast, mlir::MLIRContext &mctx,
                 const EntityMapper &em)
       : ast(ast),
         em(em),

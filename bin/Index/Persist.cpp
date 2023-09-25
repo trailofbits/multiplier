@@ -828,9 +828,7 @@ static void PersistTokenContexts(
   for (pasta::PrintedToken tok : parsed_tokens) {
     ++num_tokens;
 
-    for (auto context = tok.Context(); context; context = context->Parent()) {
-
-      pasta::TokenContext c = context.value();
+    for (pasta::TokenContext c : TokenContexts(tok)) {
       if (auto alias_context = c.Aliasee()) {
         c = std::move(alias_context.value());
       }
@@ -840,14 +838,14 @@ static void PersistTokenContexts(
       if (auto decl = pasta::Decl::From(c)) {
         const mx::RawEntityId eid = IdOfRedeclInFragment(em, frag_index, *decl);
         if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
+          contexts[eid].insert(c);
         }
 
 #define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
     } else if (auto lower_name ## _ = pasta::type_name::From(c)) { \
       const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
       if (eid != mx::kInvalidEntityId) { \
-        contexts[eid].insert(context.value()); \
+        contexts[eid].insert(c); \
       }
 
       FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)

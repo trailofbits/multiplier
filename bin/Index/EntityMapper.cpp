@@ -180,7 +180,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   // that has no corresponding derived (parsed) token.
   if (IsParsedToken(entity)) {
     assert(false);
-    return eid;
+    return mx::kInvalidEntityId;
   }
 
   if (auto mt = entity.MacroLocation()) {
@@ -204,10 +204,10 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   // an entity ID for that. We unify `Token` and `FileToken` in our serialized
   // representation, because we always want references to "point somewhere."
   if (auto ft = entity.FileLocation()) {
-    eid = EntityId(ft.value());  
+    return EntityId(ft.value());  
   }
 
-  return eid;
+  return mx::kInvalidEntityId;
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {

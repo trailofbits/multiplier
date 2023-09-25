@@ -501,6 +501,16 @@ class EntityId final {
     return opaque;
   }
 
+  // Safe `bool` idiom.
+  inline bool operator!(void) const noexcept {
+    return opaque == kInvalidEntityId;
+  }
+
+  // Safe `bool` conversion for l-values.
+  inline operator const void *(void) const & noexcept {
+    return opaque == kInvalidEntityId ? nullptr : this;
+  }
+
   inline bool operator==(const EntityId &that) const noexcept {
     return opaque == that.opaque;
   }

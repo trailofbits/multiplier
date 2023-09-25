@@ -174,11 +174,12 @@ int main(int argc, char *argv[]) {
   mx::Index index = InitExample(true);
 
   for (auto ent : index.query_entities("copy_from_user")) {
-    if (!std::holds_alternative<mx::NamedDecl>(ent)) {
+    auto nd = std::get_if<mx::NamedDecl>(&ent);
+    if (!nd) {
       continue;
     }
 
-    auto func = mx::FunctionDecl::from(std::get<mx::NamedDecl>(ent));
+    auto func = mx::FunctionDecl::from(*nd);
     if (!func || func->name() != "copy_from_user" ||
         !func->is_definition() || func->num_parameters() != 3u) {
       continue;

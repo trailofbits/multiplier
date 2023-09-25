@@ -7,7 +7,9 @@
 #include "PendingFragment.h"
 
 #include <glog/logging.h>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
+#include <pasta/AST/Printer.h>
 #include <pasta/AST/Stmt.h>
 #include <unordered_set>
 
@@ -125,7 +127,7 @@ class ParentTrackerVisitor : public EntityVisitor {
     return false;
   }
 
-  bool Enter(const pasta::Attr &) final {
+  bool Enter(const pasta::Attr &entity) final {
     AddToMaps(entity.RawAttr());
     return false;
   }
@@ -154,17 +156,20 @@ static void FindMissingParentageFromTokens(
 
   auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
   
-  for (pasta::Token tok : pf.parsed_tokens) {
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
     const void *child_stmt = nullptr;
     const void *parent_stmt = nullptr;
     const void *parent_decl = nullptr;
     bool seen_type = false;
 
-    for (auto ctx = tok.Context(); ctx; ctx = ctx->Parent()) {
-      auto raw_ctx = ctx->Data();
-      switch (ctx->Kind()) {
+    for (pasta::TokenContext ctx : TokenContexts(tok)) {
+      auto raw_ctx = ctx.Data();
+      switch (ctx.Kind()) {
         default:
-          raw_last_expr = nullptr;
+          parent_stmt = nullptr;
+          parent_decl = nullptr;
+          child_stmt = nullptr;
+          seen_type = false;
           break;
         case pasta::TokenContextKind::kStmt:
           if (seen_type) {
@@ -192,8 +197,13 @@ static void FindMissingParentageFromTokens(
       }
     }
 
-  skip:
-    continue;
+    if (!child_stmt || !seen_type) {
+      continue;
+    }
+
+    if (!parent_stmt && !parent_decl) {
+      continue;
+    }
 
   found:
     if (vis.not_yet_seen.count(child_stmt)) {

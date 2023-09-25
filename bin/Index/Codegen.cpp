@@ -151,7 +151,7 @@ std::string CodeGenerator::GenerateSourceIR(
 
   mlir::MLIRContext context(impl->registry);
 
-  MetaGenerator meta(ast, &context, em);
+  MetaGenerator meta(ast, context, em);
   MXCodeGenContext cgctx(context, ast.UnderlyingAST());
   MXCodeGenerator codegen(cgctx, meta);
   llvm::raw_string_ostream os(ret);

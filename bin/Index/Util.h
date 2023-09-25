@@ -29,6 +29,7 @@ class PrintedToken;
 class PrintedTokenRange;
 class Stmt;
 class Token;
+class TokenContext;
 class Type;
 }  // namespace pasta
 namespace mx {
@@ -98,6 +99,10 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 
 // Try to find the `Decl` referenced by a particular `type`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
+
+// Generate the token contexts associated with a printed token.
+gap::generator<pasta::TokenContext> TokenContexts(
+    const pasta::PrintedToken &tok);
 
 // Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl);

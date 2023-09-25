@@ -218,21 +218,19 @@ std::string HashFragment(
       std::stringstream tc;
       static constexpr std::hash<std::string> kHasher;
 
-      for (auto context = token.Context(); context;
-           context = context->Parent()) {
-
-        switch (context->Kind()) {
+      for (pasta::TokenContext context : TokenContexts(token)) {
+        switch (context.Kind()) {
           case pasta::TokenContextKind::kDecl:
-            tc << " d" << int(pasta::Decl::From(*context)->Kind());
+            tc << " d" << int(pasta::Decl::From(context)->Kind());
             break;
           case pasta::TokenContextKind::kStmt:
-            tc << " s" << int(pasta::Stmt::From(*context)->Kind());
+            tc << " s" << int(pasta::Stmt::From(context)->Kind());
             break;
           case pasta::TokenContextKind::kType:
-            tc << " t" << int(pasta::Type::From(*context)->Kind());
+            tc << " t" << int(pasta::Type::From(context)->Kind());
             break;
           case pasta::TokenContextKind::kAttr:
-            tc << " a" << int(pasta::Attr::From(*context)->Kind());
+            tc << " a" << int(pasta::Attr::From(context)->Kind());
             break;
           default:
             break;

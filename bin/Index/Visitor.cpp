@@ -75,7 +75,7 @@ void EntityVisitor::VisitFriendDecl(const pasta::FriendDecl &decl) {
   if (EnterDecl(decl)) {
     for (pasta::TemplateParameterList ls :
              decl.FriendTypeTemplateParameterLists()) {
-      Accept(ls.value());
+      Accept(ls);
     }
   }
 }
@@ -293,7 +293,7 @@ bool EntityVisitor::EnterCXXRecordDecl(const pasta::CXXRecordDecl &decl) {
       }
     }
     if (auto vbases = decl.VirtualBases()) {
-      for (pasta::CXXBaseSpecifier spec : *bases) {
+      for (pasta::CXXBaseSpecifier spec : *vbases) {
         Accept(spec);
       }
     }
