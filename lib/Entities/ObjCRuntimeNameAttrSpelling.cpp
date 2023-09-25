@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCRuntimeNameAttrSpelling e) {
   switch (e) {
     case ObjCRuntimeNameAttrSpelling::GNU_OBJC_RUNTIME_NAME: return "GNU_OBJC_RUNTIME_NAME";
     case ObjCRuntimeNameAttrSpelling::CXX11_CLANG_OBJC_RUNTIME_NAME: return "CXX11_CLANG_OBJC_RUNTIME_NAME";
-    case ObjCRuntimeNameAttrSpelling::C2X_CLANG_OBJC_RUNTIME_NAME: return "C2X_CLANG_OBJC_RUNTIME_NAME";
+    case ObjCRuntimeNameAttrSpelling::C23_CLANG_OBJC_RUNTIME_NAME: return "C23_CLANG_OBJC_RUNTIME_NAME";
     case ObjCRuntimeNameAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

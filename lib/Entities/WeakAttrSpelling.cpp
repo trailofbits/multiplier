@@ -17,7 +17,7 @@ const char *EnumeratorName(WeakAttrSpelling e) {
   switch (e) {
     case WeakAttrSpelling::GNU_WEAK: return "GNU_WEAK";
     case WeakAttrSpelling::CXX11_GNU_WEAK: return "CXX11_GNU_WEAK";
-    case WeakAttrSpelling::C2X_GNU_WEAK: return "C2X_GNU_WEAK";
+    case WeakAttrSpelling::C23_GNU_WEAK: return "C23_GNU_WEAK";
     case WeakAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

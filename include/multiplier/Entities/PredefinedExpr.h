@@ -71,6 +71,7 @@ class PredefinedExpr : public Expr {
   PredefinedExprIdentKind identifier_kind(void) const;
   std::string_view identifier_kind_name(void) const;
   Token token(void) const;
+  bool is_transparent(void) const;
 };
 
 static_assert(sizeof(PredefinedExpr) == sizeof(Expr));

@@ -17,7 +17,7 @@ const char *EnumeratorName(AArch64SVEPcsAttrSpelling e) {
   switch (e) {
     case AArch64SVEPcsAttrSpelling::GNU_AARCH64_SVE_PCS: return "GNU_AARCH64_SVE_PCS";
     case AArch64SVEPcsAttrSpelling::CXX11_CLANG_AARCH64_SVE_PCS: return "CXX11_CLANG_AARCH64_SVE_PCS";
-    case AArch64SVEPcsAttrSpelling::C2X_CLANG_AARCH64_SVE_PCS: return "C2X_CLANG_AARCH64_SVE_PCS";
+    case AArch64SVEPcsAttrSpelling::C23_CLANG_AARCH64_SVE_PCS: return "C23_CLANG_AARCH64_SVE_PCS";
     case AArch64SVEPcsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

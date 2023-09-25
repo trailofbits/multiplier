@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCClassStubAttrSpelling e) {
   switch (e) {
     case ObjCClassStubAttrSpelling::GNU_OBJC_CLASS_STUB: return "GNU_OBJC_CLASS_STUB";
     case ObjCClassStubAttrSpelling::CXX11_CLANG_OBJC_CLASS_STUB: return "CXX11_CLANG_OBJC_CLASS_STUB";
-    case ObjCClassStubAttrSpelling::C2X_CLANG_OBJC_CLASS_STUB: return "C2X_CLANG_OBJC_CLASS_STUB";
+    case ObjCClassStubAttrSpelling::C23_CLANG_OBJC_CLASS_STUB: return "C23_CLANG_OBJC_CLASS_STUB";
     case ObjCClassStubAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

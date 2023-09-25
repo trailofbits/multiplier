@@ -12,7 +12,6 @@
 #include <multiplier/IR/Region.h>
 #include <multiplier/IR/Type.h>
 
-#include <vast/Dialect/Dialects.hpp>
 #include <mlir/Dialect/SCF/IR/SCF.h>
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <vast/Dialect/Core/CoreOps.hpp>

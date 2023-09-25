@@ -20,6 +20,7 @@ const char *EnumeratorName(StringLiteralStringKind e) {
     case StringLiteralStringKind::UTF8: return "UTF8";
     case StringLiteralStringKind::UTF16: return "UTF16";
     case StringLiteralStringKind::UTF32: return "UTF32";
+    case StringLiteralStringKind::UNEVALUATED: return "UNEVALUATED";
     default: return "<invalid>";
   }
 }

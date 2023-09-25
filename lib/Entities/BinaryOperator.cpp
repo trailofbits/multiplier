@@ -158,12 +158,12 @@ std::optional<BinaryOperator> BinaryOperator::from(const TokenContext &t) {
 }
 
 Expr BinaryOperator::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 BinaryOperatorKind BinaryOperator::opcode(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal95());
 }
 
 std::string_view BinaryOperator::opcode_string(void) const {
@@ -172,11 +172,11 @@ std::string_view BinaryOperator::opcode_string(void) const {
 }
 
 Token BinaryOperator::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr BinaryOperator::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
@@ -201,11 +201,11 @@ bool BinaryOperator::is_comma_operation(void) const {
 }
 
 bool BinaryOperator::is_comparison_operation(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal94();
 }
 
 bool BinaryOperator::is_compound_assignment_operation(void) const {
-  return impl->reader.getVal97();
+  return impl->reader.getVal96();
 }
 
 bool BinaryOperator::is_equality_operation(void) const {

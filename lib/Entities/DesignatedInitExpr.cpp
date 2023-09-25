@@ -186,16 +186,16 @@ gap::generator<Designator> DesignatedInitExpr::designators(void) const & {
   co_return;
 }
 
-TokenRange DesignatedInitExpr::designators_source_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal38(), impl->reader.getVal39());
+TokenRange DesignatedInitExpr::designators_tokens(void) const {
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal37(), impl->reader.getVal38());
 }
 
 Token DesignatedInitExpr::equal_or_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr DesignatedInitExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

@@ -17,7 +17,7 @@ const char *EnumeratorName(PcsAttrSpelling e) {
   switch (e) {
     case PcsAttrSpelling::GNU_PCS: return "GNU_PCS";
     case PcsAttrSpelling::CXX11_GNU_PCS: return "CXX11_GNU_PCS";
-    case PcsAttrSpelling::C2X_GNU_PCS: return "C2X_GNU_PCS";
+    case PcsAttrSpelling::C23_GNU_PCS: return "C23_GNU_PCS";
     case PcsAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

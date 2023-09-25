@@ -17,7 +17,7 @@ const char *EnumeratorName(CalledOnceAttrSpelling e) {
   switch (e) {
     case CalledOnceAttrSpelling::GNU_CALLED_ONCE: return "GNU_CALLED_ONCE";
     case CalledOnceAttrSpelling::CXX11_CLANG_CALLED_ONCE: return "CXX11_CLANG_CALLED_ONCE";
-    case CalledOnceAttrSpelling::C2X_CLANG_CALLED_ONCE: return "C2X_CLANG_CALLED_ONCE";
+    case CalledOnceAttrSpelling::C23_CLANG_CALLED_ONCE: return "C23_CLANG_CALLED_ONCE";
     case CalledOnceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

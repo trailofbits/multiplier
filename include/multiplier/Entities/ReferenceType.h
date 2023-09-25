@@ -47,6 +47,7 @@ class ReferenceType : public Type {
   static std::optional<ReferenceType> from(const Reference &r);
   static std::optional<ReferenceType> from(const TokenContext &t);
 
+  Type pointee_type(void) const;
   Type pointee_type_as_written(void) const;
   bool is_inner_reference(void) const;
   bool is_spelled_as_l_value(void) const;

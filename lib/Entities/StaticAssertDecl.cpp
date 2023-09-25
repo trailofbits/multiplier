@@ -11,7 +11,6 @@
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Expr.h>
 #include <multiplier/Entities/Stmt.h>
-#include <multiplier/Entities/StringLiteral.h>
 #include <multiplier/Entities/Token.h>
 
 #include "../EntityProvider.h"
@@ -181,21 +180,21 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const TokenContext &t) {
 }
 
 Expr StaticAssertDecl::assert_expression(void) const {
-  RawEntityId eid = impl->reader.getVal50();
+  RawEntityId eid = impl->reader.getVal49();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-StringLiteral StaticAssertDecl::message(void) const {
-  RawEntityId eid = impl->reader.getVal57();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+Expr StaticAssertDecl::message(void) const {
+  RawEntityId eid = impl->reader.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token StaticAssertDecl::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 bool StaticAssertDecl::is_failed(void) const {
-  return impl->reader.getVal51();
+  return impl->reader.getVal50();
 }
 
 #pragma GCC diagnostic pop

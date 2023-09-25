@@ -7,7 +7,9 @@
 #include "PendingFragment.h"
 
 #include <glog/logging.h>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
+#include <pasta/AST/Printer.h>
 #include <pasta/AST/Stmt.h>
 #include <unordered_set>
 
@@ -45,9 +47,19 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   virtual ~ParentTrackerVisitor(void) = default;
 
-  ParentTrackerVisitor(EntityMapper &em_, PendingFragment &fragment_)
-      : em(em_),
+  explicit ParentTrackerVisitor(PendingFragment &fragment_)
+      : em(fragment_.em),
         fragment(fragment_) {}
+
+  void AddToMaps(const void *entity) {
+    if (parent_decl_id != mx::kInvalidEntityId) {
+      em.parent_decl_ids.emplace(entity, parent_decl_id);
+    }
+
+    if (parent_stmt_id != mx::kInvalidEntityId) {
+      em.parent_stmt_ids.emplace(entity, parent_stmt_id);
+    }
+  }
 
   void Accept(const pasta::Decl &entity) final {
     mx::RawEntityId rid = em.EntityId(entity);
@@ -72,6 +84,8 @@ class ParentTrackerVisitor : public EntityVisitor {
       em.parent_stmt_ids.emplace(entity.RawDecl(), parent_stmt_id);
     }
 
+    AddToMaps(entity.RawDecl());
+
     SaveRestoreEntityId save_parent_decl(parent_decl_id, rid);
     this->EntityVisitor::Accept(entity);
   }
@@ -91,16 +105,14 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    if (parent_decl_id != mx::kInvalidEntityId) {
-      em.parent_decl_ids.emplace(entity.RawStmt(), parent_decl_id);
-    }
-
-    if (parent_stmt_id != mx::kInvalidEntityId) {
-      em.parent_stmt_ids.emplace(entity.RawStmt(), parent_stmt_id);
-    }
+    AddToMaps(entity.RawStmt());
 
     SaveRestoreEntityId save_parent_stmt(parent_stmt_id, rid);
     this->EntityVisitor::Accept(entity);
+  }
+
+  void Accept(const pasta::Attr &entity) final {
+    AddToMaps(entity.RawAttr());
   }
 
   bool Enter(const pasta::Decl &entity) final {
@@ -111,28 +123,123 @@ class ParentTrackerVisitor : public EntityVisitor {
     return not_yet_seen.erase(entity.RawStmt());
   }
 
-  bool Enter(const pasta::Type &entity) final {
-    return not_yet_seen.erase(entity.RawType());
+  bool Enter(const pasta::Type &) final {
+    return false;
+  }
+
+  bool Enter(const pasta::Attr &entity) final {
+    AddToMaps(entity.RawAttr());
+    return false;
+  }
+
+  void Accept(const pasta::Type &) final {}
+
+  void Accept(const pasta::TemplateParameterList &entity) final {
+    AddToMaps(entity.RawTemplateParameterList());
+  }
+
+  void Accept(const pasta::TemplateArgument &entity) final {
+    AddToMaps(entity.RawTemplateArgument());
+  }
+
+  void Accept(const pasta::Designator &entity) final {
+    AddToMaps(entity.RawDesignator());
+  }
+
+  void Accept(const pasta::CXXBaseSpecifier &entity) final {
+    AddToMaps(entity.RawCXXBaseSpecifier());
   }
 };
+
+static void FindMissingParentageFromTokens(
+    ParentTrackerVisitor &vis, PendingFragment &pf) {
+
+  auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+  
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
+    const void *child_stmt = nullptr;
+    const void *parent_stmt = nullptr;
+    const void *parent_decl = nullptr;
+    bool seen_type = false;
+
+    for (pasta::TokenContext ctx : TokenContexts(tok)) {
+      auto raw_ctx = ctx.Data();
+      switch (ctx.Kind()) {
+        default:
+          parent_stmt = nullptr;
+          parent_decl = nullptr;
+          child_stmt = nullptr;
+          seen_type = false;
+          break;
+        case pasta::TokenContextKind::kStmt:
+          if (seen_type) {
+            parent_stmt = raw_ctx;
+            goto found;
+          } else {
+            child_stmt = raw_ctx;
+            break;
+          }
+        case pasta::TokenContextKind::kDecl:
+          if (seen_type) {
+            parent_decl = raw_ctx;
+            goto found;
+          } else {
+            child_stmt = raw_ctx;
+            break;
+          }
+        case pasta::TokenContextKind::kType:
+          if (child_stmt || seen_type) {
+            seen_type = true;
+          } else {
+            child_stmt = nullptr;
+          }
+          break;
+      }
+    }
+
+    if (!child_stmt || !seen_type) {
+      continue;
+    }
+
+    if (!parent_stmt && !parent_decl) {
+      continue;
+    }
+
+  found:
+    if (vis.not_yet_seen.count(child_stmt)) {
+      continue;
+    }
+
+    assert(parent_stmt || parent_decl);
+
+    vis.parent_stmt_id = pf.em.EntityId(parent_stmt);
+    vis.parent_decl_id = pf.em.EntityId(parent_decl);
+
+    if (vis.parent_stmt_id == mx::kInvalidEntityId) {
+      vis.parent_stmt_id = pf.em.ParentStmtId(parent_decl);
+    }
+
+    if (vis.parent_decl_id == mx::kInvalidEntityId) {
+      vis.parent_decl_id = pf.em.ParentDeclId(parent_stmt);
+    }
+
+    vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
+  }
+}
 
 }  // namespace
 
 // Maps the child-to-parent relationships in the fragment, storing the
 // relationships in `parent_decls` and `parent_stmts`.
-void LabelParentsInPendingFragment(
-    PendingFragment &pf, EntityMapper &em) {
-  ParentTrackerVisitor vis(em, pf);
+void LabelParentsInPendingFragment(PendingFragment &pf) {
+
+  ParentTrackerVisitor vis(pf);
   for (const pasta::Decl &decl : pf.decls_to_serialize) {
     vis.not_yet_seen.emplace(decl.RawDecl());
   }
 
   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
     vis.not_yet_seen.emplace(stmt.RawStmt());
-  }
-
-  for (const pasta::Type &type : pf.types_to_serialize) {
-    vis.not_yet_seen.emplace(type.RawType());
   }
 
   // Visit the top-level decls first.
@@ -151,6 +258,14 @@ void LabelParentsInPendingFragment(
     }
   }
 
+  // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
+  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
+    auto raw_entity = stmt.RawStmt();
+    if (vis.not_yet_seen.count(raw_entity)) {
+      FindMissingParentageFromTokens(vis, pf);
+    }
+  }
+
 #ifndef NDEBUG
   // NOTE(pag): If this assertion is hit, then it suggests that the manually-
   //            written traversals in `Visitor.cpp` are missing something that
@@ -166,11 +281,12 @@ void LabelParentsInPendingFragment(
 #endif
 
 // #ifndef NDEBUG
-  // TODO(kumarak): Does the manually written Visitor.cpp should have traverse function
-  //                for all stmt types. If not then we can probably remove assert here.
-  // for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-  //   assert(!vis.not_yet_seen.count(stmt.RawStmt()));
-  // }
+//   // TODO(kumarak): Does the manually written Visitor.cpp have to traverse
+//   //                all stmt types. If not then we can probably remove
+//   //                assert here.
+//   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
+//     assert(!vis.not_yet_seen.count(stmt.RawStmt()));
+//   }
 // #endif
 }
 

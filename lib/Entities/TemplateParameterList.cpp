@@ -45,7 +45,7 @@ std::optional<TemplateParameterList> TemplateParameterList::from(const TokenCont
   return t.as_template_parameter_list();
 }
 
-unsigned TemplateParameterList::depth(void) const {
+uint32_t TemplateParameterList::depth(void) const {
   return impl->reader.getVal0();
 }
 

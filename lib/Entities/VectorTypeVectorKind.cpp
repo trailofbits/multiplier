@@ -23,6 +23,7 @@ const char *EnumeratorName(VectorTypeVectorKind e) {
     case VectorTypeVectorKind::NEON_POLY_VECTOR: return "NEON_POLY_VECTOR";
     case VectorTypeVectorKind::SVE_FIXED_LENGTH_DATA_VECTOR: return "SVE_FIXED_LENGTH_DATA_VECTOR";
     case VectorTypeVectorKind::SVE_FIXED_LENGTH_PREDICATE_VECTOR: return "SVE_FIXED_LENGTH_PREDICATE_VECTOR";
+    case VectorTypeVectorKind::RVV_FIXED_LENGTH_DATA_VECTOR: return "RVV_FIXED_LENGTH_DATA_VECTOR";
     default: return "<invalid>";
   }
 }

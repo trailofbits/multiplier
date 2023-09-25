@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCNSObjectAttrSpelling e) {
   switch (e) {
     case ObjCNSObjectAttrSpelling::GNUNS_OBJECT: return "GNUNS_OBJECT";
     case ObjCNSObjectAttrSpelling::CXX11_CLANG_NS_OBJECT: return "CXX11_CLANG_NS_OBJECT";
-    case ObjCNSObjectAttrSpelling::C2X_CLANG_NS_OBJECT: return "C2X_CLANG_NS_OBJECT";
+    case ObjCNSObjectAttrSpelling::C23_CLANG_NS_OBJECT: return "C23_CLANG_NS_OBJECT";
     case ObjCNSObjectAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

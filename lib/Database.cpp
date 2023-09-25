@@ -42,7 +42,7 @@ namespace {
 static constexpr size_t kNumIdShards = 256u;
 
 // TODO(pag): Use a hash function that is the same across platforms.
-static const std::hash<std::string> kHasher;
+static const std::hash<std::string> kStringHasher;
 
 // Number of INSERT statements to try to add in a single transaction.
 static constexpr size_t kMaxTransactionSize = 10000000u;
@@ -54,6 +54,11 @@ static constexpr size_t kMaxDictionarySize = 112640;  // 110 KiB.
 static constexpr size_t kMinTrainingSetSize = 128ull * (1ull << 20ul);
 
 static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
+
+static std::mutex gDatabaseInitializationLock;
+
+// Array of table names, so we aren't always recomputing them.
+static std::array<std::string, kNumIdShards> gIndexToHashTableName;
 
 struct PushbackSignal {};
 struct ExitSignal {};
@@ -85,13 +90,19 @@ class WriterThreadState {
       get_index, set_index;
 
   RawEntityId GetOrCreateId(
-      RawEntityId proposed_id, RawEntityId context_id, const std::string &hash);
+      RawEntityId proposed_id, RawEntityId context_id, std::string hash);
+
+  RawEntityId GetOrCreateId(
+      RawEntityId proposed_id, RawEntityId hash_a, RawEntityId hash_b,
+      RawEntityId hash_c, size_t table);
 
  public:
   std::optional<RawEntityId> available_file_index;
+  std::optional<RawEntityId> available_compilation_index;
   std::optional<RawEntityId> available_small_fragment_index;
   std::optional<RawEntityId> available_big_fragment_index;
-  std::optional<RawEntityId> available_compilation_index;
+  std::optional<RawEntityId> available_small_type_index;
+  std::optional<RawEntityId> available_big_type_index;
 
   ~WriterThreadState(void) {}
 
@@ -99,45 +110,50 @@ class WriterThreadState {
       const std::filesystem::path &path)
       : db(path) {}
 
-  RawEntityId GetOrCreateFileId(RawEntityId proposed_id,
-                                const std::string &hash);
+  RawEntityId GetOrCreateFileId(RawEntityId proposed_id, std::string hash);
 
   RawEntityId GetOrCreateFragmentId(RawEntityId proposed_id,
                                     RawEntityId file_tok_id,
-                                    const std::string &hash);
+                                    std::string hash);
+
+  RawEntityId GetOrCreateTypeId(RawEntityId proposed_id,
+                                mx::TypeKind type_kind,
+                                uint32_t type_qualifiers,
+                                std::string hash);
 
   RawEntityId GetOrCreateCompilationId(RawEntityId proposed_id,
                                        RawEntityId file_tok_id,
-                                       const std::string &hash);
+                                       std::string hash);
 };
 
 RawEntityId WriterThreadState::GetOrCreateId(
-      RawEntityId proposed_id, RawEntityId context_id,
-      const std::string &hash) {
+    RawEntityId proposed_id, RawEntityId hash_a, RawEntityId hash_b,
+    RawEntityId hash_c, size_t table) {
 
-  // Calculate which file table to index into.
-  const size_t table = kHasher(hash) % kNumIdShards;
   std::optional<sqlite::Statement> &get = get_index[table];
   std::optional<sqlite::Statement> &set = set_index[table];
 
   // We might not have prepared these statements for the current thread yet.
   if (!get) {
-    auto table_name = "index_for_hash_" + std::to_string(table);
     get.emplace(db.Prepare(
-        "SELECT index_ FROM " + table_name +
-        " WHERE hash = ?1 AND context_id = ?2")),
+        "SELECT index_ FROM " + gIndexToHashTableName[table] +
+        " WHERE hash_a = ?1 AND hash_b = ?2 AND hash_c = ?3")),
 
     set.emplace(db.Prepare(
-        "INSERT INTO " + table_name + " (index_, hash, context_id) "
-        "VALUES (?1, ?2, ?3) "
+        "INSERT INTO " + gIndexToHashTableName[table] +
+        " (index_, hash_a, hash_b, hash_c) "
+        "VALUES (?1, ?2, ?3, ?4) "
         "ON CONFLICT DO UPDATE SET index_ = index_ "
         "RETURNING index_"));
   }
 
   RawEntityId id_out = kInvalidEntityId;
 
+  // NOTE(pag): Use `BindValuesWithoutCopying` if we go back to BLOB-based
+  //            hashes.
+
   // Racy read.
-  get->BindValuesWithoutCopying(hash, context_id);
+  get->BindValues(hash_a, hash_b, hash_c);
   if (get->ExecuteStep()) {
     get->Row().Columns(id_out);
   }
@@ -145,7 +161,7 @@ RawEntityId WriterThreadState::GetOrCreateId(
 
   // Transactional get/set.
   while (id_out == kInvalidEntityId) {
-    set->BindValuesWithoutCopying(proposed_id, hash, context_id);
+    set->BindValues(proposed_id, hash_a, hash_b, hash_c);
     if (set->ExecuteStep()) {
       set->Row().Columns(id_out);
     }
@@ -155,20 +171,52 @@ RawEntityId WriterThreadState::GetOrCreateId(
   return id_out;
 }
 
+RawEntityId WriterThreadState::GetOrCreateId(
+    RawEntityId proposed_id, RawEntityId context_id, std::string hash) {
+
+  // Calculate which file table to index into.
+  const uint64_t base_hash = kStringHasher(hash);
+  const size_t table = base_hash % kNumIdShards;
+
+  std::reverse(hash.begin(), hash.end());
+  const uint64_t rev_hash = kStringHasher(hash);
+
+  // Some bits of `base_hash` are already utilized for deduping in the table
+  // name itself, so we'll go and bring in "new" bits from the `rev_hash`.
+  uint64_t real_hash = ((base_hash / kNumIdShards) * kNumIdShards) +
+                       (rev_hash % kNumIdShards);
+
+  for (auto &c : hash) {
+    c = ~c;
+  }
+
+  auto inv_hash = kStringHasher(hash);
+  return GetOrCreateId(proposed_id, context_id, real_hash, inv_hash, table);
+}
+
 RawEntityId WriterThreadState::GetOrCreateFileId(
-    RawEntityId proposed_id, const std::string &hash) {
-  return GetOrCreateId(proposed_id, mx::kInvalidEntityId, hash);
+    RawEntityId proposed_id, std::string hash) {
+  return GetOrCreateId(proposed_id, mx::kInvalidEntityId, std::move(hash));
 }
 
 RawEntityId WriterThreadState::GetOrCreateFragmentId(
-    RawEntityId proposed_id, RawEntityId file_tok_id,
-    const std::string &hash) {
-  return GetOrCreateId(proposed_id, file_tok_id, hash);
+    RawEntityId proposed_id, RawEntityId file_tok_id, std::string hash) {
+  return GetOrCreateId(proposed_id, file_tok_id, std::move(hash));
+}
+
+RawEntityId WriterThreadState::GetOrCreateTypeId(RawEntityId proposed_id,
+                                                 mx::TypeKind type_kind,
+                                                 uint32_t type_qualifiers,
+                                                 std::string hash) {
+  uint64_t context_id = static_cast<uint64_t>(type_kind);
+  context_id <<= 32u;
+  context_id |= type_qualifiers;
+  return GetOrCreateId(proposed_id, context_id, std::move(hash));
 }
 
 RawEntityId WriterThreadState::GetOrCreateCompilationId(
-    RawEntityId proposed_id, RawEntityId file_id, const std::string &hash) {
-  return GetOrCreateId(proposed_id, file_id, hash);
+    RawEntityId proposed_id, RawEntityId file_id, std::string hash) {
+  return GetOrCreateId(proposed_id, file_id, std::move(hash));
 }
 
 class BulkInserterState {
@@ -393,6 +441,7 @@ class DatabaseWriterImpl {
 
   DatabaseWriterImpl(const std::filesystem::path &db_path_,
                      size_t max_queue_size_in_bytes_);
+
   ~DatabaseWriterImpl(void);
 
   void BulkInserter(void);
@@ -833,18 +882,28 @@ namespace {
 //                database first. We achieve that via the destruction of
 //                `db` here, and returning the path to re-open to the caller.
 std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
+  std::unique_lock<std::mutex> locker(gDatabaseInitializationLock);
+
   sqlite::Connection db(db_path_);
   for (const char *stmt : DatabaseWriter::kInitStatements) {
     db.Execute(std::string(stmt));
   }
   for (size_t i = 0u; i < kNumIdShards; ++i) {
+    std::string &name = gIndexToHashTableName[i];
+    if (name.empty()) {
+      name = "index_for_hash_" + std::to_string(i);
+    }
+
     db.Execute(
-        "CREATE TABLE IF NOT EXISTS index_for_hash_" + std::to_string(i) + " ("
+        "CREATE TABLE IF NOT EXISTS " + name + " ("
         "  index_ INT NOT NULL,"
-        "  context_id INT NOT NULL,"
-        "  hash BLOB NOT NULL,"
-        "  PRIMARY KEY(context_id, hash)"
+        "  hash_a INT NOT NULL,"
+        "  hash_b INT NOT NULL,"
+        "  hash_c INT NOT NULL,"
+        "  PRIMARY KEY(hash_a, hash_b, hash_c)"
         ") WITHOUT rowid");
+
+
   }
 
   db.Execute("PRAGMA wal_checkpoint(FULL)");
@@ -941,6 +1000,17 @@ bool BulkInserterState::InsertAsync(
     const FragmentFileRecord &record, sqlite::Statement &insert) {
   insert.BindValuesWithoutCopying(record.fragment_id.Pack(),
                                   record.file_id.Pack());
+  return true;
+}
+
+size_t BulkInserterState::SizeOfRecord(const NestedFragmentRecord &record) {
+  return sizeof(record);
+}
+
+bool BulkInserterState::InsertAsync(
+    const NestedFragmentRecord &record, sqlite::Statement &insert) {
+  insert.BindValuesWithoutCopying(record.parent_id.Pack(),
+                                  record.child_id.Pack());
   return true;
 }
 
@@ -1049,7 +1119,7 @@ PackedFileId DatabaseWriter::GetOrCreateFileIdForHash(
   }
 
   RawEntityId proposed_id = EntityId(FileId(proposed_index)).Pack();
-  RawEntityId found_id = writer->GetOrCreateFileId(proposed_id, hash);
+  RawEntityId found_id = writer->GetOrCreateFileId(proposed_id, std::move(hash));
   is_new = found_id == proposed_id;
   if (!is_new) {
     writer->available_file_index.emplace(proposed_index);
@@ -1062,7 +1132,7 @@ PackedFileId DatabaseWriter::GetOrCreateFileIdForHash(
 
 // Get, or create and return, a fragment ID for the specific fragment hash.
 PackedFragmentId DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
-    RawEntityId tok_id, const std::string &hash, bool &is_new) {
+    RawEntityId tok_id, std::string hash, bool &is_new) {
 
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
   RawEntityId proposed_index = kInvalidEntityId;
@@ -1078,7 +1148,7 @@ PackedFragmentId DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
 
   RawEntityId proposed_id = EntityId(FragmentId(proposed_index)).Pack();
   RawEntityId found_id = writer->GetOrCreateFragmentId(
-      proposed_id, tok_id, hash);
+      proposed_id, tok_id, std::move(hash));
   is_new = found_id == proposed_id;
   if (!is_new) {
     writer->available_small_fragment_index.emplace(proposed_index);
@@ -1093,7 +1163,7 @@ PackedFragmentId DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
 
 // Get, or create and return, a fragment ID for the specific fragment hash.
 PackedFragmentId DatabaseWriter::GetOrCreateBigFragmentIdForHash(
-    RawEntityId tok_id, const std::string &hash, bool &is_new) {
+    RawEntityId tok_id, std::string hash, bool &is_new) {
 
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
   RawEntityId proposed_index = kInvalidEntityId;
@@ -1110,7 +1180,7 @@ PackedFragmentId DatabaseWriter::GetOrCreateBigFragmentIdForHash(
 
   RawEntityId proposed_id = EntityId(FragmentId(proposed_index)).Pack();
   RawEntityId found_id = writer->GetOrCreateFragmentId(
-      proposed_id, tok_id, hash);
+      proposed_id, tok_id, std::move(hash));
   is_new = found_id == proposed_id;
   if (!is_new) {
     writer->available_big_fragment_index.emplace(proposed_index);
@@ -1131,27 +1201,36 @@ PackedFragmentId DatabaseWriter::GetOrCreateFragmentIdForHash(
   // NOTE(pag): We have a fudge factor here of `3x` to account for macro
   //            expansions.
   if ((num_tokens * 3u) >= kNumTokensInBigFragment) {
-    return GetOrCreateBigFragmentIdForHash(tok_id, hash, is_new);
+    return GetOrCreateBigFragmentIdForHash(tok_id, std::move(hash), is_new);
   } else {
-    return GetOrCreateSmallFragmentIdForHash(tok_id, hash, is_new);
+    return GetOrCreateSmallFragmentIdForHash(tok_id, std::move(hash), is_new);
   }
 }
 
-// This is dummy implementation for getting fragment id for
-// types. It bypasses the database lookup for getting the
-// new fragment id, instead get the next available small fragment id
-// for types
-
 PackedTypeId DatabaseWriter::GetOrCreateSmallTypeIdForHash(
-    mx::TypeKind type_kind, const std::string &hash, bool &is_new) {
+    mx::TypeKind type_kind, uint32_t type_qualifiers, std::string hash,
+    bool &is_new) {
 
-  (void)hash;
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = impl->next_small_type_index.fetch_add(1u);
+  RawEntityId proposed_index = kInvalidEntityId;
+
+  // Try to reuse a previously generated but unused fragment id.
+  if (!writer->available_small_type_index) {
+    proposed_index = impl->next_small_type_index.fetch_add(1u);
+  } else {
+    proposed_index = writer->available_small_type_index.value();
+    writer->available_small_type_index.reset();
+  }
   assert(proposed_index >= kMaxBigTypeId);
 
-  RawEntityId found_id = EntityId(TypeId(proposed_index, type_kind)).Pack();
-  is_new = true;
+  RawEntityId proposed_id = EntityId(TypeId(proposed_index, type_kind)).Pack();
+  RawEntityId found_id = writer->GetOrCreateTypeId(
+      proposed_id, type_kind, type_qualifiers, std::move(hash));
+
+  is_new = found_id == proposed_id;
+  if (!is_new) {
+    writer->available_small_type_index.emplace(proposed_index);
+  }
 
   VariantId vid = EntityId(found_id).Unpack();
   assert(std::holds_alternative<TypeId>(vid));
@@ -1159,15 +1238,29 @@ PackedTypeId DatabaseWriter::GetOrCreateSmallTypeIdForHash(
 }
 
 PackedTypeId DatabaseWriter::GetOrCreateBigTypeIdForHash(
-    mx::TypeKind type_kind, const std::string &hash, bool &is_new) {
+    mx::TypeKind type_kind, uint32_t type_qualifiers, std::string hash,
+    bool &is_new) {
 
-  (void)hash;
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = impl->next_big_type_index.fetch_add(1u);
+  RawEntityId proposed_index = kInvalidEntityId;
+
+  // Try to reuse a previously generated but unused fragment id.
+  if (!writer->available_big_type_index) {
+    proposed_index = impl->next_big_type_index.fetch_add(1u);
+  } else {
+    proposed_index = writer->available_big_type_index.value();
+    writer->available_big_type_index.reset();
+  }
   assert(proposed_index < kMaxBigTypeId);
 
-  RawEntityId found_id = EntityId(TypeId(proposed_index, type_kind)).Pack();
-  is_new = true;
+  RawEntityId proposed_id = EntityId(TypeId(proposed_index, type_kind)).Pack();
+  RawEntityId found_id = writer->GetOrCreateTypeId(
+      proposed_id, type_kind, type_qualifiers, std::move(hash));
+
+  is_new = found_id == proposed_id;
+  if (!is_new) {
+    writer->available_big_type_index.emplace(proposed_index);
+  }
 
   VariantId vid = EntityId(found_id).Unpack();
   assert(std::holds_alternative<TypeId>(vid));
@@ -1175,15 +1268,18 @@ PackedTypeId DatabaseWriter::GetOrCreateBigTypeIdForHash(
 }
 
 PackedTypeId DatabaseWriter::GetOrCreateTypeIdForHash(
-    mx::TypeKind type_kind, std::string hash, size_t num_tokens,
+    mx::TypeKind type_kind, uint32_t type_qualifiers,
+    std::string hash, size_t num_tokens,
     bool &is_new) {
 
   // Big types will have IDs in the range [1, mx::kMaxBigTypeId) and small types
   // will have ids [mx::kMaxBigTypeId: 2^36 + mx::kMaxBigTypeId)
   if (num_tokens >= kNumMinTokensInBigType) {
-    return GetOrCreateBigTypeIdForHash(type_kind, hash, is_new);
+    return GetOrCreateBigTypeIdForHash(type_kind, type_qualifiers,
+                                       std::move(hash), is_new);
   } else {
-    return GetOrCreateSmallTypeIdForHash(type_kind, hash, is_new);
+    return GetOrCreateSmallTypeIdForHash(type_kind, type_qualifiers,
+                                         std::move(hash), is_new);
   }
 }
 
@@ -1212,7 +1308,7 @@ PackedCompilationId DatabaseWriter::GetOrCreateCompilationId(
 
   RawEntityId proposed_id = EntityId(cid).Pack();
   RawEntityId found_id = writer->GetOrCreateCompilationId(
-      proposed_id, file_id, hash);
+      proposed_id, file_id, std::move(hash));
 
   is_new = found_id == proposed_id;
   if (!is_new) {

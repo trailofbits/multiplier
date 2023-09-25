@@ -155,12 +155,12 @@ std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const TokenContext 
 }
 
 Expr CompoundLiteralExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CompoundLiteralExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CompoundLiteralExpr::is_file_scope(void) const {

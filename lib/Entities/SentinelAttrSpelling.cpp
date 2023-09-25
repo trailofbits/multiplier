@@ -17,7 +17,7 @@ const char *EnumeratorName(SentinelAttrSpelling e) {
   switch (e) {
     case SentinelAttrSpelling::GNU_SENTINEL: return "GNU_SENTINEL";
     case SentinelAttrSpelling::CXX11_GNU_SENTINEL: return "CXX11_GNU_SENTINEL";
-    case SentinelAttrSpelling::C2X_GNU_SENTINEL: return "C2X_GNU_SENTINEL";
+    case SentinelAttrSpelling::C23_GNU_SENTINEL: return "C23_GNU_SENTINEL";
     case SentinelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

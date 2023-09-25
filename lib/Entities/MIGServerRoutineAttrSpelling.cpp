@@ -17,7 +17,7 @@ const char *EnumeratorName(MIGServerRoutineAttrSpelling e) {
   switch (e) {
     case MIGServerRoutineAttrSpelling::GNU_MIG_SERVER_ROUTINE: return "GNU_MIG_SERVER_ROUTINE";
     case MIGServerRoutineAttrSpelling::CXX11_CLANG_MIG_SERVER_ROUTINE: return "CXX11_CLANG_MIG_SERVER_ROUTINE";
-    case MIGServerRoutineAttrSpelling::C2X_CLANG_MIG_SERVER_ROUTINE: return "C2X_CLANG_MIG_SERVER_ROUTINE";
+    case MIGServerRoutineAttrSpelling::C23_CLANG_MIG_SERVER_ROUTINE: return "C23_CLANG_MIG_SERVER_ROUTINE";
     case MIGServerRoutineAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

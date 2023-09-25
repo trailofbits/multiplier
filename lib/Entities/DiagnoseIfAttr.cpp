@@ -134,7 +134,7 @@ bool DiagnoseIfAttr::is_error(void) const {
 }
 
 bool DiagnoseIfAttr::is_warning(void) const {
-  return impl->reader.getVal18();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

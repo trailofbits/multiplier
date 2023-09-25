@@ -155,12 +155,12 @@ std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const
 }
 
 Expr CXXRewrittenBinaryOperator::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal95());
 }
 
 std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
@@ -169,20 +169,20 @@ std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal96());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal97());
 }
 
 Token CXXRewrittenBinaryOperator::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr CXXRewrittenBinaryOperator::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CXXRewrittenBinaryOperator::semantic_form(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

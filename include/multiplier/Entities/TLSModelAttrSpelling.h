@@ -14,7 +14,7 @@ namespace mx {
 enum class TLSModelAttrSpelling : unsigned char {
   GNU_TLS_MODEL,
   CXX11_GNU_TLS_MODEL,
-  C2X_GNU_TLS_MODEL,
+  C23_GNU_TLS_MODEL,
   SPELLING_NOT_CALCULATED,
 };
 

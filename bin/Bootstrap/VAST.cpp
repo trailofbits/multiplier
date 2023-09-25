@@ -14,13 +14,18 @@
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
 #include <vast/Dialect/Dialects.hpp>
+#include <vast/Dialect/Core/CoreDialect.hpp>
 #include <vast/Dialect/Core/CoreOps.hpp>
 #include <vast/Dialect/Core/CoreTypes.hpp>
+#include <vast/Dialect/HighLevel/HighLevelDialect.hpp>
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/HighLevel/HighLevelTypes.hpp>
+#include <vast/Dialect/LowLevel/LowLevelDialect.hpp>
 #include <vast/Dialect/LowLevel/LowLevelOps.hpp>
+#include <vast/Dialect/Meta/MetaDialect.hpp>
 #include <vast/Dialect/Meta/MetaAttributes.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedDialect.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedOps.hpp>
 #include <vast/Dialect/Unsupported/UnsupportedTypes.hpp>
 
@@ -248,7 +253,9 @@ void CodeGenerator::FillIncludePathsFor(const pasta::CXXRecordDecl &cls) {
 
   ordered_paths.emplace(cls.Token().Index(), cls_path);
 
-  for (pasta::Token tok : cls.Tokens()) {
+  auto pt = pasta::PrintedTokenRange::Create(cls);
+
+  for (pasta::PrintedToken tok : pt) {
     for (std::optional<pasta::TokenContext> tc = tok.Context();
          tc; tc = tc->Parent()) {
       std::optional<pasta::Decl> tcd = pasta::Decl::From(tc.value());
@@ -683,6 +690,10 @@ void CodeGenerator::RunOnOps(void) {
   std::filesystem::path mx_inc = mx_root / "include" / "multiplier";
   std::filesystem::path mx_lib = mx_root / "lib";
 
+  std::error_code ec;
+  (void) std::filesystem::create_directory(mx_inc / "IR", ec);
+  (void) std::filesystem::create_directory(mx_lib / "IR", ec);
+
   std::ofstream hpp(mx_inc / "IR" / "OperationKind.h");
   std::ofstream cpp(mx_lib / "IR" / "Operation.h");  // In lib.
 
@@ -780,6 +791,11 @@ void CodeGenerator::RunOnOps(void) {
     }
 
     hpp.close();
+
+    std::error_code ec;
+    (void) std::filesystem::create_directories(mx_inc / "IR" / dialect.our_dir_name, ec);
+    (void) std::filesystem::create_directories(mx_lib / "IR" / dialect.our_dir_name, ec);
+    
     hpp.open(mx_inc / "IR" / dialect.our_dir_name / "Operation.h");
 
     cpp.close();

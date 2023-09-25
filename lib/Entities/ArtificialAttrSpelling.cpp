@@ -17,7 +17,7 @@ const char *EnumeratorName(ArtificialAttrSpelling e) {
   switch (e) {
     case ArtificialAttrSpelling::GNU_ARTIFICIAL: return "GNU_ARTIFICIAL";
     case ArtificialAttrSpelling::CXX11_GNU_ARTIFICIAL: return "CXX11_GNU_ARTIFICIAL";
-    case ArtificialAttrSpelling::C2X_GNU_ARTIFICIAL: return "C2X_GNU_ARTIFICIAL";
+    case ArtificialAttrSpelling::C23_GNU_ARTIFICIAL: return "C23_GNU_ARTIFICIAL";
     case ArtificialAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

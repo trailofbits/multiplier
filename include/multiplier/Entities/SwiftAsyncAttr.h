@@ -9,6 +9,7 @@
 #pragma once
 
 #include "InheritableAttr.h"
+#include "SwiftAsyncAttrKind.h"
 
 namespace mx {
 class EntityProvider;
@@ -53,6 +54,7 @@ class SwiftAsyncAttr : public InheritableAttr {
   static std::optional<SwiftAsyncAttr> from(const Reference &r);
   static std::optional<SwiftAsyncAttr> from(const TokenContext &t);
 
+  SwiftAsyncAttrKind attribute_kind(void) const;
 };
 
 static_assert(sizeof(SwiftAsyncAttr) == sizeof(InheritableAttr));

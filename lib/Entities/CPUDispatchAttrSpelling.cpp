@@ -17,7 +17,7 @@ const char *EnumeratorName(CPUDispatchAttrSpelling e) {
   switch (e) {
     case CPUDispatchAttrSpelling::GNU_CPU_DISPATCH: return "GNU_CPU_DISPATCH";
     case CPUDispatchAttrSpelling::CXX11_CLANG_CPU_DISPATCH: return "CXX11_CLANG_CPU_DISPATCH";
-    case CPUDispatchAttrSpelling::C2X_CLANG_CPU_DISPATCH: return "C2X_CLANG_CPU_DISPATCH";
+    case CPUDispatchAttrSpelling::C23_CLANG_CPU_DISPATCH: return "C23_CLANG_CPU_DISPATCH";
     case CPUDispatchAttrSpelling::DECLSPEC_CPU_DISPATCH: return "DECLSPEC_CPU_DISPATCH";
     case CPUDispatchAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";

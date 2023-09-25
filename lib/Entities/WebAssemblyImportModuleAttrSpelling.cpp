@@ -17,7 +17,7 @@ const char *EnumeratorName(WebAssemblyImportModuleAttrSpelling e) {
   switch (e) {
     case WebAssemblyImportModuleAttrSpelling::GNU_IMPORT_MODULE: return "GNU_IMPORT_MODULE";
     case WebAssemblyImportModuleAttrSpelling::CXX11_CLANG_IMPORT_MODULE: return "CXX11_CLANG_IMPORT_MODULE";
-    case WebAssemblyImportModuleAttrSpelling::C2X_CLANG_IMPORT_MODULE: return "C2X_CLANG_IMPORT_MODULE";
+    case WebAssemblyImportModuleAttrSpelling::C23_CLANG_IMPORT_MODULE: return "C23_CLANG_IMPORT_MODULE";
     case WebAssemblyImportModuleAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

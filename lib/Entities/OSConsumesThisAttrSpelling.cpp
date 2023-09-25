@@ -17,7 +17,7 @@ const char *EnumeratorName(OSConsumesThisAttrSpelling e) {
   switch (e) {
     case OSConsumesThisAttrSpelling::GNU_OS_CONSUMES_THIS: return "GNU_OS_CONSUMES_THIS";
     case OSConsumesThisAttrSpelling::CXX11_CLANG_OS_CONSUMES_THIS: return "CXX11_CLANG_OS_CONSUMES_THIS";
-    case OSConsumesThisAttrSpelling::C2X_CLANG_OS_CONSUMES_THIS: return "C2X_CLANG_OS_CONSUMES_THIS";
+    case OSConsumesThisAttrSpelling::C23_CLANG_OS_CONSUMES_THIS: return "C23_CLANG_OS_CONSUMES_THIS";
     case OSConsumesThisAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

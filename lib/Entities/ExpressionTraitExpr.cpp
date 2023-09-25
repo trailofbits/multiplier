@@ -155,12 +155,12 @@ std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const TokenContext 
 }
 
 Expr ExpressionTraitExpr::queried_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ExpressionTrait ExpressionTraitExpr::trait(void) const {
-  return static_cast<ExpressionTrait>(impl->reader.getVal94());
+  return static_cast<ExpressionTrait>(impl->reader.getVal95());
 }
 
 bool ExpressionTraitExpr::value(void) const {

@@ -79,12 +79,12 @@ std::optional<RValueReferenceType> RValueReferenceType::from(const TokenContext 
 }
 
 Type RValueReferenceType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal230();
+  RawEntityId eid = impl->reader.getVal24();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool RValueReferenceType::is_sugared(void) const {
-  return impl->reader.getVal233();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

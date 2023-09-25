@@ -17,7 +17,7 @@ const char *EnumeratorName(FormatArgAttrSpelling e) {
   switch (e) {
     case FormatArgAttrSpelling::GNU_FORMAT_ARGUMENT: return "GNU_FORMAT_ARGUMENT";
     case FormatArgAttrSpelling::CXX11_GNU_FORMAT_ARGUMENT: return "CXX11_GNU_FORMAT_ARGUMENT";
-    case FormatArgAttrSpelling::C2X_GNU_FORMAT_ARGUMENT: return "C2X_GNU_FORMAT_ARGUMENT";
+    case FormatArgAttrSpelling::C23_GNU_FORMAT_ARGUMENT: return "C23_GNU_FORMAT_ARGUMENT";
     case FormatArgAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

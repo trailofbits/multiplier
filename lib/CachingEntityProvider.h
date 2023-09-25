@@ -81,8 +81,10 @@ class CachingEntityProvider final : public EntityProvider {
   gap::generator<std::filesystem::path> ListPathsForFile(
       const Ptr &, PackedFileId id) final;
 
-  FragmentIdList ListFragmentsInFile(
-      const Ptr &, SpecificEntityId<FileId> id) final;
+  // Get the list nested fragments for a given fragment.
+  FragmentIdList ListNestedFragmentIds(const Ptr &, PackedFragmentId id) final;
+
+  FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) final;
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   FragmentIdList FragmentsCoveringTokens(

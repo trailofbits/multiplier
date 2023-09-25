@@ -158,7 +158,7 @@ std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(con
 
 std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -170,13 +170,13 @@ std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
 }
 
 Type CXXDependentScopeMemberExpr::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_scope(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -188,23 +188,23 @@ std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_s
 }
 
 Token CXXDependentScopeMemberExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token CXXDependentScopeMemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token CXXDependentScopeMemberExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token CXXDependentScopeMemberExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token CXXDependentScopeMemberExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const {

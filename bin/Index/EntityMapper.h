@@ -21,7 +21,14 @@ class TypeMapper;
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
-  EntityIdMap &entity_ids;
+  // Globally (within a translation unit) entity ids. Generally, these are
+  // things that can be referenced across fragments.
+  EntityIdMap entity_ids;
+  
+  // Attributes that we've observed. Many attributes can be inherited, and so
+  // they are actually copied/cloned from place-to-place. Ideally, we want to
+  // only keep around the "original" or first version of an attribute.
+  EntityIdMap attr_ids;
 
   // An instance of TypeMapper that will hold type_ids of the
   // new types encountered in a translation unit. It will be used
@@ -40,24 +47,38 @@ class EntityMapper final {
   EntityIdMap parent_decl_ids;
   EntityIdMap parent_stmt_ids;
 
-  inline explicit EntityMapper(EntityIdMap &entity_ids_, TypeMapper &tm_)
-      : entity_ids(entity_ids_),
-        tm(tm_), token_tree_ids(entity_ids_) {}
+  inline explicit EntityMapper(TypeMapper &tm_)
+      : tm(tm_) {}
+
+  mx::RawEntityId ParentDeclId(const void *) const;
+  mx::RawEntityId ParentStmtId(const void *) const;
 
   mx::RawEntityId ParentDeclId(const pasta::Decl &entity) const;
   mx::RawEntityId ParentDeclId(const pasta::Stmt &entity) const;
+  mx::RawEntityId ParentDeclId(const pasta::Designator &entity) const;
+  mx::RawEntityId ParentDeclId(const pasta::TemplateArgument &entity) const;
+  mx::RawEntityId ParentDeclId(const pasta::TemplateParameterList &entity) const;
+  mx::RawEntityId ParentDeclId(const pasta::CXXBaseSpecifier &entity) const;
+
   mx::RawEntityId ParentStmtId(const pasta::Decl &entity) const;
   mx::RawEntityId ParentStmtId(const pasta::Stmt &entity) const;
+  mx::RawEntityId ParentStmtId(const pasta::Designator &entity) const;
+  mx::RawEntityId ParentStmtId(const pasta::TemplateArgument &entity) const;
+
   mx::RawEntityId EntityId(const void *entity) const;
+  mx::RawEntityId PerFragmentEntityId(const void *entity) const;
   mx::RawEntityId EntityId(const pasta::File &file) const;
   mx::RawEntityId EntityId(const pasta::Decl &entity) const;
   mx::RawEntityId EntityId(const pasta::Stmt &entity) const;
   mx::RawEntityId EntityId(const pasta::Token &entity) const;
+  mx::RawEntityId EntityId(const pasta::PrintedToken &entity) const;
   mx::RawEntityId EntityId(const pasta::FileToken &entity) const;
   mx::RawEntityId EntityId(const pasta::MacroToken &entity);
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
   mx::RawEntityId EntityId(const pasta::Attr &entity) const;
   mx::RawEntityId EntityId(const pasta::Macro &entity) const;
+  mx::RawEntityId EntityId(const TokenTree &entity) const;
+  mx::RawEntityId EntityId(const TokenTreeNode &entity) const;
   mx::RawEntityId EntityId(const pasta::TemplateArgument &pseudo) const;
   mx::RawEntityId EntityId(const pasta::TemplateParameterList &pseudo) const;
   mx::RawEntityId EntityId(const pasta::CXXBaseSpecifier &pseudo) const;

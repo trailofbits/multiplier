@@ -9,6 +9,7 @@
 #include <map>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/Types.h>
+#include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Stmt.h>
@@ -24,11 +25,14 @@ namespace indexer {
 // referencing.
 class EntityVisitor : protected pasta::DeclVisitor,
                       protected pasta::StmtVisitor,
-                      protected pasta::TypeVisitor {
+                      protected pasta::TypeVisitor,
+                      protected pasta::AttrVisitor {
  private:
   bool EnterDecl(const pasta::Decl &decl);
   bool EnterStmt(const pasta::Stmt &stmt);
   bool EnterType(const pasta::Type &type);
+  bool EnterAttr(const pasta::Attr &attr);
+
   bool EnterTagDecl(const pasta::TagDecl &decl);
   bool EnterRecordDecl(const pasta::RecordDecl &decl);
   bool EnterCXXRecordDecl(const pasta::CXXRecordDecl &decl);
@@ -88,20 +92,28 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitCXXNewExpr(const pasta::CXXNewExpr &expr) final;
   void VisitCXXTypeidExpr(const pasta::CXXTypeidExpr &expr) final;
   void VisitCXXUuidofExpr(const pasta::CXXUuidofExpr &expr) final;
+  void VisitAlignedAttr(const pasta::AlignedAttr &attr);
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
   void VisitType(const pasta::Type &type) final;
+  void VisitAttr(const pasta::Attr &attr) final;
 
  protected:
+  virtual bool Enter(const pasta::Attr &entity) = 0;
   virtual bool Enter(const pasta::Decl &entity) = 0;
   virtual bool Enter(const pasta::Stmt &entity) = 0;
   virtual bool Enter(const pasta::Type &entity) = 0;
 
  public:
   virtual ~EntityVisitor(void);
+  virtual void Accept(const pasta::Attr &entity);
   virtual void Accept(const pasta::Decl &entity);
   virtual void Accept(const pasta::Stmt &entity);
   virtual void Accept(const pasta::Type &entity);
+  virtual void Accept(const pasta::TemplateParameterList &entity);
+  virtual void Accept(const pasta::TemplateArgument &entity);
+  virtual void Accept(const pasta::Designator &entity);
+  virtual void Accept(const pasta::CXXBaseSpecifier &entity);
 };
 
 }  // namespace indexer

@@ -14,7 +14,7 @@ namespace mx {
 enum class WeakRefAttrSpelling : unsigned char {
   GNU_WEAKREF,
   CXX11_GNU_WEAKREF,
-  C2X_GNU_WEAKREF,
+  C23_GNU_WEAKREF,
   SPELLING_NOT_CALCULATED,
 };
 

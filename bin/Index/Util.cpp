@@ -51,40 +51,7 @@ namespace indexer {
 
 // Return `true` of `tok` is in the context of `decl`.
 bool TokenIsInContextOfDecl(const pasta::Token &tok, const pasta::Decl &decl) {
-  auto cdecl = decl.CanonicalDeclaration();
-  for (auto context = tok.Context(); context; context = context->Parent()) {
-    switch (context->Kind()) {
-      case pasta::TokenContextKind::kTemplateArgument:
-      case pasta::TokenContextKind::kTemplateParameterList:
-        return true;
-      case pasta::TokenContextKind::kDecl:
-        if (auto maybe_decl = pasta::Decl::From(*context)) {
-          pasta::DeclKind dk = maybe_decl->Kind();
-          if (*maybe_decl == cdecl) {
-            return true;
-          } else if (dk == pasta::DeclKind::kClassTemplateSpecialization ||
-                     dk == pasta::DeclKind::kClassTemplatePartialSpecialization ||
-                     dk == pasta::DeclKind::kVarTemplateSpecialization ||
-                     dk == pasta::DeclKind::kVarTemplatePartialSpecialization ||
-                     dk == pasta::DeclKind::kClassScopeFunctionSpecialization) {
-            return true;
-          }
-        }
-        break;  // Keep looking.
-      case pasta::TokenContextKind::kType:
-        if (auto maybe_type = pasta::Type::From(*context)) {
-          pasta::TypeKind tk = maybe_type->Kind();
-          if (tk == pasta::TypeKind::kTemplateSpecialization ||
-              tk == pasta::TypeKind::kElaborated) {
-            return true;
-          }
-        }
-        break;  // Keep looking.
-      default:
-        break;  // Keep looking.
-    }
-  }
-  return false;
+  return decl.Tokens().Contains(tok);
 }
 
 // Returns the `pasta::FileToken` if this is a top-level token in the parse.
@@ -124,7 +91,7 @@ std::string DeclToString(const pasta::Decl &decl) {
     for (auto i = 0u, max_i = ptok.NumLeadingNewLines(); i < max_i; ++i) {
       ss << '\n';
     }
-    for (auto i = 0u, max_i = ptok.NumleadingSpaces(); i < max_i; ++i) {
+    for (auto i = 0u, max_i = ptok.NumLeadingSpaces(); i < max_i; ++i) {
       ss << ' ';
     }
     ss << ptok.Data();
@@ -340,6 +307,35 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
   return kind;
 }
 
+namespace {
+
+// Look for `asm("asm" : [identifier] "constraint" (input_or_output))` and
+// try to make `identifier` into a `STRING_LITERAL` token kind, because
+// logically it refers to to something inside of `"asm"`.
+static mx::TokenKind ClassifyIdentifierToken(const pasta::PrintedToken &token,
+                                             const pasta::Stmt &stmt) {
+  auto gcc_asm = pasta::GCCAsmStmt::From(stmt);
+  if (!gcc_asm) {
+    return mx::TokenKind::IDENTIFIER;
+  }
+
+  for (auto name : gcc_asm->InputNames()) {
+    if (token.Data() == name) {
+      return mx::TokenKind::STRING_LITERAL;
+    }
+  }
+
+  for (auto name : gcc_asm->OutputNames()) {
+    if (token.Data() == name) {
+      return mx::TokenKind::STRING_LITERAL;
+    }
+  }
+
+  return mx::TokenKind::IDENTIFIER;
+}
+
+}  // namespace
+
 // Return the token kind from printed token
 mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
   auto kind = mx::FromPasta(entity.Kind());
@@ -349,7 +345,19 @@ mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity) {
       return mx::TokenKind::WHITESPACE;
     }
   }
-  return kind;
+
+  if (mx::TokenKind::IDENTIFIER != kind) {
+    return kind;
+  }
+
+  // Try to do some context-specific specialization of token kinds.
+  if (auto context = entity.Context()) {
+    if (auto stmt = pasta::Stmt::From(context.value())) {
+      return ClassifyIdentifierToken(entity, stmt.value());
+    }
+  }
+
+  return mx::TokenKind::IDENTIFIER;
 }
 
 // Return the token kind.
@@ -947,6 +955,98 @@ bool IsSerializableDecl(const pasta::Decl &decl) {
   return true;
 }
 
+// Determines whether or not a TLD is likely to have to go into a child
+// fragment. This happens when the TLD is a forward declaration, e.g. of a
+// struct.
+//
+// TODO(pag): Thing about forward declarations in template parameter lists.
+bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kClassTemplateSpecialization:
+    case pasta::DeclKind::kVarTemplateSpecialization:
+      return true;
+
+    // TODO(pag): This might not be the right type of check.
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXMethod: {
+      auto func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      return pasta::TemplateSpecializationKind::kUndeclared !=
+             func.TemplateSpecializationKind();
+    }
+    // TODO(pag): FriendDecl for FriendTemplateDecl.
+    default:
+      return false;
+  }
+}
+
+// Determines whether or not a TLM is likely to have to go into a child
+// fragment. This generally happens when a TLM is a directive.
+bool ShouldGoInNestedFragment(const pasta::Macro &macro) {
+  switch (macro.Kind()) {
+    case pasta::MacroKind::kDefineDirective:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// Returns `true` if a macro is visible across fragments, and should have an
+// entity id stored in the global mapper.
+bool AreVisibleAcrossFragments(const pasta::Macro &macro) {
+  return pasta::DefineMacroDirective::From(macro) ||
+         pasta::MacroParameter::From(macro);
+}
+
+// Tells us if a given decl is probably a use that also acts as a forward
+// declaration.
+bool IsInjectedForwardDeclaration(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kRecord:
+    case pasta::DeclKind::kCXXRecord:
+    case pasta::DeclKind::kEnum: {
+      const auto &tag = reinterpret_cast<const pasta::TagDecl &>(decl);
+      return tag.IsEmbeddedInDeclarator() && !IsDefinition(tag);
+    }
+    default:
+      return false;
+  }
+}
+
+// Should a declaration be hidden from the indexer?
+bool ShouldHideFromIndexer(const pasta::Decl &decl) {
+  if (!IsSerializableDecl(decl)) {
+    return true;
+  }
+
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kClassScopeFunctionSpecialization:
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kFunctionTemplate:
+    case pasta::DeclKind::kVarTemplate:
+    case pasta::DeclKind::kVarTemplatePartialSpecialization:
+    case pasta::DeclKind::kFriendTemplate:
+      return true;
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXMethod: {
+      const auto &func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
+      return func.TemplatedKind() ==
+             pasta::FunctionDeclTemplatedKind::kFunctionTemplate;
+    }
+
+    default:
+      return false;
+  }
+}
+
 namespace {
 
 class StringOutputStream final : public kj::OutputStream {
@@ -1019,5 +1119,26 @@ template void AccumulateTokenData<pasta::Token>(
 
 template void AccumulateTokenData<pasta::PrintedToken>(
     std::string &data, const pasta::PrintedToken &tok);
+
+// Combine all parsed tokens into a string for diagnostic purposes.
+std::string DiagnosePrintedTokens(
+    const pasta::PrintedTokenRange &parsed_tokens) {
+  std::stringstream ss;
+  auto sep = "";
+  for (pasta::PrintedToken tok : parsed_tokens) {
+    ss << sep << tok.Data();
+    sep = " ";
+  }
+  return ss.str();
+}
+
+// Generate the token contexts associated with a printed token.
+gap::generator<pasta::TokenContext> TokenContexts(
+    const pasta::PrintedToken &tok) {
+  for (auto context = tok.Context(); context;
+       context = context->Parent()) {
+    co_yield context.value();
+  }
+}
 
 }  // namespace indexer

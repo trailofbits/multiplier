@@ -87,6 +87,7 @@ enum class StmtKind : unsigned char {
   OMP_PARALLEL_MASTER_DIRECTIVE,
   OMP_PARALLEL_SECTIONS_DIRECTIVE,
   OMP_SCAN_DIRECTIVE,
+  OMP_SCOPE_DIRECTIVE,
   OMP_SECTION_DIRECTIVE,
   OMP_SECTIONS_DIRECTIVE,
   OMP_SINGLE_DIRECTIVE,
@@ -252,7 +253,7 @@ inline static const char *EnumerationName(StmtKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(StmtKind) {
-  return 233;
+  return 234;
 }
 
 const char *EnumeratorName(StmtKind);

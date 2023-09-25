@@ -14,7 +14,7 @@ namespace mx {
 enum class MSStructAttrSpelling : unsigned char {
   GNU_MS_STRUCT,
   CXX11_GNU_MS_STRUCT,
-  C2X_GNU_MS_STRUCT,
+  C23_GNU_MS_STRUCT,
   SPELLING_NOT_CALCULATED,
 };
 

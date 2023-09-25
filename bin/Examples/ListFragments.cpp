@@ -15,7 +15,7 @@ DECLARE_bool(help);
 DECLARE_string(db);
 DEFINE_uint64(file_id, 0, "ID of the file from which to print fragments.");
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
@@ -34,7 +34,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   // List all fragment IDs in a specific file.
   if (FLAGS_file_id) {
-    auto file = index.file(FLAGS_file_id);
+    std::optional<mx::File> file = index.file(FLAGS_file_id);
     if (!file) {
       std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
       return EXIT_FAILURE;

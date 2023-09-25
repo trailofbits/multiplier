@@ -18,6 +18,7 @@ class AST;
 class Decl;
 class File;
 class Macro;
+class PrintedTokenRange;
 class TokenRange;
 }  // namespace pasta
 namespace indexer {
@@ -38,9 +39,10 @@ std::string HashFile(std::string_view data);
 // fragment deduplication as part of a compound primary key in the
 // `fragment_hash` database table.
 std::string HashFragment(
-    const std::vector<Entity> &entity_range,
-    const pasta::TokenRange &toks,
-    uint64_t begin_index, uint64_t end_index);
+    const std::vector<pasta::Decl> &decls,
+    const std::vector<pasta::Macro> &macros,
+    const pasta::TokenRange *frag_tok_range,
+    const pasta::PrintedTokenRange &decl_tok_range);
 
 // Hash the entire compilation.
 std::string HashCompilation(const pasta::AST &ast, const EntityMapper &em);

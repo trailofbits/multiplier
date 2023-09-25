@@ -41,6 +41,9 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Stmt {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -80,8 +83,6 @@ class Stmt {
   PackedStmtId id(void) const;
   gap::generator<Reference> references(void) const &;
 
-  std::optional<Decl> parent_declaration(void) const;
-  std::optional<Stmt> parent_statement(void) const;
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
  public:

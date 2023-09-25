@@ -47,8 +47,6 @@ class RegexQuery;
 class RegexQueryImpl;
 class RegexQueryMatch;
 class TokenReader;
-class WeggliQuery;
-class WeggliQueryMatch;
 
 using FilePathEntry = std::pair<std::filesystem::path, PackedFileId>;
 using FilePathMap = std::map<std::filesystem::path, PackedFileId>;

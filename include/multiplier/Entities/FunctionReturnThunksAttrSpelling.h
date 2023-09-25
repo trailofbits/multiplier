@@ -14,7 +14,7 @@ namespace mx {
 enum class FunctionReturnThunksAttrSpelling : unsigned char {
   GNU_FUNCTION_RETURN,
   CXX11_GNU_FUNCTION_RETURN,
-  C2X_GNU_FUNCTION_RETURN,
+  C23_GNU_FUNCTION_RETURN,
   SPELLING_NOT_CALCULATED,
 };
 

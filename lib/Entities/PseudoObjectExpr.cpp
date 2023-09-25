@@ -155,12 +155,12 @@ std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const TokenContext &t) {
 }
 
 Expr PseudoObjectExpr::result_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr PseudoObjectExpr::syntactic_form(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

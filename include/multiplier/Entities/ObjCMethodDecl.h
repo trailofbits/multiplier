@@ -84,7 +84,7 @@ class ObjCMethodDecl : public NamedDecl {
   ObjCMethodFamily method_family(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
   Type return_type(void) const;
-  TokenRange return_type_source_range(void) const;
+  TokenRange return_type_tokens(void) const;
   Token selector_start_token(void) const;
   ImplicitParamDecl self_declaration(void) const;
   bool has_parameter_destroyed_in_callee(void) const;

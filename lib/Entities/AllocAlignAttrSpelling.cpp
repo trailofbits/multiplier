@@ -17,7 +17,7 @@ const char *EnumeratorName(AllocAlignAttrSpelling e) {
   switch (e) {
     case AllocAlignAttrSpelling::GNU_ALLOC_ALIGN: return "GNU_ALLOC_ALIGN";
     case AllocAlignAttrSpelling::CXX11_GNU_ALLOC_ALIGN: return "CXX11_GNU_ALLOC_ALIGN";
-    case AllocAlignAttrSpelling::C2X_GNU_ALLOC_ALIGN: return "C2X_GNU_ALLOC_ALIGN";
+    case AllocAlignAttrSpelling::C23_GNU_ALLOC_ALIGN: return "C23_GNU_ALLOC_ALIGN";
     case AllocAlignAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

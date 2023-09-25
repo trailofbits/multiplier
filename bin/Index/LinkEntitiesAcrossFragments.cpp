@@ -67,7 +67,9 @@ static void TrackRedeclarations(
 // fragments.
 void LinkEntitiesAcrossFragments(
     mx::DatabaseWriter &database, const PendingFragment &pf,
-    const EntityMapper &em, const NameMangler &mangler) {
+    const NameMangler &mangler) {
+
+  const EntityMapper &em = pf.em;
 
   std::string dummy_mangled_name;
   for (const pasta::Decl &decl : pf.decls_to_serialize) {

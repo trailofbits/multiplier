@@ -133,8 +133,10 @@ std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
 
 // Save the symbolic names of all declarations into the database.
 void LinkEntityNamesToFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf, EntityMapper &em) {
+    mx::DatabaseWriter &database, const PendingFragment &pf) {
 
+  const EntityMapper &em = pf.em;
+  
   // Declaration names.
   for (const pasta::Decl &decl : pf.decls_to_serialize) {
     if (auto nd = pasta::NamedDecl::From(decl);

@@ -16,7 +16,7 @@ DECLARE_bool(help);
 DECLARE_string(db);
 DEFINE_string(output_dir, "", "Directory into which all indexed source files will be saved");
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

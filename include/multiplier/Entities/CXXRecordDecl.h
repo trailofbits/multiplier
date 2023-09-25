@@ -104,11 +104,11 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<LambdaCaptureDefault> lambda_capture_default(void) const;
   std::optional<Decl> lambda_context_declaration(void) const;
   std::optional<std::vector<NamedDecl>> lambda_explicit_template_parameters(void) const;
-  std::optional<unsigned> lambda_mangling_number(void) const;
+  std::optional<uint32_t> lambda_mangling_number(void) const;
   std::optional<Type> lambda_type(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
-  std::optional<unsigned> odr_hash(void) const;
+  std::optional<uint32_t> odr_hash(void) const;
   std::optional<CXXRecordDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;
   std::optional<bool> has_any_dependent_bases(void) const;
@@ -206,6 +206,12 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<bool> needs_overload_resolution_for_move_constructor(void) const;
   std::optional<bool> null_field_offset_is_zero(void) const;
   std::optional<std::vector<CXXBaseSpecifier>> virtual_bases(void) const;
+  std::optional<uint64_t> size_without_virtual_bases(void) const;
+  std::optional<CXXRecordDecl> primary_base(void) const;
+  std::optional<bool> has_own_virtual_function_table_pointer(void) const;
+  std::optional<bool> has_extendable_virtual_function_table_pointer(void) const;
+  std::optional<bool> has_virtual_base_table_pointer(void) const;
+  std::optional<bool> has_own_virtual_base_table_pointer(void) const;
 };
 
 static_assert(sizeof(CXXRecordDecl) == sizeof(RecordDecl));

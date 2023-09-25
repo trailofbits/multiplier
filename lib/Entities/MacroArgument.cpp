@@ -122,7 +122,7 @@ bool MacroArgument::is_variadic(void) const {
   return impl->reader.getVal3();
 }
 
-unsigned MacroArgument::index(void) const {
+uint32_t MacroArgument::index(void) const {
   return impl->reader.getVal12();
 }
 

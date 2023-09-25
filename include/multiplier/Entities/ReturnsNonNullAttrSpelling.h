@@ -14,7 +14,7 @@ namespace mx {
 enum class ReturnsNonNullAttrSpelling : unsigned char {
   GNU_RETURNS_NONNULL,
   CXX11_GNU_RETURNS_NONNULL,
-  C2X_GNU_RETURNS_NONNULL,
+  C23_GNU_RETURNS_NONNULL,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -65,6 +65,7 @@ class TopLevelStmtDecl : public Decl {
   static std::optional<TopLevelStmtDecl> from(const TokenContext &t);
 
   Stmt statement(void) const;
+  bool is_semi_missing(void) const;
 };
 
 static_assert(sizeof(TopLevelStmtDecl) == sizeof(Decl));

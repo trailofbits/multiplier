@@ -157,25 +157,25 @@ std::optional<DeclRefExpr> DeclRefExpr::from(const TokenContext &t) {
 }
 
 ValueDecl DeclRefExpr::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 NamedDecl DeclRefExpr::found_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token DeclRefExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token DeclRefExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token DeclRefExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool DeclRefExpr::had_multiple_candidates(void) const {
@@ -198,12 +198,16 @@ bool DeclRefExpr::has_template_keyword(void) const {
   return impl->reader.getVal93();
 }
 
+bool DeclRefExpr::is_immediate_escalating(void) const {
+  return impl->reader.getVal94();
+}
+
 NonOdrUseReason DeclRefExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal94());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal95());
 }
 
 bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal96();
 }
 
 #pragma GCC diagnostic pop

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "DeductionCandidate.h"
 #include "FunctionDecl.h"
 
 namespace mx {
@@ -76,7 +77,7 @@ class CXXDeductionGuideDecl : public FunctionDecl {
 
   CXXConstructorDecl corresponding_constructor(void) const;
   TemplateDecl deduced_template(void) const;
-  bool is_copy_deduction_candidate(void) const;
+  DeductionCandidate deduction_candidate_kind(void) const;
   bool is_explicit(void) const;
 };
 

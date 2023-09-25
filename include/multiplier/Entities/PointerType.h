@@ -50,6 +50,7 @@ class PointerType : public Type {
   static std::optional<PointerType> from(const TokenContext &t);
 
   Type desugar(void) const;
+  Type pointee_type(void) const;
   bool is_sugared(void) const;
 };
 

@@ -743,23 +743,32 @@ TokenCategory TokenReader::NthTokenCategory(EntityOffset token_index) const {
 
   if (std::holds_alternative<MacroId>(vid)) {
     return ClassifyMacro(kind, std::get<MacroId>(vid), baseline_category);
+  }
 
-  } else if (std::holds_alternative<DeclId>(vid)) {
+  if (std::holds_alternative<DeclId>(vid)) {
     return ClassifyDecl(this, token_index, std::get<DeclId>(vid),
                         baseline_category);
-
-  } else if (std::holds_alternative<StmtId>(vid)) {
-    return ClassifyStmt(std::get<StmtId>(vid), kind, baseline_category);
-
-  } else if (std::holds_alternative<TypeId>(vid)) {
-    return ClassifyType(std::get<TypeId>(vid), kind, baseline_category);
-
-  } else if (std::holds_alternative<FileId>(vid)) {
-    return ClassifyFile(kind, baseline_category);
-
-  } else {
-    return baseline_category;
   }
+
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ClassifyStmt(std::get<StmtId>(vid), kind, baseline_category);
+  }
+
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ClassifyType(std::get<TypeId>(vid), kind, baseline_category);
+  }
+
+  if (std::holds_alternative<FileId>(vid)) {
+    return ClassifyFile(kind, baseline_category);
+  }
+
+  // Issue #343: Make identifiers inside of attributes look like keywords.
+  if (std::holds_alternative<AttrId>(vid) &&
+      baseline_category == TokenCategory::IDENTIFIER) {
+    return TokenCategory::KEYWORD;
+  }
+
+  return baseline_category;
 }
 
 const FragmentImpl *TokenReader::OwningFragment(void) const noexcept {
@@ -1168,7 +1177,7 @@ Token Token::parsed_token(void) const {
     return TokenReader::TokenFor(impl, eid.Pack());
 
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
-    assert(std::get<MacroTokenId>(vid) == id());
+    assert(eid == id());
     assert(false);  // Really, this is unreasonable.
     return Token();
 

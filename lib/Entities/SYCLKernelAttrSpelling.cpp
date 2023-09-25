@@ -17,7 +17,7 @@ const char *EnumeratorName(SYCLKernelAttrSpelling e) {
   switch (e) {
     case SYCLKernelAttrSpelling::GNU_SYCL_KERNEL: return "GNU_SYCL_KERNEL";
     case SYCLKernelAttrSpelling::CXX11_CLANG_SYCL_KERNEL: return "CXX11_CLANG_SYCL_KERNEL";
-    case SYCLKernelAttrSpelling::C2X_CLANG_SYCL_KERNEL: return "C2X_CLANG_SYCL_KERNEL";
+    case SYCLKernelAttrSpelling::C23_CLANG_SYCL_KERNEL: return "C23_CLANG_SYCL_KERNEL";
     case SYCLKernelAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

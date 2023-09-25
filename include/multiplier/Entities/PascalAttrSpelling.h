@@ -14,7 +14,7 @@ namespace mx {
 enum class PascalAttrSpelling : unsigned char {
   GNU_PASCAL,
   CXX11_CLANG_PASCAL,
-  C2X_CLANG_PASCAL,
+  C23_CLANG_PASCAL,
   KEYWORD_PASCAL,
   SPELLING_NOT_CALCULATED,
 };

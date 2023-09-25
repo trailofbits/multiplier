@@ -14,10 +14,10 @@ namespace mx {
 enum class MipsShortCallAttrSpelling : unsigned char {
   GNU_SHORT_CALL,
   CXX11_GNU_SHORT_CALL,
-  C2X_GNU_SHORT_CALL,
+  C23_GNU_SHORT_CALL,
   GNU_NEAR,
   CXX11_GNU_NEAR,
-  C2X_GNU_NEAR,
+  C23_GNU_NEAR,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Type.h"
+#include "TypeOfKind.h"
 
 namespace mx {
 class EntityProvider;
@@ -51,6 +52,7 @@ class TypeOfExprType : public Type {
   static std::optional<TypeOfExprType> from(const TokenContext &t);
 
   Type desugar(void) const;
+  TypeOfKind type_kind(void) const;
   Expr underlying_expression(void) const;
   bool is_sugared(void) const;
 };

@@ -156,30 +156,30 @@ std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Token
 }
 
 Expr CXXPseudoDestructorExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXPseudoDestructorExpr::colon_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Type CXXPseudoDestructorExpr::destroyed_type(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token CXXPseudoDestructorExpr::destroyed_type_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token CXXPseudoDestructorExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 std::optional<Type> CXXPseudoDestructorExpr::scope_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -191,7 +191,7 @@ std::optional<Type> CXXPseudoDestructorExpr::scope_type(void) const {
 }
 
 Token CXXPseudoDestructorExpr::tilde_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 bool CXXPseudoDestructorExpr::has_qualifier(void) const {

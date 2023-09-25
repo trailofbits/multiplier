@@ -157,7 +157,7 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const TokenContext &t) {
 
 std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -169,12 +169,12 @@ std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
 }
 
 Type CXXTypeidExpr::type_operand(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXTypeidExpr::type_operand_source_info(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

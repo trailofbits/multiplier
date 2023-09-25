@@ -13,7 +13,10 @@
 #include <multiplier/Database.h>
 #include <string>
 
-#include "Codegen.h"
+#ifndef MX_DISABLE_VAST
+# include "Codegen.h"
+#endif
+
 #include "Executor.h"
 #include "ProgressBar.h"
 #include "Util.h"
@@ -71,8 +74,10 @@ class GlobalIndexingState {
   // Worker pool.
   Executor executor;
 
+#ifndef MX_DISABLE_VAST
   // MLIR code generator.
   CodeGenerator codegen;
+#endif
 
   // Write access to the index database.
   mx::DatabaseWriter &database;
@@ -117,9 +122,8 @@ class GlobalIndexingState {
   // partially because our serialized decls/stmts/etc. reference these tokens,
   // and partially so that we can do things like print out fragments, or chunks
   // thereof.
-  void PersistFragment(const pasta::AST &ast, const pasta::TokenRange &tokens,
-                       NameMangler &mangler, EntityMapper &em,
-                       TokenProvenanceCalculator &provenance,
+  void PersistFragment(const pasta::AST &ast, NameMangler &mangler,
+                       EntityMapper &em, TokenProvenanceCalculator &provenance,
                        PendingFragment &fragment);
 
   // Persist a type fragment into the database. Type fragments are special
@@ -137,7 +141,7 @@ class GlobalIndexingState {
   void PersistCompilation(const pasta::Compiler &compiler,
                           const pasta::CompileJob &job, const pasta::AST &ast,
                           const EntityMapper &em, mx::PackedCompilationId tu_id,
-                          const std::vector<PendingFragment> &fragments);
+                          std::vector<mx::PackedFragmentId> fragment_ids);
 };
 
 }  // namespace indexer

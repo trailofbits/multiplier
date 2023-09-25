@@ -155,7 +155,7 @@ std::optional<CXXThisExpr> CXXThisExpr::from(const TokenContext &t) {
 }
 
 Token CXXThisExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 bool CXXThisExpr::is_implicit(void) const {

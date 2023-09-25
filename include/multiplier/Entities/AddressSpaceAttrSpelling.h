@@ -14,7 +14,7 @@ namespace mx {
 enum class AddressSpaceAttrSpelling : unsigned char {
   GNU_ADDRESS_SPACE,
   CXX11_CLANG_ADDRESS_SPACE,
-  C2X_CLANG_ADDRESS_SPACE,
+  C23_CLANG_ADDRESS_SPACE,
   SPELLING_NOT_CALCULATED,
 };
 

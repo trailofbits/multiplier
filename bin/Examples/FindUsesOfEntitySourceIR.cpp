@@ -101,7 +101,7 @@ void PrintSource(const mx::SourceIR &ir, mx::VariantEntity entity) {
   }
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

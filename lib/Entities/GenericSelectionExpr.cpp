@@ -12,6 +12,7 @@
 #include <multiplier/Entities/Expr.h>
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Token.h>
+#include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/ValueStmt.h>
 
 #include "../EntityProvider.h"
@@ -187,8 +188,13 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const &
 }
 
 Expr GenericSelectionExpr::controlling_expression(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
+}
+
+Type GenericSelectionExpr::controlling_type(void) const {
+  RawEntityId eid = impl->reader.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token GenericSelectionExpr::default_token(void) const {
@@ -208,8 +214,16 @@ Expr GenericSelectionExpr::result_expression(void) const {
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-bool GenericSelectionExpr::is_result_dependent(void) const {
+bool GenericSelectionExpr::is_expression_predicate(void) const {
   return impl->reader.getVal89();
+}
+
+bool GenericSelectionExpr::is_result_dependent(void) const {
+  return impl->reader.getVal90();
+}
+
+bool GenericSelectionExpr::is_type_predicate(void) const {
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

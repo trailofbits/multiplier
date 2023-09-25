@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCNonRuntimeProtocolAttrSpelling e) {
   switch (e) {
     case ObjCNonRuntimeProtocolAttrSpelling::GNU_OBJC_NON_RUNTIME_PROTOCOL: return "GNU_OBJC_NON_RUNTIME_PROTOCOL";
     case ObjCNonRuntimeProtocolAttrSpelling::CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL: return "CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL";
-    case ObjCNonRuntimeProtocolAttrSpelling::C2X_CLANG_OBJC_NON_RUNTIME_PROTOCOL: return "C2X_CLANG_OBJC_NON_RUNTIME_PROTOCOL";
+    case ObjCNonRuntimeProtocolAttrSpelling::C23_CLANG_OBJC_NON_RUNTIME_PROTOCOL: return "C23_CLANG_OBJC_NON_RUNTIME_PROTOCOL";
     case ObjCNonRuntimeProtocolAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -14,7 +14,7 @@ namespace mx {
 enum class NoRandomizeLayoutAttrSpelling : unsigned char {
   GNU_NO_RANDOMIZE_LAYOUT,
   CXX11_GNU_NO_RANDOMIZE_LAYOUT,
-  C2X_GNU_NO_RANDOMIZE_LAYOUT,
+  C23_GNU_NO_RANDOMIZE_LAYOUT,
   SPELLING_NOT_CALCULATED,
 };
 

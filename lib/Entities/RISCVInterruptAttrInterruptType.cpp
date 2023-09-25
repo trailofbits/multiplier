@@ -15,7 +15,6 @@ namespace mx {
 
 const char *EnumeratorName(RISCVInterruptAttrInterruptType e) {
   switch (e) {
-    case RISCVInterruptAttrInterruptType::USER: return "USER";
     case RISCVInterruptAttrInterruptType::SUPERVISOR: return "SUPERVISOR";
     case RISCVInterruptAttrInterruptType::MACHINE: return "MACHINE";
     default: return "<invalid>";

@@ -26,8 +26,10 @@ class FileToken;
 class Macro;
 class MacroToken;
 class PrintedToken;
+class PrintedTokenRange;
 class Stmt;
 class Token;
+class TokenContext;
 class Type;
 }  // namespace pasta
 namespace mx {
@@ -98,7 +100,32 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 // Try to find the `Decl` referenced by a particular `type`.
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
 
+// Generate the token contexts associated with a printed token.
+gap::generator<pasta::TokenContext> TokenContexts(
+    const pasta::PrintedToken &tok);
+
+// Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl);
+
+// Determines whether or not a TLD is likely to have to go into a child
+// fragment. This happens when the TLD is a forward declaration, e.g. of a
+// struct.
+bool ShouldGoInNestedFragment(const pasta::Decl &decl);
+
+// Determines whether or not a TLM is likely to have to go into a child
+// fragment. This generally happens when a TLM is a directive.
+bool ShouldGoInNestedFragment(const pasta::Macro &macro);
+
+// Returns `true` if a macro is visible across fragments, and should have an
+// entity id stored in the global mapper.
+bool AreVisibleAcrossFragments(const pasta::Macro &macro);
+
+// Tells us if a given decl is probably a use that also acts as a forward
+// declaration.
+bool IsInjectedForwardDeclaration(const pasta::Decl &decl);
+
+// Should a declaration be hidden from the indexer?
+bool ShouldHideFromIndexer(const pasta::Decl &decl);
 
 template <typename T>
 struct EntityBuilder {
@@ -113,5 +140,7 @@ std::string GetSerializedData(capnp::MessageBuilder &builder);
 
 template <typename Tok>
 void AccumulateTokenData(std::string &data, const Tok &tok);
+
+std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
 
 }  // namespace indexer

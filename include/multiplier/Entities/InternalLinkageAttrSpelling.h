@@ -14,7 +14,7 @@ namespace mx {
 enum class InternalLinkageAttrSpelling : unsigned char {
   GNU_INTERNAL_LINKAGE,
   CXX11_CLANG_INTERNAL_LINKAGE,
-  C2X_CLANG_INTERNAL_LINKAGE,
+  C23_CLANG_INTERNAL_LINKAGE,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -156,21 +156,26 @@ std::optional<AtomicExpr> AtomicExpr::from(const TokenContext &t) {
 }
 
 Token AtomicExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const {
-  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal94());
+  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal95());
+}
+
+std::string_view AtomicExpr::operation_as_string(void) const {
+  capnp::Text::Reader data = impl->reader.getVal60();
+  return std::string_view(data.cStr(), data.size());
 }
 
 Expr AtomicExpr::order(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> AtomicExpr::order_fail(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,17 +187,17 @@ std::optional<Expr> AtomicExpr::order_fail(void) const {
 }
 
 Expr AtomicExpr::pointer(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token AtomicExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 std::optional<Expr> AtomicExpr::scope(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -205,7 +210,7 @@ std::optional<Expr> AtomicExpr::scope(void) const {
 
 std::optional<Expr> AtomicExpr::value1(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal44();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -218,7 +223,7 @@ std::optional<Expr> AtomicExpr::value1(void) const {
 
 std::optional<Expr> AtomicExpr::value2(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal45();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,13 +235,13 @@ std::optional<Expr> AtomicExpr::value2(void) const {
 }
 
 Type AtomicExpr::value_type(void) const {
-  RawEntityId eid = impl->reader.getVal46();
+  RawEntityId eid = impl->reader.getVal45();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> AtomicExpr::weak(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal47();
+    RawEntityId eid = impl->reader.getVal46();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

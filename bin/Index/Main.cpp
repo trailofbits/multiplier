@@ -47,9 +47,7 @@ DEFINE_int32(num_indexer_workers, -1, "Number of worker threads to use for paral
 
 DEFINE_int32(num_command_workers, -1, "Number of worker threads to use for parallel command interpretation jobs");
 
-// Only execute the target compiler twice per working directory, rather than
-// twice per command.
-DEFINE_bool(fast_import, false, "Operate in a 'fast mode' when importing compile commands.");
+DEFINE_bool(cxx_support, false, "Try to index C++ code.");
 
 // Should we show progress bars when indexing?
 DEFINE_bool(show_progress, false, "Show indexing progress bars");
@@ -63,11 +61,13 @@ DEFINE_string(target, "", "Path to the binary or JSON (compile commands) file to
 
 DEFINE_string(env, "", "Path to the file listing environment variables to import");
 
-DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
-
 DEFINE_bool(attach, false, "Print out the process ID for attaching gdb/lldb.");
 
 DEFINE_string(max_queue_size, "24G", "The maximum queue size. Use a K suffix for KiB, M suffix for MiB, or a G suffix for GiB.");
+
+#ifndef MX_DISABLE_VAST
+DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
+#endif
 
 namespace {
 
@@ -153,7 +153,7 @@ static std::optional<size_t> ParseQueueSize(void) {
 
 }  // namespace
 
-extern "C" int main(int argc, char *argv[], char *envp[]) {
+int main(int argc, char *argv[], char *envp[]) {
   pasta::InitPasta init_pasta;
 
   std::stringstream ss;
@@ -163,7 +163,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
      << " [--env PATH_TO_COPIED_ENV_VARS]\n"
      << " [--show_progress]\n"
      << " [--generate_sourceir]\n"
-     << " [--fast_import]\n"
+     << " [--cxx_support]\n"
      << " --db DATABASE\n"
      << " --target COMPILE_COMMANDS\n";
 
@@ -220,9 +220,11 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);
 
+#ifndef MX_DISABLE_VAST
   if (!FLAGS_generate_sourceir) {
     ic->codegen.Disable();
   }
+#endif
 
   std::filesystem::path path(FLAGS_target);
 
@@ -287,7 +289,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   // commands, albeit slightly modified, so that we can get the compiler to
   // tell us about include search paths, etc. The result of this is that
   // indexing actions are enqueued into the `executor`.
-  importer.Import(command_exe_options, FLAGS_fast_import);
+  importer.Import(command_exe_options, FLAGS_cxx_support);
 
   // Start the executor, so that we can start processing the indexing actions.
   // Wait for all actions to complete.

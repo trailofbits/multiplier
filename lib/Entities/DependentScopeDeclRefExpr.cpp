@@ -155,15 +155,15 @@ std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const T
 }
 
 Token DependentScopeDeclRefExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Token DependentScopeDeclRefExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token DependentScopeDeclRefExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool DependentScopeDeclRefExpr::has_explicit_template_arguments(void) const {

@@ -23,6 +23,7 @@ class DatabaseWriterImpl;
 #define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
     m(FilePathRecord) \
     m(FragmentFileRecord) \
+    m(NestedFragmentRecord) \
     m(FragmentFileRangeRecord) \
     m(RedeclarationRecord) \
     m(MangledNameRecord) \
@@ -72,6 +73,26 @@ struct FragmentFileRecord {
 
   PackedFragmentId fragment_id;
   PackedFileId file_id;
+};
+
+struct NestedFragmentRecord {
+  static constexpr const char *kTableName = "nested_fragment";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS nested_fragment (
+            parent_id INTEGER NOT NULL,
+            child_id INTEGER NOT NULL,
+            PRIMARY KEY(parent_id, child_id)
+          ) WITHOUT ROWID)",};
+
+  static constexpr const char *kExitStatements[] = {nullptr};
+
+  static constexpr const char *kInsertStatement =
+      R"(INSERT OR IGNORE INTO nested_fragment (parent_id, child_id)
+         VALUES (?1, ?2))";
+
+  PackedFragmentId parent_id;
+  PackedFragmentId child_id;
 };
 
 // Tells us a the inclusive range of file tokens of a file covered by a
@@ -308,19 +329,21 @@ class DatabaseWriter final {
 
   // Get, or create and return, a fragment ID for the specific fragment hash.
   PackedFragmentId GetOrCreateSmallFragmentIdForHash(
-      RawEntityId tok_id, const std::string &hash, bool &is_new);
+      RawEntityId tok_id, std::string hash, bool &is_new);
 
   // Get, or create and return, a fragment ID for the specific fragment hash.
   PackedFragmentId GetOrCreateBigFragmentIdForHash(
-      RawEntityId tok_id, const std::string &hash, bool &is_new);
+      RawEntityId tok_id, std::string hash, bool &is_new);
 
   // Get, or create and return, a type ID for the specific type.
   PackedTypeId GetOrCreateSmallTypeIdForHash(
-      mx::TypeKind type_kind, const std::string &hash, bool &is_new);
+      mx::TypeKind type_kind, uint32_t type_qualifiers,
+      std::string hash, bool &is_new);
 
   // Get, or create and return, a type ID for the specific type.
   PackedTypeId GetOrCreateBigTypeIdForHash(
-      mx::TypeKind type_kind, const std::string &hash, bool &is_new);
+      mx::TypeKind type_kind, uint32_t type_qualifiers,
+      std::string hash, bool &is_new);
 
  public:
   static constexpr const char *kInitStatements[] = {
@@ -368,8 +391,8 @@ class DatabaseWriter final {
       RawEntityId tok_id, std::string hash, size_t num_tokens, bool &is_new);
 
   PackedTypeId GetOrCreateTypeIdForHash(
-      mx::TypeKind type_kind, std::string hash, size_t num_tokens,
-      bool &is_new);
+      mx::TypeKind type_kind, uint32_t type_qualifiers,
+      std::string hash, size_t num_tokens, bool &is_new);
 
   // Get, or create and return, a translation unit ID for the specific compile
   // command hash.

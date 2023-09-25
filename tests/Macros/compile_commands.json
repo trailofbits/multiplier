@@ -5,6 +5,11 @@
 "directory": ""
 },
 {
+"file": "CFAvailability.c",
+"command": "/usr/bin/cc CFAvailability.c",
+"directory": ""
+},
+{
 "file": "EmptyFunctionMacroWithParams.c",
 "command": "/usr/bin/cc EmptyFunctionMacroWithParams.c",
 "directory": ""
@@ -151,7 +156,7 @@
 },
 {
 "file": "VariadicCommaConcatenateIdiom.c",
-"command": "/usr/bin/cc VariadicCommaConcatenateIdiom.c",
+"command": "/usr/bin/cc -target x86_64-unknown-linux-gnu VariadicCommaConcatenateIdiom.c",
 "directory": ""
 },
 {

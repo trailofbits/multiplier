@@ -16,7 +16,9 @@ namespace mx {
 const char *EnumeratorName(SourceLocExprIdentKind e) {
   switch (e) {
     case SourceLocExprIdentKind::FUNCTION: return "FUNCTION";
+    case SourceLocExprIdentKind::FUNC_SIG: return "FUNC_SIG";
     case SourceLocExprIdentKind::FILE: return "FILE";
+    case SourceLocExprIdentKind::FILE_NAME: return "FILE_NAME";
     case SourceLocExprIdentKind::LINE: return "LINE";
     case SourceLocExprIdentKind::COLUMN: return "COLUMN";
     case SourceLocExprIdentKind::SOURCE_TOKEN_STRUCT: return "SOURCE_TOKEN_STRUCT";

@@ -16,8 +16,8 @@ namespace mx {
 const char *EnumeratorName(CXX11NoReturnAttrSpelling e) {
   switch (e) {
     case CXX11NoReturnAttrSpelling::CXX11_NORETURN: return "CXX11_NORETURN";
-    case CXX11NoReturnAttrSpelling::C2XNORETURN: return "C2XNORETURN";
-    case CXX11NoReturnAttrSpelling::C2X_NORETURN: return "C2X_NORETURN";
+    case CXX11NoReturnAttrSpelling::C23_NORETURN: return "C23_NORETURN";
+    case CXX11NoReturnAttrSpelling::C23___NORETURN: return "C23___NORETURN";
     case CXX11NoReturnAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

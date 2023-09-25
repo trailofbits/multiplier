@@ -501,6 +501,10 @@ class EntityId final {
     return opaque;
   }
 
+  inline bool operator!(void) const noexcept {
+    return opaque == kInvalidEntityId;
+  }
+
   inline bool operator==(const EntityId &that) const noexcept {
     return opaque == that.opaque;
   }

@@ -180,20 +180,20 @@ std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const TokenContext &t
 }
 
 Token NamespaceAliasDecl::alias_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
 }
 
 NamedDecl NamespaceAliasDecl::aliased_namespace(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal57();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token NamespaceAliasDecl::namespace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal59());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
 }
 
 Token NamespaceAliasDecl::target_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal67());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal66());
 }
 
 #pragma GCC diagnostic pop

@@ -78,6 +78,11 @@ std::optional<DecayedType> DecayedType::from(const TokenContext &t) {
   return DecayedType::from(t.as_type());
 }
 
+Type DecayedType::pointee_type(void) const {
+  RawEntityId eid = impl->reader.getVal25();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

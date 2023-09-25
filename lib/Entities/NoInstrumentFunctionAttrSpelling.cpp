@@ -17,7 +17,7 @@ const char *EnumeratorName(NoInstrumentFunctionAttrSpelling e) {
   switch (e) {
     case NoInstrumentFunctionAttrSpelling::GNU_NO_INSTRUMENT_FUNCTION: return "GNU_NO_INSTRUMENT_FUNCTION";
     case NoInstrumentFunctionAttrSpelling::CXX11_GNU_NO_INSTRUMENT_FUNCTION: return "CXX11_GNU_NO_INSTRUMENT_FUNCTION";
-    case NoInstrumentFunctionAttrSpelling::C2X_GNU_NO_INSTRUMENT_FUNCTION: return "C2X_GNU_NO_INSTRUMENT_FUNCTION";
+    case NoInstrumentFunctionAttrSpelling::C23_GNU_NO_INSTRUMENT_FUNCTION: return "C23_GNU_NO_INSTRUMENT_FUNCTION";
     case NoInstrumentFunctionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

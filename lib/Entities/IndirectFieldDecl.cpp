@@ -183,12 +183,12 @@ std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const TokenContext &t) 
 }
 
 gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const & {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal51();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d52 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from(Decl(std::move(d52)))) {
+    if (auto d51 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from(Decl(std::move(d51)))) {
         co_yield std::move(*e);
       }
     }
@@ -198,7 +198,7 @@ gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const & {
 
 std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal59();
+    RawEntityId eid = impl->reader.getVal58();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -211,7 +211,7 @@ std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
 
 std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal67();
+    RawEntityId eid = impl->reader.getVal66();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

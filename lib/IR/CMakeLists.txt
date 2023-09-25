@@ -82,6 +82,7 @@ target_link_libraries("mx-mlir"
     VAST::VASTLowLevel
     VAST::VASTHighLevel
     VAST::VASTUnsupported
+    VAST::VASTElementTypeInterface
 
     MLIRDialect
     MLIRAMDGPUDialect

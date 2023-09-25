@@ -14,7 +14,7 @@ namespace mx {
 enum class AMDGPUKernelCallAttrSpelling : unsigned char {
   GNU_AMDGPU_KERNEL,
   CXX11_CLANG_AMDGPU_KERNEL,
-  C2X_CLANG_AMDGPU_KERNEL,
+  C23_CLANG_AMDGPU_KERNEL,
   SPELLING_NOT_CALCULATED,
 };
 

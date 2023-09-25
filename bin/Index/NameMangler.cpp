@@ -27,10 +27,9 @@
 #include <clang/AST/PrettyPrinter.h>
 #include <clang/Frontend/ASTUnit.h>
 #include <clang/Index/IndexSymbol.h>
-#include <llvm/Support/Casting.h>
-#include <llvm/Support/raw_ostream.h>
 #include <llvm/ADT/SmallString.h>
 #include <llvm/Support/Casting.h>
+#include <llvm/Support/raw_ostream.h>
 #pragma clang diagnostic pop
 
 #include <pasta/AST/AST.h>

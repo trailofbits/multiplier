@@ -62,10 +62,9 @@ define_example("mx-list-macros" "ListMacros.cpp")
 define_example("mx-list-redeclarations" "ListRedeclarations.cpp")
 define_example("mx-list-structures" "ListStructures.cpp")
 # define_example("mx-list-uses" "ListUses.cpp")  # TODO(pag): Make this list-references.
-define_example("mx-dump-json" "DumpJSON.cpp")
 
-define_example("mx-weggli-query" "WeggliQuery.cpp")
 define_example("mx-regex-query" "RegexQuery.cpp")
+define_example("mx-find-flexible-user-copies" "FindFlexibleUserCopies.cpp")
 define_example("mx-find-calls-in-macro-expansions" "FindCallsInMacroExpansions.cpp")
 define_example("mx-find-sketchy-casts" "FindSketchyCasts.cpp")
 define_example("mx-find-divergent-candidates" "FindDivergentCandidates.cpp")
@@ -76,17 +75,11 @@ define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
 define_example("mx-find-sequoia" "FindSequoia.cpp")
 define_example("mx-print-type-token-graph" "PrintTypeTokenGraph.cpp")
+define_example("mx-find-linked-structures" "FindLinkedStructures.cpp")
 
-target_compile_definitions("mx-dump-json"
-  PRIVATE
-    "-DLLVM_DISABLE_ABI_BREAKING_CHECKS_ENFORCING"
-)
+if(MX_ENABLE_VAST)
+  define_example("mx-count-sourceir" "CountSourceIR.cpp")
+endif()
 
-target_link_libraries("mx-dump-json"
-  PRIVATE
-    LLVMCore LLVMSupport
-)
-
-define_example("mx-count-sourceir" "CountSourceIR.cpp")
 # define_example("mx-print-sourceir" "PrintSourceIR.cpp")
 # define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")

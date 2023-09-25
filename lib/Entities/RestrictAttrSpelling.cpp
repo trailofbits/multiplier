@@ -18,7 +18,7 @@ const char *EnumeratorName(RestrictAttrSpelling e) {
     case RestrictAttrSpelling::DECLSPEC_RESTRICT: return "DECLSPEC_RESTRICT";
     case RestrictAttrSpelling::GNU_MALLOC: return "GNU_MALLOC";
     case RestrictAttrSpelling::CXX11_GNU_MALLOC: return "CXX11_GNU_MALLOC";
-    case RestrictAttrSpelling::C2X_GNU_MALLOC: return "C2X_GNU_MALLOC";
+    case RestrictAttrSpelling::C23_GNU_MALLOC: return "C23_GNU_MALLOC";
     case RestrictAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

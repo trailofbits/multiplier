@@ -141,7 +141,7 @@ Token MacroParameter::name(void) const {
   return Token();
 }
 
-unsigned MacroParameter::index(void) const {
+uint32_t MacroParameter::index(void) const {
   return impl->reader.getVal12();
 }
 

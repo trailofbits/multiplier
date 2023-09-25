@@ -17,10 +17,10 @@ const char *EnumeratorName(MipsLongCallAttrSpelling e) {
   switch (e) {
     case MipsLongCallAttrSpelling::GNU_LONG_CALL: return "GNU_LONG_CALL";
     case MipsLongCallAttrSpelling::CXX11_GNU_LONG_CALL: return "CXX11_GNU_LONG_CALL";
-    case MipsLongCallAttrSpelling::C2X_GNU_LONG_CALL: return "C2X_GNU_LONG_CALL";
+    case MipsLongCallAttrSpelling::C23_GNU_LONG_CALL: return "C23_GNU_LONG_CALL";
     case MipsLongCallAttrSpelling::GNU_FAR: return "GNU_FAR";
     case MipsLongCallAttrSpelling::CXX11_GNU_FAR: return "CXX11_GNU_FAR";
-    case MipsLongCallAttrSpelling::C2X_GNU_FAR: return "C2X_GNU_FAR";
+    case MipsLongCallAttrSpelling::C23_GNU_FAR: return "C23_GNU_FAR";
     case MipsLongCallAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

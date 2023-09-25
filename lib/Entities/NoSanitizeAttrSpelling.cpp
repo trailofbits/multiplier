@@ -17,7 +17,7 @@ const char *EnumeratorName(NoSanitizeAttrSpelling e) {
   switch (e) {
     case NoSanitizeAttrSpelling::GNU_NO_SANITIZE: return "GNU_NO_SANITIZE";
     case NoSanitizeAttrSpelling::CXX11_CLANG_NO_SANITIZE: return "CXX11_CLANG_NO_SANITIZE";
-    case NoSanitizeAttrSpelling::C2X_CLANG_NO_SANITIZE: return "C2X_CLANG_NO_SANITIZE";
+    case NoSanitizeAttrSpelling::C23_CLANG_NO_SANITIZE: return "C23_CLANG_NO_SANITIZE";
     case NoSanitizeAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

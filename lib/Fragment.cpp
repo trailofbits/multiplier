@@ -24,7 +24,6 @@
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
-#include "WeggliImpl.h"
 
 namespace mx {
 namespace ir {
@@ -48,9 +47,16 @@ std::optional<Fragment> Fragment::parent(void) const noexcept {
   return std::nullopt;
 }
 
-// Return the fragment containing a query match.
-Fragment Fragment::containing(const WeggliQueryMatch &match) {
-  return Fragment(match.frag);
+std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
+  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
+    VariantId vid = EntityId(parent_id).Unpack();
+    if (std::holds_alternative<FragmentId>(vid)) {
+      return std::get<FragmentId>(vid);
+    } else {
+      break;
+    }
+  }
+  return std::nullopt;
 }
 
 // Return the fragment containing a query match.
@@ -211,6 +217,18 @@ gap::generator<Decl> Fragment::top_level_declarations(void) const & {
   }
 }
 
+// Return child fragments.
+gap::generator<Fragment> Fragment::nested_fragments(void) const & {
+  auto ep = impl->ep;
+  for (PackedFragmentId fid : ep->ListNestedFragmentIds(ep, id())) {
+    if (FragmentImplPtr fptr = ep->FragmentFor(ep, fid)) {
+      co_yield Fragment(std::move(fptr));
+    } else {
+      assert(false);
+    }
+  }
+}
+
 // Return references to this fragment.
 gap::generator<Reference> Fragment::references(void) const & {
   auto ep = impl->ep;
@@ -226,32 +244,35 @@ gap::generator<Reference> Fragment::references(void) const & {
 gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
 
-  const EntityProviderPtr &ep = impl->ep;
+  const EntityProviderPtr ep = impl->ep;
   for (RawEntityId eid : macro_ids) {
     VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
-      MacroId macro_id = std::get<MacroId>(vid);
       MacroImplPtr eptr = ep->MacroFor(ep, eid);
-      if (macro_id.fragment_id == impl->fragment_id && eptr) {
+      
+      // NOTE(pag): We don't check for fragments matching as we might have
+      //            macros (e.g. `#define` in nested macros that we inject as
+      //            top-level macros).
+      if (eptr) {
         co_yield Macro(std::move(eptr));
       } else {
         assert(false);
       }
 
     } else if (std::holds_alternative<MacroTokenId>(vid)) {
-      MacroTokenId macro_id = std::get<MacroTokenId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id &&
-          macro_id.offset < impl->num_tokens) {
-        co_yield Token(impl->MacroTokenReader(impl), macro_id.offset);
+      MacroTokenId tid = std::get<MacroTokenId>(vid);
+      if (tid.fragment_id == impl->fragment_id &&
+          tid.offset < impl->num_tokens) {
+        co_yield Token(impl->MacroTokenReader(impl), tid.offset);
       } else {
         assert(false);
       }
 
     } else if (std::holds_alternative<ParsedTokenId>(vid)) {
-      ParsedTokenId macro_id = std::get<ParsedTokenId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id &&
-          macro_id.offset < impl->num_parsed_tokens) {
-        co_yield Token(impl->ParsedTokenReader(impl), macro_id.offset);
+      ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+      if (tid.fragment_id == impl->fragment_id &&
+          tid.offset < impl->num_parsed_tokens) {
+        co_yield Token(impl->ParsedTokenReader(impl), tid.offset);
       } else {
         assert(false);
       }
@@ -275,15 +296,6 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
     } else {
       assert(false);
     }
-  }
-}
-
-// Run a Weggli search over this fragment.
-gap::generator<WeggliQueryMatch> Fragment::query(
-    const WeggliQuery &query) const & {
-  WeggliQueryResultImpl res(query, impl);
-  for (auto match : res.Enumerate()) {
-    co_yield match;
   }
 }
 

@@ -27,8 +27,6 @@ class FileImpl;
 class FragmentImpl;
 class RegexQuery;
 class RegexQueryResultImpl;
-class WeggliQueryResultImpl;
-
 class SQLiteEntityProviderImpl;
 class SQLiteDecompressionDictionary;
 
@@ -61,6 +59,9 @@ class SQLiteEntityProvider final : public EntityProvider {
   // Get the list of paths associated with a given file id.
   gap::generator<std::filesystem::path> ListPathsForFile(
       const Ptr &, PackedFileId) final;
+
+  // Get the list nested fragments for a given fragment.
+  FragmentIdList ListNestedFragmentIds(const Ptr &, PackedFragmentId) final;
 
   FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id);
 

@@ -293,7 +293,6 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"FunctionTemplateDecl", "MostRecentDeclaration"},
   {"CXXRecordDecl", "MostRecentDeclaration"},
   {"RecordDecl", "MostRecentDeclaration"},
-
   {"Decl", "PreviousDeclaration"},
   {"TypeAliasTemplateDecl", "PreviousDeclaration"},
   {"VarTemplateDecl", "PreviousDeclaration"},
@@ -304,11 +303,17 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"RecordDecl", "PreviousDeclaration"},
   {"RecordDecl", "FirstNamedDataMember"},
 
+  // We hoist forward declarations embedded in declarators out into their own
+  // freestanding fragments that aren't associated with files, and so the return
+  // value of this method loses its meaning in those cases.
+  {"TagDecl", "IsEmbeddedInDeclarator"},
+
   // These are redundant.
   {"FunctionDecl", "ParameterDeclarations"},
 
   // These can crash?
   {"Expr", "BestDynamicClassType"},
+  {"Expr", "IsCXX98IntegralConstantExpression"},
 
   // These are odd.
   {"CXXRecordDecl", "IsParsingBaseSpecifiers"},
@@ -318,8 +323,14 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 
   // We want to make sure we get the most derived spelling.
   {"Attr", "Spelling"},
+  {"Attr", "SpellingListIndex"},
   {"InheritableAttr", "Spelling"},
   {"InheritableParamAttr", "Spelling"},
+
+  // These are problematic for indexing, where our model is to deduplicate
+  // inherted attributes, and also treat attributes as being specific to
+  // fragments, and thus not observable across fragments.
+  {"CallExpr", "UnusedResultAttribute"},
 
   // These have complicated assertions in them.
   {"CXXRecordDecl", "DefaultedCopyConstructorIsDeleted"},
@@ -375,6 +386,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"QualifiedType", "WithoutLocalFastQualifiers"},
 
   // End up being a bit spammy in serialization, and we support `::from`.
+  {"Type", "ArrayElementTypeNoTypeQualified"},
   {"Type", "AsCXXRecordDeclaration"},
   {"Type", "AsComplexIntegerType"},
   {"Type", "AsObjCInterfacePointerType"},
@@ -388,7 +400,235 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Type", "AsTagDeclaration"},
   {"Type", "AsUnionType"},
   {"Type", "LocallyUnqualifiedSingleStepDesugaredType"},
-
+  {"Type", "PointeeType"},  // NOTE(pag): Has special handling below.
+  {"Type", "ArrayElementTypeNoTypeQualified"},
+  {"Type", "AsCXXRecordDeclaration"},
+  {"Type", "AsComplexIntegerType"},
+  {"Type", "AsObjCInterfacePointerType"},
+  {"Type", "AsObjCInterfaceType"},
+  {"Type", "AsObjCQualifiedClassType"},
+  {"Type", "AsObjCQualifiedIdType"},
+  {"Type", "AsObjCQualifiedInterfaceType"},
+  {"Type", "AsPlaceholderType"},
+  {"Type", "AsRecordDeclaration"},
+  {"Type", "AsStructureType"},
+  {"Type", "AsTagDeclaration"},
+  {"Type", "AsUnionType"},
+  {"Type", "ContainedAutoType"},
+  {"Type", "ContainedDeducedType"},
+  {"Type", "Nullability"},
+  {"Type", "PointeeCXXRecordDeclaration"},
+  {"Type", "PointeeOrArrayElementType"},
+  {"Type", "RVVElementType"},
+  {"Type", "ScalarTypeKind"},
+  {"Type", "SveElementType"},
+  {"Type", "RVVElementType"},
+  {"Type", "CanonicalTypeInternal"},
+  {"Type", "LocallyUnqualifiedSingleStepDesugaredType"},
+  {"Type", "IsAggregateType"},
+  {"Type", "HasAutoForTrailingReturnType"},
+  {"Type", "HasFloatingRepresentation"},
+  {"Type", "HasIntegerRepresentation"},
+  {"Type", "HasObjCPointerRepresentation"},
+  {"Type", "HasPointerRepresentation"},
+  {"Type", "HasSignedIntegerRepresentation"},
+  {"Type", "HasSizedVLAType"},
+  {"Type", "HasUnnamedOrLocalType"},
+  {"Type", "HasUnsignedIntegerRepresentation"},
+  {"Type", "IsAlignValueT"},
+  {"Type", "IsAnyCharacterType"},
+  {"Type", "IsAnyComplexType"},
+  {"Type", "IsAnyPointerType"},
+  {"Type", "IsArithmeticType"},
+  {"Type", "IsArrayType"},
+  {"Type", "IsAtomicType"},
+  {"Type", "IsBFloat16Type"},
+  {"Type", "IsBitIntType"},
+  {"Type", "IsBlockCompatibleObjCPointerType"},
+  {"Type", "IsBlockPointerType"},
+  {"Type", "IsBooleanType"},
+  {"Type", "IsBuiltinType"},
+  {"Type", "IsCARCBridgableType"},
+  {"Type", "IsCUDADeviceBuiltinSurfaceType"},
+  {"Type", "IsCUDADeviceBuiltinTextureType"},
+  {"Type", "IsCanonicalUnqualified"},
+  {"Type", "IsChar16Type"},
+  {"Type", "IsChar32Type"},
+  {"Type", "IsChar8Type"},
+  {"Type", "IsCharacterType"},
+  {"Type", "IsClassType"},
+  {"Type", "IsClkEventT"},
+  {"Type", "IsComplexIntegerType"},
+  {"Type", "IsComplexType"},
+  {"Type", "IsCompoundType"},
+  {"Type", "IsConstantArrayType"},
+  {"Type", "IsConstantMatrixType"},
+  {"Type", "IsConstantSizeType"},
+  {"Type", "IsDecltypeType"},
+  {"Type", "IsDependentAddressSpaceType"},
+  {"Type", "IsDependentSizedArrayType"},
+  {"Type", "IsDependentType"},
+  {"Type", "IsElaboratedTypeSpecifier"},
+  {"Type", "IsEnumeralType"},
+  {"Type", "IsEventT"},
+  {"Type", "IsExtVectorBooleanType"},
+  {"Type", "IsExtVectorType"},
+  {"Type", "IsFixedPointOrIntegerType"},
+  {"Type", "IsFixedPointType"},
+  {"Type", "IsFloat128Type"},
+  {"Type", "IsFloat16Type"},
+  {"Type", "IsFloatingType"},
+  {"Type", "IsFromAST"},
+  {"Type", "IsFunctionNoProtoType"},
+  {"Type", "IsFunctionPointerType"},
+  {"Type", "IsFunctionProtoType"},
+  {"Type", "IsFunctionReferenceType"},
+  {"Type", "IsFunctionType"},
+  {"Type", "IsFundamentalType"},
+  {"Type", "IsHalfType"},
+  {"Type", "IsIbm128Type"},
+  {"Type", "IsImageType"},
+  {"Type", "IsIncompleteArrayType"},
+  {"Type", "IsIncompleteOrObjectType"},
+  {"Type", "IsIncompleteType"},
+  {"Type", "IsInstantiationDependentType"},
+  {"Type", "IsIntegerType"},
+  {"Type", "IsIntegralOrEnumerationType"},
+  {"Type", "IsIntegralOrUnscopedEnumerationType"},
+  {"Type", "IsIntegralType"},
+  {"Type", "IsInterfaceType"},
+  {"Type", "IsLValueReferenceType"},
+  {"Type", "IsLinkageValid"},
+  {"Type", "IsLiteralType"},
+  {"Type", "IsMatrixType"},
+  {"Type", "IsMemberDataPointerType"},
+  {"Type", "IsMemberFunctionPointerType"},
+  {"Type", "IsMemberPointerType"},
+  {"Type", "IsNonOverloadPlaceholderType"},
+  {"Type", "IsNothrowT"},
+  {"Type", "IsNullPointerType"},
+  {"Type", "IsOCLExtOpaqueType"},
+  {"Type", "IsOCLImage1dArrayROType"},
+  {"Type", "IsOCLImage1dArrayRWType"},
+  {"Type", "IsOCLImage1dArrayWOType"},
+  {"Type", "IsOCLImage1dBufferROType"},
+  {"Type", "IsOCLImage1dBufferRWType"},
+  {"Type", "IsOCLImage1dBufferWOType"},
+  {"Type", "IsOCLImage1dROType"},
+  {"Type", "IsOCLImage1dRWType"},
+  {"Type", "IsOCLImage1dWOType"},
+  {"Type", "IsOCLImage2dArrayDepthROType"},
+  {"Type", "IsOCLImage2dArrayDepthRWType"},
+  {"Type", "IsOCLImage2dArrayDepthWOType"},
+  {"Type", "IsOCLImage2dArrayMSAADepthROType"},
+  {"Type", "IsOCLImage2dArrayMSAADepthRWType"},
+  {"Type", "IsOCLImage2dArrayMSAADepthWOType"},
+  {"Type", "IsOCLImage2dArrayMSAAROType"},
+  {"Type", "IsOCLImage2dArrayMSAARWType"},
+  {"Type", "IsOCLImage2dArrayMSAAWOType"},
+  {"Type", "IsOCLImage2dArrayROType"},
+  {"Type", "IsOCLImage2dArrayRWType"},
+  {"Type", "IsOCLImage2dArrayWOType"},
+  {"Type", "IsOCLImage2dDepthROType"},
+  {"Type", "IsOCLImage2dDepthRWType"},
+  {"Type", "IsOCLImage2dDepthWOType"},
+  {"Type", "IsOCLImage2dMSAADepthROType"},
+  {"Type", "IsOCLImage2dMSAADepthRWType"},
+  {"Type", "IsOCLImage2dMSAADepthWOType"},
+  {"Type", "IsOCLImage2dMSAAROType"},
+  {"Type", "IsOCLImage2dMSAARWType"},
+  {"Type", "IsOCLImage2dMSAAWOType"},
+  {"Type", "IsOCLImage2dROType"},
+  {"Type", "IsOCLImage2dRWType"},
+  {"Type", "IsOCLImage2dWOType"},
+  {"Type", "IsOCLImage3dROType"},
+  {"Type", "IsOCLImage3dRWType"},
+  {"Type", "IsOCLImage3dWOType"},
+  {"Type", "IsOCLIntelSubgroupAVCImeDualReferenceStreaminType"},
+  {"Type", "IsOCLIntelSubgroupAVCImePayloadType"},
+  {"Type", "IsOCLIntelSubgroupAVCImeResultDualReferenceStreamoutType"},
+  {"Type", "IsOCLIntelSubgroupAVCImeResultSingleReferenceStreamoutType"},
+  {"Type", "IsOCLIntelSubgroupAVCImeResultType"},
+  {"Type", "IsOCLIntelSubgroupAVCImeSingleReferenceStreaminType"},
+  {"Type", "IsOCLIntelSubgroupAVCMcePayloadType"},
+  {"Type", "IsOCLIntelSubgroupAVCMceResultType"},
+  {"Type", "IsOCLIntelSubgroupAVCRefPayloadType"},
+  {"Type", "IsOCLIntelSubgroupAVCRefResultType"},
+  {"Type", "IsOCLIntelSubgroupAVCSicPayloadType"},
+  {"Type", "IsOCLIntelSubgroupAVCSicResultType"},
+  {"Type", "IsOCLIntelSubgroupAVCType"},
+  {"Type", "IsObjCARCBridgableType"},
+  {"Type", "IsObjCARCImplicitlyUnretainedType"},
+  {"Type", "IsObjCBoxableRecordType"},
+  {"Type", "IsObjCBuiltinType"},
+  {"Type", "IsObjCClassOrClassKindOfType"},
+  {"Type", "IsObjCClassType"},
+  {"Type", "IsObjCIdType"},
+  {"Type", "IsObjCIndependentClassType"},
+  {"Type", "IsObjCIndirectLifetimeType"},
+  {"Type", "IsObjCInertUnsafeUnretainedType"},
+  {"Type", "IsObjCLifetimeType"},
+  {"Type", "IsObjCNSObjectType"},
+  {"Type", "IsObjCObjectOrInterfaceType"},
+  {"Type", "IsObjCObjectPointerType"},
+  {"Type", "IsObjCObjectType"},
+  {"Type", "IsObjCQualifiedClassType"},
+  {"Type", "IsObjCQualifiedIdType"},
+  {"Type", "IsObjCQualifiedInterfaceType"},
+  {"Type", "IsObjCRetainableType"},
+  {"Type", "IsObjCSelType"},
+  {"Type", "IsObjectPointerType"},
+  {"Type", "IsObjectType"},
+  {"Type", "IsOpenCLSpecificType"},
+  {"Type", "IsOverloadableType"},
+  {"Type", "IsPipeType"},
+  {"Type", "IsPlaceholderType"},
+  {"Type", "IsPointerType"},
+  {"Type", "IsQueueT"},
+  {"Type", "IsRVVSizelessBuiltinType"},
+  {"Type", "IsRVVVLSBuiltinType"},
+  {"Type", "IsRValueReferenceType"},
+  {"Type", "IsRealFloatingType"},
+  {"Type", "IsRealType"},
+  {"Type", "IsRecordType"},
+  {"Type", "IsReferenceType"},
+  {"Type", "IsReserveIDT"},
+  {"Type", "IsSVESizelessBuiltinType"},
+  {"Type", "IsSamplerT"},
+  {"Type", "IsSaturatedFixedPointType"},
+  {"Type", "IsScalarType"},
+  {"Type", "IsScopedEnumeralType"},
+  {"Type", "IsSignedFixedPointType"},
+  {"Type", "IsSignedIntegerOrEnumerationType"},
+  {"Type", "IsSignedIntegerType"},
+  {"Type", "IsSizelessBuiltinType"},
+  {"Type", "IsSizelessType"},
+  {"Type", "IsSpecifierType"},
+  {"Type", "IsStandardLayoutType"},
+  {"Type", "IsStdByteType"},
+  {"Type", "IsStructuralType"},
+  {"Type", "IsStructureOrClassType"},
+  {"Type", "IsStructureType"},
+  {"Type", "IsSveVLSBuiltinType"},
+  {"Type", "IsTemplateTypeParmType"},
+  {"Type", "IsTypedefNameType"},
+  {"Type", "IsUndeducedAutoType"},
+  {"Type", "IsUndeducedType"},
+  {"Type", "IsUnionType"},
+  {"Type", "IsUnsaturatedFixedPointType"},
+  {"Type", "IsUnscopedEnumerationType"},
+  {"Type", "IsUnsignedFixedPointType"},
+  {"Type", "IsUnsignedIntegerOrEnumerationType"},
+  {"Type", "IsUnsignedIntegerType"},
+  {"Type", "IsVariableArrayType"},
+  {"Type", "IsVariablyModifiedType"},
+  {"Type", "IsVectorType"},
+  {"Type", "IsVisibilityExplicit"},
+  {"Type", "IsVoidPointerType"},
+  {"Type", "IsVoidType"},
+  {"Type", "IsWebAssemblyExternrefType"},
+  {"Type", "IsWebAssemblyTableType"},
+  {"Type", "IsWideCharacterType"},
   {"Type", "CanonicalTypeInternal"},
   {"Type", "ContainedAutoType"},
   {"Type", "ContainedDeducedType"},
@@ -403,6 +643,17 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "AlignedSubstitutions"},
   {"Stmt", "AlignedSubstitutions"},
 
+  // These don't make sense because their results are specific to a translation
+  // unit.
+  {"Decl", "IsThisDeclarationReferenced"},
+  {"Decl", "IsUsed"},
+  {"Decl", "IsReferenced"},
+  {"Decl", "IsReachable"},
+  {"Decl", "IsInvalidDeclaration"},
+  {"Decl", "IsCanonicalDeclaration"},
+  {"Decl", "IsFirstDeclaration"},
+  {"Decl", "IdentifierNamespace"},
+
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 };
@@ -410,7 +661,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 static const char *SchemaIntType(pasta::Type type) {
   auto t = type;
   if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
-    switch (bt->Kind()) {
+    switch (bt->BuiltinKind()) {
       case pasta::BuiltinTypeKind::kBoolean: return "Bool";
       case pasta::BuiltinTypeKind::kCharacterS: return "Int8";  // `char`.
       case pasta::BuiltinTypeKind::kCharacterU: return "UInt8";  // `char`.
@@ -542,7 +793,8 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
 
   auto enumerators = enum_decl.Enumerators();
   auto num_enumerators = enumerators.size();
-  auto itype = CxxIntType(enum_decl.IntegerType());
+  auto enum_underlying_type = enum_decl.IntegerType();
+  auto itype = CxxIntType(enum_underlying_type);
 
   auto &types = enum_type[enum_name];
 
@@ -799,15 +1051,45 @@ void CodeGenerator::RunOnOptional(
     cxx_element_name = "bool";
     cxx_underlying_name = cxx_element_name;
 
-  } else if (*element_name == "unsigned") {
-    capn_element_name = "UInt32";
-    cxx_element_name = "unsigned";
+  } else if (*element_name == "uint64_t") {
+    capn_element_name = "UInt64";
+    cxx_element_name = std::move(element_name.value());
     cxx_underlying_name = cxx_element_name;
 
-  } else if (*element_name == "int") {
-    capn_element_name = "Int32";
-    cxx_element_name = "int";
+  } else if (*element_name == "int64_t") {
+    capn_element_name = "Int64";
+    cxx_element_name = std::move(element_name.value());
     cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "uint32_t") {
+    capn_element_name = "UInt32";
+    cxx_element_name = std::move(element_name.value());
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "int32_t") {
+    capn_element_name = "Int32";
+    cxx_element_name = std::move(element_name.value());
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "uint8_t") {
+    capn_element_name = "UInt8";
+    cxx_element_name = std::move(element_name.value());
+    cxx_underlying_name = cxx_element_name;
+
+  } else if (*element_name == "int8_t") {
+    capn_element_name = "Int8";
+    cxx_element_name = std::move(element_name.value());
+    cxx_underlying_name = cxx_element_name;
+
+  // } else if (*element_name == "double") {
+  //   capn_element_name = "Float64";
+  //   cxx_element_name = std::move(element_name.value());
+  //   cxx_underlying_name = cxx_element_name;
+
+  // } else if (*element_name == "float") {
+  //   capn_element_name = "Float32";
+  //   cxx_element_name = std::move(element_name.value());
+  //   cxx_underlying_name = cxx_element_name;
 
   } else if (enum_names.count(*element_name)) {
     auto &types = enum_type[*element_name];
@@ -1670,8 +1952,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::"
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::"
         << class_name << " &e, const TokenTree *) {\n"
+        << "  (void) pf;\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -1699,8 +1982,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
-        << class_name << " &e, const TokenTree *) {\n";
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
+        << class_name << " &e, const TokenTree *) {\n"
+        << "  (void) pf;\n";
 
     if (is_concrete) {
       serialize_inc_os
@@ -1724,8 +2008,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::"
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::"
         << class_name << " &e, const TokenTree *) {\n"
+        << "  (void) pf;\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -1751,8 +2036,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::"
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::"
         << class_name << " &e, const TokenTree *) {\n"
+        << "  (void) pf;\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -1780,8 +2066,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Macro::Builder b, "
+        << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::Macro::Builder b, "
         << "const pasta::" << class_name << " &e, const TokenTree *tt) {\n"
+        << "  (void) pf;\n"
         << "  (void) tt;\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
@@ -1806,9 +2093,10 @@ MethodListPtr CodeGenerator::RunOnClass(
       needed_decls.insert("PseudoKind"); \
       serialize_cpp_os \
           << "void Serialize" << class_name \
-          << "(const EntityMapper &es, mx::ast::" #type_name \
+          << "(const PendingFragment &pf, const EntityMapper &es, mx::ast::" #type_name \
           << "::Builder b, const pasta::" \
           << class_name << " &e, const TokenTree *) {\n" \
+          << "  (void) pf;\n" \
           << "  (void) es;\n" \
           << "  (void) b;\n" \
           << "  (void) e;\n"; \
@@ -1863,10 +2151,10 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (!dont_serialize) {
       if (is_macro) {
         serialize_cpp_os
-            << "  Serialize" << base_class_name << "(es, b, e, tt);\n";
+            << "  Serialize" << base_class_name << "(pf, es, b, e, tt);\n";
       } else {
         serialize_cpp_os
-            << "  Serialize" << base_class_name << "(es, b, e, nullptr);\n";
+            << "  Serialize" << base_class_name << "(pf, es, b, e, nullptr);\n";
       }
 
       serialize_inc_os
@@ -1884,72 +2172,71 @@ MethodListPtr CodeGenerator::RunOnClass(
   // are derived from entities in fragments, and link to entities in fragments,
   // and so we need to carry around a fragment pointer.
   } else if (gFragmentEntityTypes.count(class_name)) {
-    unsigned cd = 0;  // Containing decl.
-    unsigned cs = 0;  // Containing stmt.
+    auto make_parent = [&] (const char *name, const char *link, const char *ent_kind) {
+      auto sd = storage.AddMethod("UInt64");  // Reference.
+      auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(sd);
 
-    // Keep track of containing/parent decl/stmt. We don't have this for types
-    // because they are deduplicated under-the-hood, and not specific to any
-    // one location (that's `clang::TypeLoc`, which PASTA doesn't represent).
-    if (class_name == "Decl" || class_name == "Stmt") {
-      cd = storage.AddMethod("UInt64");  // Reference.
-      cs = storage.AddMethod("UInt64");  // Reference.
-
-      auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(cd);
-      auto [cs_getter_name, cs_setter_name, cs_init_name] = NamesFor(cs);
+      class_os
+          << "  std::optional<" << ent_kind << "> " << name << "(void) const;\n";
 
       serialize_inc_os
-          << "  MX_VISIT_DECL_LINK(" << class_name
-          << ", parent_declaration, " << cd << ")\n"
-          << "  MX_VISIT_STMT_LINK(" << class_name << ", parent_statement, "
-          << cs << ")\n";
+          << "  " << link << "(" << class_name
+          << ", " << name << ", " << sd << ")\n";
 
       serialize_cpp_os
-          << "  b." << cd_setter_name << "(es.ParentDeclId(e));\n"
-          << "  b." << cs_setter_name << "(es.ParentStmtId(e));\n";
-
-      // `Decl::is_definition`
-      if (class_name == "Decl") {
-        const auto def = storage.AddMethod("Bool");
-        auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
-
-        serialize_inc_os
-            << "  MX_VISIT_BOOL(Decl, is_definition, " << def
-            << ", MX_APPLY_FUNC, IsDefinition, bool, NthDecl)\n";
-
-        lib_cpp_os
-            << "bool Decl::is_definition(void) const {\n"
-            << "  return impl->reader." << def_getter_name << "();\n"
-            << "}\n\n";
-
-        serialize_cpp_os
-            << "  b." << def_setter_name << "(IsDefinition(e));\n";
-      }
+          << "  b." << cd_setter_name << "(es.Parent" << ent_kind << "Id(e));\n";
 
       lib_cpp_os
-          << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
+          << "std::optional<" << ent_kind << "> " << class_name << "::" << name << "(void) const {\n"
           << "  if (auto id = impl->reader." << cd_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
-          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {\n"
-          << "      return Decl(std::move(eptr));\n"
+          << "    if (auto eptr = impl->ep->" << ent_kind << "For(impl->ep, id)) {\n"
+          << "      return " << ent_kind << "(std::move(eptr));\n"
           << "    }\n"
           << "    assert(false);\n"
           << "  }\n"
           << "  return std::nullopt;\n"
-          << "}\n\n"
-          << "std::optional<Stmt> " << class_name << "::parent_statement(void) const {\n"
-          << "  if (auto id = impl->reader." << cs_getter_name << "(); "
-          << "id != kInvalidEntityId) {\n"
-          << "    if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {\n"
-          << "      return Stmt(std::move(eptr));\n"
-          << "    }\n"
-          << "    assert(false);\n"
-          << "  }\n"
-          << "  return std::nullopt;\n"
-          << "}\n";
-    }
+          << "}\n\n";
+      return sd;
+    };
 
     class_os
         << " {\n"
+        << " public:\n";
+
+    // `*::parent_declaration()`.
+    if (class_name == "Decl" || class_name == "Stmt" ||
+        class_name == "CXXBaseSpecifier" ||
+        class_name == "CXXTemplateParameterList" ||
+        class_name == "Designator" || class_name == "TemplateArgument") {
+      make_parent("parent_declaration", "MX_VISIT_DECL_LINK", "Decl");
+    }
+
+    // `*::parent_statement()`.
+    if (class_name == "Decl" || class_name == "Stmt" ||
+        class_name == "Designator" || class_name == "TemplateArgument") {
+      make_parent("parent_statement", "MX_VISIT_STMT_LINK", "Stmt");
+    }
+
+    // `Decl::is_definition`
+    if (class_name == "Decl") {
+      const auto def = storage.AddMethod("Bool");
+      auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
+
+      serialize_inc_os
+          << "  MX_VISIT_BOOL(Decl, is_definition, " << def
+          << ", MX_APPLY_FUNC, IsDefinition, bool, NthDecl)\n";
+
+      lib_cpp_os
+          << "bool Decl::is_definition(void) const {\n"
+          << "  return impl->reader." << def_getter_name << "();\n"
+          << "}\n\n";
+
+      serialize_cpp_os
+          << "  b." << def_setter_name << "(IsDefinition(e));\n";
+    }
+
+    class_os
         << " protected:\n"
         << FriendOf(class_os, class_name, "Attr")
         << FriendOf(class_os, class_name, "Decl")
@@ -2032,8 +2319,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     if (class_name == "Decl") {
       class_os
-          << "  std::optional<Decl> parent_declaration(void) const;\n"
-          << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<Decl> definition(void) const;\n"
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
@@ -2061,8 +2346,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (class_name == "Stmt") {
       class_os
-          << "  std::optional<Decl> parent_declaration(void) const;\n"
-          << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<PackedDeclId> referenced_declaration_id(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
           << " public:\n";
@@ -2791,17 +3074,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     } else if (snake_name == "is_this_declarationaration_a_demoted_definition") {
       snake_name = "is_demoted_definition";
     
-    } else if (snake_name == "kind") {
-      if (class_name == "BuiltinType") {
-        snake_name = "builtin_kind";
-      } else if (class_name == "UnaryExprOrTypeTraitExpr") {
-        snake_name = "expression_or_trait_kind";
-      } else if (class_name == "CharacterLiteral") {
-        snake_name = "character_kind";
-      } else if (class_name == "StringLiteral") {
-        snake_name = "string_kind";
-      }
-    
     } else if (snake_name == "kind_name") {
       if (class_name == "TagDecl") {
         snake_name = "tag_kind_name";
@@ -2833,6 +3105,13 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     std::pair<std::string, std::string> method_key{class_name, method_name};
     if (kMethodBlackList.count(method_key)) {
+
+      // TODO(pag): `PointeeType` is a different method on a bunch of derived
+      //            classes, so we can't black list it on
+      if (class_name == "Type" && method_name == "PointeeType") {
+        continue;
+      }
+
       (void) seen_methods->emplace(api_name);
       continue;
     }
@@ -2877,8 +3156,19 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "}\n\n";
 
         serialize_cpp_os
-            << "  auto t" << i << " = e." << method_name << "();\n"
-            << "  b." << setter_name << "(es.EntityId(t" << i << "));\n";
+            << "  auto et" << i << " = es.EntityId(e." << method_name << "());\n";
+
+        // For builtin declarations, we sometimes need to go looking for the
+        // token, because it never existed in any parsed representation.
+        if (class_name == "Decl" && method_name == "Token") {
+          serialize_cpp_os
+              << "  if (!et" << i << ") {\n"
+              << "    et" << i << " = pf.DeclTokenEntityId(e);\n"
+              << "  }\n";
+        }
+
+        serialize_cpp_os
+            << "  b." << setter_name << "(et" << i << ");\n";
 
       // Handle `pasta::TokenRange`.
       } else if (record_name == "TokenRange") {
@@ -3222,7 +3512,6 @@ MethodListPtr CodeGenerator::RunOnClass(
       auto [getter_name, setter_name, init_name] = NamesFor(i);
 
       if (cxx_int_type == "bool") {
-
         serialize_inc_os
             << "  MX_VISIT_BOOL(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
@@ -3574,6 +3863,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
+      << "#include <cstdint>\n"
       << "#include <multiplier/AST.capnp.h>\n"
       << "#include <optional>\n\n"
       << "namespace pasta {\n";
@@ -3600,6 +3890,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Entity.h\"\n"
       << "#include \"EntityMapper.h\"\n"
       << "#include \"PASTA.h\"\n"
+      << "#include \"PendingFragment.h\"\n"
       << "#include \"TokenTree.h\"\n"
       << "#include \"Util.h\"\n"
       << "namespace indexer {\n\n"
@@ -3623,6 +3914,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
+      << "#include <cstdint>\n\n"
       << "namespace pasta {\n"
       << "class File;\n";
 
@@ -3636,11 +3928,19 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 #undef DECLARE_ENTITY_CLASSES
 
   for (const pasta::EnumDecl &tag : enums) {
-    if (auto itype = CxxIntType(tag.IntegerType())) {
-      serialize_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
-      lib_pasta_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
+    if (auto itype = tag.IntegerType()) {
+      auto ptr = pasta::PrintedTokenRange::Create(itype.value());
+      serialize_h_os << "enum class " << tag.Name() << " :";
+      lib_pasta_h_os << "enum class " << tag.Name() << " :";
+      for (auto tok : ptr) {
+        serialize_h_os << ' ' << tok.Data();
+        lib_pasta_h_os << ' ' << tok.Data();    
+      }
+      serialize_h_os << ";\n";
+      lib_pasta_h_os << ";\n";
     } else {
-      std::cerr << "??? " << tag.Name() << "\n";
+      serialize_h_os << "enum class " << tag.Name() << " : int;\n";
+      lib_pasta_h_os << "enum class " << tag.Name() << " : int;\n";
     }
   }
   serialize_h_os
@@ -3726,6 +4026,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   serialize_h_os
       << "class EntityMapper;\n"
+      << "class PendingFragment;\n"
       << "class TokenTree;\n";
 
   // Forward declarations.
@@ -3734,7 +4035,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       std::string name = record.Name(); \
       serialize_h_os \
           << "void Serialize" << name \
-          << "(const EntityMapper &, mx::ast::" #type_name \
+          << "(const PendingFragment &, const EntityMapper &, mx::ast::" #type_name \
           << "::Builder, const pasta::" << name \
           << " &, const TokenTree *);\n"; \
     }

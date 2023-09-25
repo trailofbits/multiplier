@@ -184,11 +184,11 @@ std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const TokenContext &t) {
 }
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::access_control(void) const {
-  return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal86());
+  return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal85());
 }
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::canonical_access_control(void) const {
-  return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal88());
+  return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal87());
 }
 
 ObjCInterfaceDecl ObjCIvarDecl::containing_interface(void) const {
@@ -197,12 +197,12 @@ ObjCInterfaceDecl ObjCIvarDecl::containing_interface(void) const {
 }
 
 ObjCIvarDecl ObjCIvarDecl::next_instance_variable(void) const {
-  RawEntityId eid = impl->reader.getVal85();
+  RawEntityId eid = impl->reader.getVal86();
   return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ObjCIvarDecl::synthesize(void) const {
-  return impl->reader.getVal101();
+  return impl->reader.getVal103();
 }
 
 #pragma GCC diagnostic pop

@@ -14,7 +14,7 @@ namespace mx {
 enum class HotAttrSpelling : unsigned char {
   GNU_HOT,
   CXX11_GNU_HOT,
-  C2X_GNU_HOT,
+  C23_GNU_HOT,
   SPELLING_NOT_CALCULATED,
 };
 
