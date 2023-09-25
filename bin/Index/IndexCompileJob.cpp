@@ -83,6 +83,12 @@ class TLDFinder final : public pasta::DeclVisitor {
   explicit TLDFinder(std::vector<OrderedDecl> &tlds_)
       : tlds(tlds_) {}
 
+  void VisitDeeperDeclContext(const pasta::DeclContext &dc) {
+    ++depth;
+    VisitDeclContext(dc);    
+    --depth;
+  }
+
   void VisitDeclContext(const pasta::DeclContext &dc) {
     dc_depth.emplace(dc.RawDeclContext(), depth);
 
@@ -154,19 +160,12 @@ class TLDFinder final : public pasta::DeclVisitor {
   //              https://gcc.godbolt.org/z/MGrMjxxvx
   void VisitClassTemplatePartialSpecializationDecl(
       const pasta::ClassTemplatePartialSpecializationDecl &decl) final {
-
-    ++depth;
-    VisitDeclContext(decl);
-    --depth;
+    VisitDeeperDeclContext(decl);
   }
 
   void VisitClassTemplateSpecializationDecl(
       const pasta::ClassTemplateSpecializationDecl &decl) final {
-
-    ++depth;
-    VisitDeclContext(decl);
-    --depth;
-
+    VisitDeeperDeclContext(decl);
     tlds.emplace_back(decl, order++);
   }
 
@@ -176,10 +175,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   // }
 
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
-
-    ++depth;
-    VisitDeclContext(decl.TemplatedDeclaration());
-    --depth;
+    VisitDeeperDeclContext(decl.TemplatedDeclaration());
 
     if (!seen_specs.emplace(decl.CanonicalDeclaration()).second) {
       return;
@@ -250,9 +246,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 
     // Forward declarations embedded in declarators within a record may have
     // a semantic decl context that is at the top level.
-    ++depth;
-    VisitDeclContext(decl);
-    --depth;
+    VisitDeeperDeclContext(decl);
 
     VisitDecl(decl);
   }

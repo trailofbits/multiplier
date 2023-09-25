@@ -218,42 +218,30 @@ struct CompilerPathInfo {
   std::string no_sysroot;
 };
 
-class CompilerPathInfoCache {
- private:
-  const bool enable_cache;
-
-  std::unordered_map<std::string, CompilerPathInfo> cached_info;
-  std::mutex cached_info_lock;
-
- public:
-  inline CompilerPathInfoCache(bool enable_cache_)
-      : enable_cache(enable_cache_) {}
-
-  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
-      const Command &command);
-};
-
 class BuildCommandAction final : public Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
   std::shared_ptr<GlobalIndexingState> ctx;
-  CompilerPathInfoCache &cache;
+  const bool cxx_support;
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
-  static bool CanRunCompileJob(const pasta::CompileJob &job);
+  bool CanRunCompileJob(const pasta::CompileJob &job) const;
+
+  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
+      const Command &command);
 
  public:
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
                             std::shared_ptr<GlobalIndexingState> ctx_,
-                            CompilerPathInfoCache &cache_)
+                            bool cxx_support_)
       : fm(fm_),
         command(command_),
         ctx(std::move(ctx_)),
-        cache(cache_) {}
+        cxx_support(cxx_support_) {}
 
   void Run(void) final;
 };
@@ -261,28 +249,13 @@ class BuildCommandAction final : public Action {
 // If we are using something like CMake commands, then pull in the relevant
 // information by trying to execute the compiler directly.
 std::variant<CompilerPathInfo, std::string>
-CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
-
-  std::unique_lock<std::mutex> locker;
-
-  // In caching mode, we check to see if, for the given compiler path, if we've
-  // already got compiler info. If so then great, if not then we need to run
-  // a command. We'll use the info generated from the first successful command.
-  //
-  // NOTE(pag): This is technically sketchy, but for some tests, in uniform
-  //            codebases, this can significantly speed up the import step for
-  //            compile commands.
-  if (enable_cache) {
-    std::unique_lock<std::mutex>(cached_info_lock).swap(locker);
-    if (auto info_it = cached_info.find(command.vec[0]);
-        info_it != cached_info.end()) {
-      return info_it->second;  // Cache hit.
-    }
-  }
-
+BuildCommandAction::GetCompilerInfo(const Command &command) {
   std::vector<std::string> new_args;
   bool skip = false;
-  for (const char *arg : command.vec) {
+  for (const char *arg_ : command.vec) {
+
+    std::string_view arg(arg_);
+
     if (skip) {
       skip = false;
 
@@ -290,60 +263,60 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
       //
       //      ... -main-file-name -mrelocation-model ...
       //
-      if (arg[0] != '-' && 1u < strlen(arg)) {
+      if (arg.front() != '-' && 1u < arg.size()) {
         continue;
       }
     }
 
-    if (strstr(arg, "-Wno") == arg) {
+    if (arg.starts_with("-Wno-")) {
       // Keep the argument.
 
     // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
-    } else if (strstr(arg, "-W") == arg ||
-               strstr(arg, "-pedantic") == arg ||
-               !strcmp(arg, "-pic-is-pie")) {
+    } else if (arg.starts_with("-W") ||
+               arg.starts_with("-pedantic") ||
+               arg == "-pic-is-pie") {
       continue;  // Skip the argument.
 
-    } else if (!strcmp(arg, "-mllvm") ||
-               !strcmp(arg, "-Xclang") ||
-               !strcmp(arg, "-dependency-file") ||
-               !strcmp(arg, "-diagnostic-log-file") ||
-               !strcmp(arg, "-header-include-file") ||
-               !strcmp(arg, "-stack-usage-file") ||
-               !strcmp(arg, "-mrelocation-model") ||
-               !strcmp(arg, "-pic-level") ||
-               !strcmp(arg, "-main-file-name")) {
+    } else if (arg == "-mllvm" ||
+               arg == "-Xclang" ||
+               arg == "-dependency-file" ||
+               arg == "-diagnostic-log-file" ||
+               arg == "-header-include-file" ||
+               arg == "-stack-usage-file" ||
+               arg == "-mrelocation-model" ||
+               arg == "-pic-level" ||
+               arg == "-main-file-name") {
       skip = true;
       continue;  // Skip the argument and the next argument.
 
     // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` or
     // `-fprofile-remapping-file=`, or ..., then drop it.
-    } else if (strstr(arg, "-file=") /* NOTE(pag): find anywhere */ ||
-               strstr(arg, "-dependent-lib=") == arg ||
-               strstr(arg, "-stats-file=") == arg ||
-               strstr(arg, "-fprofile-list=") == arg ||
-               strstr(arg, "-fxray-always-instrument=") == arg ||
-               strstr(arg, "-fxray-never-instrument=") == arg ||
-               strstr(arg, "-fxray-attr-list=") == arg ||
-               strstr(arg, "-tsan-compound-read-before-write=") == arg ||
-               strstr(arg, "-tsan-distinguish-volatile=") == arg ||
-               strstr(arg, "-treat") == arg) {
+    } else if (strstr(arg_, "-file=") /* NOTE(pag): find anywhere */ ||
+               arg.starts_with("-dependent-lib=") ||
+               arg.starts_with("-stats-file=") ||
+               arg.starts_with("-fprofile-list=") ||
+               arg.starts_with("-fxray-always-instrument=") ||
+               arg.starts_with("-fxray-never-instrument=") ||
+               arg.starts_with("-fxray-attr-list=") ||
+               arg.starts_with("-tsan-compound-read-before-write=") ||
+               arg.starts_with("-tsan-distinguish-volatile=") ||
+               arg.starts_with("-treat")) {
       continue;
 
     // Output file.
-    } else if (!strcmp(arg, "-o")) {
+    } else if (arg == "-o") {
       skip = true;
       new_args.emplace_back(arg);
       new_args.emplace_back("/dev/null");
       continue;
 
     // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
-    } else if ((arg[0] == '\'' || arg[0] == '"') && arg[1] == '-' &&
-               arg[strlen(arg) - 1u] == arg[0]) {
+    } else if ((arg.front() == '\'' || arg.front() == '"') && arg[1] == '-' &&
+               arg.back() == arg.front()) {
       continue;
     }
 
-    new_args.emplace_back(arg);
+    new_args.emplace_back(arg_);
   }
 
   new_args.emplace_back("-w");  // Disable all warnings (GCC).
@@ -388,7 +361,8 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
       new_args, &(command.env), nullptr, nullptr, &output.no_sysroot);
 
   // NOTE(pag): Changing the sysroot might make parts of the compilation fail.
-  if (std::holds_alternative<std::error_code>(ret) && output.no_sysroot.empty()) {
+  if (std::holds_alternative<std::error_code>(ret) &&
+      output.no_sysroot.empty()) {
     return std::get<std::error_code>(ret).message();
   }
 
@@ -401,18 +375,14 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
     }
   }
 
-  if (enable_cache) {
-    cached_info.emplace(command.vec[0], output);
-  }
-
   return output;
 }
 
-bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
+bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
   const auto &args = job.Arguments();
   for (auto it = args.begin(); it != args.end(); ++it) {
-    const char *arg = *it;
-    if (strcmp(arg, "-x")) {
+    std::string_view arg = *it;
+    if (arg != "-x") {
       continue;
     }
     
@@ -425,7 +395,7 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
     // Next argument after opt_x flag will be lang value; Compare
     // it with the supported language i.e. C.
     arg = *it;
-    if (!strcmp(arg, "c") || !strcmp(arg, "c++")) {
+    if (arg == "c" || (arg == "c++" && cxx_support)) {
 
     } else {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
@@ -491,7 +461,7 @@ void BuildCommandAction::Run(void) {
     return;
   }
 
-  auto maybe_cc_info = cache.GetCompilerInfo(command);
+  auto maybe_cc_info = GetCompilerInfo(command);
   if (!std::holds_alternative<CompilerPathInfo>(maybe_cc_info)) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
@@ -743,11 +713,10 @@ namespace {
 static std::mutex gImportLock;
 }  // namespace
 
-void Importer::Import(const ExecutorOptions &options, bool fast_import) {
+void Importer::Import(const ExecutorOptions &options, bool cxx_support) {
   Executor per_path_exe(options);
 
   for (auto &[cwd, commands] : d->commands) {
-    CompilerPathInfoCache cc_info_cache(fast_import);
 
     // Make sure that even concurrent calls to `Import` never concurrently
     // change the current working directory.
@@ -766,7 +735,7 @@ void Importer::Import(const ExecutorOptions &options, bool fast_import) {
 
     for (const Command &cmd : commands) {
       per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx,
-                                                     cc_info_cache);
+                                                     cxx_support);
     }
 
     per_path_exe.Start();

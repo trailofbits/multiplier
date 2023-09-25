@@ -214,13 +214,13 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const 
   if (auto id = PerFragmentEntityId(entity.RawToken());
       id != mx::kInvalidEntityId) {
     return id;
-
-  } else if (auto pt = entity.DerivedLocation()) {
-    return EntityId(pt.value());
-  
-  } else {
-    return mx::kInvalidEntityId;
   }
+
+  if (auto pt = entity.DerivedLocation()) {
+    return EntityId(pt.value());
+  }
+
+  return mx::kInvalidEntityId;
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {

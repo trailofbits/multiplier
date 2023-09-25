@@ -37,6 +37,9 @@
 namespace indexer {
 namespace {
 
+// TODO(pag): Switch to something like xxHash that is stable across libcs.
+static constexpr std::hash<std::string_view> kHasher;
+
 class HashVisitor final : public pasta::DeclVisitor {
  public:
   virtual ~HashVisitor(void) = default;
@@ -66,33 +69,31 @@ class HashVisitor final : public pasta::DeclVisitor {
     VisitDeclContext(decl);
   }
 
-  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-
-    // XREF(pag): Issue #318. Only integrate the ODR hash when we have a
-    //            definition.
-    if (IsDefinition(decl)) {
-      if (auto hash = decl.ODRHash()) {
+  // XREF(pag): Issue #318. Only integrate the ODR hash when we have a
+  //            definition.
+  template <typename T>
+  void VisitODRHashable(const T &entity) {
+    if (IsDefinition(entity)) {
+      if (auto hash = entity.ODRHash()) {
         ss << " o" << hash.value();
       }
     }
+  }
+
+  void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
+    VisitODRHashable(decl);
     VisitDeclContext(decl);
   }
 
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
+    VisitODRHashable(decl);
     if (IsDefinition(decl)) {
-      if (auto hash = decl.ODRHash()) {
-        ss << " o" << hash.value();
-      }
       VisitDeclContext(decl);
     }
   }
 
   void VisitEnumDecl(const pasta::EnumDecl &decl) final {
-    if (IsDefinition(decl)) {
-      if (auto hash = decl.ODRHash()) {
-        ss << " o" << hash.value();
-      }
-    }
+    VisitODRHashable(decl);
   }
 
   // VisitDecl will add kind name of all decl to the folding set
@@ -169,8 +170,9 @@ std::string HashFragment(
 
   uint64_t end_index = 0u;
 
-  auto mixin_token = [&ss] (mx::TokenKind kind, pasta::TokenRole role,
-                            std::string_view data) {
+  auto accumulate_token_into_hash = [&ss] (mx::TokenKind kind,
+                                           pasta::TokenRole role,
+                                           std::string_view data) {
     if (data.empty()) {
       return;
     }
@@ -195,7 +197,6 @@ std::string HashFragment(
         return;
     }
 
-    static constexpr std::hash<std::string_view> kHasher;
     if (data.size() >= 8u) {
       ss << kHasher(data);
     } else if (data[0] != '_' && !isalpha(data[0])) {
@@ -206,18 +207,17 @@ std::string HashFragment(
   if (frag_tok_range && *frag_tok_range) {
     for (pasta::Token token : *frag_tok_range) {
       end_index = token.Index();
-      mixin_token(mx::FromPasta(token.Kind()), token.Role(), token.Data());
+      accumulate_token_into_hash(mx::FromPasta(token.Kind()), token.Role(),
+                                 token.Data());
     }
   }
 
   if (decl_tok_range) {
     for (pasta::PrintedToken token : decl_tok_range) {
-      mixin_token(mx::FromPasta(token.Kind()), pasta::TokenRole::kFileToken,
-                  token.Data());
+      accumulate_token_into_hash(mx::FromPasta(token.Kind()),
+                                 pasta::TokenRole::kFileToken, token.Data());
 
       std::stringstream tc;
-      static constexpr std::hash<std::string> kHasher;
-
       for (pasta::TokenContext context : TokenContexts(token)) {
         switch (context.Kind()) {
           case pasta::TokenContextKind::kDecl:
