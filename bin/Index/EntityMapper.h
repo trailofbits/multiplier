@@ -50,10 +50,21 @@ class EntityMapper final {
   inline explicit EntityMapper(TypeMapper &tm_)
       : tm(tm_) {}
 
+  mx::RawEntityId ParentDeclId(const void *) const;
+  mx::RawEntityId ParentStmtId(const void *) const;
+
   mx::RawEntityId ParentDeclId(const pasta::Decl &entity) const;
   mx::RawEntityId ParentDeclId(const pasta::Stmt &entity) const;
+  mx::RawEntityId ParentDeclId(const pasta::Designator &entity) const;
+  mx::RawEntityId ParentDeclId(const pasta::TemplateArgument &entity) const;
+  mx::RawEntityId ParentDeclId(const pasta::TemplateParameterList &entity) const;
+  mx::RawEntityId ParentDeclId(const pasta::CXXBaseSpecifier &entity) const;
+
   mx::RawEntityId ParentStmtId(const pasta::Decl &entity) const;
   mx::RawEntityId ParentStmtId(const pasta::Stmt &entity) const;
+  mx::RawEntityId ParentStmtId(const pasta::Designator &entity) const;
+  mx::RawEntityId ParentStmtId(const pasta::TemplateArgument &entity) const;
+
   mx::RawEntityId EntityId(const void *entity) const;
   mx::RawEntityId PerFragmentEntityId(const void *entity) const;
   mx::RawEntityId EntityId(const pasta::File &file) const;

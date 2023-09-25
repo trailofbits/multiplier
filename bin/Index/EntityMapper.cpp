@@ -17,40 +17,60 @@
 
 namespace indexer {
 
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
-  if (auto it = parent_decl_ids.find(entity.RawDecl());
-      it != parent_decl_ids.end()) {
+mx::RawEntityId EntityMapper::ParentDeclId(const void *entity) const {
+  if (auto it = parent_decl_ids.find(entity); it != parent_decl_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
   }
+}
+
+mx::RawEntityId EntityMapper::ParentStmtId(const void *entity) const {
+  if (auto it = parent_stmt_ids.find(entity); it != parent_stmt_ids.end()) {
+    return it->second.Pack();
+  } else {
+    return mx::kInvalidEntityId;
+  }
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
+  return ParentDeclId(entity.RawDecl());
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
-  if (auto it = parent_decl_ids.find(entity.RawStmt());
-      it != parent_decl_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return ParentDeclId(entity.RawStmt());
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Designator &entity) const {
+  return ParentDeclId(entity.RawDesignator());
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::TemplateArgument &entity) const {
+  return ParentDeclId(entity.RawTemplateArgument());
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::TemplateParameterList &entity) const {
+  return ParentDeclId(entity.RawTemplateParameterList());
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::CXXBaseSpecifier &entity) const {
+  return ParentDeclId(entity.RawCXXBaseSpecifier());
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
-  if (auto it = parent_stmt_ids.find(entity.RawDecl());
-      it != parent_stmt_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return ParentStmtId(entity.RawDecl());
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
-  if (auto it = parent_stmt_ids.find(entity.RawStmt());
-      it != parent_stmt_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return ParentStmtId(entity.RawStmt());
+}
+
+mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Designator &entity) const {
+  return ParentStmtId(entity.RawDesignator());
+}
+
+mx::RawEntityId EntityMapper::ParentStmtId(const pasta::TemplateArgument &entity) const {
+  return ParentStmtId(entity.RawTemplateArgument());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {

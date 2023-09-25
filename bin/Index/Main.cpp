@@ -155,7 +155,7 @@ static std::optional<size_t> ParseQueueSize(void) {
 
 }  // namespace
 
-extern "C" int main(int argc, char *argv[], char *envp[]) {
+int main(int argc, char *argv[], char *envp[]) {
   pasta::InitPasta init_pasta;
 
   std::stringstream ss;

@@ -33,7 +33,7 @@ static void RenderField(const mx::RecordDecl &record,
   std::cout << "\n\n";
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
@@ -51,7 +51,6 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index = InitExample(true);
 
   std::unordered_set<mx::PackedDeclId> self_referencing;
-  std::unordered_set<mx::PackedDeclId> next_self_referencing;
   std::unordered_set<mx::PackedDeclId> seen;
 
   int level = 0;
@@ -89,6 +88,8 @@ extern "C" int main(int argc, char *argv[]) {
     prev_size = self_referencing.size();
     ++level;
 
+    std::unordered_set<mx::PackedDeclId> next_self_referencing;
+
     for (mx::FieldDecl field : mx::FieldDecl::in(index)) {
       if (seen.contains(field.id())) {
         continue;
@@ -117,7 +118,6 @@ extern "C" int main(int argc, char *argv[]) {
 
     self_referencing.insert(next_self_referencing.begin(),
                             next_self_referencing.end());
-    next_self_referencing.clear();
   }
 
   return EXIT_SUCCESS;

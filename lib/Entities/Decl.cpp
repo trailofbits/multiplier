@@ -29,10 +29,6 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
-bool Decl::is_definition(void) const {
-  return impl->reader.getVal2();
-}
-
 std::optional<Decl> Decl::parent_declaration(void) const {
   if (auto id = impl->reader.getVal0(); id != kInvalidEntityId) {
     if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
@@ -52,6 +48,11 @@ std::optional<Stmt> Decl::parent_statement(void) const {
   }
   return std::nullopt;
 }
+
+bool Decl::is_definition(void) const {
+  return impl->reader.getVal2();
+}
+
 std::shared_ptr<EntityProvider> Decl::entity_provider_of(const Index &index_) {
   return index_.impl;
 }

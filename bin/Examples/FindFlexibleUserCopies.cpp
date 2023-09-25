@@ -156,7 +156,7 @@ static void WithCopyToUser(mx::FunctionDecl copy_from_user) {
   }
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

@@ -42,6 +42,7 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Type {
+ public:
  protected:
   friend class Attr;
   friend class Decl;

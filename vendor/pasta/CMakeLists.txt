@@ -28,10 +28,6 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/pasta/src
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
-
-  execute_process(
-    COMMAND "${GIT_EXECUTABLE}" submodule set-branch --branch llvm17 vendor/pasta/src
-    WORKING_DIRECTORY "${PASTA_SOURCE_DIR}")
 endif()
 
 # This is the main build, setup and execute the nested build

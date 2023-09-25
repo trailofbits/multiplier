@@ -40,6 +40,7 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Attr {
+ public:
  protected:
   friend class Decl;
   friend class File;

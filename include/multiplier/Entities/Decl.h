@@ -50,6 +50,9 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Decl {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class File;
@@ -90,8 +93,6 @@ class Decl {
   PackedDeclId id(void) const;
   gap::generator<Reference> references(void) const &;
 
-  std::optional<Decl> parent_declaration(void) const;
-  std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> definition(void) const;
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;

@@ -110,6 +110,10 @@ class EntityVisitor : protected pasta::DeclVisitor,
   virtual void Accept(const pasta::Decl &entity);
   virtual void Accept(const pasta::Stmt &entity);
   virtual void Accept(const pasta::Type &entity);
+  virtual void Accept(const pasta::TemplateParameterList &entity);
+  virtual void Accept(const pasta::TemplateArgument &entity);
+  virtual void Accept(const pasta::Designator &entity);
+  virtual void Accept(const pasta::CXXBaseSpecifier &entity);
 };
 
 }  // namespace indexer

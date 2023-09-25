@@ -49,6 +49,16 @@ class ParentTrackerVisitor : public EntityVisitor {
       : em(fragment_.em),
         fragment(fragment_) {}
 
+  void AddToMaps(const void *entity) {
+    if (parent_decl_id != mx::kInvalidEntityId) {
+      em.parent_decl_ids.emplace(entity, parent_decl_id);
+    }
+
+    if (parent_stmt_id != mx::kInvalidEntityId) {
+      em.parent_stmt_ids.emplace(entity, parent_stmt_id);
+    }
+  }
+
   void Accept(const pasta::Decl &entity) final {
     mx::RawEntityId rid = em.EntityId(entity);
     mx::VariantId vid = mx::EntityId(rid).Unpack();
@@ -72,6 +82,8 @@ class ParentTrackerVisitor : public EntityVisitor {
       em.parent_stmt_ids.emplace(entity.RawDecl(), parent_stmt_id);
     }
 
+    AddToMaps(entity.RawDecl());
+
     SaveRestoreEntityId save_parent_decl(parent_decl_id, rid);
     this->EntityVisitor::Accept(entity);
   }
@@ -91,19 +103,15 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    if (parent_decl_id != mx::kInvalidEntityId) {
-      em.parent_decl_ids.emplace(entity.RawStmt(), parent_decl_id);
-    }
-
-    if (parent_stmt_id != mx::kInvalidEntityId) {
-      em.parent_stmt_ids.emplace(entity.RawStmt(), parent_stmt_id);
-    }
+    AddToMaps(entity.RawStmt());
 
     SaveRestoreEntityId save_parent_stmt(parent_stmt_id, rid);
     this->EntityVisitor::Accept(entity);
   }
 
-  void Accept(const pasta::Attr &) final {}
+  void Accept(const pasta::Attr &entity) final {
+    AddToMaps(entity.RawAttr());
+  }
 
   bool Enter(const pasta::Decl &entity) final {
     return not_yet_seen.erase(entity.RawDecl());
@@ -113,14 +121,101 @@ class ParentTrackerVisitor : public EntityVisitor {
     return not_yet_seen.erase(entity.RawStmt());
   }
 
-  bool Enter(const pasta::Type &entity) final {
-    return not_yet_seen.erase(entity.RawType());
+  bool Enter(const pasta::Type &) final {
+    return false;
   }
 
   bool Enter(const pasta::Attr &) final {
+    AddToMaps(entity.RawAttr());
     return false;
   }
+
+  void Accept(const pasta::Type &) final {}
+
+  void Accept(const pasta::TemplateParameterList &entity) final {
+    AddToMaps(entity.RawTemplateParameterList());
+  }
+
+  void Accept(const pasta::TemplateArgument &entity) final {
+    AddToMaps(entity.RawTemplateArgument());
+  }
+
+  void Accept(const pasta::Designator &entity) final {
+    AddToMaps(entity.RawDesignator());
+  }
+
+  void Accept(const pasta::CXXBaseSpecifier &entity) final {
+    AddToMaps(entity.RawCXXBaseSpecifier());
+  }
 };
+
+static void FindMissingParentageFromTokens(
+    ParentTrackerVisitor &vis, PendingFragment &pf) {
+
+  auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+  
+  for (pasta::Token tok : pf.parsed_tokens) {
+    const void *child_stmt = nullptr;
+    const void *parent_stmt = nullptr;
+    const void *parent_decl = nullptr;
+    bool seen_type = false;
+
+    for (auto ctx = tok.Context(); ctx; ctx = ctx->Parent()) {
+      auto raw_ctx = ctx->Data();
+      switch (ctx->Kind()) {
+        default:
+          raw_last_expr = nullptr;
+          break;
+        case pasta::TokenContextKind::kStmt:
+          if (seen_type) {
+            parent_stmt = raw_ctx;
+            goto found;
+          } else {
+            child_stmt = raw_ctx;
+            break;
+          }
+        case pasta::TokenContextKind::kDecl:
+          if (seen_type) {
+            parent_decl = raw_ctx;
+            goto found;
+          } else {
+            child_stmt = raw_ctx;
+            break;
+          }
+        case pasta::TokenContextKind::kType:
+          if (child_stmt || seen_type) {
+            seen_type = true;
+          } else {
+            child_stmt = nullptr;
+          }
+          break;
+      }
+    }
+
+  skip:
+    continue;
+
+  found:
+    if (vis.not_yet_seen.count(child_stmt)) {
+      continue;
+    }
+
+    assert(parent_stmt || parent_decl);
+
+    vis.parent_stmt_id = pf.em.EntityId(parent_stmt);
+    vis.parent_decl_id = pf.em.EntityId(parent_decl);
+
+    if (vis.parent_stmt_id == mx::kInvalidEntityId) {
+      vis.parent_stmt_id = pf.em.ParentStmtId(parent_decl);
+    }
+
+    if (vis.parent_decl_id == mx::kInvalidEntityId) {
+      vis.parent_decl_id = pf.em.ParentDeclId(parent_stmt);
+    }
+
+    vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
+  }
+}
 
 }  // namespace
 
@@ -137,10 +232,6 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
     vis.not_yet_seen.emplace(stmt.RawStmt());
   }
 
-  for (const pasta::Type &type : pf.types_to_serialize) {
-    vis.not_yet_seen.emplace(type.RawType());
-  }
-
   // Visit the top-level decls first.
 
   for (const pasta::Decl &decl : pf.top_level_decls) {
@@ -154,6 +245,14 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
       vis.Accept(decl);
       DCHECK_EQ(max_i, pf.decls_to_serialize.size());
       max_i = pf.decls_to_serialize.size();
+    }
+  }
+
+  // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
+  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
+    auto raw_entity = stmt.RawStmt();
+    if (vis.not_yet_seen.count(raw_entity)) {
+      FindMissingParentageFromTokens(vis, pf);
     }
   }
 

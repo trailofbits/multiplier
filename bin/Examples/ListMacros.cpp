@@ -37,7 +37,7 @@ static void PrintMacroNames(mx::Index index) {
   }
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

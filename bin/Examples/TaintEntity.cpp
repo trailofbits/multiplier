@@ -736,7 +736,7 @@ static std::ostream &TokData(mx::Token tok, std::ostream &ss) {
   return ss;
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

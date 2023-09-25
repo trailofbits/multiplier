@@ -41,6 +41,7 @@ class Value;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
+ public:
  protected:
   friend class Attr;
   friend class Decl;

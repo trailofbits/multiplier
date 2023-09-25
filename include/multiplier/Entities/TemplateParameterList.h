@@ -41,6 +41,7 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
+ public:
  protected:
   friend class Attr;
   friend class Decl;

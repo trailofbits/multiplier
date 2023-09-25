@@ -17,7 +17,7 @@ DECLARE_string(db);
 DEFINE_string(name, "", "Search for the symbol with name");
 DEFINE_bool(exact, false, "Should we match exactly the specified name?");
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

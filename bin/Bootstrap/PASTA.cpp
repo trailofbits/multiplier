@@ -2172,72 +2172,71 @@ MethodListPtr CodeGenerator::RunOnClass(
   // are derived from entities in fragments, and link to entities in fragments,
   // and so we need to carry around a fragment pointer.
   } else if (gFragmentEntityTypes.count(class_name)) {
-    unsigned cd = 0;  // Containing decl.
-    unsigned cs = 0;  // Containing stmt.
+    auto make_parent = [&] (const char *name, const char *link, const char *ent_kind) {
+      auto sd = storage.AddMethod("UInt64");  // Reference.
+      auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(sd);
 
-    // Keep track of containing/parent decl/stmt. We don't have this for types
-    // because they are deduplicated under-the-hood, and not specific to any
-    // one location (that's `clang::TypeLoc`, which PASTA doesn't represent).
-    if (class_name == "Decl" || class_name == "Stmt") {
-      cd = storage.AddMethod("UInt64");  // Reference.
-      cs = storage.AddMethod("UInt64");  // Reference.
-
-      auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(cd);
-      auto [cs_getter_name, cs_setter_name, cs_init_name] = NamesFor(cs);
+      class_os
+          << "  std::optional<" << ent_kind << "> " << name << "(void) const;\n";
 
       serialize_inc_os
-          << "  MX_VISIT_DECL_LINK(" << class_name
-          << ", parent_declaration, " << cd << ")\n"
-          << "  MX_VISIT_STMT_LINK(" << class_name << ", parent_statement, "
-          << cs << ")\n";
+          << "  " << link << "(" << class_name
+          << ", " << name << ", " << sd << ")\n";
 
       serialize_cpp_os
-          << "  b." << cd_setter_name << "(es.ParentDeclId(e));\n"
-          << "  b." << cs_setter_name << "(es.ParentStmtId(e));\n";
-
-      // `Decl::is_definition`
-      if (class_name == "Decl") {
-        const auto def = storage.AddMethod("Bool");
-        auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
-
-        serialize_inc_os
-            << "  MX_VISIT_BOOL(Decl, is_definition, " << def
-            << ", MX_APPLY_FUNC, IsDefinition, bool, NthDecl)\n";
-
-        lib_cpp_os
-            << "bool Decl::is_definition(void) const {\n"
-            << "  return impl->reader." << def_getter_name << "();\n"
-            << "}\n\n";
-
-        serialize_cpp_os
-            << "  b." << def_setter_name << "(IsDefinition(e));\n";
-      }
+          << "  b." << cd_setter_name << "(es.Parent" << ent_kind << "Id(e));\n";
 
       lib_cpp_os
-          << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
+          << "std::optional<" << ent_kind << "> " << class_name << "::" << name << "(void) const {\n"
           << "  if (auto id = impl->reader." << cd_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
-          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {\n"
-          << "      return Decl(std::move(eptr));\n"
+          << "    if (auto eptr = impl->ep->" << ent_kind << "For(impl->ep, id)) {\n"
+          << "      return " << ent_kind << "(std::move(eptr));\n"
           << "    }\n"
           << "    assert(false);\n"
           << "  }\n"
           << "  return std::nullopt;\n"
-          << "}\n\n"
-          << "std::optional<Stmt> " << class_name << "::parent_statement(void) const {\n"
-          << "  if (auto id = impl->reader." << cs_getter_name << "(); "
-          << "id != kInvalidEntityId) {\n"
-          << "    if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {\n"
-          << "      return Stmt(std::move(eptr));\n"
-          << "    }\n"
-          << "    assert(false);\n"
-          << "  }\n"
-          << "  return std::nullopt;\n"
-          << "}\n";
-    }
+          << "}\n\n";
+      return sd;
+    };
 
     class_os
         << " {\n"
+        << " public:\n";
+
+    // `*::parent_declaration()`.
+    if (class_name == "Decl" || class_name == "Stmt" ||
+        class_name == "CXXBaseSpecifier" ||
+        class_name == "CXXTemplateParameterList" ||
+        class_name == "Designator" || class_name == "TemplateArgument") {
+      make_parent("parent_declaration", "MX_VISIT_DECL_LINK", "Decl");
+    }
+
+    // `*::parent_statement()`.
+    if (class_name == "Decl" || class_name == "Stmt" ||
+        class_name == "Designator" || class_name == "TemplateArgument") {
+      make_parent("parent_statement", "MX_VISIT_STMT_LINK", "Stmt");
+    }
+
+    // `Decl::is_definition`
+    if (class_name == "Decl") {
+      const auto def = storage.AddMethod("Bool");
+      auto [def_getter_name, def_setter_name, def_init_name] = NamesFor(def);
+
+      serialize_inc_os
+          << "  MX_VISIT_BOOL(Decl, is_definition, " << def
+          << ", MX_APPLY_FUNC, IsDefinition, bool, NthDecl)\n";
+
+      lib_cpp_os
+          << "bool Decl::is_definition(void) const {\n"
+          << "  return impl->reader." << def_getter_name << "();\n"
+          << "}\n\n";
+
+      serialize_cpp_os
+          << "  b." << def_setter_name << "(IsDefinition(e));\n";
+    }
+
+    class_os
         << " protected:\n"
         << FriendOf(class_os, class_name, "Attr")
         << FriendOf(class_os, class_name, "Decl")
@@ -2320,8 +2319,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     if (class_name == "Decl") {
       class_os
-          << "  std::optional<Decl> parent_declaration(void) const;\n"
-          << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<Decl> definition(void) const;\n"
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
@@ -2349,8 +2346,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (class_name == "Stmt") {
       class_os
-          << "  std::optional<Decl> parent_declaration(void) const;\n"
-          << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<PackedDeclId> referenced_declaration_id(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
           << " public:\n";

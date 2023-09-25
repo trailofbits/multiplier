@@ -605,16 +605,18 @@ struct Macro @0xf88157fb8bf2eeff{
 }
 
 struct TemplateArgument @0xb5127dad01992f67{
-  val6 @0 :UInt64;
-  val7 @1 :UInt64;
-  val8 @2 :UInt64;
-  val9 @3 :UInt64;
-  val1 @4 :Bool;
-  val2 @5 :Bool;
-  val3 @6 :Bool;
-  val4 @7 :Bool;
-  val5 @8 :Bool;
-  val0 @9 :UInt8;
+  val3 @0 :Bool;
+  val4 @1 :Bool;
+  val5 @2 :Bool;
+  val6 @3 :Bool;
+  val7 @4 :Bool;
+  val2 @5 :UInt8;
+  val0 @6 :UInt64;
+  val1 @7 :UInt64;
+  val8 @8 :UInt64;
+  val9 @9 :UInt64;
+  val10 @10 :UInt64;
+  val11 @11 :UInt64;
 }
 
 struct TemplateParameterList @0xee0d4e6aba92fdde{
@@ -631,30 +633,33 @@ struct TemplateParameterList @0xee0d4e6aba92fdde{
 }
 
 struct CXXBaseSpecifier @0x8e0e4024ab6be99f{
-  val4 @0 :UInt8;
-  val8 @1 :UInt8;
-  val9 @2 :UInt8;
-  val3 @3 :Bool;
-  val5 @4 :Bool;
-  val6 @5 :Bool;
+  val5 @0 :UInt8;
+  val9 @1 :UInt8;
+  val10 @2 :UInt8;
+  val4 @3 :Bool;
+  val6 @4 :Bool;
+  val7 @5 :Bool;
   val0 @6 :UInt64;
   val1 @7 :UInt64;
   val2 @8 :UInt64;
-  val7 @9 :UInt64;
-  val10 @10 :UInt64;
+  val3 @9 :UInt64;
+  val8 @10 :UInt64;
+  val11 @11 :UInt64;
 }
 
 struct Designator @0x8fa2d595d812339e{
-  val3 @0 :UInt64;
-  val4 @1 :UInt64;
-  val5 @2 :UInt64;
-  val6 @3 :UInt64;
-  val7 @4 :UInt64;
-  val8 @5 :UInt64;
-  val9 @6 :UInt64;
-  val10 @7 :UInt64;
-  val0 @8 :Bool;
-  val1 @9 :Bool;
-  val2 @10 :Bool;
+  val2 @0 :Bool;
+  val3 @1 :Bool;
+  val4 @2 :Bool;
+  val0 @3 :UInt64;
+  val1 @4 :UInt64;
+  val5 @5 :UInt64;
+  val6 @6 :UInt64;
+  val7 @7 :UInt64;
+  val8 @8 :UInt64;
+  val9 @9 :UInt64;
+  val10 @10 :UInt64;
+  val11 @11 :UInt64;
+  val12 @12 :UInt64;
 }
 

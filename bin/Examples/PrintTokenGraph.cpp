@@ -435,7 +435,7 @@ void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
 }
 
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
