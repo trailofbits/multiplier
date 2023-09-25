@@ -215,15 +215,15 @@ Expr GenericSelectionExpr::result_expression(void) const {
 }
 
 bool GenericSelectionExpr::is_expression_predicate(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 bool GenericSelectionExpr::is_result_dependent(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal90();
 }
 
 bool GenericSelectionExpr::is_type_predicate(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

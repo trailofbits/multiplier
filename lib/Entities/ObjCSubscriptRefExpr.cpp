@@ -175,7 +175,7 @@ Token ObjCSubscriptRefExpr::r_bracket_token(void) const {
 }
 
 bool ObjCSubscriptRefExpr::is_array_subscript_reference_expression(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

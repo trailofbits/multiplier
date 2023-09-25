@@ -195,11 +195,11 @@ Token CXXPseudoDestructorExpr::tilde_token(void) const {
 }
 
 bool CXXPseudoDestructorExpr::has_qualifier(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 bool CXXPseudoDestructorExpr::is_arrow(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

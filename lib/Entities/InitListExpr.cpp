@@ -216,15 +216,15 @@ std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
 }
 
 bool InitListExpr::had_array_range_designator(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 bool InitListExpr::has_array_filler(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal90();
 }
 
 bool InitListExpr::has_designated_initializer(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal91();
 }
 
 unsigned InitListExpr::num_initializers(void) const {
@@ -260,26 +260,26 @@ gap::generator<Expr> InitListExpr::initializers(void) const & {
 }
 
 bool InitListExpr::is_explicit(void) const {
-  return impl->reader.getVal90();
-}
-
-bool InitListExpr::is_semantic_form(void) const {
-  return impl->reader.getVal91();
-}
-
-bool InitListExpr::is_string_literal_initializer(void) const {
   return impl->reader.getVal92();
 }
 
-bool InitListExpr::is_syntactic_form(void) const {
+bool InitListExpr::is_semantic_form(void) const {
+  return impl->reader.getVal93();
+}
+
+bool InitListExpr::is_string_literal_initializer(void) const {
   return impl->reader.getVal94();
 }
 
+bool InitListExpr::is_syntactic_form(void) const {
+  return impl->reader.getVal96();
+}
+
 std::optional<bool> InitListExpr::is_transparent(void) const {
-  if (!impl->reader.getVal97()) {
+  if (!impl->reader.getVal99()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal96());
+    return static_cast<bool>(impl->reader.getVal98());
   }
   return std::nullopt;
 }

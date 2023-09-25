@@ -180,7 +180,7 @@ Token CXXDefaultArgExpr::used_token(void) const {
 }
 
 bool CXXDefaultArgExpr::has_rewritten_initializer(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

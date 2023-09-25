@@ -175,15 +175,15 @@ Token UnresolvedMemberExpr::operator_token(void) const {
 }
 
 bool UnresolvedMemberExpr::has_unresolved_using(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal91();
 }
 
 bool UnresolvedMemberExpr::is_arrow(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal92();
 }
 
 bool UnresolvedMemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop
