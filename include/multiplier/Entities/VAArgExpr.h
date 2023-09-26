@@ -17,7 +17,6 @@ class Decl;
 class Expr;
 class Stmt;
 class Token;
-class Type;
 class VAArgExpr;
 class ValueStmt;
 namespace ir {
@@ -69,7 +68,6 @@ class VAArgExpr : public Expr {
   Token builtin_token(void) const;
   Token r_paren_token(void) const;
   Expr sub_expression(void) const;
-  Type written_type(void) const;
   bool is_microsoft_abi(void) const;
 };
 

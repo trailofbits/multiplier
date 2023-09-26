@@ -76,7 +76,6 @@ class ObjCMessageExpr : public Expr {
   gap::generator<Expr> arguments(void) const &;
   Type call_return_type(void) const;
   Type class_receiver(void) const;
-  Type class_receiver_type(void) const;
   Expr instance_receiver(void) const;
   Token left_token(void) const;
   ObjCMethodDecl method_declaration(void) const;
