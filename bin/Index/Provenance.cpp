@@ -699,10 +699,6 @@ mx::RawEntityId RelatedEntityIdToToken(
     token_data = parsed_tok->Data();
   }
 
-  if (tk == pasta::TokenKind::kLSquare) {
-    asm volatile ("":::"memory");
-  }
-
   const void *related_entity = nullptr;
   mx::RawEntityId eid = mx::kInvalidEntityId;
   bool is_literal = false;
