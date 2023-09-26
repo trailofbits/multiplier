@@ -301,7 +301,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
 static const void *VisitType(const pasta::Type &type,
                              std::string_view tok_data,
-                             unsigned context_depth) {
+                             int context_depth) {
 
   if (auto typedef_type = pasta::TypedefType::From(type)) {
     auto typedef_decl = typedef_type->Declaration();
@@ -784,15 +784,17 @@ mx::RawEntityId RelatedEntityIdToToken(
       break;
   }
 
-  unsigned depth = 0u;
-  for (auto context = printed_tok.Context();
-       !related_entity && eid == mx::kInvalidEntityId && context;
-       ++depth, context = context->Parent()) {
+  int depth = -1;
+  for (auto context : TokenContexts(printed_tok)) {
+    if (related_entity || eid != mx::kInvalidEntityId) {
+      break;
+    }
 
-    switch (context->Kind()) {
+    ++depth;
+
+    switch (context.Kind()) {
       case pasta::TokenContextKind::kStmt:
-        if (std::optional<pasta::Stmt> stmt =
-                pasta::Stmt::From(context.value())) {
+        if (auto stmt = pasta::Stmt::From(context)) {
           if (is_literal) {
             switch (stmt->Kind()) {
               default: break;
@@ -816,7 +818,7 @@ mx::RawEntityId RelatedEntityIdToToken(
       case pasta::TokenContextKind::kType:
         if (!is_literal) {
           related_entity = VisitType(
-              pasta::Type::From(context.value()).value(), token_data, depth);
+              pasta::Type::From(context).value(), token_data, depth);
         }
         break;
 
@@ -825,7 +827,7 @@ mx::RawEntityId RelatedEntityIdToToken(
           break;
         }
 
-        std::optional<pasta::Decl> decl = pasta::Decl::From(context.value());
+        std::optional<pasta::Decl> decl = pasta::Decl::From(context);
         if (!decl) {
           break;
         }
@@ -837,8 +839,7 @@ mx::RawEntityId RelatedEntityIdToToken(
       }
 
       case pasta::TokenContextKind::kAttr:
-        if (std::optional<pasta::Attr> attr =
-                pasta::Attr::From(context.value()).value()) {
+        if (auto attr = pasta::Attr::From(context)) {
 
           if (attr->Token().RawToken() == self) {
             eid = em.EntityId(attr.value());
@@ -854,8 +855,7 @@ mx::RawEntityId RelatedEntityIdToToken(
         break;
       case pasta::TokenContextKind::kDesignator:
         if (!is_literal) {
-          if (std::optional<pasta::Designator> d =
-                  pasta::Designator::From(context.value())) {
+          if (auto d = pasta::Designator::From(context)) {
             if (d->FieldToken().RawToken() == self) {
               if (auto field = d->Field()) {
                 related_entity = field->RawDecl();
