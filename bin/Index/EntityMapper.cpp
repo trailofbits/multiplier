@@ -184,27 +184,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   }
 
   if (auto mt = entity.MacroLocation()) {
-    eid = EntityId(mt->RawMacro());
-    if (eid != mx::kInvalidEntityId) {
-      return eid;
-    }
-  }
-
-  // If this token is derived from another one, and we don't have an entity
-  // ID for it, then try to get the entity ID for the derived token.
-  if (auto dt = entity.DerivedLocation()) {
-    eid = EntityId(dt.value());
-    if (eid != mx::kInvalidEntityId) {
-      return eid;
-    }
-  }
-
-  // If we fail to resolve the parsed token to an entity ID, then try to
-  // see if it's associated with a `pasta::FileToken`, and if so, then form
-  // an entity ID for that. We unify `Token` and `FileToken` in our serialized
-  // representation, because we always want references to "point somewhere."
-  if (auto ft = entity.FileLocation()) {
-    return EntityId(ft.value());  
+    return EntityId(mt->RawMacro());
   }
 
   return mx::kInvalidEntityId;
