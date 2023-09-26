@@ -632,6 +632,56 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
   return mx::kInvalidEntityId;
 }
 
+// Try to see if a token matches a declaration.
+static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
+                             const pasta::Decl &decl,
+                             std::string_view token_data) {
+
+  auto is_cxx_destructor = decl.Kind() == pasta::DeclKind::kCXXDestructor;
+
+  if (auto func = pasta::FunctionDecl::From(decl)) {
+    
+    // Try to match the operator token itself, or the `operator` keyword.
+    auto ook = func->OverloadedOperator();
+    if (AcceptOOK(ook, tk)) {
+      return true;
+    }
+
+    if (ook != pasta::OverloadedOperatorKind::kNone) {
+      return false;
+    }
+
+    // Match the `~` in a destructor name to the destructor.
+    if (tk == pasta::TokenKind::kTilde && is_cxx_destructor) {
+      return true;
+    }
+  }
+
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    auto nd_name = nd->Name();
+    std::string_view nd_name_view = nd_name;
+
+    // E.g. Issue #439, empty parameter names.
+    if (nd_name_view.empty()) {
+      return false;
+    }
+
+    if (is_cxx_destructor && nd_name_view.starts_with('~')) {
+      nd_name_view.remove_prefix(1);
+    }
+
+    if (token_data == nd_name_view) {
+      return true;
+    }
+  }
+
+  if (raw_token) {
+    return decl.Token().RawToken() == raw_token;
+  }
+
+  return false;
+}
+
 }  // namespace
 
 // Find the entity ID of the declaration that is most related to a particular
@@ -647,6 +697,10 @@ mx::RawEntityId RelatedEntityIdToToken(
     tk = parsed_tok->Kind();
     self = parsed_tok->RawToken();
     token_data = parsed_tok->Data();
+  }
+
+  if (tk == pasta::TokenKind::kLSquare) {
+    asm volatile ("":::"memory");
   }
 
   const void *related_entity = nullptr;
@@ -770,26 +824,21 @@ mx::RawEntityId RelatedEntityIdToToken(
         }
         break;
 
-      case pasta::TokenContextKind::kDecl:
-        if (!is_literal) {
-          if (std::optional<pasta::Decl> decl =
-                  pasta::Decl::From(context.value())) {
+      case pasta::TokenContextKind::kDecl: {
+        if (is_literal) {
+          break;
+        }
 
-            // Match on the name.
-            if (auto nd = pasta::NamedDecl::From(decl.value());
-                nd && nd->Name() == token_data) {
-              related_entity = nd->RawDecl();
-            }
+        std::optional<pasta::Decl> decl = pasta::Decl::From(context.value());
+        if (!decl) {
+          break;
+        }
 
-            // The backup case happens when we have something like `memset`,
-            // but Clang turns it into `__builtin_memset`, and so the name
-            // doesn't match.
-            if (!related_entity && self && decl->Token().RawToken() == self) {
-              related_entity = decl->RawDecl();
-            }
-          }
+        if (TokenMatchesDecl(tk, self, decl.value(), token_data)) {
+          related_entity = decl->RawDecl();
         }
         break;
+      }
 
       case pasta::TokenContextKind::kAttr:
         if (std::optional<pasta::Attr> attr =
