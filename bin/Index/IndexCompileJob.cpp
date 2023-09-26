@@ -62,6 +62,8 @@ using EntityGroup = std::vector<Entity>;
 using EntityGroupRange = std::tuple<EntityGroup, uint64_t, uint64_t>;
 static constexpr unsigned kGroupIndex = 0u;
 
+static bool IsProbablyABuiltinDecl(const pasta::Decl &decl);
+
 // Find all top-level declarations.
 class TLDFinder final : public pasta::DeclVisitor {
  private:
@@ -74,8 +76,27 @@ class TLDFinder final : public pasta::DeclVisitor {
   // Depth of a decl context.
   std::unordered_map<const void *, unsigned> dc_depth;
 
-  unsigned order{0u};
+  // If it doesn't look like a builtin declaration, then shift the order
+  // by a fudge factor. Clang can invent a lot of builtins, though definitely
+  // not more than 100,000.
+  unsigned builtin_order{0u};
+  unsigned order{100000u};
+
   unsigned depth{0u};
+
+  // Clang will invent some builtins just-in-time, and "just-in-time" ends up
+  // appearing logically after they're needed. E.g. when declaring
+  // `operator new`, Clang will invent the `std` namespace, and then invent
+  // things like `std::align_val_t` and the global `operator new`. These will
+  // appear *after* any uses of these things in the translation unit. So we
+  // need to arrange for them to be in the right order.
+  void AddDecl(const pasta::Decl &decl) {
+    if (IsProbablyABuiltinDecl(decl)) {
+      tlds.emplace_back(decl, builtin_order++);
+    } else {
+      tlds.emplace_back(decl, order++);
+    }
+  }
 
  public:
   virtual ~TLDFinder(void) = default;
@@ -132,7 +153,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     // context.
     if (auto tag = ut.AsTagDeclaration()) {
       Accept(tag.value());
-    
+
     // Builtin typedefs may be hiding top-level entities that are logically
     // only defined in the declarator of the typedef, e.g.
     // `__builtin_va_list_tag` within `__builtin_va_list`. Unlike when normal
@@ -166,7 +187,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   void VisitClassTemplateSpecializationDecl(
       const pasta::ClassTemplateSpecializationDecl &decl) final {
     VisitDeeperDeclContext(decl);
-    tlds.emplace_back(decl, order++);
+    AddDecl(decl);
   }
 
   // void VisitVarTemplatePartialSpecializationDecl(
@@ -208,7 +229,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitVarTemplateSpecializationDecl(
       const pasta::VarTemplateSpecializationDecl &decl) {
-    tlds.emplace_back(decl, order++);
+    AddDecl(decl);
   }
 
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
@@ -239,6 +260,22 @@ class TLDFinder final : public pasta::DeclVisitor {
       }
     }
 
+    // Go hunting for things like `std::align_val_t`.
+    //
+    // NOTE(pag): The parameters of an implicit `operator new` lack types?!
+    if (IsProbablyABuiltinDecl(decl)) {
+      for (pasta::ParmVarDecl p : decl.Parameters()) {
+        if (!p.IsImplicit()) {
+          continue;
+        }
+        if (auto tag = p.Type().AsTagDeclaration()) {
+          if (IsProbablyABuiltinDecl(tag.value())) {
+            Accept(tag.value());
+          }
+        }
+      }
+    }
+
     VisitDecl(decl);
   }
 
@@ -253,12 +290,12 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitDecl(const pasta::Decl &decl) final {
     if (!depth) {
-      tlds.emplace_back(decl, order++);
-    
+      AddDecl(decl);
+
     // Check if we found something that is semantically at the top level.
     } else if (auto sema_dc = decl.DeclarationContext()) {
       if (!dc_depth[sema_dc->RawDeclContext()]) {
-        tlds.emplace_back(decl, order++);
+        AddDecl(decl);
       }
     }
   }
@@ -562,18 +599,23 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 // not possible to get location information for these, unless we first printed
 // out the compiler builtins to a file and then introduced those as a special
 // preamble.
-static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
+bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
 
-  // The compiler knows how to recognize builtin functions.
-  if (auto fd = pasta::FunctionDecl::From(decl)) {
-    return fd->BuiltinID() != 0u;
-  }
-
-  if (!decl.IsImplicit()) {
+  if (decl.Token()) {
     return false;
   }
 
-  if (decl.Token()) {
+  // The compiler knows how to recognize builtin functions.
+  //
+  // NOTE(pag): Clang will sometimes "upgrade" user-defined functions into
+  //            builtins, hence the prior check on not having a location.
+  if (auto fd = pasta::FunctionDecl::From(decl)) {
+    if (fd->BuiltinID() != 0u) {
+      return true;
+    }
+  }
+
+  if (!decl.IsImplicit()) {
     return false;
   }
 
@@ -583,7 +625,18 @@ static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
     return false;
   }
 
-  if (dc.value() != pasta::AST::From(decl).TranslationUnit()) {
+  if (auto dc_decl = pasta::Decl::From(dc.value())) {
+    if (dc_decl->Kind() == pasta::DeclKind::kTranslationUnit) {
+      return true;
+    }
+
+    // Things like `std::align_val_t`, as well as an implicit `std` namespace,
+    // are injected into the TU if one declares an overloaded `operator new`.
+    if (dc_decl->IsImplicit() && decl.IsInStdNamespace()) {
+      return true;
+    }
+
+    assert(!dc_decl->IsImplicit());
     return false;
   }
 
@@ -607,7 +660,7 @@ static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
   //    __NSConstantString
   if (auto td = pasta::TypedefDecl::From(decl)) {
     return td->Name().starts_with("__");
-  
+
   // E.g. `__NSConstantString_tag`, `__va_list_tag`.
   } else if (auto rd = pasta::RecordDecl::From(decl)) {
     std::string name = rd->Name();
@@ -1386,7 +1439,7 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
     const std::vector<pasta::Decl> &root_decls,
     const std::vector<pasta::Decl> &child_decls,
     const pasta::PrintingPolicy &pp) {
-  
+
   if (root_decls.empty()) {
     if (child_decls.empty()) {
       return parsed_tokens;
@@ -1696,7 +1749,7 @@ static void CreatePendingFragments(
         std::move(root_decls),
         top_level_macros  /* copied */,
         root_fragment_id);
-  
+
     root_fragment_id = pf->fragment_id;
 
     LabelDeclsInFragment(*pf);
@@ -1718,7 +1771,7 @@ static void CreatePendingFragments(
     CHECK(!directive_range.empty());
     DCHECK_LE(begin_index, directive_range.Front()->Index());
     DCHECK_GE(end_index, directive_range.Back()->Index());
-    
+
     pasta::PrintedTokenRange parsed_tokens_in_directive_range =
         pasta::PrintedTokenRange::Adopt(directive_range);
     CHECK(parsed_tokens_in_directive_range.empty());

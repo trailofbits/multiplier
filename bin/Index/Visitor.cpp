@@ -112,9 +112,7 @@ void EntityVisitor::VisitNonTypeTemplateParmDecl(
 
 bool EntityVisitor::EnterFunctionDecl(const pasta::FunctionDecl &decl) {
   if (EnterDeclaratorDecl(decl)) {
-    if (auto type = decl.Type()) {
-      Accept(decl.Type().value());
-    }
+    Accept(decl.Type());
     VisitDeclContext(decl);
     for (const pasta::ParmVarDecl &param : decl.Parameters()) {
       Accept(param);
