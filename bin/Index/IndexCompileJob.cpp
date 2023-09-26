@@ -601,10 +601,6 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 // preamble.
 bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
 
-  if (decl.Token()) {
-    return false;
-  }
-
   // The compiler knows how to recognize builtin functions.
   //
   // NOTE(pag): Clang will sometimes "upgrade" user-defined functions into
@@ -613,6 +609,10 @@ bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
     if (fd->BuiltinID() != 0u) {
       return true;
     }
+  }
+
+  if (decl.Token()) {
+    return false;
   }
 
   if (!decl.IsImplicit()) {
