@@ -23,6 +23,8 @@ if(NOT EXISTS "${src_dir}/CMakeLists.txt")
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 endif()
 
+find_package(absl CONFIG REQUIRED)
+
 # This is the main build, setup and execute the nested build
 # to ensure the re2 library exists before continuing
 
@@ -46,6 +48,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DUSEPCRE:BOOL=OFF
                         -DRE2_BUILD_FRAMEWORK:BOOL=OFF
                         -DRE2_BUILD_TESTING:BOOL=OFF
+                        "-Dabsl_DIR=${absl_DIR}"
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
