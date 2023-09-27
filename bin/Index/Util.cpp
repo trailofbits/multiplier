@@ -1137,4 +1137,12 @@ gap::generator<pasta::TokenContext> TokenContexts(
   }
 }
 
+// Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.
+pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c) {
+  if (auto alias = c.Aliasee()) {
+    return alias.value();
+  }
+  return c;
+}
+
 }  // namespace indexer
