@@ -68,8 +68,11 @@ find_package(Clang CONFIG REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)
 find_package(reproc++ CONFIG REQUIRED)
+find_package(RocksDB CONFIG REQUIRED)
 
-# find_package(VAST CONFIG REQUIRED)
+if(MX_ENABLE_VAST)
+  find_package(VAST CONFIG REQUIRED)
+endif()
 
 if(MX_ENABLE_INSTALL)
   export(PACKAGE "${PROJECT_NAME}")
