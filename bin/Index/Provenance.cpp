@@ -1402,7 +1402,7 @@ bool TokenProvenanceCalculator::Push(void) {
   return changed;
 }
 
-// This is the version containing all toekn tree nodes. `tokens` is generally
+// This is the version containing all token tree nodes. `tokens` is generally
 // already in the order we want it to be in, but we can't guarantee this long
 // term, so we implement a sorting procedure.
 void TokenProvenanceCalculator::Run(
