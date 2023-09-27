@@ -632,6 +632,23 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
   return mx::kInvalidEntityId;
 }
 
+// If `name` represents the name of a destructor (`is_cxx_destructor`), then
+// strip off the leading `~`. When lexing, the leading `~` is a separate token,
+// but Clang forms the destructor name with it. When we ask for the location of
+// destructor, we get a token pointing to the name token, i.e. the token after
+// the `~`, and so we want to compare the token's data against the stripped
+// name.
+static std::string_view NameWithoutTilde(const std::string &name,
+                                         bool is_cxx_destructor) {
+  std::string_view stripped_name = name;
+
+  if (is_cxx_destructor && stripped_name.starts_with('~')) {
+    stripped_name.remove_prefix(1);
+  }
+
+  return stripped_name;
+}
+
 // Try to see if a token matches a declaration.
 static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
                              const pasta::Decl &decl,
@@ -659,18 +676,13 @@ static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
 
   if (auto nd = pasta::NamedDecl::From(decl)) {
     auto nd_name = nd->Name();
-    std::string_view nd_name_view = nd_name;
 
     // E.g. Issue #439, empty parameter names.
-    if (nd_name_view.empty()) {
+    if (nd_name.empty()) {
       return false;
     }
 
-    if (is_cxx_destructor && nd_name_view.starts_with('~')) {
-      nd_name_view.remove_prefix(1);
-    }
-
-    if (token_data == nd_name_view) {
+    if (token_data == NameWithoutTilde(nd_name, is_cxx_destructor)) {
       return true;
     }
   }
