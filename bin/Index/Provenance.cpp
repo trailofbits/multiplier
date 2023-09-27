@@ -301,7 +301,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
 static const void *VisitType(const pasta::Type &type,
                              std::string_view tok_data,
-                             unsigned context_depth) {
+                             int context_depth) {
 
   if (auto typedef_type = pasta::TypedefType::From(type)) {
     auto typedef_decl = typedef_type->Declaration();
@@ -632,6 +632,56 @@ mx::RawEntityId RelatedEntityIdToMacroToken(
   return mx::kInvalidEntityId;
 }
 
+// Try to see if a token matches a declaration.
+static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
+                             const pasta::Decl &decl,
+                             std::string_view token_data) {
+
+  auto is_cxx_destructor = decl.Kind() == pasta::DeclKind::kCXXDestructor;
+
+  if (auto func = pasta::FunctionDecl::From(decl)) {
+    
+    // Try to match the operator token itself, or the `operator` keyword.
+    auto ook = func->OverloadedOperator();
+    if (AcceptOOK(ook, tk)) {
+      return true;
+    }
+
+    if (ook != pasta::OverloadedOperatorKind::kNone) {
+      return false;
+    }
+
+    // Match the `~` in a destructor name to the destructor.
+    if (tk == pasta::TokenKind::kTilde && is_cxx_destructor) {
+      return true;
+    }
+  }
+
+  if (auto nd = pasta::NamedDecl::From(decl)) {
+    auto nd_name = nd->Name();
+    std::string_view nd_name_view = nd_name;
+
+    // E.g. Issue #439, empty parameter names.
+    if (nd_name_view.empty()) {
+      return false;
+    }
+
+    if (is_cxx_destructor && nd_name_view.starts_with('~')) {
+      nd_name_view.remove_prefix(1);
+    }
+
+    if (token_data == nd_name_view) {
+      return true;
+    }
+  }
+
+  if (raw_token) {
+    return decl.Token().RawToken() == raw_token;
+  }
+
+  return false;
+}
+
 }  // namespace
 
 // Find the entity ID of the declaration that is most related to a particular
@@ -734,15 +784,17 @@ mx::RawEntityId RelatedEntityIdToToken(
       break;
   }
 
-  unsigned depth = 0u;
-  for (auto context = printed_tok.Context();
-       !related_entity && eid == mx::kInvalidEntityId && context;
-       ++depth, context = context->Parent()) {
+  int depth = -1;
+  for (auto context : TokenContexts(printed_tok)) {
+    if (related_entity || eid != mx::kInvalidEntityId) {
+      break;
+    }
 
-    switch (context->Kind()) {
+    ++depth;
+
+    switch (context.Kind()) {
       case pasta::TokenContextKind::kStmt:
-        if (std::optional<pasta::Stmt> stmt =
-                pasta::Stmt::From(context.value())) {
+        if (auto stmt = pasta::Stmt::From(context)) {
           if (is_literal) {
             switch (stmt->Kind()) {
               default: break;
@@ -766,34 +818,28 @@ mx::RawEntityId RelatedEntityIdToToken(
       case pasta::TokenContextKind::kType:
         if (!is_literal) {
           related_entity = VisitType(
-              pasta::Type::From(context.value()).value(), token_data, depth);
+              pasta::Type::From(context).value(), token_data, depth);
         }
         break;
 
-      case pasta::TokenContextKind::kDecl:
-        if (!is_literal) {
-          if (std::optional<pasta::Decl> decl =
-                  pasta::Decl::From(context.value())) {
+      case pasta::TokenContextKind::kDecl: {
+        if (is_literal) {
+          break;
+        }
 
-            // Match on the name.
-            if (auto nd = pasta::NamedDecl::From(decl.value());
-                nd && nd->Name() == token_data) {
-              related_entity = nd->RawDecl();
-            }
+        std::optional<pasta::Decl> decl = pasta::Decl::From(context);
+        if (!decl) {
+          break;
+        }
 
-            // The backup case happens when we have something like `memset`,
-            // but Clang turns it into `__builtin_memset`, and so the name
-            // doesn't match.
-            if (!related_entity && self && decl->Token().RawToken() == self) {
-              related_entity = decl->RawDecl();
-            }
-          }
+        if (TokenMatchesDecl(tk, self, decl.value(), token_data)) {
+          related_entity = decl->RawDecl();
         }
         break;
+      }
 
       case pasta::TokenContextKind::kAttr:
-        if (std::optional<pasta::Attr> attr =
-                pasta::Attr::From(context.value()).value()) {
+        if (auto attr = pasta::Attr::From(context)) {
 
           if (attr->Token().RawToken() == self) {
             eid = em.EntityId(attr.value());
@@ -809,8 +855,7 @@ mx::RawEntityId RelatedEntityIdToToken(
         break;
       case pasta::TokenContextKind::kDesignator:
         if (!is_literal) {
-          if (std::optional<pasta::Designator> d =
-                  pasta::Designator::From(context.value())) {
+          if (auto d = pasta::Designator::From(context)) {
             if (d->FieldToken().RawToken() == self) {
               if (auto field = d->Field()) {
                 related_entity = field->RawDecl();
@@ -1357,7 +1402,7 @@ bool TokenProvenanceCalculator::Push(void) {
   return changed;
 }
 
-// This is the version containing all toekn tree nodes. `tokens` is generally
+// This is the version containing all token tree nodes. `tokens` is generally
 // already in the order we want it to be in, but we can't guarantee this long
 // term, so we implement a sorting procedure.
 void TokenProvenanceCalculator::Run(

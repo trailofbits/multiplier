@@ -35,7 +35,6 @@ class Stmt;
 class TagDecl;
 class TemplateParameterList;
 class Token;
-class Type;
 class TypeDecl;
 namespace ir {
 class Operation;
@@ -105,7 +104,6 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<Decl> lambda_context_declaration(void) const;
   std::optional<std::vector<NamedDecl>> lambda_explicit_template_parameters(void) const;
   std::optional<uint32_t> lambda_mangling_number(void) const;
-  std::optional<Type> lambda_type(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
   std::optional<uint32_t> odr_hash(void) const;

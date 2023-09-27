@@ -231,8 +231,10 @@ std::string TypeMapper::HashType(
          c; c = c->Parent()) {
       if (c->Kind() == pasta::TokenContextKind::kDecl) {
         if (const void *decl = c->Data(); decl != last_decl) {
-          decls.emplace_back(decl, i++);
           last_decl = decl;
+          if (!ShouldHideFromIndexer(pasta::Decl::From(c.value()).value())) {            
+            decls.emplace_back(decl, i++);
+          }
         }
 
         // We only care about the shallowest decl in the context chain; anything

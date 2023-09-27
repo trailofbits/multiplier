@@ -200,22 +200,17 @@ Type ObjCMessageExpr::class_receiver(void) const {
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-Type ObjCMessageExpr::class_receiver_type(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
 Expr ObjCMessageExpr::instance_receiver(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCMessageExpr::left_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 ObjCMethodDecl ObjCMessageExpr::method_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal41();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
@@ -224,7 +219,7 @@ ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
 }
 
 ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal42();
   return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
@@ -233,28 +228,28 @@ ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {
 }
 
 TokenRange ObjCMessageExpr::receiver_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal44(), impl->reader.getVal45());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal43(), impl->reader.getVal44());
 }
 
 Type ObjCMessageExpr::receiver_type(void) const {
-  RawEntityId eid = impl->reader.getVal46();
+  RawEntityId eid = impl->reader.getVal45();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token ObjCMessageExpr::right_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 Token ObjCMessageExpr::selector_start_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
 }
 
 Token ObjCMessageExpr::super_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
 }
 
 Type ObjCMessageExpr::super_type(void) const {
-  RawEntityId eid = impl->reader.getVal50();
+  RawEntityId eid = impl->reader.getVal49();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

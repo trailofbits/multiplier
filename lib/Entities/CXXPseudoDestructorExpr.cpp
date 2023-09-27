@@ -177,21 +177,8 @@ Token CXXPseudoDestructorExpr::operator_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
-std::optional<Type> CXXPseudoDestructorExpr::scope_type(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal42();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
 Token CXXPseudoDestructorExpr::tilde_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool CXXPseudoDestructorExpr::has_qualifier(void) const {

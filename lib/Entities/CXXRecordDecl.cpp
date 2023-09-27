@@ -25,7 +25,6 @@
 #include <multiplier/Entities/TagDecl.h>
 #include <multiplier/Entities/TemplateParameterList.h>
 #include <multiplier/Entities/Token.h>
-#include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/TypeDecl.h>
 
 #include "../EntityProvider.h"
@@ -412,19 +411,6 @@ std::optional<uint32_t> CXXRecordDecl::lambda_mangling_number(void) const {
   return std::nullopt;
 }
 
-std::optional<Type> CXXRecordDecl::lambda_type(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal130();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
 std::optional<MSInheritanceModel> CXXRecordDecl::ms_inheritance_model(void) const {
   if (!impl->reader.getVal145()) {
     return std::nullopt;
@@ -449,7 +435,7 @@ std::optional<uint32_t> CXXRecordDecl::odr_hash(void) const {
 
 std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal132();
+    RawEntityId eid = impl->reader.getVal130();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -1077,7 +1063,7 @@ std::optional<bool> CXXRecordDecl::is_literal(void) const {
 
 std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal133();
+    RawEntityId eid = impl->reader.getVal132();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -1330,14 +1316,14 @@ std::optional<uint64_t> CXXRecordDecl::size_without_virtual_bases(void) const {
   if (!impl->reader.getVal343()) {
     return std::nullopt;
   } else {
-    return static_cast<uint64_t>(impl->reader.getVal141());
+    return static_cast<uint64_t>(impl->reader.getVal133());
   }
   return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::primary_base(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal143();
+    RawEntityId eid = impl->reader.getVal141();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

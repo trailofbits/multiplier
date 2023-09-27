@@ -115,14 +115,16 @@ static void PersistTokenContexts(
     ++num_tokens;
 
     for (pasta::TokenContext c : TokenContexts(tok)) {
+      // What context to use for references.
+      auto ref_c = c;
       if (auto alias_context = c.Aliasee()) {
-        c = std::move(alias_context.value());
+        ref_c = std::move(alias_context.value());
       }
 
       if (false) {
 
 #define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
-    } else if (auto lower_name ## _ = pasta::type_name::From(c)) { \
+    } else if (auto lower_name ## _ = pasta::type_name::From(ref_c)) { \
       const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
       if (eid != mx::kInvalidEntityId) { \
         contexts[eid].insert(c); \
