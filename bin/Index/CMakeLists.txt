@@ -83,6 +83,7 @@ target_link_libraries("${exe_name}"
     gflags::gflags
     concurrentqueue
     reproc++
+    xxHash::xxhash
     ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
     ${MX_END_FORCE_LOAD_GROUP}
 )

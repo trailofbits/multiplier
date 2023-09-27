@@ -43,8 +43,6 @@
 namespace indexer {
 namespace {
 
-static const std::hash<std::string_view> kHasher;
-
 static bool IsDefinableToken(pasta::TokenKind kind) {
   auto clang_kind = static_cast<clang::tok::TokenKind>(kind);
   switch (clang_kind) {
@@ -1483,11 +1481,11 @@ void TokenProvenanceCalculator::Run(
     // Hash the data. Data equivalence helps to prioritize the propagation of
     // info.
     if (pl) {
-      data_hash = kHasher(pl->Data());
+      data_hash = Hash64(pl->Data());
     } else if (ml) {
-      data_hash = kHasher(ml->Data());
+      data_hash = Hash64(ml->Data());
     } else if (fl) {
-      data_hash = kHasher(fl->Data());
+      data_hash = Hash64(fl->Data());
     }
 
     TokenInfo &info = infos.emplace_back(tok_id, data_hash, rel_id, parsed_id);
@@ -1578,7 +1576,7 @@ void TokenProvenanceCalculator::Run(
     }
 
     TokenInfo &info = infos.emplace_back(
-        tok_id, kHasher(tok.Data()), rel_id, parsed_id);
+        tok_id, Hash64(tok.Data()), rel_id, parsed_id);
 
 #ifndef NDEBUG
     info.data = tok.Data();
