@@ -23,6 +23,7 @@ add_subdirectory(reproc)
 add_subdirectory(sqlite)
 add_subdirectory(gap)
 add_subdirectory(zstd)
+add_subdirectory(xxhash)
 add_subdirectory(rocksdb)  # Depends on zstd, gflags
 add_subdirectory(llvm-project)  # Depends on zstd
 add_subdirectory(pasta)  # Depends on llvm-project
