@@ -28,7 +28,7 @@ static void FunctionReferences(const pasta::AST &ast,
                                mx::ReferenceRecord &record) {
   auto valid_parent = true;
   auto parent = stmt;
-  record.kind = mx::BuiltinReferenceKind::TAKES_ADDRESS_OF;
+  record.kind = mx::BuiltinReferenceKind::ADDRESS_OF;
   while (valid_parent) {
     switch (parent.Kind()) {
       case pasta::StmtKind::kCallExpr:
@@ -36,10 +36,11 @@ static void FunctionReferences(const pasta::AST &ast,
           if (call->DirectCallee() == func) {
             record.kind = mx::BuiltinReferenceKind::CALLS;
             record.context_id = em.EntityId(parent);
-            return;
           }
         }
-        break;
+        // if the reference is not direct callee, the reference
+        // kind is of type `ADDRESS_OF`; return from here.
+        return;
       default: break;
     }
 
@@ -64,7 +65,7 @@ static void VariableReferences(const pasta::AST &ast,
   bool is_field = stmt.Kind() == pasta::StmtKind::kMemberExpr;
   assert((is_field || stmt.Kind() == pasta::StmtKind::kDeclRefExpr)
          && "Unexpected statement");
-  assert(record.kind == mx::BuiltinReferenceKind::USES
+  assert(record.kind == mx::BuiltinReferenceKind::USE
          && "Reference record kind incorrectly assigned!");
 
   if (auto maybe_parent = em.ParentStmt(ast, child)) {
@@ -78,35 +79,35 @@ static void VariableReferences(const pasta::AST &ast,
         record.context_id = em.EntityId(parent);
         if (auto switch_ = pasta::SwitchStmt::From(parent);
         switch_ && switch_->Condition() == child) {
-          record.kind = mx::BuiltinReferenceKind::CONDITIONS;
+          record.kind = mx::BuiltinReferenceKind::CONDITIONAL_TEST;
         }
         return;
       case pasta::StmtKind::kDoStmt:
         record.context_id = em.EntityId(child);
         if (auto do_ = pasta::DoStmt::From(parent);
         do_ && do_->Condition() == child) {
-          record.kind = mx::BuiltinReferenceKind::CONDITIONS;
+          record.kind = mx::BuiltinReferenceKind::CONDITIONAL_TEST;
         }
         return;
       case pasta::StmtKind::kWhileStmt:
         record.context_id = em.EntityId(child);
         if (auto while_ = pasta::WhileStmt::From(parent);
         while_ && while_->Condition() == child) {
-          record.kind = mx::BuiltinReferenceKind::CONDITIONS;
+          record.kind = mx::BuiltinReferenceKind::CONDITIONAL_TEST;
         }
         return;
       case pasta::StmtKind::kForStmt:
         record.context_id = em.EntityId(child);
         if (auto for_ = pasta::ForStmt::From(parent);
         for_ && for_->Condition() == child) {
-          record.kind = mx::BuiltinReferenceKind::CONDITIONS;
+          record.kind = mx::BuiltinReferenceKind::CONDITIONAL_TEST;
         }
         return;
       case pasta::StmtKind::kIfStmt:
         record.context_id = em.EntityId(child);
         if (auto if_ = pasta::IfStmt::From(parent);
         if_ && if_->Condition() == child) {
-          record.kind = mx::BuiltinReferenceKind::CONDITIONS;
+          record.kind = mx::BuiltinReferenceKind::CONDITIONAL_TEST;
         }
         return;
       case pasta::StmtKind::kCaseStmt:
@@ -118,7 +119,7 @@ static void VariableReferences(const pasta::AST &ast,
       case pasta::StmtKind::kCXXCatchStmt:
       case pasta::StmtKind::kCoroutineBodyStmt:
         record.context_id = em.EntityId(child);
-        record.kind = mx::BuiltinReferenceKind::USES;
+        record.kind = mx::BuiltinReferenceKind::USE;
         return;
 
       case pasta::StmtKind::kUnaryOperator:
@@ -126,11 +127,11 @@ static void VariableReferences(const pasta::AST &ast,
           switch (uop->Opcode()) {
             case pasta::UnaryOperatorKind::kAddressOf:
               record.context_id = em.EntityId(parent);
-              record.kind = mx::BuiltinReferenceKind::TAKES_ADDRESS_OF;
+              record.kind = mx::BuiltinReferenceKind::ADDRESS_OF;
               return;
             case pasta::UnaryOperatorKind::kDeref:
               record.context_id = em.EntityId(parent);
-              record.kind = mx::BuiltinReferenceKind::DEREFERENCES;
+              record.kind = mx::BuiltinReferenceKind::DEREFERENCE;
               return;
             default: break;
           }
@@ -142,7 +143,7 @@ static void VariableReferences(const pasta::AST &ast,
           if (bin->IsAssignmentOperation()) {
             if (bin->LHS() == child) {
               record.context_id = em.EntityId(parent);
-              record.kind = mx::BuiltinReferenceKind::ASSIGNED_TO;
+              record.kind = mx::BuiltinReferenceKind::ASSIGNEMENT;
               return;
             } else if (bin->RHS() == child) {
               record.context_id = em.EntityId(parent);
@@ -155,7 +156,7 @@ static void VariableReferences(const pasta::AST &ast,
           } else if (bin->Opcode() == pasta::BinaryOperatorKind::kComma) {
             if (bin->LHS() == child) {
               record.context_id = em.EntityId(child);
-              record.kind = mx::BuiltinReferenceKind::USES;
+              record.kind = mx::BuiltinReferenceKind::USE;
               return;
             }
           }
@@ -165,7 +166,7 @@ static void VariableReferences(const pasta::AST &ast,
         if (auto cond = pasta::ConditionalOperator::From(parent);
             cond && cond->Condition() == child) {
           record.context_id = em.EntityId(child);
-          record.kind = mx::BuiltinReferenceKind::CONDITIONS;
+          record.kind = mx::BuiltinReferenceKind::CONDITIONAL_TEST;
           return;
         }
         break;
@@ -173,19 +174,19 @@ static void VariableReferences(const pasta::AST &ast,
         if (auto member = pasta::MemberExpr::From(parent);
             member && member->Base() == child && member->IsArrow()) {
           record.context_id = em.EntityId(parent);
-          record.kind = mx::BuiltinReferenceKind::DEREFERENCES;
+          record.kind = mx::BuiltinReferenceKind::DEREFERENCE;
           return;
         }
         if (stmt.Kind() == pasta::StmtKind::kMemberExpr) {
           record.context_id = em.EntityId(child);
-          record.kind = mx::BuiltinReferenceKind::USES;
+          record.kind = mx::BuiltinReferenceKind::USE;
           return;
         }
         break;
       case pasta::StmtKind::kArraySubscriptExpr:
         if (auto arr = pasta::ArraySubscriptExpr::From(parent)) {
           record.context_id = em.EntityId(parent);
-          record.kind = mx::BuiltinReferenceKind::DEREFERENCES;
+          record.kind = mx::BuiltinReferenceKind::DEREFERENCE;
           return;
         }
         break;
@@ -193,13 +194,13 @@ static void VariableReferences(const pasta::AST &ast,
         if (auto call = pasta::CallExpr::From(parent)) {
           if (call->Callee() == child) {
             record.context_id = em.EntityId(parent);
-            record.kind = mx::BuiltinReferenceKind::DEREFERENCES;
+            record.kind = mx::BuiltinReferenceKind::DEREFERENCE;
             return;
           } else {
             if (auto dc = call->DirectCallee();
-                !dc || !dc->Name().starts_with("__builtin_")) {
+                !dc || !dc->BuiltinID()) {
               record.context_id = em.EntityId(parent);
-              record.kind = mx::BuiltinReferenceKind::CALL_ARGUMENTS;
+              record.kind = mx::BuiltinReferenceKind::CALL_ARGUMENT;
               return;
             }
           }
@@ -211,14 +212,12 @@ static void VariableReferences(const pasta::AST &ast,
         record.context_id = em.EntityId(parent);
         for (auto init : parent.Children()) {
           if (init == child) {
-            record.kind = mx::BuiltinReferenceKind::ASSIGNED_TO;
-            // Note: Identify the reference kind but does not swap
-            //       reference entity id with the referer id. Info
-            //       browser will take care of this.
+            // initialized by the expression
+            record.kind = mx::BuiltinReferenceKind::INITIALZATION;
             return;
           }
         }
-        record.kind = mx::BuiltinReferenceKind::ASSIGNED_TO;
+        record.kind = mx::BuiltinReferenceKind::ASSIGNEMENT;
         return;
       default: break;
     }
@@ -231,7 +230,7 @@ static void VariableReferences(const pasta::AST &ast,
     valid_parent = false;
   }
 
-  record.kind = mx::BuiltinReferenceKind::USES;
+  record.kind = mx::BuiltinReferenceKind::USE;
   record.context_id = em.EntityId(stmt);
 }
 
@@ -297,7 +296,7 @@ void DeclReferenceKind(const pasta::AST &ast,
   } else if (auto type = pasta::TypeDecl::From(ref)) {
     TypeReferences(ast, em, stmt, record);
   } else {
-    record.kind = mx::BuiltinReferenceKind::USES;
+    record.kind = mx::BuiltinReferenceKind::USE;
   }
 }
 

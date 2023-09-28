@@ -78,7 +78,7 @@ void LinkExternalReferencesInFragment(
       // DeclReferenceKind function updates it based on the AST analysis
       // of the context in which declaration is referred.
       mx::ReferenceRecord record{
-          from_id, to_id, from_id, mx::BuiltinReferenceKind::USES};
+          from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
       DeclReferenceKind(ast, em, decl, ref_decl, record);
       database.AddAsync(record);
     }
@@ -110,7 +110,7 @@ void LinkExternalReferencesInFragment(
       // DeclReferenceKind function updates it based on the AST analysis
       // of the context in which declaration is referred.
       mx::ReferenceRecord record{
-          from_id, to_id, from_id, mx::BuiltinReferenceKind::USES};
+          from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
       DeclReferenceKind(ast, em, stmt, ref_decl, record);
       database.AddAsync(record);
     }
@@ -138,7 +138,7 @@ void LinkExternalReferencesInFragment(
       // DeclReferenceKind function updates it based on the AST analysis
       // of the context in which declaration is referred.
       mx::ReferenceRecord record{
-          from_id, to_id, from_id, mx::BuiltinReferenceKind::USES};
+          from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
       DeclReferenceKind(ast, em, d, to_field.value(), record);
       database.AddAsync(record);
     }
@@ -216,7 +216,7 @@ void LinkExternalReferencesInFragment(
           // The referrer context id will be same as `macro_id` by default
           // and assigned the same.
           database.AddAsync(mx::ReferenceRecord{macro_id, def_id, macro_id,
-            mx::BuiltinReferenceKind::EXPANSION_OF});
+                                                mx::BuiltinReferenceKind::EXPANSION_OF});
         }
         break;
 
@@ -241,7 +241,7 @@ void LinkExternalReferencesInFragment(
           // The referrer context id will be same as `macro_id` by default
           // and assigned the same.
           database.AddAsync(mx::ReferenceRecord{macro_id, file_id, macro_id,
-            mx::BuiltinReferenceKind::INCLUDEDS});
+                                                mx::BuiltinReferenceKind::INCLUSION});
         }
         break;
     }

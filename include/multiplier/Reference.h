@@ -27,20 +27,22 @@ using WeakReferenceKindImplPtr = std::weak_ptr<const ReferenceKindImpl>;
 using ReferenceContextImplPtr = std::shared_ptr<const ReferenceContextImpl>;
 
 enum class BuiltinReferenceKind {
-  USES = 0,    // default value as some kind of uses
+  USE = 0,    // default value as some kind of uses
+  ADDRESS_OF,
   ASSIGNED_TO,
-  ASSIGNEMENTS,
+  ASSIGNEMENT,
   CALLS,
-  CALL_ARGUMENTS,
+  CALL_ARGUMENT,
   DEFINITIONS,
   DECLARATIONS,
   USED_BY,
-  DEREFERENCES,
+  DEREFERENCE,
   ENUMERATIONS,
   FUNCTIONS,
   EXPANSION_OF,
-  INCLUDEDS,
-  CONDITIONS,
+  INCLUSION,
+  INITIALZATION,
+  CONDITIONAL_TEST,
   TOP_LEVEL_ENTITIES,
   TYPES,
   TYPE_CASTS,
@@ -52,7 +54,6 @@ enum class BuiltinReferenceKind {
   PARAMETER_VARIABLES,
   STATEMENT_USES,
   TYPE_TRAIT_USES,
-  TAKES_ADDRESS_OF,
 };
 
 inline static const char *EnumerationName(BuiltinReferenceKind) {

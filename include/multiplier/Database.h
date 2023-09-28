@@ -236,7 +236,10 @@ struct ReferenceRecord {
             to_entity_id INTEGER NOT NULL,
             context_id INTEGER NOT NULL,
             kind_id INTEGER NOT NULL,
-            PRIMARY KEY(to_entity_id ASC, from_entity_id ASC, context_id ASC, kind_id)
+            PRIMARY KEY(to_entity_id ASC,
+                        from_entity_id ASC,
+                        context_id ASC,
+                        kind_id)
           ) WITHOUT ROWID)",
 
        R"(CREATE TABLE IF NOT EXISTS reference_kind (
@@ -245,31 +248,33 @@ struct ReferenceRecord {
 
        R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
           VALUES (0, "Uses"),
-                 (1, "Assigned Tos"),
-                 (2, "Assignments"),
-                 (3, "Caller"),
-                 (4, "Call Arguments"),
-                 (5, "Definitions"),
-                 (6, "Declarations"),
-                 (7, "Used By"),
-                 (8, "Dereferences"),
-                 (9, "Enumerations"),
-                 (10, "Functions"),
-                 (11, "Expansions"),
-                 (12, "Included By"),
-                 (13, "Influencing Condition"),
-                 (14, "Top Level Entity"),
-                 (15, "Types"),
-                 (16, "Type Casts"),
-                 (17, "Variables"),
-                 (18, "Local Variables"),
-                 (19, "Global Variables"),
-                 (20, "Thread Local Variables"),
-                 (21, "Static Local Variables"),
-                 (22, "Parameter Variables"),
-                 (23, "Statement Uses"),
-                 (24, "Type Trait Uses"),
-                 (25, "Address ofs")
+                 (1, "Address ofs"),
+                 (2, "Assigned Tos"),
+                 (3, "Assignments"),
+                 (4, "Caller"),
+                 (5, "Call Arguments"),
+                 (6, "Definitions"),
+                 (7, "Declarations"),
+                 (8, "Used By"),
+                 (9, "Dereferences"),
+                 (10, "Enumerations"),
+                 (11, "Functions"),
+                 (12, "Expansions"),
+                 (13, "Included By"),
+                 (14, "Initialization"),
+                 (15, "Influencing Condition"),
+                 (16, "Top Level Entity"),
+                 (17, "Types"),
+                 (18, "Type Casts"),
+                 (19, "Variables"),
+                 (20, "Local Variables"),
+                 (21, "Global Variables"),
+                 (22, "Thread Local Variables"),
+                 (23, "Static Local Variables"),
+                 (24, "Parameter Variables"),
+                 (25, "Statement Uses"),
+                 (26, "Type Trait Uses")
+
           )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};

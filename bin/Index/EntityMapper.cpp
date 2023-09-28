@@ -264,7 +264,7 @@ std::optional<const pasta::Decl> EntityMapper::ParentDecl(
     const pasta::AST &ast, const pasta::Decl &entity) const {
   if (auto it = parent_decls.find(entity.RawDecl());
       it != parent_decls.end()) {
-    return ast.Adopt(static_cast<const clang::Decl*>(it->second));
+    return ast.Adopt(static_cast<const clang::Decl *>(it->second));
   }
   return std::nullopt;
 }
@@ -273,7 +273,7 @@ std::optional<const pasta::Decl> EntityMapper::ParentDecl(
     const pasta::AST &ast, const pasta::Stmt &entity) const {
   if (auto it = parent_decls.find(entity.RawStmt());
       it != parent_decls.end()) {
-    return ast.Adopt(static_cast<const clang::Decl*>(it->second));
+    return ast.Adopt(static_cast<const clang::Decl *>(it->second));
   }
   return std::nullopt;
 }
@@ -282,7 +282,7 @@ std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
     const pasta::AST &ast, const pasta::Decl &entity) const {
   if (auto it = parent_stmts.find(entity.RawDecl());
       it != parent_stmts.end()) {
-    return ast.Adopt(static_cast<const clang::Stmt*>(it->second));
+    return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
   }
   return std::nullopt;
 }
@@ -291,7 +291,7 @@ std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
     const pasta::AST &ast, const pasta::Stmt &entity) const {
   if (auto it = parent_stmts.find(entity.RawStmt());
       it != parent_stmts.end()) {
-    return ast.Adopt(static_cast<const clang::Stmt*>(it->second));
+    return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
   }
   return std::nullopt;
 }
