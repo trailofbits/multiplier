@@ -36,7 +36,7 @@ class Importer {
 
   explicit Importer(std::filesystem::path cwd_,
                     const pasta::FileManager &fm,
-                    std::shared_ptr<GlobalIndexingState> context);
+                    GlobalIndexingState &context);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o,

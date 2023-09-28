@@ -36,6 +36,7 @@ namespace indexer {
 
 class CodeGenerator;
 class GlobalIndexingState;
+class IdStore;
 class NameMangler;
 class PendingFragment;
 class TokenProvenanceCalculator;
@@ -82,7 +83,10 @@ class GlobalIndexingState {
   // Write access to the index database.
   mx::DatabaseWriter &database;
 
+  IdStore &id_store;
+
   explicit GlobalIndexingState(mx::DatabaseWriter &database_,
+                               IdStore &id_store_,
                                const Executor &exe_);
 
   ~GlobalIndexingState(void);

@@ -222,7 +222,7 @@ class BuildCommandAction final : public Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
-  std::shared_ptr<GlobalIndexingState> ctx;
+  GlobalIndexingState &ctx;
   const bool cxx_support;
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
@@ -236,11 +236,11 @@ class BuildCommandAction final : public Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            std::shared_ptr<GlobalIndexingState> ctx_,
+                            GlobalIndexingState &ctx_,
                             bool cxx_support_)
       : fm(fm_),
         command(command_),
-        ctx(std::move(ctx_)),
+        ctx(ctx_),
         cxx_support(cxx_support_) {}
 
   void Run(void) final;
@@ -439,7 +439,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
         << "Creating indexing action for main source file "
         << job.SourceFile().Path().generic_string();
 
-    ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, cc, job);
+    ctx.executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, cc, job);
   }
 
   LOG_IF(ERROR, !num_jobs)
@@ -450,7 +450,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
 // Build the compilers for the commands, then build the commands.
 void BuildCommandAction::Run(void) {
 
-  ProgressBarWork progress_tracker(ctx->eval_command_progress);
+  ProgressBarWork progress_tracker(ctx.eval_command_progress);
 
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(
@@ -506,26 +506,26 @@ struct Importer::PrivateData {
 
   std::filesystem::path cwd;
   pasta::FileManager fm;
-  std::shared_ptr<GlobalIndexingState> ctx;
+  GlobalIndexingState &ctx;
 
   inline PrivateData(std::filesystem::path cwd_,
                      const pasta::FileManager &fm_,
-                     std::shared_ptr<GlobalIndexingState> ctx_)
+                     GlobalIndexingState &ctx_)
       : cwd(std::move(cwd_)),
         fm(fm_),
-        ctx(std::move(ctx_)) {}
+        ctx(ctx_) {}
 };
 
 Importer::~Importer(void) {}
 
 Importer::Importer(std::filesystem::path cwd_,
                    const pasta::FileManager &fm,
-                   std::shared_ptr<GlobalIndexingState> ctx)
+                   GlobalIndexingState &ctx)
     : d(std::make_unique<Importer::PrivateData>(
-            std::move(cwd_), fm, std::move(ctx))) {}
+            std::move(cwd_), fm, ctx)) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
-  ProgressBarWork progress_tracker(d->ctx->command_progress);
+  ProgressBarWork progress_tracker(d->ctx.command_progress);
   auto wrapped_tool = o.getString("wrapped_tool");
   auto cwd = o.getString("cwd");
   auto args = o.getArray("canonicalized_args");
@@ -610,7 +610,7 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
 bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
                                          const EnvVariableMap &envp) {
 
-  ProgressBarWork progress_tracker(d->ctx->command_progress);
+  ProgressBarWork progress_tracker(d->ctx.command_progress);
 
   auto cwd = o.getString("directory");
   auto file = o.getString("file");

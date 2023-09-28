@@ -26,8 +26,9 @@ enum OtherKind : uint64_t {
   kCompilation
 };
 
-// A code chunk with many tokens. This
-static_assert(kNumTokensInBigFragment == (1u << kBigFragmentIdNumBits));
+// A code chunk with many tokens.
+static_assert(kNumTokensInBigFragment <= (1u << kBigFragmentIdNumBits));
+static_assert(kNumTokensInBigType <= (1u << kTypeOffsetNumBits));
 
 enum IdentifiedPseudo : uint64_t {
   kTemplateArgument,
@@ -136,10 +137,10 @@ union PackedEntityId {
 
   struct {
     uint64_t token_offset:(62u - (kTokenKindNumBits + kTypeKindNumBits +
-                                  kTypeIdNumBits + kOtherKindBits));
+                                  kSmallTypeIdNumBits + kOtherKindBits));
     uint64_t token_kind:kTokenKindNumBits;
     uint64_t type_kind:kTypeKindNumBits;
-    uint64_t type_id:kTypeIdNumBits;
+    uint64_t type_id:kSmallTypeIdNumBits;
     uint64_t is_big:1;
     uint64_t kind:kOtherKindBits;
     uint64_t is_fragment_entity:1u;

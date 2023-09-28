@@ -27,6 +27,7 @@
 #include "Context.h"
 #include "EntityMapper.h"
 #include "Hash.h"
+#include "IdStore.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
 #include "Provenance.h"
@@ -1371,7 +1372,7 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
 }
 
 static PendingFragmentPtr CreatePendingFragment(
-    mx::DatabaseWriter &database, EntityMapper &em,
+    IdStore &id_store, EntityMapper &em,
     const pasta::TokenRange *original_tokens,
     pasta::PrintedTokenRange parsed_tokens,
     std::optional<FileLocationOfFragment> floc,
@@ -1399,7 +1400,7 @@ static PendingFragmentPtr CreatePendingFragment(
   // Compute the fragment ID, and in doing so, figure out if this is actually
   // a new fragment.
   bool is_new_fragment_id = false;
-  mx::PackedFragmentId fid = database.GetOrCreateFragmentIdForHash(
+  mx::PackedFragmentId fid = id_store.GetOrCreateFragmentIdForHash(
       (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
       HashFragment(decls, macros, original_tokens, parsed_tokens),
       num_tokens  /* for fragment id packing format */,
@@ -1535,7 +1536,7 @@ static bool DebugIndexOnlyThisFragment(const EntityGroup &entities) {
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/396
 static void CreateFreestandingDeclFragment(
-    mx::DatabaseWriter &database,
+    IdStore &id_store,
     EntityMapper &em,
     std::optional<FileLocationOfFragment> floc,
     mx::PackedCompilationId tu_id,
@@ -1589,7 +1590,7 @@ static void CreateFreestandingDeclFragment(
   //            guarantee that the parsed tokens aren't the result of
   //            macro expansions.
   auto pf = CreatePendingFragment(
-      database,
+      id_store,
       em,
       nullptr  /* original_tokens */,
       std::move(printed_tokens)  /* parsed_tokens */,
@@ -1629,7 +1630,7 @@ static void CreateFreestandingDeclFragment(
 }
 
 static void CreatePendingFragments(
-    mx::DatabaseWriter &database, EntityMapper &em,
+    IdStore &id_store, EntityMapper &em,
     const pasta::TokenRange &tok_range, mx::PackedCompilationId tu_id,
     EntityGroupRange group_range, std::string_view main_file_path,
     std::vector<PendingFragmentPtr> &pending_fragments) {
@@ -1690,7 +1691,7 @@ static void CreatePendingFragments(
                  decl.IsImplicit()) {
 
         CreateFreestandingDeclFragment(
-            database, em, floc, tu_id, begin_index, end_index,
+            id_store, em, floc, tu_id, begin_index, end_index,
             decl, pending_fragments, main_file_path);
 
       // These are generally template instantiations.
@@ -1738,7 +1739,7 @@ static void CreatePendingFragments(
     CHECK(!aligned_tokens.empty() || has_top_level_macros);
 
     pf = CreatePendingFragment(
-        database,
+        id_store,
         em,
         &frag_tok_range  /* original_tokens */,
         std::move(aligned_tokens)  /* parsed_tokens */,
@@ -1777,7 +1778,7 @@ static void CreatePendingFragments(
     CHECK(parsed_tokens_in_directive_range.empty());
 
     pf = CreatePendingFragment(
-        database,
+        id_store,
         em,
         &directive_range  /* original_tokens */,
         std::move(parsed_tokens_in_directive_range)  /* parsed_tokens */,
@@ -1814,7 +1815,7 @@ static void CreatePendingFragments(
     CHECK(!aligned_tokens.empty());
 
     pf = CreatePendingFragment(
-        database,
+        id_store,
         em,
         &frag_tok_range  /* original_tokens */,
         std::move(aligned_tokens)  /* parsed_tokens */,
@@ -1865,7 +1866,7 @@ static std::vector<PendingFragmentPtr> CreatePendingFragments(
   // the fragments logically containing those tokens/expressions.
   for (EntityGroupRange &entities_in_fragment : decl_group_ranges) {
     try {
-      CreatePendingFragments(context.database, em, tok_range, tu_id,
+      CreatePendingFragments(context.id_store, em, tok_range, tu_id,
                              std::move(entities_in_fragment), main_job_file,
                              pending_fragments);
     } catch (...) {
@@ -1963,8 +1964,7 @@ static void MaybePersistParsedFile(
   }
 
   bool is_new_file_id = false;
-  mx::DatabaseWriter &database = context.database;
-  mx::PackedFileId file_id = database.GetOrCreateFileIdForHash(
+  mx::PackedFileId file_id = context.id_store.GetOrCreateFileIdForHash(
       HashFile(maybe_data.TakeValue()), is_new_file_id);
 
   if (is_new_file_id) {
@@ -1988,13 +1988,13 @@ static void PersistParsedFiles(
 
 // Create an AST from a compile job.
 static std::optional<pasta::AST> CompileJobToAST(
-    const std::shared_ptr<GlobalIndexingState> &context,
+    const GlobalIndexingState &context,
     const pasta::CompileJob &job) {
 
   DLOG(INFO)
       << "Running compile job: " << job.Arguments().Join();
 
-  ProgressBarWork parsing_progress_tracker(context->ast_progress);
+  ProgressBarWork parsing_progress_tracker(context.ast_progress);
   pasta::Result<pasta::AST, std::string> maybe_ast = job.Run();
   if (!maybe_ast.Succeeded()) {
     LOG(ERROR)
@@ -2012,10 +2012,10 @@ static std::optional<pasta::AST> CompileJobToAST(
 IndexCompileJobAction::~IndexCompileJobAction(void) {}
 
 IndexCompileJobAction::IndexCompileJobAction(
-    std::shared_ptr<GlobalIndexingState> context_,
+    GlobalIndexingState &context_,
     pasta::FileManager file_manager_,
     pasta::Compiler compiler_, pasta::CompileJob job_)
-    : context(std::move(context_)),
+    : context(context_),
       file_manager(std::move(file_manager_)),
       compiler(std::move(compiler_)),
       job(std::move(job_)) {}
@@ -2028,7 +2028,7 @@ void IndexCompileJobAction::Run(void) {
     return;
   }
 
-  TypeMapper tm(context->database);
+  TypeMapper tm(context.id_store);
   EntityMapper em(tm);
 
   pasta::AST ast = std::move(maybe_ast.value());
@@ -2037,11 +2037,11 @@ void IndexCompileJobAction::Run(void) {
   DLOG(INFO)
       << "Built AST for main source file " << main_file_path;
 
-  PersistParsedFiles(*context, ast, em);
+  PersistParsedFiles(context, ast, em);
 
   // Detect if this is a new compilation.
   bool is_new_tu_id = false;
-  mx::PackedCompilationId tu_id = context->database.GetOrCreateCompilationId(
+  mx::PackedCompilationId tu_id = context.id_store.GetOrCreateCompilationId(
       em.EntityId(main_file), HashCompilation(ast, em), is_new_tu_id);
 
   if (!is_new_tu_id) {
@@ -2051,10 +2051,10 @@ void IndexCompileJobAction::Run(void) {
   }
 
   PersistParsedFragments(
-      *context, compiler, job, ast, em, tu_id,
+      context, compiler, job, ast, em, tu_id,
       CreatePendingFragments(
-          *context, em, ast, tu_id,
-          PartitionEntities(*context, ast)));
+          context, em, ast, tu_id,
+          PartitionEntities(context, ast)));
 }
 
 }  // namespace indexer

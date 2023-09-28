@@ -24,11 +24,12 @@
 
 namespace indexer {
 
-GlobalIndexingState::GlobalIndexingState(mx::DatabaseWriter &database_,
-                                 const Executor &exe_)
+GlobalIndexingState::GlobalIndexingState(
+    mx::DatabaseWriter &database_, IdStore &id_store_, const Executor &exe_)
     : num_workers(exe_.NumWorkers()),
       executor(exe_),
-      database(database_) {}
+      database(database_),
+      id_store(id_store_) {}
 
 GlobalIndexingState::~GlobalIndexingState(void) {}
 

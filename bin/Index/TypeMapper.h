@@ -20,11 +20,9 @@ class QualType;
 class Type;
 }  // namespace clang
 
-namespace mx {
-class DatabaseWriter;
-} // namespace mx
-
 namespace indexer {
+
+class IdStore;
 
 // This printing policy aims to maximize our ability to deduplicate types.
 class TypePrintingPolicy final : public pasta::PrintingPolicy {
@@ -64,12 +62,12 @@ class TypeMapper final {
  public:
   TypeIdMap type_ids;
 
-  mx::DatabaseWriter &database;
+  IdStore &id_store;
 
   bool read_only{false};
 
-  inline explicit TypeMapper(mx::DatabaseWriter &database_)
-      : database(database_) {
+  inline explicit TypeMapper(IdStore &id_store_)
+      : id_store(id_store_) {
     decls.reserve(64);
   }
 
