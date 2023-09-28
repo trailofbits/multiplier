@@ -213,10 +213,9 @@ static mx::RawEntityId InFragmentEntityId(const PendingFragment &pf,
   return eid;
 }
 
+// Use the token contexts to try to find missing parents.
 static void FindMissingParentageFromTokens(
     ParentTrackerVisitor &vis, PendingFragment &pf) {
-
-  auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
 
   for (pasta::PrintedToken tok : pf.parsed_tokens) {
     auto [seen_type, child_stmt, parent_stmt, parent_decl] =
@@ -250,13 +249,64 @@ static void FindMissingParentageFromTokens(
     vis.parent_decl_id = InFragmentEntityId<mx::DeclId>(pf, vis.parent_decl_id);
     vis.parent_stmt_id = InFragmentEntityId<mx::StmtId>(pf, vis.parent_stmt_id);
 
+    if (vis.parent_stmt_id != mx::kInvalidEntityId ||
+        vis.parent_decl_id != mx::kInvalidEntityId) {
 
-    if (vis.parent_stmt_id == mx::kInvalidEntityId &&
-        vis.parent_decl_id == mx::kInvalidEntityId) {
+      auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+      vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
+    }
+  }
+}
+
+// PASTA has a blind spot with expressions nested inside of attributes. For now,
+// PASTA defers to Clang's pretty printer for most attributes, and so we don't
+// have the token contexts from them.
+static void FindMissingParentageFromAttributeTokens(
+    ParentTrackerVisitor &vis, PendingFragment &pf) {
+
+  std::unordered_map<const void *, const void *> tok_to_attr;
+
+  // Find the parsed tokens whose nearest context is an `Attr`.
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
+    auto parsed_tok = tok.DerivedLocation();
+    if (!parsed_tok) {
       continue;
     }
 
-    vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
+    auto context = tok.Context();
+    if (context && context->Kind() == pasta::TokenContextKind::kAttr) {
+      tok_to_attr.emplace(parsed_tok->RawToken(), context->Data());
+    }
+  }
+
+  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
+    if (!vis.not_yet_seen.count(stmt.RawStmt())) {
+      continue;
+    }
+
+    // Look at the tokens of the statement
+    for (pasta::Token tok : stmt.Tokens()) {
+      auto attr_it = tok_to_attr.find(tok.RawToken());
+      if (attr_it == tok_to_attr.end()) {
+        continue;
+      }
+
+      // Look for the parents of the attribute.
+      vis.parent_stmt_id = pf.em.ParentStmtId(attr_it->second);
+      vis.parent_decl_id = pf.em.ParentDeclId(attr_it->second);
+
+      vis.parent_decl_id = InFragmentEntityId<mx::DeclId>(pf, vis.parent_decl_id);
+      vis.parent_stmt_id = InFragmentEntityId<mx::StmtId>(pf, vis.parent_stmt_id);
+
+      // If we'be got them, then visit this statement.
+      if (vis.parent_stmt_id != mx::kInvalidEntityId ||
+          vis.parent_decl_id != mx::kInvalidEntityId) {
+
+        auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+        vis.Accept(stmt);
+        break;
+      }
+    }
   }
 }
 
@@ -310,10 +360,16 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   }
 
   FindMissingParentageFromTokens(vis, pf);
-
   if (vis.not_yet_seen.empty()) {
     return;
   }
+
+  FindMissingParentageFromAttributeTokens(vis, pf);
+  if (vis.not_yet_seen.empty()) {
+    return;
+  }
+
+  // Log the error.
 
   std::optional<pasta::Stmt> first_missing_stmt;
   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
