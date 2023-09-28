@@ -58,11 +58,12 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DWITH_TRACE_TOOLS:BOOL=OFF
                         -DWITH_CORE_TOOLS:BOOL=OFF
                         -DWITH_BENCHMARK_TOOLS:BOOL=OFF
-
                         -DWITH_RUNTIME_DEBUG:BOOL=OFF
                         -DFAIL_ON_WARNINGS:BOOL=OFF
+                        -DWITH_DYNAMIC_EXTENSION:BOOL=OFF
                         -DROCKSDB_BUILD_SHARED:BOOL=OFF
-                        -DBUILD_TESTING=OFF
+                        -DBUILD_TESTING:BOOL=OFF
+                        -DUSE_RTTI:BOOL=ON
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
