@@ -11,6 +11,7 @@
 #include <gap/core/generator.hpp>
 #include <iosfwd>
 #include <multiplier/Types.h>
+#include <pasta/AST/Token.h>
 #include <string_view>
 #include <vector>
 #include <unordered_map>

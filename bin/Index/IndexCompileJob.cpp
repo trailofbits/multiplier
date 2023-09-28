@@ -1399,12 +1399,10 @@ static PendingFragmentPtr CreatePendingFragment(
 
   // Compute the fragment ID, and in doing so, figure out if this is actually
   // a new fragment.
-  bool is_new_fragment_id = false;
-  mx::PackedFragmentId fid = id_store.GetOrCreateFragmentIdForHash(
+  auto [fid, is_new_fragment_id] = id_store.GetOrCreateFragmentIdForHash(
       (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
       HashFragment(decls, macros, original_tokens, parsed_tokens),
-      num_tokens  /* for fragment id packing format */,
-      is_new_fragment_id  /* mutated by reference */);
+      num_tokens  /* for fragment id packing format */);
 
   PendingFragmentPtr pf(new PendingFragment(
       fid,
@@ -1963,9 +1961,8 @@ static void MaybePersistParsedFile(
         << ": " << maybe_data.TakeError().message();
   }
 
-  bool is_new_file_id = false;
-  mx::PackedFileId file_id = context.id_store.GetOrCreateFileIdForHash(
-      HashFile(maybe_data.TakeValue()), is_new_file_id);
+  auto [file_id, is_new_file_id] = context.id_store.GetOrCreateFileIdForHash(
+      HashFile(maybe_data.TakeValue()));
 
   if (is_new_file_id) {
     context.PersistFile(file_id, file);
@@ -2040,9 +2037,8 @@ void IndexCompileJobAction::Run(void) {
   PersistParsedFiles(context, ast, em);
 
   // Detect if this is a new compilation.
-  bool is_new_tu_id = false;
-  mx::PackedCompilationId tu_id = context.id_store.GetOrCreateCompilationId(
-      em.EntityId(main_file), HashCompilation(ast, em), is_new_tu_id);
+  auto [tu_id, is_new_tu_id] = context.id_store.GetOrCreateCompilationId(
+      em.EntityId(main_file), HashCompilation(ast, em));
 
   if (!is_new_tu_id) {
     DLOG(INFO)

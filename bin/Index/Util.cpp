@@ -1130,8 +1130,7 @@ std::string DiagnosePrintedTokens(
 }
 
 // Generate the token contexts associated with a printed token.
-gap::generator<pasta::TokenContext> TokenContexts(
-    const pasta::PrintedToken &tok) {
+gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok) {
   for (auto context = tok.Context(); context;
        context = context->Parent()) {
     co_yield context.value();

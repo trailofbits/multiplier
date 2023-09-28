@@ -35,6 +35,6 @@ namespace {
 static const unsigned short kEndian = 0xFFEE;
 }  // namespade
 }  // namespace indexer
-#  define MX_LITTLE_ENDIAN ((*reinterpret_cast<const unsigned char *>(&::hyde::rt::kEndian)) == 0xEE)
-#  define MX_BIG_ENDIAN ((*reinterpret_cast<const unsigned char *>(&::hyde::rt::kEndian)) == 0xFF)
+#  define MX_LITTLE_ENDIAN ((*reinterpret_cast<const unsigned char *>(&::indexer::kEndian)) == 0xEE)
+#  define MX_BIG_ENDIAN ((*reinterpret_cast<const unsigned char *>(&::indexer::kEndian)) == 0xFF)
 #endif

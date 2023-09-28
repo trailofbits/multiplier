@@ -37,11 +37,11 @@ static constexpr RawEntityId kMaxBigTypeId = 1ull << kBigTypeIdNumBits;
 
 static constexpr unsigned kBigTypeOffsetNumBits = 18u;
 static constexpr unsigned kSmallTypeIdNumBits = 36u;
-static constexpr RawEntityId kMaxSmallTypeId = (1ull << kSmallTypeIdNumBits) + kMaxBigTypeId;
+static constexpr RawEntityId kMaxSmallTypeId = (1ull << kSmallTypeIdNumBits) +
+                                               kMaxBigTypeId;
 
 static constexpr unsigned kTypeOffsetNumBits = 8u;
-static constexpr RawEntityId kNumTokensInBigType =
-    (1ull << kTypeOffsetNumBits) / 2u  /* fudge factor */;
+static constexpr RawEntityId kNumTokensInBigType = 1ull << kTypeOffsetNumBits;
 
 static constexpr unsigned kCompilationIdNumBits = kFileIdNumBits;
 static constexpr RawEntityId kMaxCompilationId = 1ull << kCompilationIdNumBits;

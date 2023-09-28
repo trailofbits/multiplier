@@ -1079,10 +1079,8 @@ VariantId EntityId::Unpack(void) const noexcept {
         }
       }
       case OtherKind::kCompilation: {
-        CompilationId id;
-        id.compilation_id = packed.compilation.compilation_id;
-        id.file_id = packed.compilation.file_id;
-        return id;
+        return CompilationId(packed.compilation.compilation_id,
+                             packed.compilation.file_id);
       }
     }
   }
