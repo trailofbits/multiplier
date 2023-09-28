@@ -150,8 +150,16 @@ static mx::RawEntityId PackAndCheckId(T id) {
   return packed_id;
 }
 
-inline static auto ConstGenerator(mx::RawEntityId id) {
-  return [=] (void) -> mx::RawEntityId {return id;};
+static mx::RawEntityId MakeOne(void) {
+  return 1u;
+}
+
+static mx::RawEntityId MakeMaxBigFragmentId(void) {
+  return mx::kMaxBigFragmentId;
+}
+
+static mx::RawEntityId MakeMaxBigTypeId(void) {
+  return mx::kMaxBigTypeId;
 }
 
 }  // namespace
@@ -164,6 +172,9 @@ class IdStoreImpl {
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.
   AtomicEntityId next_file_index;
+
+  // The next translation unit ID that can be assigned.
+  AtomicEntityId next_compilation_index;
 
   // The next ID for a "small fragment." A small fragment has fewer than
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
@@ -185,11 +196,11 @@ class IdStoreImpl {
   AtomicEntityId next_small_type_index;
   AtomicEntityId next_big_type_index;
 
-  // The next translation unit ID that can be assigned.
-  AtomicEntityId next_compilation_index;
-
-  void InitNextIndices(void);
+  // Store the `next_*` ids back to the database.
   void ExitNextIndices(void);
+
+  // Safely close RocksDB.
+  void ExitRocksDB(void);
 
   // Set `val` to `key`.
   void UnlockedSet(const std::string &key, mx::RawEntityId val);
@@ -201,13 +212,26 @@ class IdStoreImpl {
  public:
   static std::shared_ptr<IdStoreImpl> Open(std::filesystem::path path);
 
-  ~IdStoreImpl(void);
-
-  inline IdStoreImpl(rocksdb::DB *rocks_db_)
-      : rocks_db(rocks_db_),
-        cf_handle(rocks_db->DefaultColumnFamily()) {
-    InitNextIndices();
+  ~IdStoreImpl(void) {
+    ExitNextIndices();
+    ExitRocksDB();
   }
+
+  IdStoreImpl(rocksdb::DB *rocks_db_)
+      : rocks_db(rocks_db_),
+        cf_handle(rocks_db->DefaultColumnFamily()),
+        next_file_index(
+            GetOrSet(kNextFileIndex, MakeOne).first),
+        next_compilation_index(
+            GetOrSet(kNextCompilationIndex, MakeOne).first),
+        next_small_fragment_index(
+            GetOrSet(kNextSmallFragmentIndex, MakeMaxBigFragmentId).first),
+        next_big_fragment_index(
+            GetOrSet(kNextBigFragmentIndex, MakeOne).first),
+        next_small_type_index(
+            GetOrSet(kNextSmallTypeIndex, MakeMaxBigTypeId).first),
+        next_big_type_index(
+            GetOrSet(kNextBigTypeIndex, MakeOne).first) {}
 
   MaybeNewId<mx::PackedFragmentId> GetOrCreateSmallFragmentIdForHash(
       mx::RawEntityId tok_id, std::string hash, size_t num_tokens);
@@ -291,9 +315,19 @@ std::shared_ptr<IdStoreImpl> IdStoreImpl::Open(std::filesystem::path path) {
   return db_ptr;
 }
 
-IdStoreImpl::~IdStoreImpl(void) {
-  ExitNextIndices();
+// Store the metadata back to the database so that future executions of the
+// indexer don't re-use already allocated indices.
+void IdStoreImpl::ExitNextIndices(void) {
+  UnlockedSet(kNextFileIndex, next_file_index.load());
+  UnlockedSet(kNextCompilationIndex, next_compilation_index.load());
+  UnlockedSet(kNextSmallFragmentIndex, next_small_fragment_index.load());
+  UnlockedSet(kNextBigFragmentIndex, next_big_fragment_index.load());
+  UnlockedSet(kNextSmallTypeIndex, next_small_type_index.load());
+  UnlockedSet(kNextBigTypeIndex, next_big_type_index.load());
+}
 
+// Safely close RocksDB.
+void IdStoreImpl::ExitRocksDB(void) {
   LOG(INFO)
     << "Shutting down key-value engine";
 
@@ -316,31 +350,6 @@ IdStoreImpl::~IdStoreImpl(void) {
   status = rocks_db->Close();
   LOG_IF(ERROR, !status.ok())
       << "Error closing key/value store: " << status.ToString();
-}
-
-// Initialize the default metadata, or get its current state to continue on.
-void IdStoreImpl::InitNextIndices(void) {
-  auto make_one = ConstGenerator(1u);
-  next_file_index.store(GetOrSet(kNextFileIndex, make_one).first);
-  next_compilation_index.store(GetOrSet(kNextCompilationIndex, make_one).first);
-  next_small_fragment_index.store(
-      GetOrSet(kNextSmallFragmentIndex,
-               ConstGenerator(mx::kMaxBigFragmentId)).first);
-  next_big_fragment_index.store(GetOrSet(kNextBigFragmentIndex, make_one).first);
-  next_small_type_index.store(
-      GetOrSet(kNextSmallTypeIndex, ConstGenerator(mx::kMaxBigTypeId)).first);
-  next_big_type_index.store(GetOrSet(kNextBigTypeIndex, make_one).first);
-}
-
-// Store the metadata back to the database so that future executions of the
-// indexer don't re-use already allocated indices.
-void IdStoreImpl::ExitNextIndices(void) {
-  UnlockedSet(kNextFileIndex, next_file_index.load());
-  UnlockedSet(kNextCompilationIndex, next_compilation_index.load());
-  UnlockedSet(kNextSmallFragmentIndex, next_small_fragment_index.load());
-  UnlockedSet(kNextBigFragmentIndex, next_big_fragment_index.load());
-  UnlockedSet(kNextSmallTypeIndex, next_small_type_index.load());
-  UnlockedSet(kNextBigTypeIndex, next_big_type_index.load());
 }
 
 // Set `val` to `key`.
@@ -416,7 +425,6 @@ MaybeNewId<mx::PackedFragmentId> IdStoreImpl::GetOrCreateBigFragmentIdForHash(
   CHECK_LT(maybe_eid->fragment_id, mx::kMaxBigFragmentId);
   return {maybe_eid.value(), is_new};
 }
-
 
 MaybeNewId<mx::PackedTypeId> IdStoreImpl::GetOrCreateSmallTypeIdForHash(
     mx::TypeKind type_kind, uint32_t type_qualifiers, size_t num_tokens,
