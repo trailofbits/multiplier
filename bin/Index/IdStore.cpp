@@ -317,11 +317,9 @@ void IdStore::ExitNextIndices(void) {
 // Set `val` to `key`.
 void IdStore::UnlockedSet(const std::string &key, mx::RawEntityId id) {
   IDMarshaller id_marshal;
-  std::string &val = tValue;
   id_marshal.Store(id);
-  id_marshal.LoadInto(val);
-  auto status = rocks_db->Put(kWriteOptions, key, val);
-  CHECK(status.ok());
+  id_marshal.LoadInto(tValue);
+  CHECK(rocks_db->Put(kWriteOptions, key, tValue).ok());
 }
 
 // Core `GetOrSet` primitive used by higher-level APIs.
@@ -329,12 +327,12 @@ MaybeNewId<mx::RawEntityId> IdStore::GetOrSet(
     const std::string &key, mx::RawEntityId id) {
 
   IDMarshaller id_marshal;
-
   std::string &val = tValue;
+  val.clear();
 
   // Racy read, relying on RocksDB to implement the concurrency control.
-  auto status = rocks_db->Get(kReadOptions, cf_handle, key, &val);
-  if (status.ok() && val.size() == sizeof(id)) {
+  auto racy_get_status = rocks_db->Get(kReadOptions, cf_handle, key, &val);
+  if (racy_get_status.ok() && val.size() == sizeof(id)) {
     id_marshal.Store(val);
     auto new_id = id_marshal.Load();
     CHECK_NE(id, new_id);
@@ -344,19 +342,15 @@ MaybeNewId<mx::RawEntityId> IdStore::GetOrSet(
   auto locker = KeyShardGuard(key);
 
   // Uncontended read, synchronized with concurrent `Put`s.
-  status = rocks_db->Get(kReadOptions, cf_handle, key, &val);
-  if (status.ok() && val.size() == sizeof(id)) {
+  auto locked_get_status = rocks_db->Get(kReadOptions, cf_handle, key, &val);
+  if (locked_get_status.ok() && val.size() == sizeof(id)) {
     id_marshal.Store(val);
     auto new_id = id_marshal.Load();
     CHECK_NE(id, new_id);
     return {new_id, false};
   }
 
-  id_marshal.Store(id);
-  id_marshal.LoadInto(val);
-  status = rocks_db->Put(kWriteOptions, key, val);
-  CHECK(status.ok());
-
+  UnlockedSet(key, id);
   return {id, true};
 }
 
