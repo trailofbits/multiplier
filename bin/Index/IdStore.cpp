@@ -288,7 +288,6 @@ std::shared_ptr<IdStoreImpl> IdStoreImpl::Open(std::filesystem::path path) {
   }
 
   std::string name = abs_kvdir.generic_string();
-
   std::unique_lock<std::mutex> locker(gOpenDbsLock);
   auto &db_ptr_ref = gOpenDbs[name];
   if (auto already_open_db = db_ptr_ref.lock()) {
@@ -301,7 +300,7 @@ std::shared_ptr<IdStoreImpl> IdStoreImpl::Open(std::filesystem::path path) {
 
   std::vector<rocksdb::ColumnFamilyHandle *> cf_handles;
   rocksdb::DB *rocks_db_ptr = nullptr;
-  auto status = rocksdb::DB::Open(DBOptions(), abs_kvdir, cf_descs,
+  auto status = rocksdb::DB::Open(DBOptions(), name, cf_descs,
                                   &cf_handles, &rocks_db_ptr);
 
   CHECK(status.ok())
