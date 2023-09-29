@@ -201,6 +201,13 @@ const char *EnumeratorName(EntityCategory e) noexcept {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 
+// Return the maximum small fragment index.
+RawEntityId MaxSmallFragmentId(void) {
+  PackedEntityId packed = {};
+  packed.opaque = ~packed.opaque;
+  return packed.small_entity.fragment_id + 1ull;
+}
+
 EntityId::EntityId(DeclId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};

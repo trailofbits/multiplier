@@ -48,6 +48,9 @@ static constexpr RawEntityId kMaxCompilationId = 1ull << kCompilationIdNumBits;
 
 }  // namespace
 
+// Return the maximum small fragment index.
+RawEntityId MaxSmallFragmentId(void);
+
 // Return the fragment offset from an entity ID. Returns `~0u` if it's not
 // a fragment-specific entity ID.
 std::optional<EntityOffset> FragmentOffsetFromEntityId(RawEntityId id);

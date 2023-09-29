@@ -38,26 +38,14 @@
 namespace indexer {
 namespace {
 
-using AtomicEntityId = std::atomic<mx::RawEntityId>;
-
 // Used for temporary storage of values read from RocksDB.
 static thread_local std::string tKey;
 static thread_local std::string tValue;
 
-// Keys in the ID store to hold current values for the IDs.
-static const std::string kNextFileIndex = "meta:NEXT_FILE_INDEX";
-static const std::string kNextCompilationIndex = "meta:NEXT_COMPILATION_INDEX";
-static const std::string kNextSmallFragmentIndex = "meta:NEXT_SMALL_FRAGMENT_INDEX";
-static const std::string kNextBigFragmentIndex = "meta:NEXT_BIG_FRAGMENT_INDEX";
-static const std::string kNextSmallTypeIndex = "meta:NEXT_SMALL_TYPE_INDEX";
-static const std::string kNextBigTypeIndex = "meta:NEXT_BIG_TYPE_INDEX";
-
 static const rocksdb::ReadOptions kReadOptions;
 static const rocksdb::WriteOptions kWriteOptions;
 
-enum : size_t {
-  kNumKeyShards = 1024UL
-};
+static constexpr size_t kNumKeyShards = 1024UL;
 
 // When doing `GetOrSet` we hash the key and grab a lock based on that hash.
 static std::mutex gKeyShards[kNumKeyShards];
@@ -115,66 +103,159 @@ union alignas(mx::RawEntityId) IDMarshaller {
 
 static_assert(sizeof(IDMarshaller) == sizeof(mx::RawEntityId));
 
-// Create a key for the KV store by concatenating several elements, separated
-// by `:`s.
+// NOTE(pag): `val` can be quite long. That's overall not a big issue for
+//            RocksDB, and it can apply compression to reduce the problem. For
+//            now, though, there's usually enough context being fed into
+//            keys via other values for us to reduce the `val` string down into
+//            two opaque summary integers without risk of collisions.
 //
-// NOTE(pag): This accesses thread-
-template <typename... Args>
-inline static const std::string &Key(const Args&... args) {
-  tKey.clear();
-  llvm::raw_string_ostream key_os(tKey);
-  ((key_os << args << ':'), ...);
-  return tKey;
-}
-
-// Calculate the next proposed index. This might re-used a local cached index.
-static mx::RawEntityId NextProposedIndex(AtomicEntityId &global_next) {
-  return global_next.fetch_add(1u);
+// NOTE(pag): The `32` size thing is a bit of a dumb hack. For file IDs, we use
+//            SHA256, which we definitely *do* want to preserve, as we don't
+//            have additional context (as mentioned above).
+static void AccumulateValIntoKey(llvm::raw_string_ostream &os,
+                                 const std::string &val) {
+  if (val.size() > 32) {
+    os << ':' << Hash64(val) << ':' << Hash32(val);
+  } else {
+    os << ':' << val;
+  }
 }
 
 template <typename T>
-static mx::RawEntityId PackAndCheckId(T id) {
-  mx::EntityId eid(id);
-  auto packed_id = eid.Pack();
-  CHECK_NE(packed_id, mx::kInvalidEntityId);
-
-  auto unpack = eid.Extract<T>();
-  CHECK(unpack.has_value());
-  CHECK(id == unpack.value());
-  return packed_id;
+static void AccumulateValIntoKey(llvm::raw_string_ostream &os, T val) {
+  os << ':';
+  if constexpr (std::is_enum_v<T>) {
+    os << static_cast<std::underlying_type_t<T>>(val);
+  } else if constexpr (std::is_integral_v<T>) {
+    os << val;
+  }
 }
 
-static mx::RawEntityId MakeOne(void) {
-  return 1u;
+template <typename T>
+struct Tag {};
+
+// NOTE(pag): The parameter lists (following the tag and `index`) of the
+//            following functions must be compatible with the parameter lists
+//            of the `IdStore::GetOrCreate*` methods.
+
+static mx::FragmentId MakeId(Tag<mx::FragmentId>, mx::RawEntityId index,
+                             mx::RawEntityId /* tok_id */,
+                             size_t /* num_tokens */,
+                             const std::string & /* hash */) {
+  return mx::FragmentId(index);
 }
 
-static mx::RawEntityId MakeMaxBigFragmentId(void) {
-  return mx::kMaxBigFragmentId;
+static mx::FileId MakeId(Tag<mx::FileId>, mx::RawEntityId index,
+                         const std::string & /* hash */) {
+  return mx::FileId(index);
 }
 
-static mx::RawEntityId MakeMaxBigTypeId(void) {
-  return mx::kMaxBigTypeId;
+static mx::CompilationId MakeId(Tag<mx::CompilationId>, mx::RawEntityId index,
+                                mx::RawEntityId file_id,
+                                const std::string & /* hash */) {
+  auto fid = mx::EntityId(file_id).Extract<mx::FileId>();
+  CHECK(fid.has_value());
+  return mx::CompilationId(index, fid->file_id);
+}
+
+static mx::TypeId MakeId(Tag<mx::TypeId>, mx::RawEntityId index,
+                         mx::TypeKind type_kind, uint32_t /* type_qualifiers */,
+                         size_t /* num_tokens */,
+                         const std::string & /* hash */) {
+  return mx::TypeId(index, type_kind);
 }
 
 }  // namespace
 
+struct IdConfig {
+  // The key in the k/v store where the last value of this ID is stored.
+  // A new database has no last value, so we initialize it to the
+  // `min_value_inclusive`. When we close the database, we persist the present
+  // value back into the k/v store.
+  //
+  // NOTE(pag): `metadata_name` should be prefixed by the `META:` namespace.
+  const std::string metadata_name;
+
+  // All IDs generated from this configuration will be "namespaced" by this
+  // prefix in the k/v store. Namespacing aviods the potential for collisions.
+  const std::string_view key_prefix;
+
+  // `[min_value_inclusive, max_value_exclusive)` range of valid values that
+  // we allow to be generated by `next_index`. These values correspond to
+  // constraints in how we do bit packing of IDs in `mx::EntityId`.
+  const mx::RawEntityId min_value_inclusive;
+  const mx::RawEntityId max_value_exclusive;
+
+  // The present value of this ID.
+  std::atomic<mx::RawEntityId> next_index;
+
+  inline IdConfig(const char *metadata_name_,
+                  const char *key_prefix_,
+                  mx::RawEntityId min_value_inclusive_,
+                  mx::RawEntityId max_value_exclusive_)
+      : metadata_name(metadata_name_),
+        key_prefix(key_prefix_),
+        min_value_inclusive(min_value_inclusive_),
+        max_value_exclusive(max_value_exclusive_) {
+
+    CHECK(metadata_name.starts_with("META:"));
+    CHECK_NE(key_prefix, "META");
+  }
+
+  void Load(IdStoreImpl &);
+  void Store(IdStoreImpl &);
+
+  mx::RawEntityId NextProposedIndex(void) {
+    auto proposed_index = next_index.fetch_add(1u);
+    CHECK_GE(proposed_index, min_value_inclusive);
+    CHECK_LT(proposed_index, max_value_exclusive);
+    return proposed_index;
+  }
+
+  // Create a key for the KV store by concatenating several elements, separated
+  // by `:`s.
+  //
+  // NOTE(pag): This returns a reference to `tKey`, a thread-local string.
+  template <typename... Args>
+  inline const std::string &Key(const Args&... args) {
+    tKey.clear();
+    llvm::raw_string_ostream key_os(tKey);
+    key_os << key_prefix;
+    (void(AccumulateValIntoKey(key_os, args)), ...);
+    return tKey;
+  }
+
+  template <typename IdType, typename... Args>
+  mx::RawEntityId PackAndCheckId(const Args&... args) {
+    IdType id = MakeId(Tag<IdType>{}, NextProposedIndex(), args...);
+    mx::EntityId eid(id);
+    auto packed_id = eid.Pack();
+    CHECK_NE(packed_id, mx::kInvalidEntityId);
+
+    auto unpack = eid.Extract<IdType>();
+    CHECK(unpack.has_value());
+    CHECK(id == unpack.value());
+    return packed_id;
+  }
+};
+
 class IdStoreImpl {
- private:
+ public:
   const std::unique_ptr<rocksdb::DB> rocks_db;
   rocksdb::ColumnFamilyHandle * const cf_handle;
 
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.
-  AtomicEntityId next_file_index;
+  IdConfig next_file_index;
 
   // The next translation unit ID that can be assigned.
-  AtomicEntityId next_compilation_index;
+  IdConfig next_compilation_index;
 
   // The next ID for a "small fragment." A small fragment has fewer than
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
   // are more common, and require fewer bits to encode token offsets inside of
   // the packed `mx::EntityId` for tokens.
-  AtomicEntityId next_small_fragment_index;
+  IdConfig next_small_fragment_index;
 
   // The next ID for a "big fragment." A big fragment has at least
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
@@ -184,26 +265,21 @@ class IdStoreImpl {
   // but because we reserve the low ID space for big fragment IDs, we know that
   // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
   // bit for token offset bits.
-  AtomicEntityId next_big_fragment_index;
+  IdConfig next_big_fragment_index;
 
   // The next type ID that can be assigned.
-  AtomicEntityId next_small_type_index;
-  AtomicEntityId next_big_type_index;
+  IdConfig next_small_type_index;
+  IdConfig next_big_type_index;
 
-  // Store the `next_*` ids back to the database.
+  // Initialize the `next_*` ids from the k/v store.
+  void EnterNextIndices(void);
+
+  // Store the `next_*` ids back to the k/v store.
   void ExitNextIndices(void);
 
   // Safely close RocksDB.
   void ExitRocksDB(void);
 
-  // Set `val` to `key`.
-  void UnlockedSet(const std::string &key, mx::RawEntityId val);
-
-  // Core `GetOrSet` primitive used by higher-level APIs.
-  template <typename MakeId>
-  MaybeNewId<mx::RawEntityId> GetOrSet(const std::string &key, MakeId make_id);
-
- public:
   static std::shared_ptr<IdStoreImpl> Open(std::filesystem::path path);
 
   ~IdStoreImpl(void) {
@@ -214,38 +290,78 @@ class IdStoreImpl {
   IdStoreImpl(rocksdb::DB *rocks_db_)
       : rocks_db(rocks_db_),
         cf_handle(rocks_db->DefaultColumnFamily()),
-        next_file_index(
-            GetOrSet(kNextFileIndex, MakeOne).first),
-        next_compilation_index(
-            GetOrSet(kNextCompilationIndex, MakeOne).first),
-        next_small_fragment_index(
-            GetOrSet(kNextSmallFragmentIndex, MakeMaxBigFragmentId).first),
-        next_big_fragment_index(
-            GetOrSet(kNextBigFragmentIndex, MakeOne).first),
-        next_small_type_index(
-            GetOrSet(kNextSmallTypeIndex, MakeMaxBigTypeId).first),
-        next_big_type_index(
-            GetOrSet(kNextBigTypeIndex, MakeOne).first) {}
+        next_file_index("META:NEXT_FILE_INDEX", "FID", 1u, mx::kMaxFileId),
+        next_compilation_index("META::NEXT_COMPILATION_INDEX", "CID",
+                               1, mx::kMaxCompilationId),
+        next_small_fragment_index("META:NEXT_SMALL_FRAGMENT_INDEX", "SFI",
+                                  mx::kMaxBigFragmentId,
+                                  mx::MaxSmallFragmentId()),
+        next_big_fragment_index("META:NEXT_BIG_FRAGMENT_INDEX", "BFI",
+                                1, mx::kMaxBigFragmentId),
+        next_small_type_index("META::NEXT_SMALL_TYPE_INDEX", "STI",
+                              mx::kMaxBigTypeId, mx::kMaxSmallTypeId),
+        next_big_type_index("META::NEXT_BIG_TYPE_INDEX", "BTI",
+                            1, mx::kMaxBigTypeId) {
+          EnterNextIndices();
+        }
 
-  MaybeNewId<mx::PackedFragmentId> GetOrCreateSmallFragmentIdForHash(
-      mx::RawEntityId tok_id, std::string hash, size_t num_tokens);
+  // Set `val` to `key`.
+  void UnlockedSet(const std::string &key, mx::RawEntityId val);
 
-  MaybeNewId<mx::PackedFragmentId> GetOrCreateBigFragmentIdForHash(
-      mx::RawEntityId tok_id, std::string hash, size_t num_tokens);
+  // Implements a transactional get or set operation.
+  template <typename MakeId>
+  MaybeNewId<mx::RawEntityId> GetOrSet(const std::string &key, MakeId make_id);
 
-  MaybeNewId<mx::PackedTypeId> GetOrCreateSmallTypeIdForHash(
-      mx::TypeKind type_kind, uint32_t type_qualifiers, size_t num_tokens,
-      std::string hash);
+  template <typename IdType, typename... Args>
+  MaybeNewId<mx::SpecificEntityId<IdType>> GetOrCreateId(
+      IdConfig &config, Args&... args) {
 
-  MaybeNewId<mx::PackedTypeId> GetOrCreateBigTypeIdForHash(
-      mx::TypeKind type_kind, uint32_t type_qualifiers, size_t num_tokens,
-      std::string hash);
+    auto [found_id, is_new] = GetOrSet(
+        config.Key(args...),
+        [&] (void) {
+          return config.PackAndCheckId<IdType>(args...);
+        });
 
-  MaybeNewId<mx::PackedFileId> GetOrCreateFileIdForHash(std::string hash);
-
-  MaybeNewId<mx::PackedCompilationId> GetOrCreateCompilationId(
-      mx::RawEntityId file_id, std::string hash);
+    auto maybe_eid = mx::EntityId(found_id).Extract<IdType>();
+    CHECK(maybe_eid.has_value());
+    return {maybe_eid.value(), is_new};
+  }
 };
+
+// Load the current value of this id from the persistent k/v store.
+void IdConfig::Load(IdStoreImpl &kv) {
+  next_index.store(kv.GetOrSet(
+      metadata_name,
+      [=, this] (void) {
+        return min_value_inclusive;
+      }).first);
+}
+
+// Store the current value fo this id back to the persistent k/v store.
+void IdConfig::Store(IdStoreImpl &kv) {
+  kv.UnlockedSet(metadata_name, next_index.load());
+}
+
+// Initialize the `next_*` ids from the k/v store.
+void IdStoreImpl::EnterNextIndices(void) {
+  next_file_index.Load(*this);
+  next_compilation_index.Load(*this);
+  next_small_fragment_index.Load(*this);
+  next_big_fragment_index.Load(*this);
+  next_small_type_index.Load(*this);
+  next_big_type_index.Load(*this);
+}
+
+// Store the metadata back to the database so that future executions of the
+// indexer don't re-use already allocated indices.
+void IdStoreImpl::ExitNextIndices(void) {
+  next_file_index.Store(*this);
+  next_compilation_index.Store(*this);
+  next_small_fragment_index.Store(*this);
+  next_big_fragment_index.Store(*this);
+  next_small_type_index.Store(*this);
+  next_big_type_index.Store(*this);
+}
 
 std::shared_ptr<IdStoreImpl> IdStoreImpl::Open(std::filesystem::path path) {
   std::error_code ec;
@@ -300,17 +416,6 @@ std::shared_ptr<IdStoreImpl> IdStoreImpl::Open(std::filesystem::path path) {
   return db_ptr;
 }
 
-// Store the metadata back to the database so that future executions of the
-// indexer don't re-use already allocated indices.
-void IdStoreImpl::ExitNextIndices(void) {
-  UnlockedSet(kNextFileIndex, next_file_index.load());
-  UnlockedSet(kNextCompilationIndex, next_compilation_index.load());
-  UnlockedSet(kNextSmallFragmentIndex, next_small_fragment_index.load());
-  UnlockedSet(kNextBigFragmentIndex, next_big_fragment_index.load());
-  UnlockedSet(kNextSmallTypeIndex, next_small_type_index.load());
-  UnlockedSet(kNextBigTypeIndex, next_big_type_index.load());
-}
-
 // Safely close RocksDB.
 void IdStoreImpl::ExitRocksDB(void) {
   LOG(INFO)
@@ -362,124 +467,6 @@ MaybeNewId<mx::RawEntityId> IdStoreImpl::GetOrSet(
   return {invented_id, true};
 }
 
-// Get, or create and return, a fragment ID for the specific fragment hash.
-MaybeNewId<mx::PackedFragmentId> IdStoreImpl::GetOrCreateSmallFragmentIdForHash(
-    mx::RawEntityId tok_id, std::string hash, size_t num_tokens) {
-
-  auto [found_id, is_new] = GetOrSet(
-      Key("SFI", tok_id, num_tokens, Hash64(hash), Hash32(hash)),
-      [=, this] (void) {
-        auto proposed_index = NextProposedIndex(next_small_fragment_index);
-        CHECK_GE(proposed_index, mx::kMaxBigFragmentId);
-        return PackAndCheckId(mx::FragmentId(proposed_index));
-      });
-
-  auto maybe_eid = mx::EntityId(found_id).Extract<mx::FragmentId>();
-  CHECK(maybe_eid.has_value());
-  CHECK_GE(maybe_eid->fragment_id, mx::kMaxBigFragmentId);
-  return {maybe_eid.value(), is_new};
-}
-
-// Get, or create and return, a fragment ID for the specific fragment hash.
-MaybeNewId<mx::PackedFragmentId> IdStoreImpl::GetOrCreateBigFragmentIdForHash(
-    mx::RawEntityId tok_id, std::string hash, size_t num_tokens) {
-
-  auto [found_id, is_new] = GetOrSet(
-      Key("BFI", tok_id, num_tokens, Hash64(hash), Hash32(hash)),
-      [=, this] (void) {
-        auto proposed_index = NextProposedIndex(next_big_fragment_index);
-        CHECK_LT(proposed_index, mx::kMaxBigFragmentId);
-        return PackAndCheckId(mx::FragmentId(proposed_index));
-      });
-
-  auto maybe_eid = mx::EntityId(found_id).Extract<mx::FragmentId>();
-  CHECK(maybe_eid.has_value());
-  CHECK_LT(maybe_eid->fragment_id, mx::kMaxBigFragmentId);
-  return {maybe_eid.value(), is_new};
-}
-
-MaybeNewId<mx::PackedTypeId> IdStoreImpl::GetOrCreateSmallTypeIdForHash(
-    mx::TypeKind type_kind, uint32_t type_qualifiers, size_t num_tokens,
-    std::string hash) {
-
-  auto [found_id, is_new] = GetOrSet(
-      Key("STI", int(type_kind), type_qualifiers, num_tokens,
-          Hash64(hash), Hash32(hash)),
-      [=, this] (void) { 
-        auto proposed_index = NextProposedIndex(next_small_type_index);
-        CHECK_GE(proposed_index, mx::kMaxBigTypeId);
-        CHECK_LT(proposed_index, mx::kMaxSmallTypeId);
-        return PackAndCheckId(mx::TypeId(proposed_index, type_kind));
-      });
-
-  auto maybe_eid = mx::EntityId(found_id).Extract<mx::TypeId>();
-  CHECK(maybe_eid.has_value());
-  CHECK_GE(maybe_eid->type_id, mx::kMaxBigTypeId);
-  CHECK_LT(maybe_eid->type_id, mx::kMaxSmallTypeId);
-  CHECK(maybe_eid->kind == type_kind);
-
-  return {maybe_eid.value(), is_new};
-}
-
-MaybeNewId<mx::PackedTypeId> IdStoreImpl::GetOrCreateBigTypeIdForHash(
-    mx::TypeKind type_kind, uint32_t type_qualifiers, size_t num_tokens,
-    std::string hash) {
-
-  auto [found_id, is_new] = GetOrSet(
-      Key("BTI", int(type_kind), type_qualifiers, num_tokens,
-          Hash64(hash), Hash32(hash)),
-      [=, this] (void) {
-        auto proposed_index = NextProposedIndex(next_big_type_index);
-        CHECK_LT(proposed_index, mx::kMaxBigTypeId);
-        return PackAndCheckId(mx::TypeId(proposed_index, type_kind));
-      });
-
-  auto maybe_eid = mx::EntityId(found_id).Extract<mx::TypeId>();
-  CHECK(maybe_eid.has_value());
-  CHECK_LT(maybe_eid->type_id, mx::kMaxBigTypeId);
-  CHECK(maybe_eid->kind == type_kind);
-  return {maybe_eid.value(), is_new};
-}
-
-// Get, or create and return, a file ID for the specific file contents hash.
-MaybeNewId<mx::PackedFileId> IdStoreImpl::GetOrCreateFileIdForHash(
-    std::string hash) {
-
-  auto [found_id, is_new] = GetOrSet(
-      Key("FID", hash),
-      [=, this] (void) {
-        auto proposed_index = NextProposedIndex(next_file_index);
-        CHECK_LT(proposed_index, mx::kMaxFileId);
-        return PackAndCheckId(mx::FileId(proposed_index));
-      });
-
-  auto maybe_eid = mx::EntityId(found_id).Extract<mx::FileId>();
-  CHECK(maybe_eid.has_value());
-  CHECK_LT(maybe_eid->file_id, mx::kMaxFileId);
-  return {maybe_eid.value(), is_new};
-}
-
-MaybeNewId<mx::PackedCompilationId> IdStoreImpl::GetOrCreateCompilationId(
-    mx::RawEntityId file_id, std::string hash) {
-
-  auto fid = mx::EntityId(file_id).Extract<mx::FileId>();
-  CHECK(fid.has_value());
-
-  auto [found_id, is_new] = GetOrSet(
-      Key("CID", file_id, hash),
-      [=, this] (void) {
-        auto proposed_index = NextProposedIndex(next_compilation_index);
-        CHECK_LT(proposed_index, mx::kMaxCompilationId);
-        return PackAndCheckId(mx::CompilationId(proposed_index, fid->file_id));
-      });
-
-  auto maybe_eid = mx::EntityId(found_id).Extract<mx::CompilationId>();
-  CHECK(maybe_eid.has_value());
-  CHECK_LT(maybe_eid->compilation_id, mx::kMaxCompilationId);
-  CHECK_EQ(maybe_eid->file_id, fid->file_id);
-  return {maybe_eid.value(), is_new};
-}
-
 IdStore::~IdStore(void) {}
 
 IdStore::IdStore(std::filesystem::path path) 
@@ -493,10 +480,11 @@ MaybeNewId<mx::PackedFragmentId> IdStore::GetOrCreateFragmentIdForHash(
   // NOTE(pag): We have a fudge factor here of `3x` to account for macro
   //            expansions.
   if (num_tokens >= mx::kNumTokensInBigFragment) {
-    return impl->GetOrCreateBigFragmentIdForHash(tok_id, std::move(hash), num_tokens);
+    return impl->GetOrCreateId<mx::FragmentId>(
+        impl->next_big_fragment_index, tok_id, num_tokens, hash);
   } else {
-    return impl->GetOrCreateSmallFragmentIdForHash(
-        tok_id, std::move(hash), num_tokens);
+    return impl->GetOrCreateId<mx::FragmentId>(
+        impl->next_small_fragment_index, tok_id, num_tokens, hash);
   }
 }
 
@@ -507,23 +495,26 @@ MaybeNewId<mx::PackedTypeId> IdStore::GetOrCreateTypeIdForHash(
   // Big types will have IDs in the range [1, mx::kMaxBigTypeId) and small types
   // will have ids [mx::kMaxBigTypeId: 2^36 + mx::kMaxBigTypeId)
   if (num_tokens >= mx::kNumTokensInBigType) {
-    return impl->GetOrCreateBigTypeIdForHash(type_kind, type_qualifiers, num_tokens,
-                                       std::move(hash));
+    return impl->GetOrCreateId<mx::TypeId>(
+        impl->next_big_type_index, type_kind, type_qualifiers, num_tokens,
+        hash);
   } else {
-    return impl->GetOrCreateSmallTypeIdForHash(type_kind, type_qualifiers, num_tokens,
-                                         std::move(hash));
+    return impl->GetOrCreateId<mx::TypeId>(
+        impl->next_small_type_index, type_kind, type_qualifiers, num_tokens,
+        hash);
   }
 }
 
 // Get, or create and return, a file ID for the specific file contents hash.
 MaybeNewId<mx::PackedFileId> IdStore::GetOrCreateFileIdForHash(
     std::string hash) {
-  return impl->GetOrCreateFileIdForHash(std::move(hash));
+  return impl->GetOrCreateId<mx::FileId>(impl->next_file_index, hash);
 }
 
 MaybeNewId<mx::PackedCompilationId> IdStore::GetOrCreateCompilationId(
     mx::RawEntityId file_id, std::string hash) {
-  return impl->GetOrCreateCompilationId(file_id, std::move(hash));
+  return impl->GetOrCreateId<mx::CompilationId>(
+      impl->next_compilation_index, file_id, hash);
 }
 
 }  // namespace indexer
