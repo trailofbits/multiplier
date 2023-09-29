@@ -246,35 +246,27 @@ struct ReferenceRecord {
             kind BLOB NOT NULL PRIMARY KEY
           ))",
 
+       // The reference kind values should be in sync with the enum
+       // `BuildinReferenceKind` (include/multiplier/Reference.h:29).
+       // The reference_kind table is used to convert the reference kind
+       // into string that appears in the info browser.
        R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
-          VALUES (0, "Uses"),
-                 (1, "Address ofs"),
-                 (2, "Assigned Tos"),
-                 (3, "Assignments"),
-                 (4, "Caller"),
-                 (5, "Call Arguments"),
-                 (6, "Definitions"),
-                 (7, "Declarations"),
-                 (8, "Used By"),
-                 (9, "Dereferences"),
-                 (10, "Enumerations"),
-                 (11, "Functions"),
-                 (12, "Expansions"),
-                 (13, "Included By"),
-                 (14, "Initialization"),
-                 (15, "Influencing Condition"),
-                 (16, "Top Level Entity"),
-                 (17, "Types"),
-                 (18, "Type Casts"),
-                 (19, "Variables"),
-                 (20, "Local Variables"),
-                 (21, "Global Variables"),
-                 (22, "Thread Local Variables"),
-                 (23, "Static Local Variables"),
-                 (24, "Parameter Variables"),
-                 (25, "Statement Uses"),
-                 (26, "Type Trait Uses")
-
+          VALUES (0, "Use"),
+                 (1, "Address of"),
+                 (2, "Assigned To"),
+                 (3, "Assignment"),
+                 (4, "Called By"),
+                 (5, "Call Argument"),
+                 (6, "Used By"),
+                 (7, "Dereference"),
+                 (8, "Enumeration"),
+                 (9, "Expansion"),
+                 (10, "Included By"),
+                 (11, "Initialization"),
+                 (12, "Influencing Condition"),
+                 (13, "Type Cast"),
+                 (14, "Statement Use"),
+                 (15, "Type Trait Use")
           )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
@@ -287,8 +279,10 @@ struct ReferenceRecord {
 
   // Entity id of the referer
   RawEntityId from_entity_id;
+
   // Entity id of the reference
   RawEntityId to_entity_id;
+
   // Entity id of the context in which reference has happened. It will
   // be either same as `from_entity_id` or ancestor of `from_entity_id`.
   RawEntityId context_id;
