@@ -66,22 +66,16 @@ static std::mutex gKeyShards[kNumKeyShards];
 static std::mutex gOpenDbsLock;
 static std::unordered_map<std::string, std::weak_ptr<IdStoreImpl>> gOpenDbs;
 
-static rocksdb::DBOptions DBOptions(void) {
-  rocksdb::DBOptions options;
+static rocksdb::Options DBOptions(void) {
+  rocksdb::Options options;
   options.create_if_missing = true;
-  options.create_missing_column_families = true;
+  options.compression = rocksdb::kZSTD;
+  options.bottommost_compression = rocksdb::kZSTD;
+  options.compression_opts.enabled = true;
+  options.OptimizeForPointLookup(2048  /* MiB */);
   options.IncreaseParallelism(static_cast<int>(
       std::thread::hardware_concurrency()));
   return options;
-}
-
-static rocksdb::ColumnFamilyOptions CFOptions(void) {
-  rocksdb::ColumnFamilyOptions cf_options;
-  cf_options.compression = rocksdb::kZSTD;
-  cf_options.bottommost_compression = rocksdb::kZSTD;
-  cf_options.compression_opts.enabled = true;
-  cf_options.OptimizeForPointLookup(2048  /* MiB */);
-  return cf_options;
 }
 
 static std::unique_lock<std::mutex> KeyShardGuard(std::string_view key) {
@@ -294,20 +288,12 @@ std::shared_ptr<IdStoreImpl> IdStoreImpl::Open(std::filesystem::path path) {
     return already_open_db;
   }
 
-  std::vector<rocksdb::ColumnFamilyDescriptor> cf_descs;
-  
-  cf_descs.emplace_back(rocksdb::kDefaultColumnFamilyName, CFOptions());
-
-  std::vector<rocksdb::ColumnFamilyHandle *> cf_handles;
   rocksdb::DB *rocks_db_ptr = nullptr;
-  auto status = rocksdb::DB::Open(DBOptions(), name, cf_descs,
-                                  &cf_handles, &rocks_db_ptr);
+  auto status = rocksdb::DB::Open(DBOptions(), name, &rocks_db_ptr);
 
   CHECK(status.ok())
       << "Unable to open RocksDB database at " << abs_kvdir << ": "
       << status.ToString();
-
-  CHECK_EQ(cf_handles.size(), 1);
 
   auto db_ptr = std::make_shared<IdStoreImpl>(rocks_db_ptr);
   db_ptr_ref = db_ptr;
@@ -330,23 +316,10 @@ void IdStoreImpl::ExitRocksDB(void) {
   LOG(INFO)
     << "Shutting down key-value engine";
 
-  auto status = rocks_db->FlushWAL(true  /* sync */);
-  LOG_IF(ERROR, !status.ok() && !status.IsNotSupported())
-      << "Error flushing write-ahead log: " << status.ToString();
-
-  rocksdb::FlushOptions options;
-  options.wait = true;
-  status = rocks_db->Flush(options, cf_handle);
-  LOG_IF(ERROR, !status.ok())
-      << "Error flushing key/value store: " << status.ToString();
-
-  LOG(INFO)
-      << "Canceling background RocksDB work";
-  rocksdb::CancelAllBackgroundWork(rocks_db.get(), true  /* wait */);
-
-  rocks_db->DestroyColumnFamilyHandle(cf_handle);
-
-  status = rocks_db->Close();
+  rocksdb::WaitForCompactOptions opts;
+  opts.flush = true;
+  opts.close_db = true;
+  auto status = rocks_db->WaitForCompact(opts);
   LOG_IF(ERROR, !status.ok())
       << "Error closing key/value store: " << status.ToString();
 }
