@@ -88,10 +88,10 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
   // Inspect each section in this object file.
   for (const llvm::object::SectionRef &sec : object->sections()) {
     auto maybe_name = sec.getName();
-    if (!maybe_name) {
+    if (auto name_err = maybe_name.takeError()) {
       LOG(WARNING)
           << "Missing section name in object file " << file_name
-          << ": " << maybe_name.takeError();
+          << ": " << llvm::toString(std::move(name_err));
       continue;
     }
 
@@ -114,10 +114,10 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
         << "Found compile commands section in " << file_name;
 
     auto maybe_data = sec.getContents();
-    if (!maybe_data) {
+    if (auto data_err = maybe_data.takeError()) {
       LOG(ERROR)
           << "Unable to import the compile commands in object file "
-          << file_name << ": " << maybe_data.takeError();
+          << file_name << ": " << llvm::toString(std::move(data_err));
 
       ret = false;
       continue;
@@ -136,12 +136,13 @@ bool Parser::ParseArchive(llvm::object::Archive *archive) {
   auto ret = true;
   for (const llvm::object::Archive::Child &child : archive->children(err)) {
     auto maybe_bin = child.getAsBinary(&context);
-    if (!maybe_bin) {
-      LOG(ERROR) << maybe_bin.takeError();
+    if (auto bin_err = maybe_bin.takeError()) {
+      LOG(ERROR) << llvm::toString(std::move(bin_err));
       ret = false;
-    } else {
-      ret = ParseBinary(maybe_bin.get().get()) && ret;
+      continue;
     }
+
+    ret = ParseBinary(maybe_bin.get().get()) && ret;
   }
   return ret;
 }
@@ -253,14 +254,15 @@ bool Parser::ParseBinaryJSONCommands(std::string_view file_name,
   for (auto command_ : SplitCompileCommands(data)) {
     auto command = SanitizeJsonString(command_, "{", "}");
     auto maybe_json = llvm::json::parse(command);
-    if (maybe_json) {
-      ret = ParseBinaryJSONCommand(*maybe_json) && ret;
-    } else {
+    if (auto json_err = maybe_json.takeError()) {
       LOG(ERROR)
            << "Unable to parse compile command in object file "
-           << file_name << ": " << maybe_json.takeError();
+           << file_name << ": " << llvm::toString(std::move(json_err));
       ret = false;
+      continue;
     }
+
+    ret = ParseBinaryJSONCommand(*maybe_json) && ret;
   }
   return ret;
 }
@@ -312,16 +314,13 @@ bool Parser::Parse(const llvm::MemoryBuffer &buff, const EnvVariableMap &envp) {
   DLOG(INFO) << "Parsing buffer " << file_name;
 
   auto maybe_json = llvm::json::parse(buff.getBuffer());
-  llvm::Error json_err = maybe_json.takeError();  // Error might not be UTF-8.
-
-  if (json_err) {
+  if (auto json_err = maybe_json.takeError()) {
     DLOG(INFO)
         << "Buffer " << file_name << " is not JSON: "
         << llvm::toString(std::move(json_err));
     
     auto maybe_bin = llvm::object::createBinary(buff, &context);
-    auto bin_err = maybe_bin.takeError();
-    if (bin_err) {
+    if (auto bin_err = maybe_bin.takeError()) {
       LOG(ERROR)
           << "Unable to parse " << file_name << " as binary: "
           << llvm::toString(std::move(bin_err));
