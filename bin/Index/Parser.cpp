@@ -106,25 +106,25 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
 
     // If we've found a section with embedded compile commands, then
     // try to parse them and import them.
-    if (name.contains_insensitive("trailofbits_cc")) {
-
-      LOG(INFO)
-          << "Found compile commands section in " << file_name;
-
-      auto maybe_data = sec.getContents();
-      if (!maybe_data) {
-        LOG(ERROR)
-            << "Unable to import the compile commands in object file "
-            << file_name << ": " << maybe_data.takeError();
-
-        ret = false;
-        continue;
-
-      } else {
-        std::string_view commands_view(maybe_data->data(), maybe_data->size());
-        ret = ParseBinaryJSONCommands(file_name_str, commands_view) && ret;
-      }
+    if (!name.contains_insensitive("trailofbits_cc")) {
+      continue;
     }
+
+    LOG(INFO)
+        << "Found compile commands section in " << file_name;
+
+    auto maybe_data = sec.getContents();
+    if (!maybe_data) {
+      LOG(ERROR)
+          << "Unable to import the compile commands in object file "
+          << file_name << ": " << maybe_data.takeError();
+
+      ret = false;
+      continue;
+    }
+
+    std::string_view commands_view(maybe_data->data(), maybe_data->size());
+    ret = ParseBinaryJSONCommands(file_name_str, commands_view) && ret;
   }
 
   return ret;
@@ -278,26 +278,30 @@ bool Parser::ParseBinaryJSONCommand(llvm::json::Value &json) {
 bool Parser::ParseCompileCommandsJSON(std::string_view file_name,
                                       llvm::json::Value &json,
                                       const EnvVariableMap &envp) {
-  auto ret = true;
-  if (auto arr = json.getAsArray()) {
-    for (llvm::json::Value &val : *arr) {
-      if (llvm::json::Object *obj = val.getAsObject()) {
-        if (obj->getString("wrapped_tool")) {
-          ret = importer.ImportBlightCompileCommand(*obj) && ret;
-        } else {
-          ret = importer.ImportCMakeCompileCommand(*obj, envp) && ret;
-        }
-      } else {
-        DLOG(ERROR)
-            << "Entry in top-level array of JSON file is not an object";
-        ret = false;
-      }
-    }
-  } else {
+  auto arr = json.getAsArray();
+  if (!arr) {
     DLOG(ERROR)
         << "JSON object is not an array of objects";
     return false;
   }
+
+  auto ret = true;
+  for (llvm::json::Value &val : *arr) {
+    llvm::json::Object *obj = val.getAsObject();
+    if (!obj) {
+      DLOG(ERROR)
+          << "Entry in top-level array of JSON file is not an object";
+      ret = false;
+      continue;
+    }
+
+    if (obj->getString("wrapped_tool")) {
+      ret = importer.ImportBlightCompileCommand(*obj) && ret;
+    } else {
+      ret = importer.ImportCMakeCompileCommand(*obj, envp) && ret;
+    }
+  }
+
   (void)file_name;
   return ret;
 }
@@ -308,24 +312,27 @@ bool Parser::Parse(const llvm::MemoryBuffer &buff, const EnvVariableMap &envp) {
   DLOG(INFO) << "Parsing buffer " << file_name;
 
   auto maybe_json = llvm::json::parse(buff.getBuffer());
-  if (maybe_json) {
-    DLOG(INFO) << "Buffer is JSON; parsing commands";
-    return ParseCompileCommandsJSON(file_name, *maybe_json, envp);
-  } else {
+  llvm::Error json_err = maybe_json.takeError();  // Error might not be UTF-8.
+
+  if (json_err) {
     DLOG(INFO)
         << "Buffer " << file_name << " is not JSON: "
-        << maybe_json.takeError();
-  }
+        << llvm::toString(std::move(json_err));
+    
+    auto maybe_bin = llvm::object::createBinary(buff, &context);
+    auto bin_err = maybe_bin.takeError();
+    if (bin_err) {
+      LOG(ERROR)
+          << "Unable to parse " << file_name << " as binary: "
+          << llvm::toString(std::move(bin_err));
+      return false;
+    }
 
-  auto maybe_bin = llvm::object::createBinary(buff, &context);
-  if (!maybe_bin) {
-    LOG(ERROR)
-        << "Unable to parse " << file_name << " as binary: "
-        << maybe_bin.takeError();
-    return false;
-  } else {
     return ParseBinary(maybe_bin.get().get());
   }
+
+  DLOG(INFO) << "Buffer is JSON; parsing commands";
+  return ParseCompileCommandsJSON(file_name, *maybe_json, envp);
 }
 
 }  // namespace indexer
