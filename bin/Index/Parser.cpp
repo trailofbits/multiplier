@@ -98,8 +98,7 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
     llvm::StringRef name = std::move(*maybe_name);
     if (name.empty()) {
       LOG(WARNING)
-          << "Empty section name in object file " << file_name
-          << ": " << maybe_name.takeError();
+          << "Empty section name in object file " << file_name;
       continue;
     }
 
