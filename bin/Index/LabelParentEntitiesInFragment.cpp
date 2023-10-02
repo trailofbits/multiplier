@@ -60,12 +60,12 @@ class ParentTrackerVisitor : public EntityVisitor {
         fragment(fragment_) {}
 
   void AddToMaps(const void *entity) {
-    if (parent_decl_id != mx::kInvalidEntityId) {
+    if (parent_decl_id != mx::kInvalidEntityId && parent_decl) {
       em.parent_decl_ids.emplace(entity, parent_decl_id);
       em.parent_decls.emplace(entity, parent_decl);
     }
 
-    if (parent_stmt_id != mx::kInvalidEntityId) {
+    if (parent_stmt_id != mx::kInvalidEntityId && parent_stmt) {
       em.parent_stmt_ids.emplace(entity, parent_stmt_id);
       em.parent_stmts.emplace(entity, parent_stmt);
     }
@@ -200,21 +200,33 @@ static ScanResult ScanTokenContexts(pasta::PrintedToken tok) {
   return {};
 }
 
-// Return `mx::kInvalidEntityId` if `eid` doesn't belong to the same fragment
-// as `pf`.
-template <typename T>
-static mx::RawEntityId InFragmentEntityId(const PendingFragment &pf,
-                                          mx::RawEntityId eid) {
-  auto id = mx::EntityId(eid).Extract<T>();
-  if (!id) {
-    return mx::kInvalidEntityId;
+static const void *GetOrNullptr(EntityParentMap &map, const void *key) {
+  if (auto it = map.find(key); it != map.end()) {
+    return it->second;
+  }
+  return nullptr;
+}
+
+// Sync up the pointers and IDs for parentage.
+static bool ResolveParents(ParentTrackerVisitor &vis, const void *parent_stmt,
+                           const void *parent_decl) {
+  EntityMapper &em = vis.em;
+  vis.parent_stmt = parent_stmt;
+  vis.parent_decl = parent_decl;
+
+  if (!vis.parent_stmt && vis.parent_decl) {
+    vis.parent_stmt = GetOrNullptr(em.parent_stmts, vis.parent_decl);
   }
 
-  if (id->fragment_id != pf.fragment_index) {
-    return mx::kInvalidEntityId;
+  if (!vis.parent_decl && vis.parent_stmt) {
+    vis.parent_stmt = GetOrNullptr(em.parent_decls, vis.parent_stmt);
   }
 
-  return eid;
+  vis.parent_stmt_id = em.ParentStmtId(vis.parent_stmt);
+  vis.parent_decl_id = em.ParentStmtId(vis.parent_decl);
+
+  return (vis.parent_stmt && vis.parent_stmt_id != mx::kInvalidEntityId) ||
+         (vis.parent_decl && vis.parent_decl_id != mx::kInvalidEntityId);
 }
 
 // Use the token contexts to try to find missing parents.
@@ -239,23 +251,7 @@ static void FindMissingParentageFromTokens(
       continue;
     }
 
-    vis.parent_stmt_id = pf.em.EntityId(parent_stmt);
-    vis.parent_decl_id = pf.em.EntityId(parent_decl);
-
-    if (vis.parent_stmt_id == mx::kInvalidEntityId) {
-      vis.parent_stmt_id = pf.em.ParentStmtId(parent_decl);
-    }
-
-    if (vis.parent_decl_id == mx::kInvalidEntityId) {
-      vis.parent_decl_id = pf.em.ParentDeclId(parent_stmt);
-    }
-
-    vis.parent_decl_id = InFragmentEntityId<mx::DeclId>(pf, vis.parent_decl_id);
-    vis.parent_stmt_id = InFragmentEntityId<mx::StmtId>(pf, vis.parent_stmt_id);
-
-    if (vis.parent_stmt_id != mx::kInvalidEntityId ||
-        vis.parent_decl_id != mx::kInvalidEntityId) {
-
+    if (ResolveParents(vis, parent_stmt, parent_decl)) {
       auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
       vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
     }
@@ -268,9 +264,12 @@ static void FindMissingParentageFromTokens(
 static void FindMissingParentageFromAttributeTokens(
     ParentTrackerVisitor &vis, PendingFragment &pf) {
 
-  std::unordered_map<const void *, const void *> tok_to_attr;
+  if (pf.attrs_to_serialize.empty()) {
+    return;
+  }
 
   // Find the parsed tokens whose nearest context is an `Attr`.
+  std::unordered_map<const void *, const void *> tok_to_attr;
   for (pasta::PrintedToken tok : pf.parsed_tokens) {
     auto parsed_tok = tok.DerivedLocation();
     if (!parsed_tok) {
@@ -295,18 +294,10 @@ static void FindMissingParentageFromAttributeTokens(
         continue;
       }
 
-      // Look for the parents of the attribute.
-      vis.parent_stmt_id = pf.em.ParentStmtId(attr_it->second);
-      vis.parent_decl_id = pf.em.ParentDeclId(attr_it->second);
+      auto parent_stmt = GetOrNullptr(pf.em.parent_stmts, attr_it->second);
+      auto parent_decl = GetOrNullptr(pf.em.parent_decls, attr_it->second);
 
-      vis.parent_decl_id = InFragmentEntityId<mx::DeclId>(pf, vis.parent_decl_id);
-      vis.parent_stmt_id = InFragmentEntityId<mx::StmtId>(pf, vis.parent_stmt_id);
-
-      // If we'be got them, then visit this statement.
-      if (vis.parent_stmt_id != mx::kInvalidEntityId ||
-          vis.parent_decl_id != mx::kInvalidEntityId) {
-
-        auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+      if (ResolveParents(vis, parent_stmt, parent_decl)) {
         vis.Accept(stmt);
         break;
       }
