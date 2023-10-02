@@ -7,6 +7,7 @@
 #include "IdStore.h"
 
 #include <atomic>
+#include <deque>
 #include <glog/logging.h>
 #include <mutex>
 #include <string>
@@ -37,10 +38,6 @@
 
 namespace indexer {
 namespace {
-
-// Used for temporary storage of values read from RocksDB.
-static thread_local std::string tKey;
-static thread_local std::string tValue;
 
 static const rocksdb::ReadOptions kReadOptions;
 static const rocksdb::WriteOptions kWriteOptions;
@@ -214,15 +211,13 @@ struct IdConfig {
 
   // Create a key for the KV store by concatenating several elements, separated
   // by `:`s.
-  //
-  // NOTE(pag): This returns a reference to `tKey`, a thread-local string.
   template <typename... Args>
-  inline const std::string &Key(const Args&... args) {
-    tKey.clear();
-    llvm::raw_string_ostream key_os(tKey);
+  inline std::string Key(const Args&... args) {
+    std::string key;
+    llvm::raw_string_ostream key_os(key);
     key_os << key_prefix;
     (void(AccumulateValIntoKey(key_os, args)), ...);
-    return tKey;
+    return key;
   }
 
   template <typename IdType, typename... Args>
@@ -244,18 +239,20 @@ class IdStoreImpl {
   const std::unique_ptr<rocksdb::DB> rocks_db;
   rocksdb::ColumnFamilyHandle * const cf_handle;
 
+  std::deque<IdConfig> configs;
+
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.
-  IdConfig next_file_index;
+  IdConfig &next_file_index;
 
   // The next translation unit ID that can be assigned.
-  IdConfig next_compilation_index;
+  IdConfig &next_compilation_index;
 
   // The next ID for a "small fragment." A small fragment has fewer than
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
   // are more common, and require fewer bits to encode token offsets inside of
   // the packed `mx::EntityId` for tokens.
-  IdConfig next_small_fragment_index;
+  IdConfig &next_small_fragment_index;
 
   // The next ID for a "big fragment." A big fragment has at least
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
@@ -265,11 +262,11 @@ class IdStoreImpl {
   // but because we reserve the low ID space for big fragment IDs, we know that
   // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
   // bit for token offset bits.
-  IdConfig next_big_fragment_index;
+  IdConfig &next_big_fragment_index;
 
   // The next type ID that can be assigned.
-  IdConfig next_small_type_index;
-  IdConfig next_big_type_index;
+  IdConfig &next_small_type_index;
+  IdConfig &next_big_type_index;
 
   // Initialize the `next_*` ids from the k/v store.
   void EnterNextIndices(void);
@@ -290,18 +287,20 @@ class IdStoreImpl {
   IdStoreImpl(rocksdb::DB *rocks_db_)
       : rocks_db(rocks_db_),
         cf_handle(rocks_db->DefaultColumnFamily()),
-        next_file_index("META:NEXT_FILE_INDEX", "FID", 1u, mx::kMaxFileId),
-        next_compilation_index("META::NEXT_COMPILATION_INDEX", "CID",
-                               1, mx::kMaxCompilationId),
-        next_small_fragment_index("META:NEXT_SMALL_FRAGMENT_INDEX", "SFI",
-                                  mx::kMaxBigFragmentId,
-                                  mx::MaxSmallFragmentId()),
-        next_big_fragment_index("META:NEXT_BIG_FRAGMENT_INDEX", "BFI",
-                                1, mx::kMaxBigFragmentId),
-        next_small_type_index("META::NEXT_SMALL_TYPE_INDEX", "STI",
-                              mx::kMaxBigTypeId, mx::kMaxSmallTypeId),
-        next_big_type_index("META::NEXT_BIG_TYPE_INDEX", "BTI",
-                            1, mx::kMaxBigTypeId) {
+        next_file_index(configs.emplace_back(
+            "META:NEXT_FILE_INDEX", "FID", 1u, mx::kMaxFileId)),
+        next_compilation_index(configs.emplace_back(
+            "META::NEXT_COMPILATION_INDEX", "CID", 1, mx::kMaxCompilationId)),
+        next_small_fragment_index(configs.emplace_back(
+            "META:NEXT_SMALL_FRAGMENT_INDEX", "SFI", mx::kMaxBigFragmentId,
+            mx::MaxSmallFragmentId())),
+        next_big_fragment_index(configs.emplace_back(
+            "META:NEXT_BIG_FRAGMENT_INDEX", "BFI", 1, mx::kMaxBigFragmentId)),
+        next_small_type_index(configs.emplace_back(
+            "META::NEXT_SMALL_TYPE_INDEX", "STI", mx::kMaxBigTypeId,
+            mx::kMaxSmallTypeId)),
+        next_big_type_index(configs.emplace_back(
+            "META::NEXT_BIG_TYPE_INDEX", "BTI", 1, mx::kMaxBigTypeId)) {
           EnterNextIndices();
         }
 
@@ -344,23 +343,17 @@ void IdConfig::Store(IdStoreImpl &kv) {
 
 // Initialize the `next_*` ids from the k/v store.
 void IdStoreImpl::EnterNextIndices(void) {
-  next_file_index.Load(*this);
-  next_compilation_index.Load(*this);
-  next_small_fragment_index.Load(*this);
-  next_big_fragment_index.Load(*this);
-  next_small_type_index.Load(*this);
-  next_big_type_index.Load(*this);
+  for (auto &config : configs) {
+    config.Load(*this);
+  }
 }
 
 // Store the metadata back to the database so that future executions of the
 // indexer don't re-use already allocated indices.
 void IdStoreImpl::ExitNextIndices(void) {
-  next_file_index.Store(*this);
-  next_compilation_index.Store(*this);
-  next_small_fragment_index.Store(*this);
-  next_big_fragment_index.Store(*this);
-  next_small_type_index.Store(*this);
-  next_big_type_index.Store(*this);
+  for (auto &config : configs) {
+    config.Store(*this);
+  }
 }
 
 std::shared_ptr<IdStoreImpl> IdStoreImpl::Open(std::filesystem::path path) {
@@ -431,10 +424,11 @@ void IdStoreImpl::ExitRocksDB(void) {
 
 // Set `val` to `key`.
 void IdStoreImpl::UnlockedSet(const std::string &key, mx::RawEntityId id) {
+  std::string val;
   IDMarshaller id_marshal;
   id_marshal.Store(id);
-  id_marshal.LoadInto(tValue);
-  CHECK(rocks_db->Put(kWriteOptions, key, tValue).ok());
+  id_marshal.LoadInto(val);
+  CHECK(rocks_db->Put(kWriteOptions, key, val).ok());
 }
 
 // Core `GetOrSet` primitive used by higher-level APIs.
@@ -443,8 +437,7 @@ MaybeNewId<mx::RawEntityId> IdStoreImpl::GetOrSet(
     const std::string &key, MakeId make_id) {
 
   IDMarshaller id_marshal;
-  std::string &val = tValue;
-  val.clear();
+  std::string val;
 
   // Racy read, relying on RocksDB to implement the concurrency control.
   auto racy_get_status = rocks_db->Get(kReadOptions, cf_handle, key, &val);
@@ -476,16 +469,10 @@ MaybeNewId<mx::PackedFragmentId> IdStore::GetOrCreateFragmentIdForHash(
     mx::RawEntityId tok_id, std::string hash, size_t num_tokens) {
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
-  //
-  // NOTE(pag): We have a fudge factor here of `3x` to account for macro
-  //            expansions.
-  if (num_tokens >= mx::kNumTokensInBigFragment) {
-    return impl->GetOrCreateId<mx::FragmentId>(
-        impl->next_big_fragment_index, tok_id, num_tokens, hash);
-  } else {
-    return impl->GetOrCreateId<mx::FragmentId>(
-        impl->next_small_fragment_index, tok_id, num_tokens, hash);
-  }
+  return impl->GetOrCreateId<mx::FragmentId>(
+      (num_tokens >= mx::kNumTokensInBigFragment ?
+       impl->next_big_fragment_index : impl->next_small_fragment_index),
+      tok_id, num_tokens, hash);
 }
 
 MaybeNewId<mx::PackedTypeId> IdStore::GetOrCreateTypeIdForHash(
@@ -494,15 +481,10 @@ MaybeNewId<mx::PackedTypeId> IdStore::GetOrCreateTypeIdForHash(
 
   // Big types will have IDs in the range [1, mx::kMaxBigTypeId) and small types
   // will have ids [mx::kMaxBigTypeId: 2^36 + mx::kMaxBigTypeId)
-  if (num_tokens >= mx::kNumTokensInBigType) {
-    return impl->GetOrCreateId<mx::TypeId>(
-        impl->next_big_type_index, type_kind, type_qualifiers, num_tokens,
-        hash);
-  } else {
-    return impl->GetOrCreateId<mx::TypeId>(
-        impl->next_small_type_index, type_kind, type_qualifiers, num_tokens,
-        hash);
-  }
+  return impl->GetOrCreateId<mx::TypeId>(
+      (num_tokens >= mx::kNumTokensInBigType ? impl->next_big_type_index :
+                                               impl->next_small_type_index),
+      type_kind, type_qualifiers, num_tokens, hash);
 }
 
 // Get, or create and return, a file ID for the specific file contents hash.

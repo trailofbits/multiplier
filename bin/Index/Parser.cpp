@@ -124,7 +124,7 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
     }
 
     std::string_view commands_view(maybe_data->data(), maybe_data->size());
-    ret = ParseBinaryJSONCommands(file_name_str, commands_view) && ret;
+    ret &= ParseBinaryJSONCommands(file_name_str, commands_view);
   }
 
   return ret;
@@ -141,7 +141,7 @@ bool Parser::ParseArchive(llvm::object::Archive *archive) {
       continue;
     }
 
-    ret = ParseBinary(maybe_bin.get().get()) && ret;
+    ret &= ParseBinary(maybe_bin.get().get());
   }
   return ret;
 }
@@ -168,7 +168,7 @@ bool Parser::ParseModule(const llvm::Module &module) {
       auto file_name = module.getName();
       auto data = init->getAsString();
       std::string_view commands_view(data.data(), data.size());
-      ret = ParseBinaryJSONCommands(file_name.str(), commands_view) && ret;
+      ret &= ParseBinaryJSONCommands(file_name.str(), commands_view);
     }
   }
   return ret;
@@ -179,7 +179,7 @@ bool Parser::ParseModule(const llvm::Module &module) {
 bool Parser::ParseIR(llvm::object::IRObjectFile *ir) {
   auto ret = false;
   for (const llvm::Module &module : ir->modules()) {
-    ret = ParseModule(module) && ret;
+    ret &= ParseModule(module);
   }
   return ret;
 }
@@ -202,9 +202,9 @@ bool Parser::ParseUB(llvm::object::MachOUniversalBinary *ub) {
       ret = false;
 
     } else if (!object_file) {
-      ret = ParseArchive(archive.get().get()) && ret;
+      ret &= ParseArchive(archive.get().get());
     } else {
-      ret = ParseObject(object_file.get().get()) && ret;
+      ret &= ParseObject(object_file.get().get());
     }
   }
   return ret;
@@ -261,7 +261,7 @@ bool Parser::ParseBinaryJSONCommands(std::string_view file_name,
       continue;
     }
 
-    ret = ParseBinaryJSONCommand(*maybe_json) && ret;
+    ret &= ParseBinaryJSONCommand(*maybe_json);
   }
   return ret;
 }
@@ -282,7 +282,7 @@ bool Parser::ParseCompileCommandsJSON(std::string_view file_name,
   auto arr = json.getAsArray();
   if (!arr) {
     DLOG(ERROR)
-        << "JSON object is not an array of objects";
+        << "JSON object in " << file_name << " is not an array of objects";
     return false;
   }
 
@@ -291,19 +291,19 @@ bool Parser::ParseCompileCommandsJSON(std::string_view file_name,
     llvm::json::Object *obj = val.getAsObject();
     if (!obj) {
       DLOG(ERROR)
-          << "Entry in top-level array of JSON file is not an object";
+          << "Entry in top-level array of JSON file " << file_name
+          << " is not an object";
       ret = false;
       continue;
     }
 
     if (obj->getString("wrapped_tool")) {
-      ret = importer.ImportBlightCompileCommand(*obj) && ret;
+      ret &= importer.ImportBlightCompileCommand(*obj);
     } else {
-      ret = importer.ImportCMakeCompileCommand(*obj, envp) && ret;
+      ret &= importer.ImportCMakeCompileCommand(*obj, envp);
     }
   }
 
-  (void)file_name;
   return ret;
 }
 
