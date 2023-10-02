@@ -294,7 +294,7 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
 #endif
 
       get_references(db.Prepare(
-          "SELECT DISTINCT(r.from_entity_id), r.kind_id "
+          "SELECT DISTINCT(r.from_entity_id), r.context_id, r.kind_id "
           "FROM reference AS r "
           "WHERE r.from_entity_id > ?1 "
           "  AND r.to_entity_id IN (SELECT l.entity_id "
@@ -395,8 +395,8 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "RETURNING rowid")),
       add_reference(db.Prepare(
           "INSERT OR IGNORE INTO reference "
-          "(from_entity_id, to_entity_id, kind_id) "
-          "VALUES (?1, ?2, ?3)")),
+          "(from_entity_id, to_entity_id, context_id, kind_id) "
+          "VALUES (?1, ?2, ?3, ?4)")),
       decompression_context(ZSTD_createDCtx()) {}
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)
@@ -640,10 +640,11 @@ ReferenceKindImplPtr SQLiteEntityProvider::ReferenceKindFor(
 
 bool SQLiteEntityProvider::AddReference(const Ptr &, RawEntityId kind_id,
                                         RawEntityId from_id,
-                                        RawEntityId to_id) {
+                                        RawEntityId to_id,
+                                        RawEntityId context_id) {
   ImplPtr context = impl.Lock();
   sqlite::Statement &add = context->add_reference;
-  add.BindValues(from_id, to_id, kind_id);
+  add.BindValues(from_id, to_id, context_id, kind_id);
   add.Execute();
   return true;
 }
@@ -721,7 +722,7 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
 //
 // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
 //            with `eid` if `eid` resides in a fragment.
-gap::generator<std::pair<RawEntityId, RawEntityId>>
+gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
 
   ImplPtr context = impl.Lock();
@@ -756,7 +757,7 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
   //            integer.
   auto lower_bound = std::numeric_limits<int64_t>::min();
 
-  std::array<std::pair<RawEntityId, RawEntityId>, MX_REFERENCE_PAGE_SIZE>
+  std::array<std::tuple<RawEntityId, RawEntityId, RawEntityId>, MX_REFERENCE_PAGE_SIZE>
       paged_results;
 
   auto version = self->VersionNumber();
@@ -785,8 +786,9 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
         found = true;
         RawEntityId from_id = kInvalidEntityId;
         RawEntityId kind_id = kInvalidEntityId;
+        RawEntityId context_id = kInvalidEntityId;
 
-        get_references.Row().Columns(from_id, kind_id);
+        get_references.Row().Columns(from_id, context_id, kind_id);
 
         // For next page.
         lower_bound = std::max(lower_bound, static_cast<int64_t>(from_id));
@@ -797,8 +799,9 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
           continue;
         }
 
-        paged_results[num_paged_results].first = from_id;
-        paged_results[num_paged_results].second = kind_id;
+        std::get<0>(paged_results[num_paged_results]) = from_id;
+        std::get<1>(paged_results[num_paged_results]) = context_id;
+        std::get<2>(paged_results[num_paged_results]) = kind_id;
         ++num_paged_results;
       }
 

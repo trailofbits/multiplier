@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 
+#include "Reference.h"
 #include "Types.h"
 
 #define MX_DATABASE_HAS_FTS5 1
@@ -233,26 +234,59 @@ struct ReferenceRecord {
       {R"(CREATE TABLE IF NOT EXISTS reference (
             from_entity_id INTEGER NOT NULL,
             to_entity_id INTEGER NOT NULL,
+            context_id INTEGER NOT NULL,
             kind_id INTEGER NOT NULL,
-            PRIMARY KEY(to_entity_id ASC, from_entity_id ASC, kind_id)
+            PRIMARY KEY(to_entity_id ASC,
+                        from_entity_id ASC,
+                        context_id ASC,
+                        kind_id)
           ) WITHOUT ROWID)",
 
        R"(CREATE TABLE IF NOT EXISTS reference_kind (
             kind BLOB NOT NULL PRIMARY KEY
           ))",
 
+       // The reference kind values should be in sync with the enum
+       // `BuildinReferenceKind` (include/multiplier/Reference.h:29).
+       // The reference_kind table is used to convert the reference kind
+       // into string that appears in the info browser.
        R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
-          VALUES (0, "Explicit code reference"))"};
+          VALUES (0, "Use"),
+                 (1, "Address of"),
+                 (2, "Assigned To"),
+                 (3, "Assignment"),
+                 (4, "Called By"),
+                 (5, "Call Argument"),
+                 (6, "Used By"),
+                 (7, "Dereference"),
+                 (8, "Enumeration"),
+                 (9, "Expansion"),
+                 (10, "Included By"),
+                 (11, "Initialization"),
+                 (12, "Influencing Condition"),
+                 (13, "Type Cast"),
+                 (14, "Statement Use"),
+                 (15, "Type Trait Use")
+          )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
   // NOTE(pag): Reference id `0` is the id of an "explicit code reference."
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id, kind_id)
-         VALUES (?1, ?2, 0))";
+      R"(INSERT OR IGNORE INTO reference (from_entity_id,
+         to_entity_id, context_id, kind_id)
+         VALUES (?1, ?2, ?3, ?4))";
 
+  // Entity id of the referer
   RawEntityId from_entity_id;
+
+  // Entity id of the reference
   RawEntityId to_entity_id;
+
+  // Entity id of the context in which reference has happened. It will
+  // be either same as `from_entity_id` or ancestor of `from_entity_id`.
+  RawEntityId context_id;
+  mx::BuiltinReferenceKind kind;
 };
 
 // Records a ZSTD dictionary for a category of entities into the database.

@@ -19,10 +19,39 @@ class Index;
 class EntityProvider;
 class Reference;
 class ReferenceKindImpl;
+class ReferenceContextImpl;
 
 using OpaqueImplPtr = std::shared_ptr<const void>;
 using ReferenceKindImplPtr = std::shared_ptr<const ReferenceKindImpl>;
 using WeakReferenceKindImplPtr = std::weak_ptr<const ReferenceKindImpl>;
+using ReferenceContextImplPtr = std::shared_ptr<const ReferenceContextImpl>;
+
+enum class BuiltinReferenceKind {
+  USE, // default value as some kind of uses
+  ADDRESS_OF,
+  ASSIGNED_TO,
+  ASSIGNEMENT,
+  CALLS,
+  CALL_ARGUMENT,
+  USED_BY,
+  DEREFERENCE,
+  ENUMERATIONS,
+  EXPANSION_OF,
+  INCLUSION,
+  INITIALZATION,
+  CONDITIONAL_TEST,
+  TYPE_CASTS,
+  STATEMENT_USES,
+  TYPE_TRAIT_USES,
+};
+
+inline static const char *EnumerationName(BuiltinReferenceKind) {
+  return "BuiltinReferenceKind";
+}
+
+inline static constexpr unsigned NumEnumerators(BuiltinReferenceKind) {
+  return 26;
+}
 
 class ReferenceKind {
  private:
@@ -51,9 +80,48 @@ class ReferenceKind {
   std::string kind(void) const && noexcept;
 };
 
+class ReferenceContext {
+ private:
+  ReferenceContextImplPtr impl;
+
+#define MX_FRIEND(type_name, lower_name, enum_name, category) \
+    friend class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND)
+#undef MX_FRIEND
+
+ public:
+  ReferenceContext(void) = delete;
+
+  inline explicit ReferenceContext(ReferenceContextImplPtr impl_)
+      : impl(std::move(impl_)) {}
+
+
+#define MX_DECLARE_REF_GETTER(type_name, lower_name, enum_name, category) \
+    std::optional<type_name> as_ ## lower_name (void) const noexcept;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_REF_GETTER,
+                              MX_DECLARE_REF_GETTER,
+                              MX_DECLARE_REF_GETTER,
+                              MX_DECLARE_REF_GETTER,
+                              MX_DECLARE_REF_GETTER,
+                              MX_DECLARE_REF_GETTER,
+                              MX_DECLARE_REF_GETTER)
+#undef MX_DECLARE_REF_GETTER
+};
+
 class Reference {
  private:
   OpaqueImplPtr impl;
+  // The reference context will have entity id of referrer
+  // that references the entity of interest.
+  ReferenceContextImplPtr context_;
   RawEntityId eid;
   EntityCategory category_;
   RawEntityId kind_id;
@@ -72,40 +140,24 @@ class Reference {
 
   Reference(void) = delete;
 
-  inline explicit Reference(OpaqueImplPtr impl_, RawEntityId eid_,
-                            EntityCategory category__, RawEntityId kind_id_)
+  inline explicit Reference(OpaqueImplPtr impl_, ReferenceContextImplPtr context__,
+                            RawEntityId eid_, EntityCategory category__, RawEntityId kind_id_)
       : impl(std::move(impl_)),
+        context_(std::move(context__)),
         eid(eid_),
         category_(category__),
         kind_id(kind_id_) {}
 
   // Add a reference between two entities.
   static bool add(const ReferenceKind &kind, RawEntityId from_id,
-                  RawEntityId to_id, int);
+                  RawEntityId to_id, RawEntityId context_id, int);
 
  public:
-
-  template <typename T, typename U>
-  inline static bool add(const ReferenceKind &kind, SpecificEntityId<T> from_id,
-                         SpecificEntityId<U> to_id) {
-    return add(kind, from_id.Pack(), to_id.Pack(), 0);
-  }
-
-  template <typename T>
-  inline static bool add(const ReferenceKind &kind, SpecificEntityId<T> from_id,
-                         EntityId to_id) {
-    return add(kind, from_id.Pack(), to_id.Pack(), 0);
-  }
-
-  template <typename T>
+  // The context id will be same or ancestor of `from_id`. The default
+  // value will be same as `from_id`.
   inline static bool add(const ReferenceKind &kind, EntityId from_id,
-                         SpecificEntityId<T> to_id) {
-    return add(kind, from_id.Pack(), to_id.Pack(), 0);
-  }
-
-  inline static bool add(const ReferenceKind &kind, EntityId from_id,
-                         EntityId to_id) {
-    return add(kind, from_id.Pack(), to_id.Pack(), 0);
+                         EntityId to_id, EntityId context_id) {
+    return add(kind, from_id.Pack(), to_id.Pack(), context_id.Pack(), 0);
   }
 
   inline EntityCategory category(void) const noexcept {
@@ -124,6 +176,8 @@ class Reference {
 
   // Return the kind of this reference.
   ReferenceKind kind(void) const noexcept;
+
+  std::optional<ReferenceContext> context(void) const noexcept;
 
   // Return this reference as a `VariantEntity`.
   VariantEntity as_variant(void) const noexcept;

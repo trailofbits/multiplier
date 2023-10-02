@@ -39,6 +39,7 @@ namespace indexer {
 
 using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
 struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
+struct EntityParentMap final : public std::unordered_map<const void *, const void *> {};
 struct FileIdMap final : public std::unordered_map<const void *, mx::SpecificEntityId<mx::FileId>> {};
 struct FileHashMap final : public std::unordered_map<pasta::File, std::string> {};
 using TypeKey = std::pair<const void *, uint32_t>;

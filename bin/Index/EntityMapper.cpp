@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <glog/logging.h>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
@@ -259,6 +260,42 @@ mx::RawEntityId EntityMapper::EntityIdOfType(
   return tm.EntityId(type, quals);
 }
 
+std::optional<const pasta::Decl> EntityMapper::ParentDecl(
+    const pasta::AST &ast, const pasta::Decl &entity) const {
+  if (auto it = parent_decls.find(entity.RawDecl());
+      it != parent_decls.end()) {
+    return ast.Adopt(static_cast<const clang::Decl *>(it->second));
+  }
+  return std::nullopt;
+}
+
+std::optional<const pasta::Decl> EntityMapper::ParentDecl(
+    const pasta::AST &ast, const pasta::Stmt &entity) const {
+  if (auto it = parent_decls.find(entity.RawStmt());
+      it != parent_decls.end()) {
+    return ast.Adopt(static_cast<const clang::Decl *>(it->second));
+  }
+  return std::nullopt;
+}
+
+std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
+    const pasta::AST &ast, const pasta::Decl &entity) const {
+  if (auto it = parent_stmts.find(entity.RawDecl());
+      it != parent_stmts.end()) {
+    return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
+  }
+  return std::nullopt;
+}
+
+std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
+    const pasta::AST &ast, const pasta::Stmt &entity) const {
+  if (auto it = parent_stmts.find(entity.RawStmt());
+      it != parent_stmts.end()) {
+    return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
+  }
+  return std::nullopt;
+}
+
 void EntityMapper::ResetForFragment(void) {
   // clear token tree ids, parent_decl_ids, and parent_stmt_ids before
   // processing new pending fragments. Not clearing them will cause issue
@@ -266,6 +303,8 @@ void EntityMapper::ResetForFragment(void) {
   token_tree_ids.clear();
   parent_decl_ids.clear();
   parent_stmt_ids.clear();
+  parent_decls.clear();
+  parent_stmts.clear();
 }
 
 }  // namespace indexer
