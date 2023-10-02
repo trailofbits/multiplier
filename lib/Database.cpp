@@ -34,16 +34,6 @@
 namespace mx {
 namespace {
 
-// Fragment hashes are sharded by the file token index and with the file ID.
-//
-// In WAL journalling mode, SQLite locks B-Trees. Each table gets its own
-// B-Tree root, and so by sharding the fragment hash table, which gets a lot
-// of concurrent writes during indexing, we try to spread the load.
-static constexpr size_t kNumIdShards = 256u;
-
-// TODO(pag): Use a hash function that is the same across platforms.
-static const std::hash<std::string> kStringHasher;
-
 // Number of INSERT statements to try to add in a single transaction.
 static constexpr size_t kMaxTransactionSize = 10000000u;
 
@@ -56,9 +46,6 @@ static constexpr size_t kMinTrainingSetSize = 128ull * (1ull << 20ul);
 static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
 
 static std::mutex gDatabaseInitializationLock;
-
-// Array of table names, so we aren't always recomputing them.
-static std::array<std::string, kNumIdShards> gIndexToHashTableName;
 
 struct PushbackSignal {};
 struct ExitSignal {};
@@ -78,146 +65,6 @@ class Semaphore : public moodycamel::LightweightSemaphore {
  public:
   using moodycamel::LightweightSemaphore::LightweightSemaphore;
 };
-
-// Thread-local database connection.
-class WriterThreadState {
- private:
-  sqlite::Connection db;
-
-  // Get/set a file/fragment/compilation ID index given a hash and a
-  // contextual ID.
-  std::array<std::optional<sqlite::Statement>, kNumIdShards>
-      get_index, set_index;
-
-  RawEntityId GetOrCreateId(
-      RawEntityId proposed_id, RawEntityId context_id, std::string hash);
-
-  RawEntityId GetOrCreateId(
-      RawEntityId proposed_id, RawEntityId hash_a, RawEntityId hash_b,
-      RawEntityId hash_c, size_t table);
-
- public:
-  std::optional<RawEntityId> available_file_index;
-  std::optional<RawEntityId> available_compilation_index;
-  std::optional<RawEntityId> available_small_fragment_index;
-  std::optional<RawEntityId> available_big_fragment_index;
-  std::optional<RawEntityId> available_small_type_index;
-  std::optional<RawEntityId> available_big_type_index;
-
-  ~WriterThreadState(void) {}
-
-  WriterThreadState(
-      const std::filesystem::path &path)
-      : db(path) {}
-
-  RawEntityId GetOrCreateFileId(RawEntityId proposed_id, std::string hash);
-
-  RawEntityId GetOrCreateFragmentId(RawEntityId proposed_id,
-                                    RawEntityId file_tok_id,
-                                    std::string hash);
-
-  RawEntityId GetOrCreateTypeId(RawEntityId proposed_id,
-                                mx::TypeKind type_kind,
-                                uint32_t type_qualifiers,
-                                std::string hash);
-
-  RawEntityId GetOrCreateCompilationId(RawEntityId proposed_id,
-                                       RawEntityId file_tok_id,
-                                       std::string hash);
-};
-
-RawEntityId WriterThreadState::GetOrCreateId(
-    RawEntityId proposed_id, RawEntityId hash_a, RawEntityId hash_b,
-    RawEntityId hash_c, size_t table) {
-
-  std::optional<sqlite::Statement> &get = get_index[table];
-  std::optional<sqlite::Statement> &set = set_index[table];
-
-  // We might not have prepared these statements for the current thread yet.
-  if (!get) {
-    get.emplace(db.Prepare(
-        "SELECT index_ FROM " + gIndexToHashTableName[table] +
-        " WHERE hash_a = ?1 AND hash_b = ?2 AND hash_c = ?3")),
-
-    set.emplace(db.Prepare(
-        "INSERT INTO " + gIndexToHashTableName[table] +
-        " (index_, hash_a, hash_b, hash_c) "
-        "VALUES (?1, ?2, ?3, ?4) "
-        "ON CONFLICT DO UPDATE SET index_ = index_ "
-        "RETURNING index_"));
-  }
-
-  RawEntityId id_out = kInvalidEntityId;
-
-  // NOTE(pag): Use `BindValuesWithoutCopying` if we go back to BLOB-based
-  //            hashes.
-
-  // Racy read.
-  get->BindValues(hash_a, hash_b, hash_c);
-  if (get->ExecuteStep()) {
-    get->Row().Columns(id_out);
-  }
-  get->Reset();
-
-  // Transactional get/set.
-  while (id_out == kInvalidEntityId) {
-    set->BindValues(proposed_id, hash_a, hash_b, hash_c);
-    if (set->ExecuteStep()) {
-      set->Row().Columns(id_out);
-    }
-    set->Reset();
-  }
-
-  return id_out;
-}
-
-RawEntityId WriterThreadState::GetOrCreateId(
-    RawEntityId proposed_id, RawEntityId context_id, std::string hash) {
-
-  // Calculate which file table to index into.
-  const uint64_t base_hash = kStringHasher(hash);
-  const size_t table = base_hash % kNumIdShards;
-
-  std::reverse(hash.begin(), hash.end());
-  const uint64_t rev_hash = kStringHasher(hash);
-
-  // Some bits of `base_hash` are already utilized for deduping in the table
-  // name itself, so we'll go and bring in "new" bits from the `rev_hash`.
-  uint64_t real_hash = ((base_hash / kNumIdShards) * kNumIdShards) +
-                       (rev_hash % kNumIdShards);
-
-  for (auto &c : hash) {
-    c = ~c;
-  }
-
-  auto inv_hash = kStringHasher(hash);
-  return GetOrCreateId(proposed_id, context_id, real_hash, inv_hash, table);
-}
-
-RawEntityId WriterThreadState::GetOrCreateFileId(
-    RawEntityId proposed_id, std::string hash) {
-  return GetOrCreateId(proposed_id, mx::kInvalidEntityId, std::move(hash));
-}
-
-RawEntityId WriterThreadState::GetOrCreateFragmentId(
-    RawEntityId proposed_id, RawEntityId file_tok_id, std::string hash) {
-  return GetOrCreateId(proposed_id, file_tok_id, std::move(hash));
-}
-
-RawEntityId WriterThreadState::GetOrCreateTypeId(RawEntityId proposed_id,
-                                                 mx::TypeKind type_kind,
-                                                 uint32_t type_qualifiers,
-                                                 std::string hash) {
-  uint64_t context_id = static_cast<uint64_t>(type_kind);
-  context_id <<= 32u;
-  context_id |= type_qualifiers;
-  return GetOrCreateId(proposed_id, context_id, std::move(hash));
-}
-
-RawEntityId WriterThreadState::GetOrCreateCompilationId(
-    RawEntityId proposed_id, RawEntityId file_id, std::string hash) {
-  return GetOrCreateId(proposed_id, file_id, std::move(hash));
-}
 
 class BulkInserterState {
  public:
@@ -321,7 +168,6 @@ void DictionaryContext::ReleaseContext(std::pair<ZSTD_CCtx *, size_t> c) {
 
 }  // namespace
 
-
 struct DictionaryCompressor {
 
   // The ZSTD dictionary to use to compress an entity record. If this contains
@@ -388,42 +234,6 @@ class DatabaseWriterImpl {
   // Add some version info to the database. The number of records in the
   // versions table tells us whether or not we're currently indexing.
   sqlite::Statement add_version;
-
-  // Get the latest copies of file and fragment ids.
-  sqlite::Statement get_ids;
-
-  // Update the metadata.
-  sqlite::Statement update_meta_stmt;
-
-  // Per-thread connection state with the database.
-  ThreadLocal<WriterThreadState> thread_state;
-
-  // The next file ID that can be assigned. This represents an upper bound on
-  // the total number of file IDs.
-  std::atomic<RawEntityId> next_file_index;
-
-  // The next ID for a "small fragment." A small fragment has fewer than
-  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
-  // are more common, and require fewer bits to encode token offsets inside of
-  // the packed `mx::EntityId` for tokens.
-  std::atomic<RawEntityId> next_small_fragment_index;
-
-  // The next ID for a "big fragment." A big fragment has at least
-  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
-  // are less common, so we reserve space for fewer of them (typically there is
-  // a maximum of 2^16 big fragments allowed). Big fragments require more bits
-  // to represent token offsets inside of the packed `mx::EntityId` for tokens,
-  // but because we reserve the low ID space for big fragment IDs, we know that
-  // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
-  // bit for token offset bits.
-  std::atomic<RawEntityId> next_big_fragment_index;
-
-  // The next type ID that can be assigned.
-  std::atomic<RawEntityId> next_small_type_index;
-  std::atomic<RawEntityId> next_big_type_index;
-
-  // The next translation unit ID that can be assigned. This
-  std::atomic<RawEntityId> next_compilation_index;
 
   // Entity-specific compression dictionaries.
   DictionaryContext dictionary_context;
@@ -654,16 +464,6 @@ void DictionaryCompressor::Build(DatabaseWriterImpl &impl,
 void DatabaseWriterImpl::ExitMetadata(void) {
   add_version.BindValues(0u);
   add_version.Execute();
-
-  // Update the metadata.
-  update_meta_stmt.BindValues(
-      next_file_index.load(),
-      next_small_fragment_index.load(),
-      next_big_fragment_index.load(),
-      next_small_type_index.load(),
-      next_big_type_index.load(),
-      next_compilation_index.load());
-  update_meta_stmt.Execute();
 }
 
 // Load in the dictionaries.
@@ -706,62 +506,8 @@ void DatabaseWriterImpl::ExitDictionaries(void) {
 // Initialize the metadata table. It only stores one row of data.
 void DatabaseWriterImpl::InitMetadata(void) {
 
-  // Initialize the default metadata. The trick we use here is that we hard-code
-  // a `rowid` of `1`, and so the implicit primary key constraint on `rowid`
-  // will cause repeated initializations to be ignored.
-  sqlite::Statement set_meta_stmt = db.Prepare(
-      R"(INSERT OR IGNORE INTO metadata 
-         (rowid, next_file_index, next_small_fragment_index,
-          next_big_fragment_index, next_small_type_index,
-          next_big_type_index, next_compilation_index)
-          VALUES (1, 1, ?1, 1, ?2, 1, 1))");
-
-  set_meta_stmt.BindValues(
-      mx::kMaxBigFragmentId  /* next_small_fragment_index */,
-      mx::kMaxBigTypeId /* next_small_type_index */);
-  set_meta_stmt.Execute();
-
   add_version.BindValues(1u);
   add_version.Execute();
-
-  // TODO(pag): Really, we need a way to "reserve" some ranges of IDs for
-  //            use to support concurrent writers. We could achieve this by
-  //            doing an UPDATE that atomically increments all the IDs by
-  //            the reservation amount, or having multiple rows in the
-  //            metadata table, where each row is a reservation.
-  RawEntityId file_id = kInvalidEntityId;
-  RawEntityId small_id = kInvalidEntityId;
-  RawEntityId big_id = kInvalidEntityId;
-  RawEntityId small_type_id = kInvalidEntityId;
-  RawEntityId big_type_id = kInvalidEntityId;
-  RawEntityId tu_id = kInvalidEntityId;
-
-  if (get_ids.ExecuteStep()) {
-    get_ids.Row().Columns(file_id, small_id, big_id, small_type_id, big_type_id,
-                          tu_id);
-
-    assert(1u <= file_id);
-    assert(mx::kMaxBigFragmentId <= small_id);
-    assert(1u <= big_id);
-    assert(big_id < mx::kMaxBigFragmentId);
-    assert(mx::kMaxBigTypeId <= small_type_id);
-    assert(1u <= big_type_id);
-    assert(big_type_id < mx::kMaxBigTypeId);
-    assert(1u <= tu_id);
-
-    next_file_index.store(file_id);
-    next_small_fragment_index.store(small_id);
-    next_big_fragment_index.store(big_id);
-    next_small_type_index.store(small_type_id);
-    next_big_type_index.store(big_type_id);
-    next_compilation_index.store(tu_id);
-
-  // TODO(pag): Throw an exception?
-  } else {
-    assert(false);
-  }
-
-  get_ids.Reset();
 }
 
 void DatabaseWriterImpl::BulkInserter(void) {
@@ -778,12 +524,6 @@ void DatabaseWriterImpl::BulkInserter(void) {
 
   for (; !should_exit || num_added_rows < num_total_rows.load();
        should_flush = false) {
-
-//    std::cerr
-//        << "should_exit=" << should_exit << " num_added_rows="
-//        << num_added_rows << " num_total_rows=" << num_total_rows.load()
-//        << " num_in_flight_bytes=" << num_in_flight_bytes
-//        << " num_pushbacks=" << num_pushbacks << '\n';
 
     // Get rid of the last transaction's data.
     pending_items.clear();
@@ -888,23 +628,6 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
   for (const char *stmt : DatabaseWriter::kInitStatements) {
     db.Execute(std::string(stmt));
   }
-  for (size_t i = 0u; i < kNumIdShards; ++i) {
-    std::string &name = gIndexToHashTableName[i];
-    if (name.empty()) {
-      name = "index_for_hash_" + std::to_string(i);
-    }
-
-    db.Execute(
-        "CREATE TABLE IF NOT EXISTS " + name + " ("
-        "  index_ INT NOT NULL,"
-        "  hash_a INT NOT NULL,"
-        "  hash_b INT NOT NULL,"
-        "  hash_c INT NOT NULL,"
-        "  PRIMARY KEY(hash_a, hash_b, hash_c)"
-        ") WITHOUT rowid");
-
-
-  }
 
   db.Execute("PRAGMA wal_checkpoint(FULL)");
 
@@ -937,29 +660,6 @@ DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
       db(CreateDatabase(db_path)),
       add_version(db.Prepare(
           R"(INSERT INTO version (action) VALUES (?1))")),
-      get_ids(db.Prepare(
-          R"(SELECT next_file_index, next_small_fragment_index, 
-                    next_big_fragment_index, next_small_type_index,
-                    next_big_type_index, next_compilation_index
-             FROM metadata
-             WHERE rowid = 1
-             LIMIT 1)")),
-      update_meta_stmt(db.Prepare(
-          R"(UPDATE metadata
-             SET next_file_index = ?1,
-                 next_small_fragment_index = ?2,
-                 next_big_fragment_index = ?3,
-                 next_small_type_index = ?4,
-                 next_big_type_index = ?5,
-                 next_compilation_index = ?6
-             WHERE rowid = 1)")),
-      thread_state(
-          [this] (unsigned) -> WriterThreadState * {
-             return new WriterThreadState(db_path);
-          },
-          [] (void *ptr) {
-            delete reinterpret_cast<WriterThreadState *>(ptr);
-          }),
       insertion_queue(kMaxTransactionSize) {
 
   InitMetadata();
@@ -1104,226 +804,6 @@ DatabaseWriter::~DatabaseWriter(void) {}
 
 void DatabaseWriter::AsyncFlush(void) {
   impl->insertion_queue.enqueue(FlushSignal{});
-}
-
-// Get, or create and return, a file ID for the specific file contents hash.
-PackedFileId DatabaseWriter::GetOrCreateFileIdForHash(
-    std::string hash, bool &is_new) {
-
-  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = kInvalidEntityId;
-
-  // Try to reuse a previously generated but unused file id.
-  if (!writer->available_file_index) {
-    proposed_index = impl->next_file_index.fetch_add(1u);
-  } else {
-    proposed_index = writer->available_file_index.value();
-    writer->available_file_index.reset();
-  }
-
-  RawEntityId proposed_id = EntityId(FileId(proposed_index)).Pack();
-  RawEntityId found_id = writer->GetOrCreateFileId(proposed_id, std::move(hash));
-  is_new = found_id == proposed_id;
-  if (!is_new) {
-    writer->available_file_index.emplace(proposed_index);
-  }
-
-  VariantId vid = EntityId(found_id).Unpack();
-  assert(std::holds_alternative<FileId>(vid));
-  return std::get<FileId>(vid);
-}
-
-// Get, or create and return, a fragment ID for the specific fragment hash.
-PackedFragmentId DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
-    RawEntityId tok_id, std::string hash, bool &is_new) {
-
-  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = kInvalidEntityId;
-
-  // Try to reuse a previously generated but unused fragment id.
-  if (!writer->available_small_fragment_index) {
-    proposed_index = impl->next_small_fragment_index.fetch_add(1u);
-  } else {
-    proposed_index = writer->available_small_fragment_index.value();
-    writer->available_small_fragment_index.reset();
-  }
-  assert(proposed_index >= kMaxBigFragmentId);
-
-  RawEntityId proposed_id = EntityId(FragmentId(proposed_index)).Pack();
-  RawEntityId found_id = writer->GetOrCreateFragmentId(
-      proposed_id, tok_id, std::move(hash));
-  is_new = found_id == proposed_id;
-  if (!is_new) {
-    writer->available_small_fragment_index.emplace(proposed_index);
-  }
-
-  VariantId vid = EntityId(found_id).Unpack();
-  assert(std::holds_alternative<FragmentId>(vid));
-  FragmentId fid = std::get<FragmentId>(vid);
-  assert(fid.fragment_id >= kMaxBigFragmentId);
-  return fid;
-}
-
-// Get, or create and return, a fragment ID for the specific fragment hash.
-PackedFragmentId DatabaseWriter::GetOrCreateBigFragmentIdForHash(
-    RawEntityId tok_id, std::string hash, bool &is_new) {
-
-  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = kInvalidEntityId;
-
-  // Try to reuse a previously generated but unused fragment id.
-  if (!writer->available_big_fragment_index) {
-    proposed_index = impl->next_big_fragment_index.fetch_add(1u);
-  } else {
-    proposed_index = writer->available_big_fragment_index.value();
-    writer->available_big_fragment_index.reset();
-  }
-
-  assert(proposed_index < kMaxBigFragmentId);
-
-  RawEntityId proposed_id = EntityId(FragmentId(proposed_index)).Pack();
-  RawEntityId found_id = writer->GetOrCreateFragmentId(
-      proposed_id, tok_id, std::move(hash));
-  is_new = found_id == proposed_id;
-  if (!is_new) {
-    writer->available_big_fragment_index.emplace(proposed_index);
-  }
-
-  VariantId vid = EntityId(found_id).Unpack();
-  assert(std::holds_alternative<FragmentId>(vid));
-  FragmentId fid = std::get<FragmentId>(vid);
-  assert(fid.fragment_id < kMaxBigFragmentId);
-  return fid;
-}
-
-PackedFragmentId DatabaseWriter::GetOrCreateFragmentIdForHash(
-    RawEntityId tok_id, std::string hash, size_t num_tokens, bool &is_new) {
-
-  // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
-  //
-  // NOTE(pag): We have a fudge factor here of `3x` to account for macro
-  //            expansions.
-  if ((num_tokens * 3u) >= kNumTokensInBigFragment) {
-    return GetOrCreateBigFragmentIdForHash(tok_id, std::move(hash), is_new);
-  } else {
-    return GetOrCreateSmallFragmentIdForHash(tok_id, std::move(hash), is_new);
-  }
-}
-
-PackedTypeId DatabaseWriter::GetOrCreateSmallTypeIdForHash(
-    mx::TypeKind type_kind, uint32_t type_qualifiers, std::string hash,
-    bool &is_new) {
-
-  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = kInvalidEntityId;
-
-  // Try to reuse a previously generated but unused fragment id.
-  if (!writer->available_small_type_index) {
-    proposed_index = impl->next_small_type_index.fetch_add(1u);
-  } else {
-    proposed_index = writer->available_small_type_index.value();
-    writer->available_small_type_index.reset();
-  }
-  assert(proposed_index >= kMaxBigTypeId);
-
-  RawEntityId proposed_id = EntityId(TypeId(proposed_index, type_kind)).Pack();
-  RawEntityId found_id = writer->GetOrCreateTypeId(
-      proposed_id, type_kind, type_qualifiers, std::move(hash));
-
-  is_new = found_id == proposed_id;
-  if (!is_new) {
-    writer->available_small_type_index.emplace(proposed_index);
-  }
-
-  VariantId vid = EntityId(found_id).Unpack();
-  assert(std::holds_alternative<TypeId>(vid));
-  return std::get<TypeId>(vid);
-}
-
-PackedTypeId DatabaseWriter::GetOrCreateBigTypeIdForHash(
-    mx::TypeKind type_kind, uint32_t type_qualifiers, std::string hash,
-    bool &is_new) {
-
-  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = kInvalidEntityId;
-
-  // Try to reuse a previously generated but unused fragment id.
-  if (!writer->available_big_type_index) {
-    proposed_index = impl->next_big_type_index.fetch_add(1u);
-  } else {
-    proposed_index = writer->available_big_type_index.value();
-    writer->available_big_type_index.reset();
-  }
-  assert(proposed_index < kMaxBigTypeId);
-
-  RawEntityId proposed_id = EntityId(TypeId(proposed_index, type_kind)).Pack();
-  RawEntityId found_id = writer->GetOrCreateTypeId(
-      proposed_id, type_kind, type_qualifiers, std::move(hash));
-
-  is_new = found_id == proposed_id;
-  if (!is_new) {
-    writer->available_big_type_index.emplace(proposed_index);
-  }
-
-  VariantId vid = EntityId(found_id).Unpack();
-  assert(std::holds_alternative<TypeId>(vid));
-  return std::get<TypeId>(vid);
-}
-
-PackedTypeId DatabaseWriter::GetOrCreateTypeIdForHash(
-    mx::TypeKind type_kind, uint32_t type_qualifiers,
-    std::string hash, size_t num_tokens,
-    bool &is_new) {
-
-  // Big types will have IDs in the range [1, mx::kMaxBigTypeId) and small types
-  // will have ids [mx::kMaxBigTypeId: 2^36 + mx::kMaxBigTypeId)
-  if (num_tokens >= kNumMinTokensInBigType) {
-    return GetOrCreateBigTypeIdForHash(type_kind, type_qualifiers,
-                                       std::move(hash), is_new);
-  } else {
-    return GetOrCreateSmallTypeIdForHash(type_kind, type_qualifiers,
-                                         std::move(hash), is_new);
-  }
-}
-
-PackedCompilationId DatabaseWriter::GetOrCreateCompilationId(
-    RawEntityId file_id, std::string hash, bool &is_new) {
-
-  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_index = kInvalidEntityId;
-
-  // Try to reuse a previously generated but unused fragment id.
-  if (!writer->available_compilation_index) {
-    proposed_index = impl->next_compilation_index.fetch_add(1u);
-  } else {
-    proposed_index = writer->available_compilation_index.value();
-    writer->available_compilation_index.reset();
-  }
-
-  assert(proposed_index < kMaxCompilationId);
-
-  std::optional<FileId> fid = EntityId(file_id).Extract<FileId>();
-  assert(fid.has_value());
-
-  CompilationId cid;
-  cid.compilation_id = proposed_index;
-  cid.file_id = fid->file_id;
-
-  RawEntityId proposed_id = EntityId(cid).Pack();
-  RawEntityId found_id = writer->GetOrCreateCompilationId(
-      proposed_id, file_id, std::move(hash));
-
-  is_new = found_id == proposed_id;
-  if (!is_new) {
-    writer->available_compilation_index.emplace(proposed_index);
-
-    VariantId vid = EntityId(found_id).Unpack();
-    assert(std::holds_alternative<CompilationId>(vid));
-    cid = std::get<CompilationId>(vid);
-    assert(cid.compilation_id < kMaxCompilationId);
-  }
-
-  return cid;
 }
 
 void DatabaseWriterImpl::InitRecords(void) {

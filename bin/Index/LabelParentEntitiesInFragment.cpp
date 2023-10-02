@@ -155,53 +155,77 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 };
 
+struct ScanResult {
+  bool seen_type{false};
+  const void *child_stmt{nullptr};
+  const void *parent_stmt{nullptr};
+  const void *parent_decl{nullptr};
+};
+
+// Scan for a `Stmt` (`child_stmt`) nested inside of a `Type` (`seen_type`)
+// nested inside of a `Stmt` (`parent_stmt`) or `Decl` (`parent_decl`).
+static ScanResult ScanTokenContexts(pasta::PrintedToken tok) {
+  ScanResult res;
+
+  for (pasta::TokenContext ctx : TokenContexts(tok)) {
+    auto raw_ctx = ctx.Data();
+    switch (ctx.Kind()) {
+      default:
+        break;
+      case pasta::TokenContextKind::kStmt:
+        if (res.seen_type) {
+          res.parent_stmt = raw_ctx;
+          return res;
+        } else {
+          res.child_stmt = raw_ctx;
+          break;
+        }
+      case pasta::TokenContextKind::kDecl:
+        if (res.seen_type) {
+          res.parent_decl = raw_ctx;
+          return res;
+        } else {
+          res.child_stmt = nullptr;
+          break;
+        }
+      case pasta::TokenContextKind::kType:
+        if (res.child_stmt || res.seen_type) {
+          res.seen_type = true;
+        } else {
+          res.child_stmt = nullptr;
+        }
+        break;
+    }
+  }
+  return {};
+}
+
+// Return `mx::kInvalidEntityId` if `eid` doesn't belong to the same fragment
+// as `pf`.
+template <typename T>
+static mx::RawEntityId InFragmentEntityId(const PendingFragment &pf,
+                                          mx::RawEntityId eid) {
+  auto id = mx::EntityId(eid).Extract<T>();
+  if (!id) {
+    return mx::kInvalidEntityId;
+  }
+
+  if (id->fragment_id != pf.fragment_index) {
+    return mx::kInvalidEntityId;
+  }
+
+  return eid;
+}
+
+// Use the token contexts to try to find missing parents.
 static void FindMissingParentageFromTokens(
     ParentTrackerVisitor &vis, PendingFragment &pf) {
 
-  auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
-  
   for (pasta::PrintedToken tok : pf.parsed_tokens) {
-    const void *child_stmt = nullptr;
-    const void *parent_stmt = nullptr;
-    const void *parent_decl = nullptr;
-    bool seen_type = false;
+    auto [seen_type, child_stmt, parent_stmt, parent_decl] =
+        ScanTokenContexts(std::move(tok));
 
-    for (pasta::TokenContext ctx : TokenContexts(tok)) {
-      auto raw_ctx = ctx.Data();
-      switch (ctx.Kind()) {
-        default:
-          parent_stmt = nullptr;
-          parent_decl = nullptr;
-          child_stmt = nullptr;
-          seen_type = false;
-          break;
-        case pasta::TokenContextKind::kStmt:
-          if (seen_type) {
-            parent_stmt = raw_ctx;
-            goto found;
-          } else {
-            child_stmt = raw_ctx;
-            break;
-          }
-        case pasta::TokenContextKind::kDecl:
-          if (seen_type) {
-            parent_decl = raw_ctx;
-            goto found;
-          } else {
-            child_stmt = raw_ctx;
-            break;
-          }
-        case pasta::TokenContextKind::kType:
-          if (child_stmt || seen_type) {
-            seen_type = true;
-          } else {
-            child_stmt = nullptr;
-          }
-          break;
-      }
-    }
-
-    if (!child_stmt || !seen_type) {
+    if (!seen_type || !child_stmt) {
       continue;
     }
 
@@ -209,12 +233,11 @@ static void FindMissingParentageFromTokens(
       continue;
     }
 
-  found:
-    if (vis.not_yet_seen.count(child_stmt)) {
+    // If we're already seen `child_stmt`, then it isn't one of the missing
+    // ones.
+    if (!vis.not_yet_seen.count(child_stmt)) {
       continue;
     }
-
-    assert(parent_stmt || parent_decl);
 
     vis.parent_stmt_id = pf.em.EntityId(parent_stmt);
     vis.parent_decl_id = pf.em.EntityId(parent_decl);
@@ -227,7 +250,67 @@ static void FindMissingParentageFromTokens(
       vis.parent_decl_id = pf.em.ParentDeclId(parent_stmt);
     }
 
-    vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
+    vis.parent_decl_id = InFragmentEntityId<mx::DeclId>(pf, vis.parent_decl_id);
+    vis.parent_stmt_id = InFragmentEntityId<mx::StmtId>(pf, vis.parent_stmt_id);
+
+    if (vis.parent_stmt_id != mx::kInvalidEntityId ||
+        vis.parent_decl_id != mx::kInvalidEntityId) {
+
+      auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+      vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
+    }
+  }
+}
+
+// PASTA has a blind spot with expressions nested inside of attributes. For now,
+// PASTA defers to Clang's pretty printer for most attributes, and so we don't
+// have the token contexts from them.
+static void FindMissingParentageFromAttributeTokens(
+    ParentTrackerVisitor &vis, PendingFragment &pf) {
+
+  std::unordered_map<const void *, const void *> tok_to_attr;
+
+  // Find the parsed tokens whose nearest context is an `Attr`.
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
+    auto parsed_tok = tok.DerivedLocation();
+    if (!parsed_tok) {
+      continue;
+    }
+
+    auto context = tok.Context();
+    if (context && context->Kind() == pasta::TokenContextKind::kAttr) {
+      tok_to_attr.emplace(parsed_tok->RawToken(), context->Data());
+    }
+  }
+
+  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
+    if (!vis.not_yet_seen.count(stmt.RawStmt())) {
+      continue;
+    }
+
+    // Look at the tokens of the statement
+    for (pasta::Token tok : stmt.Tokens()) {
+      auto attr_it = tok_to_attr.find(tok.RawToken());
+      if (attr_it == tok_to_attr.end()) {
+        continue;
+      }
+
+      // Look for the parents of the attribute.
+      vis.parent_stmt_id = pf.em.ParentStmtId(attr_it->second);
+      vis.parent_decl_id = pf.em.ParentDeclId(attr_it->second);
+
+      vis.parent_decl_id = InFragmentEntityId<mx::DeclId>(pf, vis.parent_decl_id);
+      vis.parent_stmt_id = InFragmentEntityId<mx::StmtId>(pf, vis.parent_stmt_id);
+
+      // If we'be got them, then visit this statement.
+      if (vis.parent_stmt_id != mx::kInvalidEntityId ||
+          vis.parent_decl_id != mx::kInvalidEntityId) {
+
+        auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+        vis.Accept(stmt);
+        break;
+      }
+    }
   }
 }
 
@@ -255,43 +338,61 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   // Expand the set of decls.
   for (size_t i = 0u, max_i = pf.decls_to_serialize.size(); i < max_i; ++i) {
     pasta::Decl decl = pf.decls_to_serialize[i];
-    if (vis.not_yet_seen.count(decl.RawDecl())) {
+    auto raw_entity = decl.RawDecl();
+    
+    if (vis.not_yet_seen.count(raw_entity)) {
       vis.Accept(decl);
+      
+      // NOTE(pag): If this assertion is hit, then it suggests that the
+      //            manually-written traversals in `Visitor.cpp` are missing
+      //            something that the automatically generated visitors created
+      //            from `Visitor.inc.h` have found. Missing things is not the
+      //            end of the world, but it suggests a blindspot, hence we want
+      //            to loudly detect them here if possible. Missing things can
+      //            also be an indication that we're not fully linking something
+      //            to its parent decls/statements.
+      DCHECK(!vis.not_yet_seen.count(raw_entity));
+
       DCHECK_EQ(max_i, pf.decls_to_serialize.size());
       max_i = pf.decls_to_serialize.size();
     }
   }
 
   // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
+  if (vis.not_yet_seen.empty()) {
+    return;
+  }
+
+  FindMissingParentageFromTokens(vis, pf);
+  if (vis.not_yet_seen.empty()) {
+    return;
+  }
+
+  FindMissingParentageFromAttributeTokens(vis, pf);
+  if (vis.not_yet_seen.empty()) {
+    return;
+  }
+
+  // Log the error.
+
+  std::optional<pasta::Stmt> first_missing_stmt;
   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    auto raw_entity = stmt.RawStmt();
-    if (vis.not_yet_seen.count(raw_entity)) {
-      FindMissingParentageFromTokens(vis, pf);
+    if (vis.not_yet_seen.count(stmt.RawStmt())) {
+      first_missing_stmt.emplace(stmt);
+      break;
     }
   }
 
-#ifndef NDEBUG
-  // NOTE(pag): If this assertion is hit, then it suggests that the manually-
-  //            written traversals in `Visitor.cpp` are missing something that
-  //            the automatically generated visitors created from
-  //            `Visitor.inc.h` have found. Missing things is not the end of the
-  //            world, but it suggests a blindspot, hence we want to loudly
-  //            detect them here if possible. Missing things can also be an
-  //            indication that we're not fully linking something to its parent
-  //            decls/statements.
-  for (const pasta::Decl &decl : pf.decls_to_serialize) {
-    assert(!vis.not_yet_seen.count(decl.RawDecl()));
-  }
-#endif
+  CHECK(first_missing_stmt.has_value());
 
-// #ifndef NDEBUG
-//   // TODO(kumarak): Does the manually written Visitor.cpp have to traverse
-//   //                all stmt types. If not then we can probably remove
-//   //                assert here.
-//   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-//     assert(!vis.not_yet_seen.count(stmt.RawStmt()));
-//   }
-// #endif
+  auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+  LOG(ERROR)
+      << "Fragment"
+      << PrefixedLocation(pf.decls_to_serialize.front(), " at or near ")
+      << " main job file " << ast.MainFile().Path().generic_string()
+      << " has statements without parents: "
+      << DiagnosePrintedTokens(
+             pasta::PrintedTokenRange::Create(first_missing_stmt.value()));
 }
 
 }  // namespace indexer

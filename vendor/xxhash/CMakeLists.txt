@@ -6,25 +6,25 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(NOT MX_USE_VENDORED_ZSTD)
-  find_package(zstd CONFIG QUIET)
-  if(zstd_FOUND)
+if(NOT MX_USE_VENDORED_XXHASH)
+  find_package(xxHash CONFIG QUIET)
+  if(xxHash_FOUND)
     return()
   endif()
 endif()
 
-set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src/build/cmake")
+set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src/cmake_unofficial")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
 
 # Fetch the submodule if we don't yet have it.
 if(NOT EXISTS "${src_dir}/CMakeLists.txt")
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/zstd/src
+    COMMAND "${GIT_EXECUTABLE}" submodule update --init vendor/xxhash/src
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 endif()
 
 # This is the main build, setup and execute the nested build
-# to ensure the zstd library exists before continuing
+# to ensure the xxhash library exists before continuing
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 
@@ -41,15 +41,9 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_MODULE_LINKER_FLAGS_INIT=${CMAKE_MODULE_LINKER_FLAGS_INIT}"
                         "-DCMAKE_SHARED_LINKER_FLAGS_INIT=${CMAKE_SHARED_LINKER_FLAGS_INIT}"
                         -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
-                        -DZSTD_LEGACY_SUPPORT=OFF
-                        -DZSTD_MULTITHREAD_SUPPORT_DEFAULT=ON
-                        -DZSTD_LEGACY_SUPPORT=OFF
-                        -DZSTD_BUILD_PROGRAMS=OFF
-                        -DZSTD_BUILD_CONTRIB=OFF
-                        -DZSTD_BUILD_TESTS=OFF
-                        -DZSTD_USE_STATIC_RUNTIME=ON
-                        -DZSTD_PROGRAMS_LINK_SHARED=OFF
-                        -DBUILD_TESTING=OFF
+                        -DXXHASH_BUILD_XXHSUM=OFF
+                        -DXXHASH_BUNDLED_MODE:BOOL=OFF
+                        -DBUILD_SHARED_LIBS=OFF
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 
@@ -60,4 +54,4 @@ execute_process(COMMAND ${CMAKE_COMMAND}
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
-find_package(zstd CONFIG REQUIRED PATHS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
+find_package(xxHash CONFIG REQUIRED PATHS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)

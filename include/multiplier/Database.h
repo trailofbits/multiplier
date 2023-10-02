@@ -417,22 +417,6 @@ class DatabaseWriter final {
   // the database writes have actually happened.
   void AsyncFlush(void);
 
-  // Get, or create and return, a file ID for the specific file contents hash.
-  PackedFileId GetOrCreateFileIdForHash(
-      std::string hash, bool &is_new);
-
-  PackedFragmentId GetOrCreateFragmentIdForHash(
-      RawEntityId tok_id, std::string hash, size_t num_tokens, bool &is_new);
-
-  PackedTypeId GetOrCreateTypeIdForHash(
-      mx::TypeKind type_kind, uint32_t type_qualifiers,
-      std::string hash, size_t num_tokens, bool &is_new);
-
-  // Get, or create and return, a translation unit ID for the specific compile
-  // command hash.
-  PackedCompilationId GetOrCreateCompilationId(
-      RawEntityId file_id, std::string hash, bool &is_new);
-
 //  // Flush all outstanding writes to the database.
 //  void Flush(void);
 

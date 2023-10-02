@@ -172,8 +172,8 @@ target_link_libraries("mx-api"
     "gap::gap-core"
     "std::coroutines"
     "gap::gap-settings"
-    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
   PRIVATE
+    "zstd::zstd"
     "CapnProto::capnp"
     $<BUILD_INTERFACE:concurrentqueue>
 )

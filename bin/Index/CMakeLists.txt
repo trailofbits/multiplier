@@ -23,6 +23,7 @@ add_executable("${exe_name}"
   ${mlir_codegen_sources}
   "Context.cpp"
   "Context.h"
+  "Endian.h"
   "Entity.h"
   "EntityMapper.cpp"
   "EntityMapper.h"
@@ -30,6 +31,8 @@ add_executable("${exe_name}"
   "Executor.h"
   "Hash.cpp"
   "Hash.h"
+  "IdStore.h"
+  "IdStore.cpp"
   "Importer.cpp"
   "Importer.h"
   "IndexCompileJob.cpp"
@@ -84,6 +87,8 @@ target_link_libraries("${exe_name}"
     gflags::gflags
     concurrentqueue
     reproc++
+    xxHash::xxhash
+    RocksDB::rocksdb
     ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
     ${MX_END_FORCE_LOAD_GROUP}
 )

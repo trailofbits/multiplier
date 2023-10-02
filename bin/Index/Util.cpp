@@ -43,6 +43,7 @@
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
 #include <kj/io.h>
+#include <xxhash.h>
 
 #include "EntityMapper.h"
 #include "PASTA.h"
@@ -1129,8 +1130,7 @@ std::string DiagnosePrintedTokens(
 }
 
 // Generate the token contexts associated with a printed token.
-gap::generator<pasta::TokenContext> TokenContexts(
-    const pasta::PrintedToken &tok) {
+gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok) {
   for (auto context = tok.Context(); context;
        context = context->Parent()) {
     co_yield context.value();
@@ -1143,6 +1143,20 @@ pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c) {
     return alias.value();
   }
   return c;
+}
+
+uint32_t Hash32(std::string_view data) {
+  if (data.empty()) {
+    return 0u;
+  }
+  return XXH32(data.data(), data.size(), 0x00676170u);
+}
+
+uint64_t Hash64(std::string_view data) {
+  if (data.empty()) {
+    return 0u;
+  }
+  return XXH64(data.data(), data.size(), 0x7265746570626F74ull);
 }
 
 }  // namespace indexer

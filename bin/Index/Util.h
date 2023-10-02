@@ -102,8 +102,7 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
 
 // Generate the token contexts associated with a printed token.
-gap::generator<pasta::TokenContext> TokenContexts(
-    const pasta::PrintedToken &tok);
+gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok);
 
 // Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl);
@@ -146,5 +145,8 @@ std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
 
 // Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.
 pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c);
+
+uint32_t Hash32(std::string_view data);
+uint64_t Hash64(std::string_view data);
 
 }  // namespace indexer

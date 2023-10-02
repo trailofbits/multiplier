@@ -37,9 +37,6 @@
 namespace indexer {
 namespace {
 
-// TODO(pag): Switch to something like xxHash that is stable across libcs.
-static constexpr std::hash<std::string_view> kHasher;
-
 class HashVisitor final : public pasta::DeclVisitor {
  public:
   virtual ~HashVisitor(void) = default;
@@ -198,7 +195,7 @@ std::string HashFragment(
     }
 
     if (data.size() >= 8u) {
-      ss << kHasher(data);
+      ss << Hash64(data);
     } else if (data[0] != '_' && !isalpha(data[0])) {
       ss << data;
     }
@@ -237,7 +234,7 @@ std::string HashFragment(
         }
       }
 
-      ss << " c" << kHasher(tc.str());
+      ss << " c" << Hash64(tc.str());
     }
   }
 

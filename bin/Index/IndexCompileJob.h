@@ -28,7 +28,7 @@ namespace indexer {
 
 class IndexCompileJobAction final : public Action {
  private:
-  const std::shared_ptr<GlobalIndexingState> context;
+  GlobalIndexingState &context;
   const pasta::FileManager file_manager;
   const pasta::Compiler compiler;
   const pasta::CompileJob job;
@@ -36,7 +36,7 @@ class IndexCompileJobAction final : public Action {
  public:
   virtual ~IndexCompileJobAction(void);
 
-  IndexCompileJobAction(std::shared_ptr<GlobalIndexingState> context_,
+  IndexCompileJobAction(GlobalIndexingState &context_,
                         pasta::FileManager file_manager_,
                         pasta::Compiler compiler_, pasta::CompileJob job_);
 

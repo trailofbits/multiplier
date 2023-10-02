@@ -42,3 +42,9 @@
 	path = vendor/re2/src
 	url = https://github.com/google/re2.git
 	shallow = true
+[submodule "vendor/rocksdb/src"]
+	path = vendor/rocksdb/src
+	url = https://github.com/facebook/rocksdb.git
+[submodule "vendor/xxhash/src"]
+	path = vendor/xxhash/src
+	url = https://github.com/Cyan4973/xxHash.git

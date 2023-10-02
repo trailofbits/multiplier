@@ -8,8 +8,6 @@
 
 #include <sstream>
 
-#include <multiplier/Database.h>
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
 #pragma clang diagnostic ignored "-Wimplicit-int-conversion"
@@ -28,6 +26,7 @@
 #include <pasta/AST/AST.h>
 
 #include "EntityMapper.h"
+#include "IdStore.h"
 #include "PASTA.h"
 
 namespace indexer {
@@ -343,16 +342,14 @@ bool TypeMapper::AddEntityId(const EntityMapper &em, pasta::Type *entity_) {
 
   entity = pasta::AST::From(entity).Adopt(raw_type, raw_qualifiers);
 
-  bool is_new_type_id = false;
   auto token_range = pasta::PrintedTokenRange::Create(entity, pp);
-
-  mx::PackedTypeId tid = database.GetOrCreateTypeIdForHash(
+  auto [type_id, is_new_type_id] = id_store.GetOrCreateTypeIdForHash(
       mx::FromPasta(entity.Kind()),
       raw_qualifiers,
       HashType(em, entity, token_range),
-      token_range.size(),
-      is_new_type_id).Unpack();
+      token_range.size());
 
+  auto tid = type_id.Unpack();
   type_ids.emplace(orig_type_key, tid);
   type_ids.emplace(dedup_type_key, tid);
 

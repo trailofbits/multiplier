@@ -333,6 +333,11 @@ struct CompilationId {
   // The ID (FileId::file_id) of the main source file of the compilation.
   RawEntityId file_id;
 
+  inline explicit CompilationId(RawEntityId compilation_id_,
+                                RawEntityId file_id_)
+      : compilation_id(compilation_id_),
+        file_id(file_id_) {}
+
   bool operator==(const CompilationId &) const noexcept = default;
   auto operator<=>(const CompilationId &) const noexcept = default;
 };
