@@ -20,7 +20,8 @@
 
 DECLARE_bool(help);
 DECLARE_string(db);
-DECLARE_bool(names_only);
+
+DEFINE_bool(names_only, false, "Output only the record name, not the entire implementation");
 DEFINE_uint64(max_size, 0u, "Minimum size of record to filter on");
 DEFINE_uint64(min_size, 0u, "Maximum size of record to filter on");
 
@@ -36,10 +37,10 @@ enum FieldType {
   Elastic,
   SinglySelfReferencing,
   DoublySelfReferencing,
+  CustomFilter,
 };
 
 using FieldMap = std::unordered_map<mx::PackedDeclId, FieldType>;
-
 
 static void RenderField(const mx::RecordDecl &record,
                         const mx::FieldDecl &field,
@@ -64,10 +65,8 @@ static void RenderRecord(const mx::RecordDecl &record) {
   std::cout << "\n\n";
 }
 
-static void GetSelfReferences(const mx::RecordDecl &record) {
+static void GetSelfReferences(const mx::RecordDecl &record, FieldMap &field_map) {
   std::unordered_set<mx::PackedDeclId> seen;
-  std::unordered_set<mx::PackedDeclId> self_referencing;
-
   int level = 0;
 
   // First pass: identify all directly self-linking / singly linked fields
@@ -88,10 +87,11 @@ static void GetSelfReferences(const mx::RecordDecl &record) {
     }
 
     //RenderField(record, field, level);
+    field_map[field.id()] = SinglySelfReferencing;
     seen.insert(field.id());
-    self_referencing.insert(record.id());
   }
 
+  /*
   // Second pass: indirectly self-linking structures, e.g. users of `list_head`.
   for (size_t prev_size = 0u; prev_size < self_referencing.size(); ) {
     prev_size = self_referencing.size();
@@ -122,6 +122,7 @@ static void GetSelfReferences(const mx::RecordDecl &record) {
       //next_self_referencing.insert(record->id());
     }
   }
+  */
 }
 
 extern "C" int main(int argc, char *argv[]) {
@@ -148,6 +149,14 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  std::string typ;
+  unsigned int starting_offset;
+  if (FLAGS_filter_offset_type != "") {
+    std::istringstream ss(FLAGS_filter_offset_type);
+    std::getline(ss, typ, ':');
+    ss >> starting_offset;
+  }
+
   mx::Index index = InitExample(true);
 
   for (const mx::RecordDecl record_decl : mx::RecordDecl::in(index)) {
@@ -164,25 +173,29 @@ extern "C" int main(int argc, char *argv[]) {
       }
     }
 
+    // Match on a field type and an offset
+
     // Flexible/elastic array members must always be the last field
     // TODO: elastic structs that DONT have an explicit flexible field should also be found with some more static analysis
-    if (FLAGS_filter_elastic && record_decl.has_flexible_array_member()) {
+    bool is_flexible = record_decl.has_flexible_array_member();
+    if (FLAGS_filter_elastic && is_flexible) {
       auto num_fields = record_decl.num_fields() - 1;
       auto last_field = record_decl.nth_field(num_fields);
       if (!last_field)
-        goto self_reference;
+        continue;
 
       // NOTE: record_decl.has_flexible_array_member() isn't entirely accurate, so do an additional check
       //if (!last_field->is_zero_size())
-      //  goto self_reference;
-      current_field_map[last_field->id()] = Elastic;
-    }
+      //  continue;
 
-self_reference:
+      current_field_map[last_field->id()] = Elastic;
+    } else if (FLAGS_filter_elastic && !is_flexible) {
+      continue;
+    }
 
     // Potentially multiple fields, retrieve all singly/doubly as one list for now
     if (FLAGS_filter_self_referencing) {
-      // TODO
+      GetSelfReferences(record_decl, current_field_map);
     }
 
     if (FLAGS_names_only) {
