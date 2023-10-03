@@ -32,6 +32,15 @@ DEFINE_bool(filter_self_referencing, false, "Filter on self-referencing records"
 // Field filtering (TODO: allow for multiple)
 DEFINE_string(filter_offset_type, FILTER_OFFSET_PLACEHOLDER, "Filter on records with a specific type at an offset (in the format TYPE:4)");
 
+enum FieldType {
+  Elastic,
+  SinglySelfReferencing,
+  DoublySelfReferencing,
+};
+
+using FieldMap = std::unordered_map<mx::PackedDeclId, FieldType>;
+
+
 static void RenderField(const mx::RecordDecl &record,
                         const mx::FieldDecl &field,
                         int level) {
@@ -43,6 +52,15 @@ static void RenderField(const mx::RecordDecl &record,
       << "\nField ID: " << field.id()
       << "\nLevel of indirection: " << level << "\n";
   RenderFragment(std::cout, fragment, field.tokens(), "\t", true);
+  std::cout << "\n\n";
+}
+
+static void RenderRecord(const mx::RecordDecl &record) {
+  auto fragment = mx::Fragment::containing(record);
+  std::cout
+      << "Frag ID: " << fragment.id()
+      << "\nStructure ID: " << record.id() << "\n";
+  RenderFragment(std::cout, fragment, record.tokens(), "\t", true);
   std::cout << "\n\n";
 }
 
@@ -69,7 +87,7 @@ static void GetSelfReferences(const mx::RecordDecl &record) {
       continue;
     }
 
-    RenderField(record, field, level);
+    //RenderField(record, field, level);
     seen.insert(field.id());
     self_referencing.insert(record.id());
   }
@@ -99,7 +117,7 @@ static void GetSelfReferences(const mx::RecordDecl &record) {
         continue;
       }
 
-      RenderField(record.value(), field, level);
+      //RenderField(record.value(), field, level);
       seen.insert(field.id());
       //next_self_referencing.insert(record->id());
     }
@@ -133,11 +151,14 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index = InitExample(true);
 
   for (const mx::RecordDecl record_decl : mx::RecordDecl::in(index)) {
-    
+
+    FieldMap current_field_map;
+
     // size range check will take precedence in filtering
     if (FLAGS_max_size != 0 || FLAGS_min_size != 0) {
       if (auto size = record_decl.size()) {
-        if (!(*size >= FLAGS_min_size && *size <= FLAGS_max_size)) {
+        uint64_t actual_size = *size;
+        if (!(actual_size >= FLAGS_min_size && actual_size <= FLAGS_max_size)) {
           continue;
         }
       }
@@ -154,14 +175,28 @@ extern "C" int main(int argc, char *argv[]) {
       // NOTE: record_decl.has_flexible_array_member() isn't entirely accurate, so do an additional check
       //if (!last_field->is_zero_size())
       //  goto self_reference;
-
-      RenderField(record_decl, *last_field, 0);
+      current_field_map[last_field->id()] = Elastic;
     }
 
 self_reference:
 
+    // Potentially multiple fields, retrieve all singly/doubly as one list for now
     if (FLAGS_filter_self_referencing) {
-      GetSelfReferences(record_decl);
+      // TODO
+    }
+
+    if (FLAGS_names_only) {
+      std::cout << record_decl.name() << std::endl;
+      continue;
+    }
+
+    // Just output struct definition with no field highlighting
+    if (!FLAGS_filter_elastic && !FLAGS_filter_self_referencing) {
+      RenderRecord(record_decl);
+
+    // TODO: Otherwise render the struct with all significant fields highlighted
+    } else {
+
     }
   }
   return EXIT_SUCCESS;
