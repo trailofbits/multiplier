@@ -19,7 +19,6 @@ const char *EnumeratorName(Linkage e) {
     case Linkage::INTERNAL_LINKAGE: return "INTERNAL_LINKAGE";
     case Linkage::UNIQUE_EXTERNAL_LINKAGE: return "UNIQUE_EXTERNAL_LINKAGE";
     case Linkage::VISIBLE_NO_LINKAGE: return "VISIBLE_NO_LINKAGE";
-    case Linkage::MODULE_INTERNAL_LINKAGE: return "MODULE_INTERNAL_LINKAGE";
     case Linkage::MODULE_LINKAGE: return "MODULE_LINKAGE";
     case Linkage::EXTERNAL_LINKAGE: return "EXTERNAL_LINKAGE";
     default: return "<invalid>";

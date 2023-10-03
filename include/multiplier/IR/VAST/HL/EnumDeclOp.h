@@ -28,7 +28,7 @@ class EnumDeclOp final : public Operation {
   // Imported methods:
   ::mx::ir::Region constants(void) const;
   std::string_view name(void) const;
-  //::mlir::Type type(void) const;
+  //::std::optional<::mlir::Type> type(void) const;
 };
 static_assert(sizeof(EnumDeclOp) == sizeof(Operation));
 

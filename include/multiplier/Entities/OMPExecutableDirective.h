@@ -53,6 +53,7 @@ class OMPParallelMasterTaskLoopDirective;
 class OMPParallelMasterTaskLoopSimdDirective;
 class OMPParallelSectionsDirective;
 class OMPScanDirective;
+class OMPScopeDirective;
 class OMPSectionDirective;
 class OMPSectionsDirective;
 class OMPSimdDirective;

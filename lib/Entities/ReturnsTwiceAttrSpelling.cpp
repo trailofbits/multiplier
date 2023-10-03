@@ -17,7 +17,7 @@ const char *EnumeratorName(ReturnsTwiceAttrSpelling e) {
   switch (e) {
     case ReturnsTwiceAttrSpelling::GNU_RETURNS_TWICE: return "GNU_RETURNS_TWICE";
     case ReturnsTwiceAttrSpelling::CXX11_GNU_RETURNS_TWICE: return "CXX11_GNU_RETURNS_TWICE";
-    case ReturnsTwiceAttrSpelling::C2X_GNU_RETURNS_TWICE: return "C2X_GNU_RETURNS_TWICE";
+    case ReturnsTwiceAttrSpelling::C23_GNU_RETURNS_TWICE: return "C23_GNU_RETURNS_TWICE";
     case ReturnsTwiceAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

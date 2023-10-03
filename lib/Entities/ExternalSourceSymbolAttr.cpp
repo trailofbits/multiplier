@@ -118,6 +118,11 @@ std::string_view ExternalSourceSymbolAttr::language(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+std::string_view ExternalSourceSymbolAttr::usr(void) const {
+  capnp::Text::Reader data = impl->reader.getVal18();
+  return std::string_view(data.cStr(), data.size());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

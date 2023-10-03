@@ -38,8 +38,6 @@ class TokenReader;
 class TokenTree;
 class TokenTreeImpl;
 class TypeImpl;
-class WeggliQuery;
-class WeggliQueryResultIterator;
 
 enum class TokenKind : unsigned short;
 enum class TokenCategory : unsigned char;
@@ -230,8 +228,6 @@ class TokenRange {
   friend class Macro;
   friend class RegexQuery;
   friend class RegexQueryResultIterator;
-  friend class WeggliQuery;
-  friend class WeggliQueryResultImpl;
   friend class TokenTree;
   friend class TokenTreeImpl;
   friend class TypeImpl;

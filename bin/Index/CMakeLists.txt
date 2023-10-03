@@ -8,16 +8,22 @@
 
 set(exe_name "mx-index")
 
+if(MX_ENABLE_VAST)
+  set(mlir_codegen_sources
+    "Codegen.cpp"
+    "Codegen.h"
+    "CodegenMetaGenerator.h"
+  )
+endif()
+
 add_executable("${exe_name}"
   "Action.cpp"
   "Action.h"
   "BuildPendingFragment.cpp"
-  "Codegen.cpp"
-  "Codegen.h"
-  "CodegenMetaGenerator.h"
-  "CodegenVisitor.h"
+  ${mlir_codegen_sources}
   "Context.cpp"
   "Context.h"
+  "Endian.h"
   "Entity.h"
   "EntityMapper.cpp"
   "EntityMapper.h"
@@ -25,6 +31,8 @@ add_executable("${exe_name}"
   "Executor.h"
   "Hash.cpp"
   "Hash.h"
+  "IdStore.h"
+  "IdStore.cpp"
   "Importer.cpp"
   "Importer.h"
   "IndexCompileJob.cpp"
@@ -42,11 +50,13 @@ add_executable("${exe_name}"
   "Parser.h"
   "PendingFragment.h"
   "Persist.cpp"
+  "PersistTokenContexts.cpp"
   "PersistTypes.cpp"
   "ProgressBar.cpp"
   "ProgressBar.h"
   "Provenance.cpp"
   "Provenance.h"
+  "References.cpp"
   "Serialize.h"
   "SerializePendingFragment.cpp"
   "Signal.cpp"
@@ -72,10 +82,13 @@ target_link_libraries("${exe_name}"
   PRIVATE
     ${MX_BEGIN_FORCE_LOAD_GROUP}
     "mx-api"
+    clangIndex
     glog::glog
     gflags::gflags
     concurrentqueue
     reproc++
+    xxHash::xxhash
+    RocksDB::rocksdb
     ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
     ${MX_END_FORCE_LOAD_GROUP}
 )

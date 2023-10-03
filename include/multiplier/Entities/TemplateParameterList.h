@@ -41,6 +41,7 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
+ public:
  protected:
   friend class Attr;
   friend class Decl;
@@ -93,7 +94,7 @@ class TemplateParameterList {
 
   static std::optional<TemplateParameterList> from(const TokenContext &t);
 
-  unsigned depth(void) const;
+  uint32_t depth(void) const;
   bool has_unexpanded_parameter_pack(void) const;
   bool has_parameter_pack(void) const;
   std::optional<Expr> requires_clause(void) const;

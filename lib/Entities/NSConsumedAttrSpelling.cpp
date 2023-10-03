@@ -17,7 +17,7 @@ const char *EnumeratorName(NSConsumedAttrSpelling e) {
   switch (e) {
     case NSConsumedAttrSpelling::GNU_NS_CONSUMED: return "GNU_NS_CONSUMED";
     case NSConsumedAttrSpelling::CXX11_CLANG_NS_CONSUMED: return "CXX11_CLANG_NS_CONSUMED";
-    case NSConsumedAttrSpelling::C2X_CLANG_NS_CONSUMED: return "C2X_CLANG_NS_CONSUMED";
+    case NSConsumedAttrSpelling::C23_CLANG_NS_CONSUMED: return "C23_CLANG_NS_CONSUMED";
     case NSConsumedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

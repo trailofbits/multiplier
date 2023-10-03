@@ -120,6 +120,30 @@ std::string ReferenceKind::kind(void) const && noexcept {
   return impl->kind_data;
 }
 
+#define DEFINE_REF_GETTER(type_name, lower_name, enum_name, category) \
+    std::optional<type_name> \
+    ReferenceContext::as_ ## lower_name (void) const noexcept { \
+      if (auto [eptr, category_] = ReferencedEntity(impl->ep, impl->eid); eptr) {   \
+        if (category_ != EntityCategory::enum_name) { \
+          return std::nullopt; \
+        } \
+        return type_name(type_name ## ImplPtr( \
+            eptr, reinterpret_cast<const type_name ## Impl *>(eptr.get()))); \
+      } \
+      return std::nullopt; \
+    }
+
+MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER)
+
+#undef DEFINE_REF_GETTER
+
+
 // Return the kind of this reference.
 ReferenceKind Reference::kind(void) const noexcept {
   ReferenceKindImplPtr rptr;
@@ -137,9 +161,16 @@ ReferenceKind Reference::kind(void) const noexcept {
   return rptr;
 }
 
+std::optional<ReferenceContext> Reference::context(void) const noexcept {
+  if (context_) {
+    return ReferenceContext(context_);
+  }
+  return std::nullopt;
+}
+
 // Add a reference between two entities.
 bool Reference::add(const ReferenceKind &kind, RawEntityId from_id,
-                    RawEntityId to_id, int) {
+                    RawEntityId to_id, RawEntityId context_id, int) {
   const EntityProviderPtr &ep = kind.impl->ep;
   auto found = false;
   for (RawEntityId redecl_id : ep->Redeclarations(ep, from_id)) {
@@ -163,7 +194,7 @@ bool Reference::add(const ReferenceKind &kind, RawEntityId from_id,
     return false;
   }
 
-  return ep->AddReference(ep, kind.impl->kind_id, from_id, to_id);
+  return ep->AddReference(ep, kind.impl->kind_id, from_id, to_id, context_id);
 }
 
 // Return this reference as a `VariantEntity`.

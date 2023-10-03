@@ -41,12 +41,12 @@
 #include <vast/Dialect/Dialects.hpp>
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/HighLevel/HighLevelTypes.hpp>
-#include <vast/Dialect/HighLevel/HighLevelLinkage.hpp>
 #include <vast/Dialect/LowLevel/LowLevelOps.hpp>
 #include <vast/Dialect/Meta/MetaAttributes.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
-#include <vast/Translation/CodeGenContext.hpp>
-#include <vast/Translation/CodeGenBuilder.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedOps.hpp>
+#include <vast/CodeGen/CodeGenContext.hpp>
+#include <vast/CodeGen/CodeGenBuilder.hpp>
 
 #include "../Fragment.h"
 #include "Operation.h"
@@ -113,10 +113,12 @@ MLIRInitializer::MLIRInitializer(int)
     op_type_to_kind.try_emplace(mlir::TypeID::get<type>(), kind);
 
   MX_IR_FOR_EACH_MLIR_OP(MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME,
-                         MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME)
+                         MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME, MAP_OP_NAME,
+                         MAP_OP_NAME)
 
   MX_IR_FOR_EACH_MLIR_OP(MAP_OP_TYPE, MAP_OP_TYPE, MAP_OP_TYPE, MAP_OP_TYPE,
-                         MAP_OP_TYPE, MAP_OP_TYPE, MAP_OP_TYPE, MAP_OP_TYPE)
+                         MAP_OP_TYPE, MAP_OP_TYPE, MAP_OP_TYPE, MAP_OP_TYPE,
+                         MAP_OP_TYPE)
 
 #undef MAP_OP_NAME
 #undef MAP_OP_TYPE

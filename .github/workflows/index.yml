@@ -100,91 +100,12 @@ jobs:
           name: pcre2-10.42
           path: /tmp/pcre2-10.42.mx
 
-  index-sqlite:
-    # this is currently not working
-    if: false
-    runs-on: multiplier
-    continue-on-error: true
-    needs: start-ec2-runner
-    container: 
-      image: ghcr.io/trailofbits/multiplier:builder
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.github_token }}
-    steps:
-      - name: Download, configure and build SQLite
-        run: |
-          curl --silent --location \
-            https://www.sqlite.org/2022/sqlite-autoconf-3400000.tar.gz | tar xz -C '/work/src'
-          mkdir '/work/build/sqlite-autoconf-3400000'
-          cd '/work/build/sqlite-autoconf-3400000'
-          /work/src/sqlite-autoconf-3400000/configure
-          bear -- make
-
-      - name: Index SQLite
-        run: |
-          mx-index \
-            --db /tmp/sqlite-autoconf-3400000.mx \
-            --target '/work/build/sqlite-autoconf-3400000/compile_commands.json'
-
-      - name: List functions
-        run: |
-          mx-list-functions \
-            --db /tmp/sqlite-autoconf-3400000.mx
-
-      - name: Upload SQLite index
-        uses: actions/upload-artifact@v3
-        with:
-          name: sqlite-autoconf-3400000
-          path: /tmp/sqlite-autoconf-3400000.mx
-
-  index-linux:
-    # Indexing linux takes too long and eats up all our CI points, skip for now
-    if: false
-    needs: start-ec2-runner
-    container: 
-      image: ghcr.io/trailofbits/multiplier:builder
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.github_token }}
-    runs-on: multiplier
-    continue-on-error: true
-    steps:
-      - name: Download, configure and build Linux
-        run: |
-          curl --silent --location \
-            https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.6.tar.xz | tar xJ -C '/work/src'
-          cd '/work/src/linux-6.1.6'
-          PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" make LLVM=1 defconfig
-          PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" make LLVM=1 compile_commands.json
-          PATH="${VCPKG_ROOT}/installed/x64-linux-rel/tools/llvm:${PATH}" env > env_vars.txt
-
-      - name: Index Linux
-        run: |
-          mx-index \
-            --env '/work/src/linux-6.1.6/env_vars.txt' \
-            --db /tmp/linux-6.1.6.mx \
-            --target '/work/src/linux-6.1.6/compile_commands.json'
-
-      - name: List functions
-        run: |
-          mx-list-functions \
-            --db /tmp/linux-6.1.6.mx
-
-      - name: Upload Linux index
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-6.1.6
-          path: /tmp/linux-6.1.6.mx
-
   stop-ec2-runner:
     if: always()
     runs-on: ubuntu-latest
     needs:
       - index-lua
       - index-pcre2
-      # - index-sqlite
-      # - index-linux
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16

@@ -66,7 +66,7 @@ class CharacterLiteral : public Expr {
   static std::optional<CharacterLiteral> from(const Reference &r);
   static std::optional<CharacterLiteral> from(const TokenContext &t);
 
-  CharacterLiteralCharacterKind character_kind(void) const;
+  CharacterLiteralCharacterKind literal_kind(void) const;
   Token token(void) const;
 };
 

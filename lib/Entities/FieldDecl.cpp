@@ -191,7 +191,7 @@ std::optional<FieldDecl> FieldDecl::from(const TokenContext &t) {
 
 std::optional<Expr> FieldDecl::bit_width(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal80();
+    RawEntityId eid = impl->reader.getVal79();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -204,7 +204,7 @@ std::optional<Expr> FieldDecl::bit_width(void) const {
 
 std::optional<VariableArrayType> FieldDecl::captured_vla_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal82();
+    RawEntityId eid = impl->reader.getVal81();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -216,12 +216,12 @@ std::optional<VariableArrayType> FieldDecl::captured_vla_type(void) const {
 }
 
 InClassInitStyle FieldDecl::in_class_initializer_style(void) const {
-  return static_cast<InClassInitStyle>(impl->reader.getVal81());
+  return static_cast<InClassInitStyle>(impl->reader.getVal80());
 }
 
 std::optional<Expr> FieldDecl::in_class_initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal83();
+    RawEntityId eid = impl->reader.getVal82();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -233,11 +233,15 @@ std::optional<Expr> FieldDecl::in_class_initializer(void) const {
 }
 
 bool FieldDecl::has_captured_vla_type(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal76();
 }
 
 bool FieldDecl::has_in_class_initializer(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal77();
+}
+
+bool FieldDecl::has_non_null_in_class_initializer(void) const {
+  return impl->reader.getVal94();
 }
 
 bool FieldDecl::is_anonymous_struct_or_union(void) const {
@@ -252,16 +256,29 @@ bool FieldDecl::is_mutable(void) const {
   return impl->reader.getVal97();
 }
 
-bool FieldDecl::is_unnamed_bitfield(void) const {
+bool FieldDecl::is_potentially_overlapping(void) const {
   return impl->reader.getVal98();
 }
 
-bool FieldDecl::is_zero_length_bit_field(void) const {
+bool FieldDecl::is_unnamed_bitfield(void) const {
   return impl->reader.getVal99();
 }
 
-bool FieldDecl::is_zero_size(void) const {
+bool FieldDecl::is_zero_length_bit_field(void) const {
   return impl->reader.getVal100();
+}
+
+bool FieldDecl::is_zero_size(void) const {
+  return impl->reader.getVal101();
+}
+
+std::optional<uint64_t> FieldDecl::offset_in_bits(void) const {
+  if (!impl->reader.getVal102()) {
+    return std::nullopt;
+  } else {
+    return static_cast<uint64_t>(impl->reader.getVal83());
+  }
+  return std::nullopt;
 }
 
 #pragma GCC diagnostic pop

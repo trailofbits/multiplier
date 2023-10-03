@@ -14,7 +14,7 @@ namespace mx {
 enum class NoDerefAttrSpelling : unsigned char {
   GNU_NODEREF,
   CXX11_CLANG_NODEREF,
-  C2X_CLANG_NODEREF,
+  C23_CLANG_NODEREF,
   SPELLING_NOT_CALCULATED,
 };
 

@@ -74,6 +74,7 @@ class InitListExpr : public Expr {
   std::optional<InitListExpr> syntactic_form(void) const;
   bool had_array_range_designator(void) const;
   bool has_array_filler(void) const;
+  bool has_designated_initializer(void) const;
   std::optional<Expr> nth_initializer(unsigned n) const;
   unsigned num_initializers(void) const;
   gap::generator<Expr> initializers(void) const &;

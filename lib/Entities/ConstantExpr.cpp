@@ -156,7 +156,7 @@ std::optional<ConstantExpr> ConstantExpr::from(const TokenContext &t) {
 }
 
 ConstantExprResultStorageKind ConstantExpr::result_storage_kind(void) const {
-  return static_cast<ConstantExprResultStorageKind>(impl->reader.getVal94());
+  return static_cast<ConstantExprResultStorageKind>(impl->reader.getVal95());
 }
 
 bool ConstantExpr::has_ap_value_result(void) const {

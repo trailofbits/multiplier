@@ -14,7 +14,7 @@
 DECLARE_bool(help);
 DECLARE_string(db);
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

@@ -21,12 +21,32 @@
 
 namespace indexer {
 
+// Identify the reference kind and update the records. The function
+// goes through the AST node of referrer and assigned the reference
+// kind for the decl. The functions are defined in `References.cpp`
+extern void DeclReferenceKind(
+    const pasta::AST &ast, const EntityMapper &em,
+    const pasta::Stmt &stmt, const pasta::Decl &ref,
+     mx::ReferenceRecord &record);
+
+extern void DeclReferenceKind(
+    const pasta::AST &ast, const EntityMapper &em,
+    const pasta::Decl &decl, const pasta::Decl &ref,
+    mx::ReferenceRecord &record);
+
+extern void DeclReferenceKind(
+    const pasta::AST &ast, const EntityMapper &em,
+    const pasta::Designator &designator, const pasta::Decl &ref,
+    mx::ReferenceRecord &record);
+
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 void LinkExternalReferencesInFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
-    EntityMapper &em) {
+    const pasta::AST &ast, mx::DatabaseWriter &database,
+    const PendingFragment &pf) {
 
+  const EntityMapper &em = pf.em;
+  
   // XREF(pag): Issue #214. We want to record references to other decls that are
   //            expressed in types. In PASTA, we don't present Clang's
   //            `TypeLoc`s, so we need to instead go through the types to find
@@ -34,6 +54,7 @@ void LinkExternalReferencesInFragment(
   for (const pasta::Decl &decl : pf.decls_to_serialize) {
     mx::RawEntityId from_id = em.EntityId(decl);
     mx::VariantId vid = mx::EntityId(from_id).Unpack();
+
     if (!std::holds_alternative<mx::DeclId>(vid)) {
       assert(false);
       continue;
@@ -53,7 +74,13 @@ void LinkExternalReferencesInFragment(
         continue;
       }
 
-      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
+      // The referer context id will be same as `from_id` by default. The
+      // DeclReferenceKind function updates it based on the AST analysis
+      // of the context in which declaration is referred.
+      mx::ReferenceRecord record{
+          from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
+      DeclReferenceKind(ast, em, decl, ref_decl, record);
+      database.AddAsync(record);
     }
   }
 
@@ -79,7 +106,13 @@ void LinkExternalReferencesInFragment(
         continue;
       }
 
-      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
+      // The referer context id will be same as `from_id` by default. The
+      // DeclReferenceKind function updates it based on the AST analysis
+      // of the context in which declaration is referred.
+      mx::ReferenceRecord record{
+          from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
+      DeclReferenceKind(ast, em, stmt, ref_decl, record);
+      database.AddAsync(record);
     }
   }
 
@@ -101,7 +134,13 @@ void LinkExternalReferencesInFragment(
         continue;
       }
 
-      database.AddAsync(mx::ReferenceRecord{from_id, to_id});
+      // The referer context id will be same as `from_id` by default. The
+      // DeclReferenceKind function updates it based on the AST analysis
+      // of the context in which declaration is referred.
+      mx::ReferenceRecord record{
+          from_id, to_id, from_id, mx::BuiltinReferenceKind::USE};
+      DeclReferenceKind(ast, em, d, to_field.value(), record);
+      database.AddAsync(record);
     }
   }
 
@@ -174,7 +213,10 @@ void LinkExternalReferencesInFragment(
             continue;
           }
 
-          database.AddAsync(mx::ReferenceRecord{macro_id, def_id});
+          // The referrer context id will be same as `macro_id` by default
+          // and assigned the same.
+          database.AddAsync(mx::ReferenceRecord{macro_id, def_id, macro_id,
+                                                mx::BuiltinReferenceKind::EXPANSION_OF});
         }
         break;
 
@@ -196,7 +238,10 @@ void LinkExternalReferencesInFragment(
             continue;
           }
 
-          database.AddAsync(mx::ReferenceRecord{macro_id, file_id});
+          // The referrer context id will be same as `macro_id` by default
+          // and assigned the same.
+          database.AddAsync(mx::ReferenceRecord{macro_id, file_id, macro_id,
+                                                mx::BuiltinReferenceKind::INCLUSION});
         }
         break;
     }

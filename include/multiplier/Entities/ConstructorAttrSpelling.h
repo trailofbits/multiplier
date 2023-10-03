@@ -14,7 +14,7 @@ namespace mx {
 enum class ConstructorAttrSpelling : unsigned char {
   GNU_CONSTRUCTOR,
   CXX11_GNU_CONSTRUCTOR,
-  C2X_GNU_CONSTRUCTOR,
+  C23_GNU_CONSTRUCTOR,
   SPELLING_NOT_CALCULATED,
 };
 

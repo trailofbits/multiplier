@@ -81,8 +81,10 @@ class CachingEntityProvider final : public EntityProvider {
   gap::generator<std::filesystem::path> ListPathsForFile(
       const Ptr &, PackedFileId id) final;
 
-  FragmentIdList ListFragmentsInFile(
-      const Ptr &, SpecificEntityId<FileId> id) final;
+  // Get the list nested fragments for a given fragment.
+  FragmentIdList ListNestedFragmentIds(const Ptr &, PackedFragmentId id) final;
+
+  FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) final;
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   FragmentIdList FragmentsCoveringTokens(
@@ -95,11 +97,12 @@ class CachingEntityProvider final : public EntityProvider {
   ReferenceKindFor(const Ptr &, std::string_view kind_data) final;
 
   bool AddReference(const Ptr &ep, RawEntityId kind_id,
-                    RawEntityId from_id, RawEntityId to_id) final;
+                    RawEntityId from_id, RawEntityId to_id,
+                    RawEntityId context_id) final;
 
   gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) & final;
 
-  gap::generator<std::pair<RawEntityId, RawEntityId>>
+  gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
   References(const Ptr &, RawEntityId eid) & final;
 
   gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) & final;

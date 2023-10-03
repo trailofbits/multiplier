@@ -40,6 +40,9 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Designator {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -102,7 +105,6 @@ class Designator {
   Token left_bracket_token(void) const;
   Token right_bracket_token(void) const;
   Token ellipsis_token(void) const;
-  std::optional<unsigned> first_expression_index(void) const;
 };
 
 #endif

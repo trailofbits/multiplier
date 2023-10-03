@@ -69,7 +69,7 @@ class SubstNonTypeTemplateParmExpr : public Expr {
 
   Decl associated_declaration(void) const;
   Token name_token(void) const;
-  std::optional<unsigned> pack_index(void) const;
+  std::optional<uint32_t> pack_index(void) const;
   NonTypeTemplateParmDecl parameter(void) const;
   Type parameter_type(void) const;
   Expr replacement(void) const;

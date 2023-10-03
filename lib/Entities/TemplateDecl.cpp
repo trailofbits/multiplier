@@ -200,21 +200,21 @@ std::optional<TemplateDecl> TemplateDecl::from(const TokenContext &t) {
 }
 
 TemplateParameterList TemplateDecl::template_parameters(void) const {
-  RawEntityId eid = impl->reader.getVal57();
+  RawEntityId eid = impl->reader.getVal56();
   return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 NamedDecl TemplateDecl::templated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal57();
   return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool TemplateDecl::has_associated_constraints(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal74();
 }
 
 bool TemplateDecl::is_type_alias(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal75();
 }
 
 #pragma GCC diagnostic pop

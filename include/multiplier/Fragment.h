@@ -27,12 +27,6 @@ class ReferenceIteratorImpl;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
-class WeggliQuery;
-class WeggliQueryMatch;
-class WeggliQueryResult;
-class WeggliQueryResultImpl;
-class WeggliQueryResultIterator;
-class WeggliQueryResultIterator;
 
 #define MX_FORWARD_DECLARE(type_name, ln, e, c) \
     class type_name;
@@ -64,8 +58,6 @@ class Fragment {
   friend class RegexQueryResultImpl;
   friend class TokenTree;
   friend class TokenTreeImpl;
-  friend class WeggliQuery;
-  friend class WeggliQueryResultImpl;
 
 #define MX_FRIEND(type_name, ln, e, c) \
     friend class type_name;
@@ -90,13 +82,13 @@ class Fragment {
   // with C++ templates, but can also happen in C due to elaborated type uses,
   // such as `struct foo`, acting as forward declarations upon their first use.
   std::optional<Fragment> parent(void) const noexcept;
+  std::optional<PackedFragmentId> parent_id(void) const noexcept;
 
   // Return a fragment's parent fragment. If this is a top-level fragment, then
   // this returns the argument.
   static Fragment containing(const Fragment &);
 
   // Return the fragment containing a query match.
-  static Fragment containing(const WeggliQueryMatch &);
   static Fragment containing(const RegexQueryMatch &);
 
   // Return the fragment containing a token tree.
@@ -131,6 +123,9 @@ class Fragment {
   // The range of parsed tokens in this fragment.
   TokenRange parsed_tokens(void) const;
 
+  // Return child fragments.
+  gap::generator<Fragment> nested_fragments(void) const &;
+
   // Return references to this fragment.
   gap::generator<Reference> references(void) const &;
 
@@ -147,9 +142,6 @@ class Fragment {
   inline bool operator!=(const Fragment &that) const noexcept {
     return id() != that.id();
   }
-
-  // Run a Weggli search over this fragment.
-  gap::generator<WeggliQueryMatch> query(const WeggliQuery &query) const &;
 
   // Run a regular expression search over this fragment.
   gap::generator<RegexQueryMatch> query(const RegexQuery &query) const &;

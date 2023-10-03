@@ -42,6 +42,8 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXBaseSpecifier {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
  protected:
   friend class Attr;
   friend class Decl;

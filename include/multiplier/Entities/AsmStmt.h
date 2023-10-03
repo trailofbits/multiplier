@@ -70,14 +70,14 @@ class AsmStmt : public Stmt {
   std::optional<Expr> nth_output(unsigned n) const;
   unsigned num_outputs(void) const;
   gap::generator<Expr> outputs(void) const &;
+  gap::generator<std::string_view> output_constraints(void) const &;
   std::optional<Expr> nth_output_expression(unsigned n) const;
   unsigned num_output_expressions(void) const;
   gap::generator<Expr> output_expressions(void) const &;
-  gap::generator<std::string_view> output_constraints(void) const &;
+  gap::generator<std::string_view> input_constraints(void) const &;
   std::optional<Expr> nth_input_expression(unsigned n) const;
   unsigned num_input_expressions(void) const;
   gap::generator<Expr> input_expressions(void) const &;
-  gap::generator<std::string_view> input_constraints(void) const &;
   gap::generator<std::string_view> clobbers(void) const &;
 };
 

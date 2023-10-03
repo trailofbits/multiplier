@@ -27,7 +27,7 @@ class LabelStmt final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<::vast::hl::LabelType> label(void) const;
-  ::mx::ir::Region substmt(void) const;
+  ::mx::ir::Region body(void) const;
 };
 static_assert(sizeof(LabelStmt) == sizeof(Operation));
 

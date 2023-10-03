@@ -11,6 +11,10 @@
 #include <multiplier/Entities/AddressSpaceAttr.h>
 #include <multiplier/Entities/AnnotateTypeAttr.h>
 #include <multiplier/Entities/ArmMveStrictPolymorphismAttr.h>
+#include <multiplier/Entities/ArmPreservesZAAttr.h>
+#include <multiplier/Entities/ArmSharedZAAttr.h>
+#include <multiplier/Entities/ArmStreamingAttr.h>
+#include <multiplier/Entities/ArmStreamingCompatibleAttr.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/BTFTypeTagAttr.h>
 #include <multiplier/Entities/CmseNSCallAttr.h>
@@ -35,6 +39,7 @@
 #include <multiplier/Entities/TypeNullableAttr.h>
 #include <multiplier/Entities/TypeNullableResultAttr.h>
 #include <multiplier/Entities/UPtrAttr.h>
+#include <multiplier/Entities/WebAssemblyFuncrefAttr.h>
 
 #include "../EntityProvider.h"
 #include "../Attr.h"
@@ -76,9 +81,14 @@ static const AttrKind kTypeAttrDerivedKinds[] = {
     TypeNullableAttr::static_kind(),
     TypeNullableResultAttr::static_kind(),
     UPtrAttr::static_kind(),
+    WebAssemblyFuncrefAttr::static_kind(),
     AddressSpaceAttr::static_kind(),
     AnnotateTypeAttr::static_kind(),
     ArmMveStrictPolymorphismAttr::static_kind(),
+    ArmPreservesZAAttr::static_kind(),
+    ArmSharedZAAttr::static_kind(),
+    ArmStreamingAttr::static_kind(),
+    ArmStreamingCompatibleAttr::static_kind(),
     BTFTypeTagAttr::static_kind(),
     CmseNSCallAttr::static_kind(),
     HLSLGroupSharedAddressSpaceAttr::static_kind(),
@@ -105,9 +115,14 @@ std::optional<TypeAttr> TypeAttr::from(const Attr &parent) {
     case TypeNullableAttr::static_kind():
     case TypeNullableResultAttr::static_kind():
     case UPtrAttr::static_kind():
+    case WebAssemblyFuncrefAttr::static_kind():
     case AddressSpaceAttr::static_kind():
     case AnnotateTypeAttr::static_kind():
     case ArmMveStrictPolymorphismAttr::static_kind():
+    case ArmPreservesZAAttr::static_kind():
+    case ArmSharedZAAttr::static_kind():
+    case ArmStreamingAttr::static_kind():
+    case ArmStreamingCompatibleAttr::static_kind():
     case BTFTypeTagAttr::static_kind():
     case CmseNSCallAttr::static_kind():
     case HLSLGroupSharedAddressSpaceAttr::static_kind():

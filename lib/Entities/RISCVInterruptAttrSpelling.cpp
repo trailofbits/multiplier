@@ -17,7 +17,7 @@ const char *EnumeratorName(RISCVInterruptAttrSpelling e) {
   switch (e) {
     case RISCVInterruptAttrSpelling::GNU_INTERRUPT: return "GNU_INTERRUPT";
     case RISCVInterruptAttrSpelling::CXX11_GNU_INTERRUPT: return "CXX11_GNU_INTERRUPT";
-    case RISCVInterruptAttrSpelling::C2X_GNU_INTERRUPT: return "C2X_GNU_INTERRUPT";
+    case RISCVInterruptAttrSpelling::C23_GNU_INTERRUPT: return "C23_GNU_INTERRUPT";
     case RISCVInterruptAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -192,20 +192,20 @@ gap::generator<Expr> CXXConstructExpr::arguments(void) const & {
 }
 
 CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const {
-  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal94());
+  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal95());
 }
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXConstructExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 TokenRange CXXConstructExpr::parenthesis_or_brace_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal40(), impl->reader.getVal41());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal39(), impl->reader.getVal40());
 }
 
 bool CXXConstructExpr::had_multiple_candidates(void) const {
@@ -216,16 +216,20 @@ bool CXXConstructExpr::is_elidable(void) const {
   return impl->reader.getVal90();
 }
 
-bool CXXConstructExpr::is_list_initialization(void) const {
+bool CXXConstructExpr::is_immediate_escalating(void) const {
   return impl->reader.getVal91();
 }
 
-bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
+bool CXXConstructExpr::is_list_initialization(void) const {
   return impl->reader.getVal92();
 }
 
-bool CXXConstructExpr::requires_zero_initialization(void) const {
+bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
   return impl->reader.getVal93();
+}
+
+bool CXXConstructExpr::requires_zero_initialization(void) const {
+  return impl->reader.getVal94();
 }
 
 #pragma GCC diagnostic pop

@@ -80,26 +80,26 @@ std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from
 }
 
 Type SubstTemplateTypeParmPackType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Decl SubstTemplateTypeParmPackType::associated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal230();
+  RawEntityId eid = impl->reader.getVal18();
   return Decl(impl->ep->DeclFor(impl->ep, eid));
 }
 
 bool SubstTemplateTypeParmPackType::final(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 TemplateTypeParmDecl SubstTemplateTypeParmPackType::replaced_parameter(void) const {
-  RawEntityId eid = impl->reader.getVal236();
+  RawEntityId eid = impl->reader.getVal24();
   return TemplateTypeParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool SubstTemplateTypeParmPackType::is_sugared(void) const {
-  return impl->reader.getVal232();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

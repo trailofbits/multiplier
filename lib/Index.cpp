@@ -163,11 +163,12 @@ gap::generator<File> Index::files(void) const & {
 
 #define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \
   std::optional<type_name> Index::lower_name(RawEntityId id) const { \
-    if (type_name ## ImplPtr ptr = impl->type_name ## For(impl, id)) { \
-      return type_name(std::move(ptr)); \
-    } else { \
-      return std::nullopt; \
+    if (CategoryFromEntityId(id) == EntityCategory::enum_name) { \
+      if (type_name ## ImplPtr ptr = impl->type_name ## For(impl, id)) { \
+        return type_name(std::move(ptr)); \
+      } \
     } \
+    return std::nullopt; \
   }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,

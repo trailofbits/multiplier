@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define MX_IR_FOR_EACH_MLIR_OP(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta) \
+#define MX_IR_FOR_EACH_MLIR_OP(_builtin, _llvm, _scf, _memref, _ll, _hl, _core, _meta, _unsup) \
    _builtin("builtin.module", OperationKind::BUILTIN_MODULE, mlir::ModuleOp) \
    _builtin("builtin.unrealized_conversion_cast", OperationKind::BUILTIN_UNREALIZED_CONVERSION_CAST, mlir::UnrealizedConversionCastOp) \
    _llvm("llvm.ashr", OperationKind::LLVM_ASHR, mlir::LLVM::AShrOp) \
@@ -272,16 +272,20 @@
    _memref("memref.subview", OperationKind::MEMREF_SUBVIEW, mlir::memref::SubViewOp) \
    _memref("memref.tensor_store", OperationKind::MEMREF_TENSOR_STORE, mlir::memref::TensorStoreOp) \
    _ll("ll.br", OperationKind::LL_BR, vast::ll::Br) \
+   _ll("ll.concat", OperationKind::LL_CONCAT, vast::ll::Concat) \
    _ll("ll.cond_br", OperationKind::LL_COND_BR, vast::ll::CondBr) \
    _ll("ll.cond_scope_ret", OperationKind::LL_COND_SCOPE_RET, vast::ll::CondScopeRet) \
+   _ll("ll.extract", OperationKind::LL_EXTRACT, vast::ll::Extract) \
    _ll("ll.initialize", OperationKind::LL_INITIALIZE, vast::ll::InitializeVar) \
    _ll("ll.inline_scope", OperationKind::LL_INLINE_SCOPE, vast::ll::InlineScope) \
+   _ll("ll.func", OperationKind::LL_FUNC, vast::ll::FuncOp) \
    _ll("ll.gep", OperationKind::LL_GEP, vast::ll::StructGEPOp) \
    _ll("ll.return", OperationKind::LL_RETURN, vast::ll::ReturnOp) \
    _ll("ll.scope", OperationKind::LL_SCOPE, vast::ll::Scope) \
    _ll("ll.scope_recurse", OperationKind::LL_SCOPE_RECURSE, vast::ll::ScopeRecurse) \
    _ll("ll.scope_ret", OperationKind::LL_SCOPE_RET, vast::ll::ScopeRet) \
    _ll("ll.uninitialized_var", OperationKind::LL_UNINITIALIZED_VAR, vast::ll::UninitializedVar) \
+   _hl("hl.access", OperationKind::HL_ACCESS, vast::hl::AccessSpecifierOp) \
    _hl("hl.assign.fadd", OperationKind::HL_ASSIGN_FADD, vast::hl::AddFAssignOp) \
    _hl("hl.fadd", OperationKind::HL_FADD, vast::hl::AddFOp) \
    _hl("hl.assign.add", OperationKind::HL_ASSIGN_ADD, vast::hl::AddIAssignOp) \
@@ -307,8 +311,11 @@
    _hl("hl.builtin_bitcast", OperationKind::HL_BUILTIN_BITCAST, vast::hl::BuiltinBitCastOp) \
    _hl("hl.cstyle_cast", OperationKind::HL_CSTYLE_CAST, vast::hl::CStyleCastOp) \
    _hl("hl.call", OperationKind::HL_CALL, vast::hl::CallOp) \
+   _hl("hl.class", OperationKind::HL_CLASS, vast::hl::ClassDeclOp) \
    _hl("hl.cmp", OperationKind::HL_CMP, vast::hl::CmpOp) \
    _hl("hl.const", OperationKind::HL_CONST, vast::hl::ConstantOp) \
+   _hl("hl.base", OperationKind::HL_BASE, vast::hl::CxxBaseSpecifierOp) \
+   _hl("hl.cxxstruct", OperationKind::HL_CXXSTRUCT, vast::hl::CxxStructDeclOp) \
    _hl("hl.ref", OperationKind::HL_REF, vast::hl::DeclRefOp) \
    _hl("hl.deref", OperationKind::HL_DEREF, vast::hl::Deref) \
    _hl("hl.assign.fdiv", OperationKind::HL_ASSIGN_FDIV, vast::hl::DivFAssignOp) \
@@ -324,7 +331,6 @@
    _hl("hl.gnu.extension", OperationKind::HL_GNU_EXTENSION, vast::hl::ExtensionOp) \
    _hl("hl.fcmp", OperationKind::HL_FCMP, vast::hl::FCmpOp) \
    _hl("hl.field", OperationKind::HL_FIELD, vast::hl::FieldDeclOp) \
-   _hl("hl.func", OperationKind::HL_FUNC, vast::hl::FuncOp) \
    _hl("hl.funcref", OperationKind::HL_FUNCREF, vast::hl::FuncRefOp) \
    _hl("hl.globref", OperationKind::HL_GLOBREF, vast::hl::GlobalRefOp) \
    _hl("hl.break", OperationKind::HL_BREAK, vast::hl::BreakOp) \
@@ -334,16 +340,16 @@
    _hl("hl.continue", OperationKind::HL_CONTINUE, vast::hl::ContinueOp) \
    _hl("hl.default", OperationKind::HL_DEFAULT, vast::hl::DefaultOp) \
    _hl("hl.do", OperationKind::HL_DO, vast::hl::DoOp) \
+   _hl("hl.empty.decl", OperationKind::HL_EMPTY_DECL, vast::hl::EmptyDeclOp) \
    _hl("hl.for", OperationKind::HL_FOR, vast::hl::ForOp) \
+   _hl("hl.func", OperationKind::HL_FUNC, vast::hl::FuncOp) \
    _hl("hl.goto", OperationKind::HL_GOTO, vast::hl::GotoStmt) \
    _hl("hl.if", OperationKind::HL_IF, vast::hl::IfOp) \
    _hl("hl.label.decl", OperationKind::HL_LABEL_DECL, vast::hl::LabelDeclOp) \
    _hl("hl.label", OperationKind::HL_LABEL, vast::hl::LabelStmt) \
    _hl("hl.skip", OperationKind::HL_SKIP, vast::hl::SkipStmt) \
    _hl("hl.switch", OperationKind::HL_SWITCH, vast::hl::SwitchOp) \
-   _hl("hl.unsupportedDecl", OperationKind::HL_UNSUPPORTEDDECL, vast::hl::UnsupportedDeclOp) \
-   _hl("hl.unsupportedExpr", OperationKind::HL_UNSUPPORTEDEXPR, vast::hl::UnsupportedExprOp) \
-   _hl("hl.unsupportedOp", OperationKind::HL_UNSUPPORTEDOP, vast::hl::UnsupportedOp) \
+   _hl("hl.type.yield", OperationKind::HL_TYPE_YIELD, vast::hl::TypeYieldOp) \
    _hl("hl.value.yield", OperationKind::HL_VALUE_YIELD, vast::hl::ValueYieldOp) \
    _hl("hl.var", OperationKind::HL_VAR, vast::hl::VarDeclOp) \
    _hl("hl.while", OperationKind::HL_WHILE, vast::hl::WhileOp) \
@@ -371,7 +377,6 @@
    _hl("hl.assign.urem", OperationKind::HL_ASSIGN_UREM, vast::hl::RemUAssignOp) \
    _hl("hl.urem", OperationKind::HL_UREM, vast::hl::RemUOp) \
    _hl("hl.return", OperationKind::HL_RETURN, vast::hl::ReturnOp) \
-   _hl("hl.scope", OperationKind::HL_SCOPE, vast::hl::ScopeOp) \
    _hl("hl.sizeof.expr", OperationKind::HL_SIZEOF_EXPR, vast::hl::SizeOfExprOp) \
    _hl("hl.sizeof.type", OperationKind::HL_SIZEOF_TYPE, vast::hl::SizeOfTypeOp) \
    _hl("hl.stmt.expr", OperationKind::HL_STMT_EXPR, vast::hl::StmtExprOp) \
@@ -381,15 +386,21 @@
    _hl("hl.assign.sub", OperationKind::HL_ASSIGN_SUB, vast::hl::SubIAssignOp) \
    _hl("hl.sub", OperationKind::HL_SUB, vast::hl::SubIOp) \
    _hl("hl.subscript", OperationKind::HL_SUBSCRIPT, vast::hl::SubscriptOp) \
+   _hl("hl.this", OperationKind::HL_THIS, vast::hl::ThisOp) \
    _hl("hl.translation_unit", OperationKind::HL_TRANSLATION_UNIT, vast::hl::TranslationUnitOp) \
    _hl("hl.type", OperationKind::HL_TYPE, vast::hl::TypeDeclOp) \
    _hl("hl.typedef", OperationKind::HL_TYPEDEF, vast::hl::TypeDefOp) \
+   _hl("hl.typeof.expr", OperationKind::HL_TYPEOF_EXPR, vast::hl::TypeOfExprOp) \
+   _hl("hl.typeof.type", OperationKind::HL_TYPEOF_TYPE, vast::hl::TypeOfTypeOp) \
    _hl("hl.union", OperationKind::HL_UNION, vast::hl::UnionDeclOp) \
    _hl("hl.unreachable", OperationKind::HL_UNREACHABLE, vast::hl::UnreachableOp) \
    _core("core.bin.land", OperationKind::CORE_BIN_LAND, vast::core::BinLAndOp) \
    _core("core.bin.lor", OperationKind::CORE_BIN_LOR, vast::core::BinLOrOp) \
    _core("core.lazy.op", OperationKind::CORE_LAZY_OP, vast::core::LazyOp) \
-   _core("core.select", OperationKind::CORE_SELECT, vast::core::SelectOp)
+   _core("core.select", OperationKind::CORE_SELECT, vast::core::SelectOp) \
+   _core("core.scope", OperationKind::CORE_SCOPE, vast::core::ScopeOp) \
+   _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
+   _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 381
+#define MX_IR_NUM_MLIR_OPS 392
 

@@ -14,14 +14,20 @@
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
 #include <vast/Dialect/Dialects.hpp>
+#include <vast/Dialect/Core/CoreDialect.hpp>
 #include <vast/Dialect/Core/CoreOps.hpp>
 #include <vast/Dialect/Core/CoreTypes.hpp>
+#include <vast/Dialect/HighLevel/HighLevelDialect.hpp>
 #include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 #include <vast/Dialect/HighLevel/HighLevelTypes.hpp>
-#include <vast/Dialect/HighLevel/HighLevelLinkage.hpp>
+#include <vast/Dialect/LowLevel/LowLevelDialect.hpp>
 #include <vast/Dialect/LowLevel/LowLevelOps.hpp>
+#include <vast/Dialect/Meta/MetaDialect.hpp>
 #include <vast/Dialect/Meta/MetaAttributes.hpp>
 #include <vast/Dialect/Meta/MetaTypes.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedDialect.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedOps.hpp>
+#include <vast/Dialect/Unsupported/UnsupportedTypes.hpp>
 
 #else
 
@@ -247,7 +253,9 @@ void CodeGenerator::FillIncludePathsFor(const pasta::CXXRecordDecl &cls) {
 
   ordered_paths.emplace(cls.Token().Index(), cls_path);
 
-  for (pasta::Token tok : cls.Tokens()) {
+  auto pt = pasta::PrintedTokenRange::Create(cls);
+
+  for (pasta::PrintedToken tok : pt) {
     for (std::optional<pasta::TokenContext> tc = tok.Context();
          tc; tc = tc->Parent()) {
       std::optional<pasta::Decl> tcd = pasta::Decl::From(tc.value());
@@ -378,6 +386,7 @@ static Dialect gDialects[] = {
   {"HighLevel", "VAST/HL", "hl", "vast::hl", "vast", "hl", {}, {}, {}},
   {"Core", "VAST/Core", "core", "vast::core", "vast", "core", {}, {}, {}},
   {"Meta", "VAST/Meta", "meta", "vast::meta", "vast", "meta", {}, {}, {}},
+  {"Unsupported", "VAST/Unsupported", "unsup", "vast::unsup", "vast", "unsup", {}, {}, {}},
 };
 
 class TypeWrapper {
@@ -681,6 +690,10 @@ void CodeGenerator::RunOnOps(void) {
   std::filesystem::path mx_inc = mx_root / "include" / "multiplier";
   std::filesystem::path mx_lib = mx_root / "lib";
 
+  std::error_code ec;
+  (void) std::filesystem::create_directory(mx_inc / "IR", ec);
+  (void) std::filesystem::create_directory(mx_lib / "IR", ec);
+
   std::ofstream hpp(mx_inc / "IR" / "OperationKind.h");
   std::ofstream cpp(mx_lib / "IR" / "Operation.h");  // In lib.
 
@@ -778,6 +791,11 @@ void CodeGenerator::RunOnOps(void) {
     }
 
     hpp.close();
+
+    std::error_code ec;
+    (void) std::filesystem::create_directories(mx_inc / "IR" / dialect.our_dir_name, ec);
+    (void) std::filesystem::create_directories(mx_lib / "IR" / dialect.our_dir_name, ec);
+    
     hpp.open(mx_inc / "IR" / dialect.our_dir_name / "Operation.h");
 
     cpp.close();
@@ -1153,7 +1171,7 @@ void CodeGenerator::RunOnOpClass(const std::string &root_ns, const std::string &
   op.methods = std::move(methods);
   op.attributes = std::move(attributes);
 
-//  std::cerr << "OP: " << root_ns << "::" << ns << "::" << name << " = "
+//  std::cerr << "OP: " << root_ns << "::" << ns << "::" << cls.Name() << " = "
 //            << op_name << '\n';
 //  for (const pasta::CXXMethodDecl &meth : methods) {
 //    std::string meth_name = meth.Name();
@@ -1327,7 +1345,7 @@ void CodeGenerator::RunOnNamespace(const pasta::NamespaceDecl &root_ns,
 
   if (root_ns_name == "vast") {
     if (ns_name != "hl" && ns_name != "ll" && ns_name != "meta" &&
-        ns_name != "core") {
+        ns_name != "core" && ns_name != "unsup") {
       return;
     }
   } else if (root_ns_name == "mlir") {

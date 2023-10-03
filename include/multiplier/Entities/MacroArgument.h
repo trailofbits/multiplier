@@ -56,7 +56,7 @@ class MacroArgument : public Macro {
   static std::optional<MacroArgument> from(const TokenContext &t);
 
   bool is_variadic(void) const;
-  unsigned index(void) const;
+  uint32_t index(void) const;
 };
 
 static_assert(sizeof(MacroArgument) == sizeof(Macro));

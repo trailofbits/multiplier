@@ -203,7 +203,7 @@ static void CollectEntities(
         // Which could correspond to `foo` in `foo *bar;`. We don't require
         // a definition of `foo` or any other decls seen along the way, only
         // a declaration of them, so we move them to the weak decls list.
-        } else if (ty->is_any_pointer_type()) {
+        } else if (mx::PointerType::from(ty.value())) {
           weak_decl_ids.insert(weak_decl_ids.end(), pending_decl_ids.begin(),
                                pending_decl_ids.end());
           pending_decl_ids.clear();
@@ -415,7 +415,7 @@ struct DAG {
   }
 };
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

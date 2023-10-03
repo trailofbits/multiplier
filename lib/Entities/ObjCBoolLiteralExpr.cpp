@@ -155,7 +155,7 @@ std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const TokenContext 
 }
 
 Token ObjCBoolLiteralExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 bool ObjCBoolLiteralExpr::value(void) const {

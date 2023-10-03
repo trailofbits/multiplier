@@ -157,7 +157,7 @@ std::optional<InitListExpr> InitListExpr::from(const TokenContext &t) {
 
 std::optional<Expr> InitListExpr::array_filler(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -170,7 +170,7 @@ std::optional<Expr> InitListExpr::array_filler(void) const {
 
 std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -182,16 +182,16 @@ std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
 }
 
 Token InitListExpr::l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token InitListExpr::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal42();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -204,7 +204,7 @@ std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
 
 std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -221,6 +221,10 @@ bool InitListExpr::had_array_range_designator(void) const {
 
 bool InitListExpr::has_array_filler(void) const {
   return impl->reader.getVal90();
+}
+
+bool InitListExpr::has_designated_initializer(void) const {
+  return impl->reader.getVal91();
 }
 
 unsigned InitListExpr::num_initializers(void) const {
@@ -256,26 +260,26 @@ gap::generator<Expr> InitListExpr::initializers(void) const & {
 }
 
 bool InitListExpr::is_explicit(void) const {
-  return impl->reader.getVal91();
-}
-
-bool InitListExpr::is_semantic_form(void) const {
   return impl->reader.getVal92();
 }
 
-bool InitListExpr::is_string_literal_initializer(void) const {
+bool InitListExpr::is_semantic_form(void) const {
   return impl->reader.getVal93();
 }
 
+bool InitListExpr::is_string_literal_initializer(void) const {
+  return impl->reader.getVal94();
+}
+
 bool InitListExpr::is_syntactic_form(void) const {
-  return impl->reader.getVal95();
+  return impl->reader.getVal96();
 }
 
 std::optional<bool> InitListExpr::is_transparent(void) const {
-  if (!impl->reader.getVal98()) {
+  if (!impl->reader.getVal99()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal97());
+    return static_cast<bool>(impl->reader.getVal98());
   }
   return std::nullopt;
 }

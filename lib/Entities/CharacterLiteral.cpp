@@ -154,12 +154,12 @@ std::optional<CharacterLiteral> CharacterLiteral::from(const TokenContext &t) {
   return CharacterLiteral::from(t.as_statement());
 }
 
-CharacterLiteralCharacterKind CharacterLiteral::character_kind(void) const {
-  return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal94());
+CharacterLiteralCharacterKind CharacterLiteral::literal_kind(void) const {
+  return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal95());
 }
 
 Token CharacterLiteral::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 #pragma GCC diagnostic pop

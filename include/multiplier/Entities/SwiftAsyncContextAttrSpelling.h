@@ -14,7 +14,7 @@ namespace mx {
 enum class SwiftAsyncContextAttrSpelling : unsigned char {
   GNU_SWIFT_ASYNC_CONTEXT,
   CXX11_CLANG_SWIFT_ASYNC_CONTEXT,
-  C2X_CLANG_SWIFT_ASYNC_CONTEXT,
+  C23_CLANG_SWIFT_ASYNC_CONTEXT,
   SPELLING_NOT_CALCULATED,
 };
 

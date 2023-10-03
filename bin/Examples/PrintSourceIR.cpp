@@ -90,7 +90,7 @@ static void DumpOperation(const mx::ir::Operation &op,
   os << "\n";
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

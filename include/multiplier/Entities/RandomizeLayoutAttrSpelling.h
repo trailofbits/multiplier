@@ -14,7 +14,7 @@ namespace mx {
 enum class RandomizeLayoutAttrSpelling : unsigned char {
   GNU_RANDOMIZE_LAYOUT,
   CXX11_GNU_RANDOMIZE_LAYOUT,
-  C2X_GNU_RANDOMIZE_LAYOUT,
+  C23_GNU_RANDOMIZE_LAYOUT,
   SPELLING_NOT_CALCULATED,
 };
 

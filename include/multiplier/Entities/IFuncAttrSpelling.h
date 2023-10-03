@@ -14,7 +14,7 @@ namespace mx {
 enum class IFuncAttrSpelling : unsigned char {
   GNU_IFUNC,
   CXX11_GNU_IFUNC,
-  C2X_GNU_IFUNC,
+  C23_GNU_IFUNC,
   SPELLING_NOT_CALCULATED,
 };
 

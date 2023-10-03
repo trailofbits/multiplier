@@ -76,11 +76,13 @@ target_link_libraries("mx-mlir"
     "std::coroutines"
     "gap::gap-settings"
     
-    "vast::vast"
-    "vast::MLIRCore"
-    "vast::MLIRMeta"
-    "vast::MLIRLowLevel"
-    "vast::MLIRHighLevel"
+    VAST::VASTCodeGen
+    VAST::VASTCore
+    VAST::VASTMeta
+    VAST::VASTLowLevel
+    VAST::VASTHighLevel
+    VAST::VASTUnsupported
+    VAST::VASTElementTypeInterface
 
     MLIRDialect
     MLIRAMDGPUDialect

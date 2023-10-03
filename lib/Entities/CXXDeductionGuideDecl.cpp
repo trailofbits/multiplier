@@ -185,17 +185,17 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const TokenCont
 }
 
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
-  RawEntityId eid = impl->reader.getVal168();
+  RawEntityId eid = impl->reader.getVal169();
   return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
-  RawEntityId eid = impl->reader.getVal169();
+  RawEntityId eid = impl->reader.getVal170();
   return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
-bool CXXDeductionGuideDecl::is_copy_deduction_candidate(void) const {
-  return impl->reader.getVal170();
+DeductionCandidate CXXDeductionGuideDecl::deduction_candidate_kind(void) const {
+  return static_cast<DeductionCandidate>(impl->reader.getVal168());
 }
 
 bool CXXDeductionGuideDecl::is_explicit(void) const {

@@ -53,6 +53,7 @@ class DependentAddressSpaceType : public Type {
   Type desugar(void) const;
   Expr address_space_expression(void) const;
   Token attribute_token(void) const;
+  Type pointee_type(void) const;
   bool is_sugared(void) const;
 };
 

@@ -69,7 +69,7 @@ class UnaryExprOrTypeTraitExpr : public Expr {
 
   std::optional<Expr> argument_expression(void) const;
   std::optional<Type> argument_type(void) const;
-  UnaryExprOrTypeTrait expression_or_trait_kind(void) const;
+  UnaryExprOrTypeTrait keyword_kind(void) const;
   Token operator_token(void) const;
   Token r_paren_token(void) const;
   Type type_of_argument(void) const;

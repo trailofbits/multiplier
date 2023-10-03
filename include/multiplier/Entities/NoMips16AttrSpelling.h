@@ -14,7 +14,7 @@ namespace mx {
 enum class NoMips16AttrSpelling : unsigned char {
   GNU_NOMIPS16,
   CXX11_GNU_NOMIPS16,
-  C2X_GNU_NOMIPS16,
+  C23_GNU_NOMIPS16,
   SPELLING_NOT_CALCULATED,
 };
 

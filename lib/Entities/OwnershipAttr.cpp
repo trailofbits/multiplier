@@ -121,7 +121,7 @@ bool OwnershipAttr::is_returns(void) const {
 }
 
 bool OwnershipAttr::is_takes(void) const {
-  return impl->reader.getVal18();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

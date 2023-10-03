@@ -58,6 +58,7 @@ class AlignedAttr : public InheritableAttr {
 
   std::optional<Expr> alignment_expression(void) const;
   std::optional<Type> alignment_type(void) const;
+  std::optional<uint32_t> cached_alignment_value(void) const;
   AlignedAttrSpelling semantic_spelling(void) const;
   bool is_alignas(void) const;
   bool is_alignment_dependent(void) const;

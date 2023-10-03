@@ -18,7 +18,9 @@ capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file
 file(GLOB entity_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_ENTITIES_DIR}/*.h")
 file(GLOB entity_sources CONFIGURE_DEPENDS "${MX_BOOTSTRAP_LIB_ENTITIES_DIR}/*.cpp")
 
-add_subdirectory("IR")
+if(MX_ENABLE_VAST)
+  add_subdirectory("IR")
+endif()
 
 add_library("mx-entities" INTERFACE)
 set_target_properties("mx-entities"
@@ -90,7 +92,6 @@ set(api_headers
   "${source_include_dir}/Token.h"
   "${source_include_dir}/TokenTree.h"
   "${source_include_dir}/Types.h"
-  "${source_include_dir}/Weggli.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
 
@@ -153,9 +154,6 @@ add_library("mx-api" STATIC
   "Types.h"
   "Types.cpp"
   "Util.h"
-  "Weggli.cpp"
-  "WeggliImpl.cpp"
-  "WeggliImpl.h"
 
   # Auto-generated.
   ${copied_headers}
@@ -170,35 +168,35 @@ add_dependencies("mx-api"
 target_link_libraries("mx-api"
   PUBLIC
     "mx-sqlite"
-    "mx-mlir"
-    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
+    "gap::gap"
+    "gap::gap-core"
+    "std::coroutines"
+    "gap::gap-settings"
   PRIVATE
-    "CapnProto::capnp-rpc"
+    "zstd::zstd"
+    "CapnProto::capnp"
     $<BUILD_INTERFACE:concurrentqueue>
 )
+
+if(MX_ENABLE_VAST)
+  target_link_libraries("mx-api"
+    PUBLIC
+      "mx-mlir")
+else()
+  target_compile_definitions("mx-api"
+    PUBLIC
+      "MX_DISABLE_VAST")
+endif()
 
 if(MX_ENABLE_RE2)
   target_link_libraries("mx-api"
     PRIVATE
-      "re2::re2"
-  )
-else(MX_ENABLE_RE2)
+      re2::re2)
+else()
   target_compile_definitions("mx-api"
     PUBLIC
       "MX_DISABLE_RE2")
-endif(MX_ENABLE_RE2)
-
-
-if(MX_ENABLE_WEGGLI)
-  target_link_libraries("mx-api"
-    PRIVATE
-      "weggli_native::static"
-  )
-else(MX_ENABLE_WEGGLI)
-  target_compile_definitions("mx-api"
-    PUBLIC
-      "MX_DISABLE_WEGGLI")
-endif(MX_ENABLE_WEGGLI)
+endif()
 
 target_compile_options("mx-api"
   PRIVATE

@@ -14,7 +14,7 @@ namespace mx {
 enum class SwiftErrorResultAttrSpelling : unsigned char {
   GNU_SWIFT_ERROR_RESULT,
   CXX11_CLANG_SWIFT_ERROR_RESULT,
-  C2X_CLANG_SWIFT_ERROR_RESULT,
+  C23_CLANG_SWIFT_ERROR_RESULT,
   SPELLING_NOT_CALCULATED,
 };
 

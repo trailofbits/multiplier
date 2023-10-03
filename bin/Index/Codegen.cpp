@@ -6,6 +6,7 @@
 
 #include "Codegen.h"
 
+#define VAST_ENABLE_EXCEPTIONS
 #include <vast/Util/Warnings.hpp>
 
 VAST_RELAX_WARNINGS
@@ -25,26 +26,90 @@ VAST_UNRELAX_WARNINGS
 #include <pasta/AST/Decl.h>
 
 #include <vast/Util/Common.hpp>
-#include <vast/Translation/CodeGenContext.hpp>
-#include <vast/Translation/CodeGenVisitor.hpp>
+#include <vast/CodeGen/CodeGenContext.hpp>
+#include <vast/CodeGen/CodeGenVisitor.hpp>
+#include <vast/CodeGen/CodeGen.hpp>
 #include <vast/Dialect/Dialects.hpp>
-#include <vast/Translation/CodeGen.hpp>
 
 #include "CodegenMetaGenerator.h"
-#include "CodegenVisitor.h"
-
 #include "Context.h"
 #include "EntityMapper.h"
 #include "PendingFragment.h"
+#include "TypeMapper.h"
 #include "Util.h"
 
 namespace indexer {
+namespace {
 
-template<typename Derived>
-using VisitorConfig =  vast::cg::CodeGenFallBackVisitorMixin<
-    Derived, vast::cg::DefaultCodeGenVisitorMixin, FallBackVisitor >;
+using MXCodeGenContext = vast::cg::CodeGenContext;
 
-using CodeGenVisitor = vast::cg::CodeGenVisitor<VisitorConfig, MetaGenerator>;
+template <typename Derived>
+struct TypeCompressingGenVisitor
+    : vast::cg::CodeGenTypeVisitorWithDataLayout< Derived > {
+ public:
+
+  // The base class is logically our "next" class in the proxy pattern.
+  using Base = vast::cg::CodeGenTypeVisitorWithDataLayout< Derived >;
+
+  // Apply the `TypeMapper`s type compression, which eagerly desugars things
+  // like `AutoType`, `ElaboratedType`, etc. (but isn't as aggressive when
+  // the types are incomplete / dependent on template parameters), then ask
+  // VAST's default type code generator to handle things.
+  //
+  // E.g. if there was an `AutoType` that wrapped a `PointerType`, then here
+  // we'd forward the pointer type to `Base`, then when `Base` gets around to
+  // lifting the pointer element type into an MLIR type, it will call
+  // `Derived::visit`, the most derived type, and represents the "top" code
+  // generator visitor, which will lead us back into here to apply compression
+  // on the pointer element type.
+  vast::cg::mlir_type Visit(clang::QualType type) {
+    return Base::Visit(TypeMapper::Compress(Base::acontext(), type));
+  }
+
+  vast::cg::mlir_type Visit(const clang::Type *type) {
+    auto new_qtype = TypeMapper::Compress(Base::acontext(), type);
+    auto new_type = new_qtype.getTypePtrOrNull();
+    if (new_type != type) {
+      if (new_qtype.hasQualifiers()) {
+        return Base::Visit(new_qtype);
+      }
+    } else {
+      assert(!new_qtype.hasQualifiers());
+    }
+
+    return Base::Visit(new_type);
+  }
+};
+
+template< typename Derived >
+struct MXDefaultCodeGenVisitor
+    : vast::cg::CodeGenDeclVisitor< Derived >
+    , vast::cg::CodeGenStmtVisitor< Derived >
+    , TypeCompressingGenVisitor< Derived >
+{
+    using DeclVisitor = vast::cg::CodeGenDeclVisitor< Derived >;
+    using StmtVisitor = vast::cg::CodeGenStmtVisitor< Derived >;
+    using TypeVisitor = TypeCompressingGenVisitor< Derived >;
+
+    using DeclVisitor::Visit;
+    using StmtVisitor::Visit;
+    using TypeVisitor::Visit;
+};
+
+template< typename Derived >
+using MXVisitorConfig = vast::cg::FallBackVisitor< Derived,
+    MXDefaultCodeGenVisitor,
+    vast::cg::UnsupportedVisitor,
+    vast::cg::UnreachableVisitor
+>;
+
+using MXCodeGenVisitor = vast::cg::CodeGenVisitor<
+    vast::cg::CodeGenContext, MXVisitorConfig, MetaGenerator
+    >;
+
+using MXCodeGenerator = vast::cg::CodeGenBase<MXCodeGenVisitor, MXCodeGenContext>;
+
+}  // namespace
 
 class CodeGeneratorImpl {
  public:
@@ -86,8 +151,9 @@ std::string CodeGenerator::GenerateSourceIR(
 
   mlir::MLIRContext context(impl->registry);
 
-  MetaGenerator meta(ast, &context, em);
-  vast::cg::CodeGenBase<CodeGenVisitor> codegen(&context, meta);
+  MetaGenerator meta(ast, context, em);
+  MXCodeGenContext cgctx(context, ast.UnderlyingAST());
+  MXCodeGenerator codegen(cgctx, meta);
   llvm::raw_string_ostream os(ret);
 
   try {

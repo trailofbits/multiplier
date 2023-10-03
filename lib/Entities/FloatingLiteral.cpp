@@ -155,7 +155,7 @@ std::optional<FloatingLiteral> FloatingLiteral::from(const TokenContext &t) {
 }
 
 Token FloatingLiteral::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 bool FloatingLiteral::is_exact(void) const {

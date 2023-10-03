@@ -1,4 +1,4 @@
-// Copyright (c) 2022-present, Trail of Bits, Inc.
+// Copyright (c) 2023-present, Trail of Bits, Inc.
 // All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
@@ -9,30 +9,15 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <multiplier/Entities/FieldDecl.h>
+#include <multiplier/Entities/PointerType.h>
 #include <multiplier/Entities/RecordDecl.h>
 #include <multiplier/Entities/RecordType.h>
 #include <sstream>
-#include <csignal>
-#include <csetjmp>
 
 #include "Index.h"
 
+DECLARE_bool(help);
 DECLARE_string(db);
-DECLARE_string(pahole_path, NULL, "Path to a pahole dump of structs");
-DECLARE_int(offset, -1, "Filter for target structs with an interesting field at a certain offset (pahole path must be set).");
-DECLARE_int(field, -1, "Filter for target structs with an interesting field.");
-
-static bool gHasJumpBuf = false;
-static sigjmp_buf gJumpBuf;
-
-static void HandleSegfault(int) {
-  if (gHasJumpBuf) {
-    gHasJumpBuf = false;
-    siglongjmp(gJumpBuf, 1);
-  } else {
-    abort();
-  }
-}
 
 static void RenderField(const mx::RecordDecl &record,
                         const mx::FieldDecl &field,
@@ -58,8 +43,6 @@ extern "C" int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  signal(SIGSEGV, HandleSegfault);
-
   if (FLAGS_help) {
     std::cerr << google::ProgramUsage() << std::endl;
     return EXIT_FAILURE;
@@ -68,44 +51,30 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index = InitExample(true);
 
   std::unordered_set<mx::PackedDeclId> self_referencing;
-  std::unordered_set<mx::PackedDeclId> next_self_referencing;
   std::unordered_set<mx::PackedDeclId> seen;
 
   int level = 0;
 
-  std::optional<mx::Type> pointee_type;
-  std::optional<mx::RecordType> record_type;
-  std::optional<mx::RecordDecl> record;
-
   // Identify directly self-linking structures, e.g. `list_head`.
   for (mx::FieldDecl field : mx::FieldDecl::in(index)) {
-    pointee_type = field.type().pointee_type();
-    if (!pointee_type) {
+    auto pointer_type = mx::PointerType::from(field.type());
+    if (!pointer_type) {
       continue;
     }
 
-    gHasJumpBuf = false;
-    if (!sigsetjmp(gJumpBuf, 1)) {
-      gHasJumpBuf = true;
+    auto pointee_type = pointer_type->pointee_type();
+    auto record_type = mx::RecordType::from(pointee_type.desugared_type());
+    if (!record_type) {
+      continue;
+    }
 
-      record_type = mx::RecordType::from(pointee_type->desugared_type());
-      if (!record_type) {
-        continue;
-      }
+    auto record = mx::RecordDecl::from(field.parent_declaration());
+    if (!record) {
+      continue;
+    }
 
-      record = mx::RecordDecl::from(field.parent_declaration());
-      if (!record) {
-        continue;
-      }
-
-      if (*record != record_type->declaration()) {
-        continue;
-      }
-
-      gHasJumpBuf = false;
-
-    } else {
-      continue;  // Crash.
+    if (*record != record_type->declaration()) {
+      continue;
     }
 
     RenderField(record.value(), field, level);
@@ -114,38 +83,31 @@ extern "C" int main(int argc, char *argv[]) {
     self_referencing.insert(record->id());
   }
 
-  std::optional<mx::TagDecl> byval_record;
-
   // Identify indirectly self-linking structures, e.g. users of `list_head`.
   for (size_t prev_size = 0u; prev_size < self_referencing.size(); ) {
     prev_size = self_referencing.size();
     ++level;
+
+    std::unordered_set<mx::PackedDeclId> next_self_referencing;
 
     for (mx::FieldDecl field : mx::FieldDecl::in(index)) {
       if (seen.contains(field.id())) {
         continue;
       }
 
-      gHasJumpBuf = false;
-      if (!sigsetjmp(gJumpBuf, 1)) {
-        gHasJumpBuf = true;
+      auto record_type = mx::RecordType::from(field.type().desugared_type());
+      if (!record_type) {
+        continue;
+      }
 
-        record_type = mx::RecordType::from(field.type().desugared_type());
-        if (!record_type) {
-          continue;
-        }
+      auto byval_record = record_type->declaration();
+      if (!self_referencing.contains(byval_record.id())) {
+        continue;
+      }
 
-        byval_record = record_type->declaration();
-        if (!self_referencing.contains(byval_record->id())) {
-          continue;
-        }
-
-        record = mx::RecordDecl::from(field.parent_declaration());
-        if (!record) {
-          continue;
-        }
-      } else {
-        continue;  // Crash.
+      auto record = mx::RecordDecl::from(field.parent_declaration());
+      if (!record) {
+        continue;
       }
 
       RenderField(record.value(), field, level);
@@ -156,7 +118,6 @@ extern "C" int main(int argc, char *argv[]) {
 
     self_referencing.insert(next_self_referencing.begin(),
                             next_self_referencing.end());
-    next_self_referencing.clear();
   }
 
   return EXIT_SUCCESS;

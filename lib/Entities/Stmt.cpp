@@ -44,6 +44,7 @@ std::optional<Stmt> Stmt::parent_statement(void) const {
   }
   return std::nullopt;
 }
+
 std::shared_ptr<EntityProvider> Stmt::entity_provider_of(const Index &index_) {
   return index_.impl;
 }

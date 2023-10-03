@@ -51,6 +51,7 @@ class DecayedType : public AdjustedType {
   static std::optional<DecayedType> from(const Reference &r);
   static std::optional<DecayedType> from(const TokenContext &t);
 
+  Type pointee_type(void) const;
 };
 
 static_assert(sizeof(DecayedType) == sizeof(AdjustedType));

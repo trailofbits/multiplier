@@ -52,8 +52,6 @@ class EntityProvider {
   friend class Token;
   friend class TokenReader;
   friend class TokenContext;
-  friend class WeggliQuery;
-  friend class WeggliQueryResultImpl;
 
  public:
 
@@ -82,6 +80,10 @@ class EntityProvider {
   virtual gap::generator<std::filesystem::path> ListPathsForFile(
       const Ptr &, PackedFileId id) = 0;
 
+  // Get the list nested fragments for a given fragment.
+  virtual FragmentIdList ListNestedFragmentIds(
+      const Ptr &, PackedFragmentId id) = 0;
+
   // Download a list of fragment IDs contained in a specific file.
   virtual FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) = 0;
 
@@ -92,7 +94,8 @@ class EntityProvider {
   ReferenceKindFor(const Ptr &, std::string_view kind_data) = 0;
 
   virtual bool AddReference(const Ptr &ep, RawEntityId kind_id,
-                            RawEntityId from_id, RawEntityId to_id) = 0;
+                            RawEntityId from_id, RawEntityId to_id,
+                            RawEntityId context_id) = 0;
 
   // Get a token by its entity ID.
   Token TokenFor(const Ptr &, RawEntityId id);
@@ -177,7 +180,7 @@ class EntityProvider {
 
   // Fill out `redecl_ids_out` and `references_ids_out` with the set of things
   // to analyze when looking for references.
-  virtual gap::generator<std::pair<RawEntityId, RawEntityId>>
+  virtual gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
   References(const Ptr &, RawEntityId eid) & = 0;
 
   // Find the entity ids matching the name

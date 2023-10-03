@@ -743,23 +743,32 @@ TokenCategory TokenReader::NthTokenCategory(EntityOffset token_index) const {
 
   if (std::holds_alternative<MacroId>(vid)) {
     return ClassifyMacro(kind, std::get<MacroId>(vid), baseline_category);
+  }
 
-  } else if (std::holds_alternative<DeclId>(vid)) {
+  if (std::holds_alternative<DeclId>(vid)) {
     return ClassifyDecl(this, token_index, std::get<DeclId>(vid),
                         baseline_category);
-
-  } else if (std::holds_alternative<StmtId>(vid)) {
-    return ClassifyStmt(std::get<StmtId>(vid), kind, baseline_category);
-
-  } else if (std::holds_alternative<TypeId>(vid)) {
-    return ClassifyType(std::get<TypeId>(vid), kind, baseline_category);
-
-  } else if (std::holds_alternative<FileId>(vid)) {
-    return ClassifyFile(kind, baseline_category);
-
-  } else {
-    return baseline_category;
   }
+
+  if (std::holds_alternative<StmtId>(vid)) {
+    return ClassifyStmt(std::get<StmtId>(vid), kind, baseline_category);
+  }
+
+  if (std::holds_alternative<TypeId>(vid)) {
+    return ClassifyType(std::get<TypeId>(vid), kind, baseline_category);
+  }
+
+  if (std::holds_alternative<FileId>(vid)) {
+    return ClassifyFile(kind, baseline_category);
+  }
+
+  // Issue #343: Make identifiers inside of attributes look like keywords.
+  if (std::holds_alternative<AttrId>(vid) &&
+      baseline_category == TokenCategory::IDENTIFIER) {
+    return TokenCategory::KEYWORD;
+  }
+
+  return baseline_category;
 }
 
 const FragmentImpl *TokenReader::OwningFragment(void) const noexcept {
@@ -1149,9 +1158,11 @@ EntityId Token::id(void) const {
 // References to this token.
 gap::generator<Reference> Token::references(void) const & {
   if (EntityProviderPtr ep = TokenReader::EntityProviderFor(*this)) {
-    for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
-      if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
-        co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+    for (auto ref : ep->References(ep, id().Pack())) {
+      if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
+        auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));
+        co_yield Reference(std::move(eptr), std::move(context),
+                           std::get<0>(ref), category, std::get<2>(ref));
       }
     }
   }
@@ -1168,7 +1179,7 @@ Token Token::parsed_token(void) const {
     return TokenReader::TokenFor(impl, eid.Pack());
 
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
-    assert(std::get<MacroTokenId>(vid) == id());
+    assert(eid == id());
     assert(false);  // Really, this is unreasonable.
     return Token();
 

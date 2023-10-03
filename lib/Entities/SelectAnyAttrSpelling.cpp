@@ -18,7 +18,7 @@ const char *EnumeratorName(SelectAnyAttrSpelling e) {
     case SelectAnyAttrSpelling::DECLSPEC_SELECTANY: return "DECLSPEC_SELECTANY";
     case SelectAnyAttrSpelling::GNU_SELECTANY: return "GNU_SELECTANY";
     case SelectAnyAttrSpelling::CXX11_GNU_SELECTANY: return "CXX11_GNU_SELECTANY";
-    case SelectAnyAttrSpelling::C2X_GNU_SELECTANY: return "C2X_GNU_SELECTANY";
+    case SelectAnyAttrSpelling::C23_GNU_SELECTANY: return "C23_GNU_SELECTANY";
     case SelectAnyAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

@@ -17,7 +17,7 @@ const char *EnumeratorName(PreserveMostAttrSpelling e) {
   switch (e) {
     case PreserveMostAttrSpelling::GNU_PRESERVE_MOST: return "GNU_PRESERVE_MOST";
     case PreserveMostAttrSpelling::CXX11_CLANG_PRESERVE_MOST: return "CXX11_CLANG_PRESERVE_MOST";
-    case PreserveMostAttrSpelling::C2X_CLANG_PRESERVE_MOST: return "C2X_CLANG_PRESERVE_MOST";
+    case PreserveMostAttrSpelling::C23_CLANG_PRESERVE_MOST: return "C23_CLANG_PRESERVE_MOST";
     case PreserveMostAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

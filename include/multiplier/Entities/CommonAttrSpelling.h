@@ -14,7 +14,7 @@ namespace mx {
 enum class CommonAttrSpelling : unsigned char {
   GNU_COMMON,
   CXX11_GNU_COMMON,
-  C2X_GNU_COMMON,
+  C23_GNU_COMMON,
   SPELLING_NOT_CALCULATED,
 };
 

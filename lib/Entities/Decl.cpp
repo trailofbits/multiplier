@@ -29,10 +29,6 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
-bool Decl::is_definition(void) const {
-  return impl->reader.getVal2();
-}
-
 std::optional<Decl> Decl::parent_declaration(void) const {
   if (auto id = impl->reader.getVal0(); id != kInvalidEntityId) {
     if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
@@ -52,6 +48,11 @@ std::optional<Stmt> Decl::parent_statement(void) const {
   }
   return std::nullopt;
 }
+
+bool Decl::is_definition(void) const {
+  return impl->reader.getVal2();
+}
+
 std::shared_ptr<EntityProvider> Decl::entity_provider_of(const Index &index_) {
   return index_.impl;
 }
@@ -302,11 +303,11 @@ DeclFriendObjectKind Decl::friend_object_kind(void) const {
   return static_cast<DeclFriendObjectKind>(impl->reader.getVal10());
 }
 
-std::optional<unsigned> Decl::max_alignment(void) const {
+std::optional<uint32_t> Decl::max_alignment(void) const {
   if (!impl->reader.getVal12()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(impl->reader.getVal11());
+    return static_cast<uint32_t>(impl->reader.getVal11());
   }
   return std::nullopt;
 }
@@ -360,56 +361,56 @@ bool Decl::is_function_or_function_template(void) const {
   return impl->reader.getVal22();
 }
 
-bool Decl::is_implicit(void) const {
+bool Decl::is_function_pointer_type(void) const {
   return impl->reader.getVal23();
 }
 
-bool Decl::is_in_anonymous_namespace(void) const {
+bool Decl::is_implicit(void) const {
   return impl->reader.getVal24();
 }
 
-bool Decl::is_in_export_declaration_context(void) const {
+bool Decl::is_in_anonymous_namespace(void) const {
   return impl->reader.getVal25();
 }
 
+bool Decl::is_in_another_module_unit(void) const {
+  return impl->reader.getVal26();
+}
+
+bool Decl::is_in_export_declaration_context(void) const {
+  return impl->reader.getVal27();
+}
+
 std::optional<bool> Decl::is_in_local_scope_for_instantiation(void) const {
-  if (!impl->reader.getVal27()) {
+  if (!impl->reader.getVal29()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal26());
+    return static_cast<bool>(impl->reader.getVal28());
   }
   return std::nullopt;
 }
 
 bool Decl::is_in_std_namespace(void) const {
-  return impl->reader.getVal28();
-}
-
-bool Decl::is_invalid_declaration(void) const {
-  return impl->reader.getVal29();
-}
-
-bool Decl::is_invisible_outside_the_owning_module(void) const {
   return impl->reader.getVal30();
 }
 
-bool Decl::is_local_extern_declaration(void) const {
+bool Decl::is_invisible_outside_the_owning_module(void) const {
   return impl->reader.getVal31();
 }
 
-bool Decl::is_module_private(void) const {
+bool Decl::is_local_extern_declaration(void) const {
   return impl->reader.getVal32();
 }
 
-bool Decl::is_out_of_line(void) const {
+bool Decl::is_module_private(void) const {
   return impl->reader.getVal33();
 }
 
-bool Decl::is_parameter_pack(void) const {
+bool Decl::is_out_of_line(void) const {
   return impl->reader.getVal34();
 }
 
-bool Decl::is_reachable(void) const {
+bool Decl::is_parameter_pack(void) const {
   return impl->reader.getVal35();
 }
 
@@ -429,40 +430,36 @@ bool Decl::is_templated(void) const {
   return impl->reader.getVal39();
 }
 
-bool Decl::is_this_declaration_referenced(void) const {
+bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
   return impl->reader.getVal40();
 }
 
-bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
+bool Decl::is_unavailable(void) const {
   return impl->reader.getVal41();
 }
 
-bool Decl::is_unavailable(void) const {
+bool Decl::is_unconditionally_visible(void) const {
   return impl->reader.getVal42();
 }
 
-bool Decl::is_unconditionally_visible(void) const {
+bool Decl::is_weak_imported(void) const {
   return impl->reader.getVal43();
 }
 
-bool Decl::is_weak_imported(void) const {
-  return impl->reader.getVal44();
-}
-
 DeclKind Decl::kind(void) const {
-  return static_cast<DeclKind>(impl->reader.getVal45());
+  return static_cast<DeclKind>(impl->reader.getVal44());
 }
 
 DeclCategory Decl::category(void) const {
-  return static_cast<DeclCategory>(impl->reader.getVal46());
+  return static_cast<DeclCategory>(impl->reader.getVal45());
 }
 
 Token Decl::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal47());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 TokenRange Decl::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal48(), impl->reader.getVal49());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal47(), impl->reader.getVal48());
 }
 
 #pragma GCC diagnostic pop

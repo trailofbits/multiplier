@@ -16,6 +16,7 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::CORE_BIN_LOR:
     case mx::ir::OperationKind::CORE_LAZY_OP:
     case mx::ir::OperationKind::CORE_SELECT:
+    case mx::ir::OperationKind::CORE_SCOPE:
       return reinterpret_cast<const Operation &>(that);
   }
 }

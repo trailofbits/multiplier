@@ -99,6 +99,9 @@ class RecordDecl : public TagDecl {
   bool is_parameter_destroyed_in_callee(void) const;
   bool is_randomized(void) const;
   bool may_insert_extra_padding(void) const;
+  std::optional<uint64_t> size(void) const;
+  std::optional<uint64_t> alignment(void) const;
+  std::optional<uint64_t> size_without_trailing_padding(void) const;
 };
 
 static_assert(sizeof(RecordDecl) == sizeof(TagDecl));

@@ -205,7 +205,9 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD___BUILTIN_CHOOSE_EXPRESSION: return "KEYWORD___BUILTIN_CHOOSE_EXPRESSION";
     case TokenKind::KEYWORD___BUILTIN_OFFSETOF: return "KEYWORD___BUILTIN_OFFSETOF";
     case TokenKind::KEYWORD___BUILTIN_FILE: return "KEYWORD___BUILTIN_FILE";
+    case TokenKind::KEYWORD___BUILTIN_FILENAME: return "KEYWORD___BUILTIN_FILENAME";
     case TokenKind::KEYWORD___BUILTIN_FUNCTION: return "KEYWORD___BUILTIN_FUNCTION";
+    case TokenKind::KEYWORD___BUILTIN_FUNCSIG: return "KEYWORD___BUILTIN_FUNCSIG";
     case TokenKind::KEYWORD___BUILTIN_LINE: return "KEYWORD___BUILTIN_LINE";
     case TokenKind::KEYWORD___BUILTIN_COLUMN: return "KEYWORD___BUILTIN_COLUMN";
     case TokenKind::KEYWORD___BUILTIN_SOURCE_TOKEN: return "KEYWORD___BUILTIN_SOURCE_TOKEN";
@@ -281,12 +283,15 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD___REMOVE_VOLATILE: return "KEYWORD___REMOVE_VOLATILE";
     case TokenKind::KEYWORD___UNDERLYING_TYPE: return "KEYWORD___UNDERLYING_TYPE";
     case TokenKind::KEYWORD___IS_TRIVIALLY_RELOCATABLE: return "KEYWORD___IS_TRIVIALLY_RELOCATABLE";
+    case TokenKind::KEYWORD___IS_TRIVIALLY_EQUALITY_COMPARABLE: return "KEYWORD___IS_TRIVIALLY_EQUALITY_COMPARABLE";
     case TokenKind::KEYWORD___IS_BOUNDED_ARRAY: return "KEYWORD___IS_BOUNDED_ARRAY";
     case TokenKind::KEYWORD___IS_UNBOUNDED_ARRAY: return "KEYWORD___IS_UNBOUNDED_ARRAY";
     case TokenKind::KEYWORD___IS_NULLPTR: return "KEYWORD___IS_NULLPTR";
     case TokenKind::KEYWORD___IS_SCOPED_ENUM: return "KEYWORD___IS_SCOPED_ENUM";
     case TokenKind::KEYWORD___IS_REFERENCEABLE: return "KEYWORD___IS_REFERENCEABLE";
+    case TokenKind::KEYWORD___CAN_PASS_IN_REGS: return "KEYWORD___CAN_PASS_IN_REGS";
     case TokenKind::KEYWORD___REFERENCE_BINDS_TO_TEMPORARY: return "KEYWORD___REFERENCE_BINDS_TO_TEMPORARY";
+    case TokenKind::KEYWORD___REFERENCE_CONSTRUCTS_FROM_TEMPORARY: return "KEYWORD___REFERENCE_CONSTRUCTS_FROM_TEMPORARY";
     case TokenKind::KEYWORD___IS_LVALUE_EXPRESSION: return "KEYWORD___IS_LVALUE_EXPRESSION";
     case TokenKind::KEYWORD___IS_RVALUE_EXPRESSION: return "KEYWORD___IS_RVALUE_EXPRESSION";
     case TokenKind::KEYWORD___IS_ARITHMETIC: return "KEYWORD___IS_ARITHMETIC";
@@ -379,6 +384,7 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD__NULLABLE: return "KEYWORD__NULLABLE";
     case TokenKind::KEYWORD__NULLABLE_RESULT: return "KEYWORD__NULLABLE_RESULT";
     case TokenKind::KEYWORD__NULL_UNSPECIFIED: return "KEYWORD__NULL_UNSPECIFIED";
+    case TokenKind::KEYWORD___FUNCREF: return "KEYWORD___FUNCREF";
     case TokenKind::KEYWORD___PTR64: return "KEYWORD___PTR64";
     case TokenKind::KEYWORD___PTR32: return "KEYWORD___PTR32";
     case TokenKind::KEYWORD___SPTR: return "KEYWORD___SPTR";
@@ -399,6 +405,12 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::KEYWORD___BUILTIN_BIT_CAST: return "KEYWORD___BUILTIN_BIT_CAST";
     case TokenKind::KEYWORD___BUILTIN_AVAILABLE: return "KEYWORD___BUILTIN_AVAILABLE";
     case TokenKind::KEYWORD___BUILTIN_SYCL_UNIQUE_STABLE_NAME: return "KEYWORD___BUILTIN_SYCL_UNIQUE_STABLE_NAME";
+    case TokenKind::KEYWORD___ARM_LOCALLY_STREAMING: return "KEYWORD___ARM_LOCALLY_STREAMING";
+    case TokenKind::KEYWORD___ARM_NEW_ZA: return "KEYWORD___ARM_NEW_ZA";
+    case TokenKind::KEYWORD___ARM_PRESERVES_ZA: return "KEYWORD___ARM_PRESERVES_ZA";
+    case TokenKind::KEYWORD___ARM_SHARED_ZA: return "KEYWORD___ARM_SHARED_ZA";
+    case TokenKind::KEYWORD___ARM_STREAMING: return "KEYWORD___ARM_STREAMING";
+    case TokenKind::KEYWORD___ARM_STREAMING_COMPATIBLE: return "KEYWORD___ARM_STREAMING_COMPATIBLE";
     case TokenKind::KEYWORD___UNKNOWN_ANYTYPE: return "KEYWORD___UNKNOWN_ANYTYPE";
     case TokenKind::ANNOT_CXXSCOPE: return "ANNOT_CXXSCOPE";
     case TokenKind::ANNOT_TYPENAME: return "ANNOT_TYPENAME";
@@ -440,6 +452,7 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::ANNOT_MODULE_BEGIN: return "ANNOT_MODULE_BEGIN";
     case TokenKind::ANNOT_MODULE_END: return "ANNOT_MODULE_END";
     case TokenKind::ANNOT_HEADER_UNIT: return "ANNOT_HEADER_UNIT";
+    case TokenKind::ANNOT_REPL_INPUT_END: return "ANNOT_REPL_INPUT_END";
     case TokenKind::PP_IF: return "PP_IF";
     case TokenKind::PP_IFDEF: return "PP_IFDEF";
     case TokenKind::PP_IFNDEF: return "PP_IFNDEF";

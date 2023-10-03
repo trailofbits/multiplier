@@ -31,8 +31,10 @@ class InvalidEntityProvider final : public EntityProvider {
   gap::generator<std::filesystem::path> ListPathsForFile(
       const Ptr &, PackedFileId) final;
 
-  FragmentIdList ListFragmentsInFile(
-      const Ptr &, SpecificEntityId<FileId> id);
+  // Get the list nested fragments for a given fragment.
+  FragmentIdList ListNestedFragmentIds(const Ptr &, PackedFragmentId) final;
+
+  FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId);
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   FragmentIdList FragmentsCoveringTokens(
@@ -46,9 +48,9 @@ class InvalidEntityProvider final : public EntityProvider {
 
   gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) & final;
 
-  bool AddReference(const Ptr &, RawEntityId, RawEntityId, RawEntityId) final;
+  bool AddReference(const Ptr &, RawEntityId, RawEntityId, RawEntityId, RawEntityId) final;
 
-  gap::generator<std::pair<RawEntityId, RawEntityId>>
+  gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
   References(const Ptr &, RawEntityId eid) & final;
 
   gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) & final;

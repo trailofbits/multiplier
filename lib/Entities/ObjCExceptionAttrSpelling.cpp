@@ -17,7 +17,7 @@ const char *EnumeratorName(ObjCExceptionAttrSpelling e) {
   switch (e) {
     case ObjCExceptionAttrSpelling::GNU_OBJC_EXCEPTION: return "GNU_OBJC_EXCEPTION";
     case ObjCExceptionAttrSpelling::CXX11_CLANG_OBJC_EXCEPTION: return "CXX11_CLANG_OBJC_EXCEPTION";
-    case ObjCExceptionAttrSpelling::C2X_CLANG_OBJC_EXCEPTION: return "C2X_CLANG_OBJC_EXCEPTION";
+    case ObjCExceptionAttrSpelling::C23_CLANG_OBJC_EXCEPTION: return "C23_CLANG_OBJC_EXCEPTION";
     case ObjCExceptionAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

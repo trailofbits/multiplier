@@ -156,22 +156,22 @@ std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const TokenContex
 }
 
 ObjCMethodDecl ObjCSubscriptRefExpr::at_index_method_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal37();
   return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Expr ObjCSubscriptRefExpr::base_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ObjCSubscriptRefExpr::key_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCSubscriptRefExpr::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 bool ObjCSubscriptRefExpr::is_array_subscript_reference_expression(void) const {

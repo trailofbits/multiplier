@@ -18,7 +18,7 @@ const char *EnumeratorName(DLLImportAttrSpelling e) {
     case DLLImportAttrSpelling::DECLSPEC_DLLIMPORT: return "DECLSPEC_DLLIMPORT";
     case DLLImportAttrSpelling::GNU_DLLIMPORT: return "GNU_DLLIMPORT";
     case DLLImportAttrSpelling::CXX11_GNU_DLLIMPORT: return "CXX11_GNU_DLLIMPORT";
-    case DLLImportAttrSpelling::C2X_GNU_DLLIMPORT: return "C2X_GNU_DLLIMPORT";
+    case DLLImportAttrSpelling::C23_GNU_DLLIMPORT: return "C23_GNU_DLLIMPORT";
     case DLLImportAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

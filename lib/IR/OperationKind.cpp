@@ -276,16 +276,20 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::MEMREF_SUBVIEW: return "MEMREF_SUBVIEW";
     case ir::OperationKind::MEMREF_TENSOR_STORE: return "MEMREF_TENSOR_STORE";
     case ir::OperationKind::LL_BR: return "LL_BR";
+    case ir::OperationKind::LL_CONCAT: return "LL_CONCAT";
     case ir::OperationKind::LL_COND_BR: return "LL_COND_BR";
     case ir::OperationKind::LL_COND_SCOPE_RET: return "LL_COND_SCOPE_RET";
+    case ir::OperationKind::LL_EXTRACT: return "LL_EXTRACT";
     case ir::OperationKind::LL_INITIALIZE: return "LL_INITIALIZE";
     case ir::OperationKind::LL_INLINE_SCOPE: return "LL_INLINE_SCOPE";
+    case ir::OperationKind::LL_FUNC: return "LL_FUNC";
     case ir::OperationKind::LL_GEP: return "LL_GEP";
     case ir::OperationKind::LL_RETURN: return "LL_RETURN";
     case ir::OperationKind::LL_SCOPE: return "LL_SCOPE";
     case ir::OperationKind::LL_SCOPE_RECURSE: return "LL_SCOPE_RECURSE";
     case ir::OperationKind::LL_SCOPE_RET: return "LL_SCOPE_RET";
     case ir::OperationKind::LL_UNINITIALIZED_VAR: return "LL_UNINITIALIZED_VAR";
+    case ir::OperationKind::HL_ACCESS: return "HL_ACCESS";
     case ir::OperationKind::HL_ASSIGN_FADD: return "HL_ASSIGN_FADD";
     case ir::OperationKind::HL_FADD: return "HL_FADD";
     case ir::OperationKind::HL_ASSIGN_ADD: return "HL_ASSIGN_ADD";
@@ -311,8 +315,11 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_BUILTIN_BITCAST: return "HL_BUILTIN_BITCAST";
     case ir::OperationKind::HL_CSTYLE_CAST: return "HL_CSTYLE_CAST";
     case ir::OperationKind::HL_CALL: return "HL_CALL";
+    case ir::OperationKind::HL_CLASS: return "HL_CLASS";
     case ir::OperationKind::HL_CMP: return "HL_CMP";
     case ir::OperationKind::HL_CONST: return "HL_CONST";
+    case ir::OperationKind::HL_BASE: return "HL_BASE";
+    case ir::OperationKind::HL_CXXSTRUCT: return "HL_CXXSTRUCT";
     case ir::OperationKind::HL_REF: return "HL_REF";
     case ir::OperationKind::HL_DEREF: return "HL_DEREF";
     case ir::OperationKind::HL_ASSIGN_FDIV: return "HL_ASSIGN_FDIV";
@@ -328,7 +335,6 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_GNU_EXTENSION: return "HL_GNU_EXTENSION";
     case ir::OperationKind::HL_FCMP: return "HL_FCMP";
     case ir::OperationKind::HL_FIELD: return "HL_FIELD";
-    case ir::OperationKind::HL_FUNC: return "HL_FUNC";
     case ir::OperationKind::HL_FUNCREF: return "HL_FUNCREF";
     case ir::OperationKind::HL_GLOBREF: return "HL_GLOBREF";
     case ir::OperationKind::HL_BREAK: return "HL_BREAK";
@@ -338,16 +344,16 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_CONTINUE: return "HL_CONTINUE";
     case ir::OperationKind::HL_DEFAULT: return "HL_DEFAULT";
     case ir::OperationKind::HL_DO: return "HL_DO";
+    case ir::OperationKind::HL_EMPTY_DECL: return "HL_EMPTY_DECL";
     case ir::OperationKind::HL_FOR: return "HL_FOR";
+    case ir::OperationKind::HL_FUNC: return "HL_FUNC";
     case ir::OperationKind::HL_GOTO: return "HL_GOTO";
     case ir::OperationKind::HL_IF: return "HL_IF";
     case ir::OperationKind::HL_LABEL_DECL: return "HL_LABEL_DECL";
     case ir::OperationKind::HL_LABEL: return "HL_LABEL";
     case ir::OperationKind::HL_SKIP: return "HL_SKIP";
     case ir::OperationKind::HL_SWITCH: return "HL_SWITCH";
-    case ir::OperationKind::HL_UNSUPPORTEDDECL: return "HL_UNSUPPORTEDDECL";
-    case ir::OperationKind::HL_UNSUPPORTEDEXPR: return "HL_UNSUPPORTEDEXPR";
-    case ir::OperationKind::HL_UNSUPPORTEDOP: return "HL_UNSUPPORTEDOP";
+    case ir::OperationKind::HL_TYPE_YIELD: return "HL_TYPE_YIELD";
     case ir::OperationKind::HL_VALUE_YIELD: return "HL_VALUE_YIELD";
     case ir::OperationKind::HL_VAR: return "HL_VAR";
     case ir::OperationKind::HL_WHILE: return "HL_WHILE";
@@ -375,7 +381,6 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_ASSIGN_UREM: return "HL_ASSIGN_UREM";
     case ir::OperationKind::HL_UREM: return "HL_UREM";
     case ir::OperationKind::HL_RETURN: return "HL_RETURN";
-    case ir::OperationKind::HL_SCOPE: return "HL_SCOPE";
     case ir::OperationKind::HL_SIZEOF_EXPR: return "HL_SIZEOF_EXPR";
     case ir::OperationKind::HL_SIZEOF_TYPE: return "HL_SIZEOF_TYPE";
     case ir::OperationKind::HL_STMT_EXPR: return "HL_STMT_EXPR";
@@ -385,15 +390,21 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_ASSIGN_SUB: return "HL_ASSIGN_SUB";
     case ir::OperationKind::HL_SUB: return "HL_SUB";
     case ir::OperationKind::HL_SUBSCRIPT: return "HL_SUBSCRIPT";
+    case ir::OperationKind::HL_THIS: return "HL_THIS";
     case ir::OperationKind::HL_TRANSLATION_UNIT: return "HL_TRANSLATION_UNIT";
     case ir::OperationKind::HL_TYPE: return "HL_TYPE";
     case ir::OperationKind::HL_TYPEDEF: return "HL_TYPEDEF";
+    case ir::OperationKind::HL_TYPEOF_EXPR: return "HL_TYPEOF_EXPR";
+    case ir::OperationKind::HL_TYPEOF_TYPE: return "HL_TYPEOF_TYPE";
     case ir::OperationKind::HL_UNION: return "HL_UNION";
     case ir::OperationKind::HL_UNREACHABLE: return "HL_UNREACHABLE";
     case ir::OperationKind::CORE_BIN_LAND: return "CORE_BIN_LAND";
     case ir::OperationKind::CORE_BIN_LOR: return "CORE_BIN_LOR";
     case ir::OperationKind::CORE_LAZY_OP: return "CORE_LAZY_OP";
     case ir::OperationKind::CORE_SELECT: return "CORE_SELECT";
+    case ir::OperationKind::CORE_SCOPE: return "CORE_SCOPE";
+    case ir::OperationKind::UNSUP_DECL: return "UNSUP_DECL";
+    case ir::OperationKind::UNSUP_STMT: return "UNSUP_STMT";
   }
 }
 

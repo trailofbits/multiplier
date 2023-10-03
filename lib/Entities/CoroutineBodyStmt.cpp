@@ -8,6 +8,7 @@
 
 #include <multiplier/Entities/CoroutineBodyStmt.h>
 
+#include <multiplier/Entities/CompoundStmt.h>
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Expr.h>
 #include <multiplier/Entities/Stmt.h>
@@ -154,14 +155,26 @@ std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const TokenContext &t) 
   return CoroutineBodyStmt::from(t.as_statement());
 }
 
+gap::generator<Stmt> CoroutineBodyStmt::children_excl_body(void) const & {
+  auto list = impl->reader.getVal15();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d15 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d15));
+    }
+  }
+  co_return;
+}
+
 Expr CoroutineBodyStmt::allocate(void) const {
   RawEntityId eid = impl->reader.getVal9();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
-Stmt CoroutineBodyStmt::body(void) const {
+CompoundStmt CoroutineBodyStmt::body(void) const {
   RawEntityId eid = impl->reader.getVal10();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid));
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineBodyStmt::deallocate(void) const {
@@ -190,11 +203,11 @@ Stmt CoroutineBodyStmt::initializer_suspend_statement(void) const {
 }
 
 unsigned CoroutineBodyStmt::num_parameter_moves(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal26().size();
 }
 
 std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal26();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -208,12 +221,12 @@ std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
 }
 
 gap::generator<Stmt> CoroutineBodyStmt::parameter_moves(void) const & {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal26();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d15));
+    if (auto d26 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d26));
     }
   }
   co_return;
@@ -229,23 +242,28 @@ Stmt CoroutineBodyStmt::promise_declaration_statement(void) const {
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
-Stmt CoroutineBodyStmt::return_statement(void) const {
+Stmt CoroutineBodyStmt::result_declaration(void) const {
   RawEntityId eid = impl->reader.getVal21();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
-Stmt CoroutineBodyStmt::return_statement_on_alloc_failure(void) const {
+Stmt CoroutineBodyStmt::return_statement(void) const {
   RawEntityId eid = impl->reader.getVal22();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
-Expr CoroutineBodyStmt::return_value(void) const {
+Stmt CoroutineBodyStmt::return_statement_on_alloc_failure(void) const {
   RawEntityId eid = impl->reader.getVal30();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
+}
+
+Expr CoroutineBodyStmt::return_value(void) const {
+  RawEntityId eid = impl->reader.getVal31();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineBodyStmt::return_value_initializer(void) const {
-  RawEntityId eid = impl->reader.getVal31();
+  RawEntityId eid = impl->reader.getVal32();
   return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 

@@ -29,7 +29,7 @@ class FuncOp final : public Operation {
   ::mx::ir::Region body(void) const;
   std::string_view sym_name(void) const;
   //::mlir::FunctionType function_type(void) const;
-  //::vast::hl::GlobalLinkageKind linkage(void) const;
+  //::vast::core::GlobalLinkageKind linkage(void) const;
   std::optional<std::string_view> sym_visibility(void) const;
   //::std::optional<::mlir::ArrayAttr> arg_attrs(void) const;
   //::std::optional<::mlir::ArrayAttr> res_attrs(void) const;

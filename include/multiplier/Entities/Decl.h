@@ -50,6 +50,9 @@ class Value;
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Decl {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class File;
@@ -90,8 +93,6 @@ class Decl {
   PackedDeclId id(void) const;
   gap::generator<Reference> references(void) const &;
 
-  std::optional<Decl> parent_declaration(void) const;
-  std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> definition(void) const;
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;
@@ -138,7 +139,7 @@ class Decl {
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   std::optional<ExternalSourceSymbolAttr> external_source_symbol_attribute(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
-  std::optional<unsigned> max_alignment(void) const;
+  std::optional<uint32_t> max_alignment(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
   std::optional<Decl> non_closure_context(void) const;
   bool has_attributes(void) const;
@@ -149,23 +150,22 @@ class Decl {
   bool is_discarded_in_global_module_fragment(void) const;
   bool is_file_context_declaration(void) const;
   bool is_function_or_function_template(void) const;
+  bool is_function_pointer_type(void) const;
   bool is_implicit(void) const;
   bool is_in_anonymous_namespace(void) const;
+  bool is_in_another_module_unit(void) const;
   bool is_in_export_declaration_context(void) const;
   std::optional<bool> is_in_local_scope_for_instantiation(void) const;
   bool is_in_std_namespace(void) const;
-  bool is_invalid_declaration(void) const;
   bool is_invisible_outside_the_owning_module(void) const;
   bool is_local_extern_declaration(void) const;
   bool is_module_private(void) const;
   bool is_out_of_line(void) const;
   bool is_parameter_pack(void) const;
-  bool is_reachable(void) const;
   bool is_template_declaration(void) const;
   bool is_template_parameter(void) const;
   bool is_template_parameter_pack(void) const;
   bool is_templated(void) const;
-  bool is_this_declaration_referenced(void) const;
   bool is_top_level_declaration_in_obj_c_container(void) const;
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;

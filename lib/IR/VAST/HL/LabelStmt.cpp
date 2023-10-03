@@ -36,8 +36,8 @@ std::optional<LabelStmt> LabelStmt::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::LabelStmt(this->Operation::op_);
 }
 
-::mx::ir::Region LabelStmt::substmt(void) const {
-  auto &val = underlying_op().getSubstmt();
+::mx::ir::Region LabelStmt::body(void) const {
+  auto &val = underlying_op().getBody();
   return ::mx::ir::Region(module_, val);
 }
 

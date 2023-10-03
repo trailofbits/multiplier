@@ -155,11 +155,11 @@ std::optional<ParenListExpr> ParenListExpr::from(const TokenContext &t) {
 }
 
 Token ParenListExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 Token ParenListExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 unsigned ParenListExpr::num_expressions(void) const {

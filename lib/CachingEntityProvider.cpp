@@ -72,6 +72,12 @@ gap::generator<std::filesystem::path> CachingEntityProvider::ListPathsForFile(
   return next->ListPathsForFile(self, id);
 }
 
+// Get the list nested fragments for a given fragment.
+FragmentIdList CachingEntityProvider::ListNestedFragmentIds(
+    const Ptr &self, PackedFragmentId id) {
+  return next->ListNestedFragmentIds(self, id);
+}
+
 // Get the current list of fragment IDs associated with a file.
 //
 // TODO(pag): Re-evaluate if caching this is beneficial/useful.
@@ -127,8 +133,9 @@ CachingEntityProvider::ReferenceKindFor(const Ptr &self,
 
 bool CachingEntityProvider::AddReference(const Ptr &ep, RawEntityId kind_id,
                                          RawEntityId from_id,
-                                         RawEntityId to_id) {
-  return next->AddReference(ep, kind_id, from_id, to_id);
+                                         RawEntityId to_id,
+                                         RawEntityId context_id) {
+  return next->AddReference(ep, kind_id, from_id, to_id, context_id);
 }
 
 gap::generator<RawEntityId> CachingEntityProvider::Redeclarations(
@@ -174,7 +181,7 @@ gap::generator<RawEntityId> CachingEntityProvider::Redeclarations(
   }
 }
 
-gap::generator<std::pair<RawEntityId, RawEntityId>>
+gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 CachingEntityProvider::References(const Ptr &self, RawEntityId eid) & {
   return next->References(self, eid);
 }

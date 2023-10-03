@@ -187,7 +187,7 @@ std::optional<ParmVarDecl> ParmVarDecl::from(const TokenContext &t) {
 
 std::optional<Expr> ParmVarDecl::default_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal129();
+    RawEntityId eid = impl->reader.getVal128();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -199,21 +199,21 @@ std::optional<Expr> ParmVarDecl::default_argument(void) const {
 }
 
 TokenRange ParmVarDecl::default_argument_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal130(), impl->reader.getVal131());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal129(), impl->reader.getVal130());
 }
 
 DeclObjCDeclQualifier ParmVarDecl::obj_c_decl_qualifier(void) const {
-  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal132());
+  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal131());
 }
 
 Type ParmVarDecl::original_type(void) const {
-  RawEntityId eid = impl->reader.getVal133();
+  RawEntityId eid = impl->reader.getVal132();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> ParmVarDecl::uninstantiated_default_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal134();
+    RawEntityId eid = impl->reader.getVal133();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -225,31 +225,31 @@ std::optional<Expr> ParmVarDecl::uninstantiated_default_argument(void) const {
 }
 
 bool ParmVarDecl::has_default_argument(void) const {
-  return impl->reader.getVal135();
+  return impl->reader.getVal134();
 }
 
 bool ParmVarDecl::has_inherited_default_argument(void) const {
-  return impl->reader.getVal136();
+  return impl->reader.getVal135();
 }
 
 bool ParmVarDecl::has_uninstantiated_default_argument(void) const {
-  return impl->reader.getVal137();
+  return impl->reader.getVal136();
 }
 
 bool ParmVarDecl::has_unparsed_default_argument(void) const {
-  return impl->reader.getVal138();
+  return impl->reader.getVal137();
 }
 
 bool ParmVarDecl::is_destroyed_in_callee(void) const {
-  return impl->reader.getVal139();
+  return impl->reader.getVal138();
 }
 
 bool ParmVarDecl::is_knr_promoted(void) const {
-  return impl->reader.getVal140();
+  return impl->reader.getVal139();
 }
 
 bool ParmVarDecl::is_obj_c_method_parameter(void) const {
-  return impl->reader.getVal141();
+  return impl->reader.getVal140();
 }
 
 #pragma GCC diagnostic pop

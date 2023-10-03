@@ -26,8 +26,9 @@ enum OtherKind : uint64_t {
   kCompilation
 };
 
-// A code chunk with many tokens. This
-static_assert(kNumTokensInBigFragment == (1u << kBigFragmentIdNumBits));
+// A code chunk with many tokens.
+static_assert(kNumTokensInBigFragment <= (1u << kBigFragmentIdNumBits));
+static_assert(kNumTokensInBigType <= (1u << kTypeOffsetNumBits));
 
 enum IdentifiedPseudo : uint64_t {
   kTemplateArgument,
@@ -136,10 +137,10 @@ union PackedEntityId {
 
   struct {
     uint64_t token_offset:(62u - (kTokenKindNumBits + kTypeKindNumBits +
-                                  kTypeIdNumBits + kOtherKindBits));
+                                  kSmallTypeIdNumBits + kOtherKindBits));
     uint64_t token_kind:kTokenKindNumBits;
     uint64_t type_kind:kTypeKindNumBits;
-    uint64_t type_id:kTypeIdNumBits;
+    uint64_t type_id:kSmallTypeIdNumBits;
     uint64_t is_big:1;
     uint64_t kind:kOtherKindBits;
     uint64_t is_fragment_entity:1u;
@@ -199,6 +200,13 @@ const char *EnumeratorName(EntityCategory e) noexcept {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+
+// Return the maximum small fragment index.
+RawEntityId MaxSmallFragmentId(void) {
+  PackedEntityId packed = {};
+  packed.opaque = ~packed.opaque;
+  return packed.small_entity.fragment_id + 1ull;
+}
 
 EntityId::EntityId(DeclId id) {
   if (id.fragment_id) {
@@ -750,6 +758,9 @@ struct IDKind {
   inline int operator()(FileId) const noexcept { return -1; }
   inline int operator()(FragmentId) const noexcept { return -1; }
   inline int operator()(DesignatorId) const noexcept { return -1; }
+  inline int operator()(TemplateArgumentId) const noexcept { return -1; }
+  inline int operator()(TemplateParameterListId) const noexcept { return -1; }
+  inline int operator()(CXXBaseSpecifierId) const noexcept { return -1; }
   inline int operator()(CompilationId) const noexcept { return -1; }
   template <typename T>
   inline int operator()(T t) const noexcept {
@@ -796,6 +807,15 @@ struct IDCategory {
   }
   inline EntityCategory operator()(DesignatorId) const noexcept {
     return EntityCategory::DESIGNATOR;
+  }
+  inline EntityCategory operator()(TemplateArgumentId) const noexcept {
+    return EntityCategory::TEMPLATE_ARGUMENT;
+  }
+  inline EntityCategory operator()(TemplateParameterListId) const noexcept {
+    return EntityCategory::TEMPLATE_PARAMETER_LIST;
+  }
+  inline EntityCategory operator()(CXXBaseSpecifierId) const noexcept {
+    return EntityCategory::CXX_BASE_SPECIFIER;
   }
   inline EntityCategory operator()(CompilationId) const noexcept {
     return EntityCategory::COMPILATION;
@@ -1066,10 +1086,8 @@ VariantId EntityId::Unpack(void) const noexcept {
         }
       }
       case OtherKind::kCompilation: {
-        CompilationId id;
-        id.compilation_id = packed.compilation.compilation_id;
-        id.file_id = packed.compilation.file_id;
-        return id;
+        return CompilationId(packed.compilation.compilation_id,
+                             packed.compilation.file_id);
       }
     }
   }

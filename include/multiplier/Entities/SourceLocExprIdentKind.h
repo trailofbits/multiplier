@@ -13,7 +13,9 @@
 namespace mx {
 enum class SourceLocExprIdentKind : unsigned char {
   FUNCTION,
+  FUNC_SIG,
   FILE,
+  FILE_NAME,
   LINE,
   COLUMN,
   SOURCE_TOKEN_STRUCT,
@@ -24,7 +26,7 @@ inline static const char *EnumerationName(SourceLocExprIdentKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(SourceLocExprIdentKind) {
-  return 5;
+  return 7;
 }
 
 const char *EnumeratorName(SourceLocExprIdentKind);

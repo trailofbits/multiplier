@@ -104,6 +104,10 @@ std::optional<SwiftAsyncAttr> SwiftAsyncAttr::from(const TokenContext &t) {
   return SwiftAsyncAttr::from(t.as_attribute());
 }
 
+SwiftAsyncAttrKind SwiftAsyncAttr::attribute_kind(void) const {
+  return static_cast<SwiftAsyncAttrKind>(impl->reader.getVal10());
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -19,13 +19,14 @@ const char *EnumeratorName(LangFeatures e) {
     case LangFeatures::C99: return "C99";
     case LangFeatures::C11: return "C11";
     case LangFeatures::C17: return "C17";
-    case LangFeatures::C2X: return "C2X";
+    case LangFeatures::C23: return "C23";
     case LangFeatures::C_PLUS_PLUS: return "C_PLUS_PLUS";
     case LangFeatures::C_PLUS_PLUS11: return "C_PLUS_PLUS11";
     case LangFeatures::C_PLUS_PLUS14: return "C_PLUS_PLUS14";
     case LangFeatures::C_PLUS_PLUS17: return "C_PLUS_PLUS17";
     case LangFeatures::C_PLUS_PLUS20: return "C_PLUS_PLUS20";
-    case LangFeatures::C_PLUS_PLUS2B: return "C_PLUS_PLUS2B";
+    case LangFeatures::C_PLUS_PLUS23: return "C_PLUS_PLUS23";
+    case LangFeatures::C_PLUS_PLUS26: return "C_PLUS_PLUS26";
     case LangFeatures::DIGRAPHS: return "DIGRAPHS";
     case LangFeatures::GNU_MODE: return "GNU_MODE";
     case LangFeatures::HEX_FLOAT: return "HEX_FLOAT";

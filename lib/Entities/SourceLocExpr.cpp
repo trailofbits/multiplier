@@ -160,11 +160,11 @@ std::string_view SourceLocExpr::builtin_string(void) const {
 }
 
 SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const {
-  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal94());
+  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal95());
 }
 
 Token SourceLocExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
 }
 
 bool SourceLocExpr::is_int_type(void) const {

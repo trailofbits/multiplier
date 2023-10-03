@@ -17,7 +17,7 @@ const char *EnumeratorName(SYCLSpecialClassAttrSpelling e) {
   switch (e) {
     case SYCLSpecialClassAttrSpelling::GNU_SYCL_SPECIAL_CLASS: return "GNU_SYCL_SPECIAL_CLASS";
     case SYCLSpecialClassAttrSpelling::CXX11_CLANG_SYCL_SPECIAL_CLASS: return "CXX11_CLANG_SYCL_SPECIAL_CLASS";
-    case SYCLSpecialClassAttrSpelling::C2X_CLANG_SYCL_SPECIAL_CLASS: return "C2X_CLANG_SYCL_SPECIAL_CLASS";
+    case SYCLSpecialClassAttrSpelling::C23_CLANG_SYCL_SPECIAL_CLASS: return "C23_CLANG_SYCL_SPECIAL_CLASS";
     case SYCLSpecialClassAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

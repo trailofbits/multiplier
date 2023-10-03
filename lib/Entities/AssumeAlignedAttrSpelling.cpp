@@ -17,7 +17,7 @@ const char *EnumeratorName(AssumeAlignedAttrSpelling e) {
   switch (e) {
     case AssumeAlignedAttrSpelling::GNU_ASSUME_ALIGNED: return "GNU_ASSUME_ALIGNED";
     case AssumeAlignedAttrSpelling::CXX11_GNU_ASSUME_ALIGNED: return "CXX11_GNU_ASSUME_ALIGNED";
-    case AssumeAlignedAttrSpelling::C2X_GNU_ASSUME_ALIGNED: return "C2X_GNU_ASSUME_ALIGNED";
+    case AssumeAlignedAttrSpelling::C23_GNU_ASSUME_ALIGNED: return "C23_GNU_ASSUME_ALIGNED";
     case AssumeAlignedAttrSpelling::SPELLING_NOT_CALCULATED: return "SPELLING_NOT_CALCULATED";
     default: return "<invalid>";
   }

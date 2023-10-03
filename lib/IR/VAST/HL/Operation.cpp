@@ -12,6 +12,7 @@ namespace mx::ir::hl {
 std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
   switch (that.kind()) {
     default: return std::nullopt;
+    case mx::ir::OperationKind::HL_ACCESS:
     case mx::ir::OperationKind::HL_ASSIGN_FADD:
     case mx::ir::OperationKind::HL_FADD:
     case mx::ir::OperationKind::HL_ASSIGN_ADD:
@@ -37,8 +38,11 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_BUILTIN_BITCAST:
     case mx::ir::OperationKind::HL_CSTYLE_CAST:
     case mx::ir::OperationKind::HL_CALL:
+    case mx::ir::OperationKind::HL_CLASS:
     case mx::ir::OperationKind::HL_CMP:
     case mx::ir::OperationKind::HL_CONST:
+    case mx::ir::OperationKind::HL_BASE:
+    case mx::ir::OperationKind::HL_CXXSTRUCT:
     case mx::ir::OperationKind::HL_REF:
     case mx::ir::OperationKind::HL_DEREF:
     case mx::ir::OperationKind::HL_ASSIGN_FDIV:
@@ -54,7 +58,6 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_GNU_EXTENSION:
     case mx::ir::OperationKind::HL_FCMP:
     case mx::ir::OperationKind::HL_FIELD:
-    case mx::ir::OperationKind::HL_FUNC:
     case mx::ir::OperationKind::HL_FUNCREF:
     case mx::ir::OperationKind::HL_GLOBREF:
     case mx::ir::OperationKind::HL_BREAK:
@@ -64,16 +67,16 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_CONTINUE:
     case mx::ir::OperationKind::HL_DEFAULT:
     case mx::ir::OperationKind::HL_DO:
+    case mx::ir::OperationKind::HL_EMPTY_DECL:
     case mx::ir::OperationKind::HL_FOR:
+    case mx::ir::OperationKind::HL_FUNC:
     case mx::ir::OperationKind::HL_GOTO:
     case mx::ir::OperationKind::HL_IF:
     case mx::ir::OperationKind::HL_LABEL_DECL:
     case mx::ir::OperationKind::HL_LABEL:
     case mx::ir::OperationKind::HL_SKIP:
     case mx::ir::OperationKind::HL_SWITCH:
-    case mx::ir::OperationKind::HL_UNSUPPORTEDDECL:
-    case mx::ir::OperationKind::HL_UNSUPPORTEDEXPR:
-    case mx::ir::OperationKind::HL_UNSUPPORTEDOP:
+    case mx::ir::OperationKind::HL_TYPE_YIELD:
     case mx::ir::OperationKind::HL_VALUE_YIELD:
     case mx::ir::OperationKind::HL_VAR:
     case mx::ir::OperationKind::HL_WHILE:
@@ -101,7 +104,6 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_ASSIGN_UREM:
     case mx::ir::OperationKind::HL_UREM:
     case mx::ir::OperationKind::HL_RETURN:
-    case mx::ir::OperationKind::HL_SCOPE:
     case mx::ir::OperationKind::HL_SIZEOF_EXPR:
     case mx::ir::OperationKind::HL_SIZEOF_TYPE:
     case mx::ir::OperationKind::HL_STMT_EXPR:
@@ -111,9 +113,12 @@ std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
     case mx::ir::OperationKind::HL_ASSIGN_SUB:
     case mx::ir::OperationKind::HL_SUB:
     case mx::ir::OperationKind::HL_SUBSCRIPT:
+    case mx::ir::OperationKind::HL_THIS:
     case mx::ir::OperationKind::HL_TRANSLATION_UNIT:
     case mx::ir::OperationKind::HL_TYPE:
     case mx::ir::OperationKind::HL_TYPEDEF:
+    case mx::ir::OperationKind::HL_TYPEOF_EXPR:
+    case mx::ir::OperationKind::HL_TYPEOF_TYPE:
     case mx::ir::OperationKind::HL_UNION:
     case mx::ir::OperationKind::HL_UNREACHABLE:
       return reinterpret_cast<const Operation &>(that);

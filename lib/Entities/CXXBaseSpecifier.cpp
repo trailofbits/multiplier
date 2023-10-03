@@ -24,6 +24,16 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+std::optional<Decl> CXXBaseSpecifier::parent_declaration(void) const {
+  if (auto id = impl->reader.getVal0(); id != kInvalidEntityId) {
+    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
+      return Decl(std::move(eptr));
+    }
+    assert(false);
+  }
+  return std::nullopt;
+}
+
 std::shared_ptr<EntityProvider> CXXBaseSpecifier::entity_provider_of(const Index &index_) {
   return index_.impl;
 }
@@ -45,32 +55,32 @@ std::optional<CXXBaseSpecifier> CXXBaseSpecifier::from(const TokenContext &t) {
 }
 
 TokenRange CXXBaseSpecifier::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal0(), impl->reader.getVal1());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal1(), impl->reader.getVal2());
 }
 
 Token CXXBaseSpecifier::base_type_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal2());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal3());
 }
 
 bool CXXBaseSpecifier::is_virtual(void) const {
-  return impl->reader.getVal3();
+  return impl->reader.getVal4();
 }
 
 TagTypeKind CXXBaseSpecifier::base_kind(void) const {
-  return static_cast<TagTypeKind>(impl->reader.getVal4());
+  return static_cast<TagTypeKind>(impl->reader.getVal5());
 }
 
 bool CXXBaseSpecifier::is_pack_expansion(void) const {
-  return impl->reader.getVal5();
+  return impl->reader.getVal6();
 }
 
 bool CXXBaseSpecifier::constructors_are_inherited(void) const {
-  return impl->reader.getVal6();
+  return impl->reader.getVal7();
 }
 
 Token CXXBaseSpecifier::ellipsis_token(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal7();
+    RawEntityId eid = impl->reader.getVal8();
     if (eid == kInvalidEntityId) {
       return Token();
     }
@@ -80,15 +90,15 @@ Token CXXBaseSpecifier::ellipsis_token(void) const {
 }
 
 AccessSpecifier CXXBaseSpecifier::semantic_access_specifier(void) const {
-  return static_cast<AccessSpecifier>(impl->reader.getVal8());
-}
-
-AccessSpecifier CXXBaseSpecifier::lexical_access_specifier(void) const {
   return static_cast<AccessSpecifier>(impl->reader.getVal9());
 }
 
+AccessSpecifier CXXBaseSpecifier::lexical_access_specifier(void) const {
+  return static_cast<AccessSpecifier>(impl->reader.getVal10());
+}
+
 Type CXXBaseSpecifier::base_type(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal11();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

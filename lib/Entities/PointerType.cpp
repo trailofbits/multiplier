@@ -78,12 +78,17 @@ std::optional<PointerType> PointerType::from(const TokenContext &t) {
 }
 
 Type PointerType::desugar(void) const {
-  RawEntityId eid = impl->reader.getVal229();
+  RawEntityId eid = impl->reader.getVal17();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
+Type PointerType::pointee_type(void) const {
+  RawEntityId eid = impl->reader.getVal18();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool PointerType::is_sugared(void) const {
-  return impl->reader.getVal231();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop
