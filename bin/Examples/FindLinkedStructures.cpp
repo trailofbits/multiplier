@@ -16,8 +16,20 @@
 
 #include "Index.h"
 
+#define FILTER_OFFSET_PLACEHOLDER "TYPE:4"
+
 DECLARE_bool(help);
 DECLARE_string(db);
+DEFINE_uint64(max_size, 0u, "Minimum size of record to filter on");
+DEFINE_uint64(min_size, 0u, "Maximum size of record to filter on");
+
+// Record filtering
+// NOTE: --elastic will also honor --max_size, but this will not represent the true size of discovered target structs
+DEFINE_bool(filter_elastic, false, "Filter on elastic records");
+DEFINE_bool(filter_self_referencing, false, "Filter on self-referencing records");
+
+// Field filtering
+DEFINE_string(filter_offset_type, FILTER_OFFSET_PLACEHOLDER, "Filter on records with a specific type at an offset (in the format TYPE:4)");
 
 static void RenderField(const mx::RecordDecl &record,
                         const mx::FieldDecl &field,
@@ -33,30 +45,14 @@ static void RenderField(const mx::RecordDecl &record,
   std::cout << "\n\n";
 }
 
-extern "C" int main(int argc, char *argv[]) {
-  std::stringstream ss;
-  ss
-    << "Usage: " << argv[0]
-    << " [--db DATABASE]"
-
-  google::SetUsageMessage(ss.str());
-  google::ParseCommandLineFlags(&argc, &argv, false);
-  google::InitGoogleLogging(argv[0]);
-
-  if (FLAGS_help) {
-    std::cerr << google::ProgramUsage() << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  mx::Index index = InitExample(true);
-
-  std::unordered_set<mx::PackedDeclId> self_referencing;
+static std::unordered_set<mx::PackedDeclId> GetSelfReferences(const mx::RecordDecl &record) {
   std::unordered_set<mx::PackedDeclId> seen;
+  std::unordered_set<mx::PackedDeclId> self_referencing;
 
   int level = 0;
 
-  // Identify directly self-linking structures, e.g. `list_head`.
-  for (mx::FieldDecl field : mx::FieldDecl::in(index)) {
+  // First pass: identify all directly self-linking structures
+  for (mx::FieldDecl field : record.fields()) {
     auto pointer_type = mx::PointerType::from(field.type());
     if (!pointer_type) {
       continue;
@@ -68,29 +64,19 @@ extern "C" int main(int argc, char *argv[]) {
       continue;
     }
 
-    auto record = mx::RecordDecl::from(field.parent_declaration());
-    if (!record) {
+    if (record != record_type->declaration()) {
       continue;
     }
-
-    if (*record != record_type->declaration()) {
-      continue;
-    }
-
-    RenderField(record.value(), field, level);
-
     seen.insert(field.id());
-    self_referencing.insert(record->id());
+    self_referencing.insert(record.id());
   }
 
-  // Identify indirectly self-linking structures, e.g. users of `list_head`.
+  // Second pass: indirectly self-linking structures, e.g. users of `list_head`.
   for (size_t prev_size = 0u; prev_size < self_referencing.size(); ) {
     prev_size = self_referencing.size();
     ++level;
 
-    std::unordered_set<mx::PackedDeclId> next_self_referencing;
-
-    for (mx::FieldDecl field : mx::FieldDecl::in(index)) {
+    for (mx::FieldDecl field : record.fields()) {
       if (seen.contains(field.id())) {
         continue;
       }
@@ -110,15 +96,64 @@ extern "C" int main(int argc, char *argv[]) {
         continue;
       }
 
-      RenderField(record.value(), field, level);
-
+      //RenderField(record.value(), field, level);
       seen.insert(field.id());
-      next_self_referencing.insert(record->id());
+      self_referencing.insert(record->id());
     }
+  }
+  return self_referencing;
+}
 
-    self_referencing.insert(next_self_referencing.begin(),
-                            next_self_referencing.end());
+extern "C" int main(int argc, char *argv[]) {
+  std::stringstream ss;
+  ss
+    << "Usage: " << argv[0]
+    << " [--db DATABASE]"
+    << " [--max_size MAX_SIZE]"
+    << " [--min_size MIN_SIZE]"
+    << " [--filter_elastic]"
+    << " [--filter_self_referencing]";
+
+  google::SetUsageMessage(ss.str());
+  google::ParseCommandLineFlags(&argc, &argv, false);
+  google::InitGoogleLogging(argv[0]);
+
+  if (FLAGS_help) {
+    std::cerr << google::ProgramUsage() << std::endl;
+    return EXIT_FAILURE;
   }
 
+  if (FLAGS_min_size > FLAGS_max_size) {
+    std::cerr << "ERROR: min_size > max_size" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  mx::Index index = InitExample(true);
+
+  std::unordered_set<mx::PackedDeclId> found;
+  for (mx::RecordDecl record_decl : mx::RecordDecl::in(index)) {
+    if (FLAGS_min_size != 0 && FLAGS_max_size != 0) {
+      unsigned int num_fields = record_decl.num_fields();
+      auto last_field = record_decl.nth_field(num_fields);
+      if (!last_field) {
+        continue;
+      }
+
+      if (auto size = last_field->offset_in_bits()) {
+        if (!(FLAGS_min_size <= *size <= FLAGS_max_size)) {
+          continue;
+        }
+      }
+    }
+
+    if (FLAGS_filter_elastic && !record_decl.has_flexible_array_member()) {
+      continue;
+    }
+
+    if (FLAGS_filter_self_referencing) {
+      continue;
+    }
+    found.insert(record_decl.id());
+  }
   return EXIT_SUCCESS;
 }
