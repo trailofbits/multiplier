@@ -20,15 +20,16 @@
 
 DECLARE_bool(help);
 DECLARE_string(db);
+DECLARE_bool(names_only);
 DEFINE_uint64(max_size, 0u, "Minimum size of record to filter on");
 DEFINE_uint64(min_size, 0u, "Maximum size of record to filter on");
 
 // Record filtering
-// NOTE: --elastic will also honor --max_size, but this will not represent the true size of discovered target structs
+// NOTE: --filter_elastic will also honor --max_size, but this will not represent the true size of discovered target structs
 DEFINE_bool(filter_elastic, false, "Filter on elastic records");
 DEFINE_bool(filter_self_referencing, false, "Filter on self-referencing records");
 
-// Field filtering
+// Field filtering (TODO: allow for multiple)
 DEFINE_string(filter_offset_type, FILTER_OFFSET_PLACEHOLDER, "Filter on records with a specific type at an offset (in the format TYPE:4)");
 
 static void RenderField(const mx::RecordDecl &record,
@@ -45,13 +46,13 @@ static void RenderField(const mx::RecordDecl &record,
   std::cout << "\n\n";
 }
 
-static std::unordered_set<mx::PackedDeclId> GetSelfReferences(const mx::RecordDecl &record) {
+static void GetSelfReferences(const mx::RecordDecl &record) {
   std::unordered_set<mx::PackedDeclId> seen;
   std::unordered_set<mx::PackedDeclId> self_referencing;
 
   int level = 0;
 
-  // First pass: identify all directly self-linking structures
+  // First pass: identify all directly self-linking / singly linked fields
   for (mx::FieldDecl field : record.fields()) {
     auto pointer_type = mx::PointerType::from(field.type());
     if (!pointer_type) {
@@ -67,6 +68,8 @@ static std::unordered_set<mx::PackedDeclId> GetSelfReferences(const mx::RecordDe
     if (record != record_type->declaration()) {
       continue;
     }
+
+    RenderField(record, field, level);
     seen.insert(field.id());
     self_referencing.insert(record.id());
   }
@@ -96,12 +99,11 @@ static std::unordered_set<mx::PackedDeclId> GetSelfReferences(const mx::RecordDe
         continue;
       }
 
-      //RenderField(record.value(), field, level);
+      RenderField(record.value(), field, level);
       seen.insert(field.id());
-      self_referencing.insert(record->id());
+      //next_self_referencing.insert(record->id());
     }
   }
-  return self_referencing;
 }
 
 extern "C" int main(int argc, char *argv[]) {
@@ -130,30 +132,37 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index = InitExample(true);
 
-  std::unordered_set<mx::PackedDeclId> found;
-  for (mx::RecordDecl record_decl : mx::RecordDecl::in(index)) {
-    if (FLAGS_min_size != 0 && FLAGS_max_size != 0) {
-      unsigned int num_fields = record_decl.num_fields();
-      auto last_field = record_decl.nth_field(num_fields);
-      if (!last_field) {
-        continue;
-      }
-
-      if (auto size = last_field->offset_in_bits()) {
-        if (!(FLAGS_min_size <= *size <= FLAGS_max_size)) {
+  for (const mx::RecordDecl record_decl : mx::RecordDecl::in(index)) {
+    
+    // size range check will take precedence in filtering
+    if (FLAGS_max_size != 0 || FLAGS_min_size != 0) {
+      if (auto size = record_decl.size()) {
+        if (!(*size >= FLAGS_min_size && *size <= FLAGS_max_size)) {
           continue;
         }
       }
     }
 
-    if (FLAGS_filter_elastic && !record_decl.has_flexible_array_member()) {
-      continue;
+    // Flexible/elastic array members must always be the last field
+    // TODO: elastic structs that DONT have an explicit flexible field should also be found with some more static analysis
+    if (FLAGS_filter_elastic && record_decl.has_flexible_array_member()) {
+      auto num_fields = record_decl.num_fields() - 1;
+      auto last_field = record_decl.nth_field(num_fields);
+      if (!last_field)
+        goto self_reference;
+
+      // NOTE: record_decl.has_flexible_array_member() isn't entirely accurate, so do an additional check
+      //if (!last_field->is_zero_size())
+      //  goto self_reference;
+
+      RenderField(record_decl, *last_field, 0);
     }
 
+self_reference:
+
     if (FLAGS_filter_self_referencing) {
-      continue;
+      GetSelfReferences(record_decl);
     }
-    found.insert(record_decl.id());
   }
   return EXIT_SUCCESS;
 }

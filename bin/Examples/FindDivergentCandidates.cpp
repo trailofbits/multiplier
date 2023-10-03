@@ -17,7 +17,7 @@ DEFINE_bool(show_locations, false, "Show the locations of users?");
  * Looks variables that are:
  * - Declared outside of a loop
  * - Incremented inside of a loop
- * - Used to access memory by indexing intodb an array
+ * - Used to access memory by indexing into an array
  * - Used elsewhere outside of the loop
  * 
  * Variables that meet these conditions may be optimized by the compiler into 
