@@ -15,6 +15,7 @@
 #include <sstream>
 
 #include "Index.h"
+#include "multiplier/Types.h"
 
 #define FILTER_OFFSET_PLACEHOLDER "TYPE:4"
 
@@ -56,7 +57,7 @@ static void RenderField(const mx::RecordDecl &record,
   std::cout << "\n\n";
 }
 
-static void RenderRecord(const mx::RecordDecl &record) {
+static void RenderRecord(const mx::RecordDecl &record, FieldMap &field_map) {
   auto fragment = mx::Fragment::containing(record);
   std::cout
       << "Frag ID: " << fragment.id()
@@ -65,8 +66,56 @@ static void RenderRecord(const mx::RecordDecl &record) {
   std::cout << "\n\n";
 }
 
+static void RenderRecordHighlightedFields(const mx::Index index, const mx::RecordDecl &record, FieldMap &field_map) {
+  auto fragment = mx::Fragment::containing(record);
+  auto frag_tokens = fragment.file_tokens();
+
+  // populate map with field tokens and the color to highlight with =
+  std::unordered_map<unsigned, mx::TokenRange> highlights;
+  for (const auto &[field_id, field_type] : field_map) {
+    auto field = mx::FieldDecl::by_id(index, field_id);
+    if (!field)
+      continue;
+
+    unsigned ascii_color;
+    switch (field_type) {
+    case Elastic:
+      ascii_color = 43;
+      break;
+    case SinglySelfReferencing:
+      ascii_color = 44;
+      break;
+    case DoublySelfReferencing:
+      ascii_color = 45;
+      break;
+    case CustomFilter:
+      ascii_color = 46;
+      break;
+    default:
+      break;
+    }
+    highlights[ascii_color] = field->tokens().file_tokens();
+  }
+
+  // render record with highlighted structs
+  for (auto tok: frag_tokens) {
+    auto found = false;
+    for (const auto &[ascii_color, colored_range] : highlights) {
+      if (colored_range.index_of(tok)) {
+        std::cout << "\u001b[" << ascii_color << "m\033[1m" << tok.data() << "\033[0m";
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      std::cout << tok.data();
+    }
+  }
+}
+
 static void GetSelfReferences(const mx::RecordDecl &record, FieldMap &field_map) {
   std::unordered_set<mx::PackedDeclId> seen;
+  std::unordered_set<mx::PackedDeclId> self_referencing;
   int level = 0;
 
   // First pass: identify all directly self-linking / singly linked fields
@@ -86,12 +135,11 @@ static void GetSelfReferences(const mx::RecordDecl &record, FieldMap &field_map)
       continue;
     }
 
-    //RenderField(record, field, level);
     field_map[field.id()] = SinglySelfReferencing;
     seen.insert(field.id());
+    self_referencing.insert(field.id());
   }
 
-  /*
   // Second pass: indirectly self-linking structures, e.g. users of `list_head`.
   for (size_t prev_size = 0u; prev_size < self_referencing.size(); ) {
     prev_size = self_referencing.size();
@@ -117,12 +165,10 @@ static void GetSelfReferences(const mx::RecordDecl &record, FieldMap &field_map)
         continue;
       }
 
-      //RenderField(record.value(), field, level);
+      field_map[field.id()] = DoublySelfReferencing;
       seen.insert(field.id());
-      //next_self_referencing.insert(record->id());
     }
   }
-  */
 }
 
 extern "C" int main(int argc, char *argv[]) {
@@ -174,6 +220,9 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
     // Match on a field type and an offset
+    if (FLAGS_filter_offset_type != "") {
+
+    }
 
     // Flexible/elastic array members must always be the last field
     // TODO: elastic structs that DONT have an explicit flexible field should also be found with some more static analysis
@@ -193,7 +242,7 @@ extern "C" int main(int argc, char *argv[]) {
       continue;
     }
 
-    // Potentially multiple fields, retrieve all singly/doubly as one list for now
+    // Grab potentially multiple fields that are self-referencing
     if (FLAGS_filter_self_referencing) {
       GetSelfReferences(record_decl, current_field_map);
     }
@@ -203,13 +252,13 @@ extern "C" int main(int argc, char *argv[]) {
       continue;
     }
 
-    // Just output struct definition with no field highlighting
-    if (!FLAGS_filter_elastic && !FLAGS_filter_self_referencing) {
-      RenderRecord(record_decl);
+    // Just output struct definition with no field highlighting if no filters applied
+    if (current_field_map.empty()) {
+      RenderRecord(record_decl, current_field_map);
 
     // TODO: Otherwise render the struct with all significant fields highlighted
     } else {
-
+      RenderRecordHighlightedFields(index, record_decl, current_field_map);
     }
   }
   return EXIT_SUCCESS;
