@@ -8,27 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ArrayType.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ArrayType;
 class ConstantArrayType;
 class Expr;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConstantArrayType : public ArrayType {
  private:
@@ -36,7 +30,6 @@ class ConstantArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<ConstantArrayType> in(const Fragment &frag);
   static gap::generator<ConstantArrayType> in(const Index &index);
   static gap::generator<ConstantArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +37,6 @@ class ConstantArrayType : public ArrayType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CONSTANT_ARRAY;
-  }
-
-  inline static std::optional<ConstantArrayType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ConstantArrayType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<ConstantArrayType> from(const ArrayType &parent);
-
-  inline static std::optional<ConstantArrayType> from(const std::optional<ArrayType> &parent) {
-    if (parent) {
-      return ConstantArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ConstantArrayType> from(const Type &parent);
@@ -73,6 +48,9 @@ class ConstantArrayType : public ArrayType {
       return std::nullopt;
     }
   }
+
+  static std::optional<ConstantArrayType> from(const Reference &r);
+  static std::optional<ConstantArrayType> from(const TokenContext &t);
 
   Type desugar(void) const;
   std::optional<Expr> size_expression(void) const;

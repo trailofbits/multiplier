@@ -8,33 +8,29 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "TemplateSpecializationKind.h"
 #include "VarDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class NamedDecl;
+class Stmt;
 class TemplateArgument;
+class Token;
 class Type;
 class ValueDecl;
 class VarDecl;
 class VarTemplateDecl;
+class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarTemplateSpecializationDecl : public VarDecl {
  private:
@@ -45,11 +41,12 @@ class VarTemplateSpecializationDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<VarTemplateSpecializationDecl> in(const Fragment &frag);
   static gap::generator<VarTemplateSpecializationDecl> in(const Index &index);
   static gap::generator<VarTemplateSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<VarTemplateSpecializationDecl> by_id(const Index &, EntityId);
+  static gap::generator<VarTemplateSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<VarTemplateSpecializationDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE_SPECIALIZATION;
@@ -64,55 +61,9 @@ class VarTemplateSpecializationDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<VarTemplateSpecializationDecl> redeclarations(void) const;
-  inline static std::optional<VarTemplateSpecializationDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<VarTemplateSpecializationDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<VarTemplateSpecializationDecl> from(const VarDecl &parent);
-
-  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<VarDecl> &parent) {
-    if (parent) {
-      return VarTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplateSpecializationDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return VarTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplateSpecializationDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return VarTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplateSpecializationDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return VarTemplateSpecializationDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  VarTemplateSpecializationDecl canonical_declaration(void) const;
+  std::optional<VarTemplateSpecializationDecl> definition(void) const;
+  gap::generator<VarTemplateSpecializationDecl> redeclarations(void) const &;
   static std::optional<VarTemplateSpecializationDecl> from(const Decl &parent);
 
   inline static std::optional<VarTemplateSpecializationDecl> from(const std::optional<Decl> &parent) {
@@ -123,13 +74,18 @@ class VarTemplateSpecializationDecl : public VarDecl {
     }
   }
 
+  static std::optional<VarTemplateSpecializationDecl> from(const Reference &r);
+  static std::optional<VarTemplateSpecializationDecl> from(const TokenContext &t);
+
   Token extern_token(void) const;
   TemplateSpecializationKind specialization_kind(void) const;
   VarTemplateDecl specialized_template(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
-  gap::generator<TemplateArgument> template_arguments(void) const;
+  unsigned num_template_arguments(void) const;
+  gap::generator<TemplateArgument> template_arguments(void) const &;
   std::optional<TemplateArgument> nth_template_instantiation_argument(unsigned n) const;
-  gap::generator<TemplateArgument> template_instantiation_arguments(void) const;
+  unsigned num_template_instantiation_arguments(void) const;
+  gap::generator<TemplateArgument> template_instantiation_arguments(void) const &;
   Token template_keyword_token(void) const;
   Type type_as_written(void) const;
   bool is_class_scope_explicit_specialization(void) const;

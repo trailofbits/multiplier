@@ -15,13 +15,14 @@
 
 namespace mx {
 
-FragmentImpl::FragmentImpl(EntityProvider::Ptr ep_,
+FragmentImpl::FragmentImpl(EntityProviderPtr ep_,
                            kj::Array<capnp::word> data_,
                            RawEntityId id_)
     : EntityImpl<rpc::Fragment>(std::move(ep_), kj::mv(data_)),
       fragment_id(EntityId(id_).Extract<FragmentId>()->fragment_id),
       parsed_token_reader(this),
       macro_token_reader(this),
+      token_context_reader(this),
       num_parsed_tokens(reader.getParsedTokenContextOffsets().size()),
       num_tokens(reader.getTokenKinds().size()) {
 
@@ -58,6 +59,13 @@ TokenReader::Ptr FragmentImpl::ParsedTokenReader(
 TokenReader::Ptr FragmentImpl::MacroTokenReader(
     const FragmentImplPtr &self) const {
   return TokenReader::Ptr(self, &macro_token_reader);
+}
+
+// Return a reader for the parsed tokens in the fragment. This doesn't
+// include all tokens, i.e. macro use tokens, comments, etc.
+TokenContextReader::Ptr
+FragmentImpl::TokenContextReader(const TokenReader::Ptr &ptr) const {
+  return TokenContextReader::Ptr(ptr, &token_context_reader);
 }
 
 // Return the number of tokens in the fragment.
@@ -147,6 +155,12 @@ EntityId ReadMacroTokensFromFragment::NthRelatedEntityId(
   return fragment->reader.getRelatedEntityId()[ti];
 }
 
+// Return the entity associated with the Nth token.
+VariantEntity ReadMacroTokensFromFragment::NthRelatedEntity(
+    EntityOffset ti) const {
+  return Index(fragment->ep).entity(NthRelatedEntityId(ti));
+}
+
 // Return the id of the Nth token.
 EntityId ReadMacroTokensFromFragment::NthTokenId(EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
@@ -200,8 +214,25 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
       mx::MacroTokenId tid = std::get<mx::MacroTokenId>(vid);
       FragmentId fid(tid.fragment_id);
       if (tid.fragment_id == fragment->fragment_id) {
-        ti = tid.offset;  // Follow to the next one.
+        if (ti != tid.offset) {
 
+          // The serialization in the Indexer's persistence code serializes
+          // all "afters" of macros before all befores. Following a derivation
+          // means going back in time from afters to befores, and so the
+          // indices should be increasing.
+//          assert(ti < tid.offset);
+          assert(ti < fragment->num_tokens);
+
+          ti = tid.offset;  // Follow to the next one.
+          continue;
+
+        } else {
+          assert(false);
+          return kInvalidEntityId;
+        }
+
+      // NOTE(pag): We shouldn't actually find ourselves going into another
+      //            fragment.
       } else if (FragmentImplPtr frag =
           fragment->ep->FragmentFor(fragment->ep, fid)) {
         assert(false);
@@ -219,12 +250,6 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
 
   assert(false);
   return kInvalidEntityId;
-}
-
-// Return the token reader for another file.
-TokenReader::Ptr ReadMacroTokensFromFragment::ReaderForToken(
-    const TokenReader::Ptr &self, RawEntityId eid) const {
-  return TokenReader::ReaderForToken(self, fragment->ep, eid);
 }
 
 // Returns `true` if `this` is logically equivalent to `that`.
@@ -423,15 +448,6 @@ bool ReadParsedTokensFromFragment::Equals(const class TokenReader *that_) const 
   }
 
   return true;
-}
-
-std::string_view FragmentImpl::SourceIR(void) const & noexcept {
-  if (reader.hasMlir()) {
-    if (auto mlir = reader.getMlir(); auto size = mlir.size()) {
-      return std::string_view(mlir.cStr(), size);
-    }
-  }
-  return {};
 }
 
 std::string_view FragmentImpl::Data(void) const & noexcept {

@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class CDeclAttr;
 class InheritableAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CDeclAttr : public InheritableAttr {
  private:
@@ -35,32 +29,15 @@ class CDeclAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<CDeclAttr> in(const Fragment &frag);
   static gap::generator<CDeclAttr> in(const Index &index);
   static gap::generator<CDeclAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CDeclAttr> by_id(const Index &, EntityId);
+  static gap::generator<CDeclAttr> in(const Fragment &frag);
+  static gap::generator<CDeclAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::C_DECL;
-  }
-
-  inline static std::optional<CDeclAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<CDeclAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<CDeclAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<CDeclAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return CDeclAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<CDeclAttr> from(const Attr &parent);
@@ -72,6 +49,9 @@ class CDeclAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<CDeclAttr> from(const Reference &r);
+  static std::optional<CDeclAttr> from(const TokenContext &t);
 
 };
 

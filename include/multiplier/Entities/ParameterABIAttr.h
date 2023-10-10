@@ -8,28 +8,26 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableParamAttr.h"
 #include "ParameterABI.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class InheritableParamAttr;
 class ParameterABIAttr;
+class SwiftAsyncContextAttr;
+class SwiftContextAttr;
+class SwiftErrorResultAttr;
+class SwiftIndirectResultAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ParameterABIAttr : public InheritableParamAttr {
  private:
@@ -38,39 +36,12 @@ class ParameterABIAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ParameterABIAttr> in(const Fragment &frag);
   static gap::generator<ParameterABIAttr> in(const Index &index);
   static gap::generator<ParameterABIAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ParameterABIAttr> by_id(const Index &, EntityId);
-
-  inline static std::optional<ParameterABIAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ParameterABIAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ParameterABIAttr> from(const InheritableParamAttr &parent);
-
-  inline static std::optional<ParameterABIAttr> from(const std::optional<InheritableParamAttr> &parent) {
-    if (parent) {
-      return ParameterABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ParameterABIAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ParameterABIAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ParameterABIAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
+  static gap::generator<ParameterABIAttr> in(const Fragment &frag);
+  static gap::generator<ParameterABIAttr> in(const File &file);
 
   static std::optional<ParameterABIAttr> from(const Attr &parent);
 
@@ -81,6 +52,9 @@ class ParameterABIAttr : public InheritableParamAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<ParameterABIAttr> from(const Reference &r);
+  static std::optional<ParameterABIAttr> from(const TokenContext &t);
 
   ParameterABI abi(void) const;
 };

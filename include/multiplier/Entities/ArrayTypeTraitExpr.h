@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ArrayTypeTrait.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ArrayTypeTraitExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ArrayTypeTraitExpr : public Expr {
  private:
@@ -39,11 +34,12 @@ class ArrayTypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ArrayTypeTraitExpr> in(const Fragment &frag);
   static gap::generator<ArrayTypeTraitExpr> in(const Index &index);
   static gap::generator<ArrayTypeTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ArrayTypeTraitExpr> by_id(const Index &, EntityId);
+  static gap::generator<ArrayTypeTraitExpr> in(const Fragment &frag);
+  static gap::generator<ArrayTypeTraitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ARRAY_TYPE_TRAIT_EXPR;
@@ -58,34 +54,6 @@ class ArrayTypeTraitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ArrayTypeTraitExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ArrayTypeTraitExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ArrayTypeTraitExpr> from(const Expr &parent);
-
-  inline static std::optional<ArrayTypeTraitExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ArrayTypeTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ArrayTypeTraitExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ArrayTypeTraitExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ArrayTypeTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ArrayTypeTraitExpr> from(const Stmt &parent);
 
   inline static std::optional<ArrayTypeTraitExpr> from(const std::optional<Stmt> &parent) {
@@ -95,6 +63,9 @@ class ArrayTypeTraitExpr : public Expr {
       return std::nullopt;
     }
   }
+
+  static std::optional<ArrayTypeTraitExpr> from(const Reference &r);
+  static std::optional<ArrayTypeTraitExpr> from(const TokenContext &t);
 
   Expr dimension_expression(void) const;
   Type queried_type(void) const;

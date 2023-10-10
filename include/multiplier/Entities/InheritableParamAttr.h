@@ -8,26 +8,33 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class AnnotateAttr;
 class Attr;
+class CFConsumedAttr;
+class CarriesDependencyAttr;
 class InheritableAttr;
 class InheritableParamAttr;
+class NSConsumedAttr;
+class NonNullAttr;
+class OSConsumedAttr;
+class PassObjectSizeAttr;
+class ReleaseHandleAttr;
+class SwiftAsyncContextAttr;
+class SwiftContextAttr;
+class SwiftErrorResultAttr;
+class SwiftIndirectResultAttr;
+class Token;
+class UseHandleAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InheritableParamAttr : public InheritableAttr {
  private:
@@ -35,29 +42,12 @@ class InheritableParamAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<InheritableParamAttr> in(const Fragment &frag);
   static gap::generator<InheritableParamAttr> in(const Index &index);
   static gap::generator<InheritableParamAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InheritableParamAttr> by_id(const Index &, EntityId);
-
-  inline static std::optional<InheritableParamAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<InheritableParamAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<InheritableParamAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<InheritableParamAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return InheritableParamAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
+  static gap::generator<InheritableParamAttr> in(const Fragment &frag);
+  static gap::generator<InheritableParamAttr> in(const File &file);
 
   static std::optional<InheritableParamAttr> from(const Attr &parent);
 
@@ -68,6 +58,9 @@ class InheritableParamAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<InheritableParamAttr> from(const Reference &r);
+  static std::optional<InheritableParamAttr> from(const TokenContext &t);
 
 };
 

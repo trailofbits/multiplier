@@ -8,31 +8,27 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CXXNewExprInitializationStyle.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConstructExpr;
 class CXXNewExpr;
+class Decl;
 class Expr;
 class FunctionDecl;
 class Stmt;
+class Token;
+class TokenRange;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXNewExpr : public Expr {
  private:
@@ -41,11 +37,12 @@ class CXXNewExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXNewExpr> in(const Fragment &frag);
   static gap::generator<CXXNewExpr> in(const Index &index);
   static gap::generator<CXXNewExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXNewExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXNewExpr> in(const Fragment &frag);
+  static gap::generator<CXXNewExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NEW_EXPR;
@@ -60,34 +57,6 @@ class CXXNewExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXNewExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXNewExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXNewExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXNewExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXNewExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXNewExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXNewExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXNewExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXNewExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXNewExpr> from(const std::optional<Stmt> &parent) {
@@ -97,6 +66,9 @@ class CXXNewExpr : public Expr {
       return std::nullopt;
     }
   }
+
+  static std::optional<CXXNewExpr> from(const Reference &r);
+  static std::optional<CXXNewExpr> from(const TokenContext &t);
 
   bool does_usual_array_delete_want_size(void) const;
   Type allocated_type(void) const;
@@ -114,7 +86,8 @@ class CXXNewExpr : public Expr {
   bool is_parenthesis_type_id(void) const;
   bool pass_alignment(void) const;
   std::optional<Expr> nth_placement_argument(unsigned n) const;
-  gap::generator<Expr> placement_arguments(void) const;
+  unsigned num_placement_arguments(void) const;
+  gap::generator<Expr> placement_arguments(void) const &;
   bool should_null_check_allocation(void) const;
 };
 

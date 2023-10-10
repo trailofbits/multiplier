@@ -14,6 +14,7 @@ add_library("mx-example-index" STATIC
 target_link_libraries("mx-example-index"
   PUBLIC
     "mx-api"
+    "mx-analysis"
     glog::glog
     gflags::gflags
 )
@@ -44,12 +45,14 @@ function(define_example exe_name source_file)
 endfunction(define_example)
 
 define_example("mx-list-files" "ListFiles.cpp")
+define_example("mx-dump-files" "DumpFiles.cpp")
 define_example("mx-print-file" "PrintFile.cpp")
 define_example("mx-highlight-entity" "HighlightEntity.cpp")
 define_example("mx-print-call-hierarchy" "PrintCallHierarchy.cpp")
 define_example("mx-print-call-graph" "PrintCallGraph.cpp")
 define_example("mx-print-include-graph" "PrintIncludeGraph.cpp")
 define_example("mx-print-token-graph" "PrintTokenGraph.cpp")
+define_example("mx-print-token-tree" "PrintTokenTree.cpp")
 define_example("mx-print-reference-graph" "PrintReferenceGraph.cpp")
 define_example("mx-list-fragments" "ListFragments.cpp")
 define_example("mx-print-fragment" "PrintFragment.cpp")
@@ -59,18 +62,24 @@ define_example("mx-list-macros" "ListMacros.cpp")
 define_example("mx-list-redeclarations" "ListRedeclarations.cpp")
 define_example("mx-list-structures" "ListStructures.cpp")
 # define_example("mx-list-uses" "ListUses.cpp")  # TODO(pag): Make this list-references.
-define_example("mx-dump-json" "DumpJSON.cpp")
-define_example("mx-print-sourceir" "PrintSourceIR.cpp")
-define_example("mx-weggli-query" "WeggliQuery.cpp")
+
 define_example("mx-regex-query" "RegexQuery.cpp")
+define_example("mx-find-flexible-user-copies" "FindFlexibleUserCopies.cpp")
+define_example("mx-find-calls-in-macro-expansions" "FindCallsInMacroExpansions.cpp")
 define_example("mx-find-sketchy-casts" "FindSketchyCasts.cpp")
 define_example("mx-find-divergent-candidates" "FindDivergentCandidates.cpp")
+define_example("mx-find-other-uses-of-max" "FindOtherUsesOfMax.cpp")
 define_example("mx-find-sketchy-strchr" "FindSketchyStrchr.cpp")
 define_example("mx-find-symbol" "FindSymbol.cpp")
 define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
+define_example("mx-find-sequoia" "FindSequoia.cpp")
+define_example("mx-print-type-token-graph" "PrintTypeTokenGraph.cpp")
+define_example("mx-find-linked-structures" "FindLinkedStructures.cpp")
 
-target_link_libraries("mx-dump-json"
-  PRIVATE
-    LLVMCore LLVMSupport
-)
+if(MX_ENABLE_VAST)
+  define_example("mx-count-sourceir" "CountSourceIR.cpp")
+endif()
+
+# define_example("mx-print-sourceir" "PrintSourceIR.cpp")
+# define_example("mx-find-uses-of-entity-sourceir" "FindUsesOfEntitySourceIR.cpp")

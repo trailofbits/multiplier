@@ -6,25 +6,40 @@
 
 #pragma once
 
+#include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <string_view>
-#include <gap/core/generator.hpp>
 
+#include "Entity.h"
 #include "Token.h"
 
 namespace mx {
 
+class Compilation;
+class CompilationImpl;
 class EntityProvider;
-class File;
 class FileImpl;
 class FileLocationCache;
 class FileLocationCacheImpl;
-class Fragment;
 class FragmentImpl;
 class Index;
 class Reference;
 class RegexQueryMatch;
-class WeggliQueryMatch;
+class TokenRange;
+class TokenTree;
+
+#define MX_FORWARD_DECLARE(type_name, ln, e, c) \
+    class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE)
+#undef MX_FORWARD_DECLARE
 
 using FragmentIdList = std::vector<PackedFragmentId>;
 
@@ -68,10 +83,9 @@ class FileLocationCache {
 // de-duplicate via a hash of the contents.
 class File {
  private:
-  using Ptr = std::shared_ptr<const FileImpl>;
-
+  friend class Compilation;
+  friend class CompilationImpl;
   friend class EntityProvider;
-  friend class Fragment;
   friend class FileLocationCache;
   friend class FileLocationCacheImpl;
   friend class FragmentImpl;
@@ -81,30 +95,46 @@ class File {
   friend class RegexQuery;
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
-  friend class Token;
-  friend class WeggliQuery;
+  friend class TokenRange;
+  friend class TokenTree;
+  friend class TokenTreeImpl;
 
-  Ptr impl;
+#define MX_FRIEND(type_name, ln, e, c) \
+    friend class type_name;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND,
+                              MX_FRIEND)
+#undef MX_FRIEND
+
+  FileImplPtr impl;
 
  public:
 
-  /* implicit */ inline File(std::shared_ptr<const FileImpl> impl_)
+  /* implicit */ inline File(FileImplPtr impl_)
       : impl(std::move(impl_)) {}
 
   // Return the file containing a regex query match.
   static std::optional<File> containing(const RegexQueryMatch &match);
 
-  // Return the file containing a specific weggli query match.
-  static std::optional<File> containing(const WeggliQueryMatch &match);
+  inline static File containing(const File &file) {
+    return file;
+  }
 
 #define MX_DECLARE_CONTAINING(type_name, lower_name, enum_name, category) \
     static std::optional<File> containing(const type_name &entity);
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
-                              MX_DECLARE_CONTAINING)
+                              MX_DECLARE_CONTAINING,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_CONTAINING
 
   // Return the file containing a specific token.
@@ -118,6 +148,14 @@ class File {
   // Go through the tokens of the iterator and return the first file found.
   static std::optional<File> containing(const TokenRange &tokens);
 
+  // Return the file containing the token tree. Token trees can cover multiple
+  // files, e.g. in the case of x-macro like includes (e.g. within an `enum`
+  // declaration). This will return the "top" file.
+  static std::optional<File> containing(const TokenTree &tokens);
+
+  // Return the file holding a generic entity.
+  static std::optional<File> containing(const VariantEntity &);
+
   inline static constexpr EntityCategory entity_category(void) {
     return EntityCategory::FILE;
   }
@@ -126,7 +164,10 @@ class File {
   SpecificEntityId<FileId> id(void) const noexcept;
 
   // Return a list of fragments in this file.
-  gap::generator<Fragment> fragments(void) const;
+  gap::generator<Fragment> fragments(void) const &;
+
+  // Return all file paths associated with this file.
+  gap::generator<std::filesystem::path> paths(void) const &;
 
   // Return the list of fragment ids in the file
   FragmentIdList fragment_ids(void) const;
@@ -138,7 +179,7 @@ class File {
   std::string_view data(void) const noexcept;
 
   // References of this file.
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();
@@ -147,11 +188,6 @@ class File {
   inline bool operator!=(const File &that) const noexcept {
     return id() != that.id();
   }
-};
-
-class FileManager {
- private:
-  std::shared_ptr<EntityProvider> ep;
 };
 
 }  // namespace mx

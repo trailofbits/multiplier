@@ -17,6 +17,7 @@ enum class StringLiteralStringKind : unsigned char {
   UTF8,
   UTF16,
   UTF32,
+  UNEVALUATED,
 };
 
 inline static const char *EnumerationName(StringLiteralStringKind) {
@@ -24,7 +25,7 @@ inline static const char *EnumerationName(StringLiteralStringKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(StringLiteralStringKind) {
-  return 5;
+  return 6;
 }
 
 const char *EnumeratorName(StringLiteralStringKind);

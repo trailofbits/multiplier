@@ -8,32 +8,28 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "DeclObjCDeclQualifier.h"
 #include "VarDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class Expr;
 class NamedDecl;
 class ParmVarDecl;
+class Stmt;
+class Token;
+class TokenRange;
 class Type;
 class ValueDecl;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ParmVarDecl : public VarDecl {
  private:
@@ -44,11 +40,12 @@ class ParmVarDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ParmVarDecl> in(const Fragment &frag);
   static gap::generator<ParmVarDecl> in(const Index &index);
   static gap::generator<ParmVarDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ParmVarDecl> by_id(const Index &, EntityId);
+  static gap::generator<ParmVarDecl> in(const Fragment &frag);
+  static gap::generator<ParmVarDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PARM_VAR;
@@ -63,55 +60,9 @@ class ParmVarDecl : public VarDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ParmVarDecl> redeclarations(void) const;
-  inline static std::optional<ParmVarDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ParmVarDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ParmVarDecl> from(const VarDecl &parent);
-
-  inline static std::optional<ParmVarDecl> from(const std::optional<VarDecl> &parent) {
-    if (parent) {
-      return ParmVarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ParmVarDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<ParmVarDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return ParmVarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ParmVarDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<ParmVarDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return ParmVarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ParmVarDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ParmVarDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ParmVarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  ParmVarDecl canonical_declaration(void) const;
+  std::optional<ParmVarDecl> definition(void) const;
+  gap::generator<ParmVarDecl> redeclarations(void) const &;
   static std::optional<ParmVarDecl> from(const Decl &parent);
 
   inline static std::optional<ParmVarDecl> from(const std::optional<Decl> &parent) {
@@ -121,6 +72,9 @@ class ParmVarDecl : public VarDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<ParmVarDecl> from(const Reference &r);
+  static std::optional<ParmVarDecl> from(const TokenContext &t);
 
   std::optional<Expr> default_argument(void) const;
   TokenRange default_argument_range(void) const;

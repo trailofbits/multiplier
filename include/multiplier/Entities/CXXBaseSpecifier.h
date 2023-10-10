@@ -8,31 +8,42 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
 
 #include "AccessSpecifier.h"
 #include "PseudoKind.h"
 #include "TagTypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXBaseSpecifier;
 class CXXBaseSpecifierImpl;
+class File;
+class Fragment;
 class Reference;
 class Token;
+class TokenRange;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXBaseSpecifier {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -46,14 +57,22 @@ class CXXBaseSpecifier {
   friend class TokenContext;
   friend class Type;
   friend class CXXBaseSpecifierImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const CXXBaseSpecifierImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier(const CXXBaseSpecifier &) = default;
   CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
+
+  inline bool operator==(const CXXBaseSpecifier &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
+  }
 
   /* implicit */ inline CXXBaseSpecifier(std::shared_ptr<const CXXBaseSpecifierImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -63,7 +82,7 @@ class CXXBaseSpecifier {
   }
 
   PackedCXXBaseSpecifierId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<CXXBaseSpecifier> from(const CXXBaseSpecifier &self) {
     return self;
@@ -73,13 +92,9 @@ class CXXBaseSpecifier {
     return self;
   }
 
-  inline static std::optional<CXXBaseSpecifier> from(const Reference &r) {
-    return r.as_cxx_base_specifier();
-  }
+  static std::optional<CXXBaseSpecifier> from(const Reference &r);
 
-  inline static std::optional<CXXBaseSpecifier> from(const TokenContext &t) {
-    return t.as_cxx_base_specifier();
-  }
+  static std::optional<CXXBaseSpecifier> from(const TokenContext &t);
 
   TokenRange tokens(void) const;
   Token base_type_token(void) const;

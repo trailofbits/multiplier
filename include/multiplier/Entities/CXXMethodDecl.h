@@ -8,31 +8,29 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "FunctionDecl.h"
 #include "RefQualifierKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class CXXConstructorDecl;
+class CXXConversionDecl;
+class CXXDestructorDecl;
 class CXXMethodDecl;
 class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class Type;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXMethodDecl : public FunctionDecl {
  private:
@@ -43,11 +41,12 @@ class CXXMethodDecl : public FunctionDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<CXXMethodDecl> in(const Fragment &frag);
   static gap::generator<CXXMethodDecl> in(const Index &index);
   static gap::generator<CXXMethodDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXMethodDecl> by_id(const Index &, EntityId);
+  static gap::generator<CXXMethodDecl> in(const Fragment &frag);
+  static gap::generator<CXXMethodDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_METHOD;
@@ -62,55 +61,9 @@ class CXXMethodDecl : public FunctionDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<CXXMethodDecl> redeclarations(void) const;
-  inline static std::optional<CXXMethodDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXMethodDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<CXXMethodDecl> from(const FunctionDecl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<FunctionDecl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMethodDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMethodDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMethodDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<CXXMethodDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return CXXMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  CXXMethodDecl canonical_declaration(void) const;
+  std::optional<CXXMethodDecl> definition(void) const;
+  gap::generator<CXXMethodDecl> redeclarations(void) const &;
   static std::optional<CXXMethodDecl> from(const Decl &parent);
 
   inline static std::optional<CXXMethodDecl> from(const std::optional<Decl> &parent) {
@@ -120,6 +73,9 @@ class CXXMethodDecl : public FunctionDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<CXXMethodDecl> from(const Reference &r);
+  static std::optional<CXXMethodDecl> from(const TokenContext &t);
 
   RefQualifierKind reference_qualifier(void) const;
   std::optional<Type> this_object_type(void) const;
@@ -133,7 +89,8 @@ class CXXMethodDecl : public FunctionDecl {
   bool is_virtual(void) const;
   bool is_volatile(void) const;
   std::optional<CXXMethodDecl> nth_overridden_method(unsigned n) const;
-  gap::generator<CXXMethodDecl> overridden_methods(void) const;
+  unsigned num_overridden_methods(void) const;
+  gap::generator<CXXMethodDecl> overridden_methods(void) const &;
 };
 
 static_assert(sizeof(CXXMethodDecl) == sizeof(FunctionDecl));

@@ -8,26 +8,19 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Macro.h"
-#include "MacroKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Macro;
 class MacroParameter;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroParameter : public Macro {
  private:
@@ -35,6 +28,7 @@ class MacroParameter : public Macro {
   friend class Macro;
  public:
   static gap::generator<MacroParameter> in(const Fragment &frag);
+  static gap::generator<MacroParameter> in(const File &file);
 
   static gap::generator<MacroParameter> in(const Index &index);
   static std::optional<MacroParameter> by_id(const Index &, EntityId);
@@ -49,14 +43,6 @@ class MacroParameter : public Macro {
   static gap::generator<MacroParameter> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroParameter> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroParameter> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
   static std::optional<MacroParameter> from(const Macro &parent);
 
   inline static std::optional<MacroParameter> from(const std::optional<Macro> &parent) {
@@ -67,9 +53,12 @@ class MacroParameter : public Macro {
     }
   }
 
+  static std::optional<MacroParameter> from(const Reference &r);
+  static std::optional<MacroParameter> from(const TokenContext &t);
+
   Token variadic_dots(void) const;
   Token name(void) const;
-  unsigned index(void) const;
+  uint32_t index(void) const;
 };
 
 static_assert(sizeof(MacroParameter) == sizeof(Macro));

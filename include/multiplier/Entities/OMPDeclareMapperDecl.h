@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "OMPDeclarativeDirectiveValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class NamedDecl;
 class OMPDeclarativeDirectiveValueDecl;
 class OMPDeclareMapperDecl;
+class Stmt;
+class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
  private:
@@ -40,11 +35,12 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPDeclareMapperDecl> in(const Fragment &frag);
   static gap::generator<OMPDeclareMapperDecl> in(const Index &index);
   static gap::generator<OMPDeclareMapperDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclareMapperDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclareMapperDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclareMapperDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_MAPPER;
@@ -59,45 +55,9 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<OMPDeclareMapperDecl> redeclarations(void) const;
-  inline static std::optional<OMPDeclareMapperDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<OMPDeclareMapperDecl> from(const OMPDeclarativeDirectiveValueDecl &parent);
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<OMPDeclarativeDirectiveValueDecl> &parent) {
-    if (parent) {
-      return OMPDeclareMapperDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPDeclareMapperDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return OMPDeclareMapperDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPDeclareMapperDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return OMPDeclareMapperDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  OMPDeclareMapperDecl canonical_declaration(void) const;
+  std::optional<OMPDeclareMapperDecl> definition(void) const;
+  gap::generator<OMPDeclareMapperDecl> redeclarations(void) const &;
   static std::optional<OMPDeclareMapperDecl> from(const Decl &parent);
 
   inline static std::optional<OMPDeclareMapperDecl> from(const std::optional<Decl> &parent) {
@@ -108,8 +68,11 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
     }
   }
 
+  static std::optional<OMPDeclareMapperDecl> from(const Reference &r);
+  static std::optional<OMPDeclareMapperDecl> from(const TokenContext &t);
+
   Expr mapper_variable_reference(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(OMPDeclareMapperDecl) == sizeof(OMPDeclarativeDirectiveValueDecl));

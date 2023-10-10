@@ -8,38 +8,34 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class ObjCAtCatchStmt;
 class ObjCAtFinallyStmt;
 class ObjCAtTryStmt;
 class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCAtTryStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<ObjCAtTryStmt> in(const Fragment &frag);
   static gap::generator<ObjCAtTryStmt> in(const Index &index);
   static gap::generator<ObjCAtTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCAtTryStmt> by_id(const Index &, EntityId);
+  static gap::generator<ObjCAtTryStmt> in(const Fragment &frag);
+  static gap::generator<ObjCAtTryStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_TRY_STMT;
@@ -54,14 +50,6 @@ class ObjCAtTryStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCAtTryStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCAtTryStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<ObjCAtTryStmt> from(const Stmt &parent);
 
   inline static std::optional<ObjCAtTryStmt> from(const std::optional<Stmt> &parent) {
@@ -72,11 +60,15 @@ class ObjCAtTryStmt : public Stmt {
     }
   }
 
+  static std::optional<ObjCAtTryStmt> from(const Reference &r);
+  static std::optional<ObjCAtTryStmt> from(const TokenContext &t);
+
   Token at_try_token(void) const;
   ObjCAtFinallyStmt finally_statement(void) const;
   Stmt try_body(void) const;
   std::optional<ObjCAtCatchStmt> nth_catch_statement(unsigned n) const;
-  gap::generator<ObjCAtCatchStmt> catch_statements(void) const;
+  unsigned num_catch_statements(void) const;
+  gap::generator<ObjCAtCatchStmt> catch_statements(void) const &;
 };
 
 static_assert(sizeof(ObjCAtTryStmt) == sizeof(Stmt));

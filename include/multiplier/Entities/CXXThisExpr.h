@@ -8,27 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXThisExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXThisExpr : public Expr {
  private:
@@ -37,11 +32,12 @@ class CXXThisExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXThisExpr> in(const Fragment &frag);
   static gap::generator<CXXThisExpr> in(const Index &index);
   static gap::generator<CXXThisExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXThisExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXThisExpr> in(const Fragment &frag);
+  static gap::generator<CXXThisExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_THIS_EXPR;
@@ -56,34 +52,6 @@ class CXXThisExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXThisExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXThisExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXThisExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXThisExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXThisExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXThisExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXThisExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXThisExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXThisExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXThisExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +61,9 @@ class CXXThisExpr : public Expr {
       return std::nullopt;
     }
   }
+
+  static std::optional<CXXThisExpr> from(const Reference &r);
+  static std::optional<CXXThisExpr> from(const TokenContext &t);
 
   Token token(void) const;
   bool is_implicit(void) const;

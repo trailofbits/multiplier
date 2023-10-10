@@ -8,20 +8,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "LambdaCaptureDefault.h"
 #include "MSInheritanceModel.h"
 #include "MSVtorDispMode.h"
@@ -29,22 +15,32 @@
 #include "TemplateSpecializationKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXBaseSpecifier;
 class CXXConstructorDecl;
 class CXXDestructorDecl;
 class CXXMethodDecl;
 class CXXRecordDecl;
 class ClassTemplateDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
 class Decl;
 class FriendDecl;
 class FunctionDecl;
 class FunctionTemplateDecl;
 class NamedDecl;
 class RecordDecl;
+class Stmt;
 class TagDecl;
 class TemplateParameterList;
-class Type;
+class Token;
 class TypeDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXRecordDecl : public RecordDecl {
  private:
@@ -55,11 +51,12 @@ class CXXRecordDecl : public RecordDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<CXXRecordDecl> in(const Fragment &frag);
   static gap::generator<CXXRecordDecl> in(const Index &index);
   static gap::generator<CXXRecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXRecordDecl> by_id(const Index &, EntityId);
+  static gap::generator<CXXRecordDecl> in(const Fragment &frag);
+  static gap::generator<CXXRecordDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_RECORD;
@@ -74,55 +71,9 @@ class CXXRecordDecl : public RecordDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<CXXRecordDecl> redeclarations(void) const;
-  inline static std::optional<CXXRecordDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXRecordDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<CXXRecordDecl> from(const RecordDecl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<RecordDecl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXRecordDecl> from(const TagDecl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<TagDecl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXRecordDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXRecordDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<CXXRecordDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return CXXRecordDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  CXXRecordDecl canonical_declaration(void) const;
+  std::optional<CXXRecordDecl> definition(void) const;
+  gap::generator<CXXRecordDecl> redeclarations(void) const &;
   static std::optional<CXXRecordDecl> from(const Decl &parent);
 
   inline static std::optional<CXXRecordDecl> from(const std::optional<Decl> &parent) {
@@ -133,11 +84,15 @@ class CXXRecordDecl : public RecordDecl {
     }
   }
 
+  static std::optional<CXXRecordDecl> from(const Reference &r);
+  static std::optional<CXXRecordDecl> from(const TokenContext &t);
+
   std::optional<bool> allow_const_default_initializer(void) const;
   std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;
   std::optional<MSInheritanceModel> calculate_inheritance_model(void) const;
   std::optional<CXXConstructorDecl> nth_constructor(unsigned n) const;
-  gap::generator<CXXConstructorDecl> constructors(void) const;
+  unsigned num_constructors(void) const;
+  gap::generator<CXXConstructorDecl> constructors(void) const &;
   std::optional<std::vector<FriendDecl>> friends(void) const;
   std::optional<FunctionTemplateDecl> dependent_lambda_call_operator(void) const;
   std::optional<ClassTemplateDecl> described_class_template(void) const;
@@ -148,13 +103,10 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<LambdaCaptureDefault> lambda_capture_default(void) const;
   std::optional<Decl> lambda_context_declaration(void) const;
   std::optional<std::vector<NamedDecl>> lambda_explicit_template_parameters(void) const;
-  std::optional<unsigned> lambda_mangling_number(void) const;
-  std::optional<Type> lambda_type(void) const;
+  std::optional<uint32_t> lambda_mangling_number(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
-  std::optional<unsigned> num_bases(void) const;
-  std::optional<unsigned> num_virtual_bases(void) const;
-  std::optional<unsigned> odr_hash(void) const;
+  std::optional<uint32_t> odr_hash(void) const;
   std::optional<CXXRecordDecl> template_instantiation_pattern(void) const;
   TemplateSpecializationKind template_specialization_kind(void) const;
   std::optional<bool> has_any_dependent_bases(void) const;
@@ -252,6 +204,12 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<bool> needs_overload_resolution_for_move_constructor(void) const;
   std::optional<bool> null_field_offset_is_zero(void) const;
   std::optional<std::vector<CXXBaseSpecifier>> virtual_bases(void) const;
+  std::optional<uint64_t> size_without_virtual_bases(void) const;
+  std::optional<CXXRecordDecl> primary_base(void) const;
+  std::optional<bool> has_own_virtual_function_table_pointer(void) const;
+  std::optional<bool> has_extendable_virtual_function_table_pointer(void) const;
+  std::optional<bool> has_virtual_base_table_pointer(void) const;
+  std::optional<bool> has_own_virtual_base_table_pointer(void) const;
 };
 
 static_assert(sizeof(CXXRecordDecl) == sizeof(RecordDecl));

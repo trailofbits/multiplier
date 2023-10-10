@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "DeducedType.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DeducedTemplateSpecializationType;
 class DeducedType;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DeducedTemplateSpecializationType : public DeducedType {
  private:
@@ -35,7 +29,6 @@ class DeducedTemplateSpecializationType : public DeducedType {
   friend class DeducedType;
   friend class Type;
  public:
-  static gap::generator<DeducedTemplateSpecializationType> in(const Fragment &frag);
   static gap::generator<DeducedTemplateSpecializationType> in(const Index &index);
   static gap::generator<DeducedTemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +36,6 @@ class DeducedTemplateSpecializationType : public DeducedType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEDUCED_TEMPLATE_SPECIALIZATION;
-  }
-
-  inline static std::optional<DeducedTemplateSpecializationType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<DeducedTemplateSpecializationType> from(const DeducedType &parent);
-
-  inline static std::optional<DeducedTemplateSpecializationType> from(const std::optional<DeducedType> &parent) {
-    if (parent) {
-      return DeducedTemplateSpecializationType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DeducedTemplateSpecializationType> from(const Type &parent);
@@ -72,6 +47,9 @@ class DeducedTemplateSpecializationType : public DeducedType {
       return std::nullopt;
     }
   }
+
+  static std::optional<DeducedTemplateSpecializationType> from(const Reference &r);
+  static std::optional<DeducedTemplateSpecializationType> from(const TokenContext &t);
 
 };
 

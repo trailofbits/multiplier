@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "TagType.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class EnumType;
 class TagType;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class EnumType : public TagType {
  private:
@@ -35,7 +29,6 @@ class EnumType : public TagType {
   friend class TagType;
   friend class Type;
  public:
-  static gap::generator<EnumType> in(const Fragment &frag);
   static gap::generator<EnumType> in(const Index &index);
   static gap::generator<EnumType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +36,6 @@ class EnumType : public TagType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ENUM;
-  }
-
-  inline static std::optional<EnumType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<EnumType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<EnumType> from(const TagType &parent);
-
-  inline static std::optional<EnumType> from(const std::optional<TagType> &parent) {
-    if (parent) {
-      return EnumType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<EnumType> from(const Type &parent);
@@ -72,6 +47,9 @@ class EnumType : public TagType {
       return std::nullopt;
     }
   }
+
+  static std::optional<EnumType> from(const Reference &r);
+  static std::optional<EnumType> from(const TokenContext &t);
 
   Type desugar(void) const;
   bool is_sugared(void) const;

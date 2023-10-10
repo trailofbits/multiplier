@@ -8,25 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Macro.h"
-#include "MacroKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Macro;
+class MacroConcatenate;
+class MacroExpansion;
+class MacroParameterSubstitution;
+class MacroStringify;
 class MacroSubstitution;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroSubstitution : public Macro {
  private:
@@ -34,6 +32,7 @@ class MacroSubstitution : public Macro {
   friend class Macro;
  public:
   static gap::generator<MacroSubstitution> in(const Fragment &frag);
+  static gap::generator<MacroSubstitution> in(const File &file);
 
   static gap::generator<MacroSubstitution> in(const Index &index);
   static std::optional<MacroSubstitution> by_id(const Index &, EntityId);
@@ -48,14 +47,6 @@ class MacroSubstitution : public Macro {
   static gap::generator<MacroSubstitution> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroSubstitution> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroSubstitution> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
   static std::optional<MacroSubstitution> from(const Macro &parent);
 
   inline static std::optional<MacroSubstitution> from(const std::optional<Macro> &parent) {
@@ -66,7 +57,13 @@ class MacroSubstitution : public Macro {
     }
   }
 
-  gap::generator<MacroOrToken> replacement_children(void) const;
+  static std::optional<MacroSubstitution> from(const Reference &r);
+  static std::optional<MacroSubstitution> from(const TokenContext &t);
+
+  gap::generator<MacroOrToken> replacement_children(void) const &;
+  Token first_fully_substituted_token(void) const;
+  Token last_fully_substituted_token(void) const;
+  Token name_or_operator(void) const;
 };
 
 static_assert(sizeof(MacroSubstitution) == sizeof(Macro));

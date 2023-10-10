@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 #include "UnaryExprOrTypeTrait.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class UnaryExprOrTypeTraitExpr;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnaryExprOrTypeTraitExpr : public Expr {
  private:
@@ -39,11 +34,12 @@ class UnaryExprOrTypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<UnaryExprOrTypeTraitExpr> in(const Fragment &frag);
   static gap::generator<UnaryExprOrTypeTraitExpr> in(const Index &index);
   static gap::generator<UnaryExprOrTypeTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnaryExprOrTypeTraitExpr> by_id(const Index &, EntityId);
+  static gap::generator<UnaryExprOrTypeTraitExpr> in(const Fragment &frag);
+  static gap::generator<UnaryExprOrTypeTraitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
@@ -58,34 +54,6 @@ class UnaryExprOrTypeTraitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<UnaryExprOrTypeTraitExpr> from(const Expr &parent);
-
-  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return UnaryExprOrTypeTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnaryExprOrTypeTraitExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<UnaryExprOrTypeTraitExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return UnaryExprOrTypeTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UnaryExprOrTypeTraitExpr> from(const Stmt &parent);
 
   inline static std::optional<UnaryExprOrTypeTraitExpr> from(const std::optional<Stmt> &parent) {
@@ -96,9 +64,12 @@ class UnaryExprOrTypeTraitExpr : public Expr {
     }
   }
 
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const Reference &r);
+  static std::optional<UnaryExprOrTypeTraitExpr> from(const TokenContext &t);
+
   std::optional<Expr> argument_expression(void) const;
   std::optional<Type> argument_type(void) const;
-  UnaryExprOrTypeTrait expression_or_trait_kind(void) const;
+  UnaryExprOrTypeTrait keyword_kind(void) const;
   Token operator_token(void) const;
   Token r_paren_token(void) const;
   Type type_of_argument(void) const;

@@ -8,37 +8,33 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CapturedDecl;
 class Decl;
 class ImplicitParamDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CapturedDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<CapturedDecl> in(const Fragment &frag);
   static gap::generator<CapturedDecl> in(const Index &index);
   static gap::generator<CapturedDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CapturedDecl> by_id(const Index &, EntityId);
+  static gap::generator<CapturedDecl> in(const Fragment &frag);
+  static gap::generator<CapturedDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CAPTURED;
@@ -53,15 +49,9 @@ class CapturedDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<CapturedDecl> redeclarations(void) const;
-  inline static std::optional<CapturedDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CapturedDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  CapturedDecl canonical_declaration(void) const;
+  std::optional<CapturedDecl> definition(void) const;
+  gap::generator<CapturedDecl> redeclarations(void) const &;
   static std::optional<CapturedDecl> from(const Decl &parent);
 
   inline static std::optional<CapturedDecl> from(const std::optional<Decl> &parent) {
@@ -72,11 +62,15 @@ class CapturedDecl : public Decl {
     }
   }
 
+  static std::optional<CapturedDecl> from(const Reference &r);
+  static std::optional<CapturedDecl> from(const TokenContext &t);
+
   ImplicitParamDecl context_parameter(void) const;
   bool is_nothrow(void) const;
   std::optional<ImplicitParamDecl> nth_parameter(unsigned n) const;
-  gap::generator<ImplicitParamDecl> parameters(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  unsigned num_parameters(void) const;
+  gap::generator<ImplicitParamDecl> parameters(void) const &;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(CapturedDecl) == sizeof(Decl));

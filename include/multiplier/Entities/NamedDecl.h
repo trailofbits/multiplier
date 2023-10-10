@@ -8,39 +8,98 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 #include "Linkage.h"
 #include "ObjCStringFormatFamily.h"
 #include "Visibility.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class BindingDecl;
+class BuiltinTemplateDecl;
+class CXXConstructorDecl;
+class CXXConversionDecl;
+class CXXDeductionGuideDecl;
+class CXXDestructorDecl;
+class CXXMethodDecl;
+class CXXRecordDecl;
+class ClassTemplateDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
+class ConceptDecl;
+class ConstructorUsingShadowDecl;
 class Decl;
+class DecompositionDecl;
+class EnumConstantDecl;
+class EnumDecl;
+class FieldDecl;
+class FunctionDecl;
+class FunctionTemplateDecl;
+class HLSLBufferDecl;
+class ImplicitParamDecl;
+class IndirectFieldDecl;
+class LabelDecl;
+class MSGuidDecl;
+class MSPropertyDecl;
 class NamedDecl;
+class NamespaceAliasDecl;
+class NamespaceDecl;
+class NonTypeTemplateParmDecl;
+class OMPCapturedExprDecl;
+class OMPDeclareMapperDecl;
+class OMPDeclareReductionDecl;
+class ObjCAtDefsFieldDecl;
+class ObjCCategoryDecl;
+class ObjCCategoryImplDecl;
+class ObjCCompatibleAliasDecl;
+class ObjCImplementationDecl;
+class ObjCInterfaceDecl;
+class ObjCIvarDecl;
+class ObjCMethodDecl;
+class ObjCPropertyDecl;
+class ObjCProtocolDecl;
+class ObjCTypeParamDecl;
+class ParmVarDecl;
+class RecordDecl;
+class Stmt;
+class TemplateParamObjectDecl;
+class TemplateTemplateParmDecl;
+class TemplateTypeParmDecl;
+class Token;
+class TypeAliasDecl;
+class TypeAliasTemplateDecl;
+class TypedefDecl;
+class UnnamedGlobalConstantDecl;
+class UnresolvedUsingIfExistsDecl;
+class UnresolvedUsingTypenameDecl;
+class UnresolvedUsingValueDecl;
+class UsingDecl;
+class UsingDirectiveDecl;
+class UsingEnumDecl;
+class UsingPackDecl;
+class UsingShadowDecl;
+class VarDecl;
+class VarTemplateDecl;
+class VarTemplatePartialSpecializationDecl;
+class VarTemplateSpecializationDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NamedDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<NamedDecl> in(const Fragment &frag);
   static gap::generator<NamedDecl> in(const Index &index);
   static gap::generator<NamedDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NamedDecl> by_id(const Index &, EntityId);
+  static gap::generator<NamedDecl> in(const Fragment &frag);
+  static gap::generator<NamedDecl> in(const File &file);
 
   static gap::generator<NamedDecl> containing(const Decl &decl);
   static gap::generator<NamedDecl> containing(const std::optional<Decl> &decl);
@@ -51,15 +110,9 @@ class NamedDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<NamedDecl> redeclarations(void) const;
-  inline static std::optional<NamedDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<NamedDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  NamedDecl canonical_declaration(void) const;
+  std::optional<NamedDecl> definition(void) const;
+  gap::generator<NamedDecl> redeclarations(void) const &;
   static std::optional<NamedDecl> from(const Decl &parent);
 
   inline static std::optional<NamedDecl> from(const std::optional<Decl> &parent) {
@@ -69,6 +122,9 @@ class NamedDecl : public Decl {
       return std::nullopt;
     }
   }
+
+  static std::optional<NamedDecl> from(const Reference &r);
+  static std::optional<NamedDecl> from(const TokenContext &t);
 
   Linkage formal_linkage(void) const;
   std::string_view name(void) const;

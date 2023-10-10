@@ -10,57 +10,45 @@
 #include <optional>
 #include <string_view>
 #include <utility>
+#include <vector>
 #include <variant>
 
 #include "Iterator.h"
 #include "Reference.h"
-#include "Types.h"
 
 namespace mx {
 
-class Attr;
-class Decl;
-class DefineMacroDirective;
+class Compilation;
+class CompilationImpl;
 class Designator;
 class EntityProvider;
 class File;
 class FileLocationCache;
 class Fragment;
-class FragmentImpl;
 class Index;
-class Macro;
-class NamedDecl;
+class MacroSubstitution;
+class MacroVAOpt;
 class Reference;
 class RegexQuery;
 class RegexQueryResultIterator;
-class Stmt;
 class TokenContext;
 class TokenRangeIterator;
 class TokenRange;
 class TokenReader;
-class Type;
-class WeggliQuery;
-class WeggliQueryResultIterator;
+class TokenTree;
+class TokenTreeImpl;
+class TypeImpl;
 
 enum class TokenKind : unsigned short;
 enum class TokenCategory : unsigned char;
-
-#define MX_DECLARE_ENTITY_VARIANT(type_name, lower_name, enum_name, category) \
-    , type_name
-
-using VariantEntity = std::variant<
-    NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT)>;
-#undef MX_DECLARE_ENTITY_VARIANT
-
-using TokenImplPtr = std::shared_ptr<const TokenReader>;
+class SimpleToken;  // Defined in Index.h due to `VariantEntity`.
+using CustomToken = std::variant<SimpleToken, Token>;
 
 // A single token, e.g. from a file or from a macro expansion.
-class Token {
+class Token final {
  private:
+  friend class Compilation;
+  friend class CompilationImpl;
   friend class EntityProvider;
   friend class File;
   friend class Fragment;
@@ -71,6 +59,10 @@ class Token {
   friend class TokenContext;
   friend class TokenRangeIterator;
   friend class TokenRange;
+  friend class TokenReader;
+  friend class TokenTree;
+  friend class TokenTreeImpl;
+  friend class TypeImpl;
 
   TokenImplPtr impl;
   EntityOffset offset;
@@ -98,13 +90,12 @@ class Token {
   // Return the ID of this token.
   EntityId id(void) const;
 
-  inline auto operator<=>(const Token &that) const noexcept
-      -> decltype(mx::RawEntityId() <=> mx::RawEntityId()) {
-    return id().Pack() <=> that.id().Pack();
+  inline bool operator==(const Token &that) const noexcept {
+    return id().Pack() == that.id().Pack();
   }
 
   // References to this token.
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   // Return the context node that identifies how this token relates to the AST.
   //
@@ -162,12 +153,16 @@ class Token {
       return std::nullopt;
     }
   }
+
+  // The macro that immediately contains this token, if any.
+  std::optional<Macro> containing_macro(void) const;
 };
 
 // Forward-only iterator over a sequence of tokens.
 class TokenRangeIterator {
  private:
   friend class TokenRange;
+  friend class TokenTree;
 
   Token impl;
   unsigned num_tokens;
@@ -226,14 +221,16 @@ class TokenRangeIterator {
 // A range of tokens.
 class TokenRange {
  protected:
+  friend class EntityProvider;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Macro;
   friend class RegexQuery;
   friend class RegexQueryResultIterator;
-  friend class WeggliQuery;
-  friend class WeggliQueryResultImpl;
+  friend class TokenTree;
+  friend class TokenTreeImpl;
+  friend class TypeImpl;
 
   std::shared_ptr<const TokenReader> impl;
   EntityOffset index;
@@ -255,6 +252,11 @@ class TokenRange {
 
   TokenRange &operator=(const TokenRange &) = default;
   TokenRange &operator=(TokenRange &&) noexcept = default;
+
+  static TokenRange create(std::vector<CustomToken> tokens);
+
+  bool operator==(const TokenRange &that) const noexcept;
+  bool operator!=(const TokenRange &that) const noexcept = default;
 
   inline operator bool(void) const noexcept {
     return !empty();

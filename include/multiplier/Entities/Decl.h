@@ -8,18 +8,17 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
 
 #include "AccessSpecifier.h"
 #include "AvailabilityResult.h"
@@ -29,15 +28,31 @@
 #include "DeclModuleOwnershipKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class Decl;
 class DeclImpl;
 class ExternalSourceSymbolAttr;
+class File;
+class Fragment;
+class Index;
 class Reference;
+class Stmt;
 class TemplateDecl;
 class TemplateParameterList;
+class Token;
+class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Decl {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class File;
@@ -50,14 +65,23 @@ class Decl {
   friend class TokenContext;
   friend class Type;
   friend class DeclImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const DeclImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Decl(Decl &&) noexcept = default;
   Decl(const Decl &) = default;
   Decl &operator=(Decl &&) noexcept = default;
   Decl &operator=(const Decl &) = default;
+
+  inline bool operator==(const Decl &rhs) const noexcept {
+    return canonical_declaration().id().Pack() ==
+           rhs.canonical_declaration().id().Pack();
+  }
 
   /* implicit */ inline Decl(std::shared_ptr<const DeclImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -67,23 +91,22 @@ class Decl {
   }
 
   PackedDeclId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
-  std::optional<Decl> parent_declaration(void) const;
-  std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> definition(void) const;
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;
-  gap::generator<Decl> redeclarations(void) const;
-
+  gap::generator<Decl> redeclarations(void) const &;
  public:
-  static gap::generator<Decl> in(const Fragment &frag, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const Index &index, std::span<DeclKind> kinds);
-  static gap::generator<Decl> in(const Fragment &frag);
+  static gap::generator<Decl> in(const Fragment &frag, std::span<DeclKind> kinds);
+  static gap::generator<Decl> in(const File &file, std::span<DeclKind> kinds);
   static gap::generator<Decl> in(const Index &index);
   static gap::generator<Decl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<Decl> by_id(const Index &, EntityId);
+  static gap::generator<Decl> in(const Fragment &frag);
+  static gap::generator<Decl> in(const File &file);
 
   static gap::generator<Decl> containing(const Decl &decl);
   static gap::generator<Decl> containing(const std::optional<Decl> &decl);
@@ -102,16 +125,13 @@ class Decl {
     return self;
   }
 
-  inline static std::optional<Decl> from(const Reference &r) {
-    return r.as_declaration();
-  }
+  static std::optional<Decl> from(const Reference &r);
 
-  inline static std::optional<Decl> from(const TokenContext &t) {
-    return t.as_declaration();
-  }
+  static std::optional<Decl> from(const TokenContext &t);
 
   std::optional<Attr> nth_attribute(unsigned n) const;
-  gap::generator<Attr> attributes(void) const;
+  unsigned num_attributes(void) const;
+  gap::generator<Attr> attributes(void) const &;
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   std::optional<Attr> defining_attribute(void) const;
@@ -119,6 +139,7 @@ class Decl {
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   std::optional<ExternalSourceSymbolAttr> external_source_symbol_attribute(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
+  std::optional<uint32_t> max_alignment(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
   std::optional<Decl> non_closure_context(void) const;
   bool has_attributes(void) const;
@@ -127,23 +148,24 @@ class Decl {
   bool is_defined_outside_function_or_method(void) const;
   bool is_deprecated(void) const;
   bool is_discarded_in_global_module_fragment(void) const;
+  bool is_file_context_declaration(void) const;
   bool is_function_or_function_template(void) const;
+  bool is_function_pointer_type(void) const;
   bool is_implicit(void) const;
   bool is_in_anonymous_namespace(void) const;
+  bool is_in_another_module_unit(void) const;
   bool is_in_export_declaration_context(void) const;
-  bool is_in_local_scope_for_instantiation(void) const;
+  std::optional<bool> is_in_local_scope_for_instantiation(void) const;
   bool is_in_std_namespace(void) const;
-  bool is_invalid_declaration(void) const;
   bool is_invisible_outside_the_owning_module(void) const;
+  bool is_local_extern_declaration(void) const;
   bool is_module_private(void) const;
   bool is_out_of_line(void) const;
   bool is_parameter_pack(void) const;
-  bool is_reachable(void) const;
   bool is_template_declaration(void) const;
   bool is_template_parameter(void) const;
   bool is_template_parameter_pack(void) const;
   bool is_templated(void) const;
-  bool is_this_declaration_referenced(void) const;
   bool is_top_level_declaration_in_obj_c_container(void) const;
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;

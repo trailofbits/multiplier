@@ -8,33 +8,26 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ObjCTypeParamDecl;
 class ObjCTypeParamType;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCTypeParamType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ObjCTypeParamType> in(const Fragment &frag);
   static gap::generator<ObjCTypeParamType> in(const Index &index);
   static gap::generator<ObjCTypeParamType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +35,6 @@ class ObjCTypeParamType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_TYPE_PARAM;
-  }
-
-  inline static std::optional<ObjCTypeParamType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ObjCTypeParamType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<ObjCTypeParamType> from(const Type &parent);
@@ -61,6 +46,9 @@ class ObjCTypeParamType : public Type {
       return std::nullopt;
     }
   }
+
+  static std::optional<ObjCTypeParamType> from(const Reference &r);
+  static std::optional<ObjCTypeParamType> from(const TokenContext &t);
 
   Type desugar(void) const;
   ObjCTypeParamDecl declaration(void) const;

@@ -13,12 +13,17 @@
 #include <multiplier/Database.h>
 #include <string>
 
-#include "Codegen.h"
+#ifndef MX_DISABLE_VAST
+# include "Codegen.h"
+#endif
+
 #include "Executor.h"
 #include "ProgressBar.h"
 #include "Util.h"
 
 namespace pasta {
+class CompileJob;
+class Compiler;
 class File;
 class TokenRange;
 }  // namespace pasta
@@ -31,17 +36,21 @@ namespace indexer {
 
 class CodeGenerator;
 class GlobalIndexingState;
+class IdStore;
 class NameMangler;
 class PendingFragment;
+class TokenProvenanceCalculator;
 
 // State that needs to live only as long as there are active indexing jobs
 // underway.
 class GlobalIndexingState {
  public:
 
-  // Tracks progress in parsing compile commands and turning them into compile
-  // jobs.
+  // Tracks progress in evaluating compile commands.
   std::unique_ptr<ProgressBar> command_progress;
+
+  // Tracks progress in evaluating compile commands.
+  std::unique_ptr<ProgressBar> eval_command_progress;
 
   // Tracks progress in running compile jobs to produce ASTs.
   std::unique_ptr<ProgressBar> ast_progress;
@@ -49,27 +58,35 @@ class GlobalIndexingState {
   // Tracks progress in partitioning an AST into fragments.
   std::unique_ptr<ProgressBar> partitioning_progress;
 
-  // Tracks progress in identifying fragments with IDs.
-  std::unique_ptr<ProgressBar> identification_progress;
-
   // Tracks progress in serializing fragments.
-  std::unique_ptr<ProgressBar> serialization_progress;
+  std::unique_ptr<ProgressBar> fragment_progress;
+
+  // Tracks progress in serializing types.
+  std::unique_ptr<ProgressBar> type_progress;
 
   // Tracks progress in saving tokenized files.
   std::unique_ptr<ProgressBar> file_progress;
+
+  // Number of fragments for which we are attempting to generate source ir.
+  std::unique_ptr<ProgressBar> sourceir_progress;
 
   const unsigned num_workers;
 
   // Worker pool.
   Executor executor;
 
+#ifndef MX_DISABLE_VAST
   // MLIR code generator.
   CodeGenerator codegen;
+#endif
 
   // Write access to the index database.
   mx::DatabaseWriter &database;
 
+  IdStore &id_store;
+
   explicit GlobalIndexingState(mx::DatabaseWriter &database_,
+                               IdStore &id_store_,
                                const Executor &exe_);
 
   ~GlobalIndexingState(void);
@@ -109,9 +126,26 @@ class GlobalIndexingState {
   // partially because our serialized decls/stmts/etc. reference these tokens,
   // and partially so that we can do things like print out fragments, or chunks
   // thereof.
-  void PersistFragment(const pasta::AST &ast, const pasta::TokenRange &tokens,
-                       NameMangler &mangler, EntityIdMap &entity_ids,
+  void PersistFragment(const pasta::AST &ast, NameMangler &mangler,
+                       EntityMapper &em, TokenProvenanceCalculator &provenance,
                        PendingFragment &fragment);
+
+  // Persist a type fragment into the database. Type fragments are special
+  // fragments that are created to persist the types collected for
+  // serialization. Storing types into a different fragment will help with type
+  // de-duplication which is a by product of inlining the types in each
+  // fragment.
+  //
+  // The pending fragment passed as one of the arguments holds the list of types
+  // that needs to be serialized in a fragment.
+  void PersistTypes(const pasta::AST &ast, NameMangler &mangler,
+                    EntityMapper &em, const PendingFragment &fragment);
+
+  // Persist the compilation.
+  void PersistCompilation(const pasta::Compiler &compiler,
+                          const pasta::CompileJob &job, const pasta::AST &ast,
+                          const EntityMapper &em, mx::PackedCompilationId tu_id,
+                          std::vector<mx::PackedFragmentId> fragment_ids);
 };
 
 }  // namespace indexer

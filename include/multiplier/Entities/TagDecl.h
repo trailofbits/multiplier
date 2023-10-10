@@ -8,30 +8,31 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "TagTypeKind.h"
 #include "TypeDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class CXXRecordDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
 class Decl;
+class EnumDecl;
 class NamedDecl;
+class RecordDecl;
+class Stmt;
 class TagDecl;
 class TemplateParameterList;
+class Token;
+class TokenRange;
 class TypeDecl;
 class TypedefNameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TagDecl : public TypeDecl {
  private:
@@ -40,11 +41,12 @@ class TagDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TagDecl> in(const Fragment &frag);
   static gap::generator<TagDecl> in(const Index &index);
   static gap::generator<TagDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TagDecl> by_id(const Index &, EntityId);
+  static gap::generator<TagDecl> in(const Fragment &frag);
+  static gap::generator<TagDecl> in(const File &file);
 
   static gap::generator<TagDecl> containing(const Decl &decl);
   static gap::generator<TagDecl> containing(const std::optional<Decl> &decl);
@@ -55,35 +57,9 @@ class TagDecl : public TypeDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TagDecl> redeclarations(void) const;
-  inline static std::optional<TagDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TagDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TagDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<TagDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return TagDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TagDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TagDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TagDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  TagDecl canonical_declaration(void) const;
+  std::optional<TagDecl> definition(void) const;
+  gap::generator<TagDecl> redeclarations(void) const &;
   static std::optional<TagDecl> from(const Decl &parent);
 
   inline static std::optional<TagDecl> from(const std::optional<Decl> &parent) {
@@ -93,6 +69,9 @@ class TagDecl : public TypeDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<TagDecl> from(const Reference &r);
+  static std::optional<TagDecl> from(const TokenContext &t);
 
   TokenRange brace_range(void) const;
   Token first_inner_token(void) const;
@@ -105,7 +84,6 @@ class TagDecl : public TypeDecl {
   bool is_complete_definition(void) const;
   bool is_complete_definition_required(void) const;
   bool is_dependent_type(void) const;
-  bool is_embedded_in_declarator(void) const;
   bool is_enum(void) const;
   bool is_free_standing(void) const;
   bool is_interface(void) const;
@@ -115,8 +93,9 @@ class TagDecl : public TypeDecl {
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
-  gap::generator<TemplateParameterList> template_parameter_lists(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  unsigned num_template_parameter_lists(void) const;
+  gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(TagDecl) == sizeof(TypeDecl));

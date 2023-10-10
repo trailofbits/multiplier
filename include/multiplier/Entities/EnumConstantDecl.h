@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "ValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class EnumConstantDecl;
 class Expr;
 class NamedDecl;
+class Stmt;
+class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class EnumConstantDecl : public ValueDecl {
  private:
@@ -38,11 +33,12 @@ class EnumConstantDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<EnumConstantDecl> in(const Fragment &frag);
   static gap::generator<EnumConstantDecl> in(const Index &index);
   static gap::generator<EnumConstantDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<EnumConstantDecl> by_id(const Index &, EntityId);
+  static gap::generator<EnumConstantDecl> in(const Fragment &frag);
+  static gap::generator<EnumConstantDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM_CONSTANT;
@@ -57,35 +53,9 @@ class EnumConstantDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<EnumConstantDecl> redeclarations(void) const;
-  inline static std::optional<EnumConstantDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<EnumConstantDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<EnumConstantDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<EnumConstantDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return EnumConstantDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<EnumConstantDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<EnumConstantDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return EnumConstantDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  EnumConstantDecl canonical_declaration(void) const;
+  std::optional<EnumConstantDecl> definition(void) const;
+  gap::generator<EnumConstantDecl> redeclarations(void) const &;
   static std::optional<EnumConstantDecl> from(const Decl &parent);
 
   inline static std::optional<EnumConstantDecl> from(const std::optional<Decl> &parent) {
@@ -95,6 +65,9 @@ class EnumConstantDecl : public ValueDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<EnumConstantDecl> from(const Reference &r);
+  static std::optional<EnumConstantDecl> from(const TokenContext &t);
 
   std::optional<Expr> initializer_expression(void) const;
 };

@@ -8,33 +8,26 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class TemplateArgument;
 class TemplateSpecializationType;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateSpecializationType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TemplateSpecializationType> in(const Fragment &frag);
   static gap::generator<TemplateSpecializationType> in(const Index &index);
   static gap::generator<TemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +35,6 @@ class TemplateSpecializationType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TEMPLATE_SPECIALIZATION;
-  }
-
-  inline static std::optional<TemplateSpecializationType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TemplateSpecializationType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<TemplateSpecializationType> from(const Type &parent);
@@ -62,13 +47,17 @@ class TemplateSpecializationType : public Type {
     }
   }
 
+  static std::optional<TemplateSpecializationType> from(const Reference &r);
+  static std::optional<TemplateSpecializationType> from(const TokenContext &t);
+
   Type desugar(void) const;
   std::optional<Type> aliased_type(void) const;
   bool is_current_instantiation(void) const;
   bool is_sugared(void) const;
   bool is_type_alias(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
-  gap::generator<TemplateArgument> template_arguments(void) const;
+  unsigned num_template_arguments(void) const;
+  gap::generator<TemplateArgument> template_arguments(void) const &;
 };
 
 static_assert(sizeof(TemplateSpecializationType) == sizeof(Type));

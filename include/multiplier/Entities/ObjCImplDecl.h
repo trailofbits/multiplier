@@ -8,29 +8,26 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "ObjCContainerDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
+class ObjCCategoryImplDecl;
 class ObjCContainerDecl;
 class ObjCImplDecl;
+class ObjCImplementationDecl;
 class ObjCInterfaceDecl;
 class ObjCPropertyImplDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCImplDecl : public ObjCContainerDecl {
  private:
@@ -39,11 +36,12 @@ class ObjCImplDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCImplDecl> in(const Fragment &frag);
   static gap::generator<ObjCImplDecl> in(const Index &index);
   static gap::generator<ObjCImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCImplDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCImplDecl> in(const Fragment &frag);
+  static gap::generator<ObjCImplDecl> in(const File &file);
 
   static gap::generator<ObjCImplDecl> containing(const Decl &decl);
   static gap::generator<ObjCImplDecl> containing(const std::optional<Decl> &decl);
@@ -54,35 +52,9 @@ class ObjCImplDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCImplDecl> redeclarations(void) const;
-  inline static std::optional<ObjCImplDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCImplDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCImplDecl> from(const ObjCContainerDecl &parent);
-
-  inline static std::optional<ObjCImplDecl> from(const std::optional<ObjCContainerDecl> &parent) {
-    if (parent) {
-      return ObjCImplDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCImplDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCImplDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCImplDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  ObjCImplDecl canonical_declaration(void) const;
+  std::optional<ObjCImplDecl> definition(void) const;
+  gap::generator<ObjCImplDecl> redeclarations(void) const &;
   static std::optional<ObjCImplDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCImplDecl> from(const std::optional<Decl> &parent) {
@@ -93,9 +65,13 @@ class ObjCImplDecl : public ObjCContainerDecl {
     }
   }
 
+  static std::optional<ObjCImplDecl> from(const Reference &r);
+  static std::optional<ObjCImplDecl> from(const TokenContext &t);
+
   ObjCInterfaceDecl class_interface(void) const;
   std::optional<ObjCPropertyImplDecl> nth_property_implementation(unsigned n) const;
-  gap::generator<ObjCPropertyImplDecl> property_implementations(void) const;
+  unsigned num_property_implementations(void) const;
+  gap::generator<ObjCPropertyImplDecl> property_implementations(void) const &;
 };
 
 static_assert(sizeof(ObjCImplDecl) == sizeof(ObjCContainerDecl));

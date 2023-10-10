@@ -8,27 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "StmtKind.h"
 #include "SwitchCase.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CaseStmt;
+class Decl;
 class Expr;
 class Stmt;
 class SwitchCase;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CaseStmt : public SwitchCase {
  private:
@@ -36,11 +31,12 @@ class CaseStmt : public SwitchCase {
   friend class SwitchCase;
   friend class Stmt;
  public:
-  static gap::generator<CaseStmt> in(const Fragment &frag);
   static gap::generator<CaseStmt> in(const Index &index);
   static gap::generator<CaseStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CaseStmt> by_id(const Index &, EntityId);
+  static gap::generator<CaseStmt> in(const Fragment &frag);
+  static gap::generator<CaseStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CASE_STMT;
@@ -55,24 +51,6 @@ class CaseStmt : public SwitchCase {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CaseStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CaseStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CaseStmt> from(const SwitchCase &parent);
-
-  inline static std::optional<CaseStmt> from(const std::optional<SwitchCase> &parent) {
-    if (parent) {
-      return CaseStmt::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CaseStmt> from(const Stmt &parent);
 
   inline static std::optional<CaseStmt> from(const std::optional<Stmt> &parent) {
@@ -82,6 +60,9 @@ class CaseStmt : public SwitchCase {
       return std::nullopt;
     }
   }
+
+  static std::optional<CaseStmt> from(const Reference &r);
+  static std::optional<CaseStmt> from(const TokenContext &t);
 
   bool case_statement_is_gnu_range(void) const;
   Token case_token(void) const;

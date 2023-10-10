@@ -8,26 +8,27 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "MacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConditionalMacroDirective;
+class ElseIfDefinedMacroDirective;
+class ElseIfMacroDirective;
+class ElseIfNotDefinedMacroDirective;
+class ElseMacroDirective;
+class EndIfMacroDirective;
+class IfDefinedMacroDirective;
+class IfMacroDirective;
+class IfNotDefinedMacroDirective;
 class Macro;
 class MacroDirective;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConditionalMacroDirective : public MacroDirective {
  private:
@@ -36,6 +37,7 @@ class ConditionalMacroDirective : public MacroDirective {
   friend class Macro;
  public:
   static gap::generator<ConditionalMacroDirective> in(const Fragment &frag);
+  static gap::generator<ConditionalMacroDirective> in(const File &file);
 
   static gap::generator<ConditionalMacroDirective> in(const Index &index);
   static std::optional<ConditionalMacroDirective> by_id(const Index &, EntityId);
@@ -46,24 +48,6 @@ class ConditionalMacroDirective : public MacroDirective {
   static gap::generator<ConditionalMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<ConditionalMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<ConditionalMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<ConditionalMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<ConditionalMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return ConditionalMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ConditionalMacroDirective> from(const Macro &parent);
 
   inline static std::optional<ConditionalMacroDirective> from(const std::optional<Macro> &parent) {
@@ -73,6 +57,9 @@ class ConditionalMacroDirective : public MacroDirective {
       return std::nullopt;
     }
   }
+
+  static std::optional<ConditionalMacroDirective> from(const Reference &r);
+  static std::optional<ConditionalMacroDirective> from(const TokenContext &t);
 
 };
 

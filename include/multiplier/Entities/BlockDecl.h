@@ -8,39 +8,35 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BlockDecl;
 class CompoundStmt;
 class Decl;
 class ParmVarDecl;
+class Stmt;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BlockDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<BlockDecl> in(const Fragment &frag);
   static gap::generator<BlockDecl> in(const Index &index);
   static gap::generator<BlockDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<BlockDecl> by_id(const Index &, EntityId);
+  static gap::generator<BlockDecl> in(const Fragment &frag);
+  static gap::generator<BlockDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BLOCK;
@@ -55,15 +51,9 @@ class BlockDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<BlockDecl> redeclarations(void) const;
-  inline static std::optional<BlockDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<BlockDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  BlockDecl canonical_declaration(void) const;
+  std::optional<BlockDecl> definition(void) const;
+  gap::generator<BlockDecl> redeclarations(void) const &;
   static std::optional<BlockDecl> from(const Decl &parent);
 
   inline static std::optional<BlockDecl> from(const std::optional<Decl> &parent) {
@@ -73,6 +63,9 @@ class BlockDecl : public Decl {
       return std::nullopt;
     }
   }
+
+  static std::optional<BlockDecl> from(const Reference &r);
+  static std::optional<BlockDecl> from(const TokenContext &t);
 
   bool block_missing_return_type(void) const;
   bool can_avoid_copy_to_heap(void) const;
@@ -86,10 +79,12 @@ class BlockDecl : public Decl {
   bool is_conversion_from_lambda(void) const;
   bool is_variadic(void) const;
   std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
-  gap::generator<ParmVarDecl> parameters(void) const;
+  unsigned num_parameters(void) const;
+  gap::generator<ParmVarDecl> parameters(void) const &;
   std::optional<ParmVarDecl> nth_parameter_declaration(unsigned n) const;
-  gap::generator<ParmVarDecl> parameter_declarations(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  unsigned num_parameter_declarations(void) const;
+  gap::generator<ParmVarDecl> parameter_declarations(void) const &;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(BlockDecl) == sizeof(Decl));

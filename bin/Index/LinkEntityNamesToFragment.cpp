@@ -33,10 +33,15 @@ static bool ShouldGetSymbolName(const pasta::Decl &decl) {
     case mx::DeclKind::DECOMPOSITION:
     case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
     case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-      if (reinterpret_cast<const pasta::VarDecl &>(decl).IsLocalVariableDeclaration()) {
-        return false;
-      } else {
-        return true;
+      switch (decl.Category()) {
+        case pasta::DeclCategory::kGlobalVariable:
+        case pasta::DeclCategory::kClassMember:
+        case pasta::DeclCategory::kInstanceMember:
+          return true;
+
+        // Don't record local variables in our search index.
+        default:
+          return false;
       }
 
     // Tags.
@@ -108,7 +113,12 @@ static std::string ContextualSymbolName(const pasta::DeclContext &dc) {
 }
 
 std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
-  auto prefix = ContextualSymbolName(decl.DeclarationContext());
+  std::string prefix;
+  if (auto decl_context = decl.DeclarationContext()) {
+    prefix = ContextualSymbolName(decl_context.value());
+  }
+
+  // prefix may be empty here if DeclarationContext has no value
   auto name = SymbolName(decl);
   if (name.empty()) {
     return prefix;
@@ -123,8 +133,10 @@ std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
 
 // Save the symbolic names of all declarations into the database.
 void LinkEntityNamesToFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf, EntityMapper &em) {
+    mx::DatabaseWriter &database, const PendingFragment &pf) {
 
+  const EntityMapper &em = pf.em;
+  
   // Declaration names.
   for (const pasta::Decl &decl : pf.decls_to_serialize) {
     if (auto nd = pasta::NamedDecl::From(decl);

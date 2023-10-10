@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCBoxableAttrSpelling : unsigned char {
   GNU_OBJC_BOXABLE,
   CXX11_CLANG_OBJC_BOXABLE,
-  C2X_CLANG_OBJC_BOXABLE,
+  C23_CLANG_OBJC_BOXABLE,
   SPELLING_NOT_CALCULATED,
 };
 

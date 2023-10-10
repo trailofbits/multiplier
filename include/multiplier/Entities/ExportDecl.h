@@ -8,36 +8,32 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class ExportDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ExportDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ExportDecl> in(const Fragment &frag);
   static gap::generator<ExportDecl> in(const Index &index);
   static gap::generator<ExportDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ExportDecl> by_id(const Index &, EntityId);
+  static gap::generator<ExportDecl> in(const Fragment &frag);
+  static gap::generator<ExportDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXPORT;
@@ -52,15 +48,9 @@ class ExportDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ExportDecl> redeclarations(void) const;
-  inline static std::optional<ExportDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ExportDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  ExportDecl canonical_declaration(void) const;
+  std::optional<ExportDecl> definition(void) const;
+  gap::generator<ExportDecl> redeclarations(void) const &;
   static std::optional<ExportDecl> from(const Decl &parent);
 
   inline static std::optional<ExportDecl> from(const std::optional<Decl> &parent) {
@@ -71,10 +61,13 @@ class ExportDecl : public Decl {
     }
   }
 
+  static std::optional<ExportDecl> from(const Reference &r);
+  static std::optional<ExportDecl> from(const TokenContext &t);
+
   Token export_token(void) const;
   Token r_brace_token(void) const;
   bool has_braces(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(ExportDecl) == sizeof(Decl));

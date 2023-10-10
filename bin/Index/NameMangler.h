@@ -9,6 +9,8 @@
 #include <memory>
 #include <string>
 
+#include <multiplier/Types.h>
+
 namespace pasta {
 class AST;
 class Decl;
@@ -25,7 +27,7 @@ class NameMangler {
  public:
   ~NameMangler(void);
 
-  explicit NameMangler(const pasta::AST &ast);
+  explicit NameMangler(const pasta::AST &ast, mx::PackedCompilationId tu_id);
 
   // Returns the mangled name of `decl`.
   //

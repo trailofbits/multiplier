@@ -344,6 +344,9 @@ static bool Ignore(const mx::CallExpr &, const mx::FunctionDecl &,
 }
 
 static const LibraryModel kLibraryModels[] = {
+    {"__builtin_expect", 0, Ignore},
+    {"__builtin_expect", 1, Ignore},
+
     {"memcpy", 0u, TaintLibraryReturnValue},
     {"memcpy", 0u, AlarmOnLibraryArgument},
     {"memcpy", 1u, AlarmOnLibraryArgument},
@@ -504,7 +507,7 @@ static void TaintTrackReturn(const mx::Stmt &ret, const UsePath &prev,
 // If `taint_source` is a tainted expression, then try to propagate the
 // taints to where the expression is used.
 void TaintTrackExpr(const mx::Expr &taint_source,
-                           const UsePath &prev, SeenEntityMap &seen) {
+                    const UsePath &prev, SeenEntityMap &seen) {
   const UsePath entry{&prev, taint_source.id().Pack()};
   if (AlreadySeen(entry, seen)) {
     return;
@@ -621,24 +624,40 @@ static void TaintTrackCallRet(const mx::CallExpr &call,
   TaintTrackExpr(call, prev, seen);
 }
 
+static bool IsVoidType(const mx::Type &type) {
+  auto bt = mx::BuiltinType::from(type);
+  if (!bt) {
+    return false;
+  }
+
+  return bt->builtin_kind() == mx::BuiltinTypeKind::VOID;
+}
+
 // If `taint_source` is a function whose return value should be tainted, then
 // look for every call to `taint_source` and then taint the values used at the
 // call sites.
 void TaintTrackFunc(const mx::FunctionDecl &taint_source,
                     const UsePath &prev, SeenEntityMap &seen) {
-  if (!taint_source.return_type().unqualified_desugared_type().is_void_type()) {
-    UsePath entry{&prev, PreferDefinition(taint_source).id().Pack()};
-    if (!AlreadySeen(entry, seen)) {
-      for (mx::Reference ref : taint_source.references()) {
-        if (auto stmt_taint_source = ref.as_statement()) {
-          auto calls = mx::CallExpr::containing(*stmt_taint_source);
-          auto call = calls.begin();
-          if (call != calls.end()) {
-            TaintTrackCallRet(*call, *stmt_taint_source, taint_source,
-                              entry, seen);
-          }
-        }
-      }
+  if (IsVoidType(taint_source.return_type().unqualified_desugared_type())) {
+    return;
+  }
+
+  UsePath entry{&prev, PreferDefinition(taint_source).id().Pack()};
+  if (AlreadySeen(entry, seen)) {
+    return;
+  }
+
+  for (mx::Reference ref : taint_source.references()) {
+    auto stmt_taint_source = ref.as_statement();
+    if (!stmt_taint_source) {
+      continue;
+    }
+
+    auto calls = mx::CallExpr::containing(*stmt_taint_source);
+    auto call = calls.begin();
+    if (call != calls.end()) {
+      TaintTrackCallRet(*call, *stmt_taint_source, taint_source,
+                        entry, seen);
     }
   }
 }
@@ -717,7 +736,7 @@ static std::ostream &TokData(mx::Token tok, std::ostream &ss) {
   return ss;
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

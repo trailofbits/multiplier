@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 #include "TypeTrait.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class TypeTraitExpr;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeTraitExpr : public Expr {
  private:
@@ -39,11 +34,12 @@ class TypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<TypeTraitExpr> in(const Fragment &frag);
   static gap::generator<TypeTraitExpr> in(const Index &index);
   static gap::generator<TypeTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeTraitExpr> by_id(const Index &, EntityId);
+  static gap::generator<TypeTraitExpr> in(const Fragment &frag);
+  static gap::generator<TypeTraitExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::TYPE_TRAIT_EXPR;
@@ -58,34 +54,6 @@ class TypeTraitExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<TypeTraitExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<TypeTraitExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<TypeTraitExpr> from(const Expr &parent);
-
-  inline static std::optional<TypeTraitExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return TypeTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypeTraitExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<TypeTraitExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return TypeTraitExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<TypeTraitExpr> from(const Stmt &parent);
 
   inline static std::optional<TypeTraitExpr> from(const std::optional<Stmt> &parent) {
@@ -96,10 +64,14 @@ class TypeTraitExpr : public Expr {
     }
   }
 
+  static std::optional<TypeTraitExpr> from(const Reference &r);
+  static std::optional<TypeTraitExpr> from(const TokenContext &t);
+
   TypeTrait trait(void) const;
   std::optional<bool> value(void) const;
   std::optional<Type> nth_argument(unsigned n) const;
-  gap::generator<Type> arguments(void) const;
+  unsigned num_arguments(void) const;
+  gap::generator<Type> arguments(void) const &;
 };
 
 static_assert(sizeof(TypeTraitExpr) == sizeof(Expr));

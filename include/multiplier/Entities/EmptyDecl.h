@@ -8,36 +8,32 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class EmptyDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class EmptyDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<EmptyDecl> in(const Fragment &frag);
   static gap::generator<EmptyDecl> in(const Index &index);
   static gap::generator<EmptyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<EmptyDecl> by_id(const Index &, EntityId);
+  static gap::generator<EmptyDecl> in(const Fragment &frag);
+  static gap::generator<EmptyDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EMPTY;
@@ -52,15 +48,9 @@ class EmptyDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<EmptyDecl> redeclarations(void) const;
-  inline static std::optional<EmptyDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<EmptyDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  EmptyDecl canonical_declaration(void) const;
+  std::optional<EmptyDecl> definition(void) const;
+  gap::generator<EmptyDecl> redeclarations(void) const &;
   static std::optional<EmptyDecl> from(const Decl &parent);
 
   inline static std::optional<EmptyDecl> from(const std::optional<Decl> &parent) {
@@ -70,6 +60,9 @@ class EmptyDecl : public Decl {
       return std::nullopt;
     }
   }
+
+  static std::optional<EmptyDecl> from(const Reference &r);
+  static std::optional<EmptyDecl> from(const TokenContext &t);
 
 };
 

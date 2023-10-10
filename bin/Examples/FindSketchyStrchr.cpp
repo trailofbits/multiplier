@@ -42,38 +42,24 @@ static mx::PackedDeclId CanonicalId(mx::ValueDecl vd) {
 }
 
 void TaintTrack(mx::FunctionDecl &func, TaintMap &map) {
-  for (mx::Reference ref : func.references()) {
-    for (mx::CallExpr call : mx::CallExpr::containing(ref.as_statement())) {
-      auto orig_decl = call.direct_callee();
-      if (!orig_decl) {
-        continue;
-      }
-
-      const mx::FunctionDecl &orig_func_decl = *orig_decl;
-      if (orig_func_decl.id() != func.id()) {
-        continue;
-      }
-
-      std::optional<mx::Expr> haystack_arg =
-          call.nth_argument(FLAGS_argument_index);
-      if (!haystack_arg) {
-        continue;
-      }
-
-      std::optional<mx::DeclRefExpr> ptr_arg =
-          mx::DeclRefExpr::from(haystack_arg->ignore_casts());
-      if (!ptr_arg) {
-        continue;
-      }
-
-      // Save instances of the strchr call corresponding to the original
-      // declaration
-      map[CanonicalId(ptr_arg->declaration())].push_back(call);
+  for (mx::CallExpr call : func.callers()) {
+    std::optional<mx::Expr> haystack_arg =
+        call.nth_argument(FLAGS_argument_index);
+    if (!haystack_arg) {
+      continue;
     }
+
+    std::optional<mx::DeclRefExpr> ptr_arg =
+        mx::DeclRefExpr::from(haystack_arg->ignore_casts());
+    if (!ptr_arg) {
+      continue;
+    }
+
+    map[CanonicalId(ptr_arg->declaration())].push_back(call);
   }
 }
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

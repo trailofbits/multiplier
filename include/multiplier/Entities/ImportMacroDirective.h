@@ -8,27 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "IncludeLikeMacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ImportMacroDirective;
 class IncludeLikeMacroDirective;
 class Macro;
 class MacroDirective;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ImportMacroDirective : public IncludeLikeMacroDirective {
  private:
@@ -38,6 +31,7 @@ class ImportMacroDirective : public IncludeLikeMacroDirective {
   friend class Macro;
  public:
   static gap::generator<ImportMacroDirective> in(const Fragment &frag);
+  static gap::generator<ImportMacroDirective> in(const File &file);
 
   static gap::generator<ImportMacroDirective> in(const Index &index);
   static std::optional<ImportMacroDirective> by_id(const Index &, EntityId);
@@ -52,34 +46,6 @@ class ImportMacroDirective : public IncludeLikeMacroDirective {
   static gap::generator<ImportMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<ImportMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<ImportMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<ImportMacroDirective> from(const IncludeLikeMacroDirective &parent);
-
-  inline static std::optional<ImportMacroDirective> from(const std::optional<IncludeLikeMacroDirective> &parent) {
-    if (parent) {
-      return ImportMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ImportMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<ImportMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return ImportMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ImportMacroDirective> from(const Macro &parent);
 
   inline static std::optional<ImportMacroDirective> from(const std::optional<Macro> &parent) {
@@ -89,6 +55,9 @@ class ImportMacroDirective : public IncludeLikeMacroDirective {
       return std::nullopt;
     }
   }
+
+  static std::optional<ImportMacroDirective> from(const Reference &r);
+  static std::optional<ImportMacroDirective> from(const TokenContext &t);
 
 };
 

@@ -23,14 +23,8 @@
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
-#include "WeggliImpl.h"
 
 namespace mx {
-namespace {
-
-static thread_local RawEntityIdList tIgnoredRedecls;
-
-}  // namespace
 
 FileLocationCache::~FileLocationCache(void) {}
 
@@ -138,13 +132,13 @@ std::optional<std::pair<unsigned, unsigned>> Token::location(
     return std::nullopt;
   }
 
-  const FileImpl *file_ptr = maybe_file_token.impl->OwningFile();
+  const FileImpl *file_ptr = maybe_file_token.impl->NthOwningFile(
+      maybe_file_token.offset);
   if (!file_ptr) {
     return std::nullopt;
   }
 
-  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token.impl),
-                                            file_ptr));
+  File file(FileImplPtr(std::move(maybe_file_token.impl), file_ptr));
   const FileLocationVector &vec = cache.impl->Add(std::move(file));
 
   if (maybe_file_token.offset >= vec.size()) {
@@ -163,13 +157,13 @@ std::optional<std::pair<unsigned, unsigned>> Token::next_location(
     return std::nullopt;
   }
 
-  const FileImpl *file_ptr = maybe_file_token.impl->OwningFile();
+  const FileImpl *file_ptr = maybe_file_token.impl->NthOwningFile(
+      maybe_file_token.offset);
   if (!file_ptr) {
     return std::nullopt;
   }
 
-  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token.impl),
-                                            file_ptr));
+  File file(FileImplPtr(std::move(maybe_file_token.impl), file_ptr));
   const FileLocationVector &vec = cache.impl->Add(std::move(file));
 
   if ((maybe_file_token.offset + 1u) >= vec.size()) {
@@ -192,10 +186,10 @@ std::optional<File> File::containing(const Fragment &fragment) {
 // Return the file containing a specific token.
 std::optional<File> File::containing(const Token &token) {
 
-  if (auto file = token.impl->OwningFile()) {
+  if (auto file = token.impl->NthOwningFile(token.offset)) {
     return File(FileImplPtr(token.impl, file));
 
-  } else if (auto frag = token.impl->OwningFragment()) {
+  } else if (auto frag = token.impl->NthOwningFragment(token.offset)) {
     return File::containing(Fragment(FragmentImplPtr(token.impl, frag)));
 
   } else {
@@ -205,6 +199,11 @@ std::optional<File> File::containing(const Token &token) {
 
 // Go through the tokens of the iterator and return the first file found.
 std::optional<File> File::containing(const TokenRange &tokens) {
+  for (Token tok : tokens.file_tokens()) {
+    if (auto file = File::containing(tok)) {
+      return file;
+    }
+  }
   for (Token tok : tokens) {
     if (auto file = File::containing(tok)) {
       return file;
@@ -215,16 +214,6 @@ std::optional<File> File::containing(const TokenRange &tokens) {
 
 // Return the file containing a regex match.
 std::optional<File> File::containing(const RegexQueryMatch &match) {
-  if (auto file = match.impl->OwningFile()) {
-    return File(FileImplPtr(match.impl, file));
-
-  } else {
-    return File::containing(Fragment::containing(match));
-  }
-}
-
-// Return the file containing a specific fragment.
-std::optional<File> File::containing(const WeggliQueryMatch &match) {
   if (auto file = match.impl->OwningFile()) {
     return File(FileImplPtr(match.impl, file));
 
@@ -250,21 +239,49 @@ std::optional<File> File::containing(const WeggliQueryMatch &match) {
       return std::nullopt; \
     }
 
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DEFINE_CONTAINING,
-                              MX_DEFINE_CONTAINING)
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_CONTAINING,
+                            MX_DEFINE_CONTAINING,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_CONTAINING
+
+std::optional<File> File::containing(const VariantEntity &entity) {
+#define GET_FILE(type_name, lower_name, enum_name, category) \
+      } else if (std::holds_alternative<type_name>(entity)) { \
+        return File::containing(std::get<type_name>(entity));
+
+  if (false) {
+    MX_FOR_EACH_ENTITY_CATEGORY(GET_FILE, GET_FILE, MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FILE, GET_FILE, GET_FILE,
+                                MX_IGNORE_ENTITY_CATEGORY)
+  } else {
+    return std::nullopt;
+  }
+#undef GET_FILE
+}
+
+// Return the file containing the token tree.
+std::optional<File> File::containing(const TokenTree &tree) {
+  if (tree.impl->file) {
+    return File(tree.impl->file);
+  } else if (tree.impl->fragment) {
+    return File::containing(Fragment(tree.impl->fragment));
+  } else {
+    return std::nullopt;
+  }
+}
 
 // Return the ID of this file.
 SpecificEntityId<FileId> File::id(void) const noexcept {
   return FileId{impl->file_id};
 }
 
-gap::generator<Fragment> File::fragments(void) const {
+gap::generator<Fragment> File::fragments(void) const & {
   FileId fid(impl->file_id);
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   auto ids = ep->ListFragmentsInFile(ep, fid);
   for (PackedFragmentId id : ids) {
     if (FragmentImplPtr frag = ep->FragmentFor(ep, id.Pack())) {
@@ -273,6 +290,11 @@ gap::generator<Fragment> File::fragments(void) const {
       assert(false);
     }
   }
+}
+
+// Return all file paths associated with this file.
+gap::generator<std::filesystem::path> File::paths(void) const & {
+  return impl->ep->ListPathsForFile(impl->ep, FileId(impl->file_id));
 }
 
 FragmentIdList File::fragment_ids(void) const {
@@ -291,11 +313,13 @@ std::string_view File::data(void) const noexcept {
 }
 
 // References of this file.
-gap::generator<Reference> File::references(void) const {
-  const EntityProvider::Ptr &ep = impl->ep;
-  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
-    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
-      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+gap::generator<Reference> File::references(void) const & {
+  const EntityProviderPtr &ep = impl->ep;
+  for (auto ref : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
+      auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));
+      co_yield Reference(std::move(eptr), std::move(context),
+                         std::get<0>(ref), category, std::get<2>(ref));
     }
   }
 }

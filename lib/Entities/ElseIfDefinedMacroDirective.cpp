@@ -1,0 +1,125 @@
+// Copyright (c) 2022-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
+
+// Auto-generated file; do not modify!
+
+#include <multiplier/Entities/ElseIfDefinedMacroDirective.h>
+
+#include <multiplier/Entities/ConditionalMacroDirective.h>
+#include <multiplier/Entities/Macro.h>
+#include <multiplier/Entities/MacroDirective.h>
+
+#include "../EntityProvider.h"
+#include "../Macro.h"
+
+namespace mx {
+#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
+gap::generator<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::containing(const Macro &macro) {
+  for (auto impl = macro.parent(); impl; impl = impl->parent()) {
+    if (auto d = ElseIfDefinedMacroDirective::from(*impl)) {
+      co_yield *d;
+    }
+  }
+}
+
+bool ElseIfDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : ElseIfDefinedMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool ElseIfDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseIfDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+gap::generator<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::containing(const Token &token) {
+  for (auto m : Macro::containing_internal(token)) {
+    if (auto d = ElseIfDefinedMacroDirective::from(m)) {
+      co_yield *d;
+    }
+  }
+}
+
+std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return ElseIfDefinedMacroDirective::from(index.macro(eid.Pack()));
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
+static const MacroKind kElseIfDefinedMacroDirectiveDerivedKinds[] = {
+    ElseIfDefinedMacroDirective::static_kind(),
+};
+
+std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case ElseIfDefinedMacroDirective::static_kind():
+      return reinterpret_cast<const ElseIfDefinedMacroDirective &>(parent);
+    default:
+      return std::nullopt;
+  }
+}
+
+gap::generator<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (MacroKind k : kElseIfDefinedMacroDirectiveDerivedKinds) {
+    for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
+      if (std::optional<ElseIfDefinedMacroDirective> e = ElseIfDefinedMacroDirective::from(Macro(std::move(eptr)))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (MacroKind k : kElseIfDefinedMacroDirectiveDerivedKinds) {
+    for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
+      if (std::optional<ElseIfDefinedMacroDirective> e = ElseIfDefinedMacroDirective::from(Macro(std::move(eptr)))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (MacroKind k : kElseIfDefinedMacroDirectiveDerivedKinds) {
+      for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
+        if (std::optional<ElseIfDefinedMacroDirective> e = ElseIfDefinedMacroDirective::from(Macro(std::move(eptr)))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const Reference &r) {
+  return ElseIfDefinedMacroDirective::from(r.as_macro());
+}
+
+std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const TokenContext &t) {
+  return ElseIfDefinedMacroDirective::from(t.as_macro());
+}
+
+#pragma GCC diagnostic pop
+#endif
+}  // namespace mx

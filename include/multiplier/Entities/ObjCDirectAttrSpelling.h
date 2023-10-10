@@ -14,7 +14,7 @@ namespace mx {
 enum class ObjCDirectAttrSpelling : unsigned char {
   GNU_OBJC_DIRECT,
   CXX11_CLANG_OBJC_DIRECT,
-  C2X_CLANG_OBJC_DIRECT,
+  C23_CLANG_OBJC_DIRECT,
   SPELLING_NOT_CALCULATED,
 };
 

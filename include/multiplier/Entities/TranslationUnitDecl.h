@@ -8,36 +8,32 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
+class Stmt;
+class Token;
 class TranslationUnitDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TranslationUnitDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<TranslationUnitDecl> in(const Fragment &frag);
   static gap::generator<TranslationUnitDecl> in(const Index &index);
   static gap::generator<TranslationUnitDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TranslationUnitDecl> by_id(const Index &, EntityId);
+  static gap::generator<TranslationUnitDecl> in(const Fragment &frag);
+  static gap::generator<TranslationUnitDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TRANSLATION_UNIT;
@@ -52,15 +48,9 @@ class TranslationUnitDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TranslationUnitDecl> redeclarations(void) const;
-  inline static std::optional<TranslationUnitDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TranslationUnitDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  TranslationUnitDecl canonical_declaration(void) const;
+  std::optional<TranslationUnitDecl> definition(void) const;
+  gap::generator<TranslationUnitDecl> redeclarations(void) const &;
   static std::optional<TranslationUnitDecl> from(const Decl &parent);
 
   inline static std::optional<TranslationUnitDecl> from(const std::optional<Decl> &parent) {
@@ -71,7 +61,10 @@ class TranslationUnitDecl : public Decl {
     }
   }
 
-  gap::generator<Decl> declarations_in_context(void) const;
+  static std::optional<TranslationUnitDecl> from(const Reference &r);
+  static std::optional<TranslationUnitDecl> from(const TokenContext &t);
+
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(TranslationUnitDecl) == sizeof(Decl));

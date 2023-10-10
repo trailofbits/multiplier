@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <multiplier/Database.h>
+#include <pasta/Compile/Compiler.h>
 #include <pasta/Compile/Job.h>
 #include <pasta/Util/FileManager.h>
 #include <unordered_map>
@@ -18,6 +19,8 @@
 
 namespace pasta {
 class AST;
+class Compiler;
+class CompileJob;
 class File;
 class TokenRange;
 }  // namespace pasta
@@ -25,16 +28,17 @@ namespace indexer {
 
 class IndexCompileJobAction final : public Action {
  private:
-  const std::shared_ptr<GlobalIndexingState> context;
+  GlobalIndexingState &context;
   const pasta::FileManager file_manager;
+  const pasta::Compiler compiler;
   const pasta::CompileJob job;
 
  public:
   virtual ~IndexCompileJobAction(void);
 
-  IndexCompileJobAction(std::shared_ptr<GlobalIndexingState> context_,
+  IndexCompileJobAction(GlobalIndexingState &context_,
                         pasta::FileManager file_manager_,
-                        pasta::CompileJob job_);
+                        pasta::Compiler compiler_, pasta::CompileJob job_);
 
   // Build and index the AST.
   void Run(void) final;

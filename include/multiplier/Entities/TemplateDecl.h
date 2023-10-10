@@ -8,27 +8,29 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class BuiltinTemplateDecl;
+class ClassTemplateDecl;
+class ConceptDecl;
 class Decl;
+class FunctionTemplateDecl;
 class NamedDecl;
+class Stmt;
 class TemplateDecl;
 class TemplateParameterList;
+class TemplateTemplateParmDecl;
+class Token;
+class TypeAliasTemplateDecl;
+class VarTemplateDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateDecl : public NamedDecl {
  private:
@@ -36,11 +38,12 @@ class TemplateDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TemplateDecl> in(const Fragment &frag);
   static gap::generator<TemplateDecl> in(const Index &index);
   static gap::generator<TemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TemplateDecl> by_id(const Index &, EntityId);
+  static gap::generator<TemplateDecl> in(const Fragment &frag);
+  static gap::generator<TemplateDecl> in(const File &file);
 
   static gap::generator<TemplateDecl> containing(const Decl &decl);
   static gap::generator<TemplateDecl> containing(const std::optional<Decl> &decl);
@@ -51,25 +54,9 @@ class TemplateDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TemplateDecl> redeclarations(void) const;
-  inline static std::optional<TemplateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TemplateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TemplateDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TemplateDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  TemplateDecl canonical_declaration(void) const;
+  std::optional<TemplateDecl> definition(void) const;
+  gap::generator<TemplateDecl> redeclarations(void) const &;
   static std::optional<TemplateDecl> from(const Decl &parent);
 
   inline static std::optional<TemplateDecl> from(const std::optional<Decl> &parent) {
@@ -80,9 +67,13 @@ class TemplateDecl : public NamedDecl {
     }
   }
 
+  static std::optional<TemplateDecl> from(const Reference &r);
+  static std::optional<TemplateDecl> from(const TokenContext &t);
+
   TemplateParameterList template_parameters(void) const;
   NamedDecl templated_declaration(void) const;
   bool has_associated_constraints(void) const;
+  bool is_type_alias(void) const;
 };
 
 static_assert(sizeof(TemplateDecl) == sizeof(NamedDecl));

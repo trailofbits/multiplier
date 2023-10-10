@@ -8,32 +8,25 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class MacroQualifiedType;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroQualifiedType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<MacroQualifiedType> in(const Fragment &frag);
   static gap::generator<MacroQualifiedType> in(const Index &index);
   static gap::generator<MacroQualifiedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +34,6 @@ class MacroQualifiedType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::MACRO_QUALIFIED;
-  }
-
-  inline static std::optional<MacroQualifiedType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<MacroQualifiedType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<MacroQualifiedType> from(const Type &parent);
@@ -60,6 +45,9 @@ class MacroQualifiedType : public Type {
       return std::nullopt;
     }
   }
+
+  static std::optional<MacroQualifiedType> from(const Reference &r);
+  static std::optional<MacroQualifiedType> from(const TokenContext &t);
 
   Type desugar(void) const;
   Type modified_type(void) const;

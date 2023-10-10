@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "ValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BindingDecl;
 class Decl;
 class Expr;
 class NamedDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BindingDecl : public ValueDecl {
  private:
@@ -39,11 +34,12 @@ class BindingDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<BindingDecl> in(const Fragment &frag);
   static gap::generator<BindingDecl> in(const Index &index);
   static gap::generator<BindingDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<BindingDecl> by_id(const Index &, EntityId);
+  static gap::generator<BindingDecl> in(const Fragment &frag);
+  static gap::generator<BindingDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BINDING;
@@ -58,35 +54,9 @@ class BindingDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<BindingDecl> redeclarations(void) const;
-  inline static std::optional<BindingDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<BindingDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<BindingDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<BindingDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return BindingDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BindingDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<BindingDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return BindingDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  BindingDecl canonical_declaration(void) const;
+  std::optional<BindingDecl> definition(void) const;
+  gap::generator<BindingDecl> redeclarations(void) const &;
   static std::optional<BindingDecl> from(const Decl &parent);
 
   inline static std::optional<BindingDecl> from(const std::optional<Decl> &parent) {
@@ -96,6 +66,9 @@ class BindingDecl : public ValueDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<BindingDecl> from(const Reference &r);
+  static std::optional<BindingDecl> from(const TokenContext &t);
 
   Expr binding(void) const;
   ValueDecl decomposed_declaration(void) const;

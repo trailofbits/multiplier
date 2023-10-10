@@ -8,27 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class Expr;
 class GenericSelectionExpr;
 class Stmt;
+class Token;
+class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class GenericSelectionExpr : public Expr {
  private:
@@ -37,11 +33,12 @@ class GenericSelectionExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<GenericSelectionExpr> in(const Fragment &frag);
   static gap::generator<GenericSelectionExpr> in(const Index &index);
   static gap::generator<GenericSelectionExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<GenericSelectionExpr> by_id(const Index &, EntityId);
+  static gap::generator<GenericSelectionExpr> in(const Fragment &frag);
+  static gap::generator<GenericSelectionExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GENERIC_SELECTION_EXPR;
@@ -56,34 +53,6 @@ class GenericSelectionExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<GenericSelectionExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<GenericSelectionExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<GenericSelectionExpr> from(const Expr &parent);
-
-  inline static std::optional<GenericSelectionExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return GenericSelectionExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<GenericSelectionExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<GenericSelectionExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return GenericSelectionExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<GenericSelectionExpr> from(const Stmt &parent);
 
   inline static std::optional<GenericSelectionExpr> from(const std::optional<Stmt> &parent) {
@@ -94,14 +63,21 @@ class GenericSelectionExpr : public Expr {
     }
   }
 
+  static std::optional<GenericSelectionExpr> from(const Reference &r);
+  static std::optional<GenericSelectionExpr> from(const TokenContext &t);
+
   std::optional<Expr> nth_association_expression(unsigned n) const;
-  gap::generator<Expr> association_expressions(void) const;
+  unsigned num_association_expressions(void) const;
+  gap::generator<Expr> association_expressions(void) const &;
   Expr controlling_expression(void) const;
+  Type controlling_type(void) const;
   Token default_token(void) const;
   Token generic_token(void) const;
   Token r_paren_token(void) const;
   Expr result_expression(void) const;
+  bool is_expression_predicate(void) const;
   bool is_result_dependent(void) const;
+  bool is_type_predicate(void) const;
 };
 
 static_assert(sizeof(GenericSelectionExpr) == sizeof(Expr));

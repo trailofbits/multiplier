@@ -8,6 +8,15 @@
 
 #include <glog/logging.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
 #include <clang/AST/Attr.h>
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
@@ -16,16 +25,12 @@
 #include <clang/AST/Mangle.h>
 #include <clang/AST/ODRHash.h>
 #include <clang/AST/PrettyPrinter.h>
-
 #include <clang/Frontend/ASTUnit.h>
-
 #include <clang/Index/IndexSymbol.h>
-
-#include <llvm/Support/Casting.h>
-#include <llvm/Support/raw_ostream.h>
-
 #include <llvm/ADT/SmallString.h>
 #include <llvm/Support/Casting.h>
+#include <llvm/Support/raw_ostream.h>
+#pragma clang diagnostic pop
 
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
@@ -35,6 +40,8 @@
 
 namespace indexer {
 namespace {
+
+static const std::string kEmpty;
 
 static clang::FunctionDecl *WalkUpToFunction(const clang::Decl *decl);
 
@@ -68,7 +75,7 @@ class NameManglerImpl {
   bool is_precise{false};
 
   explicit NameManglerImpl(clang::ASTContext &ast_context_,
-                           std::filesystem::path tu_);
+                           mx::PackedCompilationId tu_id_);
 
   // Returns the mangled name of `decl`.
   //
@@ -76,19 +83,22 @@ class NameManglerImpl {
   const std::string &GetMangledName(const clang::Decl *decl);
 
   const std::string &GetMangledNameRec(const clang::FunctionDecl *decl);
+  const std::string &GetMangledNameRec(const clang::BlockDecl *decl);
+  const std::string &GetMangledNameRec(const clang::ObjCMethodDecl *decl);
   const std::string &GetMangledNameRec(const clang::FieldDecl *decl);
   const std::string &GetMangledNameRec(const clang::ParmVarDecl *decl);
   const std::string &GetMangledNameRec(const clang::ImplicitParamDecl *decl);
   const std::string &GetMangledNameRec(const clang::VarDecl *decl);
   const std::string &GetMangledNameRec(const clang::EnumConstantDecl *decl);
-  const std::string &GetMangledNameImpl(const clang::NamedDecl *decl);
+  const std::string &GetMangledNameImpl(const clang::NamedDecl *decl,
+                                        bool force=false);
 
   NameManglerImpl(void) = delete;
 };
 
 NameManglerImpl::NameManglerImpl(clang::ASTContext &ast_context_,
-                                 std::filesystem::path tu_)
-    : tu(std::hash<std::string>{}(tu_.generic_string())),
+                                 mx::PackedCompilationId tu_id_)
+    : tu(tu_id_.Pack()),
       mangled_name_os(mangled_name),
       mangle_context(ast_context_.createMangleContext()) {
 
@@ -157,6 +167,27 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   return mangled_name;
 }
 
+// NOTE(pag): Blocks don't have names, so from the perspective of finding
+//            redeclarations, we don't want blocks to participate in the
+//            process of linking against one-another.
+const std::string &NameManglerImpl::GetMangledNameRec(
+    const clang::BlockDecl *) {
+  return kEmpty;
+}
+
+const std::string &NameManglerImpl::GetMangledNameRec(
+    const clang::ObjCMethodDecl *decl) {
+
+  (void) GetMangledNameImpl(decl);
+
+  if (!decl->isExternallyVisible() && decl->isDefined()) {
+    mangled_name_os << " tu:" << tu;
+    mangled_name_os.flush();
+  }
+
+  return mangled_name;
+}
+
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::FieldDecl *decl) {
   if (!GetMangledNameImpl(decl->getParent()).empty()) {
@@ -207,12 +238,32 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::ParmVarDecl *decl) {
-  auto parent_decl = clang::Decl::castFromDeclContext(decl->getParentFunctionOrMethod());
-  auto func_decl = clang::dyn_cast<clang::FunctionDecl>(parent_decl);
-  if (!GetMangledNameRec(func_decl).empty()) {
-    mangled_name_os
-        << " param:" << decl->getFunctionScopeIndex();
-    mangled_name_os.flush();
+  const clang::Decl *parent_decl = clang::Decl::castFromDeclContext(
+      decl->getParentFunctionOrMethod());
+
+  if (auto func_decl = clang::dyn_cast<clang::FunctionDecl>(parent_decl)) {
+    if (!GetMangledNameRec(func_decl).empty()) {
+      mangled_name_os
+          << " param:" << decl->getFunctionScopeIndex();
+      mangled_name_os.flush();
+    }
+  } else if (auto block_decl = clang::dyn_cast<clang::BlockDecl>(parent_decl)) {
+    if (!GetMangledNameRec(block_decl).empty()) {
+      mangled_name_os
+          << " param:" << decl->getFunctionScopeIndex();
+      mangled_name_os.flush();
+    }
+  } else if (auto meth_decl = clang::dyn_cast<clang::ObjCMethodDecl>(parent_decl)) {
+    if (!GetMangledNameRec(meth_decl).empty()) {
+      mangled_name_os
+          << " param:" << decl->getFunctionScopeIndex();
+      mangled_name_os.flush();
+    }
+  } else {
+    assert(false);
+    LOG(ERROR) << "Unhandled ParmVarDecl context in name mangler: "
+               << parent_decl->getDeclKindName();
+    return kEmpty;
   }
   return mangled_name;
 }
@@ -239,7 +290,7 @@ const std::string &NameManglerImpl::GetMangledNameRec(
       return mangled_name;
 
     } else {
-      return GetMangledNameImpl(decl);
+      return GetMangledNameImpl(decl, decl->hasGlobalStorage());
     }
   }
 }
@@ -250,16 +301,15 @@ const std::string &NameManglerImpl::GetMangledNameRec(
       clang::Decl::castFromDeclContext(decl->getDeclContext()));
   if (enum_decl && !GetMangledName(enum_decl).empty()) {
     mangled_name_os.flush();
-    mangled_name_os << " ";
-    mangled_name_os << "(enumerator " << decl->getName() << ", value "
-                    << decl->getInitVal() << ")";
+    mangled_name_os << " enumerator:" << decl->getName() << " value:"
+                    << decl->getInitVal();
     mangled_name_os.flush();
   }
   return mangled_name;
 }
 
 const std::string &NameManglerImpl::GetMangledNameImpl(
-    const clang::NamedDecl *decl) {
+    const clang::NamedDecl *decl, bool force) {
 
   // Sometimes C structures, compiled in C++ mode, show up as CXXRecordDecls,
   // and we don't want to mangle them, otherwise we might end up with one
@@ -269,13 +319,17 @@ const std::string &NameManglerImpl::GetMangledNameImpl(
     return mangled_name;
   }
 
-  if (mangle_context->shouldMangleDeclName(decl)) {
+  auto should_mangle = mangle_context->shouldMangleDeclName(decl);
+  if (!should_mangle && !force) {
+    return mangled_name;
+  }
 
-    clang::index::SymbolInfo info = clang::index::getSymbolInfo(decl);
-    bool is_cxx_name = info.Lang == clang::index::SymbolLanguage::CXX &&
-                       clang::isa<clang::FunctionDecl, clang::VarDecl,
-                                  clang::TemplateParamObjectDecl>(decl);
+  clang::index::SymbolInfo info = clang::index::getSymbolInfo(decl);
+  bool is_cxx_name = info.Lang == clang::index::SymbolLanguage::CXX &&
+                     clang::isa<clang::FunctionDecl, clang::VarDecl,
+                                clang::TemplateParamObjectDecl>(decl);
 
+  if (should_mangle) {
     if (auto type_decl = clang::dyn_cast<clang::TypeDecl>(decl)) {
       if (auto type = type_decl->getTypeForDecl()) {
         clang::QualType qual_type(type, 0);
@@ -306,8 +360,19 @@ const std::string &NameManglerImpl::GetMangledNameImpl(
     // TODO(pag): Handle CUDA-attributed function decls.
 
     } else {
-      mangle_context->mangleName(decl, mangled_name_os);
+      clang::GlobalDecl gd(decl);
+      mangle_context->mangleName(gd, mangled_name_os);
     }
+    mangled_name_os.flush();
+
+  } else if (is_cxx_name) {
+
+    // TODO(pag): Figure out what to do here.
+    assert(false);
+
+  } else {
+    decl->printName(mangled_name_os);
+    mangled_name_os << " kind:" << decl->getDeclKindName();
     mangled_name_os.flush();
   }
 
@@ -331,6 +396,12 @@ const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
   // `...` as their mangled name, because that is really what gets called.
   } else if (auto func_decl = clang::dyn_cast<clang::FunctionDecl>(decl)) {
     return GetMangledNameRec(func_decl);
+
+  } else if (auto block_decl = clang::dyn_cast<clang::BlockDecl>(decl)) {
+    return GetMangledNameRec(block_decl);
+
+  } else if (auto meth_decl = clang::dyn_cast<clang::ObjCMethodDecl>(decl)) {
+    return GetMangledNameRec(meth_decl);
 
   // Handle fields in terms of the mangled name of their struct/union/class
   // whatever.
@@ -406,9 +477,8 @@ const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
 
 NameMangler::~NameMangler(void) {}
 
-NameMangler::NameMangler(const pasta::AST &ast)
-    : impl(std::make_unique<NameManglerImpl>(ast.UnderlyingAST(),
-                                             ast.MainFile().Path())) {}
+NameMangler::NameMangler(const pasta::AST &ast, mx::PackedCompilationId tu_id_)
+    : impl(std::make_unique<NameManglerImpl>(ast.UnderlyingAST(), tu_id_)) {}
 
 const std::string &NameMangler::Mangle(const pasta::Decl &decl) const {
   return impl->GetMangledName(decl.RawDecl());

@@ -8,37 +8,33 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class GotoStmt;
 class LabelDecl;
 class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class GotoStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<GotoStmt> in(const Fragment &frag);
   static gap::generator<GotoStmt> in(const Index &index);
   static gap::generator<GotoStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<GotoStmt> by_id(const Index &, EntityId);
+  static gap::generator<GotoStmt> in(const Fragment &frag);
+  static gap::generator<GotoStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GOTO_STMT;
@@ -53,14 +49,6 @@ class GotoStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<GotoStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<GotoStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<GotoStmt> from(const Stmt &parent);
 
   inline static std::optional<GotoStmt> from(const std::optional<Stmt> &parent) {
@@ -70,6 +58,9 @@ class GotoStmt : public Stmt {
       return std::nullopt;
     }
   }
+
+  static std::optional<GotoStmt> from(const Reference &r);
+  static std::optional<GotoStmt> from(const TokenContext &t);
 
   Token goto_token(void) const;
   LabelDecl label(void) const;

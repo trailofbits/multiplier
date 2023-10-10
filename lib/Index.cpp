@@ -59,6 +59,15 @@ IndexStatus Index::status(bool block) const {
   }
 }
 
+// Create an in-memory caching index provider.
+Index Index::in_memory_cache(Index next, unsigned timeout_s) {
+  return EntityProvider::CreateInMemoryCache(std::move(next.impl), timeout_s);
+}
+
+Index Index::from_database(std::filesystem::path path) {
+  return EntityProvider::CreateFromDatabase(std::move(path));
+}
+
 Index Index::containing(const Fragment &fragment) {
   return Index(fragment.impl->ep);
 }
@@ -92,15 +101,30 @@ Index Index::containing(const Designator &entity) {
 }
 
 std::optional<Index> Index::containing(const Token &entity) {
-  if (auto frag = entity.impl->OwningFragment()) {
-    return Index(frag->ep);
-
-  } else if (auto file = entity.impl->OwningFile()) {
-    return Index(file->ep);
-
+  if (EntityProviderPtr ep = TokenReader::EntityProviderFor(entity)) {
+    return Index(std::move(ep));
   } else {
     return std::nullopt;
   }
+}
+
+namespace {
+
+struct IndexFromEntityVisitor {
+  inline std::optional<Index> operator()(const NotAnEntity &) const {
+    return std::nullopt;
+  }
+  template <typename T>
+  inline std::optional<Index> operator()(const T &ent) const {
+    return Index::containing(ent);
+  }
+};
+
+}  // namespace
+
+std::optional<Index> Index::containing(const VariantEntity &entity) {
+  return std::visit<std::optional<Index>>(
+      IndexFromEntityVisitor{}, entity);
 }
 
 // Clear any internal caches.
@@ -112,8 +136,13 @@ FilePathMap Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }
 
-gap::generator<File> Index::files(void) const {
-  std::vector<SpecificEntityId<FileId>> file_ids;
+// Generate all compilation units in the index.
+gap::generator<Compilation> Index::compilations(void) const & {
+  co_return;  // TODO(pag): Implement me!
+}
+
+gap::generator<File> Index::files(void) const & {
+  std::vector<PackedFileId> file_ids;
   auto file_paths = impl->ListFiles(impl);
   file_ids.reserve(file_paths.size());
   for (const auto &[path, file_id] : file_paths) {
@@ -134,14 +163,16 @@ gap::generator<File> Index::files(void) const {
 
 #define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \
   std::optional<type_name> Index::lower_name(RawEntityId id) const { \
-    if (type_name ## ImplPtr ptr = impl->type_name ## For(impl, id)) { \
-      return type_name(std::move(ptr)); \
-    } else { \
-      return std::nullopt; \
+    if (CategoryFromEntityId(id) == EntityCategory::enum_name) { \
+      if (type_name ## ImplPtr ptr = impl->type_name ## For(impl, id)) { \
+        return type_name(std::move(ptr)); \
+      } \
     } \
+    return std::nullopt; \
   }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_GETTER, MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER, MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER)
 #undef MX_DEFINE_GETTER
@@ -170,12 +201,12 @@ VariantEntity Index::entity(EntityId eid) const {
 
   // It's a reference to a parsed token resident in a fragment.
   if (std::holds_alternative<ParsedTokenId>(vid)) {
-    ParsedTokenId id = std::get<ParsedTokenId>(vid);
-    FragmentId fid(id.fragment_id);
+    ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
 
     if (FragmentImplPtr fptr = impl->FragmentFor(impl, fid);
-        id.offset < fptr->num_parsed_tokens) {
-      Token tok(fptr->ParsedTokenReader(fptr), id.offset);
+        tid.offset < fptr->num_parsed_tokens) {
+      Token tok(fptr->ParsedTokenReader(fptr), tid.offset);
       if (tok.id() == eid) {
         return tok;
       }
@@ -184,12 +215,12 @@ VariantEntity Index::entity(EntityId eid) const {
 
   // It's a reference to a macro token resident in a fragment.
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
-    MacroTokenId id = std::get<MacroTokenId>(vid);
-    FragmentId fid(id.fragment_id);
+    MacroTokenId tid = std::get<MacroTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
 
     if (FragmentImplPtr frag_ptr = impl->FragmentFor(impl, fid);
-        frag_ptr && id.offset < frag_ptr->num_tokens) {
-      Token tok(frag_ptr->MacroTokenReader(frag_ptr), id.offset);
+        frag_ptr && tid.offset < frag_ptr->num_tokens) {
+      Token tok(frag_ptr->MacroTokenReader(frag_ptr), tid.offset);
       if (tok.id() == eid) {
         return tok;
       }
@@ -198,12 +229,12 @@ VariantEntity Index::entity(EntityId eid) const {
 
   // It's a reference to a file token.
   } else if (std::holds_alternative<FileTokenId>(vid)) {
-    FileTokenId id = std::get<FileTokenId>(vid);
-    FileId fid(id.file_id);
+    FileTokenId tid = std::get<FileTokenId>(vid);
+    FileId fid(tid.file_id);
 
     if (FileImplPtr file_ptr = impl->FileFor(impl, fid);
-        file_ptr && id.offset < file_ptr->num_tokens) {
-      Token tok(file_ptr->TokenReader(file_ptr), id.offset);
+        file_ptr && tid.offset < file_ptr->num_tokens) {
+      Token tok(file_ptr->TokenReader(file_ptr), tid.offset);
       if (tok.id() == eid) {
         return tok;
       }
@@ -223,6 +254,7 @@ VariantEntity Index::entity(EntityId eid) const {
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
+                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER
 
@@ -237,7 +269,7 @@ VariantEntity Index::entity(EntityId eid) const {
 // Search for entities by their name and category.
 //
 // NOTE(pag): This might return redeclarations.
-gap::generator<NamedEntity> Index::query_entities(std::string name) const {
+gap::generator<NamedEntity> Index::query_entities(std::string name) const & {
 
   for (RawEntityId eid : impl->FindSymbol(impl, std::move(name))) {
     VariantId vid = EntityId(eid).Unpack();

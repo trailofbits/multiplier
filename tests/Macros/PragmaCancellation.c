@@ -3,7 +3,7 @@
 // because the `_Pragma` is being expanded during the macro pre-argument
 // expansion phase.
 
-void main() {
+void PragmaCancellation() {
 #define MACRO(...) __VA_ARGS__
 MACRO(_Pragma("clang diagnostic push"))
 }

@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AtomicExprAtomicOp.h"
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AtomicExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AtomicExpr : public Expr {
  private:
@@ -39,11 +34,12 @@ class AtomicExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<AtomicExpr> in(const Fragment &frag);
   static gap::generator<AtomicExpr> in(const Index &index);
   static gap::generator<AtomicExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AtomicExpr> by_id(const Index &, EntityId);
+  static gap::generator<AtomicExpr> in(const Fragment &frag);
+  static gap::generator<AtomicExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ATOMIC_EXPR;
@@ -58,34 +54,6 @@ class AtomicExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<AtomicExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<AtomicExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<AtomicExpr> from(const Expr &parent);
-
-  inline static std::optional<AtomicExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return AtomicExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<AtomicExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<AtomicExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return AtomicExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<AtomicExpr> from(const Stmt &parent);
 
   inline static std::optional<AtomicExpr> from(const std::optional<Stmt> &parent) {
@@ -96,8 +64,12 @@ class AtomicExpr : public Expr {
     }
   }
 
+  static std::optional<AtomicExpr> from(const Reference &r);
+  static std::optional<AtomicExpr> from(const TokenContext &t);
+
   Token builtin_token(void) const;
   AtomicExprAtomicOp operation(void) const;
+  std::string_view operation_as_string(void) const;
   Expr order(void) const;
   std::optional<Expr> order_fail(void) const;
   Expr pointer(void) const;
@@ -111,7 +83,8 @@ class AtomicExpr : public Expr {
   bool is_open_cl(void) const;
   bool is_volatile(void) const;
   std::optional<Expr> nth_sub_expression(unsigned n) const;
-  gap::generator<Expr> sub_expressions(void) const;
+  unsigned num_sub_expressions(void) const;
+  gap::generator<Expr> sub_expressions(void) const &;
 };
 
 static_assert(sizeof(AtomicExpr) == sizeof(Expr));

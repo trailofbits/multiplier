@@ -8,37 +8,33 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class ImportDecl;
+class Stmt;
 class Token;
+class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ImportDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ImportDecl> in(const Fragment &frag);
   static gap::generator<ImportDecl> in(const Index &index);
   static gap::generator<ImportDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ImportDecl> by_id(const Index &, EntityId);
+  static gap::generator<ImportDecl> in(const Fragment &frag);
+  static gap::generator<ImportDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPORT;
@@ -53,15 +49,9 @@ class ImportDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ImportDecl> redeclarations(void) const;
-  inline static std::optional<ImportDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ImportDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  ImportDecl canonical_declaration(void) const;
+  std::optional<ImportDecl> definition(void) const;
+  gap::generator<ImportDecl> redeclarations(void) const &;
   static std::optional<ImportDecl> from(const Decl &parent);
 
   inline static std::optional<ImportDecl> from(const std::optional<Decl> &parent) {
@@ -72,8 +62,12 @@ class ImportDecl : public Decl {
     }
   }
 
+  static std::optional<ImportDecl> from(const Reference &r);
+  static std::optional<ImportDecl> from(const TokenContext &t);
+
   std::optional<Token> nth_identifier_token(unsigned n) const;
-  gap::generator<Token> identifier_tokens(void) const;
+  unsigned num_identifier_tokens(void) const;
+  gap::generator<Token> identifier_tokens(void) const &;
 };
 
 static_assert(sizeof(ImportDecl) == sizeof(Decl));

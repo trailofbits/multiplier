@@ -66,6 +66,18 @@ FilePathMap CachingEntityProvider::ListFiles(const Ptr &self) {
   return file_list;
 }
 
+// Get the list of paths associated with a given file id.
+gap::generator<std::filesystem::path> CachingEntityProvider::ListPathsForFile(
+    const Ptr &self, PackedFileId id) {
+  return next->ListPathsForFile(self, id);
+}
+
+// Get the list nested fragments for a given fragment.
+FragmentIdList CachingEntityProvider::ListNestedFragmentIds(
+    const Ptr &self, PackedFragmentId id) {
+  return next->ListNestedFragmentIds(self, id);
+}
+
 // Get the current list of fragment IDs associated with a file.
 //
 // TODO(pag): Re-evaluate if caching this is beneficial/useful.
@@ -121,12 +133,13 @@ CachingEntityProvider::ReferenceKindFor(const Ptr &self,
 
 bool CachingEntityProvider::AddReference(const Ptr &ep, RawEntityId kind_id,
                                          RawEntityId from_id,
-                                         RawEntityId to_id) {
-  return next->AddReference(ep, kind_id, from_id, to_id);
+                                         RawEntityId to_id,
+                                         RawEntityId context_id) {
+  return next->AddReference(ep, kind_id, from_id, to_id, context_id);
 }
 
 gap::generator<RawEntityId> CachingEntityProvider::Redeclarations(
-    const Ptr &self, RawEntityId raw_id) {
+    const Ptr &self, RawEntityId raw_id) & {
 
   EntityCategory category = CategoryFromEntityId(raw_id);
   if (EntityCategory::NOT_AN_ENTITY == category) {
@@ -168,18 +181,18 @@ gap::generator<RawEntityId> CachingEntityProvider::Redeclarations(
   }
 }
 
-gap::generator<std::pair<RawEntityId, RawEntityId>>
-CachingEntityProvider::References(const Ptr &self, RawEntityId eid) {
+gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
+CachingEntityProvider::References(const Ptr &self, RawEntityId eid) & {
   return next->References(self, eid);
 }
 
 gap::generator<RawEntityId> CachingEntityProvider::FindSymbol(
-    const Ptr &self, std::string name) {
+    const Ptr &self, std::string name) & {
   return next->FindSymbol(self, std::move(name));
 }
 
 // Returns an entity provider that gets entities from a UNIX domain socket.
-EntityProvider::Ptr EntityProvider::in_memory_cache(
+EntityProviderPtr EntityProvider::CreateInMemoryCache(
     Ptr next, unsigned timeout_s_) {
   auto ret = std::make_shared<CachingEntityProvider>(std::move(next));
 
@@ -250,7 +263,7 @@ EntityProvider::Ptr EntityProvider::in_memory_cache(
     } \
     \
     gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
-        const Ptr &self) { \
+        const Ptr &self) & { \
       return next->type_name ## sFor(self); \
     }
 
@@ -258,38 +271,54 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
-      const Ptr &self, type_name ## Kind kind) { \
+      const Ptr &self, type_name ## Kind kind) & { \
     return next->type_name ## sFor(self, kind); \
-  } \
-  \
+  }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
-      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) { \
+      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) & { \
     return next->type_name ## sFor(self, kind, frag_id); \
   }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> CachingEntityProvider::type_name ## sFor( \
-      const Ptr &self, PackedFragmentId frag_id) { \
+      const Ptr &self, PackedFragmentId frag_id) & { \
     return next->type_name ## sFor(self, frag_id); \
   }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
-                            MX_DECLARE_ENTITY_LISTERS)
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
 }  // namespace mx

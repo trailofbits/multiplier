@@ -8,32 +8,26 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
+#include "TypeOfKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Token;
 class Type;
 class TypeOfType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeOfType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TypeOfType> in(const Fragment &frag);
   static gap::generator<TypeOfType> in(const Index &index);
   static gap::generator<TypeOfType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -41,14 +35,6 @@ class TypeOfType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPE_OF;
-  }
-
-  inline static std::optional<TypeOfType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TypeOfType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<TypeOfType> from(const Type &parent);
@@ -61,8 +47,12 @@ class TypeOfType : public Type {
     }
   }
 
+  static std::optional<TypeOfType> from(const Reference &r);
+  static std::optional<TypeOfType> from(const TokenContext &t);
+
   Type desugar(void) const;
-  Type underlying_type(void) const;
+  TypeOfKind type_kind(void) const;
+  Type unmodified_type(void) const;
   bool is_sugared(void) const;
 };
 

@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AddrLabelExpr;
+class Decl;
 class Expr;
 class LabelDecl;
 class Stmt;
+class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AddrLabelExpr : public Expr {
  private:
@@ -38,11 +33,12 @@ class AddrLabelExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<AddrLabelExpr> in(const Fragment &frag);
   static gap::generator<AddrLabelExpr> in(const Index &index);
   static gap::generator<AddrLabelExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AddrLabelExpr> by_id(const Index &, EntityId);
+  static gap::generator<AddrLabelExpr> in(const Fragment &frag);
+  static gap::generator<AddrLabelExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ADDR_LABEL_EXPR;
@@ -57,34 +53,6 @@ class AddrLabelExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<AddrLabelExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<AddrLabelExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<AddrLabelExpr> from(const Expr &parent);
-
-  inline static std::optional<AddrLabelExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return AddrLabelExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<AddrLabelExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<AddrLabelExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return AddrLabelExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<AddrLabelExpr> from(const Stmt &parent);
 
   inline static std::optional<AddrLabelExpr> from(const std::optional<Stmt> &parent) {
@@ -94,6 +62,9 @@ class AddrLabelExpr : public Expr {
       return std::nullopt;
     }
   }
+
+  static std::optional<AddrLabelExpr> from(const Reference &r);
+  static std::optional<AddrLabelExpr> from(const TokenContext &t);
 
   Token amp_amp_token(void) const;
   LabelDecl label(void) const;

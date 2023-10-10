@@ -8,27 +8,32 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class CXXRecordDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
 class Decl;
+class EnumDecl;
 class NamedDecl;
+class ObjCTypeParamDecl;
+class RecordDecl;
+class Stmt;
+class TemplateTypeParmDecl;
+class Token;
 class Type;
+class TypeAliasDecl;
 class TypeDecl;
+class TypedefDecl;
+class UnresolvedUsingTypenameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeDecl : public NamedDecl {
  private:
@@ -36,11 +41,12 @@ class TypeDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TypeDecl> in(const Fragment &frag);
   static gap::generator<TypeDecl> in(const Index &index);
   static gap::generator<TypeDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeDecl> by_id(const Index &, EntityId);
+  static gap::generator<TypeDecl> in(const Fragment &frag);
+  static gap::generator<TypeDecl> in(const File &file);
 
   static gap::generator<TypeDecl> containing(const Decl &decl);
   static gap::generator<TypeDecl> containing(const std::optional<Decl> &decl);
@@ -51,25 +57,9 @@ class TypeDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TypeDecl> redeclarations(void) const;
-  inline static std::optional<TypeDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TypeDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TypeDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TypeDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TypeDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  TypeDecl canonical_declaration(void) const;
+  std::optional<TypeDecl> definition(void) const;
+  gap::generator<TypeDecl> redeclarations(void) const &;
   static std::optional<TypeDecl> from(const Decl &parent);
 
   inline static std::optional<TypeDecl> from(const std::optional<Decl> &parent) {
@@ -79,6 +69,9 @@ class TypeDecl : public NamedDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<TypeDecl> from(const Reference &r);
+  static std::optional<TypeDecl> from(const TokenContext &t);
 
   std::optional<Type> type_for_declaration(void) const;
 };

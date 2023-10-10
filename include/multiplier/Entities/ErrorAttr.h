@@ -8,27 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "ErrorAttrSpelling.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class ErrorAttr;
 class InheritableAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ErrorAttr : public InheritableAttr {
  private:
@@ -36,32 +30,15 @@ class ErrorAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<ErrorAttr> in(const Fragment &frag);
   static gap::generator<ErrorAttr> in(const Index &index);
   static gap::generator<ErrorAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ErrorAttr> by_id(const Index &, EntityId);
+  static gap::generator<ErrorAttr> in(const Fragment &frag);
+  static gap::generator<ErrorAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ERROR;
-  }
-
-  inline static std::optional<ErrorAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ErrorAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<ErrorAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<ErrorAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return ErrorAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ErrorAttr> from(const Attr &parent);
@@ -73,6 +50,9 @@ class ErrorAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<ErrorAttr> from(const Reference &r);
+  static std::optional<ErrorAttr> from(const TokenContext &t);
 
   ErrorAttrSpelling semantic_spelling(void) const;
   std::string_view user_diagnostic(void) const;

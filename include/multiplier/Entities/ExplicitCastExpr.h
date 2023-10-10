@@ -8,29 +8,33 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CastExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class BuiltinBitCastExpr;
+class CStyleCastExpr;
+class CXXAddrspaceCastExpr;
+class CXXConstCastExpr;
+class CXXDynamicCastExpr;
+class CXXFunctionalCastExpr;
+class CXXReinterpretCastExpr;
+class CXXStaticCastExpr;
 class CastExpr;
+class Decl;
 class ExplicitCastExpr;
 class Expr;
+class ObjCBridgedCastExpr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ExplicitCastExpr : public CastExpr {
  private:
@@ -40,11 +44,12 @@ class ExplicitCastExpr : public CastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ExplicitCastExpr> in(const Fragment &frag);
   static gap::generator<ExplicitCastExpr> in(const Index &index);
   static gap::generator<ExplicitCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ExplicitCastExpr> by_id(const Index &, EntityId);
+  static gap::generator<ExplicitCastExpr> in(const Fragment &frag);
+  static gap::generator<ExplicitCastExpr> in(const File &file);
 
   static gap::generator<ExplicitCastExpr> containing(const Decl &decl);
   static gap::generator<ExplicitCastExpr> containing(const std::optional<Decl> &decl);
@@ -55,44 +60,6 @@ class ExplicitCastExpr : public CastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ExplicitCastExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ExplicitCastExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ExplicitCastExpr> from(const CastExpr &parent);
-
-  inline static std::optional<ExplicitCastExpr> from(const std::optional<CastExpr> &parent) {
-    if (parent) {
-      return ExplicitCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ExplicitCastExpr> from(const Expr &parent);
-
-  inline static std::optional<ExplicitCastExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ExplicitCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ExplicitCastExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ExplicitCastExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ExplicitCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ExplicitCastExpr> from(const Stmt &parent);
 
   inline static std::optional<ExplicitCastExpr> from(const std::optional<Stmt> &parent) {
@@ -102,6 +69,9 @@ class ExplicitCastExpr : public CastExpr {
       return std::nullopt;
     }
   }
+
+  static std::optional<ExplicitCastExpr> from(const Reference &r);
+  static std::optional<ExplicitCastExpr> from(const TokenContext &t);
 
   Type type_as_written(void) const;
 };

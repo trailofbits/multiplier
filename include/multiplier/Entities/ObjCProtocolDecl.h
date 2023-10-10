@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "ObjCContainerDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class ObjCContainerDecl;
 class ObjCProtocolDecl;
+class Stmt;
 class Token;
+class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCProtocolDecl : public ObjCContainerDecl {
  private:
@@ -38,11 +33,12 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCProtocolDecl> in(const Fragment &frag);
   static gap::generator<ObjCProtocolDecl> in(const Index &index);
   static gap::generator<ObjCProtocolDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCProtocolDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCProtocolDecl> in(const Fragment &frag);
+  static gap::generator<ObjCProtocolDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROTOCOL;
@@ -57,35 +53,9 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCProtocolDecl> redeclarations(void) const;
-  inline static std::optional<ObjCProtocolDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCProtocolDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
-
-  inline static std::optional<ObjCProtocolDecl> from(const std::optional<ObjCContainerDecl> &parent) {
-    if (parent) {
-      return ObjCProtocolDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCProtocolDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCProtocolDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCProtocolDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  ObjCProtocolDecl canonical_declaration(void) const;
+  std::optional<ObjCProtocolDecl> definition(void) const;
+  gap::generator<ObjCProtocolDecl> redeclarations(void) const &;
   static std::optional<ObjCProtocolDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCProtocolDecl> from(const std::optional<Decl> &parent) {
@@ -96,14 +66,19 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
     }
   }
 
+  static std::optional<ObjCProtocolDecl> from(const Reference &r);
+  static std::optional<ObjCProtocolDecl> from(const TokenContext &t);
+
   std::string_view obj_c_runtime_name_as_string(void) const;
   bool has_definition(void) const;
   bool is_non_runtime_protocol(void) const;
   bool is_this_declaration_a_definition(void) const;
   std::optional<Token> nth_protocol_token(unsigned n) const;
-  gap::generator<Token> protocol_tokens(void) const;
+  unsigned num_protocol_tokens(void) const;
+  gap::generator<Token> protocol_tokens(void) const &;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> protocols(void) const;
+  unsigned num_protocols(void) const;
+  gap::generator<ObjCProtocolDecl> protocols(void) const &;
 };
 
 static_assert(sizeof(ObjCProtocolDecl) == sizeof(ObjCContainerDecl));

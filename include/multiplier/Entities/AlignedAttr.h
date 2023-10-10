@@ -8,29 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AlignedAttrSpelling.h"
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AlignedAttr;
 class Attr;
 class Expr;
 class InheritableAttr;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AlignedAttr : public InheritableAttr {
  private:
@@ -38,32 +32,15 @@ class AlignedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AlignedAttr> in(const Fragment &frag);
   static gap::generator<AlignedAttr> in(const Index &index);
   static gap::generator<AlignedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AlignedAttr> by_id(const Index &, EntityId);
+  static gap::generator<AlignedAttr> in(const Fragment &frag);
+  static gap::generator<AlignedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGNED;
-  }
-
-  inline static std::optional<AlignedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AlignedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AlignedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AlignedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AlignedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AlignedAttr> from(const Attr &parent);
@@ -76,8 +53,12 @@ class AlignedAttr : public InheritableAttr {
     }
   }
 
+  static std::optional<AlignedAttr> from(const Reference &r);
+  static std::optional<AlignedAttr> from(const TokenContext &t);
+
   std::optional<Expr> alignment_expression(void) const;
   std::optional<Type> alignment_type(void) const;
+  std::optional<uint32_t> cached_alignment_value(void) const;
   AlignedAttrSpelling semantic_spelling(void) const;
   bool is_alignas(void) const;
   bool is_alignment_dependent(void) const;

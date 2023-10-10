@@ -44,6 +44,8 @@ class CachingEntityProvider final : public EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE,
+                              DECLARE_ENTITY_CACHE,
+                              DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE)
 #undef DECLARE_ENTITY_CACHE
 
@@ -75,8 +77,14 @@ class CachingEntityProvider final : public EntityProvider {
 
   FilePathMap ListFiles(const Ptr &) final;
 
-  FragmentIdList ListFragmentsInFile(
-      const Ptr &, SpecificEntityId<FileId> id) final;
+  // Get the list of paths associated with a given file id.
+  gap::generator<std::filesystem::path> ListPathsForFile(
+      const Ptr &, PackedFileId id) final;
+
+  // Get the list nested fragments for a given fragment.
+  FragmentIdList ListNestedFragmentIds(const Ptr &, PackedFragmentId id) final;
+
+  FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) final;
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   FragmentIdList FragmentsCoveringTokens(
@@ -89,14 +97,15 @@ class CachingEntityProvider final : public EntityProvider {
   ReferenceKindFor(const Ptr &, std::string_view kind_data) final;
 
   bool AddReference(const Ptr &ep, RawEntityId kind_id,
-                    RawEntityId from_id, RawEntityId to_id) final;
+                    RawEntityId from_id, RawEntityId to_id,
+                    RawEntityId context_id) final;
 
-  gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+  gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) & final;
 
-  gap::generator<std::pair<RawEntityId, RawEntityId>>
-  References(const Ptr &, RawEntityId eid) final;
+  gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
+  References(const Ptr &, RawEntityId eid) & final;
 
-  gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) final;
+  gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) & final;
 
 #define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
     friend class type_name ## Impl; \
@@ -105,38 +114,54 @@ class CachingEntityProvider final : public EntityProvider {
         const Ptr &ep, RawEntityId id) final; \
     \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &ep) final;
+        const Ptr &ep) & final;
 
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DECLARE_ENTITY_GETTER,
-                              MX_DECLARE_ENTITY_GETTER,
-                              MX_DECLARE_ENTITY_GETTER)
+MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, type_name ## Kind) final; \
-    \
-    gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, type_name ## Kind, PackedFragmentId) final;
+        const Ptr &, type_name ## Kind) & final;
 
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DECLARE_ENTITY_LISTERS,
-                              MX_IGNORE_ENTITY_CATEGORY)
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> type_name ## sFor( \
-        const Ptr &, PackedFragmentId) final;
+        const Ptr &, type_name ## Kind, PackedFragmentId) & final;
 
-  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DECLARE_ENTITY_LISTERS,
-                              MX_DECLARE_ENTITY_LISTERS)
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &, PackedFragmentId) & final;
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 };
 

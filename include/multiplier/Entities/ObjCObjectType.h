@@ -8,33 +8,27 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ObjCInterfaceDecl;
+class ObjCInterfaceType;
 class ObjCObjectType;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCObjectType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ObjCObjectType> in(const Fragment &frag);
   static gap::generator<ObjCObjectType> in(const Index &index);
   static gap::generator<ObjCObjectType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +36,6 @@ class ObjCObjectType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_OBJECT;
-  }
-
-  inline static std::optional<ObjCObjectType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ObjCObjectType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<ObjCObjectType> from(const Type &parent);
@@ -62,13 +48,17 @@ class ObjCObjectType : public Type {
     }
   }
 
+  static std::optional<ObjCObjectType> from(const Reference &r);
+  static std::optional<ObjCObjectType> from(const TokenContext &t);
+
   Type desugar(void) const;
   Type base_type(void) const;
   ObjCInterfaceDecl interface(void) const;
   std::optional<Type> super_class_type(void) const;
   std::optional<Type> nth_type_argument(unsigned n) const;
-  gap::generator<Type> type_arguments(void) const;
-  gap::generator<Type> type_arguments_as_written(void) const;
+  unsigned num_type_arguments(void) const;
+  gap::generator<Type> type_arguments(void) const &;
+  gap::generator<Type> type_arguments_as_written(void) const &;
   bool is_kind_of_type(void) const;
   bool is_kind_of_type_as_written(void) const;
   bool is_obj_c_class(void) const;

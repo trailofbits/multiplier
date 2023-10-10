@@ -8,27 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class Expr;
 class ObjCBoolLiteralExpr;
 class Stmt;
+class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCBoolLiteralExpr : public Expr {
  private:
@@ -37,11 +32,12 @@ class ObjCBoolLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<ObjCBoolLiteralExpr> in(const Fragment &frag);
   static gap::generator<ObjCBoolLiteralExpr> in(const Index &index);
   static gap::generator<ObjCBoolLiteralExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCBoolLiteralExpr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCBoolLiteralExpr> in(const Fragment &frag);
+  static gap::generator<ObjCBoolLiteralExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;
@@ -56,34 +52,6 @@ class ObjCBoolLiteralExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ObjCBoolLiteralExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ObjCBoolLiteralExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<ObjCBoolLiteralExpr> from(const Expr &parent);
-
-  inline static std::optional<ObjCBoolLiteralExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return ObjCBoolLiteralExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCBoolLiteralExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<ObjCBoolLiteralExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return ObjCBoolLiteralExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ObjCBoolLiteralExpr> from(const Stmt &parent);
 
   inline static std::optional<ObjCBoolLiteralExpr> from(const std::optional<Stmt> &parent) {
@@ -93,6 +61,9 @@ class ObjCBoolLiteralExpr : public Expr {
       return std::nullopt;
     }
   }
+
+  static std::optional<ObjCBoolLiteralExpr> from(const Reference &r);
+  static std::optional<ObjCBoolLiteralExpr> from(const TokenContext &t);
 
   Token token(void) const;
   bool value(void) const;

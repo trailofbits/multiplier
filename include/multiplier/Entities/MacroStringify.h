@@ -8,26 +8,19 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "MacroKind.h"
 #include "MacroSubstitution.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Macro;
 class MacroStringify;
 class MacroSubstitution;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroStringify : public MacroSubstitution {
  private:
@@ -36,6 +29,7 @@ class MacroStringify : public MacroSubstitution {
   friend class Macro;
  public:
   static gap::generator<MacroStringify> in(const Fragment &frag);
+  static gap::generator<MacroStringify> in(const File &file);
 
   static gap::generator<MacroStringify> in(const Index &index);
   static std::optional<MacroStringify> by_id(const Index &, EntityId);
@@ -50,24 +44,6 @@ class MacroStringify : public MacroSubstitution {
   static gap::generator<MacroStringify> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroStringify> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroStringify> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<MacroStringify> from(const MacroSubstitution &parent);
-
-  inline static std::optional<MacroStringify> from(const std::optional<MacroSubstitution> &parent) {
-    if (parent) {
-      return MacroStringify::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MacroStringify> from(const Macro &parent);
 
   inline static std::optional<MacroStringify> from(const std::optional<Macro> &parent) {
@@ -78,6 +54,10 @@ class MacroStringify : public MacroSubstitution {
     }
   }
 
+  static std::optional<MacroStringify> from(const Reference &r);
+  static std::optional<MacroStringify> from(const TokenContext &t);
+
+  Token stringified_token(void) const;
 };
 
 static_assert(sizeof(MacroStringify) == sizeof(MacroSubstitution));

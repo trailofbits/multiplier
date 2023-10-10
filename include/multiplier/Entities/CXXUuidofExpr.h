@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXUuidofExpr;
+class Decl;
 class Expr;
 class MSGuidDecl;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXUuidofExpr : public Expr {
  private:
@@ -39,11 +34,12 @@ class CXXUuidofExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXUuidofExpr> in(const Fragment &frag);
   static gap::generator<CXXUuidofExpr> in(const Index &index);
   static gap::generator<CXXUuidofExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXUuidofExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXUuidofExpr> in(const Fragment &frag);
+  static gap::generator<CXXUuidofExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_UUIDOF_EXPR;
@@ -58,34 +54,6 @@ class CXXUuidofExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXUuidofExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXUuidofExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXUuidofExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXUuidofExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXUuidofExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXUuidofExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXUuidofExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXUuidofExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXUuidofExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXUuidofExpr> from(const std::optional<Stmt> &parent) {
@@ -95,6 +63,9 @@ class CXXUuidofExpr : public Expr {
       return std::nullopt;
     }
   }
+
+  static std::optional<CXXUuidofExpr> from(const Reference &r);
+  static std::optional<CXXUuidofExpr> from(const TokenContext &t);
 
   std::optional<Expr> expression_operand(void) const;
   MSGuidDecl guid_declaration(void) const;

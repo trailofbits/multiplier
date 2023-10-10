@@ -8,37 +8,159 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class AddrLabelExpr;
+class ArrayInitIndexExpr;
+class ArrayInitLoopExpr;
+class ArraySubscriptExpr;
+class ArrayTypeTraitExpr;
+class AsTypeExpr;
+class AtomicExpr;
+class AttributedStmt;
+class BinaryConditionalOperator;
+class BinaryOperator;
+class BlockExpr;
+class BuiltinBitCastExpr;
+class CStyleCastExpr;
+class CUDAKernelCallExpr;
+class CXXAddrspaceCastExpr;
+class CXXBindTemporaryExpr;
+class CXXBoolLiteralExpr;
+class CXXConstCastExpr;
+class CXXConstructExpr;
+class CXXDefaultArgExpr;
+class CXXDefaultInitExpr;
+class CXXDeleteExpr;
+class CXXDependentScopeMemberExpr;
+class CXXDynamicCastExpr;
+class CXXFoldExpr;
+class CXXFunctionalCastExpr;
+class CXXInheritedCtorInitExpr;
+class CXXMemberCallExpr;
+class CXXNewExpr;
+class CXXNoexceptExpr;
+class CXXNullPtrLiteralExpr;
+class CXXOperatorCallExpr;
+class CXXParenListInitExpr;
+class CXXPseudoDestructorExpr;
+class CXXReinterpretCastExpr;
+class CXXRewrittenBinaryOperator;
+class CXXScalarValueInitExpr;
+class CXXStaticCastExpr;
+class CXXStdInitializerListExpr;
+class CXXTemporaryObjectExpr;
+class CXXThisExpr;
+class CXXThrowExpr;
+class CXXTypeidExpr;
+class CXXUnresolvedConstructExpr;
+class CXXUuidofExpr;
+class CallExpr;
+class CharacterLiteral;
+class ChooseExpr;
+class CoawaitExpr;
+class CompoundAssignOperator;
+class CompoundLiteralExpr;
+class ConceptSpecializationExpr;
+class ConditionalOperator;
+class ConstantExpr;
+class ConvertVectorExpr;
+class CoyieldExpr;
+class Decl;
+class DeclRefExpr;
+class DependentCoawaitExpr;
+class DependentScopeDeclRefExpr;
+class DesignatedInitExpr;
+class DesignatedInitUpdateExpr;
 class Expr;
+class ExprWithCleanups;
+class ExpressionTraitExpr;
+class ExtVectorElementExpr;
+class FixedPointLiteral;
+class FloatingLiteral;
+class FunctionParmPackExpr;
+class GNUNullExpr;
+class GenericSelectionExpr;
+class ImaginaryLiteral;
+class ImplicitCastExpr;
+class ImplicitValueInitExpr;
+class InitListExpr;
+class IntegerLiteral;
+class LabelStmt;
+class LambdaExpr;
+class MSPropertyRefExpr;
+class MSPropertySubscriptExpr;
+class MaterializeTemporaryExpr;
+class MatrixSubscriptExpr;
+class MemberExpr;
+class NoInitExpr;
+class OMPArraySectionExpr;
+class OMPArrayShapingExpr;
+class OMPIteratorExpr;
+class ObjCArrayLiteral;
+class ObjCAvailabilityCheckExpr;
+class ObjCBoolLiteralExpr;
+class ObjCBoxedExpr;
+class ObjCBridgedCastExpr;
+class ObjCDictionaryLiteral;
+class ObjCEncodeExpr;
+class ObjCIndirectCopyRestoreExpr;
+class ObjCIsaExpr;
+class ObjCIvarRefExpr;
+class ObjCMessageExpr;
+class ObjCPropertyRefExpr;
+class ObjCProtocolExpr;
+class ObjCSelectorExpr;
+class ObjCStringLiteral;
+class ObjCSubscriptRefExpr;
+class OffsetOfExpr;
+class OpaqueValueExpr;
+class PackExpansionExpr;
+class ParenExpr;
+class ParenListExpr;
+class PredefinedExpr;
+class PseudoObjectExpr;
+class RecoveryExpr;
+class RequiresExpr;
+class SYCLUniqueStableNameExpr;
+class ShuffleVectorExpr;
+class SizeOfPackExpr;
+class SourceLocExpr;
 class Stmt;
+class StmtExpr;
+class StringLiteral;
+class SubstNonTypeTemplateParmExpr;
+class SubstNonTypeTemplateParmPackExpr;
+class Token;
+class TypeTraitExpr;
+class TypoExpr;
+class UnaryExprOrTypeTraitExpr;
+class UnaryOperator;
+class UnresolvedLookupExpr;
+class UnresolvedMemberExpr;
+class UserDefinedLiteral;
+class VAArgExpr;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ValueStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<ValueStmt> in(const Fragment &frag);
   static gap::generator<ValueStmt> in(const Index &index);
   static gap::generator<ValueStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ValueStmt> by_id(const Index &, EntityId);
+  static gap::generator<ValueStmt> in(const Fragment &frag);
+  static gap::generator<ValueStmt> in(const File &file);
 
   static gap::generator<ValueStmt> containing(const Decl &decl);
   static gap::generator<ValueStmt> containing(const std::optional<Decl> &decl);
@@ -49,14 +171,6 @@ class ValueStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<ValueStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<ValueStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<ValueStmt> from(const Stmt &parent);
 
   inline static std::optional<ValueStmt> from(const std::optional<Stmt> &parent) {
@@ -66,6 +180,9 @@ class ValueStmt : public Stmt {
       return std::nullopt;
     }
   }
+
+  static std::optional<ValueStmt> from(const Reference &r);
+  static std::optional<ValueStmt> from(const TokenContext &t);
 
   std::optional<Expr> expression_statement(void) const;
 };

@@ -8,26 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPExecutableDirective.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class OMPCriticalDirective;
 class OMPExecutableDirective;
 class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPCriticalDirective : public OMPExecutableDirective {
  private:
@@ -35,11 +30,12 @@ class OMPCriticalDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPCriticalDirective> in(const Fragment &frag);
   static gap::generator<OMPCriticalDirective> in(const Index &index);
   static gap::generator<OMPCriticalDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPCriticalDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPCriticalDirective> in(const Fragment &frag);
+  static gap::generator<OMPCriticalDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CRITICAL_DIRECTIVE;
@@ -54,24 +50,6 @@ class OMPCriticalDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPCriticalDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPCriticalDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPCriticalDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPCriticalDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPCriticalDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPCriticalDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPCriticalDirective> from(const std::optional<Stmt> &parent) {
@@ -81,6 +59,9 @@ class OMPCriticalDirective : public OMPExecutableDirective {
       return std::nullopt;
     }
   }
+
+  static std::optional<OMPCriticalDirective> from(const Reference &r);
+  static std::optional<OMPCriticalDirective> from(const TokenContext &t);
 
 };
 

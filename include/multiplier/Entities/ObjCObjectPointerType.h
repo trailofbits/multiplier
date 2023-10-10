@@ -8,36 +8,29 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ObjCInterfaceDecl;
 class ObjCInterfaceType;
 class ObjCObjectPointerType;
 class ObjCObjectType;
 class ObjCProtocolDecl;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCObjectPointerType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<ObjCObjectPointerType> in(const Fragment &frag);
   static gap::generator<ObjCObjectPointerType> in(const Index &index);
   static gap::generator<ObjCObjectPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -45,14 +38,6 @@ class ObjCObjectPointerType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_OBJECT_POINTER;
-  }
-
-  inline static std::optional<ObjCObjectPointerType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ObjCObjectPointerType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<ObjCObjectPointerType> from(const Type &parent);
@@ -65,14 +50,19 @@ class ObjCObjectPointerType : public Type {
     }
   }
 
+  static std::optional<ObjCObjectPointerType> from(const Reference &r);
+  static std::optional<ObjCObjectPointerType> from(const TokenContext &t);
+
   Type desugar(void) const;
   ObjCInterfaceDecl interface_declaration(void) const;
   ObjCInterfaceType interface_type(void) const;
   ObjCObjectType object_type(void) const;
+  Type pointee_type(void) const;
   Type super_class_type(void) const;
   std::optional<Type> nth_type_argument(unsigned n) const;
-  gap::generator<Type> type_arguments(void) const;
-  gap::generator<Type> type_arguments_as_written(void) const;
+  unsigned num_type_arguments(void) const;
+  gap::generator<Type> type_arguments(void) const &;
+  gap::generator<Type> type_arguments_as_written(void) const &;
   bool is_kind_of_type(void) const;
   bool is_obj_c_id_or_class_type(void) const;
   bool is_specialized(void) const;
@@ -81,10 +71,12 @@ class ObjCObjectPointerType : public Type {
   bool is_unspecialized(void) const;
   bool is_unspecialized_as_written(void) const;
   std::optional<ObjCProtocolDecl> nth_qualifier(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> qualifiers(void) const;
+  unsigned num_qualifiers(void) const;
+  gap::generator<ObjCProtocolDecl> qualifiers(void) const &;
   ObjCObjectPointerType strip_obj_c_kind_of_type_and_qualifiers(void) const;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> protocols(void) const;
+  unsigned num_protocols(void) const;
+  gap::generator<ObjCProtocolDecl> protocols(void) const &;
 };
 
 static_assert(sizeof(ObjCObjectPointerType) == sizeof(Type));

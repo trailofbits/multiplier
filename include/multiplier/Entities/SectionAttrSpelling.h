@@ -14,7 +14,7 @@ namespace mx {
 enum class SectionAttrSpelling : unsigned char {
   GNU_SECTION,
   CXX11_GNU_SECTION,
-  C2X_GNU_SECTION,
+  C23_GNU_SECTION,
   DECLSPEC_ALLOCATE,
   SPELLING_NOT_CALCULATED,
 };

@@ -8,25 +8,18 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Macro.h"
-#include "MacroKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Macro;
 class MacroVAOptArgument;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroVAOptArgument : public Macro {
  private:
@@ -34,6 +27,7 @@ class MacroVAOptArgument : public Macro {
   friend class Macro;
  public:
   static gap::generator<MacroVAOptArgument> in(const Fragment &frag);
+  static gap::generator<MacroVAOptArgument> in(const File &file);
 
   static gap::generator<MacroVAOptArgument> in(const Index &index);
   static std::optional<MacroVAOptArgument> by_id(const Index &, EntityId);
@@ -48,14 +42,6 @@ class MacroVAOptArgument : public Macro {
   static gap::generator<MacroVAOptArgument> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroVAOptArgument> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroVAOptArgument> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
   static std::optional<MacroVAOptArgument> from(const Macro &parent);
 
   inline static std::optional<MacroVAOptArgument> from(const std::optional<Macro> &parent) {
@@ -65,6 +51,9 @@ class MacroVAOptArgument : public Macro {
       return std::nullopt;
     }
   }
+
+  static std::optional<MacroVAOptArgument> from(const Reference &r);
+  static std::optional<MacroVAOptArgument> from(const TokenContext &t);
 
 };
 

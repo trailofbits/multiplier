@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class TargetAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TargetAttr : public InheritableAttr {
  private:
@@ -35,32 +29,15 @@ class TargetAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<TargetAttr> in(const Fragment &frag);
   static gap::generator<TargetAttr> in(const Index &index);
   static gap::generator<TargetAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TargetAttr> by_id(const Index &, EntityId);
+  static gap::generator<TargetAttr> in(const Fragment &frag);
+  static gap::generator<TargetAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TARGET;
-  }
-
-  inline static std::optional<TargetAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TargetAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TargetAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<TargetAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return TargetAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TargetAttr> from(const Attr &parent);
@@ -72,6 +49,9 @@ class TargetAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<TargetAttr> from(const Reference &r);
+  static std::optional<TargetAttr> from(const TokenContext &t);
 
   std::string_view architecture(void) const;
   std::string_view features_string(void) const;

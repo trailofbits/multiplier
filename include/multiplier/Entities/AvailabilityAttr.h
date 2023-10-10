@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class AvailabilityAttr;
 class InheritableAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AvailabilityAttr : public InheritableAttr {
  private:
@@ -35,32 +29,15 @@ class AvailabilityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AvailabilityAttr> in(const Fragment &frag);
   static gap::generator<AvailabilityAttr> in(const Index &index);
   static gap::generator<AvailabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AvailabilityAttr> by_id(const Index &, EntityId);
+  static gap::generator<AvailabilityAttr> in(const Fragment &frag);
+  static gap::generator<AvailabilityAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AVAILABILITY;
-  }
-
-  inline static std::optional<AvailabilityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AvailabilityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AvailabilityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AvailabilityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AvailabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AvailabilityAttr> from(const Attr &parent);
@@ -72,6 +49,9 @@ class AvailabilityAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<AvailabilityAttr> from(const Reference &r);
+  static std::optional<AvailabilityAttr> from(const TokenContext &t);
 
   std::string_view message(void) const;
   std::string_view replacement(void) const;

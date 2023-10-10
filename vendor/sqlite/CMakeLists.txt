@@ -15,8 +15,8 @@ endif()
 
 FetchContent_Declare(
   sqlite
-  URL      https://sqlite.org/2022/sqlite-amalgamation-3400000.zip
-  URL_HASH SHA3_256=362a64ad2891c6ff7552f039f3f233d49da984446be0862183eb5cef0d665969
+  URL      https://sqlite.org/2023/sqlite-amalgamation-3430000.zip
+  URL_HASH SHA3_256=1286856f5dff3b145f02dfe5aa626657c172a415889e5a265dc4dee83a799c03
 )
 
 FetchContent_MakeAvailable(sqlite)
@@ -70,15 +70,15 @@ if(MX_ENABLE_INSTALL)
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
-        "${CMAKE_INSTALL_BINDIR}"
+        "${MX_INSTALL_BIN_DIR}"
     LIBRARY
       DESTINATION
-        "${CMAKE_INSTALL_LIBDIR}"
+        "${MX_INSTALL_LIB_DIR}"
     ARCHIVE
       DESTINATION
-        "${CMAKE_INSTALL_LIBDIR}"
+        "${MX_INSTALL_LIB_DIR}"
     PUBLIC_HEADER
       DESTINATION
-        "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}"
+        "${MX_INSTALL_INCLUDE_DIR}"
   )
 endif(MX_ENABLE_INSTALL)

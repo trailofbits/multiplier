@@ -8,23 +8,8 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "DeclaratorDecl.h"
 #include "LanguageLinkage.h"
-#include "QualTypeDestructionKind.h"
 #include "StorageClass.h"
 #include "StorageDuration.h"
 #include "TemplateSpecializationKind.h"
@@ -33,13 +18,28 @@
 #include "VarDeclTLSKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
+class DecompositionDecl;
 class Expr;
+class ImplicitParamDecl;
 class NamedDecl;
+class OMPCapturedExprDecl;
+class ParmVarDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VarDecl;
 class VarTemplateDecl;
+class VarTemplatePartialSpecializationDecl;
+class VarTemplateSpecializationDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarDecl : public DeclaratorDecl {
  private:
@@ -49,11 +49,12 @@ class VarDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<VarDecl> in(const Fragment &frag);
   static gap::generator<VarDecl> in(const Index &index);
   static gap::generator<VarDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<VarDecl> by_id(const Index &, EntityId);
+  static gap::generator<VarDecl> in(const Fragment &frag);
+  static gap::generator<VarDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR;
@@ -68,45 +69,9 @@ class VarDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<VarDecl> redeclarations(void) const;
-  inline static std::optional<VarDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<VarDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<VarDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<VarDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return VarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<VarDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return VarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<VarDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return VarDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  VarDecl canonical_declaration(void) const;
+  std::optional<VarDecl> definition(void) const;
+  gap::generator<VarDecl> redeclarations(void) const &;
   static std::optional<VarDecl> from(const Decl &parent);
 
   inline static std::optional<VarDecl> from(const std::optional<Decl> &parent) {
@@ -116,6 +81,9 @@ class VarDecl : public DeclaratorDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<VarDecl> from(const Reference &r);
+  static std::optional<VarDecl> from(const TokenContext &t);
 
   std::optional<VarDecl> acting_definition(void) const;
   std::optional<VarTemplateDecl> described_variable_template(void) const;
@@ -151,7 +119,6 @@ class VarDecl : public DeclaratorDecl {
   bool is_function_or_method_variable_declaration(void) const;
   bool is_in_extern_c_context(void) const;
   bool is_in_extern_cxx_context(void) const;
-  bool is_initializer_capture(void) const;
   bool is_inline(void) const;
   bool is_inline_specified(void) const;
   bool is_known_to_be_defined(void) const;
@@ -167,7 +134,6 @@ class VarDecl : public DeclaratorDecl {
   bool is_this_declaration_a_demoted_definition(void) const;
   bool is_usable_in_constant_expressions(void) const;
   bool might_be_usable_in_constant_expressions(void) const;
-  QualTypeDestructionKind needs_destruction(void) const;
 };
 
 static_assert(sizeof(VarDecl) == sizeof(DeclaratorDecl));

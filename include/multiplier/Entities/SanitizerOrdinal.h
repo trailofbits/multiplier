@@ -65,6 +65,7 @@ enum class SanitizerOrdinal : unsigned char {
   CFINV_CALL,
   CFIV_CALL,
   CFI_GROUP,
+  KCFI,
   SAFE_STACK,
   SHADOW_CALL_STACK,
   UNDEFINED_GROUP,
@@ -89,7 +90,7 @@ inline static const char *EnumerationName(SanitizerOrdinal) {
 }
 
 inline static constexpr unsigned NumEnumerators(SanitizerOrdinal) {
-  return 70;
+  return 71;
 }
 
 const char *EnumeratorName(SanitizerOrdinal);

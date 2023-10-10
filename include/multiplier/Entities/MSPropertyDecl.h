@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "DeclaratorDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class MSPropertyDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MSPropertyDecl : public DeclaratorDecl {
  private:
@@ -39,11 +34,12 @@ class MSPropertyDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<MSPropertyDecl> in(const Fragment &frag);
   static gap::generator<MSPropertyDecl> in(const Index &index);
   static gap::generator<MSPropertyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MSPropertyDecl> by_id(const Index &, EntityId);
+  static gap::generator<MSPropertyDecl> in(const Fragment &frag);
+  static gap::generator<MSPropertyDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_PROPERTY;
@@ -58,45 +54,9 @@ class MSPropertyDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<MSPropertyDecl> redeclarations(void) const;
-  inline static std::optional<MSPropertyDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<MSPropertyDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<MSPropertyDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<MSPropertyDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return MSPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<MSPropertyDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<MSPropertyDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return MSPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<MSPropertyDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<MSPropertyDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return MSPropertyDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  MSPropertyDecl canonical_declaration(void) const;
+  std::optional<MSPropertyDecl> definition(void) const;
+  gap::generator<MSPropertyDecl> redeclarations(void) const &;
   static std::optional<MSPropertyDecl> from(const Decl &parent);
 
   inline static std::optional<MSPropertyDecl> from(const std::optional<Decl> &parent) {
@@ -106,6 +66,9 @@ class MSPropertyDecl : public DeclaratorDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<MSPropertyDecl> from(const Reference &r);
+  static std::optional<MSPropertyDecl> from(const TokenContext &t);
 
   bool has_getter(void) const;
   bool has_setter(void) const;

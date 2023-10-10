@@ -9,9 +9,9 @@
 #include "Re2.h"
 
 #include <map>
-#include <multiplier/Types.h>
 
 #include "Fragment.h"
+#include "Types.h"
 
 namespace mx {
 
@@ -23,7 +23,7 @@ class RegexQueryResultImpl final {
 
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
+  const EntityProviderPtr ep;
 
   // Maps the offsets bytes following tokens to indexes of tokens in
   // `frag_file_tokens`. This is useful to go from a match offset to a file
@@ -53,17 +53,17 @@ class RegexQueryResultImpl final {
   ~RegexQueryResultImpl(void) noexcept;
 
   RegexQueryResultImpl(
-      const RegexQuery &re_, EntityProvider::Ptr ep_,
+      const RegexQuery &re_, EntityProviderPtr ep_,
       FragmentIdList fragment_ids);
 
   RegexQueryResultImpl(const RegexQuery &re_, FragmentImplPtr frag_);
 
   bool InitForFragment(FragmentImplPtr frag_);
-  bool InitForFragment(SpecificEntityId<FragmentId> frag_id);
+  bool InitForFragment(PackedFragmentId frag_id);
 
   std::optional<RegexQueryMatch> GetNextMatchInFragment(void);
 
-  gap::generator<RegexQueryMatch> Enumerate(void);
+  gap::generator<RegexQueryMatch> Enumerate(void) &;
 };
 
 }  // namespace mx

@@ -8,27 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ArrayType.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ArrayType;
 class Expr;
+class Token;
+class TokenRange;
 class Type;
 class VariableArrayType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VariableArrayType : public ArrayType {
  private:
@@ -36,7 +31,6 @@ class VariableArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  static gap::generator<VariableArrayType> in(const Fragment &frag);
   static gap::generator<VariableArrayType> in(const Index &index);
   static gap::generator<VariableArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +38,6 @@ class VariableArrayType : public ArrayType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::VARIABLE_ARRAY;
-  }
-
-  inline static std::optional<VariableArrayType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<VariableArrayType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<VariableArrayType> from(const ArrayType &parent);
-
-  inline static std::optional<VariableArrayType> from(const std::optional<ArrayType> &parent) {
-    if (parent) {
-      return VariableArrayType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<VariableArrayType> from(const Type &parent);
@@ -73,6 +49,9 @@ class VariableArrayType : public ArrayType {
       return std::nullopt;
     }
   }
+
+  static std::optional<VariableArrayType> from(const Reference &r);
+  static std::optional<VariableArrayType> from(const TokenContext &t);
 
   Type desugar(void) const;
   TokenRange brackets_range(void) const;

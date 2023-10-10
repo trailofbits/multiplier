@@ -8,57 +8,85 @@
 
 #include <cassert>
 #include <glog/logging.h>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 
+#include "TypeMapper.h"
 #include "Util.h"
 
 namespace indexer {
 
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
-  if (auto it = fragment.parent_decl_ids.find(entity.RawDecl());
-      it != fragment.parent_decl_ids.end()) {
+mx::RawEntityId EntityMapper::ParentDeclId(const void *entity) const {
+  if (auto it = parent_decl_ids.find(entity); it != parent_decl_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
   }
+}
+
+mx::RawEntityId EntityMapper::ParentStmtId(const void *entity) const {
+  if (auto it = parent_stmt_ids.find(entity); it != parent_stmt_ids.end()) {
+    return it->second.Pack();
+  } else {
+    return mx::kInvalidEntityId;
+  }
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
+  return ParentDeclId(entity.RawDecl());
 }
 
 mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
-  if (auto it = fragment.parent_decl_ids.find(entity.RawStmt());
-      it != fragment.parent_decl_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return ParentDeclId(entity.RawStmt());
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Designator &entity) const {
+  return ParentDeclId(entity.RawDesignator());
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::TemplateArgument &entity) const {
+  return ParentDeclId(entity.RawTemplateArgument());
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::TemplateParameterList &entity) const {
+  return ParentDeclId(entity.RawTemplateParameterList());
+}
+
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::CXXBaseSpecifier &entity) const {
+  return ParentDeclId(entity.RawCXXBaseSpecifier());
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
-  if (auto it = fragment.parent_stmt_ids.find(entity.RawDecl());
-      it != fragment.parent_stmt_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return ParentStmtId(entity.RawDecl());
 }
 
 mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
-  if (auto it = fragment.parent_stmt_ids.find(entity.RawStmt());
-      it != fragment.parent_stmt_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return ParentStmtId(entity.RawStmt());
+}
+
+mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Designator &entity) const {
+  return ParentStmtId(entity.RawDesignator());
+}
+
+mx::RawEntityId EntityMapper::ParentStmtId(const pasta::TemplateArgument &entity) const {
+  return ParentStmtId(entity.RawTemplateArgument());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
   if (auto it = entity_ids.find(entity); it != entity_ids.end()) {
-    return it->second.Pack();
+    if (mx::RawEntityId eid = it->second.Pack(); eid != mx::kInvalidEntityId) {
+      return eid;
+    }
+  }
+  return PerFragmentEntityId(entity);
+}
 
-  } else if (auto it2 = token_tree_ids.find(entity);
-             it2 != token_tree_ids.end()) {
-    return it2->second.Pack();
+
+mx::RawEntityId EntityMapper::PerFragmentEntityId(const void *entity) const {
+  if (auto it = token_tree_ids.find(entity); it != token_tree_ids.end()) {
+    return it->second.Pack();
 
   } else {
     return mx::kInvalidEntityId;
@@ -70,11 +98,16 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Decl &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) const {
-  return EntityId(entity.RawStmt());
+  return PerFragmentEntityId(entity.RawStmt());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
-  return EntityId(entity.RawAttr());
+  if (auto tok = entity.Token().RawToken()) {
+    if (auto it = attr_ids.find(tok); it != attr_ids.end()) {
+      return it->second.Pack();
+    }
+  }
+  return PerFragmentEntityId(entity.RawAttr());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
@@ -82,6 +115,9 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
     return EntityId(mt->ParsedLocation());
   }
 
+  // NOTE(pag): May be part of a directive, which may be referenced by other
+  //            fragments, so we use `EntityId`, which falls back on
+  //            `PerFragmentEntityId`.
   auto ret = EntityId(entity.RawMacro());
   if (ret || entity.Kind() != pasta::MacroKind::kExpansion) {
     return ret;
@@ -109,25 +145,63 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
   return ret;
 }
 
+mx::RawEntityId EntityMapper::EntityId(const TokenTree &entity) const {
+  return EntityId(entity.RawNode());
+}
+
+mx::RawEntityId EntityMapper::EntityId(const TokenTreeNode &entity) const {
+  return EntityId(entity.RawNode());
+}
+
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
-  if (auto it = entity_ids.find(entity.RawToken()); it != entity_ids.end()) {
-    return it->second.Pack();
-
-  // If this token is derived from another one, and we don't have an entity
-  // ID for it, then try to get the entity ID for the derived token.
-  } else if (auto dt = entity.DerivedLocation()) {
-    return EntityId(dt.value());
-
-  // If we fail to resolve the parsed token to an entity ID, then try to
-  // see if it's associated with a `pasta::FileToken`, and if so, then form
-  // an entity ID for that. We unify `Token` and `FileToken` in our serialized
-  // representation, because we always want references to "point somewhere."
-  } else if (auto ft = entity.FileLocation()) {
-    return this->EntityId(ft.value());
-  
-  } else {
+  if (!entity) {
     return mx::kInvalidEntityId;
   }
+
+  // NOTE(pag): May be part of a directive, which may be referenced by other
+  //            fragments, so we use `EntityId`, which falls back on
+  //            `PerFragmentEntityId`.
+  auto eid = EntityId(entity.RawToken());
+  if (eid != mx::kInvalidEntityId) {
+    return eid;
+  }
+
+  // We shouldn't get parsed tokens here, though when serializing types or
+  // freestanding fragments, i.e. where we've pulled out a forward declaration
+  // embedded in a declarator, then we might get here. Generally, this suggests
+  // a bug in PASTA, where we've used `PrintedTokenRange::Create(decl)`, and
+  // then there is some method, e.g. `decl.Location()` that should correspond
+  // to one of the `PrintedToken::DerivedLocation()`s return values, but
+  // doesn't. This means that PASTA's internal pretty printers aren't
+  // sufficiently marking locations/provenenance info. A good way to diagnose
+  // this is to check if `PendingFragment::drop_token_provenance` is `true`, and
+  // if so, then go and print out each printed token and whether its derived
+  // location has a value (where we create the fragment). What you'll see is
+  // that `entity.Data()` here likely matches some printed token data over there
+  // that has no corresponding derived (parsed) token.
+  if (IsParsedToken(entity)) {
+    assert(false);
+    return mx::kInvalidEntityId;
+  }
+
+  if (auto mt = entity.MacroLocation()) {
+    return EntityId(mt->RawMacro());
+  }
+
+  return mx::kInvalidEntityId;
+}
+
+mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {
+  if (auto id = PerFragmentEntityId(entity.RawToken());
+      id != mx::kInvalidEntityId) {
+    return id;
+  }
+
+  if (auto pt = entity.DerivedLocation()) {
+    return EntityId(pt.value());
+  }
+
+  return mx::kInvalidEntityId;
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
@@ -135,12 +209,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::File &file) const {
-  if (auto fit = entity_ids.find(file.RawFile()); fit != entity_ids.end()) {
-    return fit->second.Pack();
-
-  } else {
-    return mx::kInvalidEntityId;
-  }
+  return EntityId(file.RawFile());
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
@@ -163,47 +232,79 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) const {
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  assert(type_key.first != nullptr);
-  if (auto it = fragment.type_ids.find(type_key);
-      it != fragment.type_ids.end()) {
-    return it->second.Pack();
-  } else {
-    assert(false);
-    return mx::kInvalidEntityId;
-  }
+  return tm.EntityId(entity);
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::TemplateArgument &pseudo) const {
-  return EntityId(pseudo.RawTemplateArgument());
+  return PerFragmentEntityId(pseudo.RawTemplateArgument());
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::TemplateParameterList &pseudo) const {
-  return EntityId(pseudo.RawTemplateParameterList());
+  return PerFragmentEntityId(pseudo.RawTemplateParameterList());
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::CXXBaseSpecifier &pseudo) const {
-  return EntityId(pseudo.RawCXXBaseSpecifier());
+  return PerFragmentEntityId(pseudo.RawCXXBaseSpecifier());
 }
 
 mx::RawEntityId EntityMapper::EntityId(
     const pasta::Designator &pseudo) const {
-  return EntityId(pseudo.RawDesignator());
+  return PerFragmentEntityId(pseudo.RawDesignator());
 }
 
 mx::RawEntityId EntityMapper::EntityIdOfType(
     const void *type, uint32_t quals) const {
-  TypeKey type_key(type, quals);
-  assert(type_key.first != nullptr);
-  if (auto it = fragment.type_ids.find(type_key);
-      it != fragment.type_ids.end()) {
-    return it->second.Pack();
-  } else {
-    return mx::kInvalidEntityId;
+  return tm.EntityId(type, quals);
+}
+
+std::optional<const pasta::Decl> EntityMapper::ParentDecl(
+    const pasta::AST &ast, const pasta::Decl &entity) const {
+  if (auto it = parent_decls.find(entity.RawDecl());
+      it != parent_decls.end() && it->second) {
+    return ast.Adopt(static_cast<const clang::Decl *>(it->second));
   }
+  return std::nullopt;
+}
+
+std::optional<const pasta::Decl> EntityMapper::ParentDecl(
+    const pasta::AST &ast, const pasta::Stmt &entity) const {
+  if (auto it = parent_decls.find(entity.RawStmt());
+      it != parent_decls.end() && it->second) {
+    return ast.Adopt(static_cast<const clang::Decl *>(it->second));
+  }
+  return std::nullopt;
+}
+
+std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
+    const pasta::AST &ast, const pasta::Decl &entity) const {
+  if (auto it = parent_stmts.find(entity.RawDecl());
+      it != parent_stmts.end() && it->second) {
+    return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
+  }
+  return std::nullopt;
+}
+
+std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
+    const pasta::AST &ast, const pasta::Stmt &entity) const {
+  if (auto it = parent_stmts.find(entity.RawStmt());
+      it != parent_stmts.end() && it->second) {
+    return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
+  }
+  return std::nullopt;
+}
+
+void EntityMapper::ResetForFragment(void) {
+  // clear token tree ids, parent_decl_ids, and parent_stmt_ids before
+  // processing new pending fragments. Not clearing them will cause issue
+  // with fragment specific token trees and parentage tracking
+  token_tree_ids.clear();
+  parent_decl_ids.clear();
+  parent_stmt_ids.clear();
+  parent_decls.clear();
+  parent_stmts.clear();
 }
 
 }  // namespace indexer

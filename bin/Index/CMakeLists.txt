@@ -8,14 +8,22 @@
 
 set(exe_name "mx-index")
 
+if(MX_ENABLE_VAST)
+  set(mlir_codegen_sources
+    "Codegen.cpp"
+    "Codegen.h"
+    "CodegenMetaGenerator.h"
+  )
+endif()
+
 add_executable("${exe_name}"
   "Action.cpp"
   "Action.h"
   "BuildPendingFragment.cpp"
-  "Codegen.cpp"
-  "Codegen.h"
+  ${mlir_codegen_sources}
   "Context.cpp"
   "Context.h"
+  "Endian.h"
   "Entity.h"
   "EntityMapper.cpp"
   "EntityMapper.h"
@@ -23,6 +31,8 @@ add_executable("${exe_name}"
   "Executor.h"
   "Hash.cpp"
   "Hash.h"
+  "IdStore.h"
+  "IdStore.cpp"
   "Importer.cpp"
   "Importer.h"
   "IndexCompileJob.cpp"
@@ -33,7 +43,6 @@ add_executable("${exe_name}"
   "LinkEntityNamesToFragment.cpp"
   "LinkExternalReferencesInFragment.cpp"
   "Log.h"
-  "Macro.h"
   "Main.cpp"
   "NameMangler.cpp"
   "NameMangler.h"
@@ -41,14 +50,21 @@ add_executable("${exe_name}"
   "Parser.h"
   "PendingFragment.h"
   "Persist.cpp"
+  "PersistTokenContexts.cpp"
+  "PersistTypes.cpp"
   "ProgressBar.cpp"
   "ProgressBar.h"
+  "Provenance.cpp"
+  "Provenance.h"
+  "References.cpp"
   "Serialize.h"
   "SerializePendingFragment.cpp"
   "Signal.cpp"
   "Signal.h"
   "Subprocess.cpp"
   "Subprocess.h"
+  "TypeMapper.cpp"
+  "TypeMapper.h"
   "TokenTree.cpp"
   "TokenTree.h"
   "Util.cpp"
@@ -65,13 +81,24 @@ add_executable("${exe_name}"
 target_link_libraries("${exe_name}"
   PRIVATE
     ${MX_BEGIN_FORCE_LOAD_GROUP}
-    mx-api
+    "mx-api"
+    clangIndex
     glog::glog
     gflags::gflags
     concurrentqueue
     reproc++
+    xxHash::xxhash
+    RocksDB::rocksdb
     ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
     ${MX_END_FORCE_LOAD_GROUP}
+)
+
+# When we're bootstrapping, we might be using a different version of Clang and
+# LLVM. But if we're still using cxx-common for the 'old' LLVM, then the include
+# paths might make the indexer find the old LVLM, rather than the new one.
+target_include_directories("${exe_name}"
+  PRIVATE
+    "$<BUILD_INTERFACE:${LLVM_INCLUDE_DIRS};${LLVM_INCLUDE_DIR};${CLANG_INCLUDE_DIRS}>"
 )
 
 target_compile_options("${exe_name}"
@@ -79,19 +106,6 @@ target_compile_options("${exe_name}"
     "-Wno-unknown-warning-option"
     "-Wno-pragmas"
 )
-
-if(MX_ENABLE_VAST)
-  target_compile_definitions("${exe_name}"
-    PRIVATE
-      "MX_ENABLE_SOURCEIR"
-  )
-  target_link_libraries("${exe_name}"
-    PRIVATE
-      ${MX_BEGIN_FORCE_LOAD_GROUP}
-      mx-mlir
-      ${MX_END_FORCE_LOAD_GROUP}
-  )
-endif()
 
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 

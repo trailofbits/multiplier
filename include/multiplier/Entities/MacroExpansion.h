@@ -8,28 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "MacroKind.h"
 #include "MacroSubstitution.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DefineMacroDirective;
 class Macro;
 class MacroArgument;
 class MacroExpansion;
 class MacroSubstitution;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MacroExpansion : public MacroSubstitution {
  private:
@@ -38,6 +31,7 @@ class MacroExpansion : public MacroSubstitution {
   friend class Macro;
  public:
   static gap::generator<MacroExpansion> in(const Fragment &frag);
+  static gap::generator<MacroExpansion> in(const File &file);
 
   static gap::generator<MacroExpansion> in(const Index &index);
   static std::optional<MacroExpansion> by_id(const Index &, EntityId);
@@ -52,24 +46,6 @@ class MacroExpansion : public MacroSubstitution {
   static gap::generator<MacroExpansion> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<MacroExpansion> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<MacroExpansion> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<MacroExpansion> from(const MacroSubstitution &parent);
-
-  inline static std::optional<MacroExpansion> from(const std::optional<MacroSubstitution> &parent) {
-    if (parent) {
-      return MacroExpansion::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<MacroExpansion> from(const Macro &parent);
 
   inline static std::optional<MacroExpansion> from(const std::optional<Macro> &parent) {
@@ -80,9 +56,14 @@ class MacroExpansion : public MacroSubstitution {
     }
   }
 
+  static std::optional<MacroExpansion> from(const Reference &r);
+  static std::optional<MacroExpansion> from(const TokenContext &t);
+
+  gap::generator<MacroOrToken> intermediate_children(void) const &;
   std::optional<DefineMacroDirective> definition(void) const;
   std::optional<MacroArgument> nth_argument(unsigned n) const;
-  gap::generator<MacroArgument> arguments(void) const;
+  unsigned num_arguments(void) const;
+  gap::generator<MacroArgument> arguments(void) const &;
 };
 
 static_assert(sizeof(MacroExpansion) == sizeof(MacroSubstitution));

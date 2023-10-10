@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXUnresolvedConstructExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXUnresolvedConstructExpr : public Expr {
  private:
@@ -38,11 +33,12 @@ class CXXUnresolvedConstructExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXUnresolvedConstructExpr> in(const Fragment &frag);
   static gap::generator<CXXUnresolvedConstructExpr> in(const Index &index);
   static gap::generator<CXXUnresolvedConstructExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXUnresolvedConstructExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXUnresolvedConstructExpr> in(const Fragment &frag);
+  static gap::generator<CXXUnresolvedConstructExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;
@@ -57,34 +53,6 @@ class CXXUnresolvedConstructExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXUnresolvedConstructExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXUnresolvedConstructExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXUnresolvedConstructExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXUnresolvedConstructExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXUnresolvedConstructExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXUnresolvedConstructExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXUnresolvedConstructExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXUnresolvedConstructExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXUnresolvedConstructExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXUnresolvedConstructExpr> from(const std::optional<Stmt> &parent) {
@@ -95,8 +63,12 @@ class CXXUnresolvedConstructExpr : public Expr {
     }
   }
 
+  static std::optional<CXXUnresolvedConstructExpr> from(const Reference &r);
+  static std::optional<CXXUnresolvedConstructExpr> from(const TokenContext &t);
+
   std::optional<Expr> nth_argument(unsigned n) const;
-  gap::generator<Expr> arguments(void) const;
+  unsigned num_arguments(void) const;
+  gap::generator<Expr> arguments(void) const &;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   Type type_as_written(void) const;

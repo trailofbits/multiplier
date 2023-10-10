@@ -8,27 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class LabelDecl;
 class LabelStmt;
 class NamedDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LabelDecl : public NamedDecl {
  private:
@@ -36,11 +31,12 @@ class LabelDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<LabelDecl> in(const Fragment &frag);
   static gap::generator<LabelDecl> in(const Index &index);
   static gap::generator<LabelDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LabelDecl> by_id(const Index &, EntityId);
+  static gap::generator<LabelDecl> in(const Fragment &frag);
+  static gap::generator<LabelDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LABEL;
@@ -55,25 +51,9 @@ class LabelDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<LabelDecl> redeclarations(void) const;
-  inline static std::optional<LabelDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<LabelDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<LabelDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<LabelDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return LabelDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  LabelDecl canonical_declaration(void) const;
+  std::optional<LabelDecl> definition(void) const;
+  gap::generator<LabelDecl> redeclarations(void) const &;
   static std::optional<LabelDecl> from(const Decl &parent);
 
   inline static std::optional<LabelDecl> from(const std::optional<Decl> &parent) {
@@ -83,6 +63,9 @@ class LabelDecl : public NamedDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<LabelDecl> from(const Reference &r);
+  static std::optional<LabelDecl> from(const TokenContext &t);
 
   std::string_view ms_assembly_label(void) const;
   LabelStmt statement(void) const;

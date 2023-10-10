@@ -8,41 +8,37 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 #include "ObjCPropertyImplDeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class ObjCIvarDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
 class ObjCPropertyImplDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCPropertyImplDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ObjCPropertyImplDecl> in(const Fragment &frag);
   static gap::generator<ObjCPropertyImplDecl> in(const Index &index);
   static gap::generator<ObjCPropertyImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCPropertyImplDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCPropertyImplDecl> in(const Fragment &frag);
+  static gap::generator<ObjCPropertyImplDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROPERTY_IMPL;
@@ -57,15 +53,9 @@ class ObjCPropertyImplDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCPropertyImplDecl> redeclarations(void) const;
-  inline static std::optional<ObjCPropertyImplDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCPropertyImplDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  ObjCPropertyImplDecl canonical_declaration(void) const;
+  std::optional<ObjCPropertyImplDecl> definition(void) const;
+  gap::generator<ObjCPropertyImplDecl> redeclarations(void) const &;
   static std::optional<ObjCPropertyImplDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCPropertyImplDecl> from(const std::optional<Decl> &parent) {
@@ -75,6 +65,9 @@ class ObjCPropertyImplDecl : public Decl {
       return std::nullopt;
     }
   }
+
+  static std::optional<ObjCPropertyImplDecl> from(const Reference &r);
+  static std::optional<ObjCPropertyImplDecl> from(const TokenContext &t);
 
   Expr getter_cxx_constructor(void) const;
   ObjCMethodDecl getter_method_declaration(void) const;

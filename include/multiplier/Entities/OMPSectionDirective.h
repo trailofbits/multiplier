@@ -8,26 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPExecutableDirective.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class OMPExecutableDirective;
 class OMPSectionDirective;
 class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPSectionDirective : public OMPExecutableDirective {
  private:
@@ -35,11 +30,12 @@ class OMPSectionDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPSectionDirective> in(const Fragment &frag);
   static gap::generator<OMPSectionDirective> in(const Index &index);
   static gap::generator<OMPSectionDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPSectionDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPSectionDirective> in(const Fragment &frag);
+  static gap::generator<OMPSectionDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SECTION_DIRECTIVE;
@@ -54,24 +50,6 @@ class OMPSectionDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPSectionDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPSectionDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPSectionDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPSectionDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPSectionDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPSectionDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPSectionDirective> from(const std::optional<Stmt> &parent) {
@@ -81,6 +59,9 @@ class OMPSectionDirective : public OMPExecutableDirective {
       return std::nullopt;
     }
   }
+
+  static std::optional<OMPSectionDirective> from(const Reference &r);
+  static std::optional<OMPSectionDirective> from(const TokenContext &t);
 
   bool has_cancel(void) const;
 };

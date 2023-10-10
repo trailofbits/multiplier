@@ -38,61 +38,131 @@ SpecificEntityId<DeclId> Decl::id(void) const {
 }
 
 std::optional<Decl> Decl::definition(void) const {
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
 
-  RawEntityId cached_id = impl->definition_id.load(std::memory_order_acquire);
-  if (cached_id != kInvalidEntityId) {
-    if (DeclImplPtr redecl = ep->DeclFor(ep, cached_id)) {
-      return Decl(std::move(redecl));
+  // If we've stored the canonical ID already, then we've also computed the
+  // definition ID, if any.
+  RawEntityId min_id = impl->canonical_id.load(std::memory_order_acquire);
+  if (min_id != kInvalidEntityId) {
+    RawEntityId definition_id =
+        impl->definition_id.load(std::memory_order_acquire);
+    if (DeclImplPtr def = ep->DeclFor(ep, definition_id)) {
+      return Decl(std::move(def));
+    } else {
+      return std::nullopt;
     }
   }
 
-  for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
-    if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
+  min_id = std::numeric_limits<RawEntityId>::max();
+  RawEntityId definition_id = min_id;
+  RawEntityId this_id = id().Pack();
+  bool found_def = false;
 
-      if (impl->canonical_id.load(std::memory_order_relaxed) ==
-              kInvalidEntityId) {
-        impl->canonical_id.store(raw_id, std::memory_order_release);
-      }
+#ifndef NDEBUG
+  bool seen_this_id = false;
+#endif
 
-      Decl decl(std::move(redecl));
-      if (decl.is_definition()) {
-        impl->definition_id.store(raw_id, std::memory_order_release);
-        return decl;
-      }
+  for (RawEntityId raw_id : ep->Redeclarations(ep, this_id)) {
+    VariantId vid = EntityId(raw_id).Unpack();
+    if (!std::holds_alternative<DeclId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    DeclId did = std::get<DeclId>(vid);
+    if (did.is_definition) {
+      definition_id = std::min(definition_id, raw_id);
+      found_def = true;
+    }
+    min_id = std::min(min_id, raw_id);
+
+#ifndef NDEBUG
+    if (raw_id == this_id) {
+      seen_this_id = true;
+    }
+#endif
+  }
+
+  assert(seen_this_id);
+
+  if (found_def) {
+    if (DeclImplPtr def = ep->DeclFor(ep, definition_id)) {
+      impl->canonical_id.store(definition_id, std::memory_order_release);
+      impl->definition_id.store(definition_id, std::memory_order_release);
+      return Decl(std::move(def));
     }
   }
+
+  min_id = std::min(min_id, this_id);
+  impl->canonical_id.store(min_id, std::memory_order_release);
   return std::nullopt;
 }
 
 Decl Decl::canonical_declaration(void) const {
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
 
-  RawEntityId cached_id = impl->canonical_id.load(std::memory_order_acquire);
-  if (cached_id != kInvalidEntityId) {
-    if (DeclImplPtr redecl = ep->DeclFor(ep, cached_id)) {
+  RawEntityId min_id = impl->canonical_id.load(std::memory_order_acquire);
+  if (min_id != kInvalidEntityId) {
+    if (DeclImplPtr redecl = ep->DeclFor(ep, min_id)) {
       return Decl(std::move(redecl));
     }
   }
 
-  for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
-    if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
-      impl->canonical_id.store(raw_id, std::memory_order_release);
-      Decl decl(std::move(redecl));
-      if (decl.is_definition()) {
-        impl->definition_id.store(raw_id, std::memory_order_release);
-      }
+  min_id = std::numeric_limits<RawEntityId>::max();
+  RawEntityId definition_id = min_id;
+  RawEntityId this_id = id().Pack();
+  bool found_def = false;
 
-      return decl;
+#ifndef NDEBUG
+  bool seen_this_id = false;
+#endif
+
+  for (RawEntityId raw_id : ep->Redeclarations(ep, this_id)) {
+    VariantId vid = EntityId(raw_id).Unpack();
+    if (!std::holds_alternative<DeclId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    DeclId did = std::get<DeclId>(vid);
+    if (did.is_definition) {
+      definition_id = std::min(definition_id, raw_id);
+      found_def = true;
+    }
+    min_id = std::min(min_id, raw_id);
+
+#ifndef NDEBUG
+    if (raw_id == this_id) {
+      seen_this_id = true;
+    }
+#endif
+  }
+
+  assert(seen_this_id);
+
+  if (found_def) {
+    if (DeclImplPtr def = ep->DeclFor(ep, definition_id)) {
+      impl->canonical_id.store(definition_id, std::memory_order_release);
+      impl->definition_id.store(definition_id, std::memory_order_release);
+      return Decl(std::move(def));
     }
   }
-  assert(false);
-  return *this;
+
+  min_id = std::min(min_id, this_id);
+  if (DeclImplPtr decl = ep->DeclFor(ep, min_id)) {
+    impl->canonical_id.store(min_id, std::memory_order_release);
+    return Decl(std::move(decl));
+
+  } else {
+    assert(false);
+    impl->canonical_id.store(this_id, std::memory_order_release);
+    return *this;
+  }
 }
 
-gap::generator<Decl> Decl::redeclarations(void) const {
+gap::generator<Decl> Decl::redeclarations(void) const & {
   auto any = false;
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr &ep = impl->ep;
   for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
     if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
       any = true;
@@ -106,11 +176,28 @@ gap::generator<Decl> Decl::redeclarations(void) const {
 }
 
 // Return references to this declaration.
-gap::generator<Reference> Decl::references(void) const {
-  const EntityProvider::Ptr &ep = impl->ep;
-  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
-    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
-      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+gap::generator<Reference> Decl::references(void) const & {
+  const EntityProviderPtr &ep = impl->ep;
+  for (auto ref : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
+      auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));
+      co_yield Reference(std::move(eptr), std::move(context),
+                         std::get<0>(ref), category, std::get<2>(ref));
+    }
+  }
+}
+
+// Grab all call expressions of this FunctionDecl
+gap::generator<CallExpr> FunctionDecl::callers() const & {
+  for (Reference ref : references()) {
+    auto reference = ref.as_statement();
+    for (CallExpr call : CallExpr::containing(reference)) {
+      if (std::optional<FunctionDecl> decl = call.direct_callee()) {
+        if (*this == *decl) {
+          co_yield CallExpr(std::move(call));
+          break;
+        }
+      }
     }
   }
 }

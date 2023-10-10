@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "AbstractConditionalOperator.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AbstractConditionalOperator;
 class BinaryConditionalOperator;
+class Decl;
 class Expr;
 class OpaqueValueExpr;
 class Stmt;
+class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BinaryConditionalOperator : public AbstractConditionalOperator {
  private:
@@ -40,11 +35,12 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<BinaryConditionalOperator> in(const Fragment &frag);
   static gap::generator<BinaryConditionalOperator> in(const Index &index);
   static gap::generator<BinaryConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<BinaryConditionalOperator> by_id(const Index &, EntityId);
+  static gap::generator<BinaryConditionalOperator> in(const Fragment &frag);
+  static gap::generator<BinaryConditionalOperator> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;
@@ -59,44 +55,6 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<BinaryConditionalOperator> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<BinaryConditionalOperator> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<BinaryConditionalOperator> from(const AbstractConditionalOperator &parent);
-
-  inline static std::optional<BinaryConditionalOperator> from(const std::optional<AbstractConditionalOperator> &parent) {
-    if (parent) {
-      return BinaryConditionalOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BinaryConditionalOperator> from(const Expr &parent);
-
-  inline static std::optional<BinaryConditionalOperator> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return BinaryConditionalOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<BinaryConditionalOperator> from(const ValueStmt &parent);
-
-  inline static std::optional<BinaryConditionalOperator> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return BinaryConditionalOperator::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<BinaryConditionalOperator> from(const Stmt &parent);
 
   inline static std::optional<BinaryConditionalOperator> from(const std::optional<Stmt> &parent) {
@@ -106,6 +64,9 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
       return std::nullopt;
     }
   }
+
+  static std::optional<BinaryConditionalOperator> from(const Reference &r);
+  static std::optional<BinaryConditionalOperator> from(const TokenContext &t);
 
   Expr common(void) const;
   OpaqueValueExpr opaque_value(void) const;

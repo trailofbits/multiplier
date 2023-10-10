@@ -14,7 +14,7 @@
 DEFINE_uint64(declaration_id, 0, "ID of the declaration to print the redeclarations of");
 DEFINE_bool(show_locations, false, "Show the file locations of the redeclarations");
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

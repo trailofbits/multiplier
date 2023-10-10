@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "OMPDeclareReductionDeclInitKind.h"
 #include "ValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class NamedDecl;
 class OMPDeclareReductionDecl;
+class Stmt;
+class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPDeclareReductionDecl : public ValueDecl {
  private:
@@ -39,11 +34,12 @@ class OMPDeclareReductionDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPDeclareReductionDecl> in(const Fragment &frag);
   static gap::generator<OMPDeclareReductionDecl> in(const Index &index);
   static gap::generator<OMPDeclareReductionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPDeclareReductionDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPDeclareReductionDecl> in(const Fragment &frag);
+  static gap::generator<OMPDeclareReductionDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_REDUCTION;
@@ -58,35 +54,9 @@ class OMPDeclareReductionDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<OMPDeclareReductionDecl> redeclarations(void) const;
-  inline static std::optional<OMPDeclareReductionDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPDeclareReductionDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<OMPDeclareReductionDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<OMPDeclareReductionDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return OMPDeclareReductionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPDeclareReductionDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<OMPDeclareReductionDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return OMPDeclareReductionDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  OMPDeclareReductionDecl canonical_declaration(void) const;
+  std::optional<OMPDeclareReductionDecl> definition(void) const;
+  gap::generator<OMPDeclareReductionDecl> redeclarations(void) const &;
   static std::optional<OMPDeclareReductionDecl> from(const Decl &parent);
 
   inline static std::optional<OMPDeclareReductionDecl> from(const std::optional<Decl> &parent) {
@@ -97,6 +67,9 @@ class OMPDeclareReductionDecl : public ValueDecl {
     }
   }
 
+  static std::optional<OMPDeclareReductionDecl> from(const Reference &r);
+  static std::optional<OMPDeclareReductionDecl> from(const TokenContext &t);
+
   Expr combiner(void) const;
   Expr combiner_in(void) const;
   Expr combiner_out(void) const;
@@ -104,7 +77,7 @@ class OMPDeclareReductionDecl : public ValueDecl {
   Expr initializer_private(void) const;
   Expr initializer(void) const;
   OMPDeclareReductionDeclInitKind initializer_kind(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(OMPDeclareReductionDecl) == sizeof(ValueDecl));

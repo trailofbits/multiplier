@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "MatrixType.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConstantMatrixType;
 class MatrixType;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ConstantMatrixType : public MatrixType {
  private:
@@ -35,7 +29,6 @@ class ConstantMatrixType : public MatrixType {
   friend class MatrixType;
   friend class Type;
  public:
-  static gap::generator<ConstantMatrixType> in(const Fragment &frag);
   static gap::generator<ConstantMatrixType> in(const Index &index);
   static gap::generator<ConstantMatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +36,6 @@ class ConstantMatrixType : public MatrixType {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CONSTANT_MATRIX;
-  }
-
-  inline static std::optional<ConstantMatrixType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<ConstantMatrixType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<ConstantMatrixType> from(const MatrixType &parent);
-
-  inline static std::optional<ConstantMatrixType> from(const std::optional<MatrixType> &parent) {
-    if (parent) {
-      return ConstantMatrixType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<ConstantMatrixType> from(const Type &parent);
@@ -72,6 +47,9 @@ class ConstantMatrixType : public MatrixType {
       return std::nullopt;
     }
   }
+
+  static std::optional<ConstantMatrixType> from(const Reference &r);
+  static std::optional<ConstantMatrixType> from(const TokenContext &t);
 
 };
 

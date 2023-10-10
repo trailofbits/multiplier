@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AnyX86NoCfCheckAttr;
 class Attr;
 class InheritableAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AnyX86NoCfCheckAttr : public InheritableAttr {
  private:
@@ -35,32 +29,15 @@ class AnyX86NoCfCheckAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AnyX86NoCfCheckAttr> in(const Fragment &frag);
   static gap::generator<AnyX86NoCfCheckAttr> in(const Index &index);
   static gap::generator<AnyX86NoCfCheckAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AnyX86NoCfCheckAttr> by_id(const Index &, EntityId);
+  static gap::generator<AnyX86NoCfCheckAttr> in(const Fragment &frag);
+  static gap::generator<AnyX86NoCfCheckAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_NO_CF_CHECK;
-  }
-
-  inline static std::optional<AnyX86NoCfCheckAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AnyX86NoCfCheckAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AnyX86NoCfCheckAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AnyX86NoCfCheckAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AnyX86NoCfCheckAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AnyX86NoCfCheckAttr> from(const Attr &parent);
@@ -72,6 +49,9 @@ class AnyX86NoCfCheckAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<AnyX86NoCfCheckAttr> from(const Reference &r);
+  static std::optional<AnyX86NoCfCheckAttr> from(const TokenContext &t);
 
 };
 

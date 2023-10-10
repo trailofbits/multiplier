@@ -8,28 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "MSInheritanceAttrSpelling.h"
 #include "MSInheritanceModel.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class MSInheritanceAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MSInheritanceAttr : public InheritableAttr {
  private:
@@ -37,32 +31,15 @@ class MSInheritanceAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<MSInheritanceAttr> in(const Fragment &frag);
   static gap::generator<MSInheritanceAttr> in(const Index &index);
   static gap::generator<MSInheritanceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MSInheritanceAttr> by_id(const Index &, EntityId);
+  static gap::generator<MSInheritanceAttr> in(const Fragment &frag);
+  static gap::generator<MSInheritanceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_INHERITANCE;
-  }
-
-  inline static std::optional<MSInheritanceAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MSInheritanceAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MSInheritanceAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<MSInheritanceAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return MSInheritanceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MSInheritanceAttr> from(const Attr &parent);
@@ -74,6 +51,9 @@ class MSInheritanceAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<MSInheritanceAttr> from(const Reference &r);
+  static std::optional<MSInheritanceAttr> from(const TokenContext &t);
 
   bool best_case(void) const;
   MSInheritanceModel inheritance_model(void) const;

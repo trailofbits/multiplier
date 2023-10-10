@@ -15,6 +15,15 @@
 #include <string_view>
 #include <vector>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
 #include <llvm/ADT/StringRef.h>
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/Constants.h>
@@ -35,6 +44,7 @@
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/MemoryBuffer.h>
 #include <llvm/Support/TargetSelect.h>
+#pragma clang diagnostic pop
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -78,18 +88,16 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
   // Inspect each section in this object file.
   for (const llvm::object::SectionRef &sec : object->sections()) {
     auto maybe_name = sec.getName();
-    if (!maybe_name) {
+    if (llvm::errorToBool(maybe_name.takeError())) {
       LOG(WARNING)
-          << "Missing section name in object file " << file_name
-          << ": " << maybe_name.takeError();
+          << "Missing section name in object file " << file_name;
       continue;
     }
 
     llvm::StringRef name = std::move(*maybe_name);
     if (name.empty()) {
       LOG(WARNING)
-          << "Empty section name in object file " << file_name
-          << ": " << maybe_name.takeError();
+          << "Empty section name in object file " << file_name;
       continue;
     }
 
@@ -97,25 +105,26 @@ bool Parser::ParseObject(llvm::object::ObjectFile *object) {
 
     // If we've found a section with embedded compile commands, then
     // try to parse them and import them.
-    if (name.contains_insensitive("trailofbits_cc")) {
-
-      LOG(INFO)
-          << "Found compile commands section in " << file_name;
-
-      auto maybe_data = sec.getContents();
-      if (!maybe_data) {
-        LOG(ERROR)
-            << "Unable to import the compile commands in object file "
-            << file_name << ": " << maybe_data.takeError();
-
-        ret = false;
-        continue;
-
-      } else {
-        std::string_view commands_view(maybe_data->data(), maybe_data->size());
-        ret = ParseBinaryJSONCommands(file_name_str, commands_view) && ret;
-      }
+    if (!name.contains_insensitive("trailofbits_cc")) {
+      continue;
     }
+
+    LOG(INFO)
+        << "Found compile commands section in " << file_name;
+
+    auto maybe_data = sec.getContents();
+    if (llvm::errorToBool(maybe_data.takeError())) {
+      LOG(ERROR)
+          << "Unable to get data for the compile commands section '"
+          << name.str() << "' from object file "
+          << file_name;
+
+      ret = false;
+      continue;
+    }
+
+    std::string_view commands_view(maybe_data->data(), maybe_data->size());
+    ret &= ParseBinaryJSONCommands(file_name_str, commands_view);
   }
 
   return ret;
@@ -127,12 +136,12 @@ bool Parser::ParseArchive(llvm::object::Archive *archive) {
   auto ret = true;
   for (const llvm::object::Archive::Child &child : archive->children(err)) {
     auto maybe_bin = child.getAsBinary(&context);
-    if (!maybe_bin) {
-      LOG(ERROR) << maybe_bin.takeError();
+    if (llvm::errorToBool(maybe_bin.takeError())) {
       ret = false;
-    } else {
-      ret = ParseBinary(maybe_bin.get().get()) && ret;
+      continue;
     }
+
+    ret &= ParseBinary(maybe_bin.get().get());
   }
   return ret;
 }
@@ -159,7 +168,7 @@ bool Parser::ParseModule(const llvm::Module &module) {
       auto file_name = module.getName();
       auto data = init->getAsString();
       std::string_view commands_view(data.data(), data.size());
-      ret = ParseBinaryJSONCommands(file_name.str(), commands_view) && ret;
+      ret &= ParseBinaryJSONCommands(file_name.str(), commands_view);
     }
   }
   return ret;
@@ -170,7 +179,7 @@ bool Parser::ParseModule(const llvm::Module &module) {
 bool Parser::ParseIR(llvm::object::IRObjectFile *ir) {
   auto ret = false;
   for (const llvm::Module &module : ir->modules()) {
-    ret = ParseModule(module) && ret;
+    ret &= ParseModule(module);
   }
   return ret;
 }
@@ -193,9 +202,9 @@ bool Parser::ParseUB(llvm::object::MachOUniversalBinary *ub) {
       ret = false;
 
     } else if (!object_file) {
-      ret = ParseArchive(archive.get().get()) && ret;
+      ret &= ParseArchive(archive.get().get());
     } else {
-      ret = ParseObject(object_file.get().get()) && ret;
+      ret &= ParseObject(object_file.get().get());
     }
   }
   return ret;
@@ -244,14 +253,15 @@ bool Parser::ParseBinaryJSONCommands(std::string_view file_name,
   for (auto command_ : SplitCompileCommands(data)) {
     auto command = SanitizeJsonString(command_, "{", "}");
     auto maybe_json = llvm::json::parse(command);
-    if (maybe_json) {
-      ret = ParseBinaryJSONCommand(*maybe_json) && ret;
-    } else {
+    if (llvm::errorToBool(maybe_json.takeError())) {
       LOG(ERROR)
-           << "Unable to parse compile command in object file "
-           << file_name << ": " << maybe_json.takeError();
+           << "Unable to parse split and sanitized compile commands from object file "
+           << file_name;
       ret = false;
+      continue;
     }
+
+    ret &= ParseBinaryJSONCommand(*maybe_json);
   }
   return ret;
 }
@@ -269,50 +279,54 @@ bool Parser::ParseBinaryJSONCommand(llvm::json::Value &json) {
 bool Parser::ParseCompileCommandsJSON(std::string_view file_name,
                                       llvm::json::Value &json,
                                       const EnvVariableMap &envp) {
-  auto ret = true;
-  if (auto arr = json.getAsArray()) {
-    for (auto &val : *arr) {
-      if (auto obj = val.getAsObject()) {
-        ret = importer.ImportCMakeCompileCommand(*obj, envp) && ret;
-      } else {
-        DLOG(ERROR)
-            << "Entry in top-level array of JSON file is not an object";
-        ret = false;
-      }
-    }
-  } else {
+  auto arr = json.getAsArray();
+  if (!arr) {
     DLOG(ERROR)
-        << "JSON object is not an array of objects";
+        << "JSON object in " << file_name << " is not an array of objects";
     return false;
   }
-  (void)file_name;
+
+  auto ret = true;
+  for (llvm::json::Value &val : *arr) {
+    llvm::json::Object *obj = val.getAsObject();
+    if (!obj) {
+      DLOG(ERROR)
+          << "Entry in top-level array of JSON file " << file_name
+          << " is not an object";
+      ret = false;
+      continue;
+    }
+
+    if (obj->getString("wrapped_tool")) {
+      ret &= importer.ImportBlightCompileCommand(*obj);
+    } else {
+      ret &= importer.ImportCMakeCompileCommand(*obj, envp);
+    }
+  }
+
   return ret;
 }
 
 // Parse a memory buffer as a binary/object of some form.
 bool Parser::Parse(const llvm::MemoryBuffer &buff, const EnvVariableMap &envp) {
   auto file_name = buff.getBufferIdentifier().str();
-  DLOG(INFO) << "Parsing buffer " << file_name;
+  LOG(INFO) << "Parsing buffer " << file_name;
 
   auto maybe_json = llvm::json::parse(buff.getBuffer());
-  if (maybe_json) {
-    DLOG(INFO) << "Buffer is JSON; parsing commands";
+  if (!llvm::errorToBool(maybe_json.takeError())) {
+    LOG(INFO) << "Buffer is JSON; parsing commands";
     return ParseCompileCommandsJSON(file_name, *maybe_json, envp);
-  } else {
-    DLOG(INFO)
-        << "Buffer " << file_name << " is not JSON: "
-        << maybe_json.takeError();
   }
 
   auto maybe_bin = llvm::object::createBinary(buff, &context);
-  if (!maybe_bin) {
-    LOG(ERROR)
-        << "Unable to parse " << file_name << " as binary: "
-        << maybe_bin.takeError();
-    return false;
-  } else {
+  if (!llvm::errorToBool(maybe_bin.takeError())) {
+    LOG(INFO) << "Buffer is a binary; parsing sections";
     return ParseBinary(maybe_bin.get().get());
   }
+
+  LOG(ERROR)
+      << "Unable to parse " << file_name << " as either JSON or a binary.";
+  return false;
 }
 
 }  // namespace indexer

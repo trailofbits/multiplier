@@ -19,10 +19,6 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <llvm/Support/Format.h>
-#include <llvm/Support/FormatVariadic.h>
-#include <llvm/Support/JSON.h>
-#include <llvm/Support/raw_ostream.h>
 #include <multiplier/AST.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Command.h>
@@ -32,6 +28,21 @@
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <llvm/Support/Format.h>
+#include <llvm/Support/FormatVariadic.h>
+#include <llvm/Support/JSON.h>
+#include <llvm/Support/raw_ostream.h>
+#pragma clang diagnostic pop
 
 #include "Action.h"
 #include "Context.h"
@@ -125,6 +136,7 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
                                    PathCache &cache) {
   EnvVariableMap &envp = command.env;
   std::vector<std::string> to_remove;
+  std::vector<std::string> new_vec;
   std::string path;
 
   for (auto &[key, val] : envp) {
@@ -136,6 +148,40 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
     }
   }
 
+  auto is_quoted = [] (const char *arg) {
+    return (arg[0] == '\'' || arg[0] == '"') && arg[strlen(arg) - 1u] == arg[0];
+  };
+
+  // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
+  auto has_quoted = false;
+  for (const char *arg : command.vec.Arguments()) {
+    if (is_quoted(arg)) {
+      has_quoted = true;
+      break;
+    }
+  }
+
+  // If there are quoted arguments, then unquote them.
+  if (has_quoted) {
+    for (const char *arg : command.vec.Arguments()) {
+      if (!is_quoted(arg)) {
+        new_vec.emplace_back(arg);
+      } else {
+        std::string new_arg;
+        auto max_i = strlen(arg);
+        new_arg.reserve(max_i);
+        for (size_t i = 1u; i < max_i - 1; ++i) {
+          if (arg[i] != '\\') {
+            new_arg.push_back(arg[i]);
+          }
+        }
+        new_vec.emplace_back(std::move(new_arg));
+      }
+    }
+    command.vec.Reset(new_vec);
+    new_vec.clear();
+  }
+
   // Try to get the path of the target executable, and if we succeed, then
   // use it, otherwise drop `_`.
   std::string exe_name_var("_");
@@ -144,7 +190,6 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
 
     // Overwrite the first argument in the vector with the fully realized
     // path of the compiler.
-    std::vector<std::string> new_vec;
     for (const char *arg : command.vec.Arguments()) {
       new_vec.emplace_back(arg);
     }
@@ -173,42 +218,30 @@ struct CompilerPathInfo {
   std::string no_sysroot;
 };
 
-class CompilerPathInfoCache {
- private:
-  const bool enable_cache;
-
-  std::unordered_map<std::string, CompilerPathInfo> cached_info;
-  std::mutex cached_info_lock;
-
- public:
-  inline CompilerPathInfoCache(bool enable_cache_)
-      : enable_cache(enable_cache_) {}
-
-  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
-      const Command &command);
-};
-
 class BuildCommandAction final : public Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
-  std::shared_ptr<GlobalIndexingState> ctx;
-  CompilerPathInfoCache &cache;
+  GlobalIndexingState &ctx;
+  const bool cxx_support;
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
-  static bool CanRunCompileJob(const pasta::CompileJob &job);
+  bool CanRunCompileJob(const pasta::CompileJob &job) const;
+
+  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
+      const Command &command);
 
  public:
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            std::shared_ptr<GlobalIndexingState> ctx_,
-                            CompilerPathInfoCache &cache_)
+                            GlobalIndexingState &ctx_,
+                            bool cxx_support_)
       : fm(fm_),
         command(command_),
-        ctx(std::move(ctx_)),
-        cache(cache_) {}
+        ctx(ctx_),
+        cxx_support(cxx_support_) {}
 
   void Run(void) final;
 };
@@ -216,28 +249,13 @@ class BuildCommandAction final : public Action {
 // If we are using something like CMake commands, then pull in the relevant
 // information by trying to execute the compiler directly.
 std::variant<CompilerPathInfo, std::string>
-CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
-
-  std::unique_lock<std::mutex> locker;
-
-  // In caching mode, we check to see if, for the given compiler path, if we've
-  // already got compiler info. If so then great, if not then we need to run
-  // a command. We'll use the info generated from the first successful command.
-  //
-  // NOTE(pag): This is technically sketchy, but for some tests, in uniform
-  //            codebases, this can significantly speed up the import step for
-  //            compile commands.
-  if (enable_cache) {
-    std::unique_lock<std::mutex>(cached_info_lock).swap(locker);
-    if (auto info_it = cached_info.find(command.vec[0]);
-        info_it != cached_info.end()) {
-      return info_it->second;  // Cache hit.
-    }
-  }
-
+BuildCommandAction::GetCompilerInfo(const Command &command) {
   std::vector<std::string> new_args;
   bool skip = false;
-  for (const char *arg : command.vec) {
+  for (const char *arg_ : command.vec) {
+
+    std::string_view arg(arg_);
+
     if (skip) {
       skip = false;
 
@@ -245,55 +263,60 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
       //
       //      ... -main-file-name -mrelocation-model ...
       //
-      if (arg[0] != '-' && 1u < strlen(arg)) {
+      if (arg.front() != '-' && 1u < arg.size()) {
         continue;
       }
     }
 
-    if (strstr(arg, "-Wno") == arg) {
+    if (arg.starts_with("-Wno-")) {
       // Keep the argument.
 
     // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
-    } else if (strstr(arg, "-W") == arg ||
-               strstr(arg, "-pedantic") == arg ||
-               !strcmp(arg, "-pic-is-pie")) {
+    } else if (arg.starts_with("-W") ||
+               arg.starts_with("-pedantic") ||
+               arg == "-pic-is-pie") {
       continue;  // Skip the argument.
 
-    } else if (!strcmp(arg, "-mllvm") ||
-               !strcmp(arg, "-Xclang") ||
-               !strcmp(arg, "-dependency-file") ||
-               !strcmp(arg, "-diagnostic-log-file") ||
-               !strcmp(arg, "-header-include-file") ||
-               !strcmp(arg, "-stack-usage-file") ||
-               !strcmp(arg, "-mrelocation-model") ||
-               !strcmp(arg, "-pic-level") ||
-               !strcmp(arg, "-main-file-name")) {
+    } else if (arg == "-mllvm" ||
+               arg == "-Xclang" ||
+               arg == "-dependency-file" ||
+               arg == "-diagnostic-log-file" ||
+               arg == "-header-include-file" ||
+               arg == "-stack-usage-file" ||
+               arg == "-mrelocation-model" ||
+               arg == "-pic-level" ||
+               arg == "-main-file-name") {
       skip = true;
       continue;  // Skip the argument and the next argument.
 
     // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` or
     // `-fprofile-remapping-file=`, or ..., then drop it.
-    } else if (strstr(arg, "-file=") /* NOTE(pag): find anywhere */ ||
-               strstr(arg, "-dependent-lib=") == arg ||
-               strstr(arg, "-stats-file=") == arg ||
-               strstr(arg, "-fprofile-list=") == arg ||
-               strstr(arg, "-fxray-always-instrument=") == arg ||
-               strstr(arg, "-fxray-never-instrument=") == arg ||
-               strstr(arg, "-fxray-attr-list=") == arg ||
-               strstr(arg, "-tsan-compound-read-before-write=") == arg ||
-               strstr(arg, "-tsan-distinguish-volatile=") == arg ||
-               strstr(arg, "-treat") == arg) {
+    } else if (strstr(arg_, "-file=") /* NOTE(pag): find anywhere */ ||
+               arg.starts_with("-dependent-lib=") ||
+               arg.starts_with("-stats-file=") ||
+               arg.starts_with("-fprofile-list=") ||
+               arg.starts_with("-fxray-always-instrument=") ||
+               arg.starts_with("-fxray-never-instrument=") ||
+               arg.starts_with("-fxray-attr-list=") ||
+               arg.starts_with("-tsan-compound-read-before-write=") ||
+               arg.starts_with("-tsan-distinguish-volatile=") ||
+               arg.starts_with("-treat")) {
       continue;
 
     // Output file.
-    } else if (!strcmp(arg, "-o")) {
+    } else if (arg == "-o") {
       skip = true;
       new_args.emplace_back(arg);
       new_args.emplace_back("/dev/null");
       continue;
+
+    // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
+    } else if ((arg.front() == '\'' || arg.front() == '"') && arg[1] == '-' &&
+               arg.back() == arg.front()) {
+      continue;
     }
 
-    new_args.emplace_back(arg);
+    new_args.emplace_back(arg_);
   }
 
   new_args.emplace_back("-w");  // Disable all warnings (GCC).
@@ -301,7 +324,7 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
   new_args.emplace_back("-P");  // Disable preprocessor line markers.
   new_args.emplace_back("-v");
 //  new_args.emplace_back("-dD");  // Print macro definitions in -E mode.
-  new_args.emplace_back("-E");  // Only run the preprocessor.
+//  new_args.emplace_back("-E");  // Only run the preprocessor.
 
   // Include a non-existent file. This guarantees a fatal error in all cases,
   // which prevents any compilation jobs from proceeding.
@@ -333,11 +356,13 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
 
   new_args.emplace_back("-isysroot");
   new_args.emplace_back(command.working_dir + "/trail_of_bits");
+
   ret = Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output.no_sysroot);
 
   // NOTE(pag): Changing the sysroot might make parts of the compilation fail.
-  if (std::holds_alternative<std::error_code>(ret) && output.no_sysroot.empty()) {
+  if (std::holds_alternative<std::error_code>(ret) &&
+      output.no_sysroot.empty()) {
     return std::get<std::error_code>(ret).message();
   }
 
@@ -350,18 +375,14 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
     }
   }
 
-  if (enable_cache) {
-    cached_info.emplace(command.vec[0], output);
-  }
-
   return output;
 }
 
-bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
+bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
   const auto &args = job.Arguments();
   for (auto it = args.begin(); it != args.end(); ++it) {
-    const char *arg = *it;
-    if (strcmp(arg, "-x")) {
+    std::string_view arg = *it;
+    if (arg != "-x") {
       continue;
     }
     
@@ -374,7 +395,9 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
     // Next argument after opt_x flag will be lang value; Compare
     // it with the supported language i.e. C.
     arg = *it;
-    if (strcmp(arg, "c")) {
+    if (arg == "c" || (arg == "c++" && cxx_support)) {
+
+    } else {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
                  << arg << ": " << args.Join();
       return false;
@@ -416,7 +439,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
         << "Creating indexing action for main source file "
         << job.SourceFile().Path().generic_string();
 
-    ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
+    ctx.executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, cc, job);
   }
 
   LOG_IF(ERROR, !num_jobs)
@@ -427,6 +450,8 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
 // Build the compilers for the commands, then build the commands.
 void BuildCommandAction::Run(void) {
 
+  ProgressBarWork progress_tracker(ctx.eval_command_progress);
+
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(
           command.vec, command.working_dir);
@@ -436,7 +461,7 @@ void BuildCommandAction::Run(void) {
     return;
   }
 
-  auto maybe_cc_info = cache.GetCompilerInfo(command);
+  auto maybe_cc_info = GetCompilerInfo(command);
   if (!std::holds_alternative<CompilerPathInfo>(maybe_cc_info)) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
@@ -481,43 +506,50 @@ struct Importer::PrivateData {
 
   std::filesystem::path cwd;
   pasta::FileManager fm;
-  std::shared_ptr<GlobalIndexingState> ctx;
+  GlobalIndexingState &ctx;
 
   inline PrivateData(std::filesystem::path cwd_,
                      const pasta::FileManager &fm_,
-                     std::shared_ptr<GlobalIndexingState> ctx_)
+                     GlobalIndexingState &ctx_)
       : cwd(std::move(cwd_)),
         fm(fm_),
-        ctx(std::move(ctx_)) {}
+        ctx(ctx_) {}
 };
 
 Importer::~Importer(void) {}
 
 Importer::Importer(std::filesystem::path cwd_,
                    const pasta::FileManager &fm,
-                   std::shared_ptr<GlobalIndexingState> ctx)
+                   GlobalIndexingState &ctx)
     : d(std::make_unique<Importer::PrivateData>(
-            std::move(cwd_), fm, std::move(ctx))) {}
+            std::move(cwd_), fm, ctx)) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
-
+  ProgressBarWork progress_tracker(d->ctx.command_progress);
   auto wrapped_tool = o.getString("wrapped_tool");
   auto cwd = o.getString("cwd");
-  auto args = o.getArray("args");
-  auto hash = o.getString("hash");
+  auto args = o.getArray("canonicalized_args");
   auto lang = o.getString("lang");  // `C`, `Cxx`, `Unknown`.
   auto env = o.getObject("env");
 
-  if (!wrapped_tool || !cwd || !args || args->empty() || !hash || !lang ||
-      !env) {
+  if (!args) {
+    args = o.getArray("args");
+  }
+
+  if (!wrapped_tool || !cwd || !args || args->empty() || !env) {
     return false;
   }
 
   std::vector<std::string> args_vec;
   args_vec.emplace_back(wrapped_tool->str());
 
-  for (auto arg : *args) {
+  auto bundle = false;
+
+  for (llvm::json::Value &arg : *args) {
     if (auto arg_str = arg.getAsString()) {
+      if (arg_str->equals("-bundle")) {
+        bundle = true;
+      }
       args_vec.emplace_back(arg_str->str());
     } else {
       return false;
@@ -540,18 +572,46 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
     cwd_str = d->cwd.generic_string();
   }
 
-  auto &command = d->commands[cwd_str].emplace_back(args_vec);
+  Command &command = d->commands[cwd_str].emplace_back(args_vec);
   command.working_dir = cwd_str;
-  command.compiler_hash = hash->str();
   command.env = std::move(envp);
+
+  if (bundle) {
+    LOG(WARNING)
+        << "Skipping bundle command: "
+        << command.vec.Join();
+    d->commands[cwd_str].pop_back();
+    return true;
+  }
+
+  if (!lang || lang->equals_insensitive("unknown")) {
+    LOG(WARNING)
+        << "Skipping command with unknown language: "
+        << command.vec.Join();
+    d->commands[cwd_str].pop_back();
+    return true;
+  }
+
   if (lang->equals_insensitive("c++") || lang->equals_insensitive("cxx")) {
     command.lang = pasta::TargetLanguage::kCXX;
   }
+
+  // Compiler hash.
+  if (auto hash = o.getString("hash")) {
+    command.compiler_hash = hash->str();
+
+  } else {
+    command.compiler_hash = command.vec.Join();
+  }
+
   return true;
 }
 
 bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
                                          const EnvVariableMap &envp) {
+
+  ProgressBarWork progress_tracker(d->ctx.command_progress);
+
   auto cwd = o.getString("directory");
   auto file = o.getString("file");
   if (!cwd || !file) {
@@ -653,11 +713,10 @@ namespace {
 static std::mutex gImportLock;
 }  // namespace
 
-void Importer::Import(const ExecutorOptions &options, bool fast_import) {
+void Importer::Import(const ExecutorOptions &options, bool cxx_support) {
   Executor per_path_exe(options);
 
   for (auto &[cwd, commands] : d->commands) {
-    CompilerPathInfoCache cc_info_cache(fast_import);
 
     // Make sure that even concurrent calls to `Import` never concurrently
     // change the current working directory.
@@ -676,7 +735,7 @@ void Importer::Import(const ExecutorOptions &options, bool fast_import) {
 
     for (const Command &cmd : commands) {
       per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx,
-                                                     cc_info_cache);
+                                                     cxx_support);
     }
 
     per_path_exe.Start();

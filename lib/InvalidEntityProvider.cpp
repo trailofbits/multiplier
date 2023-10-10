@@ -26,6 +26,18 @@ FilePathMap InvalidEntityProvider::ListFiles(const Ptr &) {
   return {};
 }
 
+// Get the list of paths associated with a given file id.
+gap::generator<std::filesystem::path> InvalidEntityProvider::ListPathsForFile(
+    const Ptr &, PackedFileId) {
+  co_return;
+}
+
+// Get the list nested fragments for a given fragment.
+FragmentIdList InvalidEntityProvider::ListNestedFragmentIds(
+    const Ptr &, PackedFragmentId) {
+  return {};
+}
+
 FragmentIdList InvalidEntityProvider::ListFragmentsInFile(
     const Ptr &, SpecificEntityId<FileId>) {
   return {};
@@ -48,22 +60,23 @@ InvalidEntityProvider::ReferenceKindFor(const Ptr &, std::string_view) {
 }
 
 bool InvalidEntityProvider::AddReference(const Ptr &, RawEntityId,
-                                         RawEntityId, RawEntityId) {
+                                         RawEntityId, RawEntityId,
+                                         RawEntityId) {
   return false;
 }
 
 gap::generator<RawEntityId> InvalidEntityProvider::Redeclarations(
-    const Ptr &, RawEntityId) {
+    const Ptr &, RawEntityId) & {
   co_return;
 }
 
-gap::generator<std::pair<RawEntityId, RawEntityId>>
-InvalidEntityProvider::References(const Ptr &, RawEntityId) {
+gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
+InvalidEntityProvider::References(const Ptr &, RawEntityId) & {
   co_return;
 }
 
 gap::generator<RawEntityId> InvalidEntityProvider::FindSymbol(
-    const Ptr &, std::string) {
+    const Ptr &, std::string) & {
   co_return;
 }
 
@@ -72,10 +85,12 @@ gap::generator<RawEntityId> InvalidEntityProvider::FindSymbol(
         const Ptr &, RawEntityId) { return {}; } \
     \
     gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
-        const Ptr &) { co_return; }
+        const Ptr &) & { co_return; }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER)
@@ -83,27 +98,41 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
-      const Ptr &, type_name ## Kind) { co_return; } \
-  \
-  gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
-      const Ptr &, type_name ## Kind, PackedFragmentId) { co_return; }
+      const Ptr &, type_name ## Kind) & { co_return; }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
-      const Ptr &, PackedFragmentId) { co_return; }
+      const Ptr &, type_name ## Kind, PackedFragmentId) & { co_return; }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
-                            MX_DECLARE_ENTITY_LISTERS)
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
+  gap::generator<type_name ## ImplPtr> InvalidEntityProvider::type_name ## sFor( \
+      const Ptr &, PackedFragmentId) & { co_return; }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
 Index::Index(void)

@@ -6,7 +6,9 @@
 
 #include "Fragment.h"
 
+#include <iostream>
 #include <cassert>
+#include <multiplier/Compilation.h>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Designator.h>
@@ -22,13 +24,39 @@
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
-#include "WeggliImpl.h"
 
 namespace mx {
+namespace ir {
+class SourceIRImpl;
+}  // namespace ir
 
-// Return the fragment containing a query match.
-Fragment Fragment::containing(const WeggliQueryMatch &match) {
-  return Fragment(match.frag);
+Fragment Fragment::containing(const Fragment &child) {
+  for (mx::RawEntityId parent_id : child.impl->reader.getParentIds()) {
+    return Fragment(child.impl->ep->FragmentFor(child.impl->ep, parent_id));
+  }
+  return child;
+}
+
+// A fragment can be nested inside of another fragment. This is very common
+// with C++ templates, but can also happen in C due to elaborated type uses,
+// such as `struct foo`, acting as forward declarations upon their first use.
+std::optional<Fragment> Fragment::parent(void) const noexcept {
+  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
+    return Fragment(impl->ep->FragmentFor(impl->ep, parent_id));
+  }
+  return std::nullopt;
+}
+
+std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
+  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
+    VariantId vid = EntityId(parent_id).Unpack();
+    if (std::holds_alternative<FragmentId>(vid)) {
+      return std::get<FragmentId>(vid);
+    } else {
+      break;
+    }
+  }
+  return std::nullopt;
 }
 
 // Return the fragment containing a query match.
@@ -42,11 +70,6 @@ Fragment Fragment::containing(const Decl &entity) {
 }
 
 Fragment Fragment::containing(const Stmt &entity) {
-  return Fragment(entity.impl->ep->FragmentFor(
-      entity.impl->ep, entity.impl->fragment_id));
-}
-
-Fragment Fragment::containing(const Type &entity) {
   return Fragment(entity.impl->ep->FragmentFor(
       entity.impl->ep, entity.impl->fragment_id));
 }
@@ -82,8 +105,38 @@ Fragment Fragment::containing(const Macro &entity) {
 }
 
 std::optional<Fragment> Fragment::containing(const Token &entity) {
-  if (auto frag = entity.impl->OwningFragment()) {
+  if (auto frag = entity.impl->NthOwningFragment(entity.offset)) {
     return Fragment(FragmentImplPtr(entity.impl, frag));
+  } else {
+    return std::nullopt;
+  }
+}
+
+std::optional<Fragment> Fragment::containing(const VariantEntity &entity) {
+#define GET_FRAGMENT(type_name, lower_name, enum_name, category) \
+      } else if (std::holds_alternative<type_name>(entity)) { \
+        return Fragment::containing(std::get<type_name>(entity));
+
+  // TODO(pag): Pseudo entities have a fragment id.
+
+  if (false) {
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FRAGMENT,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                GET_FRAGMENT,
+                                GET_FRAGMENT,
+                                GET_FRAGMENT,
+                                MX_IGNORE_ENTITY_CATEGORY)
+  } else {
+    return std::nullopt;
+  }
+#undef GET_FRAGMENT
+}
+
+// Return the fragment containing a token tree.
+std::optional<Fragment> Fragment::containing(const TokenTree &tree) {
+  if (tree.impl->fragment) {
+    return Fragment(tree.impl->fragment);
   } else {
     return std::nullopt;
   }
@@ -92,6 +145,14 @@ std::optional<Fragment> Fragment::containing(const Token &entity) {
 // Return the ID of this fragment.
 SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
   return FragmentId(impl->fragment_id);
+}
+
+// Returns the unique owning compilation that produced this fragment. There
+// may be many compilations which produced equivalent/redundant fragments, but
+// those redundancies are eliminated by the indexer.
+Compilation Fragment::compilation(void) const noexcept {
+  return Compilation(impl->ep->CompilationFor(
+      impl->ep, impl->reader.getCompilationId()));
 }
 
 // The range of file tokens in this fragment.
@@ -129,9 +190,11 @@ TokenRange Fragment::parsed_tokens(void) const {
 }
 
 // Return the list of top-level declarations in this fragment.
-gap::generator<Decl> Fragment::top_level_declarations(void) const {
-  auto &ep = impl->ep;
-  for (RawEntityId eid : impl->reader.getTopLevelDeclarations()) {
+gap::generator<Decl> Fragment::top_level_declarations(void) const & {
+  auto ep = impl->ep;
+  auto frag_id = impl->fragment_id;
+  auto tlds = impl->reader.getTopLevelDeclarations();
+  for (RawEntityId eid : tlds) {
     VariantId vid = EntityId(eid).Unpack();
     if (!std::holds_alternative<DeclId>(vid)) {
       assert(false);
@@ -139,7 +202,7 @@ gap::generator<Decl> Fragment::top_level_declarations(void) const {
     }
 
     DeclId decl_id = std::get<DeclId>(vid);
-    if (decl_id.fragment_id != impl->fragment_id) {
+    if (decl_id.fragment_id != frag_id) {
       assert(false);
       continue;
     }
@@ -154,47 +217,64 @@ gap::generator<Decl> Fragment::top_level_declarations(void) const {
   }
 }
 
+// Return child fragments.
+gap::generator<Fragment> Fragment::nested_fragments(void) const & {
+  auto ep = impl->ep;
+  for (PackedFragmentId fid : ep->ListNestedFragmentIds(ep, id())) {
+    if (FragmentImplPtr fptr = ep->FragmentFor(ep, fid)) {
+      co_yield Fragment(std::move(fptr));
+    } else {
+      assert(false);
+    }
+  }
+}
+
 // Return references to this fragment.
-gap::generator<Reference> Fragment::references(void) const {
-  const EntityProvider::Ptr &ep = impl->ep;
-  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
-    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
-      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+gap::generator<Reference> Fragment::references(void) const & {
+  auto ep = impl->ep;
+  for (auto ref : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
+      auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));
+      co_yield Reference(std::move(eptr), std::move(context),
+                         std::get<0>(ref), category, std::get<2>(ref));
     }
   }
 }
 
 // Return the list of top-level macros in this fragment.
 // This will return a mix of `Macro` or `Token` values.
-gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const {
+gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
 
-  const EntityProvider::Ptr &ep = impl->ep;
+  const EntityProviderPtr ep = impl->ep;
   for (RawEntityId eid : macro_ids) {
     VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
-      MacroId macro_id = std::get<MacroId>(vid);
       MacroImplPtr eptr = ep->MacroFor(ep, eid);
-      if (macro_id.fragment_id == impl->fragment_id && eptr) {
+      
+      // NOTE(pag): We don't check for fragments matching as we might have
+      //            macros (e.g. `#define` in nested macros that we inject as
+      //            top-level macros).
+      if (eptr) {
         co_yield Macro(std::move(eptr));
       } else {
         assert(false);
       }
 
     } else if (std::holds_alternative<MacroTokenId>(vid)) {
-      MacroTokenId macro_id = std::get<MacroTokenId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id &&
-          macro_id.offset < impl->num_tokens) {
-        co_yield Token(impl->MacroTokenReader(impl), macro_id.offset);
+      MacroTokenId tid = std::get<MacroTokenId>(vid);
+      if (tid.fragment_id == impl->fragment_id &&
+          tid.offset < impl->num_tokens) {
+        co_yield Token(impl->MacroTokenReader(impl), tid.offset);
       } else {
         assert(false);
       }
 
     } else if (std::holds_alternative<ParsedTokenId>(vid)) {
-      ParsedTokenId macro_id = std::get<ParsedTokenId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id &&
-          macro_id.offset < impl->num_parsed_tokens) {
-        co_yield Token(impl->ParsedTokenReader(impl), macro_id.offset);
+      ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+      if (tid.fragment_id == impl->fragment_id &&
+          tid.offset < impl->num_parsed_tokens) {
+        co_yield Token(impl->ParsedTokenReader(impl), tid.offset);
       } else {
         assert(false);
       }
@@ -221,25 +301,9 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const {
   }
 }
 
-// Returns source IR for the fragment.
-std::optional<std::string_view> Fragment::source_ir(void) const noexcept {
-  auto mlir = impl->SourceIR();
-  if (!mlir.empty()) {
-    return mlir;
-  }
-  return std::nullopt;
-}
-
-// Run a Weggli search over this fragment.
-gap::generator<WeggliQueryMatch> Fragment::query(const WeggliQuery &query) const {
-  WeggliQueryResultImpl res(query, impl);
-  for (auto match : res.Enumerate()) {
-    co_yield match;
-  }
-}
-
 // Run a regular expression search over this fragment.
-gap::generator<RegexQueryMatch> Fragment::query(const RegexQuery &query) const {
+gap::generator<RegexQueryMatch> Fragment::query(
+    const RegexQuery &query) const & {
   RegexQueryResultImpl res(query, impl);
   for (auto match : res.Enumerate()) {
     co_yield match;

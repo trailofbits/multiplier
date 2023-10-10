@@ -8,27 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "ValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
+class Stmt;
+class Token;
 class UnresolvedUsingValueDecl;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnresolvedUsingValueDecl : public ValueDecl {
  private:
@@ -37,11 +32,12 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<UnresolvedUsingValueDecl> in(const Fragment &frag);
   static gap::generator<UnresolvedUsingValueDecl> in(const Index &index);
   static gap::generator<UnresolvedUsingValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnresolvedUsingValueDecl> by_id(const Index &, EntityId);
+  static gap::generator<UnresolvedUsingValueDecl> in(const Fragment &frag);
+  static gap::generator<UnresolvedUsingValueDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_VALUE;
@@ -56,35 +52,9 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<UnresolvedUsingValueDecl> redeclarations(void) const;
-  inline static std::optional<UnresolvedUsingValueDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<UnresolvedUsingValueDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return UnresolvedUsingValueDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedUsingValueDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return UnresolvedUsingValueDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  UnresolvedUsingValueDecl canonical_declaration(void) const;
+  std::optional<UnresolvedUsingValueDecl> definition(void) const;
+  gap::generator<UnresolvedUsingValueDecl> redeclarations(void) const &;
   static std::optional<UnresolvedUsingValueDecl> from(const Decl &parent);
 
   inline static std::optional<UnresolvedUsingValueDecl> from(const std::optional<Decl> &parent) {
@@ -94,6 +64,9 @@ class UnresolvedUsingValueDecl : public ValueDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<UnresolvedUsingValueDecl> from(const Reference &r);
+  static std::optional<UnresolvedUsingValueDecl> from(const TokenContext &t);
 
   Token ellipsis_token(void) const;
   Token using_token(void) const;

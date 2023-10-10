@@ -13,7 +13,7 @@
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print");
 
-extern "C" int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]

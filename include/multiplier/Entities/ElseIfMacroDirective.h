@@ -8,27 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ConditionalMacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class ConditionalMacroDirective;
 class ElseIfMacroDirective;
 class Macro;
 class MacroDirective;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ElseIfMacroDirective : public ConditionalMacroDirective {
  private:
@@ -38,6 +31,7 @@ class ElseIfMacroDirective : public ConditionalMacroDirective {
   friend class Macro;
  public:
   static gap::generator<ElseIfMacroDirective> in(const Fragment &frag);
+  static gap::generator<ElseIfMacroDirective> in(const File &file);
 
   static gap::generator<ElseIfMacroDirective> in(const Index &index);
   static std::optional<ElseIfMacroDirective> by_id(const Index &, EntityId);
@@ -52,34 +46,6 @@ class ElseIfMacroDirective : public ConditionalMacroDirective {
   static gap::generator<ElseIfMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<ElseIfMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<ElseIfMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<ElseIfMacroDirective> from(const ConditionalMacroDirective &parent);
-
-  inline static std::optional<ElseIfMacroDirective> from(const std::optional<ConditionalMacroDirective> &parent) {
-    if (parent) {
-      return ElseIfMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ElseIfMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<ElseIfMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return ElseIfMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<ElseIfMacroDirective> from(const Macro &parent);
 
   inline static std::optional<ElseIfMacroDirective> from(const std::optional<Macro> &parent) {
@@ -89,6 +55,9 @@ class ElseIfMacroDirective : public ConditionalMacroDirective {
       return std::nullopt;
     }
   }
+
+  static std::optional<ElseIfMacroDirective> from(const Reference &r);
+  static std::optional<ElseIfMacroDirective> from(const TokenContext &t);
 
 };
 

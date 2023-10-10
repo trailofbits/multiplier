@@ -39,6 +39,7 @@ enum class StmtKind : unsigned char {
   OMP_CRITICAL_DIRECTIVE,
   OMP_DEPOBJ_DIRECTIVE,
   OMP_DISPATCH_DIRECTIVE,
+  OMP_ERROR_DIRECTIVE,
   OMP_FLUSH_DIRECTIVE,
   OMP_INTEROP_DIRECTIVE,
   OMP_DISTRIBUTE_DIRECTIVE,
@@ -86,6 +87,7 @@ enum class StmtKind : unsigned char {
   OMP_PARALLEL_MASTER_DIRECTIVE,
   OMP_PARALLEL_SECTIONS_DIRECTIVE,
   OMP_SCAN_DIRECTIVE,
+  OMP_SCOPE_DIRECTIVE,
   OMP_SECTION_DIRECTIVE,
   OMP_SECTIONS_DIRECTIVE,
   OMP_SINGLE_DIRECTIVE,
@@ -143,6 +145,7 @@ enum class StmtKind : unsigned char {
   CXX_NEW_EXPR,
   CXX_NOEXCEPT_EXPR,
   CXX_NULL_PTR_LITERAL_EXPR,
+  CXX_PAREN_LIST_INIT_EXPR,
   CXX_PSEUDO_DESTRUCTOR_EXPR,
   CXX_REWRITTEN_BINARY_OPERATOR,
   CXX_SCALAR_VALUE_INIT_EXPR,
@@ -250,7 +253,7 @@ inline static const char *EnumerationName(StmtKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(StmtKind) {
-  return 231;
+  return 234;
 }
 
 const char *EnumeratorName(StmtKind);

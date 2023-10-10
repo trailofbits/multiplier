@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPLoopTransformationDirective.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopTransformationDirective;
 class OMPUnrollDirective;
 class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPUnrollDirective : public OMPLoopTransformationDirective {
  private:
@@ -39,11 +34,12 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPUnrollDirective> in(const Fragment &frag);
   static gap::generator<OMPUnrollDirective> in(const Index &index);
   static gap::generator<OMPUnrollDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPUnrollDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPUnrollDirective> in(const Fragment &frag);
+  static gap::generator<OMPUnrollDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_UNROLL_DIRECTIVE;
@@ -58,44 +54,6 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPUnrollDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPUnrollDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPUnrollDirective> from(const OMPLoopTransformationDirective &parent);
-
-  inline static std::optional<OMPUnrollDirective> from(const std::optional<OMPLoopTransformationDirective> &parent) {
-    if (parent) {
-      return OMPUnrollDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPUnrollDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPUnrollDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPUnrollDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPUnrollDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPUnrollDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPUnrollDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPUnrollDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPUnrollDirective> from(const std::optional<Stmt> &parent) {
@@ -105,6 +63,9 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
       return std::nullopt;
     }
   }
+
+  static std::optional<OMPUnrollDirective> from(const Reference &r);
+  static std::optional<OMPUnrollDirective> from(const TokenContext &t);
 
 };
 

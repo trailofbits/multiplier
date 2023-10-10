@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "TypedefNameDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
+class Stmt;
+class Token;
 class TypeAliasDecl;
 class TypeAliasTemplateDecl;
 class TypeDecl;
 class TypedefNameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeAliasDecl : public TypedefNameDecl {
  private:
@@ -40,11 +35,12 @@ class TypeAliasDecl : public TypedefNameDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TypeAliasDecl> in(const Fragment &frag);
   static gap::generator<TypeAliasDecl> in(const Index &index);
   static gap::generator<TypeAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypeAliasDecl> by_id(const Index &, EntityId);
+  static gap::generator<TypeAliasDecl> in(const Fragment &frag);
+  static gap::generator<TypeAliasDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPE_ALIAS;
@@ -59,45 +55,9 @@ class TypeAliasDecl : public TypedefNameDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TypeAliasDecl> redeclarations(void) const;
-  inline static std::optional<TypeAliasDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TypeAliasDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TypeAliasDecl> from(const TypedefNameDecl &parent);
-
-  inline static std::optional<TypeAliasDecl> from(const std::optional<TypedefNameDecl> &parent) {
-    if (parent) {
-      return TypeAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypeAliasDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<TypeAliasDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return TypeAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypeAliasDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TypeAliasDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TypeAliasDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  TypeAliasDecl canonical_declaration(void) const;
+  std::optional<TypeAliasDecl> definition(void) const;
+  gap::generator<TypeAliasDecl> redeclarations(void) const &;
   static std::optional<TypeAliasDecl> from(const Decl &parent);
 
   inline static std::optional<TypeAliasDecl> from(const std::optional<Decl> &parent) {
@@ -107,6 +67,9 @@ class TypeAliasDecl : public TypedefNameDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<TypeAliasDecl> from(const Reference &r);
+  static std::optional<TypeAliasDecl> from(const TokenContext &t);
 
   std::optional<TypeAliasTemplateDecl> described_alias_template(void) const;
 };

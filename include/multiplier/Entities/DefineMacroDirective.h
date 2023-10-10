@@ -8,27 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "MacroDirective.h"
-#include "MacroKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DefineMacroDirective;
 class Macro;
 class MacroDirective;
 class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DefineMacroDirective : public MacroDirective {
  private:
@@ -37,6 +30,7 @@ class DefineMacroDirective : public MacroDirective {
   friend class Macro;
  public:
   static gap::generator<DefineMacroDirective> in(const Fragment &frag);
+  static gap::generator<DefineMacroDirective> in(const File &file);
 
   static gap::generator<DefineMacroDirective> in(const Index &index);
   static std::optional<DefineMacroDirective> by_id(const Index &, EntityId);
@@ -51,24 +45,6 @@ class DefineMacroDirective : public MacroDirective {
   static gap::generator<DefineMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  inline static std::optional<DefineMacroDirective> from(const Reference &r) {
-    return from(r.as_macro());
-  }
-
-  inline static std::optional<DefineMacroDirective> from(const TokenContext &t) {
-    return from(t.as_macro());
-  }
-
-  static std::optional<DefineMacroDirective> from(const MacroDirective &parent);
-
-  inline static std::optional<DefineMacroDirective> from(const std::optional<MacroDirective> &parent) {
-    if (parent) {
-      return DefineMacroDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<DefineMacroDirective> from(const Macro &parent);
 
   inline static std::optional<DefineMacroDirective> from(const std::optional<Macro> &parent) {
@@ -79,12 +55,14 @@ class DefineMacroDirective : public MacroDirective {
     }
   }
 
+  static std::optional<DefineMacroDirective> from(const Reference &r);
+  static std::optional<DefineMacroDirective> from(const TokenContext &t);
+
   Token name(void) const;
-  gap::generator<MacroOrToken> body(void) const;
-  unsigned num_explicit_parameters(void) const;
+  gap::generator<MacroOrToken> body(void) const &;
   bool is_variadic(void) const;
   bool is_function_like(void) const;
-  gap::generator<MacroOrToken> parameters(void) const;
+  gap::generator<MacroOrToken> parameters(void) const &;
 };
 
 static_assert(sizeof(DefineMacroDirective) == sizeof(MacroDirective));

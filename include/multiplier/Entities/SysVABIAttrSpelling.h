@@ -14,7 +14,7 @@ namespace mx {
 enum class SysVABIAttrSpelling : unsigned char {
   GNU_SYSV_ABI,
   CXX11_GNU_SYSV_ABI,
-  C2X_GNU_SYSV_ABI,
+  C23_GNU_SYSV_ABI,
   SPELLING_NOT_CALCULATED,
 };
 

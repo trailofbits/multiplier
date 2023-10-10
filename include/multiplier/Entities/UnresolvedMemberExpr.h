@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OverloadExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class Expr;
 class OverloadExpr;
 class Stmt;
+class Token;
 class Type;
 class UnresolvedMemberExpr;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnresolvedMemberExpr : public OverloadExpr {
  private:
@@ -40,11 +35,12 @@ class UnresolvedMemberExpr : public OverloadExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<UnresolvedMemberExpr> in(const Fragment &frag);
   static gap::generator<UnresolvedMemberExpr> in(const Index &index);
   static gap::generator<UnresolvedMemberExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UnresolvedMemberExpr> by_id(const Index &, EntityId);
+  static gap::generator<UnresolvedMemberExpr> in(const Fragment &frag);
+  static gap::generator<UnresolvedMemberExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_MEMBER_EXPR;
@@ -59,44 +55,6 @@ class UnresolvedMemberExpr : public OverloadExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<UnresolvedMemberExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<UnresolvedMemberExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<UnresolvedMemberExpr> from(const OverloadExpr &parent);
-
-  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<OverloadExpr> &parent) {
-    if (parent) {
-      return UnresolvedMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedMemberExpr> from(const Expr &parent);
-
-  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return UnresolvedMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UnresolvedMemberExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<UnresolvedMemberExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return UnresolvedMemberExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UnresolvedMemberExpr> from(const Stmt &parent);
 
   inline static std::optional<UnresolvedMemberExpr> from(const std::optional<Stmt> &parent) {
@@ -106,6 +64,9 @@ class UnresolvedMemberExpr : public OverloadExpr {
       return std::nullopt;
     }
   }
+
+  static std::optional<UnresolvedMemberExpr> from(const Reference &r);
+  static std::optional<UnresolvedMemberExpr> from(const TokenContext &t);
 
   Expr base(void) const;
   Type base_type(void) const;

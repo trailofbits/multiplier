@@ -10,6 +10,7 @@
 #include <deque>
 
 #include <multiplier/AST.capnp.h>
+#include <multiplier/Entities/MacroKind.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Database.h>
 
@@ -18,21 +19,24 @@
 #endif
 
 #include "EntityMapper.h"
+#include "PASTA.h"
 #include "PendingFragment.h"
 #include "Serialize.h"
-#include "PASTA.h"
+#include "TypeMapper.h"
 
 namespace indexer {
 namespace {
 
-static void DispatchSerializeDecl(const EntityMapper &em,
+static void DispatchSerializeDecl(const PendingFragment &pf,
+                                  const EntityMapper &em,
                                   mx::ast::Decl::Builder builder,
                                   const pasta::Decl &entity) {
   switch (entity.Kind()) {
 #define MX_VISIT_DECL(decl) \
     case pasta::DeclKind::k ## decl: \
       Serialize ## decl ## Decl( \
-         em, builder, reinterpret_cast<const pasta::decl ## Decl &>(entity), \
+         pf, em, builder, \
+         reinterpret_cast<const pasta::decl ## Decl &>(entity), \
          nullptr); \
       break;
 
@@ -45,14 +49,15 @@ static void DispatchSerializeDecl(const EntityMapper &em,
   }
 }
 
-static void DispatchSerializeStmt(const EntityMapper &em,
+static void DispatchSerializeStmt(const PendingFragment &pf,
+                                  const EntityMapper &em,
                                   mx::ast::Stmt::Builder builder,
                                   const pasta::Stmt &entity) {
   switch (entity.Kind()) {
 #define MX_VISIT_STMT(stmt) \
     case pasta::StmtKind::k ## stmt: \
       Serialize ## stmt( \
-          em, builder, reinterpret_cast<const pasta::stmt &>(entity), \
+          pf, em, builder, reinterpret_cast<const pasta::stmt &>(entity), \
           nullptr); \
       break;
 
@@ -69,7 +74,8 @@ static void DispatchSerializeStmt(const EntityMapper &em,
   }
 }
 
-static void DispatchSerializeType(const EntityMapper &em,
+static void DispatchSerializeType(const PendingFragment &pf,
+                                  const EntityMapper &em,
                                   mx::ast::Type::Builder builder,
                                   const pasta::Type &entity) {
 
@@ -78,7 +84,8 @@ static void DispatchSerializeType(const EntityMapper &em,
 #define MX_VISIT_TYPE(type) \
   case pasta::TypeKind::k ## type: \
     Serialize ## type ## Type ( \
-        em, builder, reinterpret_cast<const pasta::type ## Type &>(entity), \
+        pf, em, builder, \
+        reinterpret_cast<const pasta::type ## Type &>(entity), \
         nullptr); \
     break;
 
@@ -91,7 +98,8 @@ static void DispatchSerializeType(const EntityMapper &em,
   }
 }
 
-static void DispatchSerializeAttr(const EntityMapper &em,
+static void DispatchSerializeAttr(const PendingFragment &pf,
+                                  const EntityMapper &em,
                                   mx::ast::Attr::Builder builder,
                                   const pasta::Attr &entity) {
 
@@ -100,7 +108,8 @@ static void DispatchSerializeAttr(const EntityMapper &em,
 #define MX_VISIT_ATTR(type) \
   case pasta::AttrKind::k ## type: \
     Serialize ## type ## Attr ( \
-        em, builder, reinterpret_cast<const pasta::type ## Attr &>(entity), \
+        pf, em, builder, \
+        reinterpret_cast<const pasta::type ## Attr &>(entity), \
         nullptr); \
     break;
 
@@ -116,127 +125,141 @@ static void DispatchSerializeAttr(const EntityMapper &em,
 }  // namespace
 
 // Dispatch to the right macro serializer.
-void DispatchSerializeMacro(const EntityMapper &em,
+void DispatchSerializeMacro(const PendingFragment &pf,
                             mx::ast::Macro::Builder builder,
                             const pasta::Macro &entity,
                             const TokenTree *tt) {
 
+  const EntityMapper &em = pf.em;
+
+  // NOTE(pag): If we have `tt`, then trust it, and not `entity`. Due to evil
+  //            sketchiness, `entity`, might be an invalid pointer.
+  mx::MacroKind kind = mx::MacroKind::SUBSTITUTION;
+  if (tt) {
+    kind = tt->Kind();
+  } else {
+    kind = mx::FromPasta(entity.Kind());
+  }
+
   // Second pass actually does the real serialization.
-  switch (entity.Kind()) {
+  if (false) {
 #define MX_VISIT_MACRO(type) \
-  case pasta::MacroKind::k ## type: \
+  } else if (kind == mx::FromPasta(pasta::MacroKind::k ## type)) { \
     SerializeMacro ## type ( \
-        em, builder, reinterpret_cast<const pasta::Macro ## type &>(entity), \
+        pf, em, builder, \
+        reinterpret_cast<const pasta::Macro ## type &>(entity), \
         tt); \
-    break;
 
 #define MX_VISIT_DIRECTIVE(type) \
-  case pasta::MacroKind::k ## type ## Directive: \
+  } else if (kind == mx::FromPasta(pasta::MacroKind::k ## type ## Directive)) { \
     Serialize ## type ## MacroDirective( \
-        em, builder, \
+        pf, em, builder, \
         reinterpret_cast<const pasta::type ## MacroDirective &>(entity), tt); \
-    break;
 
     PASTA_FOR_EACH_MACRO_IMPL(MX_VISIT_MACRO, PASTA_IGNORE_ABSTRACT,
                               MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
                               MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
                               PASTA_IGNORE_ABSTRACT)
 #undef MX_VISIT_DIRECTIVE
-    default:
-      assert(false);
-      break;
   }
 }
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
 void SerializePendingFragment(mx::DatabaseWriter &database,
-                              const PendingFragment &pf,
-                              const EntityMapper &em) {
+                              const PendingFragment &pf) {
+  const EntityMapper &em = pf.em;
+
 #ifndef NDEBUG
   std::unordered_set<mx::RawEntityId> seen_eids;
   auto is_new_eid = [&seen_eids] (mx::RawEntityId eid) {
-    auto old_size = seen_eids.size();
-    seen_eids.insert(eid);
-    return old_size != seen_eids.size();
+    return seen_eids.emplace(eid).second;
   };
 #endif
 
+  mx::EntityOffset i = 0u;
   for (const pasta::Decl &entity : pf.decls_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
     auto vid = std::get<mx::DeclId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::Decl> storage;
-    DispatchSerializeDecl(em, storage.builder, entity);
+    em.tm.EnterReadOnly();
+    DispatchSerializeDecl(pf, pf.em, storage.builder, entity);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
     auto vid = std::get<mx::StmtId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::Stmt> storage;
-    DispatchSerializeStmt(em, storage.builder, entity);
+    em.tm.EnterReadOnly();
+    DispatchSerializeStmt(pf, pf.em, storage.builder, entity);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
-  for (const pasta::Type &entity : pf.types_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-    auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(is_new_eid(eid));
-#endif
-
-    EntityBuilder<mx::ast::Type> storage;
-    DispatchSerializeType(em, storage.builder, entity);
-
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
-
+  // Note: We don't serialize types to the same fragments. They are
+  //       serialized as different fragment in the database. This
+  //       will avoid duplication of the types in each fragments.
+  i = 0u;
   for (const pasta::Attr &entity : pf.attrs_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
     auto vid = std::get<mx::AttrId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::Attr> storage;
-    DispatchSerializeAttr(em, storage.builder, entity);
+    em.tm.EnterReadOnly();
+    DispatchSerializeAttr(pf, pf.em, storage.builder, entity);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::Designator &entity : pf.designators_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
 
 #ifndef NDEBUG
     auto vid = std::get<mx::DesignatorId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::Designator> storage;
-    SerializeDesignator(em, storage.builder, entity, nullptr);
+    em.tm.EnterReadOnly();
+    SerializeDesignator(pf, pf.em, storage.builder, entity, nullptr);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::CXXBaseSpecifier &entity :
            pf.cxx_base_specifiers_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
@@ -244,15 +267,20 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #ifndef NDEBUG
     auto vid = std::get<mx::CXXBaseSpecifierId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::CXXBaseSpecifier> storage;
-    SerializeCXXBaseSpecifier(em, storage.builder, entity, nullptr);
+    em.tm.EnterReadOnly();
+    SerializeCXXBaseSpecifier(pf, pf.em, storage.builder, entity, nullptr);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::TemplateArgument &entity :
            pf.template_arguments_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
@@ -260,15 +288,20 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 #ifndef NDEBUG
     auto vid = std::get<mx::TemplateArgumentId>(mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::TemplateArgument> storage;
-    SerializeTemplateArgument(em, storage.builder, entity, nullptr);
+    em.tm.EnterReadOnly();
+    SerializeTemplateArgument(pf, pf.em, storage.builder, entity, nullptr);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
+  i = 0u;
   for (const pasta::TemplateParameterList &entity :
            pf.template_parameter_lists_to_serialize) {
     mx::RawEntityId eid = em.EntityId(entity);
@@ -277,14 +310,40 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     auto vid = std::get<mx::TemplateParameterListId>(
         mx::EntityId(eid).Unpack());
     assert(vid.fragment_id == pf.fragment_index);
+    assert(vid.offset == i);
     assert(is_new_eid(eid));
+    ++i;
 #endif
 
     EntityBuilder<mx::ast::TemplateParameterList> storage;
-    SerializeTemplateParameterList(em, storage.builder, entity, nullptr);
+    em.tm.EnterReadOnly();
+    SerializeTemplateParameterList(pf, pf.em, storage.builder, entity, nullptr);
+    em.tm.ExitReadOnly();
     database.AddAsync(
         mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
+
+  (void) i;
+}
+
+void SerializeType(const pasta::Type &entity,
+                   const PendingFragment &pf,
+                   mx::RawEntityId type_id,
+                   mx::ast::Type::Builder builder) {
+  const EntityMapper &em = pf.em;
+  mx::RawEntityId eid = em.EntityId(entity);
+
+#ifndef NDEBUG
+  auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
+  assert(vid.type_id == type_id);
+#endif
+
+  em.tm.EnterReadOnly();
+  DispatchSerializeType(pf, em, builder, entity);
+  em.tm.ExitReadOnly();
+
+  (void) eid;
+  (void) type_id;
 }
 
 }  // namespace indexer

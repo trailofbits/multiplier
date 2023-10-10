@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "TypeKind.h"
 #include "TypeWithKeyword.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DependentNameType;
+class Token;
 class Type;
 class TypeWithKeyword;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DependentNameType : public TypeWithKeyword {
  private:
@@ -35,7 +29,6 @@ class DependentNameType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  static gap::generator<DependentNameType> in(const Fragment &frag);
   static gap::generator<DependentNameType> in(const Index &index);
   static gap::generator<DependentNameType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -43,24 +36,6 @@ class DependentNameType : public TypeWithKeyword {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_NAME;
-  }
-
-  inline static std::optional<DependentNameType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DependentNameType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<DependentNameType> from(const TypeWithKeyword &parent);
-
-  inline static std::optional<DependentNameType> from(const std::optional<TypeWithKeyword> &parent) {
-    if (parent) {
-      return DependentNameType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DependentNameType> from(const Type &parent);
@@ -72,6 +47,9 @@ class DependentNameType : public TypeWithKeyword {
       return std::nullopt;
     }
   }
+
+  static std::optional<DependentNameType> from(const Reference &r);
+  static std::optional<DependentNameType> from(const TokenContext &t);
 
   Type desugar(void) const;
   bool is_sugared(void) const;

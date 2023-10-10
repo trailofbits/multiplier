@@ -8,26 +8,14 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "DeclObjCDeclQualifier.h"
 #include "NamedDecl.h"
 #include "ObjCMethodDeclImplementationControl.h"
 #include "ObjCMethodFamily.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class ImplicitParamDecl;
 class NamedDecl;
@@ -35,8 +23,15 @@ class ObjCInterfaceDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
 class ParmVarDecl;
+class Stmt;
 class Token;
+class TokenRange;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCMethodDecl : public NamedDecl {
  private:
@@ -44,11 +39,12 @@ class ObjCMethodDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCMethodDecl> in(const Fragment &frag);
   static gap::generator<ObjCMethodDecl> in(const Index &index);
   static gap::generator<ObjCMethodDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCMethodDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCMethodDecl> in(const Fragment &frag);
+  static gap::generator<ObjCMethodDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_METHOD;
@@ -63,25 +59,9 @@ class ObjCMethodDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCMethodDecl> redeclarations(void) const;
-  inline static std::optional<ObjCMethodDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCMethodDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCMethodDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCMethodDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCMethodDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  ObjCMethodDecl canonical_declaration(void) const;
+  std::optional<ObjCMethodDecl> definition(void) const;
+  gap::generator<ObjCMethodDecl> redeclarations(void) const &;
   static std::optional<ObjCMethodDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCMethodDecl> from(const std::optional<Decl> &parent) {
@@ -92,6 +72,9 @@ class ObjCMethodDecl : public NamedDecl {
     }
   }
 
+  static std::optional<ObjCMethodDecl> from(const Reference &r);
+  static std::optional<ObjCMethodDecl> from(const TokenContext &t);
+
   bool defined_in_ns_object(void) const;
   ObjCPropertyDecl find_property_declaration(void) const;
   ObjCInterfaceDecl class_interface(void) const;
@@ -101,7 +84,7 @@ class ObjCMethodDecl : public NamedDecl {
   ObjCMethodFamily method_family(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
   Type return_type(void) const;
-  TokenRange return_type_source_range(void) const;
+  TokenRange return_type_tokens(void) const;
   Token selector_start_token(void) const;
   ImplicitParamDecl self_declaration(void) const;
   bool has_parameter_destroyed_in_callee(void) const;
@@ -122,10 +105,12 @@ class ObjCMethodDecl : public NamedDecl {
   bool is_this_declaration_a_designated_initializer(void) const;
   bool is_variadic(void) const;
   std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
-  gap::generator<ParmVarDecl> parameters(void) const;
+  unsigned num_parameters(void) const;
+  gap::generator<ParmVarDecl> parameters(void) const &;
   std::optional<Token> nth_selector_token(unsigned n) const;
-  gap::generator<Token> selector_tokens(void) const;
-  gap::generator<Decl> declarations_in_context(void) const;
+  unsigned num_selector_tokens(void) const;
+  gap::generator<Token> selector_tokens(void) const &;
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(ObjCMethodDecl) == sizeof(NamedDecl));

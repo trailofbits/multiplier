@@ -8,23 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "ObjCContainerDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class ObjCCategoryDecl;
@@ -33,8 +21,15 @@ class ObjCImplementationDecl;
 class ObjCInterfaceDecl;
 class ObjCIvarDecl;
 class ObjCProtocolDecl;
+class Stmt;
 class Token;
+class TokenRange;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCInterfaceDecl : public ObjCContainerDecl {
  private:
@@ -43,11 +38,12 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<ObjCInterfaceDecl> in(const Fragment &frag);
   static gap::generator<ObjCInterfaceDecl> in(const Index &index);
   static gap::generator<ObjCInterfaceDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCInterfaceDecl> by_id(const Index &, EntityId);
+  static gap::generator<ObjCInterfaceDecl> in(const Fragment &frag);
+  static gap::generator<ObjCInterfaceDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_INTERFACE;
@@ -62,35 +58,9 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ObjCInterfaceDecl> redeclarations(void) const;
-  inline static std::optional<ObjCInterfaceDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ObjCInterfaceDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
-
-  inline static std::optional<ObjCInterfaceDecl> from(const std::optional<ObjCContainerDecl> &parent) {
-    if (parent) {
-      return ObjCInterfaceDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<ObjCInterfaceDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<ObjCInterfaceDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return ObjCInterfaceDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  ObjCInterfaceDecl canonical_declaration(void) const;
+  std::optional<ObjCInterfaceDecl> definition(void) const;
+  gap::generator<ObjCInterfaceDecl> redeclarations(void) const &;
   static std::optional<ObjCInterfaceDecl> from(const Decl &parent);
 
   inline static std::optional<ObjCInterfaceDecl> from(const std::optional<Decl> &parent) {
@@ -101,8 +71,12 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
     }
   }
 
+  static std::optional<ObjCInterfaceDecl> from(const Reference &r);
+  static std::optional<ObjCInterfaceDecl> from(const TokenContext &t);
+
   std::optional<ObjCProtocolDecl> nth_all_referenced_protocol(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> all_referenced_protocols(void) const;
+  unsigned num_all_referenced_protocols(void) const;
+  gap::generator<ObjCProtocolDecl> all_referenced_protocols(void) const &;
   bool declares_or_inherits_designated_initializers(void) const;
   Token end_of_definition_token(void) const;
   ObjCImplementationDecl implementation(void) const;
@@ -118,19 +92,26 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
   bool is_this_declaration_a_definition(void) const;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
-  gap::generator<ObjCIvarDecl> instance_variables(void) const;
+  unsigned num_instance_variables(void) const;
+  gap::generator<ObjCIvarDecl> instance_variables(void) const &;
   std::optional<ObjCCategoryDecl> nth_known_categorie(unsigned n) const;
-  gap::generator<ObjCCategoryDecl> known_categories(void) const;
+  unsigned num_known_categories(void) const;
+  gap::generator<ObjCCategoryDecl> known_categories(void) const &;
   std::optional<ObjCCategoryDecl> nth_known_extension(unsigned n) const;
-  gap::generator<ObjCCategoryDecl> known_extensions(void) const;
+  unsigned num_known_extensions(void) const;
+  gap::generator<ObjCCategoryDecl> known_extensions(void) const &;
   std::optional<Token> nth_protocol_token(unsigned n) const;
-  gap::generator<Token> protocol_tokens(void) const;
+  unsigned num_protocol_tokens(void) const;
+  gap::generator<Token> protocol_tokens(void) const &;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
-  gap::generator<ObjCProtocolDecl> protocols(void) const;
+  unsigned num_protocols(void) const;
+  gap::generator<ObjCProtocolDecl> protocols(void) const &;
   std::optional<ObjCCategoryDecl> nth_visible_categorie(unsigned n) const;
-  gap::generator<ObjCCategoryDecl> visible_categories(void) const;
+  unsigned num_visible_categories(void) const;
+  gap::generator<ObjCCategoryDecl> visible_categories(void) const &;
   std::optional<ObjCCategoryDecl> nth_visible_extension(unsigned n) const;
-  gap::generator<ObjCCategoryDecl> visible_extensions(void) const;
+  unsigned num_visible_extensions(void) const;
+  gap::generator<ObjCCategoryDecl> visible_extensions(void) const &;
 };
 
 static_assert(sizeof(ObjCInterfaceDecl) == sizeof(ObjCContainerDecl));

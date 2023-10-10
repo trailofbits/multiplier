@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPLoopDirective.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopDirective;
 class OMPSimdDirective;
 class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPSimdDirective : public OMPLoopDirective {
  private:
@@ -39,11 +34,12 @@ class OMPSimdDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPSimdDirective> in(const Fragment &frag);
   static gap::generator<OMPSimdDirective> in(const Index &index);
   static gap::generator<OMPSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPSimdDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPSimdDirective> in(const Fragment &frag);
+  static gap::generator<OMPSimdDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SIMD_DIRECTIVE;
@@ -58,44 +54,6 @@ class OMPSimdDirective : public OMPLoopDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPSimdDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPSimdDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPSimdDirective> from(const OMPLoopDirective &parent);
-
-  inline static std::optional<OMPSimdDirective> from(const std::optional<OMPLoopDirective> &parent) {
-    if (parent) {
-      return OMPSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPSimdDirective> from(const OMPLoopBasedDirective &parent);
-
-  inline static std::optional<OMPSimdDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
-    if (parent) {
-      return OMPSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<OMPSimdDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPSimdDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPSimdDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPSimdDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPSimdDirective> from(const std::optional<Stmt> &parent) {
@@ -105,6 +63,9 @@ class OMPSimdDirective : public OMPLoopDirective {
       return std::nullopt;
     }
   }
+
+  static std::optional<OMPSimdDirective> from(const Reference &r);
+  static std::optional<OMPSimdDirective> from(const TokenContext &t);
 
 };
 

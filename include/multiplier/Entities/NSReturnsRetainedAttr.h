@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class NSReturnsRetainedAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NSReturnsRetainedAttr : public InheritableAttr {
  private:
@@ -35,32 +29,15 @@ class NSReturnsRetainedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<NSReturnsRetainedAttr> in(const Fragment &frag);
   static gap::generator<NSReturnsRetainedAttr> in(const Index &index);
   static gap::generator<NSReturnsRetainedAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NSReturnsRetainedAttr> by_id(const Index &, EntityId);
+  static gap::generator<NSReturnsRetainedAttr> in(const Fragment &frag);
+  static gap::generator<NSReturnsRetainedAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_RETURNS_RETAINED;
-  }
-
-  inline static std::optional<NSReturnsRetainedAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<NSReturnsRetainedAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<NSReturnsRetainedAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<NSReturnsRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return NSReturnsRetainedAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<NSReturnsRetainedAttr> from(const Attr &parent);
@@ -72,6 +49,9 @@ class NSReturnsRetainedAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<NSReturnsRetainedAttr> from(const Reference &r);
+  static std::optional<NSReturnsRetainedAttr> from(const TokenContext &t);
 
 };
 

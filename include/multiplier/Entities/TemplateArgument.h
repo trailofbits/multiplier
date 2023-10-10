@@ -8,30 +8,42 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
 
 #include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class File;
+class Fragment;
 class Reference;
 class TemplateArgument;
 class TemplateArgumentImpl;
+class Token;
 class Type;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateArgument {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -45,14 +57,22 @@ class TemplateArgument {
   friend class TokenContext;
   friend class Type;
   friend class TemplateArgumentImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const TemplateArgumentImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   TemplateArgument(TemplateArgument &&) noexcept = default;
   TemplateArgument(const TemplateArgument &) = default;
   TemplateArgument &operator=(TemplateArgument &&) noexcept = default;
   TemplateArgument &operator=(const TemplateArgument &) = default;
+
+  inline bool operator==(const TemplateArgument &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
+  }
 
   /* implicit */ inline TemplateArgument(std::shared_ptr<const TemplateArgumentImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -62,7 +82,7 @@ class TemplateArgument {
   }
 
   PackedTemplateArgumentId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<TemplateArgument> from(const TemplateArgument &self) {
     return self;
@@ -72,13 +92,9 @@ class TemplateArgument {
     return self;
   }
 
-  inline static std::optional<TemplateArgument> from(const Reference &r) {
-    return r.as_template_argument();
-  }
+  static std::optional<TemplateArgument> from(const Reference &r);
 
-  inline static std::optional<TemplateArgument> from(const TokenContext &t) {
-    return t.as_template_argument();
-  }
+  static std::optional<TemplateArgument> from(const TokenContext &t);
 
   TemplateArgumentKind kind(void) const;
   bool is_null(void) const;

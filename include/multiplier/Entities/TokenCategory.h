@@ -45,6 +45,9 @@ enum class TokenCategory : unsigned char {
   TEMPLATE_PARAMETER_VALUE,
   LABEL,
   WHITESPACE,
+  FILE_NAME,
+  LINE_NUMBER,
+  COLUMN_NUMBER,
 };
 
 inline static const char *EnumerationName(TokenCategory) {
@@ -52,7 +55,7 @@ inline static const char *EnumerationName(TokenCategory) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenCategory) {
-  return 33;
+  return 36;
 }
 
 const char *EnumeratorName(TokenCategory);

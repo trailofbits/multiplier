@@ -8,28 +8,41 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
 
 #include "PseudoKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Designator;
 class DesignatorImpl;
 class FieldDecl;
+class File;
+class Fragment;
 class Reference;
+class Token;
+class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Designator {
+ public:
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -43,14 +56,22 @@ class Designator {
   friend class TokenContext;
   friend class Type;
   friend class DesignatorImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const DesignatorImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Designator(Designator &&) noexcept = default;
   Designator(const Designator &) = default;
   Designator &operator=(Designator &&) noexcept = default;
   Designator &operator=(const Designator &) = default;
+
+  inline bool operator==(const Designator &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
+  }
 
   /* implicit */ inline Designator(std::shared_ptr<const DesignatorImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -60,7 +81,7 @@ class Designator {
   }
 
   PackedDesignatorId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<Designator> from(const Designator &self) {
     return self;
@@ -70,13 +91,9 @@ class Designator {
     return self;
   }
 
-  inline static std::optional<Designator> from(const Reference &r) {
-    return r.as_designator();
-  }
+  static std::optional<Designator> from(const Reference &r);
 
-  inline static std::optional<Designator> from(const TokenContext &t) {
-    return t.as_designator();
-  }
+  static std::optional<Designator> from(const TokenContext &t);
 
   bool is_field_designator(void) const;
   bool is_array_designator(void) const;
@@ -88,7 +105,6 @@ class Designator {
   Token left_bracket_token(void) const;
   Token right_bracket_token(void) const;
   Token ellipsis_token(void) const;
-  std::optional<unsigned> first_expression_index(void) const;
 };
 
 #endif

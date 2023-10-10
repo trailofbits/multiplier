@@ -8,27 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "ValueDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class MSGuidDecl;
 class NamedDecl;
+class Stmt;
+class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MSGuidDecl : public ValueDecl {
  private:
@@ -37,11 +32,12 @@ class MSGuidDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<MSGuidDecl> in(const Fragment &frag);
   static gap::generator<MSGuidDecl> in(const Index &index);
   static gap::generator<MSGuidDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MSGuidDecl> by_id(const Index &, EntityId);
+  static gap::generator<MSGuidDecl> in(const Fragment &frag);
+  static gap::generator<MSGuidDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_GUID;
@@ -56,35 +52,9 @@ class MSGuidDecl : public ValueDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<MSGuidDecl> redeclarations(void) const;
-  inline static std::optional<MSGuidDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<MSGuidDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<MSGuidDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<MSGuidDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return MSGuidDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<MSGuidDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<MSGuidDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return MSGuidDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  MSGuidDecl canonical_declaration(void) const;
+  std::optional<MSGuidDecl> definition(void) const;
+  gap::generator<MSGuidDecl> redeclarations(void) const &;
   static std::optional<MSGuidDecl> from(const Decl &parent);
 
   inline static std::optional<MSGuidDecl> from(const std::optional<Decl> &parent) {
@@ -94,6 +64,9 @@ class MSGuidDecl : public ValueDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<MSGuidDecl> from(const Reference &r);
+  static std::optional<MSGuidDecl> from(const TokenContext &t);
 
 };
 

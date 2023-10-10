@@ -15,9 +15,10 @@
 #include <zdict.h>
 #include <zstd.h>
 
-#include "API.h"
+#include "Compilation.h"
 #include "Attr.h"
 #include "Decl.h"
+#include "EntityProvider.h"
 #include "File.h"
 #include "Fragment.h"
 #include "Macro.h"
@@ -33,6 +34,17 @@
 #define MX_TO_STR_(a) #a
 #define MX_TO_STR(a) MX_TO_STR_(a)
 
+namespace std {
+
+template<>
+struct default_delete<ZSTD_DDict> {
+  void operator()(ZSTD_DDict *d) const {
+    ZSTD_freeDDict(d);
+  }
+};
+
+} // namespace std
+
 namespace mx {
 
 // Holds on to the dictionaries.
@@ -43,7 +55,7 @@ class SQLiteDecompressionDictionary {
  public:
   static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
 
-  std::array<ZSTD_DDict *, kNumEntityCategories> dict;
+  std::array<std::unique_ptr<ZSTD_DDict>, kNumEntityCategories> dict;
   std::array<bool, kNumEntityCategories> has_dict;
 
   explicit SQLiteDecompressionDictionary(
@@ -59,7 +71,9 @@ class SQLiteEntityProviderImpl {
   sqlite::Connection db;
   sqlite::Statement get_version_number;
   sqlite::Statement get_file_paths;
+  sqlite::Statement get_file_paths_by_id;
   sqlite::Statement get_file_fragments;
+  sqlite::Statement get_nested_fragments;
   sqlite::Statement clear_entity_id_list;
   sqlite::Statement add_entity_id_to_list;
   sqlite::Statement get_entity_ids;
@@ -70,16 +84,51 @@ class SQLiteEntityProviderImpl {
 
 #define DECLARE_GETTERS(type_name, lower_name, ...) \
     sqlite::Statement get_ ## lower_name ## _ids ; \
-    sqlite::Statement get_ ## lower_name ## _ids_by_fragment ; \
-    sqlite::Statement get_ ## lower_name ## _ids_by_kind ; \
-    sqlite::Statement get_ ## lower_name ## _ids_by_kind_fragment ; \
     sqlite::Statement get_ ## lower_name ## _by_id ; \
 
   MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_GETTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               DECLARE_GETTERS,
                               DECLARE_GETTERS,
+                              DECLARE_GETTERS,
+                              DECLARE_GETTERS,
                               DECLARE_GETTERS)
+#undef DECLARE_GETTERS
+
+#define DECLARE_GETTERS(type_name, lower_name, ...) \
+    sqlite::Statement get_ ## lower_name ## _ids_by_fragment ; \
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY)
+#undef DECLARE_GETTERS
+
+#define DECLARE_GETTERS(type_name, lower_name, ...) \
+    sqlite::Statement get_ ## lower_name ## _ids_by_kind ; \
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY)
+#undef DECLARE_GETTERS
+
+#define DECLARE_GETTERS(type_name, lower_name, ...) \
+    sqlite::Statement get_ ## lower_name ## _ids_by_kind_fragment ; \
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef DECLARE_GETTERS
 
   sqlite::Statement get_ref_kind_by_id;
@@ -153,7 +202,7 @@ SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
     }
 
     if (!prev || !prev->has_dict[category]) {
-      dict[category] = ZSTD_createDDict(data.data(), data.size());
+      dict[category] = std::unique_ptr<ZSTD_DDict>{ZSTD_createDDict(data.data(), data.size())};
       has_dict[category] = true;
     }
   }
@@ -163,11 +212,11 @@ SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
       continue;
     }
     if (prev) {
-      dict[i] = prev->dict[i];
+      dict[i] = std::move(prev->dict[i]);
       has_dict[i] = prev->has_dict[i];
       prev->dict[i] = nullptr;
     } else {
-      dict[i] = ZSTD_createDDict("", 0);
+      dict[i] = std::unique_ptr<ZSTD_DDict>{ZSTD_createDDict("", 0)};
       has_dict[i] = false;
     }
   }
@@ -175,13 +224,7 @@ SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
   dictionaries.Reset();
 }
 
-SQLiteDecompressionDictionary::~SQLiteDecompressionDictionary(void) {
-  for (ZSTD_DDict *d : dict) {
-    if (d) {
-      ZSTD_freeDDict(d);
-    }
-  }
-}
+SQLiteDecompressionDictionary::~SQLiteDecompressionDictionary(void) = default;
 
 SQLiteEntityProviderImpl::~SQLiteEntityProviderImpl(void) {
   ZSTD_freeDCtx(decompression_context);
@@ -195,10 +238,16 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "SELECT COUNT(rowid) FROM version WHERE action = ?1")),
       get_file_paths(db.Prepare(
           "SELECT file_id, path FROM file_path")),
+      get_file_paths_by_id(db.Prepare(
+          "SELECT path FROM file_path WHERE file_id = ?1")),
       get_file_fragments(db.Prepare(
           "SELECT DISTINCT(fragment_id) "
           "FROM fragment_file "
           "WHERE file_id = ?1")),
+      get_nested_fragments(db.Prepare(
+          "SELECT DISTINCT(child_id) "
+          "FROM nested_fragment "
+          "WHERE parent_id = ?1")),
       clear_entity_id_list(db.Prepare(
           "DELETE FROM " + entity_id_list)),
       add_entity_id_to_list(db.Prepare(
@@ -245,11 +294,12 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
 #endif
 
       get_references(db.Prepare(
-          "SELECT DISTINCT(r.from_entity_id), r.kind_id "
+          "SELECT DISTINCT(r.from_entity_id), r.context_id, r.kind_id "
           "FROM reference AS r "
-          "JOIN " + entity_id_list + " AS l "
-          "ON r.to_entity_id = l.entity_id "
           "WHERE r.from_entity_id > ?1 "
+          "  AND r.to_entity_id IN (SELECT l.entity_id "
+          "                         FROM " + entity_id_list + " AS l "
+          "                         ORDER BY l.entity_id ASC) "
           "ORDER BY r.from_entity_id ASC "
           "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
 
@@ -268,28 +318,6 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "WHERE " #lower_name "_id > ?2 " \
           "ORDER BY " #lower_name "_id ASC " \
           "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
-    get_ ## lower_name ## _ids_by_fragment(db.Prepare( \
-          "SELECT " #lower_name "_id " \
-          "FROM " #lower_name " " \
-          "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
-              "  AND " #lower_name "_id > ?2 " \
-          "ORDER BY " #lower_name "_id ASC " \
-          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
-    get_ ## lower_name ## _ids_by_kind(db.Prepare( \
-          "SELECT " #lower_name "_id " \
-          "FROM " #lower_name " " \
-          "WHERE entity_id_to_kind(" # lower_name "_id) = ?1 " \
-          "  AND " #lower_name "_id > ?2 " \
-          "ORDER BY " #lower_name "_id ASC " \
-          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
-    get_ ## lower_name ## _ids_by_kind_fragment(db.Prepare( \
-          "SELECT " #lower_name "_id " \
-          "FROM " #lower_name " " \
-          "WHERE entity_id_to_kind(" # lower_name "_id) = ?1 " \
-          "  AND entity_id_to_fragment_id(" #lower_name "_id) = ?2 " \
-              "  AND " #lower_name "_id > ?3 " \
-          "ORDER BY " #lower_name "_id ASC " \
-          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
     get_ ## lower_name ## _by_id(db.Prepare( \
           "SELECT data " \
           "FROM " #lower_name " " \
@@ -299,8 +327,66 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
                                 MX_IGNORE_ENTITY_CATEGORY,
                                 INIT_GETTERS,
                                 INIT_GETTERS,
+                                INIT_GETTERS,
+                                INIT_GETTERS,
                                 INIT_GETTERS)
 #undef INIT_GETTERS
+
+#define INIT_GETTERS(type_name, lower_name, enum_name, id) \
+    get_ ## lower_name ## _ids_by_fragment(db.Prepare( \
+          "SELECT " #lower_name "_id " \
+          "FROM " #lower_name " " \
+          "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
+              "  AND " #lower_name "_id > ?2 " \
+          "ORDER BY " #lower_name "_id ASC " \
+          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))),
+
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY)
+#undef INIT_GETTERS
+
+#define INIT_GETTERS(type_name, lower_name, enum_name, id) \
+    get_ ## lower_name ## _ids_by_kind(db.Prepare( \
+          "SELECT " #lower_name "_id " \
+          "FROM " #lower_name " " \
+          "WHERE entity_id_to_kind(" # lower_name "_id) = ?1 " \
+          "  AND " #lower_name "_id > ?2 " \
+          "ORDER BY " #lower_name "_id ASC " \
+          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))),
+
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY)
+#undef INIT_GETTERS
+
+#define INIT_GETTERS(type_name, lower_name, enum_name, id) \
+    get_ ## lower_name ## _ids_by_kind_fragment(db.Prepare( \
+          "SELECT " #lower_name "_id " \
+          "FROM " #lower_name " " \
+          "WHERE entity_id_to_kind(" # lower_name "_id) = ?1 " \
+          "  AND entity_id_to_fragment_id(" #lower_name "_id) = ?2 " \
+              "  AND " #lower_name "_id > ?3 " \
+          "ORDER BY " #lower_name "_id ASC " \
+          "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))), \
+
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY)
+#undef INIT_GETTERS
+
       get_ref_kind_by_id(db.Prepare(
           "SELECT kind FROM reference_kind WHERE rowid = ?1")),
       get_ref_id_by_kind(db.Prepare(
@@ -309,8 +395,8 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "RETURNING rowid")),
       add_reference(db.Prepare(
           "INSERT OR IGNORE INTO reference "
-          "(from_entity_id, to_entity_id, kind_id) "
-          "VALUES (?1, ?2, ?3)")),
+          "(from_entity_id, to_entity_id, context_id, kind_id) "
+          "VALUES (?1, ?2, ?3, ?4)")),
       decompression_context(ZSTD_createDCtx()) {}
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)
@@ -384,7 +470,9 @@ FilePathMap SQLiteEntityProvider::ListFiles(const Ptr &) {
 
     VariantId vid = EntityId(id).Unpack();
     if (std::holds_alternative<FileId>(vid)) {
-      res.emplace(std::move(path), std::get<FileId>(vid));
+      auto added = res.emplace(std::move(path), std::get<FileId>(vid)).second;
+      assert(added);
+      (void) added;
     } else {
       assert(false);
     }
@@ -394,8 +482,57 @@ FilePathMap SQLiteEntityProvider::ListFiles(const Ptr &) {
   return res;
 }
 
+// Get the list of paths associated with a given file id.
+gap::generator<std::filesystem::path> SQLiteEntityProvider::ListPathsForFile(
+    const Ptr &, PackedFileId file_id) {
+  
+  std::vector<std::filesystem::path> paths;
+  paths.reserve(2u);
+  
+  ImplPtr context = impl.Lock();
+  sqlite::Statement &query = context->get_file_paths_by_id;
+  query.BindValues(file_id.Pack());
+
+  while (query.ExecuteStep()) {
+    query.Row().Columns(paths.emplace_back());
+  }
+  query.Reset();
+
+  for (auto &path : paths) {
+    co_yield std::move(path);
+  }
+}
+
+// Get the list nested fragments for a given fragment.
+FragmentIdList SQLiteEntityProvider::ListNestedFragmentIds(
+    const Ptr &, PackedFragmentId frag_id) {
+
+  FragmentIdList res;
+  res.reserve(128u);
+
+  ImplPtr context = impl.Lock();
+  sqlite::Statement &query = context->get_nested_fragments;
+  query.BindValues(frag_id.Pack());
+
+  while (query.ExecuteStep()) {
+    RawEntityId id = kInvalidEntityId;
+    query.Row().Columns(id);
+
+    VariantId vid = EntityId(id).Unpack();
+    if (!std::holds_alternative<FragmentId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    res.emplace_back(std::get<FragmentId>(vid));
+  }
+  query.Reset();
+
+  return res;
+}
+
 FragmentIdList SQLiteEntityProvider::ListFragmentsInFile(
-    const Ptr &, SpecificEntityId<FileId> file_id) {
+    const Ptr &, PackedFileId file_id) {
 
   FragmentIdList res;
   res.reserve(128u);
@@ -503,16 +640,17 @@ ReferenceKindImplPtr SQLiteEntityProvider::ReferenceKindFor(
 
 bool SQLiteEntityProvider::AddReference(const Ptr &, RawEntityId kind_id,
                                         RawEntityId from_id,
-                                        RawEntityId to_id) {
+                                        RawEntityId to_id,
+                                        RawEntityId context_id) {
   ImplPtr context = impl.Lock();
   sqlite::Statement &add = context->add_reference;
-  add.BindValues(from_id, to_id, kind_id);
+  add.BindValues(from_id, to_id, context_id, kind_id);
   add.Execute();
   return true;
 }
 
 gap::generator<RawEntityId>
-SQLiteEntityProvider::Redeclarations(const Ptr &, RawEntityId raw_id) {
+SQLiteEntityProvider::Redeclarations(const Ptr &, RawEntityId raw_id) & {
   EntityCategory category = CategoryFromEntityId(raw_id);
   if (EntityCategory::NOT_AN_ENTITY == category) {
     assert(false);
@@ -568,11 +706,13 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
   auto it = std::unique(ret.begin(), ret.end());
   ret.erase(it, ret.end());
 
-  std::partition(
-      ret.begin(), ret.end(),
-      [] (RawEntityId eid) {
-        return std::get<DeclId>(EntityId(eid).Unpack()).is_definition;
-      });
+  if (EntityCategory::DECLARATION == category) {
+    std::partition(
+        ret.begin(), ret.end(),
+        [] (RawEntityId eid) {
+          return std::get<DeclId>(EntityId(eid).Unpack()).is_definition;
+        });
+  }
 
   return ret;
 }
@@ -582,8 +722,8 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
 //
 // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
 //            with `eid` if `eid` resides in a fragment.
-gap::generator<std::pair<RawEntityId, RawEntityId>>
-SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
+gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
+SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
 
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = context->get_references;
@@ -617,7 +757,7 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
   //            integer.
   auto lower_bound = std::numeric_limits<int64_t>::min();
 
-  std::array<std::pair<RawEntityId, RawEntityId>, MX_REFERENCE_PAGE_SIZE>
+  std::array<std::tuple<RawEntityId, RawEntityId, RawEntityId>, MX_REFERENCE_PAGE_SIZE>
       paged_results;
 
   auto version = self->VersionNumber();
@@ -646,8 +786,9 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
         found = true;
         RawEntityId from_id = kInvalidEntityId;
         RawEntityId kind_id = kInvalidEntityId;
+        RawEntityId context_id = kInvalidEntityId;
 
-        get_references.Row().Columns(from_id, kind_id);
+        get_references.Row().Columns(from_id, context_id, kind_id);
 
         // For next page.
         lower_bound = std::max(lower_bound, static_cast<int64_t>(from_id));
@@ -658,8 +799,9 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
           continue;
         }
 
-        paged_results[num_paged_results].first = from_id;
-        paged_results[num_paged_results].second = kind_id;
+        std::get<0>(paged_results[num_paged_results]) = from_id;
+        std::get<1>(paged_results[num_paged_results]) = context_id;
+        std::get<2>(paged_results[num_paged_results]) = kind_id;
         ++num_paged_results;
       }
 
@@ -677,11 +819,54 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) {
   }
 }
 
-gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
-    const Ptr &self, std::string symbol) {
+// Go collect a "page" of matched name entries. We go one page at a time so
+// that we can avoid having do to any kind of clever query caching to make
+// generators / coroutines work.
+static unsigned ReadSymbolPage(
+    ThreadLocal<SQLiteEntityProviderImpl> &impl, const std::string &symbol,
+    int64_t &lower_bound, bool &found,
+    std::array<RawEntityId, MX_ID_LIST_PAGE_SIZE> &paged_results) {
 
-  ImplPtr context = impl.Lock();
+  auto num_paged_results = 0u;
+
+  SQLiteEntityProvider::ImplPtr context = impl.Lock();
   sqlite::Statement &list_ids = context->get_entities_by_name;
+
+  // (Re)do the join to get the next page of entity references.
+  list_ids.BindValuesWithoutCopying(symbol, lower_bound);
+  try {
+    while (list_ids.ExecuteStep()) {
+      found = true;
+      RawEntityId found_id = kInvalidEntityId;
+      list_ids.Row().Columns(found_id);
+
+      // For next page.
+      lower_bound = std::max(lower_bound, static_cast<int64_t>(found_id));
+
+      VariantId vid = EntityId(found_id).Unpack();
+      if (std::holds_alternative<InvalidId>(vid)) {
+        assert(found_id == kInvalidEntityId);
+        continue;
+      } else if (std::holds_alternative<MacroId>(vid) ||
+                 std::holds_alternative<DeclId>(vid) ||
+                 std::holds_alternative<FileId>(vid)) {
+        paged_results[num_paged_results] = found_id;
+        ++num_paged_results;
+      } else {
+        assert(false);
+        continue;
+      }
+    }
+  } catch (const sqlite::Error &) {
+    // TODO(pag): Probably an FTS5 syntax error. See issue #338.
+  }
+
+  list_ids.Reset();
+  return num_paged_results;
+}
+
+gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
+    const Ptr &self, std::string symbol) & {
 
   // NOTE(pag): SQLite doesn't understand unsigned integers. When it sees our
   //            entity IDs, if the high bit is `1`, then it treats those as
@@ -698,40 +883,8 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
   auto version = self->VersionNumber();
   for (auto found = true; found; ) {
     found = false;
-    auto num_paged_results = 0u;
-
-    // Go collect a "page" of matched name entries. We go one page at a time so
-    // that we can avoid having do to any kind of clever query caching to make
-    // generators / coroutines work.
-    do {
-
-      // (Re)do the join to get the next page of entity references.
-      list_ids.BindValues(symbol, lower_bound);
-      while (list_ids.ExecuteStep()) {
-        found = true;
-        RawEntityId found_id = kInvalidEntityId;
-        list_ids.Row().Columns(found_id);
-
-        // For next page.
-        lower_bound = std::max(lower_bound, static_cast<int64_t>(found_id));
-
-        VariantId vid = EntityId(found_id).Unpack();
-        if (std::holds_alternative<InvalidId>(vid)) {
-          assert(found_id == kInvalidEntityId);
-          continue;
-        } else if (std::holds_alternative<MacroId>(vid) ||
-                   std::holds_alternative<DeclId>(vid) ||
-                   std::holds_alternative<FileId>(vid)) {
-          paged_results[num_paged_results] = found_id;
-          ++num_paged_results;
-        } else {
-          assert(false);
-          continue;
-        }
-      }
-
-      list_ids.Reset();
-    } while (false);
+    auto num_paged_results = ReadSymbolPage(
+        impl, symbol, lower_bound, found, paged_results);
 
     for (auto i = 0u; i < num_paged_results; ++i) {
       co_yield paged_results[i];
@@ -747,21 +900,26 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
 #define MX_DECLARE_ENTITY_GETTER(type_name, lower_name, enum_name, category) \
     type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
         const Ptr &self, RawEntityId raw_id) { \
-      if (raw_id == kInvalidEntityId) { \
+      \
+      EntityCategory cat = CategoryFromEntityId(raw_id); \
+      if (cat == EntityCategory::NOT_AN_ENTITY) { \
+        assert(raw_id == kInvalidEntityId); \
         return {}; \
       } \
       \
-      assert(CategoryFromEntityId(raw_id) == EntityCategory::enum_name); \
+      assert(cat == EntityCategory::enum_name); \
       const auto cat_index = static_cast<unsigned>(EntityCategory::enum_name); \
-      auto ddict = dict->dict[cat_index]; \
-      if (!ddict) { \
+      if (!dict->dict[cat_index]) { \
+        assert(false); \
         return {}; \
       } \
+      \
       ImplPtr context = impl.Lock(); \
       sqlite::Statement &query = context->get_ ## lower_name ## _by_id; \
       query.BindValues(raw_id); \
       if (!query.ExecuteStep()) { \
         query.Reset(); \
+        assert(false); \
         return {}; \
       } \
       \
@@ -769,15 +927,20 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
       query.Row().Columns(data); \
       query.Reset(); \
       \
-      return std::make_shared<type_name ## Impl>( \
-          self, \
-          Decompress(context->decompression_context, dict->dict[cat_index], \
-                     std::move(data)), \
-          raw_id); \
+      try { \
+        return std::make_shared<type_name ## Impl>( \
+            self, \
+            Decompress(context->decompression_context, dict->dict[cat_index].get(), \
+                       std::move(data)), \
+            raw_id); \
+      } catch (...) { \
+        assert(false); \
+        return {}; \
+      } \
     } \
     \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
-        const Ptr &self) { \
+        const Ptr &self) & { \
       ImplPtr context = impl.Lock(); \
       sqlite::Statement &list_ids = context->get_ ## lower_name ## _ids; \
       \
@@ -825,12 +988,14 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
+                            MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
-      const Ptr &self, type_name ## Kind kind) { \
+      const Ptr &self, type_name ## Kind kind) & { \
     ImplPtr context = impl.Lock(); \
     sqlite::Statement &list_ids = context->get_ ## lower_name ## _ids_by_kind; \
     \
@@ -872,10 +1037,21 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
         co_return; \
       } \
     } \
-  } \
-  \
+  }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_ENTITY_LISTERS
+
+
+#define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
-      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) { \
+      const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) & { \
     ImplPtr context = impl.Lock(); \
     sqlite::Statement &list_ids = context->get_ ## lower_name ## _ids_by_kind_fragment; \
     \
@@ -922,13 +1098,15 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
 #define MX_DECLARE_ENTITY_LISTERS(type_name, lower_name, enum_name, category) \
   gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
-      const Ptr &self, PackedFragmentId frag_id) { \
+      const Ptr &self, PackedFragmentId frag_id) & { \
     ImplPtr context = impl.Lock(); \
     sqlite::Statement &list_ids = context->get_ ## lower_name ## _ids_by_fragment; \
     \
@@ -975,11 +1153,13 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_ENTITY_LISTERS,
-                            MX_DECLARE_ENTITY_LISTERS)
+                            MX_DECLARE_ENTITY_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
-EntityProvider::Ptr EntityProvider::from_database(std::filesystem::path path) {
+EntityProviderPtr EntityProvider::CreateFromDatabase(std::filesystem::path path) {
   return std::make_shared<SQLiteEntityProvider>(path);
 }
 

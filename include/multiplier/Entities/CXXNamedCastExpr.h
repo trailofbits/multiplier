@@ -8,29 +8,30 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "ExplicitCastExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class CXXAddrspaceCastExpr;
+class CXXConstCastExpr;
+class CXXDynamicCastExpr;
 class CXXNamedCastExpr;
+class CXXReinterpretCastExpr;
+class CXXStaticCastExpr;
 class CastExpr;
+class Decl;
 class ExplicitCastExpr;
 class Expr;
 class Stmt;
+class Token;
+class TokenRange;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXNamedCastExpr : public ExplicitCastExpr {
  private:
@@ -41,11 +42,12 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXNamedCastExpr> in(const Fragment &frag);
   static gap::generator<CXXNamedCastExpr> in(const Index &index);
   static gap::generator<CXXNamedCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXNamedCastExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXNamedCastExpr> in(const Fragment &frag);
+  static gap::generator<CXXNamedCastExpr> in(const File &file);
 
   static gap::generator<CXXNamedCastExpr> containing(const Decl &decl);
   static gap::generator<CXXNamedCastExpr> containing(const std::optional<Decl> &decl);
@@ -56,54 +58,6 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXNamedCastExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXNamedCastExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXNamedCastExpr> from(const ExplicitCastExpr &parent);
-
-  inline static std::optional<CXXNamedCastExpr> from(const std::optional<ExplicitCastExpr> &parent) {
-    if (parent) {
-      return CXXNamedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXNamedCastExpr> from(const CastExpr &parent);
-
-  inline static std::optional<CXXNamedCastExpr> from(const std::optional<CastExpr> &parent) {
-    if (parent) {
-      return CXXNamedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXNamedCastExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXNamedCastExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXNamedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXNamedCastExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXNamedCastExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXNamedCastExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXNamedCastExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXNamedCastExpr> from(const std::optional<Stmt> &parent) {
@@ -113,6 +67,9 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
       return std::nullopt;
     }
   }
+
+  static std::optional<CXXNamedCastExpr> from(const Reference &r);
+  static std::optional<CXXNamedCastExpr> from(const TokenContext &t);
 
   TokenRange angle_brackets(void) const;
   std::string_view cast_name(void) const;

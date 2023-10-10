@@ -8,26 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "NamedDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class NamespaceDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class NamespaceDecl : public NamedDecl {
  private:
@@ -35,11 +30,12 @@ class NamespaceDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<NamespaceDecl> in(const Fragment &frag);
   static gap::generator<NamespaceDecl> in(const Index &index);
   static gap::generator<NamespaceDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<NamespaceDecl> by_id(const Index &, EntityId);
+  static gap::generator<NamespaceDecl> in(const Fragment &frag);
+  static gap::generator<NamespaceDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMESPACE;
@@ -54,25 +50,9 @@ class NamespaceDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<NamespaceDecl> redeclarations(void) const;
-  inline static std::optional<NamespaceDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<NamespaceDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<NamespaceDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<NamespaceDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return NamespaceDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  NamespaceDecl canonical_declaration(void) const;
+  std::optional<NamespaceDecl> definition(void) const;
+  gap::generator<NamespaceDecl> redeclarations(void) const &;
   static std::optional<NamespaceDecl> from(const Decl &parent);
 
   inline static std::optional<NamespaceDecl> from(const std::optional<Decl> &parent) {
@@ -83,7 +63,10 @@ class NamespaceDecl : public NamedDecl {
     }
   }
 
-  gap::generator<Decl> declarations_in_context(void) const;
+  static std::optional<NamespaceDecl> from(const Reference &r);
+  static std::optional<NamespaceDecl> from(const TokenContext &t);
+
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(NamespaceDecl) == sizeof(NamedDecl));

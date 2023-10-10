@@ -8,47 +8,34 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Attr.h"
-#include "AttrKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class ObjCDesignatedInitializerAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ObjCDesignatedInitializerAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  static gap::generator<ObjCDesignatedInitializerAttr> in(const Fragment &frag);
   static gap::generator<ObjCDesignatedInitializerAttr> in(const Index &index);
   static gap::generator<ObjCDesignatedInitializerAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ObjCDesignatedInitializerAttr> by_id(const Index &, EntityId);
+  static gap::generator<ObjCDesignatedInitializerAttr> in(const Fragment &frag);
+  static gap::generator<ObjCDesignatedInitializerAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DESIGNATED_INITIALIZER;
-  }
-
-  inline static std::optional<ObjCDesignatedInitializerAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<ObjCDesignatedInitializerAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
   }
 
   static std::optional<ObjCDesignatedInitializerAttr> from(const Attr &parent);
@@ -60,6 +47,9 @@ class ObjCDesignatedInitializerAttr : public Attr {
       return std::nullopt;
     }
   }
+
+  static std::optional<ObjCDesignatedInitializerAttr> from(const Reference &r);
+  static std::optional<ObjCDesignatedInitializerAttr> from(const TokenContext &t);
 
 };
 

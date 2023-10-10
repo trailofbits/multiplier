@@ -8,27 +8,39 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
 
 #include "AttrKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class AttrImpl;
+class File;
+class Fragment;
+class Index;
 class Reference;
+class Token;
+class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Attr {
+ public:
  protected:
   friend class Decl;
   friend class File;
@@ -41,14 +53,22 @@ class Attr {
   friend class TokenContext;
   friend class Type;
   friend class AttrImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const AttrImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   Attr(Attr &&) noexcept = default;
   Attr(const Attr &) = default;
   Attr &operator=(Attr &&) noexcept = default;
   Attr &operator=(const Attr &) = default;
+
+  inline bool operator==(const Attr &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
+  }
 
   /* implicit */ inline Attr(std::shared_ptr<const AttrImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -58,16 +78,18 @@ class Attr {
   }
 
   PackedAttrId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
  public:
-  static gap::generator<Attr> in(const Fragment &frag, std::span<AttrKind> kinds);
   static gap::generator<Attr> in(const Index &index, std::span<AttrKind> kinds);
-  static gap::generator<Attr> in(const Fragment &frag);
+  static gap::generator<Attr> in(const Fragment &frag, std::span<AttrKind> kinds);
+  static gap::generator<Attr> in(const File &file, std::span<AttrKind> kinds);
   static gap::generator<Attr> in(const Index &index);
   static gap::generator<Attr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<Attr> by_id(const Index &, EntityId);
+  static gap::generator<Attr> in(const Fragment &frag);
+  static gap::generator<Attr> in(const File &file);
 
   inline static std::optional<Attr> from(const Attr &self) {
     return self;
@@ -77,13 +99,9 @@ class Attr {
     return self;
   }
 
-  inline static std::optional<Attr> from(const Reference &r) {
-    return r.as_attribute();
-  }
+  static std::optional<Attr> from(const Reference &r);
 
-  inline static std::optional<Attr> from(const TokenContext &t) {
-    return t.as_attribute();
-  }
+  static std::optional<Attr> from(const TokenContext &t);
 
   Token token(void) const;
   bool is_implicit(void) const;

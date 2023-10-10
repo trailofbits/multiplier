@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "StmtAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class MustTailAttr;
 class StmtAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MustTailAttr : public StmtAttr {
  private:
@@ -35,32 +29,15 @@ class MustTailAttr : public StmtAttr {
   friend class StmtAttr;
   friend class Attr;
  public:
-  static gap::generator<MustTailAttr> in(const Fragment &frag);
   static gap::generator<MustTailAttr> in(const Index &index);
   static gap::generator<MustTailAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<MustTailAttr> by_id(const Index &, EntityId);
+  static gap::generator<MustTailAttr> in(const Fragment &frag);
+  static gap::generator<MustTailAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MUST_TAIL;
-  }
-
-  inline static std::optional<MustTailAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<MustTailAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<MustTailAttr> from(const StmtAttr &parent);
-
-  inline static std::optional<MustTailAttr> from(const std::optional<StmtAttr> &parent) {
-    if (parent) {
-      return MustTailAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<MustTailAttr> from(const Attr &parent);
@@ -72,6 +49,9 @@ class MustTailAttr : public StmtAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<MustTailAttr> from(const Reference &r);
+  static std::optional<MustTailAttr> from(const TokenContext &t);
 
 };
 

@@ -8,31 +8,26 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CallExpr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXMemberCallExpr;
 class CXXMethodDecl;
 class CXXRecordDecl;
 class CallExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class Type;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXMemberCallExpr : public CallExpr {
  private:
@@ -42,11 +37,12 @@ class CXXMemberCallExpr : public CallExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<CXXMemberCallExpr> in(const Fragment &frag);
   static gap::generator<CXXMemberCallExpr> in(const Index &index);
   static gap::generator<CXXMemberCallExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXMemberCallExpr> by_id(const Index &, EntityId);
+  static gap::generator<CXXMemberCallExpr> in(const Fragment &frag);
+  static gap::generator<CXXMemberCallExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_MEMBER_CALL_EXPR;
@@ -61,44 +57,6 @@ class CXXMemberCallExpr : public CallExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXMemberCallExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXMemberCallExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<CXXMemberCallExpr> from(const CallExpr &parent);
-
-  inline static std::optional<CXXMemberCallExpr> from(const std::optional<CallExpr> &parent) {
-    if (parent) {
-      return CXXMemberCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMemberCallExpr> from(const Expr &parent);
-
-  inline static std::optional<CXXMemberCallExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return CXXMemberCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXMemberCallExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<CXXMemberCallExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return CXXMemberCallExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<CXXMemberCallExpr> from(const Stmt &parent);
 
   inline static std::optional<CXXMemberCallExpr> from(const std::optional<Stmt> &parent) {
@@ -108,6 +66,9 @@ class CXXMemberCallExpr : public CallExpr {
       return std::nullopt;
     }
   }
+
+  static std::optional<CXXMemberCallExpr> from(const Reference &r);
+  static std::optional<CXXMemberCallExpr> from(const TokenContext &t);
 
   Expr implicit_object_argument(void) const;
   std::optional<CXXMethodDecl> method_declaration(void) const;

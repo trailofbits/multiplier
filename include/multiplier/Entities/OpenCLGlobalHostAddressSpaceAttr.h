@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "TypeAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class OpenCLGlobalHostAddressSpaceAttr;
+class Token;
 class TypeAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
  private:
@@ -35,32 +29,15 @@ class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const Fragment &frag);
   static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLGlobalHostAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OpenCLGlobalHostAddressSpaceAttr> by_id(const Index &, EntityId);
+  static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLGlobalHostAddressSpaceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;
-  }
-
-  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return OpenCLGlobalHostAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Attr &parent);
@@ -72,6 +49,9 @@ class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Reference &r);
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const TokenContext &t);
 
 };
 

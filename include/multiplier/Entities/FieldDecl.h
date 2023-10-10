@@ -8,31 +8,28 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "DeclaratorDecl.h"
 #include "InClassInitStyle.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class DeclaratorDecl;
 class Expr;
 class FieldDecl;
 class NamedDecl;
+class ObjCAtDefsFieldDecl;
+class ObjCIvarDecl;
+class Stmt;
+class Token;
 class ValueDecl;
 class VariableArrayType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class FieldDecl : public DeclaratorDecl {
  private:
@@ -42,11 +39,12 @@ class FieldDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<FieldDecl> in(const Fragment &frag);
   static gap::generator<FieldDecl> in(const Index &index);
   static gap::generator<FieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<FieldDecl> by_id(const Index &, EntityId);
+  static gap::generator<FieldDecl> in(const Fragment &frag);
+  static gap::generator<FieldDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FIELD;
@@ -61,45 +59,9 @@ class FieldDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<FieldDecl> redeclarations(void) const;
-  inline static std::optional<FieldDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<FieldDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<FieldDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<FieldDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return FieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<FieldDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<FieldDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return FieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<FieldDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<FieldDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return FieldDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  FieldDecl canonical_declaration(void) const;
+  std::optional<FieldDecl> definition(void) const;
+  gap::generator<FieldDecl> redeclarations(void) const &;
   static std::optional<FieldDecl> from(const Decl &parent);
 
   inline static std::optional<FieldDecl> from(const std::optional<Decl> &parent) {
@@ -110,18 +72,24 @@ class FieldDecl : public DeclaratorDecl {
     }
   }
 
+  static std::optional<FieldDecl> from(const Reference &r);
+  static std::optional<FieldDecl> from(const TokenContext &t);
+
   std::optional<Expr> bit_width(void) const;
   std::optional<VariableArrayType> captured_vla_type(void) const;
   InClassInitStyle in_class_initializer_style(void) const;
   std::optional<Expr> in_class_initializer(void) const;
   bool has_captured_vla_type(void) const;
   bool has_in_class_initializer(void) const;
+  bool has_non_null_in_class_initializer(void) const;
   bool is_anonymous_struct_or_union(void) const;
   bool is_bit_field(void) const;
   bool is_mutable(void) const;
+  bool is_potentially_overlapping(void) const;
   bool is_unnamed_bitfield(void) const;
   bool is_zero_length_bit_field(void) const;
   bool is_zero_size(void) const;
+  std::optional<uint64_t> offset_in_bits(void) const;
 };
 
 static_assert(sizeof(FieldDecl) == sizeof(DeclaratorDecl));

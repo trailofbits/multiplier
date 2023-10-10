@@ -8,38 +8,34 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Stmt.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXCatchStmt;
+class Decl;
 class Stmt;
+class Token;
 class Type;
 class VarDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXCatchStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  static gap::generator<CXXCatchStmt> in(const Fragment &frag);
   static gap::generator<CXXCatchStmt> in(const Index &index);
   static gap::generator<CXXCatchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXCatchStmt> by_id(const Index &, EntityId);
+  static gap::generator<CXXCatchStmt> in(const Fragment &frag);
+  static gap::generator<CXXCatchStmt> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_CATCH_STMT;
@@ -54,14 +50,6 @@ class CXXCatchStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<CXXCatchStmt> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<CXXCatchStmt> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
   static std::optional<CXXCatchStmt> from(const Stmt &parent);
 
   inline static std::optional<CXXCatchStmt> from(const std::optional<Stmt> &parent) {
@@ -71,6 +59,9 @@ class CXXCatchStmt : public Stmt {
       return std::nullopt;
     }
   }
+
+  static std::optional<CXXCatchStmt> from(const Reference &r);
+  static std::optional<CXXCatchStmt> from(const TokenContext &t);
 
   Token catch_token(void) const;
   Type caught_type(void) const;

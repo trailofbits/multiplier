@@ -8,27 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "OpenCLLocalAddressSpaceAttrSpelling.h"
 #include "TypeAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class OpenCLLocalAddressSpaceAttr;
+class Token;
 class TypeAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OpenCLLocalAddressSpaceAttr : public TypeAttr {
  private:
@@ -36,32 +30,15 @@ class OpenCLLocalAddressSpaceAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  static gap::generator<OpenCLLocalAddressSpaceAttr> in(const Fragment &frag);
   static gap::generator<OpenCLLocalAddressSpaceAttr> in(const Index &index);
   static gap::generator<OpenCLLocalAddressSpaceAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OpenCLLocalAddressSpaceAttr> by_id(const Index &, EntityId);
+  static gap::generator<OpenCLLocalAddressSpaceAttr> in(const Fragment &frag);
+  static gap::generator<OpenCLLocalAddressSpaceAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
-  }
-
-  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OpenCLLocalAddressSpaceAttr> from(const TypeAttr &parent);
-
-  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
-    if (parent) {
-      return OpenCLLocalAddressSpaceAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OpenCLLocalAddressSpaceAttr> from(const Attr &parent);
@@ -73,6 +50,9 @@ class OpenCLLocalAddressSpaceAttr : public TypeAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const Reference &r);
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const TokenContext &t);
 
   OpenCLLocalAddressSpaceAttrSpelling semantic_spelling(void) const;
 };

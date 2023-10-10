@@ -8,36 +8,32 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class ExternCContextDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ExternCContextDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ExternCContextDecl> in(const Fragment &frag);
   static gap::generator<ExternCContextDecl> in(const Index &index);
   static gap::generator<ExternCContextDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ExternCContextDecl> by_id(const Index &, EntityId);
+  static gap::generator<ExternCContextDecl> in(const Fragment &frag);
+  static gap::generator<ExternCContextDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXTERN_C_CONTEXT;
@@ -52,15 +48,9 @@ class ExternCContextDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ExternCContextDecl> redeclarations(void) const;
-  inline static std::optional<ExternCContextDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ExternCContextDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  ExternCContextDecl canonical_declaration(void) const;
+  std::optional<ExternCContextDecl> definition(void) const;
+  gap::generator<ExternCContextDecl> redeclarations(void) const &;
   static std::optional<ExternCContextDecl> from(const Decl &parent);
 
   inline static std::optional<ExternCContextDecl> from(const std::optional<Decl> &parent) {
@@ -71,7 +61,10 @@ class ExternCContextDecl : public Decl {
     }
   }
 
-  gap::generator<Decl> declarations_in_context(void) const;
+  static std::optional<ExternCContextDecl> from(const Reference &r);
+  static std::optional<ExternCContextDecl> from(const TokenContext &t);
+
+  gap::generator<Decl> declarations_in_context(void) const &;
 };
 
 static_assert(sizeof(ExternCContextDecl) == sizeof(Decl));

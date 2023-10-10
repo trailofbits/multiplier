@@ -14,21 +14,41 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <kj/io.h>
-#include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
+#include <pasta/Compile/Compiler.h>
+#include <pasta/Compile/Job.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
+#include <pasta/AST/Printer.h>
+#include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
 #include <sstream>
 #include <utility>
 #include <unordered_set>
 
-#include "Codegen.h"
+// NOTE(pag): We use the UTF-8 functions from the `llvm::json` namespace.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wcast-align"
+#include <llvm/Support/JSON.h>
+#pragma clang diagnostic pop
+
+#ifndef MX_DISABLE_VAST
+# include "Codegen.h"
+#endif
+
 #include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
+#include "Provenance.h"
 #include "ProgressBar.h"
 #include "Util.h"
 
@@ -46,7 +66,7 @@ class TokenTreeNode;
 class TokenTreeNodeRange;
 
 // Dispatch to the right macro serializer.
-extern void DispatchSerializeMacro(const EntityMapper &em,
+extern void DispatchSerializeMacro(const PendingFragment &pf,
                                    mx::ast::Macro::Builder builder,
                                    const pasta::Macro &entity,
                                    const TokenTree *tt);
@@ -54,34 +74,37 @@ extern void DispatchSerializeMacro(const EntityMapper &em,
 // Build the fragment. This fills out the decls/stmts/types to serialize.
 //
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-extern void BuildPendingFragment(
-    PendingFragment &pf, EntityIdMap &entity_ids,
-    const pasta::TokenRange &tokens);
+extern void BuildPendingFragment(PendingFragment &pf);
 
 // Label the parent entity ids.
-extern void LabelParentsInPendingFragment(PendingFragment &pf,
-                                          EntityMapper &em);
+extern void LabelParentsInPendingFragment(PendingFragment &pf);
+
+// Label tokens and macros.
+extern void LabelTokensAndMacrosInFragment(PendingFragment &pf);
 
 // Store information persistently to enable linking of declarations across
 // fragments.
 extern void LinkEntitiesAcrossFragments(
     mx::DatabaseWriter &database, const PendingFragment &pf,
-    const EntityMapper &em, const NameMangler &mangler);
+    const NameMangler &mangler);
 
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 extern void LinkExternalReferencesInFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
-    EntityMapper &em);
+    const pasta::AST &ast, mx::DatabaseWriter &database,
+    const PendingFragment &pf);
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
 extern void SerializePendingFragment(mx::DatabaseWriter &database,
-                                     const PendingFragment &pf,
-                                     const EntityMapper &em);
+                                     const PendingFragment &pf);
 
 // Save the symbolic names of all declarations into the database.
 extern void LinkEntityNamesToFragment(
-    mx::DatabaseWriter &db, const PendingFragment &pf, EntityMapper &em);
+    mx::DatabaseWriter &db, const PendingFragment &pf);
+
+extern void PersistTokenContexts(
+    const EntityMapper &em, const pasta::PrintedTokenRange &parsed_tokens,
+    mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb);
 
 namespace {
 
@@ -99,34 +122,6 @@ using TokenOffsetListBuilder =
 using TokenIdListBuilder =
     capnp::List<uint64_t, ::capnp::Kind::PRIMITIVE>::Builder;
 
-// Accumulate the token data, stripping out some unwanted characters in the
-// process.
-static void AccumulateUTF8Data(std::string &data, llvm::StringRef utf8_data) {
-  data.reserve(data.size() + utf8_data.size());
-  if (!utf8_data.contains('\r')) {
-    data.insert(data.end(), utf8_data.begin(), utf8_data.end());
-
-  } else {
-    for (char ch : utf8_data) {
-      if (ch != '\r') {
-        data += ch;
-      }
-    }
-  }
-}
-
-// Accumulate the token data, encoded as UTF-8, into `data`.
-template <typename Tok>
-static void AccumulateTokenData(std::string &data, const Tok &tok) {
-  llvm::StringRef tok_data = tok.Data();
-  if (llvm::json::isUTF8(tok_data)) {
-    AccumulateUTF8Data(data, tok_data);
-
-  } else {
-    AccumulateUTF8Data(data, llvm::json::fixUTF8(tok_data));
-  }
-}
-
 }  // namespace
 
 
@@ -141,6 +136,8 @@ static void AccumulateTokenData(std::string &data, const Tok &tok) {
 void GlobalIndexingState::PersistFile(
     mx::SpecificEntityId<mx::FileId> file_id, const pasta::File &file) {
 
+  ProgressBarWork progress_tracker(file_progress);
+
   std::filesystem::path file_path = file.Path();
   auto maybe_file_data = file.Data();
   LOG_IF(FATAL, !maybe_file_data.Succeeded())
@@ -151,7 +148,6 @@ void GlobalIndexingState::PersistFile(
   std::string_view file_data = maybe_file_data.TakeValue();
   capnp::MallocMessageBuilder message;
   mx::rpc::File::Builder fb = message.initRoot<mx::rpc::File>();
-  fb.setId(file_id.Unpack().file_id);
 
   std::string utf8_file_data;
   utf8_file_data.reserve(file_data.size());
@@ -176,9 +172,9 @@ void GlobalIndexingState::PersistFile(
   fb.setData(utf8_file_data);
 
   // Build up and serialize a mapping of offsets of the last byte in a line to
-  // line numbers. This mapping is used during regular expression matches and
-  // Weggli matches over file contents to help us map to fragments whose code
-  // is derived from those files.
+  // line numbers. This mapping is used during regular expression matches over
+  // file contents to help us map to fragments whose code is derived from those
+  // files.
   std::map<unsigned, unsigned> eol_offset_to_line_num;
   auto line = 1u;
   auto offset = 0u;
@@ -201,13 +197,31 @@ void GlobalIndexingState::PersistFile(
   }
 
   // Add it to the database.
+  auto fp = file_path.lexically_normal().generic_string();
   database.AddAsync(
-      mx::FilePathRecord{file_id, file_path},
-      mx::NamedEntityRecord{file_id.Pack(), file_path.generic_string()},
+      mx::FilePathRecord{file_id, fp},
+      mx::NamedEntityRecord{file_id.Pack(), fp},
       mx::EntityRecord{file_id.Pack(), GetSerializedData(message)});
 }
 
 namespace {
+
+// Intermediate children include things like parameter-to argument
+// substitutions, stringization, and uses of `__VA_OPT__`. They might point
+// into the macro body itself, rather than the expansion, so make sure only
+// to collect them if they are owned by the expansion.
+static std::optional<pasta::MacroRange> IntermediateChildren(
+    const pasta::Macro &macro) {
+  if (auto exp = pasta::MacroExpansion::From(macro)) {
+    pasta::MacroRange children = exp->IntermediateChildren();
+    for (pasta::Macro child : children) {
+      if (child.Parent()->RawMacro() == exp->RawMacro()) {
+        return children;
+      }
+    }
+  }
+  return std::nullopt;
+}
 
 // Schedules the order of serialization of tokens derived from the token tree.
 // The main goal is for all tokens in the final expansion, i.e. all parsed
@@ -233,7 +247,9 @@ struct TokenTreeSerializationSchedule {
   // Maps parsed tokens to the macro in which they are contained.
   std::vector<mx::RawEntityId> containing_macro;
 
-  mx::RawEntityId RecordEntityId(const TokenTree &tt) {
+  mx::RawEntityId RecordEntityId(const TokenTree &tt,
+                                 bool &is_part_of_fragment) {
+
     const void *raw_tt = tt.RawNode();
     const void *raw_locator = raw_tt;
     std::optional<pasta::Macro> macro = tt.Macro();
@@ -245,20 +261,24 @@ struct TokenTreeSerializationSchedule {
     mx::RawEntityId raw_id = em.EntityId(raw_locator);
 
     // NOTE(pag): This is some collusion with `EntityLabeller::Label` in terms
-    //            of labelling the top-level macros.
+    //            of labelling the top-level macros. This also happens with
+    //            nested macro directives.
     if (raw_id != mx::kInvalidEntityId) {
       CHECK_NE(raw_tt, raw_locator);
       mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(raw_id).Unpack());
       CHECK(id.kind == tt.Kind());
-      CHECK_LT(id.offset, pf.top_level_macros.size());
-      CHECK_LT(id.offset, pf.macros_to_serialize.size());
-      CHECK(!pf.macros_to_serialize[id.offset].has_value());
-      pf.macros_to_serialize[id.offset] = tt;
+
+      is_part_of_fragment = id.fragment_id == pf.fragment_index;
+      if (is_part_of_fragment) {
+        CHECK_LT(id.offset, pf.macros_to_serialize.size());
+        CHECK(!pf.macros_to_serialize[id.offset].has_value());
+        pf.macros_to_serialize[id.offset] = tt;
+      }
 
     // We need to form a new macro id for something we discovered along the way.
     } else {
       mx::MacroId id;
-      id.fragment_id = em.fragment.fragment_index;
+      id.fragment_id = pf.fragment_index;
       id.kind = tt.Kind();
       id.offset = static_cast<unsigned>(pf.macros_to_serialize.size());
       raw_id = mx::EntityId(id).Pack();
@@ -271,30 +291,38 @@ struct TokenTreeSerializationSchedule {
     // macro, if any.
     CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
     if (raw_tt != raw_locator) {
-      (void) em.entity_ids.emplace(raw_locator, raw_id);
+      (void) em.token_tree_ids.emplace(raw_locator, raw_id);
     }
     return raw_id;
   }
 
   mx::RawEntityId RecordEntityId(const TokenTreeNode &node,
-                                 mx::RawEntityId parent_id) {
+                                 mx::RawEntityId parent_id,
+                                 bool &is_part_of_fragment) {
     mx::RawEntityId raw_id = mx::kInvalidEntityId;
+
     if (std::optional<TokenTree> sub = node.SubTree()) {
-      raw_id = RecordEntityId(sub.value());
+      raw_id = RecordEntityId(sub.value(), is_part_of_fragment);
 
     // Fill in IDs for derived tokens.
     } else {
       mx::MacroTokenId id;
       id.kind = mx::TokenKind::UNKNOWN;
-      id.fragment_id = em.fragment.fragment_index;
+      id.fragment_id = pf.fragment_index;
       id.offset = static_cast<unsigned>(tokens.size());
 
       const void *raw_pt = nullptr;
-      if (std::optional<pasta::Token> pt = node.Token()) {
+
+      if (std::optional<pasta::PrintedToken> pt = node.PrintedToken()) {
         id.kind = TokenKindFromPasta(pt.value());
         raw_pt = pt->RawToken();
-        DCHECK(!IsParsedToken(pt.value()) == !em.entity_ids.count(raw_pt));
-        CHECK(parsed_token_index.emplace(pt->RawToken(), id.offset).second);
+        CHECK(em.token_tree_ids.contains(raw_pt));
+        CHECK(parsed_token_index.emplace(raw_pt, id.offset).second);
+
+      } else if (std::optional<pasta::Token> mt = node.Token()) {
+        id.kind = TokenKindFromPasta(mt.value());
+        raw_pt = mt->RawToken();
+        DCHECK(!IsParsedToken(mt.value()) == !em.token_tree_ids.count(raw_pt));
 
       } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
         id.kind = TokenKindFromPasta(ft.value());
@@ -302,7 +330,7 @@ struct TokenTreeSerializationSchedule {
 
       raw_id = mx::EntityId(id).Pack();
       if (raw_pt) {
-        em.entity_ids.emplace(raw_pt, raw_id);
+        em.token_tree_ids.emplace(raw_pt, raw_id);
       }
 
       containing_macro.push_back(parent_id);
@@ -321,12 +349,27 @@ struct TokenTreeSerializationSchedule {
                 const TokenTreeNodeRange &nodes) {
 
     for (TokenTreeNode node : nodes) {
-      mx::RawEntityId child_id = RecordEntityId(node, parent_id);
+
+      bool is_part_of_fragment = true;
+      mx::RawEntityId child_id = RecordEntityId(node, parent_id,
+                                                is_part_of_fragment);
+
+      // If this is a macro directive that is nested inside of another fragment,
+      // then assume that we've already extracted the directive from that other
+      // fragment and persisted it.
+      if (!is_part_of_fragment) {
+        continue;
+      }
+
       if (std::optional<TokenTree> sub = node.SubTree()) {
 
         const void *child = sub->RawNode();
         if (sub->HasExpansion()) {
           Schedule(child, child_id, sub->ReplacementChildren());
+          if (sub->HasIntermediateChildren()) {
+            todo_list.emplace_back(
+                Todo{child, child_id, sub->IntermediateChildren()});
+          }
           todo_list.emplace_back(Todo{child, child_id, sub->Children()});
         } else {
           Schedule(child, child_id, sub->Children());
@@ -346,51 +389,20 @@ struct TokenTreeSerializationSchedule {
     }
   }
 
-  TokenTreeSerializationSchedule(PendingFragment &pf_, EntityMapper &em_)
+  TokenTreeSerializationSchedule(PendingFragment &pf_)
       : pf(pf_),
-        em(em_) {}
+        em(pf_.em) {}
 };
 
-static mx::RawEntityId DerivedTokenId(
-    EntityMapper &em, const pasta::FileToken &tok) {
-  return em.EntityId(tok);
-}
-
-static mx::RawEntityId DerivedTokenId(
-    EntityMapper &em, const pasta::Token &tok) {
-  if (std::optional<pasta::Token> derived_tok = tok.DerivedLocation()) {
-    return em.EntityId(derived_tok.value());
-  }
-
-  if (std::optional<pasta::FileToken> file_tok = tok.FileLocation()) {
-    return DerivedTokenId(em, file_tok.value());
-  }
-
-  return mx::kInvalidEntityId;
-}
-
-// Get the list of parsed tokens.
-static std::vector<pasta::Token> FindParsedTokens(
-    const pasta::TokenRange &tokens, uint64_t min_index, uint64_t max_index) {
-  std::vector<pasta::Token> parsed_toks;
-  for (auto i = min_index; i <= max_index; ++i) {
-    pasta::Token tok = tokens[i];
-    if (IsParsedToken(tok)) {
-      parsed_toks.emplace_back(std::move(tok));
-    }
-  }
-  return parsed_toks;
-}
-
 static void VisitMacros(
-    PendingFragment &pf, EntityMapper &em, const pasta::Macro &macro,
+    PendingFragment &pf, const pasta::Macro &macro,
     std::vector<pasta::Macro> &macros_to_serialize);
 
 static void VisitMacroRange(
-    PendingFragment &pf, EntityMapper &em, pasta::MacroRange range,
+    PendingFragment &pf, pasta::MacroRange range,
     std::vector<pasta::Macro> &macros_to_serialize) {
   for (pasta::Macro macro : range) {
-    VisitMacros(pf, em, macro, macros_to_serialize);
+    VisitMacros(pf, macro, macros_to_serialize);
   }
 }
 
@@ -400,8 +412,10 @@ static void VisitMacroRange(
 // so we need to recursively visit the macro tree and try to serialize all the
 // macros as seen by PASTA.
 void VisitMacros(
-    PendingFragment &pf, EntityMapper &em, const pasta::Macro &macro,
+    PendingFragment &pf, const pasta::Macro &macro,
     std::vector<pasta::Macro> &macros_to_serialize) {
+
+  EntityMapper &em = pf.em;
 
   if (auto tok = pasta::MacroToken::From(macro)) {
     pasta::Token pt = tok->ParsedLocation();
@@ -410,6 +424,7 @@ void VisitMacros(
     }
 
     // TODO(pag): Do this at some point.
+    // TODO(pag): Don't remember what "this" is anymore...
 
   } else {
 
@@ -422,15 +437,33 @@ void VisitMacros(
       id.offset = static_cast<unsigned>(macros_to_serialize.size());
       id.fragment_id = pf.fragment_index;
       raw_id = mx::EntityId(id).Pack();
-      em.entity_ids.emplace(macro.RawMacro(), raw_id);
+      em.token_tree_ids.emplace(macro.RawMacro(), raw_id);
       macros_to_serialize.emplace_back(macro);
+    
+    // If we've seen this already, then only process it further if it's part
+    // of this fragment. In the case of a macro directive, it may not be part
+    // of this fragment.
+    } else {
+      mx::VariantId vid = mx::EntityId(raw_id).Unpack();
+      CHECK(std::holds_alternative<mx::MacroId>(vid));
+      if (std::get<mx::MacroId>(vid).fragment_id != pf.fragment_index) {
+        return;
+      }
     }
 
     // Recursive visit this macro.
-    VisitMacroRange(pf, em, macro.Children(), macros_to_serialize);
+    VisitMacroRange(pf, macro.Children(), macros_to_serialize);
 
+    // Get the intermediae children. This live between the children and the
+    // replacement children. Some substitutions happen here, but their trees
+    // can't logically nest with those of the replacement children.
+    if (auto intermediates = IntermediateChildren(macro)) {
+      VisitMacroRange(pf, *intermediates, macros_to_serialize);
+    }
+
+    // Visit replacement children.
     if (auto sub = pasta::MacroSubstitution::From(macro)) {
-      VisitMacroRange(pf, em, sub->ReplacementChildren(),
+      VisitMacroRange(pf, sub->ReplacementChildren(),
                       macros_to_serialize);
     }
   }
@@ -440,21 +473,23 @@ void VisitMacros(
 //
 // NOTE(pag): This is a *backup* approach when building a token tree fails.
 static void PersistParsedTokens(
-    mx::DatabaseWriter &database,
-    PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
-    const std::vector<pasta::Token> &parsed_tokens) {
+    mx::DatabaseWriter &database, PendingFragment &pf,
+    mx::rpc::Fragment::Builder &fb, TokenProvenanceCalculator &provenance) {
 
-  RelatedEntityIds tok_related_entities;
+  EntityMapper &em = pf.em;
+
   std::string utf8_fragment_data;
 
   // Find the set of macros to serialize.
   std::vector<pasta::Macro> macros_to_serialize = pf.top_level_macros;
   for (const pasta::Macro &tlm : pf.top_level_macros) {
-    VisitMacros(pf, em, tlm, macros_to_serialize);
+    VisitMacros(pf, tlm, macros_to_serialize);
   }
 
+  provenance.Run(pf.fragment_index, pf.parsed_tokens);
+
   unsigned num_macros = static_cast<unsigned>(macros_to_serialize.size());
-  unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
+  unsigned num_parsed_tokens = static_cast<unsigned>(pf.parsed_tokens.size());
   unsigned num_tokens = num_parsed_tokens;
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
@@ -466,28 +501,15 @@ static void PersistParsedTokens(
   auto i = 0u;
 
   // Serialize the tokens.
-  for (const pasta::Token &tok : parsed_tokens) {
+  for (pasta::PrintedToken tok : pf.parsed_tokens) {
     pto2i.set(i, i);  // Parsed tokens to macro tokens.
     mti2po.set(i, i);  // Macro tokens to parsed tokens.
     mti2mi.set(i, mx::kInvalidEntityId);  // Mapping of token to containing macros.
 
-    if (std::optional<pasta::MacroToken> mt = tok.MacroLocation()) {
-      if (auto pm = mt->Parent()) {
-        mx::RawEntityId eid = em.EntityId(pm.value());
-        mx::VariantId vid = mx::EntityId(eid).Unpack();
-        if (std::holds_alternative<mx::MacroId>(vid)) {
-          mx::MacroId mid = std::get<mx::MacroId>(vid);
-          if (mid.fragment_id == pf.fragment_index) {
-            mti2mi.set(i, eid);
-          }
-        }
-      }
-    }
-
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
     tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
-    dt.set(i, DerivedTokenId(em, tok));
-    re.set(i, RelatedEntityId(em, tok, tok_related_entities));
+    dt.set(i, provenance.DerivedTokenId(tok));
+    re.set(i, provenance.RelatedEntityId(tok));
 
     AccumulateTokenData(utf8_fragment_data, tok);
     ++i;
@@ -498,7 +520,7 @@ static void PersistParsedTokens(
 
   for (i = 0u; i < num_macros; ++i) {
     EntityBuilder<mx::ast::Macro> storage;
-    DispatchSerializeMacro(em, storage.builder, macros_to_serialize[i],
+    DispatchSerializeMacro(pf, storage.builder, macros_to_serialize[i],
                            nullptr);
 
     mx::MacroId id;
@@ -512,20 +534,30 @@ static void PersistParsedTokens(
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
   for (i = 0u; i < pf.num_top_level_macros; ++i) {
-    tlms.set(i, em.EntityId(pf.top_level_macros[i]));
+    mx::RawEntityId eid = em.EntityId(pf.top_level_macros[i]);
+    CHECK_NE(eid, mx::kInvalidEntityId);
+    tlms.set(i, eid);
   }
 }
 
-// Combine all parsed tokens into a string for diagnostic purposes.
-static std::string DiagnoseParsedTokens(
-    const std::vector<pasta::Token> &parsed_tokens) {
-  std::stringstream ss;
-  auto sep = "";
-  for (const pasta::Token &tok : parsed_tokens) {
-    ss << sep << tok.Data();
-    sep = " ";
+static std::string MainSourceFile(const pasta::AST &ast) {
+  return ast.MainFile().Path().generic_string();
+}
+
+static std::string MainSourceFile(const PendingFragment &pf) {
+  if (!pf.top_level_decls.empty()) {
+    return MainSourceFile(pasta::AST::From(pf.top_level_decls.front()));
+
+  } else if (!pf.top_level_macros.empty()) {
+    return MainSourceFile(pasta::AST::From(pf.top_level_macros.front()));
+
+  } else if (pf.original_tokens && !pf.original_tokens->empty()) {
+    return MainSourceFile(pasta::AST::From(
+        pf.original_tokens->Front().value()));
+  
+  } else {
+    return "<unknown file>";
   }
-  return ss.str();
 }
 
 // Persist the token tree, which is a tree of substitutions, i.e. before/after
@@ -535,54 +567,106 @@ static std::string DiagnoseParsedTokens(
 // are macro tokens. The top-level substitution points to the macro code in
 // before IDs, and the
 static void PersistTokenTree(
-    mx::DatabaseWriter &database,
-    PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
-    TokenTreeNodeRange nodes, const std::vector<pasta::Token> &parsed_tokens) {
+    mx::DatabaseWriter &database, PendingFragment &pf,
+    mx::rpc::Fragment::Builder &fb, TokenTreeNodeRange nodes,
+    TokenProvenanceCalculator &provenance) {
 
-  RelatedEntityIds tok_related_entities;
-  TokenTreeSerializationSchedule sched(pf, em);
+  const EntityMapper &em = pf.em;
+
+  TokenTreeSerializationSchedule sched(pf);
   sched.Schedule(nodes);
 
-  std::string utf8_fragment_data;
+  provenance.Run(pf.fragment_index, sched.tokens);
+
+//#ifndef NDEBUG
+//  provenance.Dump(std::cerr);
+//#endif
 
   unsigned num_macros = static_cast<unsigned>(pf.macros_to_serialize.size());
-  unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
+  unsigned num_parsed_tokens = static_cast<unsigned>(pf.parsed_tokens.size());
   unsigned num_tokens = static_cast<unsigned>(sched.tokens.size());
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
   auto dt = fb.initDerivedTokenIds(num_tokens);
   auto re = fb.initRelatedEntityId(num_tokens);
+  auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
+  auto mti2mi = fb.initMacroTokenIndexToMacroId(num_tokens);
   auto i = 0u;
 
-  // Pre-fill the related entity IDs for the parsed tokens.
-  for (const pasta::Token &tok : parsed_tokens) {
-    (void) RelatedEntityId(em, tok, tok_related_entities);
+  size_t data_reserve = 128u;
+  for (const TokenTreeNode &tok_node : sched.tokens) {
+    if (auto pt = tok_node.PrintedToken()) {
+      data_reserve += pt->Data().size();
+    } else if (auto mt = tok_node.Token()) {
+      data_reserve += mt->Data().size();
+    } else if (auto ft = tok_node.FileToken()) {
+      data_reserve += ft->Data().size();
+    }
   }
+
+  std::string utf8_fragment_data;
+  utf8_fragment_data.reserve(data_reserve);
 
   // Serialize the tokens.
   for (const TokenTreeNode &tok_node : sched.tokens) {
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
 
-    std::optional<pasta::Token> pt = tok_node.Token();
+    std::optional<pasta::Token> mt = tok_node.Token();
+    std::optional<pasta::PrintedToken> pt = tok_node.PrintedToken();
     std::optional<pasta::FileToken> ft = tok_node.FileToken();
+
+    dt.set(i, provenance.DerivedTokenId(tok_node));
+    re.set(i, provenance.RelatedEntityId(tok_node));
+
     if (pt) {
       AccumulateTokenData(utf8_fragment_data, pt.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(pt.value())));
-      dt.set(i, DerivedTokenId(em, pt.value()));
-      re.set(i, RelatedEntityId(em, pt.value(), tok_related_entities));
+
+    } else if (mt) {
+      AccumulateTokenData(utf8_fragment_data, mt.value());
+      tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(mt.value())));
 
     } else if (ft) {
       AccumulateTokenData(utf8_fragment_data, ft.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(ft.value())));
-      dt.set(i, DerivedTokenId(em, ft.value()));
-      re.set(i, mx::kInvalidEntityId);
 
     } else {
-      auto ast = pasta::AST::From(parsed_tokens.front());
       LOG(FATAL)
           << "Missing parsed/file token for token node in source file "
-          << ast.MainFile().Path().generic_string() << " with parsed tokens "
-          << DiagnoseParsedTokens(parsed_tokens);
+          << MainSourceFile(pf) << " with parsed tokens "
+          << DiagnosePrintedTokens(pf.parsed_tokens);
+    }
+
+    // Associate this token node with a parsed token. Generally this can be
+    // a one-to-many mapping, but we try to choose a reasonable one.
+    mx::VariantId parsed_vid =
+        mx::EntityId(provenance.ParsedTokenId(tok_node)).Unpack();
+    
+    // We might have a backup case if we're serializing a builtin, where
+    // we serialized a buitlin or forward declaration in a declarator and
+    // (intentionally) droppped provenance so that we wouldn't accidentally
+    // bring in macros.
+    if (std::holds_alternative<mx::InvalidId>(parsed_vid) && pt) {
+      CHECK(pf.drop_token_provenance);
+      parsed_vid = mx::EntityId(em.EntityId(pt.value())).Unpack();
+    }
+
+    if (std::holds_alternative<mx::ParsedTokenId>(parsed_vid)) {
+      mti2po.set(i, std::get<mx::ParsedTokenId>(parsed_vid).offset);
+    } else {
+      CHECK(std::holds_alternative<mx::InvalidId>(parsed_vid));
+      mti2po.set(i, num_parsed_tokens);
+    }
+
+    // Map the token to its containing macro.
+    mx::EntityId macro_eid(sched.containing_macro[i]);
+    mx::VariantId macro_vid = macro_eid.Unpack();
+    if (std::holds_alternative<mx::MacroId>(macro_vid)) {
+      mx::MacroId mid = std::get<mx::MacroId>(macro_vid);
+      CHECK_EQ(mid.fragment_id, pf.fragment_index);
+      mti2mi.set(i, macro_eid.Pack());
+    } else {
+      CHECK(std::holds_alternative<mx::InvalidId>(macro_vid));
     }
 
     ++i;
@@ -591,40 +675,20 @@ static void PersistTokenTree(
   to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
   fb.setTokenData(utf8_fragment_data);
 
-  // Map the serialized tokens to the parsed tokens.
-  i = 0u;
-  auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
-  auto mti2mi = fb.initMacroTokenIndexToMacroId(num_tokens);
-  for (; i < num_tokens; ++i) {
-    mti2po.set(i, num_parsed_tokens);
-    mti2mi.set(i, mx::kInvalidEntityId);
-
-    // Map the token to its containing macro.
-    mx::EntityId eid(sched.containing_macro[i]);
-    mx::VariantId vid = eid.Unpack();
-    if (std::holds_alternative<mx::MacroId>(vid)) {
-      mx::MacroId mid = std::get<mx::MacroId>(vid);
-      CHECK_EQ(mid.fragment_id, pf.fragment_index);
-      mti2mi.set(i, eid.Pack());
-    } else {
-      CHECK(std::holds_alternative<mx::InvalidId>(vid));
-    }
-  }
-
   // Map the parsed tokens to serialized tokens.
   //
   // `ParsedTokenId::offset` needs to go through a level of indirection to
   // get into the token kinds/data.
   auto pto2i = fb.initParsedTokenOffsetToIndex(num_parsed_tokens);
   i = 0u;
-  for (const pasta::Token &parsed_tok : parsed_tokens) {
+  for (pasta::PrintedToken parsed_tok : pf.parsed_tokens) {
     auto it = sched.parsed_token_index.find(parsed_tok.RawToken());
     if (it != sched.parsed_token_index.end()) {
       auto mi = static_cast<mx::EntityOffset>(it->second);
       pto2i.set(i, mi);
-      mti2po.set(mi, i);
+      CHECK_EQ(mti2po[mi], i);  // Should be set.
+
     } else {
-      auto ast = pasta::AST::From(parsed_tokens.front());
       if (!pf.decls_to_serialize.empty()) {
         auto err = PrefixedLocation(pf.decls_to_serialize[0],
                                     "Token tree didn't cover code near ");
@@ -635,276 +699,67 @@ static void PersistTokenTree(
           << "TokenTree nodes didn't cover parsed token '" << parsed_tok.Data()
           << "' at index " << i << " (PTI " << parsed_tok.Index()
           << ") in parsed token list from source file "
-          << ast.MainFile().Path().generic_string() << " with parsed tokens "
-          << DiagnoseParsedTokens(parsed_tokens);
+          << MainSourceFile(pf) << " with parsed tokens "
+          << DiagnosePrintedTokens(pf.parsed_tokens);
     }
-
-    // Introduce a mapping of macro tokens back to parsed tokens.
-    for (auto dloc = parsed_tok.DerivedLocation(); dloc;
-         dloc = dloc->DerivedLocation()) {
-      mx::VariantId vid = mx::EntityId(em.EntityId(dloc.value())).Unpack();
-      if (!std::holds_alternative<mx::MacroTokenId>(vid)) {
-        CHECK(!std::holds_alternative<mx::ParsedTokenId>(vid));
-        continue;
-      }
-
-      mx::MacroTokenId mtid = std::get<mx::MacroTokenId>(vid);
-
-      if (mtid.fragment_id == pf.fragment_index) {
-
-        // This macro token hasn't yet been related to any single parsed
-        // token, so relate it to the first one.
-        if (mti2po[mtid.offset] == num_parsed_tokens) {
-          mti2po.set(mtid.offset, i);
-
-        // This macro token ended up being related to multiple parsed tokens.
-        } else {
-          mti2po.set(mtid.offset, num_parsed_tokens + 1u);
-        }
-      }
-    }
-
     ++i;
   }
 
   // Serialize the token trees / macros.
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
+    CHECK(tt.has_value());
+
     const void *raw_tt = tt->RawNode();
-
     mx::RawEntityId eid = em.EntityId(raw_tt);
-    mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(eid).Unpack());
+    mx::VariantId vid = mx::EntityId(eid).Unpack();
+    CHECK(std::holds_alternative<mx::MacroId>(vid));
 
+    mx::MacroId id = std::get<mx::MacroId>(vid);
+    CHECK_EQ(id.fragment_id, pf.fragment_index);
+
+    EntityBuilder<mx::ast::Macro> storage;
     CHECK_LT(id.offset, num_macros);
     if (std::optional<pasta::Macro> macro = tt->Macro()) {
-      EntityBuilder<mx::ast::Macro> storage;
-      DispatchSerializeMacro(em, storage.builder, macro.value(), &(tt.value()));
+      DispatchSerializeMacro(pf, storage.builder, macro.value(), &(tt.value()));
 
-      database.AddAsync(
-          mx::EntityRecord{eid, GetSerializedData(storage.message)});
+    // NOTE(pag): This is only reasonable on a case-by-case basis!! Right now,
+    //            we only expect `SUBSITUTION`s to be invented by the
+    //            `TokenTree` code, for connecting `#include` directives to
+    //            included file contents for X-macros.
+    } else {
+      CHECK(tt->Kind() == mx::MacroKind::SUBSTITUTION);
+      const pasta::Macro &invalid_macro =
+          *reinterpret_cast<const pasta::Macro *>(0xdeadbeefull);
+      DispatchSerializeMacro(pf, storage.builder, invalid_macro, &(tt.value()));
     }
+
+    database.AddAsync(
+        mx::EntityRecord{eid, GetSerializedData(storage.message)});
   }
 
   // Serialize the top-level list.
   auto tlms = fb.initTopLevelMacros(nodes.Size());
   i = 0u;
   for (TokenTreeNode node : nodes) {
-    tlms.set(i++, em.EntityId(node.RawNode()));
-  }
-}
-
-// Find the entity id of `canon_decl` that resides in the current fragment
-// on which the serializer is operating. Token contexts from PASTA store the
-// canonical (typically first) declaration, but we generally want the version
-// of the declaration that is inside of the fragment itself, so here we go from
-// canonical back to specific.
-//
-// TODO(pag): Eventually, we should change the serialized representation of
-//            token contexts to store full 64-bit entity IDs. Right now, they
-//            store offsets of things in the fragments, hence the actual need
-//            to go canonical->specific in the first place, and why a failure to
-//            do so results in `kInvalidEntityId` instead of just falling back
-//            on the ID of the canonical decl.
-static mx::RawEntityId IdOfRedeclInFragment(
-    const EntityMapper &em, mx::RawEntityId frag_index,
-    pasta::Decl canon_decl) {
-
-  mx::RawEntityId ret_id = em.EntityId(canon_decl);
-  for (pasta::Decl redecl : canon_decl.Redeclarations()) {
-    mx::RawEntityId eid = em.EntityId(redecl);
-    if (eid == mx::kInvalidEntityId) {
-      continue;
-    }
-
-    // If we come across a definition, then reference it if we're not able
-    // to reference a redecl that's in the right fragment.
-    if (IsDefinition(redecl)) {
-      ret_id = eid;
-    }
-
+    mx::RawEntityId eid = em.EntityId(node);
     mx::VariantId vid = mx::EntityId(eid).Unpack();
-    CHECK(std::holds_alternative<mx::DeclId>(vid));
-    mx::DeclId id = std::get<mx::DeclId>(vid);
-    if (id.fragment_id == frag_index) {
-      return eid;
-    }
-  }
-
-  return ret_id;
-}
-
-// Persist the token contexts. The token contexts are a kind of inverted tree,
-// e.g.
-//
-//        int       foo       =         0       ;
-//         |         |        |         |       |
-//     BuiltinType   |        |     IntLiteral  /
-//          \  .--<--'  .--<--' .---<---' .----'
-//           \ | .--<---' .--<--'  .--<---'
-//            \|/  .---<--'  .--<--'
-//           VarDecl <---<---'
-//
-// They tell us the provenance or relation of a particular token to the AST that
-// represents the code containing that token. You can, in theory, follow a
-// linked list from a token all the way up to the root of an AST. We want to
-// serialize these because they allow us to make queries in our API, e.g. "give
-// me the SwitchStmt containing this token." Token contexts aren't pure linked
-// lists, though; there are special "alias" nodes that tend to link you further
-// down the lists, and so that takes some special handling.
-static void PersistTokenContexts(
-    EntityMapper &em, const std::vector<pasta::Token> &parsed_tokens,
-    mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb) {
-
-  using DeclContextSet = std::unordered_set<pasta::TokenContext>;
-  std::map<mx::RawEntityId, DeclContextSet> contexts;
-
-  // First, collect only the relevant contexts for this fragment. Group them by
-  // entity ID, as we store the context list inline inside of the entities.
-  unsigned num_tokens = 0u;
-  for (const pasta::Token &tok : parsed_tokens) {
-    ++num_tokens;
-
-    for (auto context = tok.Context(); context; context = context->Parent()) {
-
-      pasta::TokenContext c = context.value();
-      if (auto alias_context = c.Aliasee()) {
-        c = std::move(alias_context.value());
-      }
-
-      // NOTE(pag): PASTA stored the canonical decl in the decl context, so
-      //            it's not likely to be in the current fragment.
-      if (auto decl = pasta::Decl::From(c)) {
-        const mx::RawEntityId eid = IdOfRedeclInFragment(em, frag_index, *decl);
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
-
-#define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
-    } else if (auto lower_name ## _ = pasta::type_name::From(c)) { \
-      const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
-      if (eid != mx::kInvalidEntityId) { \
-        contexts[eid].insert(context.value()); \
-      }
-
-      FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)
-#undef ADD_ENTITY_TO_CONTEXT
-
-      }
-    }
-  }
-
-  struct PendingTokenContext {
-    mx::RawEntityId entity_id{mx::kInvalidEntityId};
-    bool is_alias{false};
-    unsigned offset{0};
-    unsigned alias_offset{0};
-  };
-
-  std::unordered_map<pasta::TokenContext, PendingTokenContext>
-      pending_contexts;
-
-  unsigned num_contexts = 0;
-
-  // Figure out the kinds of the contexts (stmt, decl, type), the index into the
-  // respective entity list in the serialized fragment where the contexts will
-  // be placed, the offset at which each context will reside within an entity-
-  // specific list, etc.
-  for (const auto &entry : contexts) {
-    const DeclContextSet &entity_contexts = entry.second;
-
-    // First, make a "template" of the context info, based on the entity kind
-    // and fragment info.
-    PendingTokenContext tpl;
-    tpl.entity_id = entry.first;
-
-    // Then, specialize this template for each context we encounter.
-    for (const pasta::TokenContext &context : entity_contexts) {
-      PendingTokenContext &info = pending_contexts[context];
-      info = tpl;  // Copy the template.
-
-      // Adjust the kind to be an aliasee.
-      if (context.Aliasee()) {
-        info.is_alias = true;
-      }
-
-      info.offset = num_contexts++;
-    }
-  }
-
-  // Now resolve the aliasee targets, if any. Token contexts and their aliases
-  // will end up in the same entity-specific lists. This is because the entity
-  // in which the context resides will tell us its type.
-  for (const auto &entry : contexts) {
-    for (const pasta::TokenContext &context : entry.second) {
-      auto pc_it = pending_contexts.find(context);
-      if (pc_it == pending_contexts.end()) {
-        continue;  // E.g. translation unit contexts.
-      }
-
-      PendingTokenContext &info = pc_it->second;
-      CHECK_NE(info.entity_id, mx::kInvalidEntityId);
-
-      if (!info.is_alias) {
-        DCHECK(!context.Aliasee());
-        continue;
-      }
-
-      auto alias_context = context.Aliasee();
-      CHECK(alias_context.has_value());
-
-      PendingTokenContext &alias_info = pending_contexts[alias_context.value()];
-      CHECK_EQ(info.entity_id, alias_info.entity_id);
-      CHECK_NE(info.offset, alias_info.offset);
-      CHECK_LT(alias_info.offset, num_contexts);
-      info.alias_offset = alias_info.offset;
-    }
-  }
-
-  // Allocate as many token contexts as there are parsed tokens.
-  auto tcb_list = fb.initParsedTokenContexts(num_contexts);
-  auto tco_list = fb.initParsedTokenContextOffsets(num_tokens);
-
-  // Finally, serialize the contexts.
-  num_tokens = 0u;
-  for (const pasta::Token &tok : parsed_tokens) {
-    tco_list.set(num_tokens, 0u);
-
-    std::optional<mx::rpc::TokenContext::Builder> tcb;
-    for (auto context = tok.Context(); context; context = context->Parent()) {
-
-      pasta::TokenContext c = *context;
-      auto pc_it = pending_contexts.find(c);
-      if (pc_it == pending_contexts.end()) {
-        continue;  // E.g. translation unit contexts, attributes.
-      }
-
-      const PendingTokenContext &info = pc_it->second;
-
-      CHECK_LT(info.offset, num_contexts);
-      if (!tcb) {
-        tco_list.set(num_tokens, (info.offset << 1u) | 1u);
-      } else {
-        tcb->setParentIndex((info.offset << 1u) | 1u);
-      }
-
-      CHECK_NE(info.entity_id, mx::kInvalidEntityId);
-
-      tcb.reset();
-      tcb.emplace(tcb_list[info.offset]);
-      tcb->setEntityId(info.entity_id);
-      tcb->setParentIndex(0u);
-
-      if (info.is_alias) {
-        CHECK_LT(info.alias_offset, num_contexts);
-        tcb->setAliasIndex((info.alias_offset << 1u) | 1u);
-      } else {
-        tcb->setAliasIndex(0u);
+    
+    CHECK(!std::holds_alternative<mx::InvalidId>(vid));
+    
+    if (std::holds_alternative<mx::MacroId>(vid)) {
+      
+      // A directive that's not hoisted into a different fragment.
+      mx::MacroId mid = std::get<mx::MacroId>(vid);
+      if (mid.fragment_id == pf.fragment_index) {
+        CHECK_LT(mid.offset, pf.macros_to_serialize.size());
+        CHECK(pf.macros_to_serialize[mid.offset].has_value());
+        CHECK_EQ(em.EntityId(pf.macros_to_serialize[mid.offset].value()),
+                 eid);
       }
     }
 
-    ++num_tokens;
+    tlms.set(i++, eid);
   }
-
-  DCHECK_GT(fb.getTokenKinds().size(), 0u);
 }
 
 }  // namespace
@@ -932,33 +787,52 @@ static void PersistTokenContexts(
 // and partially so that we can do things like print out fragments, or chunks
 // thereof.
 void GlobalIndexingState::PersistFragment(
-    const pasta::AST &ast, const pasta::TokenRange &tokens,
-    NameMangler &mangler, EntityIdMap &entity_ids,
-    PendingFragment &pf) {
+    const pasta::AST &ast, NameMangler &mangler, EntityMapper &em,
+    TokenProvenanceCalculator &provenance, PendingFragment &pf) {
 
-  const mx::SpecificEntityId<mx::FragmentId> fragment_id = pf.fragment_id;
-  const uint64_t begin_index = pf.begin_index;
-  const uint64_t end_index = pf.end_index;
+  ProgressBarWork fragment_progress_tracker(fragment_progress);
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
+  // Labels tokens and macros.
+  LabelTokensAndMacrosInFragment(pf);
+
+  // Drop the connections between `pasta::PrintedToken::DerivedLocation` and
+  // `pasta::Token`.
+  provenance.Init(pf.parsed_tokens);
+  if (pf.drop_token_provenance) {
+    pf.parsed_tokens.DumpProvenanceInformation();
+  }
+
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  BuildPendingFragment(pf, entity_ids, tokens);
-
-  EntityMapper em(entity_ids, pf);
+  BuildPendingFragment(pf);
 
   // Figure out parentage/inheritance between the entities.
-  LabelParentsInPendingFragment(pf, em);
+  LabelParentsInPendingFragment(pf);
 
   // Serialize all discovered entities.
-  SerializePendingFragment(database, pf, em);
+  SerializePendingFragment(database, pf);
 
-  std::vector<pasta::Token> parsed_tokens = FindParsedTokens(
-      tokens, begin_index, end_index);
+  // List of fragments IDs, where index `0` is this fragment's immediate parent.
+  auto ids = fb.initParentIds(
+      static_cast<unsigned>(pf.parent_fragment_ids.size()));
+  auto i = 0u;
+  for (mx::PackedFragmentId parent_id : pf.parent_fragment_ids) {
+    ids.set(i++, parent_id.Pack());
+  }
 
-  fb.setId(pf.fragment_id.Pack());
+  // The compilation containing this fragment.
+  fb.setCompilationId(pf.compilation_id.Pack());
+
+  if (!pf.parent_fragment_ids.empty()) {
+    database.AddAsync(
+        mx::NestedFragmentRecord{
+          pf.parent_fragment_ids.front(),
+          pf.fragment_id});
+  }
+
   if (pf.file_location) {
     fb.setFirstFileTokenId(pf.file_location->first_file_token_id.Pack());
     fb.setLastFileTokenId(pf.file_location->last_file_token_id.Pack());
@@ -968,8 +842,7 @@ void GlobalIndexingState::PersistFragment(
         mx::FragmentFileRecord{pf.fragment_id, pf.file_location->file_id});
 
     // Associate the range of file tokens with the fragment. This helps with
-    // implementing things like regular expression (via RE2) and Weggli searches
-    // over code.
+    // implementing things like regular expression (via RE2) searches over code.
     database.AddAsync(
         mx::FragmentFileRangeRecord{
             pf.fragment_id,
@@ -977,14 +850,8 @@ void GlobalIndexingState::PersistFragment(
             pf.file_location->last_file_token_id});
   }
 
-  // Generate source IR before saving the fragments to the persistent
-  // storage.
-  fb.setMlir(codegen.GenerateSourceIRFromTLDs(
-      ast, fragment_id.Pack(), em, pf.top_level_decls,
-      pf.num_top_level_declarations));
-
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
-  for (auto i = 0u; i < pf.num_top_level_declarations; ++i) {
+  for (i = 0u; i < pf.num_top_level_declarations; ++i) {
     tlds.set(i, em.EntityId(pf.top_level_decls[i]));
   }
 
@@ -993,11 +860,10 @@ void GlobalIndexingState::PersistFragment(
   // fragment or its data.
   std::stringstream tok_tree_err;
   std::optional<TokenTreeNodeRange> maybe_tt = TokenTree::Create(
-      tokens, begin_index, end_index, tok_tree_err);
+      pf.original_tokens, pf.parsed_tokens, tok_tree_err);
 
   if (maybe_tt) {
-    PersistTokenTree(database, pf, em, fb, std::move(maybe_tt.value()),
-                     parsed_tokens);
+    PersistTokenTree(database, pf, fb, std::move(maybe_tt.value()), provenance);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
@@ -1010,25 +876,127 @@ void GlobalIndexingState::PersistFragment(
           << tok_tree_err.str() << " for top-level declaration "
           << DeclToString(leader_decl)
           << PrefixedLocation(leader_decl, " at or near ")
-          << " on main job file "
-          << ast.MainFile().Path().generic_string();
+          << " on main job file " << MainSourceFile(ast);
     } else {
       LOG(ERROR)
           << tok_tree_err.str() << " for macros on main job file "
-          << ast.MainFile().Path().generic_string();
+          << MainSourceFile(ast);
     }
 
-    PersistParsedTokens(database, pf, em, fb, parsed_tokens);
+    PersistParsedTokens(database, pf, fb, provenance);
   }
 
-  PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
-  LinkEntitiesAcrossFragments(database, pf, em, mangler);
-  LinkExternalReferencesInFragment(database, pf, em);
-  LinkEntityNamesToFragment(database, pf, em);
+  PersistTokenContexts(em, pf.parsed_tokens, pf.fragment_index, fb);
+  LinkEntitiesAcrossFragments(database, pf, mangler);
+  LinkExternalReferencesInFragment(ast, database, pf);
+  LinkEntityNamesToFragment(database, pf);
 
   // Add the fragment to the database.
   database.AddAsync(
       mx::EntityRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
+}
+
+// Persist the compilation.
+void GlobalIndexingState::PersistCompilation(
+    const pasta::Compiler &compiler, const pasta::CompileJob &job,
+    const pasta::AST &ast, const EntityMapper &em,
+    mx::PackedCompilationId tu_id,
+    std::vector<mx::PackedFragmentId> fragment_ids) {
+
+  capnp::MallocMessageBuilder message;
+  mx::rpc::Compilation::Builder cb = message.initRoot<mx::rpc::Compilation>();
+
+  mx::rpc::CompileCommand::Builder cc = cb.initCommand();
+  cc.setSourcePath(ast.MainFile().Path().generic_string());
+  cc.setCompilerPath(compiler.ExecutablePath().generic_string());
+  cc.setWorkingDirectory(job.WorkingDirectory().generic_string());
+  cc.setSystemRootDirectory(job.SystemRootDirectory().generic_string());
+  cc.setSystemRootIncludeDirectory(job.SystemRootIncludeDirectory().generic_string());
+  cc.setResourceDirectory(job.ResourceDirectory().generic_string());
+  cc.setInstallationDirectory(compiler.InstallationDirectory().generic_string());
+
+  capnp::Text::Reader reader("", 0u);
+  std::string_view triple = job.TargetTriple();
+  if (!triple.empty()) {
+    reader = capnp::Text::Reader(triple.data(), triple.size());
+  }
+  cc.setTargetTriple(reader);
+
+  triple = job.AuxiliaryTargetTriple();
+  reader = capnp::Text::Reader("", 0u);
+  if (!triple.empty()) {
+    reader = capnp::Text::Reader(triple.data(), triple.size());
+  }
+  cc.setAuxTargetTriple(reader);
+
+  auto i = 0u;
+  const pasta::ArgumentVector &args = job.Arguments();
+  auto al = cc.initArguments(static_cast<unsigned>(args.Size()));
+  for (const char *arg : args) {
+    al.set(i++, arg);
+  }
+
+  i = 0u;
+  std::vector<pasta::IncludePath> paths = compiler.SystemIncludeDirectories();
+  auto ipl = cc.initSystemIncludePaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
+  paths = compiler.UserIncludeDirectories();
+  ipl = cc.initUserIncludePaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
+  paths = compiler.FrameworkDirectories();
+  ipl = cc.initFrameworkPaths(static_cast<unsigned>(paths.size()));
+  for (const pasta::IncludePath &path : paths) {
+    mx::rpc::IncludePath::Builder ipb = ipl[i++];
+    ipb.setDirectory(path.Path().generic_string());
+    ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
+  }
+
+  i = 0u;
+  const auto &files = ast.ParsedFiles();
+  auto fl = cb.initFileIds(static_cast<unsigned>(files.size()));
+  for (const pasta::File &file : files) {
+    fl.set(i++, em.EntityId(file));
+  }
+
+  i = 0u;
+  fl = cb.initFragmentIds(static_cast<unsigned>(fragment_ids.size()));
+  for (mx::PackedFragmentId frag_id : fragment_ids) {
+    fl.set(i++, frag_id.Pack());
+  }
+
+  if (sourceir_progress) {
+    sourceir_progress->AddWork(1u);
+  }
+
+#ifndef MX_DISABLE_VAST
+  if (std::string mlir = codegen.GenerateSourceIR(ast, em);
+      !mlir.empty()) {
+    cb.setMlir(mlir);
+    if (sourceir_progress) {
+      sourceir_progress->Advance();
+    }
+  } else {
+    cb.initMlir(0u);
+  }
+#else
+  cb.initMlir(0u);
+#endif
+
+  // Add the compilation to the database.
+  database.AddAsync(
+      mx::EntityRecord{tu_id.Pack(), GetSerializedData(message)});
 }
 
 }  // namespace indexer

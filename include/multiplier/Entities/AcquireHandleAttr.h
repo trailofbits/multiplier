@@ -8,26 +8,20 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class AcquireHandleAttr;
 class Attr;
 class InheritableAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class AcquireHandleAttr : public InheritableAttr {
  private:
@@ -35,32 +29,15 @@ class AcquireHandleAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<AcquireHandleAttr> in(const Fragment &frag);
   static gap::generator<AcquireHandleAttr> in(const Index &index);
   static gap::generator<AcquireHandleAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<AcquireHandleAttr> by_id(const Index &, EntityId);
+  static gap::generator<AcquireHandleAttr> in(const Fragment &frag);
+  static gap::generator<AcquireHandleAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ACQUIRE_HANDLE;
-  }
-
-  inline static std::optional<AcquireHandleAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<AcquireHandleAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<AcquireHandleAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<AcquireHandleAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return AcquireHandleAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<AcquireHandleAttr> from(const Attr &parent);
@@ -72,6 +49,9 @@ class AcquireHandleAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<AcquireHandleAttr> from(const Reference &r);
+  static std::optional<AcquireHandleAttr> from(const TokenContext &t);
 
   std::string_view handle_type(void) const;
 };

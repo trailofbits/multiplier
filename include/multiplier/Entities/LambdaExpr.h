@@ -8,34 +8,30 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
 #include "LambdaCaptureDefault.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXMethodDecl;
 class CXXRecordDecl;
 class CompoundStmt;
+class Decl;
 class Expr;
 class FunctionTemplateDecl;
 class LambdaExpr;
 class NamedDecl;
 class Stmt;
 class TemplateParameterList;
+class Token;
+class TokenRange;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class LambdaExpr : public Expr {
  private:
@@ -44,11 +40,12 @@ class LambdaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<LambdaExpr> in(const Fragment &frag);
   static gap::generator<LambdaExpr> in(const Index &index);
   static gap::generator<LambdaExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<LambdaExpr> by_id(const Index &, EntityId);
+  static gap::generator<LambdaExpr> in(const Fragment &frag);
+  static gap::generator<LambdaExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LAMBDA_EXPR;
@@ -63,34 +60,6 @@ class LambdaExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<LambdaExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<LambdaExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<LambdaExpr> from(const Expr &parent);
-
-  inline static std::optional<LambdaExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return LambdaExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<LambdaExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<LambdaExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return LambdaExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<LambdaExpr> from(const Stmt &parent);
 
   inline static std::optional<LambdaExpr> from(const std::optional<Stmt> &parent) {
@@ -101,6 +70,9 @@ class LambdaExpr : public Expr {
     }
   }
 
+  static std::optional<LambdaExpr> from(const Reference &r);
+  static std::optional<LambdaExpr> from(const TokenContext &t);
+
   Stmt body(void) const;
   CXXMethodDecl call_operator(void) const;
   LambdaCaptureDefault capture_default(void) const;
@@ -108,7 +80,8 @@ class LambdaExpr : public Expr {
   CompoundStmt compound_statement_body(void) const;
   std::optional<FunctionTemplateDecl> dependent_call_operator(void) const;
   std::optional<NamedDecl> nth_explicit_template_parameter(unsigned n) const;
-  gap::generator<NamedDecl> explicit_template_parameters(void) const;
+  unsigned num_explicit_template_parameters(void) const;
+  gap::generator<NamedDecl> explicit_template_parameters(void) const &;
   TokenRange introducer_range(void) const;
   CXXRecordDecl lambda_class(void) const;
   std::optional<TemplateParameterList> template_parameter_list(void) const;

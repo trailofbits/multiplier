@@ -41,6 +41,8 @@ enum class DeclKind : unsigned char {
   FRIEND_TEMPLATE,
   FUNCTION,
   FUNCTION_TEMPLATE,
+  HLSL_BUFFER,
+  IMPLICIT_CONCEPT_SPECIALIZATION,
   IMPLICIT_PARAM,
   IMPORT,
   INDIRECT_FIELD,
@@ -79,6 +81,7 @@ enum class DeclKind : unsigned char {
   TEMPLATE_PARAM_OBJECT,
   TEMPLATE_TEMPLATE_PARM,
   TEMPLATE_TYPE_PARM,
+  TOP_LEVEL_STMT,
   TRANSLATION_UNIT,
   TYPE_ALIAS,
   TYPE_ALIAS_TEMPLATE,
@@ -103,7 +106,7 @@ inline static const char *EnumerationName(DeclKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclKind) {
-  return 84;
+  return 87;
 }
 
 const char *EnumeratorName(DeclKind);

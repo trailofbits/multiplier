@@ -8,33 +8,27 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
+#include "TypeOfKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Expr;
+class Token;
 class Type;
 class TypeOfExprType;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypeOfExprType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<TypeOfExprType> in(const Fragment &frag);
   static gap::generator<TypeOfExprType> in(const Index &index);
   static gap::generator<TypeOfExprType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +36,6 @@ class TypeOfExprType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPE_OF_EXPR;
-  }
-
-  inline static std::optional<TypeOfExprType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<TypeOfExprType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<TypeOfExprType> from(const Type &parent);
@@ -62,7 +48,11 @@ class TypeOfExprType : public Type {
     }
   }
 
+  static std::optional<TypeOfExprType> from(const Reference &r);
+  static std::optional<TypeOfExprType> from(const TokenContext &t);
+
   Type desugar(void) const;
+  TypeOfKind type_kind(void) const;
   Expr underlying_expression(void) const;
   bool is_sugared(void) const;
 };

@@ -8,31 +8,27 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
+#include "DeductionCandidate.h"
 #include "FunctionDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXConstructorDecl;
 class CXXDeductionGuideDecl;
 class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
 class NamedDecl;
+class Stmt;
 class TemplateDecl;
+class Token;
 class ValueDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class CXXDeductionGuideDecl : public FunctionDecl {
  private:
@@ -43,11 +39,12 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<CXXDeductionGuideDecl> in(const Fragment &frag);
   static gap::generator<CXXDeductionGuideDecl> in(const Index &index);
   static gap::generator<CXXDeductionGuideDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<CXXDeductionGuideDecl> by_id(const Index &, EntityId);
+  static gap::generator<CXXDeductionGuideDecl> in(const Fragment &frag);
+  static gap::generator<CXXDeductionGuideDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DEDUCTION_GUIDE;
@@ -62,55 +59,9 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<CXXDeductionGuideDecl> redeclarations(void) const;
-  inline static std::optional<CXXDeductionGuideDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<CXXDeductionGuideDecl> from(const FunctionDecl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<FunctionDecl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXDeductionGuideDecl> from(const DeclaratorDecl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<DeclaratorDecl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXDeductionGuideDecl> from(const ValueDecl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<ValueDecl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<CXXDeductionGuideDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return CXXDeductionGuideDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  CXXDeductionGuideDecl canonical_declaration(void) const;
+  std::optional<CXXDeductionGuideDecl> definition(void) const;
+  gap::generator<CXXDeductionGuideDecl> redeclarations(void) const &;
   static std::optional<CXXDeductionGuideDecl> from(const Decl &parent);
 
   inline static std::optional<CXXDeductionGuideDecl> from(const std::optional<Decl> &parent) {
@@ -121,9 +72,12 @@ class CXXDeductionGuideDecl : public FunctionDecl {
     }
   }
 
+  static std::optional<CXXDeductionGuideDecl> from(const Reference &r);
+  static std::optional<CXXDeductionGuideDecl> from(const TokenContext &t);
+
   CXXConstructorDecl corresponding_constructor(void) const;
   TemplateDecl deduced_template(void) const;
-  bool is_copy_deduction_candidate(void) const;
+  DeductionCandidate deduction_candidate_kind(void) const;
   bool is_explicit(void) const;
 };
 

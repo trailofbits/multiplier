@@ -8,26 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "OMPExecutableDirective.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class OMPExecutableDirective;
 class OMPMasterDirective;
 class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPMasterDirective : public OMPExecutableDirective {
  private:
@@ -35,11 +30,12 @@ class OMPMasterDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  static gap::generator<OMPMasterDirective> in(const Fragment &frag);
   static gap::generator<OMPMasterDirective> in(const Index &index);
   static gap::generator<OMPMasterDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPMasterDirective> by_id(const Index &, EntityId);
+  static gap::generator<OMPMasterDirective> in(const Fragment &frag);
+  static gap::generator<OMPMasterDirective> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASTER_DIRECTIVE;
@@ -54,24 +50,6 @@ class OMPMasterDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<OMPMasterDirective> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<OMPMasterDirective> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<OMPMasterDirective> from(const OMPExecutableDirective &parent);
-
-  inline static std::optional<OMPMasterDirective> from(const std::optional<OMPExecutableDirective> &parent) {
-    if (parent) {
-      return OMPMasterDirective::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<OMPMasterDirective> from(const Stmt &parent);
 
   inline static std::optional<OMPMasterDirective> from(const std::optional<Stmt> &parent) {
@@ -81,6 +59,9 @@ class OMPMasterDirective : public OMPExecutableDirective {
       return std::nullopt;
     }
   }
+
+  static std::optional<OMPMasterDirective> from(const Reference &r);
+  static std::optional<OMPMasterDirective> from(const TokenContext &t);
 
 };
 

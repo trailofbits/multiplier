@@ -8,33 +8,26 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Token;
 class Type;
 class UnresolvedUsingType;
 class UnresolvedUsingTypenameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UnresolvedUsingType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<UnresolvedUsingType> in(const Fragment &frag);
   static gap::generator<UnresolvedUsingType> in(const Index &index);
   static gap::generator<UnresolvedUsingType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +35,6 @@ class UnresolvedUsingType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::UNRESOLVED_USING;
-  }
-
-  inline static std::optional<UnresolvedUsingType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<UnresolvedUsingType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<UnresolvedUsingType> from(const Type &parent);
@@ -61,6 +46,9 @@ class UnresolvedUsingType : public Type {
       return std::nullopt;
     }
   }
+
+  static std::optional<UnresolvedUsingType> from(const Reference &r);
+  static std::optional<UnresolvedUsingType> from(const TokenContext &t);
 
   Type desugar(void) const;
   UnresolvedUsingTypenameDecl declaration(void) const;

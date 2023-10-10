@@ -8,27 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "EnumExtensibilityAttrKind.h"
 #include "InheritableAttr.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class EnumExtensibilityAttr;
 class InheritableAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class EnumExtensibilityAttr : public InheritableAttr {
  private:
@@ -36,32 +30,15 @@ class EnumExtensibilityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<EnumExtensibilityAttr> in(const Fragment &frag);
   static gap::generator<EnumExtensibilityAttr> in(const Index &index);
   static gap::generator<EnumExtensibilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<EnumExtensibilityAttr> by_id(const Index &, EntityId);
+  static gap::generator<EnumExtensibilityAttr> in(const Fragment &frag);
+  static gap::generator<EnumExtensibilityAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENUM_EXTENSIBILITY;
-  }
-
-  inline static std::optional<EnumExtensibilityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<EnumExtensibilityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<EnumExtensibilityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<EnumExtensibilityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return EnumExtensibilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<EnumExtensibilityAttr> from(const Attr &parent);
@@ -73,6 +50,9 @@ class EnumExtensibilityAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<EnumExtensibilityAttr> from(const Reference &r);
+  static std::optional<EnumExtensibilityAttr> from(const TokenContext &t);
 
   EnumExtensibilityAttrKind extensibility(void) const;
 };

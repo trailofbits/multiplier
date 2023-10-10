@@ -8,33 +8,26 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Type.h"
-#include "TypeKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class BTFTagAttributedType;
 class BTFTypeTagAttr;
+class Token;
 class Type;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class BTFTagAttributedType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  static gap::generator<BTFTagAttributedType> in(const Fragment &frag);
   static gap::generator<BTFTagAttributedType> in(const Index &index);
   static gap::generator<BTFTagAttributedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -42,14 +35,6 @@ class BTFTagAttributedType : public Type {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BTF_TAG_ATTRIBUTED;
-  }
-
-  inline static std::optional<BTFTagAttributedType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<BTFTagAttributedType> from(const TokenContext &t) {
-    return from(t.as_type());
   }
 
   static std::optional<BTFTagAttributedType> from(const Type &parent);
@@ -61,6 +46,9 @@ class BTFTagAttributedType : public Type {
       return std::nullopt;
     }
   }
+
+  static std::optional<BTFTagAttributedType> from(const Reference &r);
+  static std::optional<BTFTagAttributedType> from(const TokenContext &t);
 
   Type desugar(void) const;
   BTFTypeTagAttr attribute(void) const;

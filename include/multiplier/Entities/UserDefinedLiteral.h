@@ -8,29 +8,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "CallExpr.h"
-#include "StmtKind.h"
 #include "UserDefinedLiteralLiteralOperatorKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CallExpr;
+class Decl;
 class Expr;
 class Stmt;
+class Token;
 class UserDefinedLiteral;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class UserDefinedLiteral : public CallExpr {
  private:
@@ -40,11 +35,12 @@ class UserDefinedLiteral : public CallExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<UserDefinedLiteral> in(const Fragment &frag);
   static gap::generator<UserDefinedLiteral> in(const Index &index);
   static gap::generator<UserDefinedLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<UserDefinedLiteral> by_id(const Index &, EntityId);
+  static gap::generator<UserDefinedLiteral> in(const Fragment &frag);
+  static gap::generator<UserDefinedLiteral> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::USER_DEFINED_LITERAL;
@@ -59,44 +55,6 @@ class UserDefinedLiteral : public CallExpr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<UserDefinedLiteral> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<UserDefinedLiteral> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<UserDefinedLiteral> from(const CallExpr &parent);
-
-  inline static std::optional<UserDefinedLiteral> from(const std::optional<CallExpr> &parent) {
-    if (parent) {
-      return UserDefinedLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UserDefinedLiteral> from(const Expr &parent);
-
-  inline static std::optional<UserDefinedLiteral> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return UserDefinedLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<UserDefinedLiteral> from(const ValueStmt &parent);
-
-  inline static std::optional<UserDefinedLiteral> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return UserDefinedLiteral::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<UserDefinedLiteral> from(const Stmt &parent);
 
   inline static std::optional<UserDefinedLiteral> from(const std::optional<Stmt> &parent) {
@@ -106,6 +64,9 @@ class UserDefinedLiteral : public CallExpr {
       return std::nullopt;
     }
   }
+
+  static std::optional<UserDefinedLiteral> from(const Reference &r);
+  static std::optional<UserDefinedLiteral> from(const TokenContext &t);
 
   Expr cooked_literal(void) const;
   UserDefinedLiteralLiteralOperatorKind literal_operator_kind(void) const;

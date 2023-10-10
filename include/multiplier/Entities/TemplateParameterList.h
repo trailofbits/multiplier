@@ -8,29 +8,40 @@
 
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <filesystem>
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <optional>
 #include <span>
 #include <vector>
 
-#include <gap/core/generator.hpp>
 #include "../Iterator.h"
-#include "../Reference.h"
 #include "../Types.h"
-#include "../Token.h"
 
 #include "PseudoKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Expr;
+class File;
+class Fragment;
 class NamedDecl;
 class Reference;
 class TemplateParameterList;
 class TemplateParameterListImpl;
+class Token;
+class TokenRange;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
+ public:
  protected:
   friend class Attr;
   friend class Decl;
@@ -44,14 +55,22 @@ class TemplateParameterList {
   friend class TokenContext;
   friend class Type;
   friend class TemplateParameterListImpl;
+  friend class ir::Operation;
+  friend class ir::Value;
+
   std::shared_ptr<const TemplateParameterListImpl> impl;
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Index &);
-  inline static const std::shared_ptr<EntityProvider> &entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const Fragment &);
+  static std::shared_ptr<EntityProvider> entity_provider_of(const File &);
  public:
   TemplateParameterList(TemplateParameterList &&) noexcept = default;
   TemplateParameterList(const TemplateParameterList &) = default;
   TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
   TemplateParameterList &operator=(const TemplateParameterList &) = default;
+
+  inline bool operator==(const TemplateParameterList &rhs) const noexcept {
+    return id().Pack() == rhs.id().Pack();
+  }
 
   /* implicit */ inline TemplateParameterList(std::shared_ptr<const TemplateParameterListImpl> impl_)
       : impl(std::move(impl_)) {}
@@ -61,7 +80,7 @@ class TemplateParameterList {
   }
 
   PackedTemplateParameterListId id(void) const;
-  gap::generator<Reference> references(void) const;
+  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<TemplateParameterList> from(const TemplateParameterList &self) {
     return self;
@@ -71,17 +90,11 @@ class TemplateParameterList {
     return self;
   }
 
-  inline static std::optional<TemplateParameterList> from(const Reference &r) {
-    return r.as_template_parameter_list();
-  }
+  static std::optional<TemplateParameterList> from(const Reference &r);
 
-  inline static std::optional<TemplateParameterList> from(const TokenContext &t) {
-    return t.as_template_parameter_list();
-  }
+  static std::optional<TemplateParameterList> from(const TokenContext &t);
 
-  unsigned num_parameters(void) const;
-  unsigned num_required_parameters(void) const;
-  unsigned depth(void) const;
+  uint32_t depth(void) const;
   bool has_unexpanded_parameter_pack(void) const;
   bool has_parameter_pack(void) const;
   std::optional<Expr> requires_clause(void) const;
@@ -90,7 +103,8 @@ class TemplateParameterList {
   Token right_angle_token(void) const;
   TokenRange tokens(void) const;
   std::optional<NamedDecl> nth_parameter(unsigned n) const;
-  gap::generator<NamedDecl> parameters(void) const;
+  unsigned num_parameters(void) const;
+  gap::generator<NamedDecl> parameters(void) const &;
 };
 
 #endif

@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <capnp/c++.capnp.h>
+#include <capnp/message.h>
+#include <gap/core/generator.hpp>
 #include <map>
 #include <multiplier/Types.h>
 #include <optional>
@@ -14,8 +17,6 @@
 #include <string_view>
 #include <unordered_map>
 #include <variant>
-#include <capnp/c++.capnp.h>
-#include <capnp/message.h>
 
 namespace pasta {
 class AST;
@@ -24,8 +25,11 @@ class File;
 class FileToken;
 class Macro;
 class MacroToken;
+class PrintedToken;
+class PrintedTokenRange;
 class Stmt;
 class Token;
+class TokenContext;
 class Type;
 }  // namespace pasta
 namespace mx {
@@ -33,8 +37,9 @@ enum class TokenKind : unsigned short;
 }  // namespace mx
 namespace indexer {
 
-using Entity = std::variant<pasta::Decl, pasta::Macro>;
+using Entity = std::variant<std::monostate, pasta::Decl, pasta::Macro>;
 struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
+struct EntityParentMap final : public std::unordered_map<const void *, const void *> {};
 struct FileIdMap final : public std::unordered_map<const void *, mx::SpecificEntityId<mx::FileId>> {};
 struct FileHashMap final : public std::unordered_map<pasta::File, std::string> {};
 using TypeKey = std::pair<const void *, uint32_t>;
@@ -75,6 +80,9 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity);
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::Token &entity);
 
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::PrintedToken &entity);
+
 // Returns `true` if `decl` is a definition.
 bool IsDefinition(const pasta::Decl &decl);
 
@@ -84,28 +92,61 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type);
 // Try to find the `Decl` referenced by a particular `stmt`.
 std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt);
 
-using RelatedEntityIds = std::unordered_map<const void *, mx::RawEntityId>;
+// Try to find the `Decl` referenced by a particular `stmt`.
+gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Decl decl);
 
-// Find the entity ID of the declaration that is most related to a particular
-// token.
-mx::RawEntityId RelatedEntityId(
-    const EntityMapper &em, const pasta::Token &tok,
-    RelatedEntityIds &related_ids);
+// Try to find the `Decl` referenced by a particular `stmt`.
+gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt);
 
-// Find the entity ID of the declaration that is most related to a particular
-// token.
-mx::RawEntityId RelatedEntityId(
-    const EntityMapper &em, const pasta::MacroToken &tok,
-    RelatedEntityIds &related_ids);
+// Try to find the `Decl` referenced by a particular `type`.
+gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type);
 
-template<typename T>
+// Generate the token contexts associated with a printed token.
+gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok);
+
+// Checks if the declaration is valid and serializable
+bool IsSerializableDecl(const pasta::Decl &decl);
+
+// Determines whether or not a TLD is likely to have to go into a child
+// fragment. This happens when the TLD is a forward declaration, e.g. of a
+// struct.
+bool ShouldGoInNestedFragment(const pasta::Decl &decl);
+
+// Determines whether or not a TLM is likely to have to go into a child
+// fragment. This generally happens when a TLM is a directive.
+bool ShouldGoInNestedFragment(const pasta::Macro &macro);
+
+// Returns `true` if a macro is visible across fragments, and should have an
+// entity id stored in the global mapper.
+bool AreVisibleAcrossFragments(const pasta::Macro &macro);
+
+// Tells us if a given decl is probably a use that also acts as a forward
+// declaration.
+bool IsInjectedForwardDeclaration(const pasta::Decl &decl);
+
+// Should a declaration be hidden from the indexer?
+bool ShouldHideFromIndexer(const pasta::Decl &decl);
+
+template <typename T>
 struct EntityBuilder {
   capnp::MallocMessageBuilder message;
   typename T::Builder builder;
 
-  EntityBuilder() : builder(message.initRoot<T>()) {}
+  inline EntityBuilder(void)
+      : builder(message.initRoot<T>()) {}
 };
 
-std::string GetSerializedData(capnp::MessageBuilder& builder);
+std::string GetSerializedData(capnp::MessageBuilder &builder);
+
+template <typename Tok>
+void AccumulateTokenData(std::string &data, const Tok &tok);
+
+std::string DiagnosePrintedTokens(const pasta::PrintedTokenRange &);
+
+// Returns `c` if `c` isn't an alias, otherwise `c.Aliasee().value()`.
+pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c);
+
+uint32_t Hash32(std::string_view data);
+uint64_t Hash64(std::string_view data);
 
 }  // namespace indexer

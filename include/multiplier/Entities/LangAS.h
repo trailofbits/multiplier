@@ -31,6 +31,8 @@ enum class LangAS : unsigned char {
   PTR32_SPTR,
   PTR32_UPTR,
   PTR64,
+  HLSL_GROUPSHARED,
+  WASM_FUNCREF,
 };
 
 inline static const char *EnumerationName(LangAS) {
@@ -38,7 +40,7 @@ inline static const char *EnumerationName(LangAS) {
 }
 
 inline static constexpr unsigned NumEnumerators(LangAS) {
-  return 19;
+  return 21;
 }
 
 const char *EnumeratorName(LangAS);

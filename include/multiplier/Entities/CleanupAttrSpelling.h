@@ -14,7 +14,7 @@ namespace mx {
 enum class CleanupAttrSpelling : unsigned char {
   GNU_CLEANUP,
   CXX11_GNU_CLEANUP,
-  C2X_GNU_CLEANUP,
+  C23_GNU_CLEANUP,
   SPELLING_NOT_CALCULATED,
 };
 

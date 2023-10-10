@@ -8,27 +8,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "TypeKind.h"
 #include "TypeWithKeyword.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class DependentTemplateSpecializationType;
 class TemplateArgument;
+class Token;
 class Type;
 class TypeWithKeyword;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DependentTemplateSpecializationType : public TypeWithKeyword {
  private:
@@ -36,7 +30,6 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  static gap::generator<DependentTemplateSpecializationType> in(const Fragment &frag);
   static gap::generator<DependentTemplateSpecializationType> in(const Index &index);
   static gap::generator<DependentTemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
@@ -44,24 +37,6 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_TEMPLATE_SPECIALIZATION;
-  }
-
-  inline static std::optional<DependentTemplateSpecializationType> from(const Reference &r) {
-    return from(r.as_type());
-  }
-
-  inline static std::optional<DependentTemplateSpecializationType> from(const TokenContext &t) {
-    return from(t.as_type());
-  }
-
-  static std::optional<DependentTemplateSpecializationType> from(const TypeWithKeyword &parent);
-
-  inline static std::optional<DependentTemplateSpecializationType> from(const std::optional<TypeWithKeyword> &parent) {
-    if (parent) {
-      return DependentTemplateSpecializationType::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<DependentTemplateSpecializationType> from(const Type &parent);
@@ -74,10 +49,14 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
     }
   }
 
+  static std::optional<DependentTemplateSpecializationType> from(const Reference &r);
+  static std::optional<DependentTemplateSpecializationType> from(const TokenContext &t);
+
   Type desugar(void) const;
   bool is_sugared(void) const;
   std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
-  gap::generator<TemplateArgument> template_arguments(void) const;
+  unsigned num_template_arguments(void) const;
+  gap::generator<TemplateArgument> template_arguments(void) const &;
 };
 
 static_assert(sizeof(DependentTemplateSpecializationType) == sizeof(TypeWithKeyword));

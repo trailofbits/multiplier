@@ -8,27 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "OMPDeclarativeDirectiveDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class Expr;
 class OMPDeclarativeDirectiveDecl;
 class OMPThreadPrivateDecl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -36,11 +31,12 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   friend class OMPDeclarativeDirectiveDecl;
   friend class Decl;
  public:
-  static gap::generator<OMPThreadPrivateDecl> in(const Fragment &frag);
   static gap::generator<OMPThreadPrivateDecl> in(const Index &index);
   static gap::generator<OMPThreadPrivateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OMPThreadPrivateDecl> by_id(const Index &, EntityId);
+  static gap::generator<OMPThreadPrivateDecl> in(const Fragment &frag);
+  static gap::generator<OMPThreadPrivateDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_THREAD_PRIVATE;
@@ -55,25 +51,9 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<OMPThreadPrivateDecl> redeclarations(void) const;
-  inline static std::optional<OMPThreadPrivateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<OMPThreadPrivateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<OMPThreadPrivateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
-
-  inline static std::optional<OMPThreadPrivateDecl> from(const std::optional<OMPDeclarativeDirectiveDecl> &parent) {
-    if (parent) {
-      return OMPThreadPrivateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  OMPThreadPrivateDecl canonical_declaration(void) const;
+  std::optional<OMPThreadPrivateDecl> definition(void) const;
+  gap::generator<OMPThreadPrivateDecl> redeclarations(void) const &;
   static std::optional<OMPThreadPrivateDecl> from(const Decl &parent);
 
   inline static std::optional<OMPThreadPrivateDecl> from(const std::optional<Decl> &parent) {
@@ -84,8 +64,12 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
     }
   }
 
+  static std::optional<OMPThreadPrivateDecl> from(const Reference &r);
+  static std::optional<OMPThreadPrivateDecl> from(const TokenContext &t);
+
   std::optional<Expr> nth_varlist(unsigned n) const;
-  gap::generator<Expr> varlists(void) const;
+  unsigned num_varlists(void) const;
+  gap::generator<Expr> varlists(void) const &;
 };
 
 static_assert(sizeof(OMPThreadPrivateDecl) == sizeof(OMPDeclarativeDirectiveDecl));

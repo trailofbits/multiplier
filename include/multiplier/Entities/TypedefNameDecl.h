@@ -8,29 +8,27 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "TypeDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
+class ObjCTypeParamDecl;
+class Stmt;
 class TagDecl;
+class Token;
 class Type;
+class TypeAliasDecl;
 class TypeDecl;
+class TypedefDecl;
 class TypedefNameDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TypedefNameDecl : public TypeDecl {
  private:
@@ -39,11 +37,12 @@ class TypedefNameDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<TypedefNameDecl> in(const Fragment &frag);
   static gap::generator<TypedefNameDecl> in(const Index &index);
   static gap::generator<TypedefNameDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TypedefNameDecl> by_id(const Index &, EntityId);
+  static gap::generator<TypedefNameDecl> in(const Fragment &frag);
+  static gap::generator<TypedefNameDecl> in(const File &file);
 
   static gap::generator<TypedefNameDecl> containing(const Decl &decl);
   static gap::generator<TypedefNameDecl> containing(const std::optional<Decl> &decl);
@@ -54,35 +53,9 @@ class TypedefNameDecl : public TypeDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<TypedefNameDecl> redeclarations(void) const;
-  inline static std::optional<TypedefNameDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<TypedefNameDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<TypedefNameDecl> from(const TypeDecl &parent);
-
-  inline static std::optional<TypedefNameDecl> from(const std::optional<TypeDecl> &parent) {
-    if (parent) {
-      return TypedefNameDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<TypedefNameDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<TypedefNameDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return TypedefNameDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  TypedefNameDecl canonical_declaration(void) const;
+  std::optional<TypedefNameDecl> definition(void) const;
+  gap::generator<TypedefNameDecl> redeclarations(void) const &;
   static std::optional<TypedefNameDecl> from(const Decl &parent);
 
   inline static std::optional<TypedefNameDecl> from(const std::optional<Decl> &parent) {
@@ -92,6 +65,9 @@ class TypedefNameDecl : public TypeDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<TypedefNameDecl> from(const Reference &r);
+  static std::optional<TypedefNameDecl> from(const TokenContext &t);
 
   std::optional<TagDecl> anonymous_declaration_with_typedef_name(void) const;
   Type underlying_type(void) const;

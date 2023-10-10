@@ -8,37 +8,33 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Decl.h"
-#include "DeclKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class CXXMethodDecl;
 class ClassScopeFunctionSpecializationDecl;
 class Decl;
+class Stmt;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class ClassScopeFunctionSpecializationDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag);
   static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Index &index);
   static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<ClassScopeFunctionSpecializationDecl> by_id(const Index &, EntityId);
+  static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<ClassScopeFunctionSpecializationDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
@@ -53,15 +49,9 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<ClassScopeFunctionSpecializationDecl> redeclarations(void) const;
-  inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
+  ClassScopeFunctionSpecializationDecl canonical_declaration(void) const;
+  std::optional<ClassScopeFunctionSpecializationDecl> definition(void) const;
+  gap::generator<ClassScopeFunctionSpecializationDecl> redeclarations(void) const &;
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
 
   inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const std::optional<Decl> &parent) {
@@ -71,6 +61,9 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
       return std::nullopt;
     }
   }
+
+  static std::optional<ClassScopeFunctionSpecializationDecl> from(const Reference &r);
+  static std::optional<ClassScopeFunctionSpecializationDecl> from(const TokenContext &t);
 
   CXXMethodDecl specialization(void) const;
   bool has_explicit_template_arguments(void) const;

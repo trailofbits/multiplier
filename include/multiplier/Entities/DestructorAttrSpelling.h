@@ -14,7 +14,7 @@ namespace mx {
 enum class DestructorAttrSpelling : unsigned char {
   GNU_DESTRUCTOR,
   CXX11_GNU_DESTRUCTOR,
-  C2X_GNU_DESTRUCTOR,
+  C23_GNU_DESTRUCTOR,
   SPELLING_NOT_CALCULATED,
 };
 

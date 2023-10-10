@@ -8,28 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "OwnershipAttrOwnershipKind.h"
 #include "OwnershipAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class InheritableAttr;
 class OwnershipAttr;
+class Token;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class OwnershipAttr : public InheritableAttr {
  private:
@@ -37,32 +31,15 @@ class OwnershipAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<OwnershipAttr> in(const Fragment &frag);
   static gap::generator<OwnershipAttr> in(const Index &index);
   static gap::generator<OwnershipAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<OwnershipAttr> by_id(const Index &, EntityId);
+  static gap::generator<OwnershipAttr> in(const Fragment &frag);
+  static gap::generator<OwnershipAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OWNERSHIP;
-  }
-
-  inline static std::optional<OwnershipAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<OwnershipAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<OwnershipAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<OwnershipAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return OwnershipAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<OwnershipAttr> from(const Attr &parent);
@@ -74,6 +51,9 @@ class OwnershipAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<OwnershipAttr> from(const Reference &r);
+  static std::optional<OwnershipAttr> from(const TokenContext &t);
 
   OwnershipAttrOwnershipKind own_kind(void) const;
   OwnershipAttrSpelling semantic_spelling(void) const;

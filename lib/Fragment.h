@@ -6,9 +6,13 @@
 
 #pragma once
 
-#include "Token.h"
+#include "TokenContext.h"
+#include "TokenTree.h"
 
 namespace mx {
+namespace ir {
+class SourceIRImpl;
+}  // namespace ir
 
 class FileImpl;
 
@@ -18,12 +22,12 @@ class FragmentListImpl {
  public:
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
+  const EntityProviderPtr ep;
 
   // List of fragment IDs.
   FragmentIdList fragment_ids;
 
-  inline FragmentListImpl(EntityProvider::Ptr ep_,
+  inline FragmentListImpl(EntityProviderPtr ep_,
                           FragmentIdList fragment_ids_)
       : ep(std::move(ep_)),
         fragment_ids(std::move(fragment_ids_)) {}
@@ -57,13 +61,12 @@ class ReadMacroTokensFromFragment : public TokenReader {
   // Return an entity id associated with the Nth token.
   EntityId NthRelatedEntityId(EntityOffset) const override;
 
+  // Return the entity associated with the Nth token.
+  VariantEntity NthRelatedEntity(EntityOffset) const final;
+
   // Return the id of the Nth token.
   EntityId NthTokenId(EntityOffset token_index) const override;
   EntityId NthFileTokenId(EntityOffset token_index) const override;
-
-  // Return the token reader for another file.
-  TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
-                                  RawEntityId id) const final;
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const override;
@@ -119,10 +122,12 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
  private:
   friend class ReadParsedTokensFromFragment;
   friend class ReadMacroTokensFromFragment;
+  friend class FragmentTokenContextReader;
 
   // Token readers for this fragment.
   const ReadParsedTokensFromFragment parsed_token_reader;
   const ReadMacroTokensFromFragment macro_token_reader;
+  const FragmentTokenContextReader token_context_reader;
 
  public:
 
@@ -130,7 +135,13 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   const EntityOffset num_parsed_tokens;
   const EntityOffset num_tokens;
 
-  explicit FragmentImpl(EntityProvider::Ptr ep_, kj::Array<capnp::word> data_,
+  // Cached token tree.
+  //
+  // TODO(pag): Add method to entity provider, so we can add it to the GC-based
+  //            cache.
+  TokenTreeImplCache cached_token_tree;
+
+  explicit FragmentImpl(EntityProviderPtr ep_, kj::Array<capnp::word> data_,
                         RawEntityId id_);
 
   // Return the ID of the file containing the first token.
@@ -145,10 +156,11 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
-  std::shared_ptr<const class TokenReader>
+  TokenReader::Ptr
   ParsedTokenReader(const FragmentImplPtr &) const;
 
-  std::string_view SourceIR(void) const & noexcept;
+  TokenContextReader::Ptr
+  TokenContextReader(const TokenReader::Ptr &) const;
 
   std::string_view Data(void) const & noexcept;
 

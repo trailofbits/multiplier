@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
 #include "Expr.h"
-#include "StmtKind.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
+class Decl;
 class Expr;
 class FieldDecl;
 class InitListExpr;
 class Stmt;
+class Token;
 class ValueStmt;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class InitListExpr : public Expr {
  private:
@@ -38,11 +33,12 @@ class InitListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  static gap::generator<InitListExpr> in(const Fragment &frag);
   static gap::generator<InitListExpr> in(const Index &index);
   static gap::generator<InitListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<InitListExpr> by_id(const Index &, EntityId);
+  static gap::generator<InitListExpr> in(const Fragment &frag);
+  static gap::generator<InitListExpr> in(const File &file);
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INIT_LIST_EXPR;
@@ -57,34 +53,6 @@ class InitListExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  inline static std::optional<InitListExpr> from(const Reference &r) {
-    return from(r.as_statement());
-  }
-
-  inline static std::optional<InitListExpr> from(const TokenContext &t) {
-    return from(t.as_statement());
-  }
-
-  static std::optional<InitListExpr> from(const Expr &parent);
-
-  inline static std::optional<InitListExpr> from(const std::optional<Expr> &parent) {
-    if (parent) {
-      return InitListExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<InitListExpr> from(const ValueStmt &parent);
-
-  inline static std::optional<InitListExpr> from(const std::optional<ValueStmt> &parent) {
-    if (parent) {
-      return InitListExpr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
   static std::optional<InitListExpr> from(const Stmt &parent);
 
   inline static std::optional<InitListExpr> from(const std::optional<Stmt> &parent) {
@@ -95,6 +63,9 @@ class InitListExpr : public Expr {
     }
   }
 
+  static std::optional<InitListExpr> from(const Reference &r);
+  static std::optional<InitListExpr> from(const TokenContext &t);
+
   std::optional<Expr> array_filler(void) const;
   std::optional<FieldDecl> initialized_field_in_union(void) const;
   Token l_brace_token(void) const;
@@ -103,8 +74,10 @@ class InitListExpr : public Expr {
   std::optional<InitListExpr> syntactic_form(void) const;
   bool had_array_range_designator(void) const;
   bool has_array_filler(void) const;
+  bool has_designated_initializer(void) const;
   std::optional<Expr> nth_initializer(unsigned n) const;
-  gap::generator<Expr> initializers(void) const;
+  unsigned num_initializers(void) const;
+  gap::generator<Expr> initializers(void) const &;
   bool is_explicit(void) const;
   bool is_semantic_form(void) const;
   bool is_string_literal_initializer(void) const;

@@ -8,28 +8,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "AttrKind.h"
 #include "InheritableAttr.h"
 #include "TryAcquireCapabilityAttrSpelling.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Attr;
 class Expr;
 class InheritableAttr;
+class Token;
 class TryAcquireCapabilityAttr;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TryAcquireCapabilityAttr : public InheritableAttr {
  private:
@@ -37,32 +31,15 @@ class TryAcquireCapabilityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  static gap::generator<TryAcquireCapabilityAttr> in(const Fragment &frag);
   static gap::generator<TryAcquireCapabilityAttr> in(const Index &index);
   static gap::generator<TryAcquireCapabilityAttr> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<TryAcquireCapabilityAttr> by_id(const Index &, EntityId);
+  static gap::generator<TryAcquireCapabilityAttr> in(const Fragment &frag);
+  static gap::generator<TryAcquireCapabilityAttr> in(const File &file);
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TRY_ACQUIRE_CAPABILITY;
-  }
-
-  inline static std::optional<TryAcquireCapabilityAttr> from(const Reference &r) {
-    return from(r.as_attribute());
-  }
-
-  inline static std::optional<TryAcquireCapabilityAttr> from(const TokenContext &t) {
-    return from(t.as_attribute());
-  }
-
-  static std::optional<TryAcquireCapabilityAttr> from(const InheritableAttr &parent);
-
-  inline static std::optional<TryAcquireCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
-    if (parent) {
-      return TryAcquireCapabilityAttr::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
   }
 
   static std::optional<TryAcquireCapabilityAttr> from(const Attr &parent);
@@ -74,6 +51,9 @@ class TryAcquireCapabilityAttr : public InheritableAttr {
       return std::nullopt;
     }
   }
+
+  static std::optional<TryAcquireCapabilityAttr> from(const Reference &r);
+  static std::optional<TryAcquireCapabilityAttr> from(const TokenContext &t);
 
   TryAcquireCapabilityAttrSpelling semantic_spelling(void) const;
   Expr success_value(void) const;

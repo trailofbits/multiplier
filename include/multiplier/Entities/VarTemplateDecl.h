@@ -8,28 +8,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
-
-#include <gap/core/generator.hpp>
-#include "../Iterator.h"
-#include "../Reference.h"
-#include "../Types.h"
-#include "../Token.h"
-
-#include "DeclKind.h"
 #include "RedeclarableTemplateDecl.h"
 
 namespace mx {
+class EntityProvider;
+class Index;
 class Decl;
 class NamedDecl;
 class RedeclarableTemplateDecl;
+class Stmt;
 class TemplateDecl;
+class Token;
 class VarTemplateDecl;
+namespace ir {
+class Operation;
+class Value;
+}  // namespace ir
+
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -39,11 +34,12 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  static gap::generator<VarTemplateDecl> in(const Fragment &frag);
   static gap::generator<VarTemplateDecl> in(const Index &index);
   static gap::generator<VarTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
   static std::optional<VarTemplateDecl> by_id(const Index &, EntityId);
+  static gap::generator<VarTemplateDecl> in(const Fragment &frag);
+  static gap::generator<VarTemplateDecl> in(const File &file);
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE;
@@ -58,45 +54,9 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  gap::generator<VarTemplateDecl> redeclarations(void) const;
-  inline static std::optional<VarTemplateDecl> from(const Reference &r) {
-    return from(r.as_declaration());
-  }
-
-  inline static std::optional<VarTemplateDecl> from(const TokenContext &t) {
-    return from(t.as_declaration());
-  }
-
-  static std::optional<VarTemplateDecl> from(const RedeclarableTemplateDecl &parent);
-
-  inline static std::optional<VarTemplateDecl> from(const std::optional<RedeclarableTemplateDecl> &parent) {
-    if (parent) {
-      return VarTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplateDecl> from(const TemplateDecl &parent);
-
-  inline static std::optional<VarTemplateDecl> from(const std::optional<TemplateDecl> &parent) {
-    if (parent) {
-      return VarTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  static std::optional<VarTemplateDecl> from(const NamedDecl &parent);
-
-  inline static std::optional<VarTemplateDecl> from(const std::optional<NamedDecl> &parent) {
-    if (parent) {
-      return VarTemplateDecl::from(parent.value());
-    } else {
-      return std::nullopt;
-    }
-  }
-
+  VarTemplateDecl canonical_declaration(void) const;
+  std::optional<VarTemplateDecl> definition(void) const;
+  gap::generator<VarTemplateDecl> redeclarations(void) const &;
   static std::optional<VarTemplateDecl> from(const Decl &parent);
 
   inline static std::optional<VarTemplateDecl> from(const std::optional<Decl> &parent) {
@@ -106,6 +66,9 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
       return std::nullopt;
     }
   }
+
+  static std::optional<VarTemplateDecl> from(const Reference &r);
+  static std::optional<VarTemplateDecl> from(const TokenContext &t);
 
   bool is_this_declaration_a_definition(void) const;
 };

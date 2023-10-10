@@ -14,7 +14,7 @@ namespace mx {
 FileImpl::~FileImpl(void) noexcept {}
 
 FileImpl::FileImpl(
-    EntityProvider::Ptr ep_, kj::Array<capnp::word> data_, RawEntityId id_)
+    EntityProviderPtr ep_, kj::Array<capnp::word> data_, RawEntityId id_)
     : EntityImpl<rpc::File>(std::move(ep_), kj::mv(data_)),
       file_token_reader(this),
       file_id(EntityId(id_).Extract<FileId>()->file_id),
@@ -79,6 +79,11 @@ EntityId ReadFileTokensFromFile::NthRelatedEntityId(unsigned) const {
   return kInvalidEntityId;
 }
 
+// Return the entity associated with the Nth token.
+VariantEntity ReadFileTokensFromFile::NthRelatedEntity(EntityOffset) const {
+  return NotAnEntity{};
+}
+
 // Return the id of the Nth token.
 EntityId ReadFileTokensFromFile::NthTokenId(unsigned ti) const {
   if (ti < file->num_tokens) {
@@ -94,12 +99,6 @@ EntityId ReadFileTokensFromFile::NthTokenId(unsigned ti) const {
 
 EntityId ReadFileTokensFromFile::NthFileTokenId(unsigned token_index) const {
   return NthTokenId(token_index);
-}
-
-// Return the token reader for another file/fragment.
-TokenReader::Ptr ReadFileTokensFromFile::ReaderForToken(
-    const TokenReader::Ptr &self, RawEntityId eid) const {
-  return TokenReader::ReaderForToken(self, file->ep, eid);
 }
 
 // Returns `true` if `this` is logically equivalent to `that`.

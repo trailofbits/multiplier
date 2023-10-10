@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Token.h"
+#include "TokenTree.h"
 
 #include <mutex>
 #include <unordered_map>
@@ -59,13 +59,12 @@ class ReadFileTokensFromFile final : public TokenReader {
   // Return an entity id associated with the Nth token.
   EntityId NthRelatedEntityId(unsigned) const override;
 
+  // Return the entity associated with the Nth token.
+  VariantEntity NthRelatedEntity(EntityOffset) const override;
+
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const override;
   EntityId NthFileTokenId(unsigned token_index) const override;
-
-  // Return the token reader for another file.
-  TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
-                                  RawEntityId id) const final;
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const override;
@@ -76,8 +75,8 @@ class ReadFileTokensFromFile final : public TokenReader {
 // Interface for accessing the tokens of a file.
 class FileImpl final : public EntityImpl<rpc::File> {
  public:
-  using Ptr = std::shared_ptr<const FileImpl>;
-  using WeakPtr = std::weak_ptr<const FileImpl>;
+  using Ptr = FileImplPtr;
+  using WeakPtr = WeakFileImplPtr;
 
  private:
   friend class ReadFileTokensFromFile;
@@ -94,9 +93,15 @@ class FileImpl final : public EntityImpl<rpc::File> {
   // Number of tokens in this file.
   const unsigned num_tokens;
 
+  // Cached token tree.
+  //
+  // TODO(pag): Add method to entity provider, so we can add it to the GC-based
+  //            cache.
+  TokenTreeImplCache cached_token_tree;
+
   ~FileImpl(void) noexcept;
 
-  explicit FileImpl(EntityProvider::Ptr ep_, kj::Array<capnp::word> data_,
+  explicit FileImpl(EntityProviderPtr ep_, kj::Array<capnp::word> data_,
                     RawEntityId id_);
 
   // Return a reader for the tokens in the file.

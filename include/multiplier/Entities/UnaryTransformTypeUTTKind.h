@@ -12,6 +12,21 @@
 
 namespace mx {
 enum class UnaryTransformTypeUTTKind : unsigned char {
+  ADD_LVALUE_REFERENCE,
+  ADD_POINTER,
+  ADD_RVALUE_REFERENCE,
+  DECAY,
+  MAKE_SIGNED,
+  MAKE_UNSIGNED,
+  REMOVE_ALL_EXTENTS,
+  REMOVE_CONST,
+  REMOVE_CV,
+  REMOVE_CV_REFERENCE,
+  REMOVE_EXTENT,
+  REMOVE_POINTER,
+  REMOVE_REFERENCE,
+  REMOVE_RESTRICT,
+  REMOVE_VOLATILE,
   ENUM_UNDERLYING_TYPE,
 };
 
@@ -20,7 +35,7 @@ inline static const char *EnumerationName(UnaryTransformTypeUTTKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(UnaryTransformTypeUTTKind) {
-  return 1;
+  return 16;
 }
 
 const char *EnumeratorName(UnaryTransformTypeUTTKind);
