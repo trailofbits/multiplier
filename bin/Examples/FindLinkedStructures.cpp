@@ -210,7 +210,8 @@ extern "C" int main(int argc, char *argv[]) {
      << " [--max_size MAX_SIZE]"
      << " [--min_size MIN_SIZE]"
      << " [--filter_elastic]"
-     << " [--filter_self_referencing]";
+     << " [--filter_self_referencing]"
+     << " [--filter_offset_type TYPE:OFFSET]";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
