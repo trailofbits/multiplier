@@ -23,22 +23,27 @@
 DECLARE_bool(help);
 DECLARE_string(db);
 
-DEFINE_bool(names_only, false, "Output only the record name, not the entire implementation");
+DEFINE_bool(names_only, false,
+            "Output only the record name, not the entire implementation");
 
 // Record size filtering
 DEFINE_uint64(min_size, 0u, "Minimum size of record to filter on");
 DEFINE_uint64(max_size, UINT64_MAX, "Maximum size of record to filter on");
 
 // Record property filtering
-// NOTE: --filter_elastic will also honor --max_size, but this will not represent the true size of discovered target structs
+// NOTE: --filter_elastic will also honor --max_size, but this will not
+// represent the true size of discovered target structs
 DEFINE_bool(filter_elastic, false, "Filter on elastic records");
-DEFINE_bool(filter_self_referencing, false, "Filter on self-referencing records");
+DEFINE_bool(filter_self_referencing, false,
+            "Filter on self-referencing records");
 
-// TODO: filter on exact/fuzzy name 
+// TODO: filter on exact/fuzzy name
 // TODO: filter on exact/fuzzy path
 
 // Field property filtering (TODO: allow for multiple)
-DEFINE_string(filter_offset_type, FILTER_OFFSET_PLACEHOLDER, "Filter on records with a specific type at an exact offset (in the format TYPE:4)");
+DEFINE_string(filter_offset_type, FILTER_OFFSET_PLACEHOLDER,
+              "Filter on records with a specific type at an exact offset (in "
+              "the format TYPE:4)");
 
 enum FieldType {
   Elastic,
@@ -51,31 +56,25 @@ using FieldMap = std::unordered_map<mx::PackedDeclId, FieldType>;
 
 static void RenderRecord(const mx::RecordDecl &record, FieldMap &field_map) {
   auto fragment = mx::Fragment::containing(record);
-  std::cout
-      << "Frag ID: " << fragment.id()
-      << "\nStructure ID: " << record.id()
-      << "\nStructure Size: " << *record.size() << "\n";
+  std::cout << "Frag ID: " << fragment.id() << "\nStructure ID: " << record.id()
+            << "\nStructure Size: " << *record.size() << "\n";
 
   RenderFragment(std::cout, fragment, record.tokens(), "\t", true);
   std::cout << "\n\n";
 }
 
-static void RenderRecordHighlightedFields(const mx::Index index, const mx::RecordDecl &record, FieldMap &field_map) {
+static void RenderRecordHighlightedFields(const mx::Index index,
+                                          const mx::RecordDecl &record,
+                                          FieldMap &field_map) {
   auto fragment = mx::Fragment::containing(record);
   auto frag_tokens = fragment.file_tokens();
-  std::cout
-      << "Frag ID: " << fragment.id()
-      << "\nStructure ID: " << record.id()
-      << "\nStructure Size: " << *record.size()
-      << "\nNumber of Highlighted Fields: " << field_map.size() << "\n\n";
+  std::cout << "Frag ID: " << fragment.id() << "\nStructure ID: " << record.id()
+            << "\nStructure Size: " << *record.size()
+            << "\nNumber of Highlighted Fields: " << field_map.size() << "\n\n";
 
   // populate map with field tokens and the color to highlight with
-  std::unordered_map<unsigned, mx::TokenRange> highlights;
+  std::unordered_map<mx::PackedDeclId, unsigned> highlights;
   for (const auto &[field_id, field_type] : field_map) {
-    auto field = mx::FieldDecl::by_id(index, field_id);
-    if (!field)
-      continue;
-
     unsigned ascii_color;
     switch (field_type) {
     case Elastic:
@@ -93,15 +92,23 @@ static void RenderRecordHighlightedFields(const mx::Index index, const mx::Recor
     default:
       break;
     }
-    highlights[ascii_color] = field->tokens().file_tokens();
+
+    // TODO: deal with a field that has multiple properties matched?
+    highlights[field_id] = ascii_color;
   }
 
   // render record with highlighted structs
-  for (auto tok: frag_tokens) {
+  for (auto tok : frag_tokens) {
     auto found = false;
-    for (const auto &[ascii_color, colored_range] : highlights) {
+    for (const auto &[field_id, ascii_color] : highlights) {
+      auto field = mx::FieldDecl::by_id(index, field_id);
+      if (!field)
+        continue;
+
+      auto colored_range = field->tokens().file_tokens();
       if (colored_range.index_of(tok)) {
-        std::cout << "\u001b[" << ascii_color << "m\033[1m" << tok.data() << "\033[0m";
+        std::cout << "\u001b[" << ascii_color << "m\033[1m" << tok.data()
+                  << "\033[0m";
         found = true;
         break;
       }
@@ -113,7 +120,8 @@ static void RenderRecordHighlightedFields(const mx::Index index, const mx::Recor
   std::cout << "\n\n";
 }
 
-static int GetSelfReferences(const mx::RecordDecl &record, FieldMap &field_map) {
+static int GetSelfReferences(const mx::RecordDecl &record,
+                             FieldMap &field_map) {
   std::unordered_set<mx::PackedDeclId> seen;
   std::unordered_set<mx::PackedDeclId> self_referencing;
   int level = 0;
@@ -143,7 +151,7 @@ static int GetSelfReferences(const mx::RecordDecl &record, FieldMap &field_map) 
   }
 
   // Second pass: indirectly self-linking structures, e.g. users of `list_head`.
-  for (size_t prev_size = 0u; prev_size < self_referencing.size(); ) {
+  for (size_t prev_size = 0u; prev_size < self_referencing.size();) {
     prev_size = self_referencing.size();
     ++level;
 
@@ -177,16 +185,32 @@ static int GetSelfReferences(const mx::RecordDecl &record, FieldMap &field_map) 
   return found;
 }
 
+static bool MatchTypeAndOffset(const mx::RecordDecl &record,
+                               std::string type_to_match, int offset_to_match,
+                               FieldMap &field_map) {
+  for (mx::FieldDecl field : record.fields()) {
+    auto field_type = field.type().desugared_type();
+    std::string_view field_name = field_type.tokens().data();
+    auto offset_in_bits = field.offset_in_bits();
+    if (!offset_in_bits)
+      return false;
+
+    if (field_name == type_to_match && offset_to_match == offset_in_bits) {
+      field_map[field.id()] = CustomFilter;
+      return true;
+    }
+  }
+  return false;
+}
+
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
-  ss
-    << "Usage: " << argv[0]
-    << " [--db DATABASE]"
-    << " [--name_only]"
-    << " [--max_size MAX_SIZE]"
-    << " [--min_size MIN_SIZE]"
-    << " [--filter_elastic]"
-    << " [--filter_self_referencing]";
+  ss << "Usage: " << argv[0] << " [--db DATABASE]"
+     << " [--name_only]"
+     << " [--max_size MAX_SIZE]"
+     << " [--min_size MIN_SIZE]"
+     << " [--filter_elastic]"
+     << " [--filter_self_referencing]";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -203,12 +227,24 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   // parse offset filtering expression
-  std::string typ;
-  unsigned int starting_offset;
+  std::string type_to_match = "";
+  int offset_to_match = -1;
   if (FLAGS_filter_offset_type != FILTER_OFFSET_PLACEHOLDER) {
-    std::istringstream ss(FLAGS_filter_offset_type);
-    std::getline(ss, typ, ':');
-    ss >> starting_offset;
+
+    // split at delimiter
+    size_t pos = FLAGS_filter_offset_type.find(":");
+    if (pos == std::string::npos) {
+      std::cerr << "Invalid format: delimiter not found" << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    // parse the type to match before the delimiter
+    type_to_match = FLAGS_filter_offset_type.substr(0, pos);
+
+    // parse the integer after the delimiter
+    std::string secondPart = FLAGS_filter_offset_type.substr(pos + 1);
+    std::stringstream strstream(secondPart);
+    strstream >> offset_to_match;
   }
 
   mx::Index index = InitExample(true);
@@ -242,13 +278,23 @@ extern "C" int main(int argc, char *argv[]) {
       }
     }
 
-    // Match on a field type and an offset TODO
+    // Match on a field type and an offset if set
     if (FLAGS_filter_offset_type != FILTER_OFFSET_PLACEHOLDER) {
 
+      // remove spaces when matching with tokens (TODO: is this necessary?)
+      type_to_match.erase(
+          std::remove(type_to_match.begin(), type_to_match.end(), ' '),
+          type_to_match.end());
+
+      bool matched = MatchTypeAndOffset(record_decl, type_to_match,
+                                        offset_to_match, current_field_map);
+      if (!matched)
+        continue;
     }
 
     // Flexible/elastic array members must always be the last field
-    // TODO: elastic structs that DONT have an explicit flexible field should also be found with some more static analysis
+    // TODO: elastic structs that DONT have an explicit flexible field should
+    // also be found with some more static analysis
     bool is_flexible = record.has_flexible_array_member();
     if (FLAGS_filter_elastic && is_flexible) {
       auto num_fields = record.num_fields() - 1;
@@ -256,8 +302,9 @@ extern "C" int main(int argc, char *argv[]) {
       if (!last_field)
         continue;
 
-      // NOTE: record.has_flexible_array_member() isn't entirely accurate, so do an additional check
-      //if (!last_field->is_zero_size())
+      // NOTE: record.has_flexible_array_member() isn't entirely accurate, so do
+      // an additional check
+      // if (!last_field->is_zero_size())
       //  continue;
 
       current_field_map[last_field->id()] = Elastic;
@@ -266,7 +313,8 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
     // Grab potentially multiple fields that are self-referencing
-    if (FLAGS_filter_self_referencing && !GetSelfReferences(record, current_field_map)) {
+    if (FLAGS_filter_self_referencing &&
+        !GetSelfReferences(record, current_field_map)) {
       continue;
     }
 
@@ -275,11 +323,12 @@ extern "C" int main(int argc, char *argv[]) {
       continue;
     }
 
-    // Just output struct definition with no field highlighting if no filters applied
+    // Just output struct definition with no field highlighting if no filters
+    // applied
     if (current_field_map.empty()) {
       RenderRecord(record, current_field_map);
 
-    // Otherwise render the struct with all significant fields highlighted
+      // Otherwise render the struct with all significant fields highlighted
     } else {
       RenderRecordHighlightedFields(index, record, current_field_map);
     }
