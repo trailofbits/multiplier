@@ -22,6 +22,7 @@
 #include <pasta/Util/File.h>
 #include <variant>
 
+#include "PASTA.h"
 #include "TokenTree.h"
 #include "Util.h"
 
@@ -127,11 +128,11 @@ class PendingFragment {
 
   // Macros, declarations, statements, types, and pseudo-entities to serialize,
   // in their order of appearance and serialization.
-  std::vector<std::optional<TokenTree>> macros_to_serialize;
-  std::vector<pasta::Decl> decls_to_serialize;
-  std::vector<pasta::Stmt> stmts_to_serialize;
+  std::unordered_map<unsigned, std::vector<std::optional<TokenTree>>> macros_to_serialize;
+  std::unordered_map<unsigned, std::vector<pasta::Decl>> decls_to_serialize;
+  std::unordered_map<unsigned, std::vector<pasta::Stmt>> stmts_to_serialize;
   std::vector<pasta::Type> types_to_serialize;
-  std::vector<pasta::Attr> attrs_to_serialize;
+  std::unordered_map<unsigned, std::vector<pasta::Attr>> attrs_to_serialize;
   std::vector<pasta::TemplateArgument> template_arguments_to_serialize;
   std::vector<pasta::TemplateParameterList> template_parameter_lists_to_serialize;
   std::vector<pasta::CXXBaseSpecifier> cxx_base_specifiers_to_serialize;
@@ -155,9 +156,13 @@ class PendingFragment {
   // Should we drop token provenance after we've labelled tokens? This helps
   bool drop_token_provenance{false};
 
+  // Types have special serialization that is sort of fragment-specific. We
+  // collect the types that are "new" and seen by virtue of this fragment, but
+  // the fragment itself is not responsible for their serialization.
+  bool Add(pasta::Type entity);
+
   bool Add(const pasta::Decl &entity);
   bool Add(const pasta::Stmt &entity);
-  bool Add(pasta::Type entity);
   bool Add(const pasta::Attr &entity);
   bool Add(const pasta::TemplateArgument &pseudo);
   bool Add(const pasta::CXXBaseSpecifier &pseudo);
@@ -173,6 +178,57 @@ class PendingFragment {
   // Find and initialize `parent_decl_ids` and `last_file_token_id`.
   void InitFileLocationRange(EntityIdMap &entity_ids,
                              const pasta::TokenRange &toks);
+
+  inline std::vector<pasta::Decl> &EntityList(const pasta::Decl &entity) {
+    return decls_to_serialize[unsigned(mx::FromPasta(entity.Kind()))];
+  }
+
+  inline std::vector<pasta::Stmt> &EntityList(const pasta::Stmt &entity) {
+    return stmts_to_serialize[unsigned(mx::FromPasta(entity.Kind()))];
+  }
+
+  inline std::vector<pasta::Type> &EntityList(const pasta::Type &) {
+    return types_to_serialize;
+  }
+
+  inline std::vector<pasta::Attr> &EntityList(const pasta::Attr &entity) {
+    return attrs_to_serialize[unsigned(mx::FromPasta(entity.Kind()))];
+  }
+
+  inline std::vector<std::optional<TokenTree>> &EntityList(
+      const pasta::Macro &entity) {
+    return macros_to_serialize[unsigned(mx::FromPasta(entity.Kind()))];
+  }
+
+  inline std::vector<std::optional<TokenTree>> &EntityList(
+      const TokenTree &entity) {
+
+    // NOTE(pag): `TokenTree::Kind` returns an `mx::MacroKind`.
+    return macros_to_serialize[unsigned(entity.Kind())];
+  }
+
+  inline std::vector<pasta::Designator> &EntityList(const pasta::Designator &) {
+    return designators_to_serialize;
+  }
+
+  inline std::vector<pasta::CXXBaseSpecifier> &EntityList(
+      const pasta::CXXBaseSpecifier &) {
+    return cxx_base_specifiers_to_serialize;
+  }
+
+  inline std::vector<pasta::TemplateArgument> &EntityList(
+      const pasta::TemplateArgument &) {
+    return template_arguments_to_serialize;
+  }
+
+  inline std::vector<pasta::TemplateParameterList> &EntityList(
+      const pasta::TemplateParameterList &) {
+    return template_parameter_lists_to_serialize;
+  }
+
+ private:
+  template <typename Entity, typename MakeId>
+  bool DoAdd(const Entity &entity, EntityIdMap &entity_ids, MakeId make_id);
 };
 
 using PendingFragmentPtr = std::unique_ptr<PendingFragment>;

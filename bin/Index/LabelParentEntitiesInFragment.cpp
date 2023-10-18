@@ -86,10 +86,11 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    AddToMaps(entity.RawDecl());
+    auto raw_entity = RawEntity(entity);
+    AddToMaps(raw_entity);
 
     SaveRestoreEntity save_parent_decl(
-        parent_decl_id, parent_decl, rid, entity.RawDecl());
+        parent_decl_id, parent_decl, rid, raw_entity);
     this->EntityVisitor::Accept(entity);
   }
 
@@ -108,23 +109,24 @@ class ParentTrackerVisitor : public EntityVisitor {
       return;
     }
 
-    AddToMaps(entity.RawStmt());
+    auto raw_entity = RawEntity(entity);
+    AddToMaps(raw_entity);
 
     SaveRestoreEntity save_parent_stmt(
-        parent_stmt_id, parent_stmt, rid, entity.RawStmt());
+        parent_stmt_id, parent_stmt, rid, raw_entity);
     this->EntityVisitor::Accept(entity);
   }
 
   void Accept(const pasta::Attr &entity) final {
-    AddToMaps(entity.RawAttr());
+    AddToMaps(RawEntity(entity));
   }
 
   bool Enter(const pasta::Decl &entity) final {
-    return not_yet_seen.erase(entity.RawDecl());
+    return not_yet_seen.erase(RawEntity(entity));
   }
 
   bool Enter(const pasta::Stmt &entity) final {
-    return not_yet_seen.erase(entity.RawStmt());
+    return not_yet_seen.erase(RawEntity(entity));
   }
 
   bool Enter(const pasta::Type &) final {
@@ -132,26 +134,26 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   bool Enter(const pasta::Attr &entity) final {
-    AddToMaps(entity.RawAttr());
+    AddToMaps(RawEntity(entity));
     return false;
   }
 
   void Accept(const pasta::Type &) final {}
 
   void Accept(const pasta::TemplateParameterList &entity) final {
-    AddToMaps(entity.RawTemplateParameterList());
+    AddToMaps(RawEntity(entity));
   }
 
   void Accept(const pasta::TemplateArgument &entity) final {
-    AddToMaps(entity.RawTemplateArgument());
+    AddToMaps(RawEntity(entity));
   }
 
   void Accept(const pasta::Designator &entity) final {
-    AddToMaps(entity.RawDesignator());
+    AddToMaps(RawEntity(entity));
   }
 
   void Accept(const pasta::CXXBaseSpecifier &entity) final {
-    AddToMaps(entity.RawCXXBaseSpecifier());
+    AddToMaps(RawEntity(entity));
   }
 };
 
@@ -252,7 +254,7 @@ static void FindMissingParentageFromTokens(
     }
 
     if (ResolveParents(vis, parent_stmt, parent_decl)) {
-      auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+      auto ast = pasta::AST::From(pf.top_level_decls.front());
       vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
     }
   }
@@ -282,24 +284,26 @@ static void FindMissingParentageFromAttributeTokens(
     }
   }
 
-  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    if (!vis.not_yet_seen.count(stmt.RawStmt())) {
-      continue;
-    }
-
-    // Look at the tokens of the statement
-    for (pasta::Token tok : stmt.Tokens()) {
-      auto attr_it = tok_to_attr.find(tok.RawToken());
-      if (attr_it == tok_to_attr.end()) {
+  for (const auto &[_, entities] : pf.stmts_to_serialize) {
+    for (const pasta::Stmt &stmt : entities) {
+      if (!vis.not_yet_seen.count(RawEntity(stmt))) {
         continue;
       }
 
-      auto parent_stmt = GetOrNullptr(pf.em.parent_stmts, attr_it->second);
-      auto parent_decl = GetOrNullptr(pf.em.parent_decls, attr_it->second);
+      // Look at the tokens of the statement
+      for (pasta::Token tok : stmt.Tokens()) {
+        auto attr_it = tok_to_attr.find(tok.RawToken());
+        if (attr_it == tok_to_attr.end()) {
+          continue;
+        }
 
-      if (ResolveParents(vis, parent_stmt, parent_decl)) {
-        vis.Accept(stmt);
-        break;
+        auto parent_stmt = GetOrNullptr(pf.em.parent_stmts, attr_it->second);
+        auto parent_decl = GetOrNullptr(pf.em.parent_decls, attr_it->second);
+
+        if (ResolveParents(vis, parent_stmt, parent_decl)) {
+          vis.Accept(stmt);
+          break;
+        }
       }
     }
   }
@@ -312,12 +316,16 @@ static void FindMissingParentageFromAttributeTokens(
 void LabelParentsInPendingFragment(PendingFragment &pf) {
 
   ParentTrackerVisitor vis(pf);
-  for (const pasta::Decl &decl : pf.decls_to_serialize) {
-    vis.not_yet_seen.emplace(decl.RawDecl());
+  for (const auto &[_, entities] : pf.decls_to_serialize) {
+    for (const pasta::Decl &decl : entities) {
+      vis.not_yet_seen.emplace(RawEntity(decl));
+    }
   }
 
-  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    vis.not_yet_seen.emplace(stmt.RawStmt());
+  for (const auto &[_, entities] : pf.stmts_to_serialize) {
+    for (const pasta::Stmt &stmt : entities) {
+      vis.not_yet_seen.emplace(RawEntity(stmt));
+    }
   }
 
   // Visit the top-level decls first.
@@ -326,28 +334,44 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
     vis.Accept(decl);
   }
 
-  // Expand the set of decls.
-  for (size_t i = 0u, max_i = pf.decls_to_serialize.size(); i < max_i; ++i) {
-    pasta::Decl decl = pf.decls_to_serialize[i];
-    auto raw_entity = decl.RawDecl();
-    
-    if (vis.not_yet_seen.count(raw_entity)) {
-      vis.Accept(decl);
-      
-      // NOTE(pag): If this assertion is hit, then it suggests that the
-      //            manually-written traversals in `Visitor.cpp` are missing
-      //            something that the automatically generated visitors created
-      //            from `Visitor.inc.h` have found. Missing things is not the
-      //            end of the world, but it suggests a blindspot, hence we want
-      //            to loudly detect them here if possible. Missing things can
-      //            also be an indication that we're not fully linking something
-      //            to its parent decls/statements.
-      DCHECK(!vis.not_yet_seen.count(raw_entity));
+#ifndef NDEBUG
+  size_t num_entities = 0ul;
+  for (const auto &[_, entities] : pf.decls_to_serialize) {
+    num_entities += entities.size();
+  }
+#endif
 
-      DCHECK_EQ(max_i, pf.decls_to_serialize.size());
-      max_i = pf.decls_to_serialize.size();
+  // Expand the set of decls.
+  for (const auto &[_, entities] : pf.decls_to_serialize) {
+    for (size_t i = 0u, max_i = entities.size(); i < max_i; ++i) {
+
+      pasta::Decl decl = entities[i];
+      auto raw_entity = RawEntity(decl);
+    
+      if (vis.not_yet_seen.count(raw_entity)) {
+        vis.Accept(decl);
+        
+        // NOTE(pag): If this assertion is hit, then it suggests that the
+        //            manually-written traversals in `Visitor.cpp` are missing
+        //            something that the automatically generated visitors created
+        //            from `Visitor.inc.h` have found. Missing things is not the
+        //            end of the world, but it suggests a blindspot, hence we want
+        //            to loudly detect them here if possible. Missing things can
+        //            also be an indication that we're not fully linking something
+        //            to its parent decls/statements.
+        DCHECK(!vis.not_yet_seen.count(raw_entity));
+      }
     }
   }
+
+#ifndef NDEBUG
+  size_t new_num_entities = 0ul;
+  for (const auto &[_, entities] : pf.decls_to_serialize) {
+    new_num_entities += entities.size();
+  }
+
+  CHECK_EQ(num_entities, new_num_entities);
+#endif
 
   // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
   if (vis.not_yet_seen.empty()) {
@@ -367,19 +391,21 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   // Log the error.
 
   std::optional<pasta::Stmt> first_missing_stmt;
-  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    if (vis.not_yet_seen.count(stmt.RawStmt())) {
-      first_missing_stmt.emplace(stmt);
-      break;
+  for (const auto &[_, entities] : pf.stmts_to_serialize) {
+    for (const pasta::Stmt &stmt : entities) {
+      if (vis.not_yet_seen.count(RawEntity(stmt))) {
+        first_missing_stmt.emplace(stmt);
+        break;
+      }
     }
   }
 
   CHECK(first_missing_stmt.has_value());
 
-  auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+  auto ast = pasta::AST::From(pf.top_level_decls.front());
   LOG(ERROR)
       << "Fragment"
-      << PrefixedLocation(pf.decls_to_serialize.front(), " at or near ")
+      << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
       << " main job file " << ast.MainFile().Path().generic_string()
       << " has statements without parents: "
       << DiagnosePrintedTokens(

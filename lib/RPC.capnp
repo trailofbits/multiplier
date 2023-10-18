@@ -155,6 +155,18 @@ struct Fragment @0xe5f27760091f9a3a {
   # the compile command for a fragment there, if we need to reproduce the
   # TU, and we can find its MLIR representation there too.
   compilationId @15 :UInt64;
+
+  # The entities from this fragment. These are lists-of-lists. The top-level
+  # lists are indexed by entity kind. The nested list is all entities in this
+  # fragment of that kind.
+  declarations @16 :List(List(AST.Decl));
+  statements @17 :List(List(AST.Stmt));
+  attributes @18 :List(List(AST.Attr));
+  macros @19 :List(List(AST.Macro));
+  templateArguments @20 :List(AST.TemplateArgument);
+  templateParameterLists @21 :List(AST.TemplateParameterList);
+  cXXBaseSpecifiers @22 :List(AST.CXXBaseSpecifier);
+  designators @23 :List(AST.Designator);
 }
 
 struct Compilation @0xc8b5fa5dd0739e82 {

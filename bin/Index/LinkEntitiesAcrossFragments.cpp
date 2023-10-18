@@ -72,45 +72,47 @@ void LinkEntitiesAcrossFragments(
   const EntityMapper &em = pf.em;
 
   std::string dummy_mangled_name;
-  for (const pasta::Decl &decl : pf.decls_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(decl);
-    if (eid == mx::kInvalidEntityId) {
-      continue;
-    }
-
-    if (auto func = pasta::FunctionDecl::From(decl)) {
-      const auto &mangled_name = mangler.Mangle(decl);
-      TrackRedeclarations(
-          database, pf.fragment_index, em,
-          (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
-          decl, func->Redeclarations());
-
-    } else if (auto var = pasta::VarDecl::From(decl)) {
-      switch (var->Category()) {
-        case pasta::DeclCategory::kGlobalVariable:
-        case pasta::DeclCategory::kParameterVariable:
-        case pasta::DeclCategory::kClassMember: {
-          const auto &mangled_name = mangler.Mangle(decl);
-          TrackRedeclarations(
-              database, pf.fragment_index, em,
-              (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
-              decl, var->Redeclarations());
-          break;
-        }
-        default:
-          break;
+  for (const auto &[_, entities] : pf.decls_to_serialize) {
+    for (const pasta::Decl &decl : entities) {
+      mx::RawEntityId eid = em.EntityId(decl);
+      if (eid == mx::kInvalidEntityId) {
+        continue;
       }
 
-    } else if (auto tag = pasta::TagDecl::From(decl)) {
-      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
-                          decl, tag->Redeclarations());
+      if (auto func = pasta::FunctionDecl::From(decl)) {
+        const auto &mangled_name = mangler.Mangle(decl);
+        TrackRedeclarations(
+            database, pf.fragment_index, em,
+            (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
+            decl, func->Redeclarations());
 
-    } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
-      TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
-                          decl, tpl->Redeclarations());
+      } else if (auto var = pasta::VarDecl::From(decl)) {
+        switch (var->Category()) {
+          case pasta::DeclCategory::kGlobalVariable:
+          case pasta::DeclCategory::kParameterVariable:
+          case pasta::DeclCategory::kClassMember: {
+            const auto &mangled_name = mangler.Mangle(decl);
+            TrackRedeclarations(
+                database, pf.fragment_index, em,
+                (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
+                decl, var->Redeclarations());
+            break;
+          }
+          default:
+            break;
+        }
 
-    } else {
-      continue;
+      } else if (auto tag = pasta::TagDecl::From(decl)) {
+        TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
+                            decl, tag->Redeclarations());
+
+      } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
+        TrackRedeclarations(database, pf.fragment_index, em, dummy_mangled_name,
+                            decl, tpl->Redeclarations());
+
+      } else {
+        continue;
+      }
     }
   }
 }

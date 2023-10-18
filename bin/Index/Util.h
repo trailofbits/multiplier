@@ -20,7 +20,10 @@
 
 namespace pasta {
 class AST;
+class Attr;
+class CXXBaseSpecifier;
 class Decl;
+class Designator;
 class File;
 class FileToken;
 class Macro;
@@ -28,6 +31,8 @@ class MacroToken;
 class PrintedToken;
 class PrintedTokenRange;
 class Stmt;
+class TemplateArgument;
+class TemplateParameterList;
 class Token;
 class TokenContext;
 class Type;
@@ -46,6 +51,7 @@ using TypeKey = std::pair<const void *, uint32_t>;
 struct TypeIdMap final : public std::map<TypeKey, mx::SpecificEntityId<mx::TypeId>> {};
 struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t> {};
 class EntityMapper;
+class TokenTree;
 
 // Return `true` of `tok` is in the context of `decl`.
 bool TokenIsInContextOfDecl(const pasta::Token &tok, const pasta::Decl &decl);
@@ -128,6 +134,23 @@ bool IsInjectedForwardDeclaration(const pasta::Decl &decl);
 bool ShouldHideFromIndexer(const pasta::Decl &decl);
 
 template <typename T>
+inline static bool ShouldHideFromIndexer(const T &) {
+  return false;
+}
+
+// Return an opaque pointer to the underlying representation of a given entity.
+// This uniquely identifies the entity.
+const void *RawEntity(const pasta::Decl &entity);
+const void *RawEntity(const pasta::Stmt &entity);
+const void *RawEntity(const pasta::Attr &entity);
+const void *RawEntity(const pasta::Macro &entity);
+const void *RawEntity(const pasta::Designator &entity);
+const void *RawEntity(const pasta::CXXBaseSpecifier &entity);
+const void *RawEntity(const pasta::TemplateArgument &entity);
+const void *RawEntity(const pasta::TemplateParameterList &entity);
+const void *RawEntity(const TokenTree &entity);
+
+template <typename T>
 struct EntityBuilder {
   capnp::MallocMessageBuilder message;
   typename T::Builder builder;
@@ -148,5 +171,19 @@ pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c);
 
 uint32_t Hash32(std::string_view data);
 uint64_t Hash64(std::string_view data);
+
+template <typename Map>
+unsigned SerializationListSize(const Map &map) {
+  unsigned max_kind = 0u;
+  for (const auto &[kind, _] : map) {
+    max_kind = std::max(kind, max_kind);
+  }
+
+  if (!max_kind) {
+    return 0u;
+  }
+
+  return max_kind + 1u;
+}
 
 }  // namespace indexer

@@ -1145,6 +1145,42 @@ pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c) {
   return c;
 }
 
+const void *RawEntity(const pasta::Decl &entity) {
+  return entity.RawDecl();
+}
+
+const void *RawEntity(const pasta::Stmt &entity) {
+  return entity.RawStmt();
+}
+
+const void *RawEntity(const pasta::Attr &entity) {
+  return entity.RawAttr();
+}
+
+const void *RawEntity(const pasta::Macro &entity) {
+  return entity.RawMacro();
+}
+
+const void *RawEntity(const pasta::Designator &entity) {
+  return entity.RawDesignator();
+}
+
+const void *RawEntity(const pasta::CXXBaseSpecifier &entity) {
+  return entity.RawCXXBaseSpecifier();
+}
+
+const void *RawEntity(const pasta::TemplateArgument &entity) {
+  return entity.RawTemplateArgument();
+}
+
+const void *RawEntity(const pasta::TemplateParameterList &entity) {
+  return entity.RawTemplateParameterList();
+}
+
+const void *RawEntity(const TokenTree &entity) {
+  return entity.RawNode();
+}
+
 uint32_t Hash32(std::string_view data) {
   if (data.empty()) {
     return 0u;
