@@ -11,6 +11,11 @@
 #include <cassert>
 #include <chrono>
 #include <deque>
+#include <multiplier/Entities/AttrKind.h>
+#include <multiplier/Entities/DeclKind.h>
+#include <multiplier/Entities/MacroKind.h>
+#include <multiplier/Entities/StmtKind.h>
+#include <multiplier/Iterator.h>
 #include <mutex>
 #include <thread>
 #include <unordered_map>
@@ -628,6 +633,36 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
   for (const char *stmt : DatabaseWriter::kInitStatements) {
     db.Execute(std::string(stmt));
   }
+
+#define CREATE_FRAG_OFFSET_INDEX(upper, lower, enum_, index) \
+    for (auto enum_val : mx::EnumerationRange<mx::upper ## Kind>()) { \
+      std::string query = "CREATE TABLE IF NOT EXISTS fragment_with_"; \
+      query += mx::EnumeratorName(mx::EntityCategory::enum_); \
+      query += "_"; \
+      query += mx::EnumeratorName(enum_val); \
+      query += " (fragment_id INTEGER NOT NULL PRIMARY KEY) WITHOUT ROWID"; \
+      db.Execute(query); \
+    }
+
+#define CREATE_PSEUDO_INDEX(upper, lower, enum_, index) \
+    do { \
+      std::string query = "CREATE TABLE IF NOT EXISTS fragment_with_"; \
+      query += mx::EnumeratorName(mx::EntityCategory::enum_); \
+      query += " (fragment_id INTEGER NOT NULL PRIMARY KEY) WITHOUT ROWID"; \
+      db.Execute(query); \
+    } while (false);
+
+  MX_FOR_EACH_ENTITY_CATEGORY(
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      CREATE_FRAG_OFFSET_INDEX,
+      CREATE_PSEUDO_INDEX,
+      MX_IGNORE_ENTITY_CATEGORY)
+
+#undef CREATE_FRAG_OFFSET_INDEX
+#undef CREATE_PSEUDO_INDEX
 
   db.Execute("PRAGMA wal_checkpoint(FULL)");
 
