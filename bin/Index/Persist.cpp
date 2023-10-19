@@ -96,6 +96,7 @@ extern void LinkExternalReferencesInFragment(
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
 extern void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
+                                     mx::DatabaseWriter &database,
                                      const PendingFragment &pf);
 
 // Save the symbolic names of all declarations into the database.
@@ -201,7 +202,7 @@ void GlobalIndexingState::PersistFile(
   database.AddAsync(
       mx::FilePathRecord{file_id, fp},
       mx::NamedEntityRecord{file_id.Pack(), fp},
-      mx::EntityRecord{file_id.Pack(), GetSerializedData(message)});
+      mx::FileRecord{file_id.Pack(), GetSerializedData(message)});
 }
 
 namespace {
@@ -701,7 +702,7 @@ void GlobalIndexingState::PersistFragment(
   LabelParentsInPendingFragment(pf);
 
   // Serialize all discovered entities.
-  SerializePendingFragment(fb, pf);
+  SerializePendingFragment(fb, database, pf);
 
   // List of fragments IDs, where index `0` is this fragment's immediate parent.
   auto ids = fb.initParentIds(
@@ -781,7 +782,7 @@ void GlobalIndexingState::PersistFragment(
 
   // Add the fragment to the database.
   database.AddAsync(
-      mx::EntityRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
+      mx::FragmentRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
 }
 
 // Persist the compilation.
@@ -884,7 +885,7 @@ void GlobalIndexingState::PersistCompilation(
 
   // Add the compilation to the database.
   database.AddAsync(
-      mx::EntityRecord{tu_id.Pack(), GetSerializedData(message)});
+      mx::CompilationRecord{tu_id.Pack(), GetSerializedData(message)});
 }
 
 }  // namespace indexer

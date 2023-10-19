@@ -27,10 +27,10 @@
 namespace indexer {
 namespace {
 
-static void DispatchSerializeDecl(const PendingFragment &pf,
-                                  const EntityMapper &em,
-                                  mx::ast::Decl::Builder builder,
-                                  const pasta::Decl &entity) {
+static void DispatchSerializeEntity(const PendingFragment &pf,
+                                    const EntityMapper &em,
+                                    mx::ast::Decl::Builder builder,
+                                    const pasta::Decl &entity) {
   switch (entity.Kind()) {
 #define MX_VISIT_DECL(decl) \
     case pasta::DeclKind::k ## decl: \
@@ -49,10 +49,10 @@ static void DispatchSerializeDecl(const PendingFragment &pf,
   }
 }
 
-static void DispatchSerializeStmt(const PendingFragment &pf,
-                                  const EntityMapper &em,
-                                  mx::ast::Stmt::Builder builder,
-                                  const pasta::Stmt &entity) {
+static void DispatchSerializeEntity(const PendingFragment &pf,
+                                    const EntityMapper &em,
+                                    mx::ast::Stmt::Builder builder,
+                                    const pasta::Stmt &entity) {
   switch (entity.Kind()) {
 #define MX_VISIT_STMT(stmt) \
     case pasta::StmtKind::k ## stmt: \
@@ -74,10 +74,10 @@ static void DispatchSerializeStmt(const PendingFragment &pf,
   }
 }
 
-static void DispatchSerializeType(const PendingFragment &pf,
-                                  const EntityMapper &em,
-                                  mx::ast::Type::Builder builder,
-                                  const pasta::Type &entity) {
+static void DispatchSerializeEntity(const PendingFragment &pf,
+                                    const EntityMapper &em,
+                                    mx::ast::Type::Builder builder,
+                                    const pasta::Type &entity) {
 
   // Second pass actually does the real serialization.
   switch (entity.Kind()) {
@@ -98,10 +98,10 @@ static void DispatchSerializeType(const PendingFragment &pf,
   }
 }
 
-static void DispatchSerializeAttr(const PendingFragment &pf,
-                                  const EntityMapper &em,
-                                  mx::ast::Attr::Builder builder,
-                                  const pasta::Attr &entity) {
+static void DispatchSerializeEntity(const PendingFragment &pf,
+                                    const EntityMapper &em,
+                                    mx::ast::Attr::Builder builder,
+                                    const pasta::Attr &entity) {
 
   // Second pass actually does the real serialization.
   switch (entity.Kind()) {
@@ -121,6 +121,21 @@ static void DispatchSerializeAttr(const PendingFragment &pf,
       break;
   }
 }
+
+#define MAKE_DISPATCHER(pseudo_kind) \
+    inline static void DispatchSerializeEntity( \
+        const PendingFragment &pf, const EntityMapper &em, \
+        mx::ast::pseudo_kind::Builder builder, \
+        const pasta::pseudo_kind &entity) { \
+      Serialize ## pseudo_kind(pf, em, std::move(builder), entity, nullptr); \
+    }
+
+MAKE_DISPATCHER(TemplateArgument)
+MAKE_DISPATCHER(TemplateParameterList)
+MAKE_DISPATCHER(CXXBaseSpecifier)
+MAKE_DISPATCHER(Designator)
+
+#undef MAKE_DISPATCHER
 
 }  // namespace
 
@@ -170,159 +185,127 @@ void DispatchSerializeMacro(const PendingFragment &pf,
 //       serialized as different fragment in the database. This
 //       will avoid duplication of the types in each fragments.
 void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
+                              mx::DatabaseWriter &db,
                               const PendingFragment &pf) {
   const EntityMapper &em = pf.em;
 
-#ifndef NDEBUG
+  // Used to check if an entity ID is new.
   std::unordered_set<mx::RawEntityId> seen_eids;
   auto is_new_eid = [&seen_eids] (mx::RawEntityId eid) {
     return seen_eids.emplace(eid).second;
   };
+
+  // Serialize a list of entities.
+  auto serialize_list = [&] (auto list_builder, const auto &list,
+                             auto check_id, unsigned kind) {
+    mx::EntityOffset i = 0u;
+    for (const auto &entity : list) {
+      mx::RawEntityId eid = em.EntityId(entity);
+      db.AsyncIndexFragmentSpecificEntity(eid);
+
+#ifndef NDEBUG
+      check_id(eid, kind, i);
 #endif
+
+      DispatchSerializeEntity(pf, pf.em, list_builder[i++], entity);
+    }
+  };
+
+  // Serialize a map of entity lists. The index of the map is the integral
+  // representation of the entity kind.
+  auto serialize_map = [&] (auto map_builder, const auto &map, auto check_id) {
+    for (const auto &[kind, entities] : map) {
+      serialize_list(
+          map_builder.init(kind, static_cast<unsigned>(entities.size())),
+          entities,
+          check_id,
+          kind);
+    }
+  };
 
   em.tm.EnterReadOnly();
-  mx::EntityOffset i = 0u;
 
-  auto decls_list =
-      fb.initDeclarations(SerializationListSize(pf.decls_to_serialize));
-  for (const auto &[kind, entities] : pf.decls_to_serialize) {
-    auto kl = decls_list.init(kind, static_cast<unsigned>(entities.size()));
+  serialize_map(
+      fb.initDeclarations(SerializationListSize(pf.decls_to_serialize)),
+      pf.decls_to_serialize,
+      [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
+        auto vid = std::get<mx::DeclId>(mx::EntityId(eid).Unpack());
+        assert(vid.fragment_id == pf.fragment_index);
+        assert(vid.offset == i);
+        assert(unsigned(vid.kind) == kind);
+        assert(is_new_eid(eid));
+      });
 
-    i = 0u;
-    for (const pasta::Decl &entity : entities) {
-      mx::RawEntityId eid = em.EntityId(entity);
+  serialize_map(
+      fb.initStatements(SerializationListSize(pf.stmts_to_serialize)),
+      pf.stmts_to_serialize,
+      [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
+        auto vid = std::get<mx::StmtId>(mx::EntityId(eid).Unpack());
+        assert(vid.fragment_id == pf.fragment_index);
+        assert(vid.offset == i);
+        assert(unsigned(vid.kind) == kind);
+        assert(is_new_eid(eid));
+      });
 
-#ifndef NDEBUG
-      auto vid = std::get<mx::DeclId>(mx::EntityId(eid).Unpack());
-      assert(vid.fragment_id == pf.fragment_index);
-      assert(vid.offset == i);
-      assert(unsigned(vid.kind) == kind);
-      assert(is_new_eid(eid));
-#endif
+  serialize_map(
+      fb.initAttributes(SerializationListSize(pf.attrs_to_serialize)),
+      pf.attrs_to_serialize,
+      [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
+        auto vid = std::get<mx::AttrId>(mx::EntityId(eid).Unpack());
+        assert(vid.fragment_id == pf.fragment_index);
+        assert(vid.offset == i);
+        assert(unsigned(vid.kind) == kind);
+        assert(is_new_eid(eid));
+      });
 
-      DispatchSerializeDecl(pf, pf.em, kl[i], entity);
-      ++i;
-    }
-  }
+  serialize_list(
+      fb.initDesignators(
+          static_cast<unsigned>(pf.designators_to_serialize.size())),
+      pf.designators_to_serialize,
+      [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
+        auto vid = std::get<mx::DesignatorId>(mx::EntityId(eid).Unpack());
+        assert(vid.fragment_id == pf.fragment_index);
+        assert(vid.offset == i);
+        assert(is_new_eid(eid));
+      },
+      0u);
 
-  auto stmts_list =
-      fb.initStatements(SerializationListSize(pf.stmts_to_serialize));
-  for (const auto &[kind, entities] : pf.stmts_to_serialize) {
-    auto kl = stmts_list.init(kind, static_cast<unsigned>(entities.size()));
+  serialize_list(
+      fb.initCXXBaseSpecifiers(
+          static_cast<unsigned>(pf.cxx_base_specifiers_to_serialize.size())),
+      pf.cxx_base_specifiers_to_serialize,
+      [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
+        auto vid = std::get<mx::CXXBaseSpecifierId>(mx::EntityId(eid).Unpack());
+        assert(vid.fragment_id == pf.fragment_index);
+        assert(vid.offset == i);
+        assert(is_new_eid(eid));
+      },
+      0u);
 
-    i = 0u;
-    for (const pasta::Stmt &entity : entities) {
-      mx::RawEntityId eid = em.EntityId(entity);
+  serialize_list(
+      fb.initTemplateArguments(
+          static_cast<unsigned>(pf.template_arguments_to_serialize.size())),
+      pf.template_arguments_to_serialize,
+      [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
+        auto vid = std::get<mx::TemplateArgumentId>(mx::EntityId(eid).Unpack());
+        assert(vid.fragment_id == pf.fragment_index);
+        assert(vid.offset == i);
+        assert(is_new_eid(eid));
+      },
+      0u);
 
-#ifndef NDEBUG
-      auto vid = std::get<mx::StmtId>(mx::EntityId(eid).Unpack());
-      assert(vid.fragment_id == pf.fragment_index);
-      assert(vid.offset == i);
-      assert(unsigned(vid.kind) == kind);
-      assert(is_new_eid(eid));
-#endif
-
-      DispatchSerializeStmt(pf, pf.em, kl[i], entity);
-      ++i;
-    }
-  }
-
-  auto attrs_list =
-      fb.initAttributes(SerializationListSize(pf.attrs_to_serialize));
-  for (const auto &[kind, entities] : pf.attrs_to_serialize) {
-    auto kl = attrs_list.init(kind, static_cast<unsigned>(entities.size()));
-
-    i = 0u;
-    for (const pasta::Attr &entity : entities) {
-      mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-      auto vid = std::get<mx::AttrId>(mx::EntityId(eid).Unpack());
-      assert(vid.fragment_id == pf.fragment_index);
-      assert(vid.offset == i);
-      assert(unsigned(vid.kind) == kind);
-      assert(is_new_eid(eid));
-#endif
-
-      DispatchSerializeAttr(pf, pf.em, kl[i], entity);
-      ++i;
-    }
-  }
-
-  auto designators_list = fb.initDesignators(
-      static_cast<unsigned>(pf.designators_to_serialize.size()));
-  i = 0u;
-  for (const pasta::Designator &entity : pf.designators_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-    auto vid = std::get<mx::DesignatorId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-#endif
-
-    SerializeDesignator(pf, pf.em, designators_list[i], entity, nullptr);
-    ++i;
-  }
-
-  auto cxx_base_specifiers_list = fb.initCXXBaseSpecifiers(
-      static_cast<unsigned>(pf.cxx_base_specifiers_to_serialize.size()));
-  i = 0u;
-  for (const pasta::CXXBaseSpecifier &entity :
-           pf.cxx_base_specifiers_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-    auto vid = std::get<mx::CXXBaseSpecifierId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-#endif
-
-    SerializeCXXBaseSpecifier(pf, pf.em, cxx_base_specifiers_list[i], entity,
-                              nullptr);
-    ++i;
-  }
-
-  auto template_arguments_list = fb.initTemplateArguments(
-      static_cast<unsigned>(pf.template_arguments_to_serialize.size()));
-  i = 0u;
-  for (const pasta::TemplateArgument &entity :
-           pf.template_arguments_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-    auto vid = std::get<mx::TemplateArgumentId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-#endif
-
-    SerializeTemplateArgument(pf, pf.em, template_arguments_list[i], entity,
-                              nullptr);
-    ++i;
-  }
-
-  auto template_parameter_lists_list = fb.initTemplateParameterLists(
-      static_cast<unsigned>(pf.template_parameter_lists_to_serialize.size()));
-  i = 0u;
-  for (const pasta::TemplateParameterList &entity :
-           pf.template_parameter_lists_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-    auto vid = std::get<mx::TemplateParameterListId>(
-        mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-#endif
-
-    SerializeTemplateParameterList(pf, pf.em, template_parameter_lists_list[i],
-                                   entity, nullptr);
-    ++i;
-  }
+  serialize_list(
+      fb.initTemplateParameterLists(
+          static_cast<unsigned>(pf.template_parameter_lists_to_serialize.size())),
+      pf.template_parameter_lists_to_serialize,
+      [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
+        auto vid = std::get<mx::TemplateParameterListId>(
+            mx::EntityId(eid).Unpack());
+        assert(vid.fragment_id == pf.fragment_index);
+        assert(vid.offset == i);
+        assert(is_new_eid(eid));
+      },
+      0u);
 
   em.tm.ExitReadOnly();
 }
@@ -340,7 +323,7 @@ void SerializeType(const pasta::Type &entity,
 #endif
 
   em.tm.EnterReadOnly();
-  DispatchSerializeType(pf, em, builder, entity);
+  DispatchSerializeEntity(pf, em, builder, entity);
   em.tm.ExitReadOnly();
 
   (void) eid;

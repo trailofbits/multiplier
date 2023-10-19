@@ -133,7 +133,7 @@ void GlobalIndexingState::PersistTypes(
     (void) SerializeType(type, pf, tid.type_id, tb);
 
     database.AddAsync(
-        mx::EntityRecord{ptid.Pack(), GetSerializedData(message)});
+        mx::TypeRecord{ptid.Pack(), GetSerializedData(message)});
   }
 }
 
