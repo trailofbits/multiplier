@@ -159,9 +159,9 @@ struct Fragment @0xe5f27760091f9a3a {
   # The entities from this fragment. These are lists-of-lists. The top-level
   # lists are indexed by entity kind. The nested list is all entities in this
   # fragment of that kind.
-  declarations @16 :List(List(AST.Decl));
-  statements @17 :List(List(AST.Stmt));
-  attributes @18 :List(List(AST.Attr));
+  decls @16 :List(List(AST.Decl));
+  stmts @17 :List(List(AST.Stmt));
+  attrs @18 :List(List(AST.Attr));
   macros @19 :List(List(AST.Macro));
   templateArguments @20 :List(AST.TemplateArgument);
   templateParameterLists @21 :List(AST.TemplateParameterList);

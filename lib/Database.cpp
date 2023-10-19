@@ -133,7 +133,7 @@ class BulkInserterState {
       query += mx::EnumeratorName(mx::EntityCategory::enum_); \
       query += "_"; \
       query += mx::EnumeratorName(enum_val); \
-      query += " (fragment_id) VALUES (?)"; \
+      query += " (fragment_id) VALUES (?1)"; \
       INSERT_INTO_FRAGMNET_INDEX.emplace(key, db.Prepare(query)); \
     }
 
@@ -144,7 +144,7 @@ class BulkInserterState {
       auto key = EncodeCategoryKind(mx::EntityCategory::enum_, -1); \
       std::string query = "INSERT OR IGNORE INTO fragment_with_"; \
       query += mx::EnumeratorName(mx::EntityCategory::enum_); \
-      query += " (fragment_id) VALUES (?)"; \
+      query += " (fragment_id) VALUES (?1)"; \
       INSERT_INTO_FRAGMNET_INDEX.emplace(key, db.Prepare(query)); \
     } while (false);
 

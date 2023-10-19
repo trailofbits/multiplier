@@ -281,7 +281,7 @@ SpecificEntityId<FileId> File::id(void) const noexcept {
 
 gap::generator<Fragment> File::fragments(void) const & {
   FileId fid(impl->file_id);
-  const EntityProviderPtr &ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   auto ids = ep->ListFragmentsInFile(ep, fid);
   for (PackedFragmentId id : ids) {
     if (FragmentImplPtr frag = ep->FragmentFor(ep, id.Pack())) {
@@ -314,7 +314,7 @@ std::string_view File::data(void) const noexcept {
 
 // References of this file.
 gap::generator<Reference> File::references(void) const & {
-  const EntityProviderPtr &ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto ref : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
       auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));

@@ -226,7 +226,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
   em.tm.EnterReadOnly();
 
   serialize_map(
-      fb.initDeclarations(SerializationListSize(pf.decls_to_serialize)),
+      fb.initDecls(SerializationListSize(pf.decls_to_serialize)),
       pf.decls_to_serialize,
       [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
         auto vid = std::get<mx::DeclId>(mx::EntityId(eid).Unpack());
@@ -237,7 +237,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       });
 
   serialize_map(
-      fb.initStatements(SerializationListSize(pf.stmts_to_serialize)),
+      fb.initStmts(SerializationListSize(pf.stmts_to_serialize)),
       pf.stmts_to_serialize,
       [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
         auto vid = std::get<mx::StmtId>(mx::EntityId(eid).Unpack());
@@ -248,7 +248,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       });
 
   serialize_map(
-      fb.initAttributes(SerializationListSize(pf.attrs_to_serialize)),
+      fb.initAttrs(SerializationListSize(pf.attrs_to_serialize)),
       pf.attrs_to_serialize,
       [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
         auto vid = std::get<mx::AttrId>(mx::EntityId(eid).Unpack());

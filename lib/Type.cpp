@@ -236,7 +236,7 @@ SpecificEntityId<TypeId> Type::id(void) const {
 
 // References to this type.
 gap::generator<Reference> Type::references(void) const & {
-  const EntityProviderPtr &ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto ref : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
       auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));

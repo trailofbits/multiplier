@@ -12,12 +12,12 @@
 #include <multiplier/Entities/FunctionDecl.h>
 #include <multiplier/Entities/Decl.h>
 
-#include "Entity.h"
+#include "FragmentEntity.h"
 
 namespace mx {
 
 // Interface for accessing a declaration.
-class DeclImpl final : public EntityImpl<ast::Decl> {
+class DeclImpl final : public FragmentEntityImpl<ast::Decl> {
  public:
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
@@ -31,8 +31,8 @@ class DeclImpl final : public EntityImpl<ast::Decl> {
   mutable std::atomic<RawEntityId> definition_id;
   mutable std::atomic<RawEntityId> canonical_id;
 
-  explicit DeclImpl(std::shared_ptr<EntityProvider> ep_,
-                    kj::Array<capnp::word> data_,
+  explicit DeclImpl(FragmentImplPtr frag_,
+                    ast::Decl::Reader reader_,
                     RawEntityId id_);
 };
 

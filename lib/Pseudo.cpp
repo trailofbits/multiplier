@@ -13,9 +13,10 @@
 namespace mx {
 
 #define MX_DEFINE_PSEUDO(name) \
-    name ## Impl::name ## Impl(std::shared_ptr<EntityProvider> ep_, \
-                               kj::Array<capnp::word> data_, RawEntityId id_) \
-        : EntityImpl<ast::name>(std::move(ep_), kj::mv(data_)), \
+    name ## Impl::name ## Impl(FragmentImplPtr frag_, \
+                               ast::name::Reader reader_, \
+                               RawEntityId id_) \
+        : FragmentEntityImpl<ast::name>(std::move(frag_), kj::mv(reader_)), \
           fragment_id(FragmentIdFromEntityId(id_).value()), \
           offset(FragmentOffsetFromEntityId(id_).value()) {} \
     \
@@ -27,7 +28,7 @@ namespace mx {
     } \
     \
     gap::generator<Reference> name::references(void) const & { \
-      const EntityProviderPtr &ep = impl->ep; \
+      EntityProviderPtr ep = impl->ep; \
       for (auto ref : ep->References(ep, id().Pack())) { \
         if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) { \
           auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref)); \

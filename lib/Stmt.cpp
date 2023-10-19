@@ -14,10 +14,10 @@
 
 namespace mx {
 
-StmtImpl::StmtImpl(std::shared_ptr<EntityProvider> ep_,
-                   kj::Array<capnp::word> data_,
+StmtImpl::StmtImpl(FragmentImplPtr frag_,
+                   ast::Stmt::Reader reader_,
                    RawEntityId id_)
-    : EntityImpl<ast::Stmt>(std::move(ep_), kj::mv(data_)),
+    : FragmentEntityImpl<ast::Stmt>(std::move(frag_), kj::mv(reader_)),
       fragment_id(FragmentIdFromEntityId(id_).value()),
       offset(FragmentOffsetFromEntityId(id_).value()) {}
 
@@ -31,7 +31,7 @@ SpecificEntityId<StmtId> Stmt::id(void) const {
 
 // References to this statement.
 gap::generator<Reference> Stmt::references(void) const & {
-  const EntityProviderPtr &ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto ref : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
       auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));
@@ -46,8 +46,9 @@ gap::generator<Reference> Stmt::references(void) const & {
 // Included to make sure to distinguish from `call_return_type`
 std::optional<Type> CallExpr::casted_return_type(void) const {
   for (CastExpr cast_expr : CastExpr::containing(*this)) {
-    if (cast_expr.sub_expression().id() == id())
+    if (cast_expr.sub_expression().id() == id()) {
       return cast_expr.type();
+    }
   }
   return std::nullopt;
 }
@@ -55,8 +56,9 @@ std::optional<Type> CallExpr::casted_return_type(void) const {
 // Grabs the actual parent CastExpr if needed for further inspection
 std::optional<CastExpr> CallExpr::casted_return_value(void) const {
   for (CastExpr cast_expr : CastExpr::containing(*this)) {
-    if (cast_expr.sub_expression().id() == id())
+    if (cast_expr.sub_expression().id() == id()) {
       return cast_expr;
+    }
   }
   return std::nullopt;
 }

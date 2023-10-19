@@ -6,9 +6,17 @@
 
 #include "EntityProvider.h"
 
+#include "Compilation.h"
+#include "Attr.h"
+#include "Decl.h"
+#include "EntityProvider.h"
 #include "File.h"
 #include "Fragment.h"
-#include "Token.h"
+#include "Macro.h"
+#include "Pseudo.h"
+#include "Reference.h"
+#include "SQLiteStore.h"
+#include "Stmt.h"
 #include "Type.h"
 
 namespace mx {
@@ -243,5 +251,146 @@ TokenRange EntityProvider::TokenRangeFor(
 
   return TokenRange();
 }
+
+namespace {
+
+// This is super ugly, but we need to figure out if the declaration is a
+// definition, because that is a component of the entity id. That knowledge is
+// stored inside of the serialized form of the `Decl` itself, accessible via
+// `Decl::is_definition()`. We can pass in a mostly-right id, `id`, fake a
+// `DeclImplPtr` that aliases `frag`, and then ask for its "true" ID.
+inline static RawEntityId DefinitionId(FragmentImplPtr frag, RawEntityId id,
+                                       ast::Decl::Reader reader) {
+  DeclImpl fake_impl(frag, kj::mv(reader), id);
+  return Decl(DeclImplPtr(frag, &fake_impl)).id().Pack();
+}
+
+template <typename... Args>
+inline static RawEntityId DefinitionId(const Args&...) {
+  return kInvalidEntityId;
+}
+
+}  // namespace
+
+// Something like `EntityFor(ep, kind)`, e.g. get all declarations of a specific
+// kind.
+#define MX_DECLARE_FRAGMENT_OFFSET_LISTERS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> EntityProvider::type_name ## sFor( \
+        const Ptr &self, type_name ## Kind kind, PackedFragmentId frag_id) & { \
+      \
+      auto ep = self; \
+      auto frag = ep->FragmentFor(ep, frag_id); \
+      if (!frag) { \
+        assert(false); \
+        co_return; \
+      } \
+      \
+      auto kind_index = static_cast<unsigned>(kind); \
+      auto kind_list_reader = frag->reader.get ## type_name ## s(); \
+      if (kind_index >= kind_list_reader.size()) { \
+        co_return; \
+      } \
+      \
+      auto list_reader = kind_list_reader[kind_index]; \
+      for (auto i = 0u, max_i = list_reader.size(); i < max_i; ++i) { \
+        type_name ## Id id = {}; \
+        id.fragment_id = frag->fragment_id; \
+        id.kind = kind; \
+        id.offset = i; \
+        RawEntityId raw_id = EntityId(id).Pack(); \
+        \
+        auto reader = list_reader[i]; \
+        if constexpr (std::is_same_v<type_name ## Id, DeclId>) { \
+          raw_id = DefinitionId(frag, raw_id, reader); \
+        } \
+        \
+        if (auto eptr = ep->type_name ## For(ep, raw_id)) { \
+          co_yield eptr; \
+          continue; \
+        } \
+        \
+        assert(false); \
+        co_yield std::make_shared<type_name ## Impl>( \
+            frag, kj::mv(reader), raw_id); \
+      } \
+    } \
+    \
+    gap::generator<type_name ## ImplPtr> EntityProvider::type_name ## sFor( \
+        const Ptr &self, PackedFragmentId frag_id) & { \
+      \
+      auto ep = self; \
+      auto frag = ep->FragmentFor(ep, frag_id); \
+      if (!frag) { \
+        assert(false); \
+        co_return; \
+      } \
+      \
+      auto kind_list_reader = frag->reader.get ## type_name ## s(); \
+      for (auto kind_index = 0u, num_kinds = kind_list_reader.size(); \
+           kind_index < num_kinds; ++kind_index) { \
+        \
+        auto list_reader = kind_list_reader[kind_index]; \
+        for (auto i = 0u, max_i = list_reader.size(); i < max_i; ++i) { \
+          type_name ## Id id = {}; \
+          id.fragment_id = frag->fragment_id; \
+          id.kind = static_cast<type_name ## Kind>(kind_index); \
+          id.offset = i; \
+          RawEntityId raw_id = EntityId(id).Pack(); \
+          \
+          auto reader = list_reader[i]; \
+          if constexpr (std::is_same_v<type_name ## Id, DeclId>) { \
+            raw_id = DefinitionId(frag, raw_id, reader); \
+          } \
+          \
+          if (auto eptr = ep->type_name ## For(ep, raw_id)) { \
+            co_yield eptr; \
+            continue; \
+          } \
+          \
+          assert(false); \
+          co_yield std::make_shared<type_name ## Impl>( \
+              frag, kj::mv(reader), raw_id); \
+        } \
+      } \
+    }
+
+#define MX_DECLARE_FRAGMENT_PSEUDO_LISTERS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> EntityProvider::type_name ## sFor( \
+        const Ptr &self, PackedFragmentId frag_id) & { \
+      \
+      auto ep = self; \
+      auto frag = ep->FragmentFor(ep, frag_id); \
+      if (!frag) { \
+        assert(false); \
+        co_return; \
+      } \
+      \
+      auto list_reader = frag->reader.get ## type_name ## s(); \
+      for (auto i = 0u, max_i = list_reader.size(); i < max_i; ++i) { \
+        type_name ## Id id = {}; \
+        id.fragment_id = frag->fragment_id; \
+        id.offset = i; \
+        RawEntityId raw_id = EntityId(id).Pack(); \
+        \
+        if (auto eptr = ep->type_name ## For(ep, raw_id)) { \
+          co_yield eptr; \
+          continue; \
+        } \
+        \
+        assert(false); \
+        co_yield std::make_shared<type_name ## Impl>( \
+            frag, list_reader[i], raw_id); \
+      } \
+    }
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
+                            MX_DECLARE_FRAGMENT_PSEUDO_LISTERS,
+                            MX_IGNORE_ENTITY_CATEGORY)
+#undef MX_DECLARE_FRAGMENT_OFFSET_LISTERS
+#undef MX_DECLARE_FRAGMENT_PSEUDO_LISTERS
 
 }  // namespace mx
