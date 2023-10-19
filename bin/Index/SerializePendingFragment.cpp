@@ -8,15 +8,11 @@
 #include <capnp/common.h>
 #include <capnp/message.h>
 #include <deque>
-
 #include <multiplier/AST.capnp.h>
 #include <multiplier/Entities/MacroKind.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Database.h>
-
-#ifndef NDEBUG
-# include <unordered_set>
-#endif
+#include <unordered_set>
 
 #include "EntityMapper.h"
 #include "PASTA.h"
@@ -209,6 +205,8 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
 
       DispatchSerializeEntity(pf, pf.em, list_builder[i++], entity);
     }
+
+    (void) check_id;
   };
 
   // Serialize a map of entity lists. The index of the map is the integral
@@ -234,6 +232,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
         assert(vid.offset == i);
         assert(unsigned(vid.kind) == kind);
         assert(is_new_eid(eid));
+        (void) vid;
       });
 
   serialize_map(
@@ -245,6 +244,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
         assert(vid.offset == i);
         assert(unsigned(vid.kind) == kind);
         assert(is_new_eid(eid));
+        (void) vid;
       });
 
   serialize_map(
@@ -256,6 +256,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
         assert(vid.offset == i);
         assert(unsigned(vid.kind) == kind);
         assert(is_new_eid(eid));
+        (void) vid;
       });
 
   serialize_list(
@@ -267,6 +268,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
         assert(vid.fragment_id == pf.fragment_index);
         assert(vid.offset == i);
         assert(is_new_eid(eid));
+        (void) vid;
       },
       0u);
 
@@ -279,6 +281,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
         assert(vid.fragment_id == pf.fragment_index);
         assert(vid.offset == i);
         assert(is_new_eid(eid));
+        (void) vid;
       },
       0u);
 
@@ -291,6 +294,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
         assert(vid.fragment_id == pf.fragment_index);
         assert(vid.offset == i);
         assert(is_new_eid(eid));
+        (void) vid;
       },
       0u);
 
@@ -304,6 +308,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
         assert(vid.fragment_id == pf.fragment_index);
         assert(vid.offset == i);
         assert(is_new_eid(eid));
+        (void) vid;
       },
       0u);
 
