@@ -818,7 +818,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
       } \
       \
       mx::FragmentId fid(eid->fragment_id); \
-      auto frag = self->FragmentFor(self, raw_id); \
+      auto frag = self->FragmentFor(self, fid); \
       if (!frag) { \
         assert(false); \
         return {}; \
@@ -853,7 +853,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
       } \
       \
       mx::FragmentId fid(eid->fragment_id); \
-      auto frag = self->FragmentFor(self, raw_id); \
+      auto frag = self->FragmentFor(self, fid); \
       if (!frag) { \
         assert(false); \
         return {}; \
