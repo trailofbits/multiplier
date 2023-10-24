@@ -95,6 +95,24 @@ class BulkInserterState {
     return sizeof(FragmentIndexRecord);
   }
 
+  template <typename EntityKind>
+  sqlite::Statement CreateEntityIndexInsertQuery(mx::EntityCategory category,
+                                                 EntityKind kind) {
+    std::string query = "INSERT OR IGNORE INTO fragment_with_";
+    query += mx::EnumeratorName(category);
+    query += "_";
+    query += mx::EnumeratorName(kind);
+    query += " (fragment_id) VALUES (?1)";
+    return db.Prepare(query);
+  }
+
+  sqlite::Statement CreateEntityIndexInsertQuery(mx::EntityCategory category) {
+    std::string query = "INSERT OR IGNORE INTO fragment_with_";
+    query += mx::EnumeratorName(category);
+    query += " (fragment_id) VALUES (?1)";
+    return db.Prepare(query);
+  }
+
   void DoInsertAsync(FragmentIndexRecord record);
 
 #define MX_DECLARE_INSERT_STMT(record) \
@@ -127,26 +145,18 @@ class BulkInserterState {
       {
 
 #define CREATE_FRAG_OFFSET_INDEX(upper, lower, enum_, index) \
-    for (auto enum_val : mx::EnumerationRange<mx::upper ## Kind>()) { \
-      auto key = EncodeCategoryKind(mx::EntityCategory::enum_, enum_val); \
-      std::string query = "INSERT OR IGNORE INTO fragment_with_"; \
-      query += mx::EnumeratorName(mx::EntityCategory::enum_); \
-      query += "_"; \
-      query += mx::EnumeratorName(enum_val); \
-      query += " (fragment_id) VALUES (?1)"; \
-      INSERT_INTO_FRAGMNET_INDEX.emplace(key, db.Prepare(query)); \
+    for (auto kind : mx::EnumerationRange<mx::upper ## Kind>()) { \
+      INSERT_INTO_FRAGMNET_INDEX.emplace( \
+          EncodeCategoryKind(mx::EntityCategory::enum_, kind), \
+          CreateEntityIndexInsertQuery(mx::EntityCategory::enum_, kind)); \
     }
 
 // NOTE(pag): `-1` corresponds to return value of `KindFromEntityId` on an
 //            entity ID of this category.
 #define CREATE_PSEUDO_INDEX(upper, lower, enum_, index) \
-    do { \
-      auto key = EncodeCategoryKind(mx::EntityCategory::enum_, -1); \
-      std::string query = "INSERT OR IGNORE INTO fragment_with_"; \
-      query += mx::EnumeratorName(mx::EntityCategory::enum_); \
-      query += " (fragment_id) VALUES (?1)"; \
-      INSERT_INTO_FRAGMNET_INDEX.emplace(key, db.Prepare(query)); \
-    } while (false);
+    INSERT_INTO_FRAGMNET_INDEX.emplace( \
+        EncodeCategoryKind(mx::EntityCategory::enum_, -1), \
+        CreateEntityIndexInsertQuery(mx::EntityCategory::enum_)); \
 
   MX_FOR_EACH_ENTITY_CATEGORY(
       MX_IGNORE_ENTITY_CATEGORY,
