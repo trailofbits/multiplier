@@ -209,7 +209,7 @@ Token ObjCIsaExpr::operation_token(void) const {
 }
 
 bool ObjCIsaExpr::is_arrow(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

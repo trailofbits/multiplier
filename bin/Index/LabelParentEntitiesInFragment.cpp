@@ -124,6 +124,7 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::Decl &entity) final {
+    // Handle the serializable decl context differently
     auto eid = em.SpecificEntityId<mx::DeclId>(entity);
     if (!eid) {
       assert(false);
@@ -134,7 +135,12 @@ class ParentTrackerVisitor : public EntityVisitor {
     // happen.
     //
     // TODO(pag): Assert as a signal to find when it happens?
+    // Putting assert here will always be triggered for templates specialization if
+    // we add all template and its specialization node as top-level decls in fragments.
+    // Adding them as TLD may make it reachable from two fragments cause the fragment ids
+    // to mismatch.
     if (eid->fragment_id != fragment.fragment_index) {
+      // assert(false);
       return;
     }
 
@@ -158,6 +164,7 @@ class ParentTrackerVisitor : public EntityVisitor {
     //
     // TODO(pag): Assert as a signal to find when it happens?
     if (eid->fragment_id != fragment.fragment_index) {
+      assert(false);
       return;
     }
 
@@ -171,6 +178,7 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   void Accept(const pasta::Attr &entity) final {
     AddToMaps(RawEntity(entity));
+    this->EntityVisitor::Accept(entity);
   }
 
   bool Enter(const pasta::Decl &entity) final {
@@ -194,18 +202,22 @@ class ParentTrackerVisitor : public EntityVisitor {
 
   void Accept(const pasta::TemplateParameterList &entity) final {
     AddToMaps(RawEntity(entity));
+    this->EntityVisitor::Accept(entity);
   }
 
   void Accept(const pasta::TemplateArgument &entity) final {
     AddToMaps(RawEntity(entity));
+    this->EntityVisitor::Accept(entity);
   }
 
   void Accept(const pasta::Designator &entity) final {
     AddToMaps(RawEntity(entity));
+    this->EntityVisitor::Accept(entity);
   }
 
   void Accept(const pasta::CXXBaseSpecifier &entity) final {
     AddToMaps(RawEntity(entity));
+    this->EntityVisitor::Accept(entity);
   }
 
   bool ResolveParentIds(void) {
@@ -283,19 +295,20 @@ static ScanResult ScanTokenContexts(pasta::PrintedToken tok) {
         if (res.seen_type) {
           res.parent_stmt = raw_ctx;
           return res;
-        } else {
-          res.child_stmt = raw_ctx;
-          break;
         }
+        res.child_stmt = raw_ctx;
+        break;
       case pasta::TokenContextKind::kDecl:
         if (res.seen_type) {
           res.parent_decl = raw_ctx;
           return res;
-        } else {
-          res.child_stmt = nullptr;
-          break;
+        } else if (!res.parent_decl && res.child_stmt) {
+          res.parent_decl = raw_ctx;
         }
+        break;
       case pasta::TokenContextKind::kType:
+      case pasta::TokenContextKind::kTemplateParameterList:
+      case pasta::TokenContextKind::kTemplateArgument:
         if (res.child_stmt || res.seen_type) {
           res.seen_type = true;
         } else {

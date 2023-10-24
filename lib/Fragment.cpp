@@ -306,7 +306,7 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
       }
 
     } else {
-      assert(false);
+      //assert(false);
     }
   }
 }

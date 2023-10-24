@@ -229,24 +229,24 @@ std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from
 }
 
 Token VarTemplateSpecializationDecl::extern_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal129());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal126());
 }
 
 TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal132());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal129());
 }
 
 VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const {
-  RawEntityId eid = impl->reader.getVal130();
+  RawEntityId eid = impl->reader.getVal127();
   return VarTemplateDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 unsigned VarTemplateSpecializationDecl::num_template_arguments(void) const {
-  return impl->reader.getVal52().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -260,23 +260,23 @@ std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argu
 }
 
 gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const & {
-  auto list = impl->reader.getVal52();
+  auto list = impl->reader.getVal51();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d52 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d52));
+    if (auto d51 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d51));
     }
   }
   co_return;
 }
 
 unsigned VarTemplateSpecializationDecl::num_template_instantiation_arguments(void) const {
-  return impl->reader.getVal62().size();
+  return impl->reader.getVal61().size();
 }
 
 std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
-  auto list = impl->reader.getVal62();
+  auto list = impl->reader.getVal61();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -290,24 +290,24 @@ std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_inst
 }
 
 gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_instantiation_arguments(void) const & {
-  auto list = impl->reader.getVal62();
+  auto list = impl->reader.getVal61();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d62 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d62));
+    if (auto d61 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d61));
     }
   }
   co_return;
 }
 
 Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal131());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal128());
 }
 
 std::optional<Type> VarTemplateSpecializationDecl::type_as_written(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal133();
+    RawEntityId eid = impl->reader.getVal130();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -319,15 +319,15 @@ std::optional<Type> VarTemplateSpecializationDecl::type_as_written(void) const {
 }
 
 bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-  return impl->reader.getVal135();
+  return impl->reader.getVal132();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
-  return impl->reader.getVal136();
+  return impl->reader.getVal133();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
-  return impl->reader.getVal137();
+  return impl->reader.getVal134();
 }
 
 #pragma GCC diagnostic pop

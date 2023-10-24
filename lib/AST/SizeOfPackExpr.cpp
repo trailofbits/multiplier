@@ -203,10 +203,10 @@ NamedDecl SizeOfPackExpr::pack(void) const {
 }
 
 std::optional<uint32_t> SizeOfPackExpr::pack_length(void) const {
-  if (!impl->reader.getVal89()) {
+  if (!impl->reader.getVal86()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal105());
+    return static_cast<uint32_t>(impl->reader.getVal102());
   }
   return std::nullopt;
 }
@@ -216,7 +216,7 @@ Token SizeOfPackExpr::pack_token(void) const {
 }
 
 std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(void) const {
-  if (!impl->reader.getVal90()) {
+  if (!impl->reader.getVal87()) {
     return std::nullopt;
   }
   auto list = impl->reader.getVal15();
@@ -237,7 +237,7 @@ Token SizeOfPackExpr::r_paren_token(void) const {
 }
 
 bool SizeOfPackExpr::is_partially_substituted(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

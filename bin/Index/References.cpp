@@ -311,8 +311,12 @@ static ClassificationAction ClassifyParentChild(
       break;
 
     case pasta::StmtKind::kDeclRefExpr:
-      assert(false);
-      break;
+      // Seeing an instance where the child stmt is referering to a VarDecl
+      // and parent of it is DeclRefExpr
+      return {mx::BuiltinReferenceKind::USES_VALUE,
+              ContinuationAction::kKeepAscending};
+      //assert(false);
+      //break;
 
     case pasta::StmtKind::kMemberExpr:
       if (auto member = pasta::MemberExpr::From(parent)) {
@@ -517,16 +521,19 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt) {
     for (auto ref : DeclReferencesFrom(cxx_new->AllocatedType())) {
       co_yield ref;
     }
-
-    if (auto op_new = cxx_new->OperatorNew()) {
-      co_yield op_new.value();
+    auto cxx_new_op = cxx_new->OperatorNew();
+    if (cxx_new_op.has_value()) {
+      co_yield cxx_new_op.value();
     }
 
   // If we have `delete x`, then mark `` as being referenced in this fragment.
   } else if (auto cxx_del = pasta::CXXDeleteExpr::From(stmt)) {
-    if (auto op_del = cxx_del->OperatorDelete()) {
-      co_yield op_del.value();
+    auto cxx_del_op = cxx_del->OperatorDelete();
+    if (cxx_del_op.has_value()) {
+      co_yield cxx_del_op.value();
     }
+
+    //co_yield cxx_del->OperatorDelete();
 
   // If we have `(T *) b` then mark `T` as being referenced in this fragment.
   } else if (auto cast = pasta::CastExpr::From(stmt)) {
@@ -838,8 +845,8 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Type type) {
     }
     case pasta::TypeKind::kUnaryTransform: {
       auto &tt = reinterpret_cast<const pasta::UnaryTransformType &>(type);
-      if (auto uty = tt.UnderlyingType()) {
-        GEN(uty.value());
+      if (tt.UnderlyingType().has_value()) {
+        GEN(tt.UnderlyingType().value());
       }
       break;
     }

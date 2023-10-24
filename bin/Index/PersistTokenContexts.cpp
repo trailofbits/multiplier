@@ -42,8 +42,15 @@ static mx::RawEntityId IdOfRedeclInFragment(
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
     mx::RawEntityId eid = em.EntityId(redecl);
     auto decl_id = mx::EntityId(eid).Extract<mx::DeclId>();
+
+    // Note: Redecls of the canonical decl can be in the different
+    //       fragment. In such case move to next redecls. An example
+    //       could be a friend class:
+    //          class __attribute__((__visibility__("default"))) A;
+    //          class B {
+    //            friend class __attribute__((__visibility__("default"))) A;
+    //          };
     if (!decl_id) {
-      assert(false);
       continue;
     }
 

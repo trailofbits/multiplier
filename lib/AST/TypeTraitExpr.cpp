@@ -193,14 +193,14 @@ std::optional<TypeTraitExpr> TypeTraitExpr::from(const TokenContext &t) {
 }
 
 TypeTrait TypeTraitExpr::trait(void) const {
-  return static_cast<TypeTrait>(impl->reader.getVal95());
+  return static_cast<TypeTrait>(impl->reader.getVal92());
 }
 
 std::optional<bool> TypeTraitExpr::value(void) const {
-  if (!impl->reader.getVal90()) {
+  if (!impl->reader.getVal87()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal89());
+    return static_cast<bool>(impl->reader.getVal86());
   }
   return std::nullopt;
 }

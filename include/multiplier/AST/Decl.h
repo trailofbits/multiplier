@@ -22,7 +22,6 @@
 #include "../Iterator.h"
 #include "../Frontend/TokenContext.h"
 
-#include <multiplier/AST/AccessSpecifier.h>
 #include <multiplier/AST/AvailabilityResult.h>
 #include <multiplier/AST/DeclCategory.h>
 #include <multiplier/AST/DeclFriendObjectKind.h>
@@ -135,7 +134,6 @@ class MX_EXPORT Decl {
   std::optional<Attr> nth_attribute(unsigned n) const;
   unsigned num_attributes(void) const;
   gap::generator<Attr> attributes(void) const &;
-  AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   std::optional<Attr> defining_attribute(void) const;
   std::optional<TemplateDecl> described_template(void) const;

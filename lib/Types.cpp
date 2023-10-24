@@ -614,7 +614,7 @@ EntityId::EntityId(CXXBaseSpecifierId id) {
       packed.small_entity.sub_kind =
           kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
           kNumTokenKinds + kNumTokenKinds + kNumMacroKinds +
-          static_cast<uint64_t>(IdentifiedPseudo::kTemplateParameterList);
+          static_cast<uint64_t>(IdentifiedPseudo::kCXXBaseSpecifier);
       packed.small_entity.offset = id.offset;
       RETURN_EARLY_IF_NOT(packed.small_entity.offset == id.offset);
 

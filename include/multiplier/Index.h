@@ -26,6 +26,7 @@
 #include "Frontend/Macro.h"
 #include "Frontend/TokenKind.h"
 #include "Frontend/TokenCategory.h"
+#include "IR/Operation.h"
 #include "Fragment.h"
 #include "IR/Operation.h"
 #include "Iterator.h"

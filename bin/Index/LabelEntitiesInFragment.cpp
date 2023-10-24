@@ -40,6 +40,7 @@ class EntityLabeller final : public EntityVisitor {
   PendingFragment &fragment;
 
   std::vector<pasta::Decl> next_decls;
+  std::vector<pasta::Stmt> next_stmts;
   std::vector<pasta::Type> next_types;
 
   // Tracks the index of the next parsed token. Logic surrounding this
@@ -56,6 +57,10 @@ class EntityLabeller final : public EntityVisitor {
 
   bool Enter(const pasta::Decl &entity) final {
     if (ShouldHideFromIndexer(entity)) {
+      return false;
+    }
+
+    if (!ShouldLabelDecl(entity)) {
       return false;
     }
     
@@ -75,10 +80,11 @@ class EntityLabeller final : public EntityVisitor {
   //            be fragment-specific, and that data would get wiped out by
   //            `EntityMapper::ResetForFragment`.
   bool Enter(const pasta::Stmt &) final {
-    return false;
+    return true;
   }
 
-  void Accept(const pasta::Stmt &) final {}
+  void Accept(const pasta::Stmt &) final {
+  }
 
   // NOTE(pag): Don't recursively descend into types. We may end up walking
   //            from a `FunctionProtoType` into a `typedef` (e.g. an argument
@@ -148,6 +154,36 @@ class EntityLabeller final : public EntityVisitor {
   // Create initial macro IDs for all of the top-level macros in the range of
   // this fragment.
   bool Label(const pasta::Macro &entity);
+
+  private:
+   bool ShouldLabelDecl(const pasta::Decl &decl) {
+     switch (decl.Kind()) {
+       case pasta::DeclKind::kClassTemplate:
+       case pasta::DeclKind::kClassTemplateSpecialization: {
+          auto it = std::find(fragment.top_level_decls.begin(),
+           fragment.top_level_decls.end(), decl);
+          if (it == fragment.top_level_decls.end()) {
+            return false;
+          }
+          return true;
+       }
+       case pasta::DeclKind::kVarTemplateSpecialization: {
+        if (auto var_decl = pasta::VarTemplateSpecializationDecl::From(decl)) {
+          if (var_decl->StorageClass() == pasta::StorageClass::kStatic) {
+            auto it = std::find(fragment.top_level_decls.begin(),
+           fragment.top_level_decls.end(), decl);
+            if (it == fragment.top_level_decls.end()) {
+              return false;
+            }
+          }
+        }
+        return true;
+       }
+       default:
+         break;
+     }
+     return true;
+   }
 };
 
 static bool IsAcceptableRepeatedToken(const pasta::Token &tok) {
@@ -285,6 +321,9 @@ void LabelDeclsInFragment(PendingFragment &pf) {
 
 #ifndef NDEBUG
   const EntityMapper &em = pf.em;
+   // The NDEBUG condition check will get hit often if we add all template
+   // and specialization AST node as new TLDS. The TLD may be reached from the 
+   // other fragment causing the id to exist in the mapper.
   for (const pasta::Decl &decl : pf.top_level_decls) {
     CHECK_EQ(em.EntityId(decl), mx::kInvalidEntityId);
   }

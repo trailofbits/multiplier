@@ -16,6 +16,7 @@
 #include <multiplier/Frontend/TokenKind.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/AST.h>
+#include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/Util/ArgumentVector.h>
@@ -181,9 +182,13 @@ class TLDFinder final : public pasta::DeclVisitor {
   //
   // For example: https://gcc.godbolt.org/z/9Wjde1WYo
   //              https://gcc.godbolt.org/z/MGrMjxxvx
+
+  // NOTE(kumarak): All class template specialization and partial specialization
+  //                gets added to the top-level declarations.
   void VisitClassTemplatePartialSpecializationDecl(
       const pasta::ClassTemplatePartialSpecializationDecl &decl) final {
     VisitDeeperDeclContext(decl);
+    AddDecl(decl);
   }
 
   void VisitClassTemplateSpecializationDecl(
@@ -198,9 +203,13 @@ class TLDFinder final : public pasta::DeclVisitor {
   // }
 
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
-    VisitDeeperDeclContext(decl.TemplatedDeclaration());
-
-    if (!seen_specs.emplace(decl.CanonicalDeclaration()).second) {
+    // Note: The canonical declaration of specialization always points to the base
+    //       decl. Disable it temporarily.
+    // TODO(kumarak) : Discuss with pag before finalizing the change. Should we check for
+    //                 canonical declaration to avoid redeclaration getting into a fragment?
+    //                 The missing redeclaration fragment causes assert during reference
+    //                 lookup in mx-api.
+    if (!seen_specs.emplace(decl).second) {
       return;
     }
 
@@ -209,24 +218,26 @@ class TLDFinder final : public pasta::DeclVisitor {
 
       // We should observe the explicit specializations and instantiations
       // separately.
-      switch (spec.TemplateSpecializationKind()) {
-        case pasta::TemplateSpecializationKind::kExplicitSpecialization:
-        case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
-        case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
-          continue;
-        default:
-          Accept(spec);
+      if(IsExplicitSpecialization(spec.TemplateSpecializationKind())) {
+        continue;
       }
+      Accept(spec);
     }
+
+    VisitDeeperDeclContext(decl.TemplatedDeclaration());
+    AddDecl(decl);
   }
 
-  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &) final {
-    // Do nothing; we will see the specializations as top-level declarations.
+  void VisitVarTemplateDecl(const pasta::VarTemplateDecl &decl) final {
+    for (const pasta::VarTemplateSpecializationDecl &spec : decl.Specializations()) {
+      Accept(spec);
+    }
+    AddDecl(decl);
   }
 
   void VisitVarTemplatePartialSpecializationDecl(
-      const pasta::VarTemplatePartialSpecializationDecl &) final {
-    // Do nothing; we will see the specializations as top-level declarations.
+      const pasta::VarTemplatePartialSpecializationDecl &decl) final {
+    AddDecl(decl);
   }
 
   void VisitVarTemplateSpecializationDecl(
@@ -235,7 +246,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
-    if (!seen_specs.emplace(decl.CanonicalDeclaration()).second) {
+    if (!seen_specs.emplace(decl).second) {
       return;
     }
 
@@ -243,15 +254,36 @@ class TLDFinder final : public pasta::DeclVisitor {
 
       // We should observe the explicit specializations and instantiations
       // separately.
-      switch (spec.TemplateSpecializationKind()) {
-        case pasta::TemplateSpecializationKind::kExplicitSpecialization:
-        case pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration:
-        case pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition:
-          continue;
-        default:
-          Accept(spec);
+      // Note: In case of function template, an implicit specialization may
+      //       appear out-of-line and a friend of class template. In that case
+      //       the same node will be rechable from the class template specialization
+      //       decl as well. The check for out-of-line instantiation avoid adding
+      //       them immediately to the node and handle when it appears next.
+      if(IsExplicitSpecialization(spec.TemplateSpecializationKind())
+        || spec.IsOutOfLine()) {
+        continue;
       }
+
+      // TODO(kumarak): Not sure how to handle CXXDeductionGuide. Don't add them 
+      //                to top-level declarations.
+      if (spec.Kind() == pasta::DeclKind::kCXXDeductionGuide) {
+        continue;
+      }
+
+      Accept(spec);
     }
+
+    // Note: A FunctionTemplateDecl node can be inline to a Record context and
+    //       should not be added to the list of TLDs since Record is already
+    //       a TLD. The check about the lexical context avoid this scenario.
+    //
+    //       It also avoid inconsistencies with tagging FunctionTemplateDecl as
+    //       TLD where a decl can be beneath an Expr and not getting tagged as TLD.
+    //       Only FunctionTemplateDecl that are top-level will be tagged as TLDs.
+    if (auto lc = decl.LexicalDeclarationContext(); lc && lc->IsRecord()) {
+      return;
+    }
+    VisitDecl(decl);
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
@@ -287,6 +319,47 @@ class TLDFinder final : public pasta::DeclVisitor {
     // a semantic decl context that is at the top level.
     VisitDeeperDeclContext(decl);
 
+    VisitDecl(decl);
+  }
+
+  void VisitCXXMethodDecl(const pasta::CXXMethodDecl &decl) final {
+
+    // If the CXXMethodDecl is implicit, don't need to visit
+    // the declaration; return early.
+    if (decl.IsImplicit()) {
+      return;
+    }
+
+    VisitFunctionDecl(decl);
+
+    // The method can be explicitly instantiated and out of line. If true
+    // add them to the tld's if the decl is templated or the definition.
+    // For out of line methods, the clang patches preserves the lexical
+    // structure of the AST node and method definition does not get
+    // merged with the declarations.
+    // if (decl.IsOutOfLine() && (decl.IsTemplated() ||
+    //    decl.IsThisDeclarationADefinition())) {
+    //  AddDecl(decl);
+    // }
+  }
+
+  void VisitUsingShadowDecl(const pasta::UsingShadowDecl &) final {}
+
+  void VisitTypeAliasTemplateDecl(const pasta::TypeAliasTemplateDecl &decl) final {
+    VisitDecl(decl);
+  }
+
+  void VisitFriendDecl(const pasta::FriendDecl &decl) final {
+    // If there is a FriendDecl; visit the inner declaration
+    // and add them to the top-level decl.
+    if (auto fdl = decl.FriendDeclaration()) {
+      if (auto td = pasta::TemplateDecl::From(fdl.value())) {
+        Accept(td.value());
+      }
+    }
+  }
+
+  void VisitConceptDecl(const pasta::ConceptDecl &decl) {
     VisitDecl(decl);
   }
 
@@ -914,15 +987,20 @@ bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
 // themselves.
 static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
   auto tsk = pasta::TemplateSpecializationKind::kUndeclared;
-  bool has_partial_or_tpl = true;
+  bool has_partial_or_tpl_or_dg = true;
 
   if (auto csd = pasta::ClassTemplateSpecializationDecl::From(decl)) {
     tsk = csd->TemplateSpecializationKind();
-    has_partial_or_tpl = !csd->SpecializedTemplateOrPartial().index();
+    has_partial_or_tpl_or_dg = !csd->SpecializedTemplateOrPartial().index();
 
   } else if (auto vsd = pasta::VarTemplateSpecializationDecl::From(decl)) {
     tsk = vsd->TemplateSpecializationKind();
-    has_partial_or_tpl = !vsd->SpecializedTemplateOrPartial().index();
+    has_partial_or_tpl_or_dg = !vsd->SpecializedTemplateOrPartial().index();
+
+  } else if (auto ftd = pasta::FunctionTemplateDecl::From(decl)) {
+    auto td = ftd->TemplatedDeclaration();
+    tsk = td.TemplateSpecializationKind();
+    has_partial_or_tpl_or_dg = !(td.Kind() == pasta::DeclKind::kCXXDeductionGuide);
 
   } else if (auto fd = pasta::FunctionDecl::From(decl)) {
     tsk = fd->TemplateSpecializationKind();
@@ -940,13 +1018,15 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
     }
   }
 
-  if (tsk == pasta::TemplateSpecializationKind::kExplicitSpecialization) {
+  if ((tsk == pasta::TemplateSpecializationKind::kExplicitSpecialization) ||
+      (tsk == pasta::TemplateSpecializationKind::kExplicitInstantiationDeclaration) ||
+      (tsk == pasta::TemplateSpecializationKind::kExplicitInstantiationDefinition)) {
     return true;
 
   // NOTE(pag): Have observed situations where `ClassTemplateSpecialization`
   //            will report `kUndeclared`.
   } else if (tsk == pasta::TemplateSpecializationKind::kUndeclared) {
-    return has_partial_or_tpl;
+    return has_partial_or_tpl_or_dg;
 
   } else {
     return false;
@@ -1057,7 +1137,10 @@ static void AddDeclRangeToEntityListFor(
       return;
 
     } else {
-      LOG(ERROR)
+      // If the decl is implicit the token range will be empty causing
+      // both `begin_index` and `end_index` to be same and equal to the
+      // token index.
+      LOG_IF(ERROR, !(decl.IsImplicit() && tok.Index() == begin_index))
           << "Only found one token " << tok.Data() << " for: "
           << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
           << " on main job file " << main_file_path;
@@ -1800,7 +1883,11 @@ static void CreateFreestandingDeclFragment(
     (void) pasta::PrintedTokenRange::Align(parsed_tokens, printed_tokens);
 
   } else {
-    LOG_IF(ERROR, !is_builtin)
+
+    // If the decl is implicit, the parsed_tokens can be empty and it will
+    // fallback to the error path. Example: CXXDeductionGuide in some cases
+    // will not have parsed token and it will fallback here.
+    LOG_IF(ERROR, !(is_builtin || decl.IsImplicit()))
         << "Could not find tokens of " << decl.KindName()
         << " declaration: " << DeclToString(decl)
         << PrefixedLocation(decl, " at or near ")

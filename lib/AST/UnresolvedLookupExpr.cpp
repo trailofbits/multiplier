@@ -193,11 +193,11 @@ std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const TokenContex
 }
 
 bool UnresolvedLookupExpr::is_overloaded(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal88();
 }
 
 bool UnresolvedLookupExpr::requires_adl(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal89();
 }
 
 #pragma GCC diagnostic pop

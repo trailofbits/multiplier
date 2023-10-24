@@ -293,7 +293,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       fb.initTemplateParameterLists(
           NumEntities(pf.template_parameter_lists_to_serialize)),
       pf.template_parameter_lists_to_serialize,
-      CheckFragOffset<mx::TemplateArgumentId>,
+      CheckFragOffset<mx::TemplateParameterListId>,
       0u);
 
   // Issue #480: Index macros. Persist.cpp manages the serialization of the

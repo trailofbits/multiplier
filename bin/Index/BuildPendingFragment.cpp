@@ -6,11 +6,15 @@
 
 #include "PendingFragment.h"
 
+#include <clang/AST/Decl.h>
+
 #include "EntityMapper.h"
 #include "PASTA.h"
 #include "References.h"
 #include "TypeMapper.h"
 #include "Util.h"
+
+#include <iostream>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ingored "-Wunused-function"
@@ -261,6 +265,19 @@ bool PendingFragment::DoTryAdd(const Entity &entity, EntityIdMap &entity_ids,
 }
 
 bool PendingFragment::TryAdd(const pasta::Decl &entity) {
+  if (ShouldSerializeDeclContext(entity)) {
+    return DoTryAdd(
+        entity,
+        em.token_tree_ids,
+        [&, this] (mx::EntityOffset offset) {
+          mx::DeclId id;
+          id.fragment_id = fragment_index;
+          id.offset = offset;
+          id.kind = mx::FromPasta(entity.Kind());
+          id.is_definition = IsDefinition(entity);
+          return id;
+        });
+  }
   return DoTryAdd(
       entity,
       em.entity_ids,
@@ -476,6 +493,17 @@ void BuildPendingFragment(PendingFragment &pf) {
       
       } else if (auto spec = pasta::CXXBaseSpecifier::From(context)) {
         builder.MaybeVisitNext(*spec);
+      }
+    }
+  }
+
+  // Get the decl context of the top-level declarations and add them
+  // to token_tree_ids. This will help internally serialize them in
+  // the fragments.
+  for (auto &tld : pf.top_level_decls) {
+    if (auto dc = tld.DeclarationContext()) {
+      if (ShouldSerializeDeclContext(dc.value())) {
+        builder.MaybeVisitNext(dc.value());
       }
     }
   }

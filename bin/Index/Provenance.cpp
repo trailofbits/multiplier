@@ -323,7 +323,12 @@ static const void *VisitType(const pasta::Type &type,
     }
 
   } else if (auto deduced_type = pasta::DeducedType::From(type)) {
-    return VisitType(deduced_type.value(), tok_data, context_depth);
+    if (deduced_type->IsDeduced()) {
+      auto resolved_type = deduced_type->ResolvedType();
+      if (resolved_type) {
+        return VisitType(resolved_type.value(), tok_data, context_depth);
+      }
+    }
 
   // Handle issue #344, where parameter names in function type prototypes
   // don't have related entities.
@@ -992,7 +997,11 @@ bool TokenProvenanceCalculator::TryConnect(TokenInfo *child_info,
       return true;
 
     } else {
-      dt = dt->DerivedLocation();
+      auto next_dt = dt->DerivedLocation();
+      if (next_dt.has_value() && next_dt == dt) {
+        break;
+      }
+      dt = next_dt;
     }
   }
 

@@ -98,7 +98,6 @@ class MX_EXPORT VarDecl : public DeclaratorDecl {
   bool has_external_storage(void) const;
   std::optional<bool> has_flexible_array_initializer(void) const;
   bool has_global_storage(void) const;
-  std::optional<bool> has_ice_initializer(void) const;
   bool has_initializer(void) const;
   bool has_local_storage(void) const;
   bool is_arc_pseudo_strong(void) const;

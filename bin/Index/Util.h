@@ -37,6 +37,7 @@ class TemplateParameterList;
 class Token;
 class TokenContext;
 class Type;
+enum class TemplateSpecializationKind : unsigned int;
 }  // namespace pasta
 namespace mx {
 enum class TokenKind : unsigned short;
@@ -102,6 +103,15 @@ gap::generator<pasta::TokenContext> TokenContexts(pasta::PrintedToken tok);
 // Checks if the declaration is valid and serializable
 bool IsSerializableDecl(const pasta::Decl &decl);
 
+bool IsExplicitSpecialization(const pasta::TemplateSpecializationKind &kind);
+
+// Check of the declaration is Out of Line
+bool IsOutOfLine(const pasta::Decl &decl);
+
+// Checks should the decl context be serialized with pending
+// fragment
+bool ShouldSerializeDeclContext(const pasta::Decl &decl);
+
 // Determines whether or not a TLD is likely to have to go into a child
 // fragment. This happens when the TLD is a forward declaration, e.g. of a
 // struct.
@@ -121,6 +131,9 @@ bool IsInjectedForwardDeclaration(const pasta::Decl &decl);
 
 // Should a declaration be hidden from the indexer?
 bool ShouldHideFromIndexer(const pasta::Decl &decl);
+
+// Should a declaration be added to entity mapper
+bool ShouldAddToEntityMapper(const pasta::Decl &decl);
 
 template <typename T>
 inline static bool ShouldHideFromIndexer(const T &) {

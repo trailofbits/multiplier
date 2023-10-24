@@ -687,6 +687,20 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "IsFirstDeclaration"},
   {"Decl", "IdentifierNamespace"},
 
+  // IsInterfaceLike may fail if CXXRecordDecl bases are in-complete. Add it
+  // to the blacklist function to avoid nullptr access during serialization.
+  {"CXXRecordDecl", "IsInterfaceLike"},
+  {"MemberPointerType", "MostRecentCXXRecordDeclaration"},
+  {"Expr", "Dependence"},
+  {"Expr", "IsIntegerConstantExpression"},
+  {"VarDecl", "HasICEInitializer"},
+  {"UnresolvedMemberExpr", "Base"}, // asserts because of isImplicitAccess() is true
+  {"CXXDefaultArgExpr", "AdjustedRewrittenExpression"},
+  {"CXXNewExpr", "ShouldNullCheckAllocation"},
+  {"RequiresExpr", "IsSatisfied"},
+  {"ConceptSpecializationExpr", "IsSatisfied"},
+  {"Decl", "Access"},
+
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
 };

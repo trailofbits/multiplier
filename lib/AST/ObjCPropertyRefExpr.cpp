@@ -239,31 +239,31 @@ Type ObjCPropertyRefExpr::super_receiver_type(void) const {
 }
 
 bool ObjCPropertyRefExpr::is_class_receiver(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal86();
 }
 
 bool ObjCPropertyRefExpr::is_explicit_property(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal87();
 }
 
 bool ObjCPropertyRefExpr::is_implicit_property(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal88();
 }
 
 bool ObjCPropertyRefExpr::is_messaging_getter(void) const {
-  return impl->reader.getVal92();
+  return impl->reader.getVal89();
 }
 
 bool ObjCPropertyRefExpr::is_messaging_setter(void) const {
-  return impl->reader.getVal93();
+  return impl->reader.getVal90();
 }
 
 bool ObjCPropertyRefExpr::is_object_receiver(void) const {
-  return impl->reader.getVal94();
+  return impl->reader.getVal91();
 }
 
 bool ObjCPropertyRefExpr::is_super_receiver(void) const {
-  return impl->reader.getVal96();
+  return impl->reader.getVal93();
 }
 
 #pragma GCC diagnostic pop

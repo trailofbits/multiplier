@@ -220,7 +220,7 @@ std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const TokenContext &t) {
 
 gap::generator<Decl> LinkageSpecDecl::declarations_in_context(void) const & {
   EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal50();
   for (auto v : list) {
     if (auto eptr = ep->DeclFor(ep, v)) {
       co_yield std::move(eptr);

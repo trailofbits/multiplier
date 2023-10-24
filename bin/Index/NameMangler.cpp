@@ -108,6 +108,12 @@ NameManglerImpl::NameManglerImpl(clang::ASTContext &ast_context_,
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::FunctionDecl *decl) {
 
+  // The clang name-magling fails for deduction guide. if the decl is
+  // CXXDeductionGuideDecl then return empty.
+  if (decl->getDeclKind() == clang::Decl::Kind::CXXDeductionGuide) {
+    return mangled_name;
+  }
+
   if (auto *alias_attr = decl->getAttr<clang::AliasAttr>()) {
     const auto alias_name = alias_attr->getAliasee();
     mangled_name.assign(alias_name.data(), alias_name.size());
@@ -238,6 +244,10 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::ParmVarDecl *decl) {
+  if (decl->getParentFunctionOrMethod() == nullptr) {
+    return mangled_name;
+  }
+
   const clang::Decl *parent_decl = clang::Decl::castFromDeclContext(
       decl->getParentFunctionOrMethod());
 
@@ -368,7 +378,10 @@ const std::string &NameManglerImpl::GetMangledNameImpl(
   } else if (is_cxx_name) {
 
     // TODO(pag): Figure out what to do here.
-    assert(false);
+    // assert(false);
+    decl->printQualifiedName(mangled_name_os);
+    mangled_name_os << " kind:" << decl->getDeclKindName();
+    mangled_name_os.flush();
 
   } else {
     decl->printName(mangled_name_os);

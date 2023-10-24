@@ -1,0 +1,57 @@
+[ 
+{
+"file": "Templates.cpp",
+"command": "/usr/bin/c++ Templates.cpp",
+"directory": ""
+},
+{
+"file": "TemplateFunctionSpecialization.cpp",
+"command": "/usr/bin/c++ TemplateFunctionSpecialization.cpp",
+"directory": ""
+},
+{
+"file": "TemplatePartialSpecialization.cpp",
+"command": "/usr/bin/c++ TemplatePartialSpecialization.cpp",
+"directory": ""
+},
+{
+"file": "TemplateSpecialization.cpp",
+"command": "/usr/bin/c++ TemplateSpecialization.cpp",
+"directory": ""
+},
+{
+"file": "TemplateDeduction.cpp",
+"command": "/usr/bin/c++ TemplateDeduction.cpp",
+"directory": ""
+},
+{
+"file": "TemplateExplicitSpecialization.cpp",
+"command": "/usr/bin/c++ TemplateExplicitSpecialization.cpp",
+"directory": ""
+},
+{
+"file": "TemplateSpecializationQuals.cpp",
+"command": "/usr/bin/c++ TemplateSpecializationQuals.cpp",
+"directory": ""
+},
+{
+"file": "TemplateRecursive.cpp",
+"command": "/usr/bin/c++ TemplateRecursive.cpp",
+"directory": ""
+},
+{
+"file": "PartialSpecInstantiation.cpp",
+"command": "/usr/bin/c++ PartialSpecInstantiation.cpp",
+"directory": ""
+},
+{
+"file": "NestedLinkageSpec.cpp",
+"command": "/usr/bin/c++ NestedLinkageSpec.cpp",
+"directory": ""
+},
+{
+"file": "BuiltinTemplates.cpp",
+"command": "/usr/bin/c++ BuiltinTemplates.cpp",
+"directory": ""
+}
+]
