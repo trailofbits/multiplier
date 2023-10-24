@@ -210,7 +210,7 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
 // Create initial macro IDs for all of the top-level macros in the range of
 // this fragment.
 bool EntityLabeller::Label(const pasta::Macro &entity) {
-  auto &entity_list = fragment.EntityList(entity);
+  auto &entity_list = fragment.EntityListFor(entity);
 
   mx::MacroId id;
   id.kind = mx::FromPasta(entity.Kind());
@@ -228,7 +228,7 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 
   // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
   //            fills in the empty slots.
-  fragment.EntityList(entity).emplace_back();
+  fragment.EntityListFor(entity).emplace_back();
 
   // Define directives should go and provide entity ids for their
   // parameters, as they can be referenced by `MacroParameterSubstitution`s.

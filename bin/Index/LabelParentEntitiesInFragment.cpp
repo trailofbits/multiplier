@@ -14,6 +14,7 @@
 #include <unordered_set>
 
 #include "EntityMapper.h"
+#include "Util.h"
 #include "Visitor.h"
 
 namespace indexer {
@@ -59,12 +60,10 @@ class ParentTrackerVisitor : public EntityVisitor {
       : em(fragment_.em),
         fragment(fragment_) {}
 
-  template <typename T>
-  inline void AddUnseenEntities(const T &map) {
-    for (const auto &[_, entities] : map) {
-      for (const auto &entity : entities) {
-        not_yet_seen.emplace(RawEntity(entity));
-      }
+  template <typename EntityListMap>
+  inline void AddUnseenEntities(const EntityListMap &entities) {
+    for (auto entity : Entities(entities)) {
+      not_yet_seen.emplace(RawEntity(entity));
     }
   }
 
@@ -306,26 +305,24 @@ static void FindMissingParentageFromAttributeTokens(
     }
   }
 
-  for (const auto &[_, entities] : pf.stmts_to_serialize) {
-    for (const pasta::Stmt &stmt : entities) {
-      if (vis.HasBeenSeen(stmt)) {
+  for (pasta::Stmt stmt : Entities(pf.stmts_to_serialize)) {
+    if (vis.HasBeenSeen(stmt)) {
+      continue;
+    }
+
+    // Look at the tokens of the statement
+    for (const pasta::Token &tok : stmt.Tokens()) {
+      auto attr_it = tok_to_attr.find(tok.RawToken());
+      if (attr_it == tok_to_attr.end()) {
         continue;
       }
 
-      // Look at the tokens of the statement
-      for (const pasta::Token &tok : stmt.Tokens()) {
-        auto attr_it = tok_to_attr.find(tok.RawToken());
-        if (attr_it == tok_to_attr.end()) {
-          continue;
-        }
+      auto parent_stmt = GetOrNullptr(pf.em.parent_stmts, attr_it->second);
+      auto parent_decl = GetOrNullptr(pf.em.parent_decls, attr_it->second);
 
-        auto parent_stmt = GetOrNullptr(pf.em.parent_stmts, attr_it->second);
-        auto parent_decl = GetOrNullptr(pf.em.parent_decls, attr_it->second);
-
-        if (ResolveParents(vis, parent_stmt, parent_decl)) {
-          vis.Accept(stmt);
-          break;
-        }
+      if (ResolveParents(vis, parent_stmt, parent_decl)) {
+        vis.Accept(stmt);
+        break;
       }
     }
   }
@@ -343,47 +340,35 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
 
   // Visit the top-level decls first.
 
-  for (const pasta::Decl &decl : pf.top_level_decls) {
+  for (pasta::Decl decl : Entities(pf.top_level_decls)) {
     vis.Accept(decl);
   }
 
 #ifndef NDEBUG
-  size_t num_entities = 0ul;
-  for (const auto &[_, entities] : pf.decls_to_serialize) {
-    num_entities += entities.size();
-  }
+  size_t num_entities = NumEntities(pf.decls_to_serialize);
 #endif
 
   // Expand the set of decls.
-  for (const auto &[_, entities] : pf.decls_to_serialize) {
-    for (size_t i = 0u, max_i = entities.size(); i < max_i; ++i) {
-
-      pasta::Decl decl = entities[i];
-      auto raw_entity = RawEntity(decl);
-    
-      if (!vis.HasBeenSeen(raw_entity)) {
-        vis.Accept(decl);
-        
-        // NOTE(pag): If this assertion is hit, then it suggests that the
-        //            manually-written traversals in `Visitor.cpp` are missing
-        //            something that the automatically generated visitors created
-        //            from `Visitor.inc.h` have found. Missing things is not the
-        //            end of the world, but it suggests a blindspot, hence we want
-        //            to loudly detect them here if possible. Missing things can
-        //            also be an indication that we're not fully linking something
-        //            to its parent decls/statements.
-        DCHECK(vis.HasBeenSeen(raw_entity));
-      }
+  for (pasta::Decl decl : Entities(pf.decls_to_serialize)) {  
+    if (vis.HasBeenSeen(decl)) {
+      continue;
     }
+
+    vis.Accept(decl);
+    
+    // NOTE(pag): If this assertion is hit, then it suggests that the
+    //            manually-written traversals in `Visitor.cpp` are missing
+    //            something that the automatically generated visitors created
+    //            from `Visitor.inc.h` have found. Missing things is not the
+    //            end of the world, but it suggests a blindspot, hence we want
+    //            to loudly detect them here if possible. Missing things can
+    //            also be an indication that we're not fully linking something
+    //            to its parent decls/statements.
+    DCHECK(vis.HasBeenSeen(decl));
   }
 
 #ifndef NDEBUG
-  size_t new_num_entities = 0ul;
-  for (const auto &[_, entities] : pf.decls_to_serialize) {
-    new_num_entities += entities.size();
-  }
-
-  CHECK_EQ(num_entities, new_num_entities);
+  CHECK_EQ(num_entities, NumEntities(pf.decls_to_serialize));
 #endif
 
   // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
@@ -404,12 +389,10 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   // Log the error.
 
   std::optional<pasta::Stmt> first_missing_stmt;
-  for (const auto &[_, entities] : pf.stmts_to_serialize) {
-    for (const pasta::Stmt &stmt : entities) {
-      if (!vis.HasBeenSeen(stmt)) {
-        first_missing_stmt.emplace(stmt);
-        break;
-      }
+  for (pasta::Stmt stmt : Entities(pf.stmts_to_serialize)) {
+    if (!vis.HasBeenSeen(stmt)) {
+      first_missing_stmt.emplace(stmt);
+      break;
     }
   }
 

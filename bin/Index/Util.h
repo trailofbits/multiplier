@@ -10,6 +10,7 @@
 #include <capnp/message.h>
 #include <gap/core/generator.hpp>
 #include <map>
+#include <multiplier/Iterator.h>
 #include <multiplier/Types.h>
 #include <optional>
 #include <pasta/Util/File.h>
@@ -172,18 +173,83 @@ pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c);
 uint32_t Hash32(std::string_view data);
 uint64_t Hash64(std::string_view data);
 
-template <typename Map>
-unsigned SerializationListSize(const Map &map) {
+template <typename Kind>
+struct HashKind {
+  inline constexpr unsigned operator()(Kind k) const noexcept {
+    return static_cast<unsigned>(k);
+  }
+};
+
+template <typename Entity>
+using EntityList = std::vector<Entity>;
+
+template <typename Kind, typename Entity>
+using KindGroupedEntityLists = std::unordered_map<Kind, EntityList<Entity>, HashKind<Kind>>;
+
+template <typename Entity>
+inline static unsigned NumEntities(const EntityList<Entity> &entities) {
+  return static_cast<unsigned>(entities.size());
+}
+
+template <typename Kind, typename Entity>
+inline static unsigned NumEntities(
+    const KindGroupedEntityLists<Kind, Entity> &entities_by_kind) {
+  unsigned num_entities = 0u;
+  for (const auto &[_, entities] : entities_by_kind) {
+    num_entities += NumEntities(entities);
+  }
+  return num_entities;
+}
+
+// Figure out the minimum size needed for a serialized list-of-lists to hold
+// the entities. This is the underlying integral value of the entity kind, plus
+// one, as we use entity kinds as an index.
+template <typename Kind, typename Entity>
+unsigned SerializationListSize(
+    const KindGroupedEntityLists<Kind, Entity> &entities_by_kind) {
   unsigned max_kind = 0u;
-  for (const auto &[kind, _] : map) {
-    max_kind = std::max(kind, max_kind);
+  auto has_kind = false;
+  for (const auto &[kind, _] : entities_by_kind) {
+    max_kind = std::max(static_cast<unsigned>(kind), max_kind);
+    has_kind = true;
   }
 
-  if (!max_kind) {
-    return 0u;
-  }
+  return has_kind ? max_kind + 1u : 0u;
+}
 
-  return max_kind + 1u;
+// Generate the entities in kind-grouped entity lists.
+//
+// NOTE(pag): We don't use range based `for` loops in case the underlying size
+//            of an entity list grows during iteration, or in case new lists
+//            are added based on kinds.
+template <typename Kind, typename Entity>
+inline static gap::generator<Entity> Entities(
+    const KindGroupedEntityLists<Kind, Entity> &entities_by_kind) {
+  for (Kind kind : mx::EnumerationRange<Kind>()) {
+    auto entities_it = entities_by_kind.find(kind);
+    if (entities_it == entities_by_kind.end()) {
+      continue;
+    }
+
+    const EntityList<Entity> &entities = entities_it->second;
+    for (size_t i = 0u; i < entities.size(); ++i) {
+      Entity entity = entities[i];
+      co_yield std::move(entity);
+    }
+  }
+}
+
+// Generate the entities in an list.
+//
+// NOTE(pag): We don't use range based `for` loops in case the underlying size
+//            of an entity list grows during iteration.
+template <typename Entity>
+inline static gap::generator<Entity> Entities(
+    const EntityList<Entity> &entities) {
+  for (size_t i = 0u; i < entities.size(); ++i) {
+    Entity entity = entities[i];
+    co_yield std::move(entity);
+  }
 }
 
 }  // namespace indexer

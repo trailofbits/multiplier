@@ -190,10 +190,11 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
   auto is_new_eid = [&seen_eids] (mx::RawEntityId eid) {
     return seen_eids.emplace(eid).second;
   };
+  (void) is_new_eid;
 
   // Serialize a list of entities.
   auto serialize_list = [&] (auto list_builder, const auto &list,
-                             auto check_id, unsigned kind) {
+                             auto check_id, auto kind) {
     mx::EntityOffset i = 0u;
     for (const auto &entity : list) {
       mx::RawEntityId eid = em.EntityId(entity);
@@ -211,10 +212,13 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
 
   // Serialize a map of entity lists. The index of the map is the integral
   // representation of the entity kind.
+  //
+  // TODO(pag): Do we need to initialize the intermediate lists for kinds
+  //            that we don't have?
   auto serialize_map = [&] (auto map_builder, const auto &map, auto check_id) {
     for (const auto &[kind, entities] : map) {
       serialize_list(
-          map_builder.init(kind, static_cast<unsigned>(entities.size())),
+          map_builder.init(static_cast<unsigned>(kind), NumEntities(entities)),
           entities,
           check_id,
           kind);
@@ -226,11 +230,11 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
   serialize_map(
       fb.initDecls(SerializationListSize(pf.decls_to_serialize)),
       pf.decls_to_serialize,
-      [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
+      [&] (mx::RawEntityId eid, auto kind, mx::EntityOffset i) {
         auto vid = std::get<mx::DeclId>(mx::EntityId(eid).Unpack());
         assert(vid.fragment_id == pf.fragment_index);
         assert(vid.offset == i);
-        assert(unsigned(vid.kind) == kind);
+        assert(vid.kind == kind);
         assert(is_new_eid(eid));
         (void) vid;
       });
@@ -238,11 +242,11 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
   serialize_map(
       fb.initStmts(SerializationListSize(pf.stmts_to_serialize)),
       pf.stmts_to_serialize,
-      [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
+      [&] (mx::RawEntityId eid, mx::StmtKind kind, mx::EntityOffset i) {
         auto vid = std::get<mx::StmtId>(mx::EntityId(eid).Unpack());
         assert(vid.fragment_id == pf.fragment_index);
         assert(vid.offset == i);
-        assert(unsigned(vid.kind) == kind);
+        assert(vid.kind == kind);
         assert(is_new_eid(eid));
         (void) vid;
       });
@@ -250,18 +254,17 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
   serialize_map(
       fb.initAttrs(SerializationListSize(pf.attrs_to_serialize)),
       pf.attrs_to_serialize,
-      [&] (mx::RawEntityId eid, unsigned kind, mx::EntityOffset i) {
+      [&] (mx::RawEntityId eid, mx::AttrKind kind, mx::EntityOffset i) {
         auto vid = std::get<mx::AttrId>(mx::EntityId(eid).Unpack());
         assert(vid.fragment_id == pf.fragment_index);
         assert(vid.offset == i);
-        assert(unsigned(vid.kind) == kind);
+        assert(vid.kind == kind);
         assert(is_new_eid(eid));
         (void) vid;
       });
 
   serialize_list(
-      fb.initDesignators(
-          static_cast<unsigned>(pf.designators_to_serialize.size())),
+      fb.initDesignators(NumEntities(pf.designators_to_serialize)),
       pf.designators_to_serialize,
       [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
         auto vid = std::get<mx::DesignatorId>(mx::EntityId(eid).Unpack());
@@ -273,8 +276,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       0u);
 
   serialize_list(
-      fb.initCXXBaseSpecifiers(
-          static_cast<unsigned>(pf.cxx_base_specifiers_to_serialize.size())),
+      fb.initCXXBaseSpecifiers(NumEntities(pf.cxx_base_specifiers_to_serialize)),
       pf.cxx_base_specifiers_to_serialize,
       [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
         auto vid = std::get<mx::CXXBaseSpecifierId>(mx::EntityId(eid).Unpack());
@@ -287,7 +289,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
 
   serialize_list(
       fb.initTemplateArguments(
-          static_cast<unsigned>(pf.template_arguments_to_serialize.size())),
+          NumEntities(pf.template_arguments_to_serialize)),
       pf.template_arguments_to_serialize,
       [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
         auto vid = std::get<mx::TemplateArgumentId>(mx::EntityId(eid).Unpack());
@@ -300,7 +302,7 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
 
   serialize_list(
       fb.initTemplateParameterLists(
-          static_cast<unsigned>(pf.template_parameter_lists_to_serialize.size())),
+          NumEntities(pf.template_parameter_lists_to_serialize)),
       pf.template_parameter_lists_to_serialize,
       [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
         auto vid = std::get<mx::TemplateParameterListId>(

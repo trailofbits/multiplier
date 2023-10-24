@@ -242,7 +242,7 @@ struct TokenTreeSerializationSchedule {
       raw_locator = macro->RawMacro();
     }
 
-    auto &entity_list = pf.EntityList(tt);
+    auto &entity_list = pf.EntityListFor(tt);
     mx::RawEntityId raw_id = em.EntityId(raw_locator);
 
     // NOTE(pag): This is some collusion with `EntityLabeller::Label` in terms
@@ -592,9 +592,9 @@ static void PersistTokenTree(
       SerializationListSize(pf.macros_to_serialize));
 
   // Serialize the token trees / macros.
-  for (const auto &[kind_index, entities] : pf.macros_to_serialize) {
+  for (const auto &[kind, entities] : pf.macros_to_serialize) {
     auto mb = macros_list.init(
-        kind_index, static_cast<unsigned>(entities.size()));
+        static_cast<unsigned>(kind), NumEntities(entities));
 
     for (const std::optional<TokenTree> &tt : entities) {
       CHECK(tt.has_value());
@@ -606,9 +606,9 @@ static void PersistTokenTree(
 
       mx::MacroId id = std::get<mx::MacroId>(vid);
       CHECK_EQ(id.fragment_id, pf.fragment_index);
-
       CHECK_LT(id.offset, entities.size());
-      CHECK_EQ(unsigned(id.kind), kind_index);
+      CHECK(id.kind == kind);
+
       if (std::optional<pasta::Macro> macro = tt->Macro()) {
         DispatchSerializeMacro(pf, mb[id.offset], macro.value(), &(tt.value()));
 
@@ -639,8 +639,7 @@ static void PersistTokenTree(
       // A directive that's not hoisted into a different fragment.
       mx::MacroId mid = std::get<mx::MacroId>(vid);
       if (mid.fragment_id == pf.fragment_index) {
-        auto kind_index = unsigned(mid.kind);
-        auto &macros = pf.macros_to_serialize[kind_index];
+        auto &macros = pf.macros_to_serialize[mid.kind];
         CHECK_LT(mid.offset, macros.size());
         CHECK(macros[mid.offset].has_value());
         CHECK_EQ(em.EntityId(macros[mid.offset].value()), eid);

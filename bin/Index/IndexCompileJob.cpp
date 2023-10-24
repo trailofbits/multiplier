@@ -719,7 +719,7 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
 // Clang's ASTContext code adds builtins, but they don't behave like user-
 // written code, in that Clang doesn't always add the nested decls into
 // the `DeclContext`.
-static void AddBuiltinDeclRangeToEntityList(
+static void AddBuiltinDeclRangeToEntityListFor(
     std::string_view main_file_path, pasta::Decl decl,
     std::vector<EntityRange> &entity_ranges) {
 
@@ -734,7 +734,7 @@ static void AddBuiltinDeclRangeToEntityList(
 
 // Figure out the inclusive token index bounds of `decl` and add it to
 // `entity_ranges`.
-static void AddDeclRangeToEntityList(
+static void AddDeclRangeToEntityListFor(
     const pasta::TokenRange &tokens, std::string_view main_file_path,
     const std::map<uint64_t, uint64_t> &eof_to_include,
     const std::map<uint64_t, uint64_t> &eof_indices, pasta::Decl decl,
@@ -745,7 +745,7 @@ static void AddDeclRangeToEntityList(
   // These are probably part of the preamble of compiler-provided builtin
   // declarations.
   if (!tok) {
-    AddBuiltinDeclRangeToEntityList(main_file_path, std::move(decl),
+    AddBuiltinDeclRangeToEntityListFor(main_file_path, std::move(decl),
                                     entity_ranges);
     return;
   }
@@ -813,7 +813,7 @@ static void AddDeclRangeToEntityList(
     // builtin functions. This also happens at the usage site of builtin
     // functions themselves.
     if (IsProbablyABuiltinDecl(decl)) {
-      AddBuiltinDeclRangeToEntityList(main_file_path, std::move(decl),
+      AddBuiltinDeclRangeToEntityListFor(main_file_path, std::move(decl),
                                       entity_ranges);
       return;
 
@@ -1002,7 +1002,7 @@ static std::vector<OrderedMacro> FindTLMs(
 
 // Add a macro to our entity range list. The first token in a macro is usually
 // the first usage token, and the last one is the last expansion token.
-static void AddMacroRangeToEntityList(
+static void AddMacroRangeToEntityListFor(
     const pasta::TokenRange &tok_range, std::string_view main_file_path,
     std::vector<EntityRange> &entity_ranges, pasta::Macro node) {
 
@@ -1095,12 +1095,12 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
 
   for (OrderedMacro ordered_entry : FindTLMs(ast, tokens, bof_to_eof,
                                              eof_index_to_include)) {
-    AddMacroRangeToEntityList(tokens, main_file_path, entity_ranges,
+    AddMacroRangeToEntityListFor(tokens, main_file_path, entity_ranges,
                               std::move(ordered_entry.first));
   }
 
   for (OrderedDecl ordered_entry : FindTLDs(ast)) {
-    AddDeclRangeToEntityList(tokens, main_file_path, eof_index_to_include,
+    AddDeclRangeToEntityListFor(tokens, main_file_path, eof_index_to_include,
                              bof_to_eof, std::move(ordered_entry.first),
                              entity_ranges);
   }

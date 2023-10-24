@@ -252,7 +252,7 @@ bool PendingFragment::DoAdd(const Entity &entity, EntityIdMap &entity_ids,
     return false;
   }
 
-  auto &entity_list = EntityList(entity);
+  auto &entity_list = EntityListFor(entity);
   auto id = make_id(fragment_index,
                     static_cast<mx::EntityOffset>(entity_list.size()));
   entity_ids.emplace(locator, id);
@@ -354,7 +354,7 @@ bool PendingFragment::Add(const pasta::Attr &entity) {
     return false;
   }
 
-  auto &entity_list = EntityList(entity);
+  auto &entity_list = EntityListFor(entity);
 
   mx::AttrId id;
   id.fragment_id = fragment_index;
@@ -438,9 +438,9 @@ bool PendingFragment::Add(pasta::Type entity) {
 void BuildPendingFragment(PendingFragment &pf) {
   EntityMapper &em = pf.em;
 
-  std::unordered_map<unsigned, size_t> prev_num_decls;
-  std::unordered_map<unsigned, size_t> prev_num_stmts;
-  std::unordered_map<unsigned, size_t> prev_num_attrs;
+  std::unordered_map<mx::DeclKind, size_t, HashKind<mx::DeclKind>> prev_num_decls;
+  std::unordered_map<mx::StmtKind, size_t, HashKind<mx::StmtKind>> prev_num_stmts;
+  std::unordered_map<mx::AttrKind, size_t, HashKind<mx::AttrKind>> prev_num_attrs;
   size_t prev_num_types = 0ul;
   size_t prev_num_designators = 0ul;
   size_t prev_num_template_args = 0ul;
