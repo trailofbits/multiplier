@@ -59,6 +59,28 @@ class ParentTrackerVisitor : public EntityVisitor {
       : em(fragment_.em),
         fragment(fragment_) {}
 
+  template <typename T>
+  inline void AddUnseenEntities(const T &map) {
+    for (const auto &[_, entities] : map) {
+      for (const auto &entity : entities) {
+        not_yet_seen.emplace(RawEntity(entity));
+      }
+    }
+  }
+
+  inline bool HasUnseen(void) const {
+    return !not_yet_seen.empty();
+  }
+
+  inline bool HasBeenSeen(const void *raw_entity) const {
+    return !not_yet_seen.count(raw_entity);
+  }
+
+  template <typename T>
+  inline bool HasBeenSeen(const T &entity) const {
+    return !not_yet_seen.count(RawEntity(entity));
+  }
+
   void AddToMaps(const void *entity) {
     if (parent_decl_id != mx::kInvalidEntityId && parent_decl) {
       em.parent_decl_ids.emplace(entity, parent_decl_id);
@@ -249,7 +271,7 @@ static void FindMissingParentageFromTokens(
 
     // If we're already seen `child_stmt`, then it isn't one of the missing
     // ones.
-    if (!vis.not_yet_seen.count(child_stmt)) {
+    if (vis.HasBeenSeen(child_stmt)) {
       continue;
     }
 
@@ -286,12 +308,12 @@ static void FindMissingParentageFromAttributeTokens(
 
   for (const auto &[_, entities] : pf.stmts_to_serialize) {
     for (const pasta::Stmt &stmt : entities) {
-      if (!vis.not_yet_seen.count(RawEntity(stmt))) {
+      if (vis.HasBeenSeen(stmt)) {
         continue;
       }
 
       // Look at the tokens of the statement
-      for (pasta::Token tok : stmt.Tokens()) {
+      for (const pasta::Token &tok : stmt.Tokens()) {
         auto attr_it = tok_to_attr.find(tok.RawToken());
         if (attr_it == tok_to_attr.end()) {
           continue;
@@ -316,17 +338,8 @@ static void FindMissingParentageFromAttributeTokens(
 void LabelParentsInPendingFragment(PendingFragment &pf) {
 
   ParentTrackerVisitor vis(pf);
-  for (const auto &[_, entities] : pf.decls_to_serialize) {
-    for (const pasta::Decl &decl : entities) {
-      vis.not_yet_seen.emplace(RawEntity(decl));
-    }
-  }
-
-  for (const auto &[_, entities] : pf.stmts_to_serialize) {
-    for (const pasta::Stmt &stmt : entities) {
-      vis.not_yet_seen.emplace(RawEntity(stmt));
-    }
-  }
+  vis.AddUnseenEntities(pf.decls_to_serialize);
+  vis.AddUnseenEntities(pf.stmts_to_serialize);
 
   // Visit the top-level decls first.
 
@@ -348,7 +361,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
       pasta::Decl decl = entities[i];
       auto raw_entity = RawEntity(decl);
     
-      if (vis.not_yet_seen.count(raw_entity)) {
+      if (!vis.HasBeenSeen(raw_entity)) {
         vis.Accept(decl);
         
         // NOTE(pag): If this assertion is hit, then it suggests that the
@@ -359,7 +372,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
         //            to loudly detect them here if possible. Missing things can
         //            also be an indication that we're not fully linking something
         //            to its parent decls/statements.
-        DCHECK(!vis.not_yet_seen.count(raw_entity));
+        DCHECK(vis.HasBeenSeen(raw_entity));
       }
     }
   }
@@ -374,17 +387,17 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
 #endif
 
   // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
-  if (vis.not_yet_seen.empty()) {
+  if (!vis.HasUnseen()) {
     return;
   }
 
   FindMissingParentageFromTokens(vis, pf);
-  if (vis.not_yet_seen.empty()) {
+  if (!vis.HasUnseen()) {
     return;
   }
 
   FindMissingParentageFromAttributeTokens(vis, pf);
-  if (vis.not_yet_seen.empty()) {
+  if (!vis.HasUnseen()) {
     return;
   }
 
@@ -393,7 +406,7 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
   std::optional<pasta::Stmt> first_missing_stmt;
   for (const auto &[_, entities] : pf.stmts_to_serialize) {
     for (const pasta::Stmt &stmt : entities) {
-      if (vis.not_yet_seen.count(RawEntity(stmt))) {
+      if (!vis.HasBeenSeen(stmt)) {
         first_missing_stmt.emplace(stmt);
         break;
       }
