@@ -141,6 +141,7 @@ inline static bool ShouldHideFromIndexer(const T &) {
 
 // Return an opaque pointer to the underlying representation of a given entity.
 // This uniquely identifies the entity.
+const void *RawEntity(const pasta::Token &entity);
 const void *RawEntity(const pasta::Decl &entity);
 const void *RawEntity(const pasta::Stmt &entity);
 const void *RawEntity(const pasta::Attr &entity);

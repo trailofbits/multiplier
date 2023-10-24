@@ -250,7 +250,7 @@ struct TokenTreeSerializationSchedule {
     //            nested macro directives.
     if (raw_id != mx::kInvalidEntityId) {
       CHECK_NE(raw_tt, raw_locator);
-      mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(raw_id).Unpack());
+      mx::MacroId id = mx::EntityId(raw_id).Extract<mx::MacroId>().value();
       CHECK(id.kind == tt.Kind());
 
       is_part_of_fragment = id.fragment_id == pf.fragment_index;
@@ -601,16 +601,14 @@ static void PersistTokenTree(
 
       const void *raw_tt = tt->RawNode();
       mx::RawEntityId eid = em.EntityId(raw_tt);
-      mx::VariantId vid = mx::EntityId(eid).Unpack();
-      CHECK(std::holds_alternative<mx::MacroId>(vid));
-
-      mx::MacroId id = std::get<mx::MacroId>(vid);
-      CHECK_EQ(id.fragment_id, pf.fragment_index);
-      CHECK_LT(id.offset, entities.size());
-      CHECK(id.kind == kind);
+      auto id = mx::EntityId(eid).Extract<mx::MacroId>();
+      CHECK(id.has_value());
+      CHECK_EQ(id->fragment_id, pf.fragment_index);
+      CHECK_LT(id->offset, entities.size());
+      CHECK(id->kind == kind);
 
       if (std::optional<pasta::Macro> macro = tt->Macro()) {
-        DispatchSerializeMacro(pf, mb[id.offset], macro.value(), &(tt.value()));
+        DispatchSerializeMacro(pf, mb[id->offset], macro.value(), &(tt.value()));
 
       // NOTE(pag): This is only reasonable on a case-by-case basis!! Right now,
       //            we only expect `SUBSITUTION`s to be invented by the
@@ -620,7 +618,7 @@ static void PersistTokenTree(
         CHECK(tt->Kind() == mx::MacroKind::SUBSTITUTION);
         const pasta::Macro &invalid_macro =
             *reinterpret_cast<const pasta::Macro *>(0xdeadbeefull);
-        DispatchSerializeMacro(pf, mb[id.offset], invalid_macro, &(tt.value()));
+        DispatchSerializeMacro(pf, mb[id->offset], invalid_macro, &(tt.value()));
       }
     }
   }
@@ -630,20 +628,17 @@ static void PersistTokenTree(
   i = 0u;
   for (TokenTreeNode node : nodes) {
     mx::RawEntityId eid = em.EntityId(node);
-    mx::VariantId vid = mx::EntityId(eid).Unpack();
-    
-    CHECK(!std::holds_alternative<mx::InvalidId>(vid));
-    
-    if (std::holds_alternative<mx::MacroId>(vid)) {
-      
-      // A directive that's not hoisted into a different fragment.
-      mx::MacroId mid = std::get<mx::MacroId>(vid);
-      if (mid.fragment_id == pf.fragment_index) {
-        auto &macros = pf.macros_to_serialize[mid.kind];
-        CHECK_LT(mid.offset, macros.size());
-        CHECK(macros[mid.offset].has_value());
-        CHECK_EQ(em.EntityId(macros[mid.offset].value()), eid);
-      }
+    auto id = mx::EntityId(eid).Extract<mx::MacroId>();
+    if (!id) {
+      continue;
+    }
+
+    // A directive that's not hoisted into a different fragment.
+    if (id->fragment_id == pf.fragment_index) {
+      auto &macros = pf.macros_to_serialize[id->kind];
+      CHECK_LT(id->offset, macros.size());
+      CHECK(macros[id->offset].has_value());
+      CHECK_EQ(em.EntityId(macros[id->offset].value()), eid);
     }
 
     tlms.set(i++, eid);

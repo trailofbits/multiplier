@@ -1350,7 +1350,7 @@ static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
   if (id_it == entity_ids.end()) {
     return std::nullopt;
   }
-
+  
   mx::VariantId vid = mx::EntityId(id_it->second).Unpack();
   if (!std::holds_alternative<mx::FileId>(vid)) {
     return std::nullopt;

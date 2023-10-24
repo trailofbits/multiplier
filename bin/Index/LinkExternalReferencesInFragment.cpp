@@ -46,10 +46,9 @@ static void AddDeclReferenceFrom(
     const pasta::AST &ast, mx::DatabaseWriter &database, const EntityMapper &em,
     const Entity &from_entity, mx::RawEntityId from_id,
     const pasta::Decl &to_entity) {
-  
-  mx::RawEntityId to_id = em.EntityId(to_entity);
-  mx::VariantId vid = mx::EntityId(to_id).Unpack();
-  if (!std::holds_alternative<mx::DeclId>(vid)) {
+
+  auto to_id = em.EntityId(to_entity);
+  if (!mx::EntityId(to_id).Extract<mx::DeclId>()) {
     assert(false);
     return;
   }
@@ -71,15 +70,14 @@ static void AddDeclReferencesFrom(
 
   for (auto from_entity : Entities(entities)) {
     mx::RawEntityId from_id = pf.em.EntityId(from_entity);
-    mx::VariantId vid = mx::EntityId(from_id).Unpack();
+    auto from_eid = mx::EntityId(from_id).Extract<EntityId>();
 
-    if (!std::holds_alternative<EntityId>(vid)) {
+    if (!from_eid) {
       assert(false);
       continue;
     }
 
-    EntityId eid = std::get<EntityId>(vid);
-    if (eid.fragment_id != pf.fragment_index) {
+    if (from_eid->fragment_id != pf.fragment_index) {
       assert(false);
       continue;  // This is weird?
     }
@@ -111,8 +109,13 @@ void LinkExternalReferencesInFragment(
   //            to fields.
   for (pasta::Designator from_entity : Entities(pf.designators_to_serialize)) {
     mx::RawEntityId from_id = em.EntityId(from_entity);
-    mx::VariantId vid = mx::EntityId(from_id).Unpack();
-    if (!std::holds_alternative<mx::DesignatorId>(vid)) {
+    auto from_eid = mx::EntityId(from_id).Extract<mx::DesignatorId>();
+    if (!from_eid) {
+      assert(false);
+      continue;
+    }
+
+    if (from_eid->fragment_id != pf.fragment_index) {
       assert(false);
       continue;
     }
@@ -144,18 +147,13 @@ void LinkExternalReferencesInFragment(
 
     const pasta::Macro &m = maybe_macro.value();
     mx::RawEntityId macro_id = em.EntityId(tt);
-    if (macro_id == mx::kInvalidEntityId) {
-      macro_id = em.EntityId(m);
-    }
-
-    mx::VariantId vid = mx::EntityId(macro_id).Unpack();
-    if (!std::holds_alternative<mx::MacroId>(vid)) {
+    auto from_eid = mx::EntityId(macro_id).Extract<mx::MacroId>();
+    if (!from_eid) {
       assert(false);
       continue;
     }
 
-    mx::MacroId mid = std::get<mx::MacroId>(vid);
-    if (mid.fragment_id != pf.fragment_index) {
+    if (from_eid->fragment_id != pf.fragment_index) {
       assert(false);
       continue;  // This is weird?
     }
@@ -173,8 +171,7 @@ void LinkExternalReferencesInFragment(
           }
 
           mx::RawEntityId def_id = em.EntityId(def.value());
-          vid = mx::EntityId(def_id).Unpack();
-          if (!std::holds_alternative<mx::MacroId>(vid)) {
+          if (!mx::EntityId(def_id).Extract<mx::MacroId>()) {
             auto macro_name = def->Name();
             if (!macro_name) {
               continue;  // Probably in a conditionally disabled region.
@@ -216,8 +213,7 @@ void LinkExternalReferencesInFragment(
           }
 
           mx::RawEntityId file_id = em.EntityId(f.value());
-          vid = mx::EntityId(file_id).Unpack();
-          if (!std::holds_alternative<mx::FileId>(vid)) {
+          if (!mx::EntityId(file_id).Extract<mx::FileId>()) {
             assert(false);
             continue;
           }

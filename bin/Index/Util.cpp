@@ -1145,6 +1145,10 @@ pasta::TokenContext UnaliasedContext(const pasta::TokenContext &c) {
   return c;
 }
 
+const void *RawEntity(const pasta::Token &entity) {
+  return entity.RawToken();
+}
+
 const void *RawEntity(const pasta::Decl &entity) {
   return entity.RawDecl();
 }

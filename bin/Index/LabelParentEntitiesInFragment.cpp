@@ -28,10 +28,10 @@ struct SaveRestoreEntity {
   const void *oldval_ptr;
 
   SaveRestoreEntity(mx::RawEntityId &ref_, const void *&ptr_,
-                    mx::RawEntityId new_val, const void *newval_ptr)
+                    mx::EntityId new_val, const void *newval_ptr)
       : ref(ref_), ref_ptr(ptr_),
         old_val(ref), oldval_ptr(ref_ptr) {
-    ref = new_val;
+    ref = new_val.Pack();
     ref_ptr = newval_ptr;
   }
 
@@ -93,17 +93,16 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::Decl &entity) final {
-    mx::RawEntityId rid = em.EntityId(entity);
-    mx::VariantId vid = mx::EntityId(rid).Unpack();
-    if (!std::holds_alternative<mx::DeclId>(vid)) {
+    auto eid = em.SpecificEntityId<mx::DeclId>(entity);
+    if (!eid) {
       return;
     }
 
-    mx::DeclId eid = std::get<mx::DeclId>(vid);
-
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
-    if (eid.fragment_id != fragment.fragment_index) {
+    //
+    // TODO(pag): Assert as a signal to find when it happens?
+    if (eid->fragment_id != fragment.fragment_index) {
       return;
     }
 
@@ -111,22 +110,21 @@ class ParentTrackerVisitor : public EntityVisitor {
     AddToMaps(raw_entity);
 
     SaveRestoreEntity save_parent_decl(
-        parent_decl_id, parent_decl, rid, raw_entity);
+        parent_decl_id, parent_decl, eid.value(), raw_entity);
     this->EntityVisitor::Accept(entity);
   }
 
   void Accept(const pasta::Stmt &entity) final {
-    mx::RawEntityId rid = em.EntityId(entity);
-    mx::VariantId vid = mx::EntityId(rid).Unpack();
-    if (!std::holds_alternative<mx::StmtId>(vid)) {
+    auto eid = em.SpecificEntityId<mx::StmtId>(entity);
+    if (!eid) {
       return;
     }
 
-    mx::StmtId eid = std::get<mx::StmtId>(vid);
-
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
-    if (eid.fragment_id != fragment.fragment_index) {
+    //
+    // TODO(pag): Assert as a signal to find when it happens?
+    if (eid->fragment_id != fragment.fragment_index) {
       return;
     }
 
@@ -134,7 +132,7 @@ class ParentTrackerVisitor : public EntityVisitor {
     AddToMaps(raw_entity);
 
     SaveRestoreEntity save_parent_stmt(
-        parent_stmt_id, parent_stmt, rid, raw_entity);
+        parent_stmt_id, parent_stmt, eid.value(), raw_entity);
     this->EntityVisitor::Accept(entity);
   }
 

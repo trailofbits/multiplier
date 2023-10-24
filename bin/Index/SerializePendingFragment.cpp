@@ -231,10 +231,11 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       fb.initDecls(SerializationListSize(pf.decls_to_serialize)),
       pf.decls_to_serialize,
       [&] (mx::RawEntityId eid, auto kind, mx::EntityOffset i) {
-        auto vid = std::get<mx::DeclId>(mx::EntityId(eid).Unpack());
-        assert(vid.fragment_id == pf.fragment_index);
-        assert(vid.offset == i);
-        assert(vid.kind == kind);
+        auto vid = mx::EntityId(eid).Extract<mx::DeclId>();
+        assert(vid.has_value());
+        assert(vid->fragment_id == pf.fragment_index);
+        assert(vid->offset == i);
+        assert(vid->kind == kind);
         assert(is_new_eid(eid));
         (void) vid;
       });
@@ -243,10 +244,11 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       fb.initStmts(SerializationListSize(pf.stmts_to_serialize)),
       pf.stmts_to_serialize,
       [&] (mx::RawEntityId eid, mx::StmtKind kind, mx::EntityOffset i) {
-        auto vid = std::get<mx::StmtId>(mx::EntityId(eid).Unpack());
-        assert(vid.fragment_id == pf.fragment_index);
-        assert(vid.offset == i);
-        assert(vid.kind == kind);
+        auto vid = mx::EntityId(eid).Extract<mx::StmtId>();
+        assert(vid.has_value());
+        assert(vid->fragment_id == pf.fragment_index);
+        assert(vid->offset == i);
+        assert(vid->kind == kind);
         assert(is_new_eid(eid));
         (void) vid;
       });
@@ -255,10 +257,11 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       fb.initAttrs(SerializationListSize(pf.attrs_to_serialize)),
       pf.attrs_to_serialize,
       [&] (mx::RawEntityId eid, mx::AttrKind kind, mx::EntityOffset i) {
-        auto vid = std::get<mx::AttrId>(mx::EntityId(eid).Unpack());
-        assert(vid.fragment_id == pf.fragment_index);
-        assert(vid.offset == i);
-        assert(vid.kind == kind);
+        auto vid = mx::EntityId(eid).Extract<mx::AttrId>();
+        assert(vid.has_value());
+        assert(vid->fragment_id == pf.fragment_index);
+        assert(vid->offset == i);
+        assert(vid->kind == kind);
         assert(is_new_eid(eid));
         (void) vid;
       });
@@ -267,9 +270,10 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       fb.initDesignators(NumEntities(pf.designators_to_serialize)),
       pf.designators_to_serialize,
       [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
-        auto vid = std::get<mx::DesignatorId>(mx::EntityId(eid).Unpack());
-        assert(vid.fragment_id == pf.fragment_index);
-        assert(vid.offset == i);
+        auto vid = mx::EntityId(eid).Extract<mx::DesignatorId>();
+        assert(vid.has_value());
+        assert(vid->fragment_id == pf.fragment_index);
+        assert(vid->offset == i);
         assert(is_new_eid(eid));
         (void) vid;
       },
@@ -279,9 +283,10 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
       fb.initCXXBaseSpecifiers(NumEntities(pf.cxx_base_specifiers_to_serialize)),
       pf.cxx_base_specifiers_to_serialize,
       [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
-        auto vid = std::get<mx::CXXBaseSpecifierId>(mx::EntityId(eid).Unpack());
-        assert(vid.fragment_id == pf.fragment_index);
-        assert(vid.offset == i);
+        auto vid = mx::EntityId(eid).Extract<mx::CXXBaseSpecifierId>();
+        assert(vid.has_value());
+        assert(vid->fragment_id == pf.fragment_index);
+        assert(vid->offset == i);
         assert(is_new_eid(eid));
         (void) vid;
       },
@@ -292,9 +297,10 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
           NumEntities(pf.template_arguments_to_serialize)),
       pf.template_arguments_to_serialize,
       [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
-        auto vid = std::get<mx::TemplateArgumentId>(mx::EntityId(eid).Unpack());
-        assert(vid.fragment_id == pf.fragment_index);
-        assert(vid.offset == i);
+        auto vid = mx::EntityId(eid).Extract<mx::TemplateArgumentId>();
+        assert(vid.has_value());
+        assert(vid->fragment_id == pf.fragment_index);
+        assert(vid->offset == i);
         assert(is_new_eid(eid));
         (void) vid;
       },
@@ -305,10 +311,10 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
           NumEntities(pf.template_parameter_lists_to_serialize)),
       pf.template_parameter_lists_to_serialize,
       [&] (mx::RawEntityId eid, unsigned, mx::EntityOffset i) {
-        auto vid = std::get<mx::TemplateParameterListId>(
-            mx::EntityId(eid).Unpack());
-        assert(vid.fragment_id == pf.fragment_index);
-        assert(vid.offset == i);
+        auto vid = mx::EntityId(eid).Extract<mx::TemplateParameterListId>();
+        assert(vid.has_value());
+        assert(vid->fragment_id == pf.fragment_index);
+        assert(vid->offset == i);
         assert(is_new_eid(eid));
         (void) vid;
       },
@@ -319,22 +325,19 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
 
 void SerializeType(const pasta::Type &entity,
                    const PendingFragment &pf,
-                   mx::RawEntityId type_id,
+                   mx::RawEntityId type_index,
                    mx::ast::Type::Builder builder) {
   const EntityMapper &em = pf.em;
-  mx::RawEntityId eid = em.EntityId(entity);
+  auto eid = em.SpecificEntityId<mx::TypeId>(entity);
+  assert(eid.has_value());
+  assert(eid->type_id == type_index);
 
-#ifndef NDEBUG
-  auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
-  assert(vid.type_id == type_id);
-#endif
+  (void) eid;
+  (void) type_index;
 
   em.tm.EnterReadOnly();
   DispatchSerializeEntity(pf, em, builder, entity);
   em.tm.ExitReadOnly();
-
-  (void) eid;
-  (void) type_id;
 }
 
 }  // namespace indexer
