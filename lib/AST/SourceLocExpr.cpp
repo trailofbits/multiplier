@@ -197,7 +197,11 @@ std::string_view SourceLocExpr::builtin_string(void) const {
 }
 
 SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const {
+<<<<<<< HEAD
   return static_cast<SourceLocExprIdentKind>(impl->reader.getVal90());
+=======
+  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal92());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Token SourceLocExpr::token(void) const {
@@ -205,7 +209,11 @@ Token SourceLocExpr::token(void) const {
 }
 
 bool SourceLocExpr::is_int_type(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
+=======
+  return impl->reader.getVal86();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

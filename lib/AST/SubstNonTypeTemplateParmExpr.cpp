@@ -203,10 +203,17 @@ Token SubstNonTypeTemplateParmExpr::name_token(void) const {
 }
 
 std::optional<uint32_t> SubstNonTypeTemplateParmExpr::pack_index(void) const {
+<<<<<<< HEAD
   if (!impl->reader.getVal84()) {
     return std::nullopt;
   } else {
     return static_cast<uint32_t>(impl->reader.getVal100());
+=======
+  if (!impl->reader.getVal86()) {
+    return std::nullopt;
+  } else {
+    return static_cast<uint32_t>(impl->reader.getVal102());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   }
   return std::nullopt;
 }
@@ -227,7 +234,11 @@ Expr SubstNonTypeTemplateParmExpr::replacement(void) const {
 }
 
 bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal85();
+=======
+  return impl->reader.getVal87();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

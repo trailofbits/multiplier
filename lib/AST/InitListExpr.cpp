@@ -253,6 +253,7 @@ std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
 }
 
 bool InitListExpr::had_array_range_designator(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -262,6 +263,17 @@ bool InitListExpr::has_array_filler(void) const {
 
 bool InitListExpr::has_designated_initializer(void) const {
   return impl->reader.getVal86();
+=======
+  return impl->reader.getVal86();
+}
+
+bool InitListExpr::has_array_filler(void) const {
+  return impl->reader.getVal87();
+}
+
+bool InitListExpr::has_designated_initializer(void) const {
+  return impl->reader.getVal88();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 unsigned InitListExpr::num_initializers(void) const {
@@ -297,6 +309,7 @@ gap::generator<Expr> InitListExpr::initializers(void) const & {
 }
 
 bool InitListExpr::is_explicit(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal87();
 }
 
@@ -317,6 +330,28 @@ std::optional<bool> InitListExpr::is_transparent(void) const {
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal93());
+=======
+  return impl->reader.getVal89();
+}
+
+bool InitListExpr::is_semantic_form(void) const {
+  return impl->reader.getVal90();
+}
+
+bool InitListExpr::is_string_literal_initializer(void) const {
+  return impl->reader.getVal91();
+}
+
+bool InitListExpr::is_syntactic_form(void) const {
+  return impl->reader.getVal93();
+}
+
+std::optional<bool> InitListExpr::is_transparent(void) const {
+  if (!impl->reader.getVal96()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal95());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   }
   return std::nullopt;
 }

@@ -276,6 +276,7 @@ std::optional<Expr> GenericSelectionExpr::result_expression(void) const {
 }
 
 bool GenericSelectionExpr::is_expression_predicate(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -285,6 +286,17 @@ bool GenericSelectionExpr::is_result_dependent(void) const {
 
 bool GenericSelectionExpr::is_type_predicate(void) const {
   return impl->reader.getVal86();
+=======
+  return impl->reader.getVal86();
+}
+
+bool GenericSelectionExpr::is_result_dependent(void) const {
+  return impl->reader.getVal87();
+}
+
+bool GenericSelectionExpr::is_type_predicate(void) const {
+  return impl->reader.getVal88();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

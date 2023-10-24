@@ -194,7 +194,11 @@ std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const TokenContext &t) {
 }
 
 bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
+=======
+  return impl->reader.getVal86();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Expr CXXDeleteExpr::argument(void) const {
@@ -229,6 +233,7 @@ std::optional<FunctionDecl> CXXDeleteExpr::operator_delete(void) const {
 }
 
 bool CXXDeleteExpr::is_array_form(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal85();
 }
 
@@ -238,6 +243,17 @@ bool CXXDeleteExpr::is_array_form_as_written(void) const {
 
 bool CXXDeleteExpr::is_global_delete(void) const {
   return impl->reader.getVal87();
+=======
+  return impl->reader.getVal87();
+}
+
+bool CXXDeleteExpr::is_array_form_as_written(void) const {
+  return impl->reader.getVal88();
+}
+
+bool CXXDeleteExpr::is_global_delete(void) const {
+  return impl->reader.getVal89();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

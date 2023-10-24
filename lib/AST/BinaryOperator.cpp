@@ -200,7 +200,11 @@ Expr BinaryOperator::lhs(void) const {
 }
 
 BinaryOperatorKind BinaryOperator::opcode(void) const {
+<<<<<<< HEAD
   return static_cast<BinaryOperatorKind>(impl->reader.getVal90());
+=======
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal92());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 std::string_view BinaryOperator::opcode_string(void) const {
@@ -218,6 +222,7 @@ Expr BinaryOperator::rhs(void) const {
 }
 
 bool BinaryOperator::has_stored_fp_features(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -271,6 +276,61 @@ bool BinaryOperator::is_shift_assign_operation(void) const {
 
 bool BinaryOperator::is_shift_operation(void) const {
   return impl->reader.getVal99();
+=======
+  return impl->reader.getVal86();
+}
+
+bool BinaryOperator::is_additive_operation(void) const {
+  return impl->reader.getVal87();
+}
+
+bool BinaryOperator::is_assignment_operation(void) const {
+  return impl->reader.getVal88();
+}
+
+bool BinaryOperator::is_bitwise_operation(void) const {
+  return impl->reader.getVal89();
+}
+
+bool BinaryOperator::is_comma_operation(void) const {
+  return impl->reader.getVal90();
+}
+
+bool BinaryOperator::is_comparison_operation(void) const {
+  return impl->reader.getVal91();
+}
+
+bool BinaryOperator::is_compound_assignment_operation(void) const {
+  return impl->reader.getVal93();
+}
+
+bool BinaryOperator::is_equality_operation(void) const {
+  return impl->reader.getVal95();
+}
+
+bool BinaryOperator::is_logical_operation(void) const {
+  return impl->reader.getVal96();
+}
+
+bool BinaryOperator::is_multiplicative_operation(void) const {
+  return impl->reader.getVal97();
+}
+
+bool BinaryOperator::is_pointer_memory_operation(void) const {
+  return impl->reader.getVal98();
+}
+
+bool BinaryOperator::is_relational_operation(void) const {
+  return impl->reader.getVal99();
+}
+
+bool BinaryOperator::is_shift_assign_operation(void) const {
+  return impl->reader.getVal100();
+}
+
+bool BinaryOperator::is_shift_operation(void) const {
+  return impl->reader.getVal101();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

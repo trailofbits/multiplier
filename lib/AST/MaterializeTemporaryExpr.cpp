@@ -220,7 +220,11 @@ std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_
 }
 
 StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
+<<<<<<< HEAD
   return static_cast<StorageDuration>(impl->reader.getVal90());
+=======
+  return static_cast<StorageDuration>(impl->reader.getVal92());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Expr MaterializeTemporaryExpr::sub_expression(void) const {
@@ -229,11 +233,19 @@ Expr MaterializeTemporaryExpr::sub_expression(void) const {
 }
 
 bool MaterializeTemporaryExpr::is_bound_to_lvalue_reference(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 bool MaterializeTemporaryExpr::is_usable_in_constant_expressions(void) const {
   return impl->reader.getVal85();
+=======
+  return impl->reader.getVal86();
+}
+
+bool MaterializeTemporaryExpr::is_usable_in_constant_expressions(void) const {
+  return impl->reader.getVal87();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

@@ -90,6 +90,10 @@ class MX_EXPORT Expr : public ValueStmt {
   bool is_gl_value(void) const;
   bool is_implicit_cxx_this(void) const;
   bool is_instantiation_dependent(void) const;
+<<<<<<< HEAD
+=======
+  std::optional<bool> is_known_to_have_boolean_value(void) const;
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   bool is_l_value(void) const;
   bool is_objcgc_candidate(void) const;
   bool is_obj_c_self_expression(void) const;

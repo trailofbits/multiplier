@@ -252,7 +252,11 @@ ObjCMethodDecl ObjCMessageExpr::method_declaration(void) const {
 }
 
 ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
+<<<<<<< HEAD
   return static_cast<ObjCMethodFamily>(impl->reader.getVal90());
+=======
+  return static_cast<ObjCMethodFamily>(impl->reader.getVal92());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
@@ -261,7 +265,11 @@ ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
 }
 
 ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {
+<<<<<<< HEAD
   return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal92());
+=======
+  return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal94());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 TokenRange ObjCMessageExpr::receiver_range(void) const {
@@ -291,6 +299,7 @@ Type ObjCMessageExpr::super_type(void) const {
 }
 
 bool ObjCMessageExpr::is_class_message(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -304,6 +313,21 @@ bool ObjCMessageExpr::is_implicit(void) const {
 
 bool ObjCMessageExpr::is_instance_message(void) const {
   return impl->reader.getVal87();
+=======
+  return impl->reader.getVal86();
+}
+
+bool ObjCMessageExpr::is_delegate_initializer_call(void) const {
+  return impl->reader.getVal87();
+}
+
+bool ObjCMessageExpr::is_implicit(void) const {
+  return impl->reader.getVal88();
+}
+
+bool ObjCMessageExpr::is_instance_message(void) const {
+  return impl->reader.getVal89();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 unsigned ObjCMessageExpr::num_selector_tokens(void) const {

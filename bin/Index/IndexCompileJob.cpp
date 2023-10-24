@@ -351,9 +351,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     // }
   }
 
-  void VisitUsingShadowDecl(const pasta::UsingShadowDecl &) final {
-
-  }
+  void VisitUsingShadowDecl(const pasta::UsingShadowDecl &) final {}
 
   void VisitTypeAliasTemplateDecl(const pasta::TypeAliasTemplateDecl &decl) final {
     VisitDecl(decl);

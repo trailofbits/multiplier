@@ -257,11 +257,19 @@ ObjCCategoryDecl ObjCCategoryDecl::next_class_category(void) const {
 }
 
 unsigned ObjCCategoryDecl::num_instance_variables(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal191().size();
 }
 
 std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) const {
   auto list = impl->reader.getVal191();
+=======
+  return impl->reader.getVal313().size();
+}
+
+std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) const {
+  auto list = impl->reader.getVal313();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -275,12 +283,21 @@ std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) 
 }
 
 gap::generator<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const & {
+<<<<<<< HEAD
   auto list = impl->reader.getVal191();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d191 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCIvarDecl::from_base(std::move(d191))) {
+=======
+  auto list = impl->reader.getVal313();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d313 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from_base(std::move(d313))) {
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
         co_yield std::move(*e);
       }
     }
@@ -289,11 +306,19 @@ gap::generator<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const & 
 }
 
 unsigned ObjCCategoryDecl::num_protocol_tokens(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal314().size();
 }
 
 std::optional<Token> ObjCCategoryDecl::nth_protocol_token(unsigned n) const {
   auto list = impl->reader.getVal314();
+=======
+  return impl->reader.getVal339().size();
+}
+
+std::optional<Token> ObjCCategoryDecl::nth_protocol_token(unsigned n) const {
+  auto list = impl->reader.getVal339();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -307,7 +332,11 @@ std::optional<Token> ObjCCategoryDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCCategoryDecl::protocol_tokens(void) const & {
+<<<<<<< HEAD
   auto list = impl->reader.getVal314();
+=======
+  auto list = impl->reader.getVal339();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
@@ -317,19 +346,32 @@ gap::generator<Token> ObjCCategoryDecl::protocol_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
+<<<<<<< HEAD
     if (auto t314 = ep->TokenFor(ep, tok_reader, v)) {
       co_yield t314;
+=======
+    if (auto t339 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t339;
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     }
   }
   co_return;
 }
 
 unsigned ObjCCategoryDecl::num_protocols(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal340().size();
 }
 
 std::optional<ObjCProtocolDecl> ObjCCategoryDecl::nth_protocol(unsigned n) const {
   auto list = impl->reader.getVal340();
+=======
+  return impl->reader.getVal350().size();
+}
+
+std::optional<ObjCProtocolDecl> ObjCCategoryDecl::nth_protocol(unsigned n) const {
+  auto list = impl->reader.getVal350();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -343,12 +385,21 @@ std::optional<ObjCProtocolDecl> ObjCCategoryDecl::nth_protocol(unsigned n) const
 }
 
 gap::generator<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const & {
+<<<<<<< HEAD
   auto list = impl->reader.getVal340();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d340 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCProtocolDecl::from_base(std::move(d340))) {
+=======
+  auto list = impl->reader.getVal350();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d350 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCProtocolDecl::from_base(std::move(d350))) {
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
         co_yield std::move(*e);
       }
     }

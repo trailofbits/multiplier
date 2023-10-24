@@ -203,7 +203,11 @@ Type ArrayTypeTraitExpr::queried_type(void) const {
 }
 
 ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const {
+<<<<<<< HEAD
   return static_cast<ArrayTypeTrait>(impl->reader.getVal90());
+=======
+  return static_cast<ArrayTypeTrait>(impl->reader.getVal92());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

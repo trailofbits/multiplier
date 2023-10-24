@@ -245,6 +245,7 @@ Token CXXDependentScopeMemberExpr::template_keyword_token(void) const {
 }
 
 bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
@@ -258,6 +259,21 @@ bool CXXDependentScopeMemberExpr::is_arrow(void) const {
 
 bool CXXDependentScopeMemberExpr::is_implicit_access(void) const {
   return impl->reader.getVal87();
+=======
+  return impl->reader.getVal86();
+}
+
+bool CXXDependentScopeMemberExpr::has_template_keyword(void) const {
+  return impl->reader.getVal87();
+}
+
+bool CXXDependentScopeMemberExpr::is_arrow(void) const {
+  return impl->reader.getVal88();
+}
+
+bool CXXDependentScopeMemberExpr::is_implicit_access(void) const {
+  return impl->reader.getVal89();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

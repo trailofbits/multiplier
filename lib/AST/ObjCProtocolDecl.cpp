@@ -239,11 +239,19 @@ bool ObjCProtocolDecl::is_this_declaration_a_definition(void) const {
 }
 
 unsigned ObjCProtocolDecl::num_protocol_tokens(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal191().size();
 }
 
 std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
   auto list = impl->reader.getVal191();
+=======
+  return impl->reader.getVal313().size();
+}
+
+std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
+  auto list = impl->reader.getVal313();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -257,7 +265,11 @@ std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const & {
+<<<<<<< HEAD
   auto list = impl->reader.getVal191();
+=======
+  auto list = impl->reader.getVal313();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   EntityProviderPtr ep = impl->ep;
   auto fragment = ep->FragmentFor(ep, impl->fragment_id);
   if (!fragment) {
@@ -267,19 +279,32 @@ gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const & {
   auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
+<<<<<<< HEAD
     if (auto t191 = ep->TokenFor(ep, tok_reader, v)) {
       co_yield t191;
+=======
+    if (auto t313 = ep->TokenFor(ep, tok_reader, v)) {
+      co_yield t313;
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
     }
   }
   co_return;
 }
 
 unsigned ObjCProtocolDecl::num_protocols(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal314().size();
 }
 
 std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const {
   auto list = impl->reader.getVal314();
+=======
+  return impl->reader.getVal339().size();
+}
+
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const {
+  auto list = impl->reader.getVal339();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -293,12 +318,21 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const & {
+<<<<<<< HEAD
   auto list = impl->reader.getVal314();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d314 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCProtocolDecl::from_base(std::move(d314))) {
+=======
+  auto list = impl->reader.getVal339();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d339 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCProtocolDecl::from_base(std::move(d339))) {
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
         co_yield std::move(*e);
       }
     }

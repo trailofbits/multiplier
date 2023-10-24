@@ -209,7 +209,11 @@ std::optional<Expr> OpaqueValueExpr::source_expression(void) const {
 }
 
 bool OpaqueValueExpr::is_unique(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
+=======
+  return impl->reader.getVal86();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

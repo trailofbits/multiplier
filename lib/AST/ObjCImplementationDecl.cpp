@@ -252,6 +252,7 @@ bool ObjCImplementationDecl::has_destructors(void) const {
 
 bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
   return impl->reader.getVal75();
+<<<<<<< HEAD
 }
 
 unsigned ObjCImplementationDecl::num_initializers(void) const {
@@ -290,6 +291,16 @@ unsigned ObjCImplementationDecl::num_instance_variables(void) const {
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
   auto list = impl->reader.getVal340();
+=======
+}
+
+unsigned ObjCImplementationDecl::num_instance_variables(void) const {
+  return impl->reader.getVal339().size();
+}
+
+std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
+  auto list = impl->reader.getVal339();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -303,12 +314,21 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const & {
+<<<<<<< HEAD
   auto list = impl->reader.getVal340();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
     if (auto d340 = ep->DeclFor(ep, v)) {
       if (auto e = ObjCIvarDecl::from_base(std::move(d340))) {
+=======
+  auto list = impl->reader.getVal339();
+  EntityProviderPtr ep = impl->ep;
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d339 = ep->DeclFor(ep, v)) {
+      if (auto e = ObjCIvarDecl::from_base(std::move(d339))) {
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
         co_yield std::move(*e);
       }
     }

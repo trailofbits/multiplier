@@ -220,11 +220,19 @@ Token ChooseExpr::r_paren_token(void) const {
 }
 
 bool ChooseExpr::is_condition_dependent(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 bool ChooseExpr::is_condition_true(void) const {
   return impl->reader.getVal85();
+=======
+  return impl->reader.getVal86();
+}
+
+bool ChooseExpr::is_condition_true(void) const {
+  return impl->reader.getVal87();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

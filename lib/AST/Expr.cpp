@@ -719,6 +719,7 @@ bool Expr::is_instantiation_dependent(void) const {
   return impl->reader.getVal59();
 }
 
+<<<<<<< HEAD
 bool Expr::is_l_value(void) const {
   return impl->reader.getVal70();
 }
@@ -744,11 +745,48 @@ std::optional<bool> Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
     return std::nullopt;
   } else {
     return static_cast<bool>(impl->reader.getVal75());
+=======
+std::optional<bool> Expr::is_known_to_have_boolean_value(void) const {
+  if (!impl->reader.getVal71()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal70());
+  }
+  return std::nullopt;
+}
+
+bool Expr::is_l_value(void) const {
+  return impl->reader.getVal72();
+}
+
+bool Expr::is_objcgc_candidate(void) const {
+  return impl->reader.getVal73();
+}
+
+bool Expr::is_obj_c_self_expression(void) const {
+  return impl->reader.getVal74();
+}
+
+bool Expr::is_ordinary_or_bit_field_object(void) const {
+  return impl->reader.getVal75();
+}
+
+bool Expr::is_pr_value(void) const {
+  return impl->reader.getVal76();
+}
+
+std::optional<bool> Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
+  if (!impl->reader.getVal78()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal77());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
   }
   return std::nullopt;
 }
 
 bool Expr::is_type_dependent(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal77();
 }
 
@@ -774,6 +812,33 @@ bool Expr::refers_to_matrix_element(void) const {
 
 bool Expr::refers_to_vector_element(void) const {
   return impl->reader.getVal83();
+=======
+  return impl->reader.getVal79();
+}
+
+bool Expr::is_value_dependent(void) const {
+  return impl->reader.getVal80();
+}
+
+bool Expr::is_x_value(void) const {
+  return impl->reader.getVal81();
+}
+
+bool Expr::refers_to_bit_field(void) const {
+  return impl->reader.getVal82();
+}
+
+bool Expr::refers_to_global_register_variable(void) const {
+  return impl->reader.getVal83();
+}
+
+bool Expr::refers_to_matrix_element(void) const {
+  return impl->reader.getVal84();
+}
+
+bool Expr::refers_to_vector_element(void) const {
+  return impl->reader.getVal85();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

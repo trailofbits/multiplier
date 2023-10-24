@@ -211,11 +211,19 @@ Token ObjCIvarRefExpr::operation_token(void) const {
 }
 
 bool ObjCIvarRefExpr::is_arrow(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 bool ObjCIvarRefExpr::is_free_instance_variable(void) const {
   return impl->reader.getVal85();
+=======
+  return impl->reader.getVal86();
+}
+
+bool ObjCIvarRefExpr::is_free_instance_variable(void) const {
+  return impl->reader.getVal87();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

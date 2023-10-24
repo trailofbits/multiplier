@@ -193,11 +193,19 @@ std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Tok
 }
 
 bool CXXInheritedCtorInitExpr::constructs_virtual_base(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(void) const {
   return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal90());
+=======
+  return impl->reader.getVal86();
+}
+
+CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(void) const {
+  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal92());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 CXXConstructorDecl CXXInheritedCtorInitExpr::constructor(void) const {
@@ -210,7 +218,11 @@ Token CXXInheritedCtorInitExpr::token(void) const {
 }
 
 bool CXXInheritedCtorInitExpr::inherited_from_virtual_base(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal85();
+=======
+  return impl->reader.getVal87();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

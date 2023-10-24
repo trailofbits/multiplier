@@ -193,11 +193,19 @@ std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const TokenContex
 }
 
 bool UnresolvedLookupExpr::is_overloaded(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal86();
 }
 
 bool UnresolvedLookupExpr::requires_adl(void) const {
   return impl->reader.getVal87();
+=======
+  return impl->reader.getVal88();
+}
+
+bool UnresolvedLookupExpr::requires_adl(void) const {
+  return impl->reader.getVal89();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

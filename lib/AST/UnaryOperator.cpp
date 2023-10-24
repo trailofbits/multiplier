@@ -192,11 +192,19 @@ std::optional<UnaryOperator> UnaryOperator::from(const TokenContext &t) {
 }
 
 bool UnaryOperator::can_overflow(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal84();
 }
 
 UnaryOperatorKind UnaryOperator::opcode(void) const {
   return static_cast<UnaryOperatorKind>(impl->reader.getVal90());
+=======
+  return impl->reader.getVal86();
+}
+
+UnaryOperatorKind UnaryOperator::opcode(void) const {
+  return static_cast<UnaryOperatorKind>(impl->reader.getVal92());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 Token UnaryOperator::operator_token(void) const {
@@ -209,6 +217,7 @@ Expr UnaryOperator::sub_expression(void) const {
 }
 
 bool UnaryOperator::has_stored_fp_features(void) const {
+<<<<<<< HEAD
   return impl->reader.getVal85();
 }
 
@@ -234,6 +243,33 @@ bool UnaryOperator::is_postfix(void) const {
 
 bool UnaryOperator::is_prefix(void) const {
   return impl->reader.getVal93();
+=======
+  return impl->reader.getVal87();
+}
+
+bool UnaryOperator::is_arithmetic_operation(void) const {
+  return impl->reader.getVal88();
+}
+
+bool UnaryOperator::is_decrement_operation(void) const {
+  return impl->reader.getVal89();
+}
+
+bool UnaryOperator::is_increment_decrement_operation(void) const {
+  return impl->reader.getVal90();
+}
+
+bool UnaryOperator::is_increment_operation(void) const {
+  return impl->reader.getVal91();
+}
+
+bool UnaryOperator::is_postfix(void) const {
+  return impl->reader.getVal93();
+}
+
+bool UnaryOperator::is_prefix(void) const {
+  return impl->reader.getVal95();
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 #pragma GCC diagnostic pop

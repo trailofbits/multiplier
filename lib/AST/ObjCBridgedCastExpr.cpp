@@ -198,7 +198,11 @@ Token ObjCBridgedCastExpr::bridge_keyword_token(void) const {
 }
 
 ObjCBridgeCastKind ObjCBridgedCastExpr::bridge_kind(void) const {
+<<<<<<< HEAD
   return static_cast<ObjCBridgeCastKind>(impl->reader.getVal92());
+=======
+  return static_cast<ObjCBridgeCastKind>(impl->reader.getVal94());
+>>>>>>> 5d49e713d (Intial changes to fix root fragment for function template)
 }
 
 std::string_view ObjCBridgedCastExpr::bridge_kind_name(void) const {
