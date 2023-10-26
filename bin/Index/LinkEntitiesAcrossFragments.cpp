@@ -21,15 +21,13 @@ static void TrackRedeclarations(
     const EntityMapper &em, const std::string &mangled_name,
     const pasta::Decl &decl, std::vector<pasta::Decl> redecls) {
 
-  mx::RawEntityId a_id = em.EntityId(decl);
-  mx::VariantId a_vid = mx::EntityId(a_id).Unpack();
-  if (!std::holds_alternative<mx::DeclId>(a_vid)) {
-    assert(false);
+  auto raw_decl_id = em.EntityId(decl);
+  auto decl_id = mx::EntityId(raw_decl_id).Extract<mx::DeclId>();
+  if (!decl_id) {
     return;
   }
 
-  mx::DeclId decl_id = std::get<mx::DeclId>(a_vid);
-  if (decl_id.fragment_id != fragment_index) {
+  if (decl_id->fragment_id != fragment_index) {
     assert(false);
     return;
   }
@@ -37,27 +35,18 @@ static void TrackRedeclarations(
   // If the mangled_name is empty, it should not be added to the table.
   // It goes around it and add redecls to the redecl record table.
   if (!mangled_name.empty()) {
-    database.AddAsync(mx::MangledNameRecord{a_id, mangled_name});
+    database.AddAsync(mx::MangledNameRecord{raw_decl_id, mangled_name});
   }
 
   for (const pasta::Decl &redecl : redecls) {
-    mx::RawEntityId b_id = em.EntityId(redecl);
-    if (a_id == b_id) {
+
+    auto redecl_id = em.SpecificEntityId<mx::DeclId>(redecl);
+    if (!redecl_id || decl_id.value() == redecl_id.value()) {
       continue;
     }
 
-    // NOTE(pag): This assertion is likely to trigger when debugging the indexer
-    //            by restricting it to indexing a specific entity, i.e. by
-    //            modifying `CreatePendingFragment` in `IndexCompileJob.cpp`.
-    //            It can safely be commented out.
-    mx::VariantId b_vid = mx::EntityId(b_id).Unpack();
-    if (!std::holds_alternative<mx::DeclId>(b_vid)) {
-      assert(false);
-      continue;
-    }
-
-    mx::DeclId redecl_id = std::get<mx::DeclId>(b_vid);
-    database.AddAsync(mx::RedeclarationRecord{decl_id, redecl_id});
+    database.AddAsync(mx::RedeclarationRecord{
+        decl_id.value(), redecl_id.value()});
   }
 }
 
@@ -72,9 +61,10 @@ void LinkEntitiesAcrossFragments(
   const EntityMapper &em = pf.em;
 
   std::string dummy_mangled_name;
-  for (const pasta::Decl &decl : pf.decls_to_serialize) {
+  for (pasta::Decl decl : Entities(pf.decls_to_serialize)) {
     mx::RawEntityId eid = em.EntityId(decl);
     if (eid == mx::kInvalidEntityId) {
+      assert(false);
       continue;
     }
 

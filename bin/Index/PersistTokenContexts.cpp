@@ -41,7 +41,9 @@ static mx::RawEntityId IdOfRedeclInFragment(
   mx::RawEntityId ret_id = em.EntityId(canon_decl);
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
     mx::RawEntityId eid = em.EntityId(redecl);
-    if (eid == mx::kInvalidEntityId) {
+    auto decl_id = mx::EntityId(eid).Extract<mx::DeclId>();
+    if (!decl_id) {
+      assert(false);
       continue;
     }
 
@@ -51,10 +53,7 @@ static mx::RawEntityId IdOfRedeclInFragment(
       ret_id = eid;
     }
 
-    mx::VariantId vid = mx::EntityId(eid).Unpack();
-    CHECK(std::holds_alternative<mx::DeclId>(vid));
-    mx::DeclId id = std::get<mx::DeclId>(vid);
-    if (id.fragment_id == frag_index) {
+    if (decl_id->fragment_id == frag_index) {
       return eid;
     }
   }

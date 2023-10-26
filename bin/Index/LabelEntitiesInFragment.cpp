@@ -59,7 +59,7 @@ class EntityLabeller final : public EntityVisitor {
       return false;
     }
     
-    if (!fragment.Add(entity)) {
+    if (!fragment.TryAdd(entity)) {
       return false;
     }
 
@@ -89,11 +89,6 @@ class EntityLabeller final : public EntityVisitor {
   // NOTE(pag): We can't rely on the order of types being deterministic for
   //            the "same" fragment in different translation units.
   bool Enter(const pasta::Type &) final {
-
-    // if (fragment.is_new) {
-    //   return fragment.Add(entity);
-    // }
-    
     return false;
   }
 
@@ -102,10 +97,14 @@ class EntityLabeller final : public EntityVisitor {
   }
 
   bool Enter(const pasta::Attr &attr) final {
-    fragment.Add(attr);
+    fragment.TryAdd(attr);
 
     // NOTE(pag): Want to return `true` because some attributes contain constant
     //            expressions.
+    //
+    // TODO(pag): Consider `return fragment.TryAdd`, given that it now has logic
+    //            to figure out if the attribute ought belong to this fragment
+    //            or not.
     return true;
   }
 
@@ -210,10 +209,12 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
 // Create initial macro IDs for all of the top-level macros in the range of
 // this fragment.
 bool EntityLabeller::Label(const pasta::Macro &entity) {
+  auto &entity_list = fragment.EntityListFor(entity);
+
   mx::MacroId id;
   id.kind = mx::FromPasta(entity.Kind());
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(fragment.macros_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(entity_list.size());
 
   // Macro definitions and their parameters can be referenced by other fragments
   // that contain expansions of those definitions, and substitutions of those
@@ -226,7 +227,7 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 
   // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
   //            fills in the empty slots.
-  fragment.macros_to_serialize.emplace_back();
+  fragment.EntityListFor(entity).emplace_back();
 
   // Define directives should go and provide entity ids for their
   // parameters, as they can be referenced by `MacroParameterSubstitution`s.

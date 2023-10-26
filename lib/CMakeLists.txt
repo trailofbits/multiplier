@@ -118,6 +118,7 @@ add_library("mx-api" STATIC
   "FileImpl.cpp"
   "File.h"
   "Fragment.cpp"
+  "FragmentEntity.h"
   "FragmentImpl.cpp"
   "Fragment.h"
   "Index.cpp"

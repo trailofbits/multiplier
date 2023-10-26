@@ -90,6 +90,17 @@ class EntityMapper final {
 
   mx::RawEntityId EntityIdOfType(const void *type, uint32_t quals=0u) const;
 
+
+  template <typename IdType>
+  inline std::optional<IdType> SpecificEntityId(const void *raw_entity) const {
+    return mx::EntityId(this->EntityId(raw_entity)).Extract<IdType>();
+  }
+
+  template <typename IdType, typename Entity>
+  inline std::optional<IdType> SpecificEntityId(const Entity &entity) const {
+    return mx::EntityId(this->EntityId(entity)).Extract<IdType>();
+  }
+
   std::optional<const pasta::Decl> ParentDecl(
       const pasta::AST &ast, const pasta::Decl &entity) const;
   std::optional<const pasta::Decl> ParentDecl(

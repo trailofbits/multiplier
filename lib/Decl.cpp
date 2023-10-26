@@ -19,10 +19,10 @@ static thread_local RawEntityIdList tIgnoredRedecls;
 
 }  // namespace
 
-DeclImpl::DeclImpl(std::shared_ptr<EntityProvider> ep_,
-                   kj::Array<capnp::word> data_,
+DeclImpl::DeclImpl(FragmentImplPtr frag_,
+                   ast::Decl::Reader reader_,
                    RawEntityId id_)
-    : EntityImpl<ast::Decl>(std::move(ep_), kj::mv(data_)),
+    : FragmentEntityImpl<ast::Decl>(std::move(frag_), kj::mv(reader_)),
       fragment_id(FragmentIdFromEntityId(id_).value()),
       offset(FragmentOffsetFromEntityId(id_).value()),
       definition_id(kInvalidEntityId),
@@ -162,7 +162,7 @@ Decl Decl::canonical_declaration(void) const {
 
 gap::generator<Decl> Decl::redeclarations(void) const & {
   auto any = false;
-  const EntityProviderPtr &ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
     if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
       any = true;
@@ -177,7 +177,7 @@ gap::generator<Decl> Decl::redeclarations(void) const & {
 
 // Return references to this declaration.
 gap::generator<Reference> Decl::references(void) const & {
-  const EntityProviderPtr &ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto ref : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
       auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));

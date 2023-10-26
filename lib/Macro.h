@@ -9,18 +9,18 @@
 #include <multiplier/AST.capnp.h>
 #include <multiplier/Entities/Macro.h>
 
-#include "Entity.h"
+#include "FragmentEntity.h"
 
 namespace mx {
 
 // Interface for accessing a macro.
-class MacroImpl final : public EntityImpl<ast::Macro> {
+class MacroImpl final : public FragmentEntityImpl<ast::Macro> {
  public:
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
 
-  explicit MacroImpl(std::shared_ptr<EntityProvider> ep_,
-                     kj::Array<capnp::word> data_,
+  explicit MacroImpl(FragmentImplPtr frag_,
+                     ast::Macro::Reader reader_,
                      RawEntityId id_);
 };
 

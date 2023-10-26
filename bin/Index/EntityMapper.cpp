@@ -213,18 +213,14 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::File &file) const {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
-  mx::RawEntityId file_id = EntityId(entity.RawFile());
-  if (file_id == mx::kInvalidEntityId) {
-    return mx::kInvalidEntityId;
-  }
-
-  mx::VariantId vid = mx::EntityId(file_id).Unpack();
-  if (!std::holds_alternative<mx::FileId>(vid)) {
+  auto file = pasta::File::Containing(entity);
+  auto fid = SpecificEntityId<mx::FileId>(file);
+  if (!fid) {
     return mx::kInvalidEntityId;
   }
 
   mx::FileTokenId id;
-  id.file_id = std::get<mx::FileId>(vid).file_id;
+  id.file_id = fid->file_id;
   id.kind = TokenKindFromPasta(entity);
   id.offset = static_cast<mx::EntityOffset>(entity.Index());
   ::mx::EntityId ret_id(id);

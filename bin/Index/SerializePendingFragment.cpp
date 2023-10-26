@@ -8,15 +8,11 @@
 #include <capnp/common.h>
 #include <capnp/message.h>
 #include <deque>
-
 #include <multiplier/AST.capnp.h>
 #include <multiplier/Entities/MacroKind.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Database.h>
-
-#ifndef NDEBUG
-# include <unordered_set>
-#endif
+#include <unordered_set>
 
 #include "EntityMapper.h"
 #include "PASTA.h"
@@ -27,10 +23,10 @@
 namespace indexer {
 namespace {
 
-static void DispatchSerializeDecl(const PendingFragment &pf,
-                                  const EntityMapper &em,
-                                  mx::ast::Decl::Builder builder,
-                                  const pasta::Decl &entity) {
+static void DispatchSerializeEntity(const PendingFragment &pf,
+                                    const EntityMapper &em,
+                                    mx::ast::Decl::Builder builder,
+                                    const pasta::Decl &entity) {
   switch (entity.Kind()) {
 #define MX_VISIT_DECL(decl) \
     case pasta::DeclKind::k ## decl: \
@@ -49,10 +45,10 @@ static void DispatchSerializeDecl(const PendingFragment &pf,
   }
 }
 
-static void DispatchSerializeStmt(const PendingFragment &pf,
-                                  const EntityMapper &em,
-                                  mx::ast::Stmt::Builder builder,
-                                  const pasta::Stmt &entity) {
+static void DispatchSerializeEntity(const PendingFragment &pf,
+                                    const EntityMapper &em,
+                                    mx::ast::Stmt::Builder builder,
+                                    const pasta::Stmt &entity) {
   switch (entity.Kind()) {
 #define MX_VISIT_STMT(stmt) \
     case pasta::StmtKind::k ## stmt: \
@@ -74,10 +70,10 @@ static void DispatchSerializeStmt(const PendingFragment &pf,
   }
 }
 
-static void DispatchSerializeType(const PendingFragment &pf,
-                                  const EntityMapper &em,
-                                  mx::ast::Type::Builder builder,
-                                  const pasta::Type &entity) {
+static void DispatchSerializeEntity(const PendingFragment &pf,
+                                    const EntityMapper &em,
+                                    mx::ast::Type::Builder builder,
+                                    const pasta::Type &entity) {
 
   // Second pass actually does the real serialization.
   switch (entity.Kind()) {
@@ -98,10 +94,10 @@ static void DispatchSerializeType(const PendingFragment &pf,
   }
 }
 
-static void DispatchSerializeAttr(const PendingFragment &pf,
-                                  const EntityMapper &em,
-                                  mx::ast::Attr::Builder builder,
-                                  const pasta::Attr &entity) {
+static void DispatchSerializeEntity(const PendingFragment &pf,
+                                    const EntityMapper &em,
+                                    mx::ast::Attr::Builder builder,
+                                    const pasta::Attr &entity) {
 
   // Second pass actually does the real serialization.
   switch (entity.Kind()) {
@@ -120,6 +116,42 @@ static void DispatchSerializeAttr(const PendingFragment &pf,
       assert(false);
       break;
   }
+}
+
+#define MAKE_DISPATCHER(pseudo_kind) \
+    inline static void DispatchSerializeEntity( \
+        const PendingFragment &pf, const EntityMapper &em, \
+        mx::ast::pseudo_kind::Builder builder, \
+        const pasta::pseudo_kind &entity) { \
+      Serialize ## pseudo_kind(pf, em, std::move(builder), entity, nullptr); \
+    }
+
+MAKE_DISPATCHER(TemplateArgument)
+MAKE_DISPATCHER(TemplateParameterList)
+MAKE_DISPATCHER(CXXBaseSpecifier)
+MAKE_DISPATCHER(Designator)
+
+#undef MAKE_DISPATCHER
+
+template <typename IdType, typename Kind>
+static void CheckFragOffsetKind(const PendingFragment &pf, mx::RawEntityId eid,
+                                Kind kind, mx::EntityOffset i) {
+  auto vid = mx::EntityId(eid).Extract<IdType>();
+  assert(vid.has_value());
+  assert(vid->fragment_id == pf.fragment_index);
+  assert(vid->offset == i);
+  assert(vid->kind == kind);
+  (void) vid;
+}
+
+template <typename IdType>
+static void CheckFragOffset(const PendingFragment &pf, mx::RawEntityId eid,
+                            unsigned /* dummy kind */, mx::EntityOffset i) {
+  auto vid = mx::EntityId(eid).Extract<IdType>();
+  assert(vid.has_value());
+  assert(vid->fragment_id == pf.fragment_index);
+  assert(vid->offset == i);
+  (void) vid;
 }
 
 }  // namespace
@@ -165,185 +197,117 @@ void DispatchSerializeMacro(const PendingFragment &pf,
 }
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
-void SerializePendingFragment(mx::DatabaseWriter &database,
+//
+// NOTE: We don't serialize types to the same fragments. They are
+//       serialized as different fragment in the database. This
+//       will avoid duplication of the types in each fragments.
+void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
+                              mx::DatabaseWriter &db,
                               const PendingFragment &pf) {
   const EntityMapper &em = pf.em;
 
-#ifndef NDEBUG
+  // Used to check if an entity ID is new.
   std::unordered_set<mx::RawEntityId> seen_eids;
   auto is_new_eid = [&seen_eids] (mx::RawEntityId eid) {
     return seen_eids.emplace(eid).second;
   };
-#endif
+  (void) is_new_eid;
 
-  mx::EntityOffset i = 0u;
-  for (const pasta::Decl &entity : pf.decls_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-    auto vid = std::get<mx::DeclId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-    ++i;
-#endif
-
-    EntityBuilder<mx::ast::Decl> storage;
-    em.tm.EnterReadOnly();
-    DispatchSerializeDecl(pf, pf.em, storage.builder, entity);
-    em.tm.ExitReadOnly();
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
-
-  i = 0u;
-  for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
+  // Serialize a list of entities.
+  auto serialize_list = [&] (auto list_builder, const auto &list,
+                             auto check_id, auto kind) {
+    mx::EntityOffset i = 0u;
+    for (const auto &entity : list) {
+      mx::RawEntityId eid = em.EntityId(entity);
+      db.AsyncIndexFragmentSpecificEntity(eid);
 
 #ifndef NDEBUG
-    auto vid = std::get<mx::StmtId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-    ++i;
+      assert(is_new_eid(eid));
+      check_id(pf, eid, kind, i);
 #endif
 
-    EntityBuilder<mx::ast::Stmt> storage;
-    em.tm.EnterReadOnly();
-    DispatchSerializeStmt(pf, pf.em, storage.builder, entity);
-    em.tm.ExitReadOnly();
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
+      DispatchSerializeEntity(pf, pf.em, list_builder[i++], entity);
+    }
 
-  // Note: We don't serialize types to the same fragments. They are
-  //       serialized as different fragment in the database. This
-  //       will avoid duplication of the types in each fragments.
-  i = 0u;
-  for (const pasta::Attr &entity : pf.attrs_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
+    (void) check_id;
+  };
 
-#ifndef NDEBUG
-    auto vid = std::get<mx::AttrId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-    ++i;
-#endif
+  // Serialize a map of entity lists. The index of the map is the integral
+  // representation of the entity kind.
+  //
+  // TODO(pag): Do we need to initialize the intermediate lists for kinds
+  //            that we don't have?
+  auto serialize_map = [&] (auto map_builder, const auto &map, auto check_id) {
+    for (const auto &[kind, entities] : map) {
+      serialize_list(
+          map_builder.init(static_cast<unsigned>(kind), NumEntities(entities)),
+          entities,
+          check_id,
+          kind);
+    }
+  };
 
-    EntityBuilder<mx::ast::Attr> storage;
-    em.tm.EnterReadOnly();
-    DispatchSerializeAttr(pf, pf.em, storage.builder, entity);
-    em.tm.ExitReadOnly();
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
+  em.tm.EnterReadOnly();
 
-  i = 0u;
-  for (const pasta::Designator &entity : pf.designators_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
+  serialize_map(
+      fb.initDecls(SerializationListSize(pf.decls_to_serialize)),
+      pf.decls_to_serialize,
+      CheckFragOffsetKind<mx::DeclId, mx::DeclKind>);
 
-#ifndef NDEBUG
-    auto vid = std::get<mx::DesignatorId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-    ++i;
-#endif
+  serialize_map(
+      fb.initStmts(SerializationListSize(pf.stmts_to_serialize)),
+      pf.stmts_to_serialize,
+      CheckFragOffsetKind<mx::StmtId, mx::StmtKind>);
 
-    EntityBuilder<mx::ast::Designator> storage;
-    em.tm.EnterReadOnly();
-    SerializeDesignator(pf, pf.em, storage.builder, entity, nullptr);
-    em.tm.ExitReadOnly();
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
+  serialize_map(
+      fb.initAttrs(SerializationListSize(pf.attrs_to_serialize)),
+      pf.attrs_to_serialize,
+      CheckFragOffsetKind<mx::AttrId, mx::AttrKind>);
 
-  i = 0u;
-  for (const pasta::CXXBaseSpecifier &entity :
-           pf.cxx_base_specifiers_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
+  serialize_list(
+      fb.initDesignators(NumEntities(pf.designators_to_serialize)),
+      pf.designators_to_serialize,
+      CheckFragOffset<mx::DesignatorId>,
+      0u);
 
-#ifndef NDEBUG
-    auto vid = std::get<mx::CXXBaseSpecifierId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-    ++i;
-#endif
+  serialize_list(
+      fb.initCXXBaseSpecifiers(NumEntities(pf.cxx_base_specifiers_to_serialize)),
+      pf.cxx_base_specifiers_to_serialize,
+      CheckFragOffset<mx::CXXBaseSpecifierId>,
+      0u);
 
-    EntityBuilder<mx::ast::CXXBaseSpecifier> storage;
-    em.tm.EnterReadOnly();
-    SerializeCXXBaseSpecifier(pf, pf.em, storage.builder, entity, nullptr);
-    em.tm.ExitReadOnly();
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
+  serialize_list(
+      fb.initTemplateArguments(
+          NumEntities(pf.template_arguments_to_serialize)),
+      pf.template_arguments_to_serialize,
+      CheckFragOffset<mx::TemplateArgumentId>,
+      0u);
 
-  i = 0u;
-  for (const pasta::TemplateArgument &entity :
-           pf.template_arguments_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
+  serialize_list(
+      fb.initTemplateParameterLists(
+          NumEntities(pf.template_parameter_lists_to_serialize)),
+      pf.template_parameter_lists_to_serialize,
+      CheckFragOffset<mx::TemplateArgumentId>,
+      0u);
 
-#ifndef NDEBUG
-    auto vid = std::get<mx::TemplateArgumentId>(mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-    ++i;
-#endif
-
-    EntityBuilder<mx::ast::TemplateArgument> storage;
-    em.tm.EnterReadOnly();
-    SerializeTemplateArgument(pf, pf.em, storage.builder, entity, nullptr);
-    em.tm.ExitReadOnly();
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
-
-  i = 0u;
-  for (const pasta::TemplateParameterList &entity :
-           pf.template_parameter_lists_to_serialize) {
-    mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-    auto vid = std::get<mx::TemplateParameterListId>(
-        mx::EntityId(eid).Unpack());
-    assert(vid.fragment_id == pf.fragment_index);
-    assert(vid.offset == i);
-    assert(is_new_eid(eid));
-    ++i;
-#endif
-
-    EntityBuilder<mx::ast::TemplateParameterList> storage;
-    em.tm.EnterReadOnly();
-    SerializeTemplateParameterList(pf, pf.em, storage.builder, entity, nullptr);
-    em.tm.ExitReadOnly();
-    database.AddAsync(
-        mx::EntityRecord{eid, GetSerializedData(storage.message)});
-  }
-
-  (void) i;
+  em.tm.ExitReadOnly();
 }
 
 void SerializeType(const pasta::Type &entity,
                    const PendingFragment &pf,
-                   mx::RawEntityId type_id,
+                   mx::RawEntityId type_index,
                    mx::ast::Type::Builder builder) {
   const EntityMapper &em = pf.em;
-  mx::RawEntityId eid = em.EntityId(entity);
-
-#ifndef NDEBUG
-  auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
-  assert(vid.type_id == type_id);
-#endif
-
-  em.tm.EnterReadOnly();
-  DispatchSerializeType(pf, em, builder, entity);
-  em.tm.ExitReadOnly();
+  auto eid = em.SpecificEntityId<mx::TypeId>(entity);
+  assert(eid.has_value());
+  assert(eid->type_id == type_index);
 
   (void) eid;
-  (void) type_id;
+  (void) type_index;
+
+  em.tm.EnterReadOnly();
+  DispatchSerializeEntity(pf, em, builder, entity);
+  em.tm.ExitReadOnly();
 }
 
 }  // namespace indexer

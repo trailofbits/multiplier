@@ -63,6 +63,8 @@ static void VariableReferences(const pasta::AST &ast,
   auto valid_parent = false;
 
   bool is_field = stmt.Kind() == pasta::StmtKind::kMemberExpr;
+  (void) is_field;
+
   assert((is_field || stmt.Kind() == pasta::StmtKind::kDeclRefExpr)
          && "Unexpected statement");
   assert(record.kind == mx::BuiltinReferenceKind::USE

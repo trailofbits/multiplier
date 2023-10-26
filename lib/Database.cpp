@@ -11,6 +11,11 @@
 #include <cassert>
 #include <chrono>
 #include <deque>
+#include <multiplier/Entities/AttrKind.h>
+#include <multiplier/Entities/DeclKind.h>
+#include <multiplier/Entities/MacroKind.h>
+#include <multiplier/Entities/StmtKind.h>
+#include <multiplier/Iterator.h>
 #include <mutex>
 #include <thread>
 #include <unordered_map>
@@ -47,14 +52,19 @@ static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
 
 static std::mutex gDatabaseInitializationLock;
 
+struct FragmentIndexRecord {
+  mx::RawEntityId entity_id;
+};
+
 struct PushbackSignal {};
 struct ExitSignal {};
 struct FlushSignal {};
 using QueueItem = std::variant<
-    std::monostate, ExitSignal, FlushSignal, PushbackSignal, EntityRecord
+    std::monostate, ExitSignal, FlushSignal, PushbackSignal, FragmentIndexRecord
 #ifndef __CDT_PARSER__
 #define MX_RECORD_VARIANT_ENTRY(name) , name
     MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_RECORD_VARIANT_ENTRY)
+    MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_RECORD_VARIANT_ENTRY)
 #undef MX_RECORD_VARIANT_ENTRY
 #endif
     >;
@@ -66,11 +76,44 @@ class Semaphore : public moodycamel::LightweightSemaphore {
   using moodycamel::LightweightSemaphore::LightweightSemaphore;
 };
 
+template <typename Kind>
+inline static uint64_t EncodeCategoryKind(EntityCategory category, Kind kind) {
+  assert(category != EntityCategory::NOT_AN_ENTITY);
+  return (uint64_t(category) << 32u) | unsigned(kind);
+}
+
 class BulkInserterState {
  public:
 
   // The `async.db` can only be used inside of the `bulk_insertion_thread`.
   sqlite::Connection db;
+
+  // Entity-category-specific insertions.
+  std::unordered_map<uint64_t, sqlite::Statement> INSERT_INTO_FRAGMNET_INDEX;
+
+  inline static size_t SizeOfRecord(const FragmentIndexRecord &) {
+    return sizeof(FragmentIndexRecord);
+  }
+
+  template <typename EntityKind>
+  sqlite::Statement CreateEntityIndexInsertQuery(mx::EntityCategory category,
+                                                 EntityKind kind) {
+    std::string query = "INSERT OR IGNORE INTO fragment_with_";
+    query += mx::EnumeratorName(category);
+    query += "_";
+    query += mx::EnumeratorName(kind);
+    query += " (fragment_id) VALUES (?1)";
+    return db.Prepare(query);
+  }
+
+  sqlite::Statement CreateEntityIndexInsertQuery(mx::EntityCategory category) {
+    std::string query = "INSERT OR IGNORE INTO fragment_with_";
+    query += mx::EnumeratorName(category);
+    query += " (fragment_id) VALUES (?1)";
+    return db.Prepare(query);
+  }
+
+  void DoInsertAsync(FragmentIndexRecord record);
 
 #define MX_DECLARE_INSERT_STMT(record) \
     sqlite::Statement INSERT_INTO_ ## record; \
@@ -85,7 +128,7 @@ class BulkInserterState {
     static size_t SizeOfRecord(const record &r);
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
-  MX_DECLARE_INSERT_STMT(EntityRecord)
+  MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
 #undef MX_DECLARE_INSERT_STMT
 
   BulkInserterState(std::filesystem::path db_path)
@@ -96,10 +139,38 @@ class BulkInserterState {
       , INSERT_INTO_ ## record(db.Prepare( \
         record::kInsertStatement))
     MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_STMT)
-    MX_DEFINE_STMT(EntityRecord)
+    MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DEFINE_STMT)
 #undef MX_DEFINE_STMT
 #endif
-      {}  // End of constructor
+      {
+
+#define CREATE_FRAG_OFFSET_INDEX(upper, lower, enum_, index) \
+    for (auto kind : mx::EnumerationRange<mx::upper ## Kind>()) { \
+      INSERT_INTO_FRAGMNET_INDEX.emplace( \
+          EncodeCategoryKind(mx::EntityCategory::enum_, kind), \
+          CreateEntityIndexInsertQuery(mx::EntityCategory::enum_, kind)); \
+    }
+
+// NOTE(pag): `-1` corresponds to return value of `KindFromEntityId` on an
+//            entity ID of this category.
+#define CREATE_PSEUDO_INDEX(upper, lower, enum_, index) \
+    INSERT_INTO_FRAGMNET_INDEX.emplace( \
+        EncodeCategoryKind(mx::EntityCategory::enum_, -1), \
+        CreateEntityIndexInsertQuery(mx::EntityCategory::enum_)); \
+
+  MX_FOR_EACH_ENTITY_CATEGORY(
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      CREATE_FRAG_OFFSET_INDEX,
+      CREATE_PSEUDO_INDEX,
+      MX_IGNORE_ENTITY_CATEGORY)
+
+#undef CREATE_FRAG_OFFSET_INDEX
+#undef CREATE_PSEUDO_INDEX
+
+  }  // End of constructor.
 };
 
 // A set of compression contexts. Compression contexts aren't thread safe. We
@@ -178,10 +249,11 @@ struct DictionaryCompressor {
   // Lock over `training_data`, etc.
   std::mutex lock;
 
-  // Training data. We accumulate the (uncompressed) `EntityRecord::data` into
-  // `training_data`. `data_sizes` contains the size of each record entry, and
-  // `entity_ids` holds the entity IDs of each record. This is a format that
-  // is compatible with ZSTD dictionary training, as well as `CompressAndAdd`.
+  // Training data. We accumulate the (uncompressed)
+  // `(Fragment/Type)Record::data` into `training_data`. `data_sizes` contains
+  // the size of each record entry, and `entity_ids` holds the entity IDs of
+  // each record. This is a format that is compatible with ZSTD dictionary
+  // training, as well as `CompressAndAdd`.
   std::string training_data;
   std::vector<size_t> data_sizes;
   std::vector<RawEntityId> entity_ids;
@@ -203,9 +275,11 @@ struct DictionaryCompressor {
 
   // Add `record`, either as a pending item for training a dictionary, or passed
   // through to `CompressAndAdd`.
+  template <typename EntityRecord>
   void Add(DatabaseWriterImpl &impl, DictionaryContext &context,
            EntityRecord record);
 
+  template <typename EntityRecord>
   void CompressAndAdd(DatabaseWriterImpl &impl, DictionaryContext &context,
                       EntityRecord record, ZSTD_CDict *d);
 
@@ -269,7 +343,8 @@ class DatabaseWriterImpl {
     void DoAddAsync(record r);
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
-  MX_DECLARE_INSERT_STMT(EntityRecord)
+  MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
+  MX_DECLARE_INSERT_STMT(FragmentIndexRecord)
 #undef MX_DECLARE_INSERT_STMT
 };
 
@@ -298,24 +373,35 @@ void DictionaryCompressor::CompressAndAdd(
     DatabaseWriterImpl &impl, RawEntityId id, const void *data,
     size_t data_size, ZSTD_CDict *d, ZSTD_CCtx *context) {
 
-  EntityRecord record;
-  record.id = id;
-
   const size_t maybe_compressed_data_size = ZSTD_compressBound(data_size);
-  record.data.resize(maybe_compressed_data_size);
+  std::string compressed_data;
+  compressed_data.resize(maybe_compressed_data_size);
 
   auto compressed_data_size = ZSTD_compress_usingCDict(
       context,
-      record.data.data(), maybe_compressed_data_size,
+      compressed_data.data(), maybe_compressed_data_size,
       data, data_size,
       d);
 
   assert(!ZSTD_isError(compressed_data_size));
-  record.data.resize(compressed_data_size);
+  compressed_data.resize(compressed_data_size);
 
   // Swap the uncompressed data with the compressed data, and add it to the
   // bulk insertion queue.
-  impl.DoAddAsync(std::move(record));
+  switch (CategoryFromEntityId(id)) {
+
+#define MX_ADD_ENTITY_RECORD(name) \
+    case name::kCategory: \
+      impl.DoAddAsync(name{id, std::move(compressed_data)}); \
+      break;
+
+    MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_ADD_ENTITY_RECORD)
+#undef MX_ADD_ENTITY_RECORD
+
+    default:
+      assert(false);
+      break;
+  }
 }
 
 void DictionaryCompressor::CompressAndAdd(
@@ -327,6 +413,7 @@ void DictionaryCompressor::CompressAndAdd(
 }
 
 // Compress the data from `record`, then add it to our insertion queue.
+template <typename EntityRecord>
 void DictionaryCompressor::CompressAndAdd(
     DatabaseWriterImpl &impl, DictionaryContext &context, EntityRecord record,
     ZSTD_CDict *d) {
@@ -336,13 +423,14 @@ void DictionaryCompressor::CompressAndAdd(
 
 // Add `record`, either as a pending item for training a dictionary, or passed
 // through to `CompressAndAdd`.
+template <typename EntityRecord>
 void DictionaryCompressor::Add(DatabaseWriterImpl &impl,
                                DictionaryContext &context,
                                EntityRecord record) {
 
   // If we already have a dictionary, then use it.
   if (ZSTD_CDict *d = dict.load(std::memory_order_acquire)) {
-    CompressAndAdd(impl, context, std::move(record), d);
+    CompressAndAdd<EntityRecord>(impl, context, std::move(record), d);
     return;
   }
 
@@ -352,7 +440,7 @@ void DictionaryCompressor::Add(DatabaseWriterImpl &impl,
   // time that it took to acquire the lock, then use it to add the record.
   if (ZSTD_CDict *d = dict.load(std::memory_order_relaxed)) {
     locker.unlock();
-    CompressAndAdd(impl, context, std::move(record), d);
+    CompressAndAdd<EntityRecord>(impl, context, std::move(record), d);
     return;
   }
 
@@ -505,7 +593,6 @@ void DatabaseWriterImpl::ExitDictionaries(void) {
 
 // Initialize the metadata table. It only stores one row of data.
 void DatabaseWriterImpl::InitMetadata(void) {
-
   add_version.BindValues(1u);
   add_version.Execute();
 }
@@ -629,6 +716,36 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
     db.Execute(std::string(stmt));
   }
 
+#define CREATE_FRAG_OFFSET_INDEX(upper, lower, enum_, index) \
+    for (auto enum_val : mx::EnumerationRange<mx::upper ## Kind>()) { \
+      std::string query = "CREATE TABLE IF NOT EXISTS fragment_with_"; \
+      query += mx::EnumeratorName(mx::EntityCategory::enum_); \
+      query += "_"; \
+      query += mx::EnumeratorName(enum_val); \
+      query += " (fragment_id INTEGER NOT NULL PRIMARY KEY) WITHOUT ROWID"; \
+      db.Execute(query); \
+    }
+
+#define CREATE_PSEUDO_INDEX(upper, lower, enum_, index) \
+    do { \
+      std::string query = "CREATE TABLE IF NOT EXISTS fragment_with_"; \
+      query += mx::EnumeratorName(mx::EntityCategory::enum_); \
+      query += " (fragment_id INTEGER NOT NULL PRIMARY KEY) WITHOUT ROWID"; \
+      db.Execute(query); \
+    } while (false);
+
+  MX_FOR_EACH_ENTITY_CATEGORY(
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      MX_IGNORE_ENTITY_CATEGORY,
+      CREATE_FRAG_OFFSET_INDEX,
+      CREATE_PSEUDO_INDEX,
+      MX_IGNORE_ENTITY_CATEGORY)
+
+#undef CREATE_FRAG_OFFSET_INDEX
+#undef CREATE_PSEUDO_INDEX
+
   db.Execute("PRAGMA wal_checkpoint(FULL)");
 
   return db_path_;
@@ -669,6 +786,27 @@ DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
   bulk_insertion_thread = std::thread([this] (void) {
     this->BulkInserter();
   });
+}
+
+// Mark that a specific fragment contains an entity of a specific type and kind.
+void BulkInserterState::DoInsertAsync(FragmentIndexRecord record) {
+  auto fragment_id = FragmentIdFromEntityId(record.entity_id);
+  if (!fragment_id) {
+    assert(false);
+    return;
+  }
+
+  uint64_t key = EncodeCategoryKind(CategoryFromEntityId(record.entity_id),
+                                    KindFromEntityId(record.entity_id));
+
+  auto stmt_it = INSERT_INTO_FRAGMNET_INDEX.find(key);
+  if (stmt_it == INSERT_INTO_FRAGMNET_INDEX.end()) {
+    assert(false);
+    return;
+  }
+
+  stmt_it->second.BindValuesWithoutCopying(fragment_id->Pack());
+  stmt_it->second.Execute();
 }
 
 size_t BulkInserterState::SizeOfRecord(const DictionaryRecord &record) {
@@ -785,15 +923,19 @@ bool BulkInserterState::InsertAsync(
   return false;
 }
 
-size_t BulkInserterState::SizeOfRecord(const EntityRecord &record) {
-  return sizeof(record) + record.data.size();
-}
+#define DEFINE_ENTITY_INSERTERS(name) \
+    size_t BulkInserterState::SizeOfRecord(const name &record) { \
+      return sizeof(record) + record.data.size(); \
+    } \
+    \
+    bool BulkInserterState::InsertAsync(const name &record, \
+                                        sqlite::Statement &insert) { \
+      insert.BindValuesWithoutCopying(record.id, record.data); \
+      return true; \
+    }
 
-bool BulkInserterState::InsertAsync(const EntityRecord &record,
-                                    sqlite::Statement &insert) {
-  insert.BindValuesWithoutCopying(record.id, record.data);
-  return true;
-}
+MX_FOR_EACH_ENTITY_RECORD_TYPE(DEFINE_ENTITY_INSERTERS)
+#undef DEFINE_ENTITY_INSERTERS
 
 DatabaseWriter::DatabaseWriter(std::filesystem::path db_path,
                                size_t max_queue_size_in_bytes)
@@ -816,7 +958,7 @@ void DatabaseWriterImpl::InitRecords(void) {
   }
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_EXEC_INITS)
-  MX_EXEC_INITS(EntityRecord)
+  MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_EXEC_INITS)
 #undef MX_EXEC_INITS
 #endif
 }
@@ -831,7 +973,7 @@ void DatabaseWriterImpl::ExitRecords(void) {
   }
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_EXEC_TEARDOWNS)
-  MX_EXEC_TEARDOWNS(EntityRecord)
+  MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_EXEC_TEARDOWNS)
 #undef MX_EXEC_TEARDOWNS
 #endif
 }
@@ -848,7 +990,8 @@ void DatabaseWriterImpl::ExitRecords(void) {
       } \
     }
 
-MX_DEFINE_ADD_RECORD(EntityRecord)
+MX_DEFINE_ADD_RECORD(FragmentIndexRecord)
+MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 
 #undef MX_DEFINE_ADD_RECORD
@@ -862,11 +1005,22 @@ MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 
 #undef MX_DEFINE_ADD_RECORD
 
-void DatabaseWriter::AddAsync(EntityRecord record) {
-  EntityCategory category = CategoryFromEntityId(record.id);
-  assert(category != EntityCategory::NOT_AN_ENTITY);
-  impl->entity_dictionaries[static_cast<unsigned>(category)].Add(
-      *impl, impl->dictionary_context, std::move(record));
+#define MX_DEFINE_ADD_ENTITY_RECORD(name) \
+    void DatabaseWriter::AddAsync(name record) { \
+      auto category = CategoryFromEntityId(record.id); \
+      assert(mx::EntityCategory::NOT_AN_ENTITY != category); \
+      impl->entity_dictionaries[static_cast<unsigned>(category)].Add( \
+          *impl, impl->dictionary_context, std::move(record)); \
+    }
+
+MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DEFINE_ADD_ENTITY_RECORD)
+#undef MX_DEFINE_ADD_ENTITY_RECORD
+
+// Add an index record saying that the fragment containing the entity with ID
+// `entity_id` contains the specific type and kind of entity.
+void DatabaseWriter::AsyncIndexFragmentSpecificEntity(
+    mx::RawEntityId entity_id) {
+  impl->DoAddAsync(FragmentIndexRecord{entity_id});
 }
 
 } // namespace mx
