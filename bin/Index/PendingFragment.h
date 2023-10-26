@@ -163,15 +163,15 @@ class PendingFragment {
   // Types have special serialization that is sort of fragment-specific. We
   // collect the types that are "new" and seen by virtue of this fragment, but
   // the fragment itself is not responsible for their serialization.
-  bool Add(pasta::Type entity);
+  bool TryAdd(pasta::Type entity);
 
-  bool Add(const pasta::Decl &entity);
-  bool Add(const pasta::Stmt &entity);
-  bool Add(const pasta::Attr &entity);
-  bool Add(const pasta::TemplateArgument &pseudo);
-  bool Add(const pasta::CXXBaseSpecifier &pseudo);
-  bool Add(const pasta::TemplateParameterList &pseudo);
-  bool Add(const pasta::Designator &pseudo);
+  bool TryAdd(const pasta::Decl &entity);
+  bool TryAdd(const pasta::Stmt &entity);
+  bool TryAdd(const pasta::Attr &entity);
+  bool TryAdd(const pasta::TemplateArgument &pseudo);
+  bool TryAdd(const pasta::CXXBaseSpecifier &pseudo);
+  bool TryAdd(const pasta::TemplateParameterList &pseudo);
+  bool TryAdd(const pasta::Designator &pseudo);
 
   // Go and try to find the entity ID to be used for `Decl::Token`. We might
   // not have any return values for that for builtin types/declarations, and
@@ -233,7 +233,7 @@ class PendingFragment {
 
  private:
   template <typename Entity, typename MakeId>
-  bool DoAdd(const Entity &entity, EntityIdMap &entity_ids, MakeId make_id);
+  bool DoTryAdd(const Entity &entity, EntityIdMap &entity_ids, MakeId make_id);
 };
 
 using PendingFragmentPtr = std::unique_ptr<PendingFragment>;

@@ -65,11 +65,11 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::Token &) {}
 
   void MaybeVisitNext(const pasta::Decl &entity) {
-    fragment.Add(entity);
+    fragment.TryAdd(entity);
   }
 
   void MaybeVisitNext(const pasta::Stmt &entity) {
-    fragment.Add(entity);
+    fragment.TryAdd(entity);
   }
 
   void MaybeVisitNext(const pasta::Type &entity) {
@@ -77,7 +77,7 @@ class FragmentBuilder final {
   }
 
   void MaybeVisitNext(const pasta::Attr &entity) {
-    fragment.Add(entity);
+    fragment.TryAdd(entity);
   }
 
   void MaybeVisitNext(const pasta::Macro &) {}
@@ -85,19 +85,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::File &) {}
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
-    Accept(pseudo);
+    fragment.TryAdd(pseudo);
   }
 
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
-    fragment.Add(pseudo);
+    fragment.TryAdd(pseudo);
   }
 
   void MaybeVisitNext(const pasta::TemplateParameterList &pseudo) {
-    fragment.Add(pseudo);
+    fragment.TryAdd(pseudo);
   }
 
   void MaybeVisitNext(const pasta::Designator &pseudo) {
-    fragment.Add(pseudo);
+    fragment.TryAdd(pseudo);
   }
 
   template <typename T>
@@ -241,8 +241,8 @@ void FragmentBuilder::Accept(const pasta::Macro &) {}
 // should ignore this entity without formulating an ID, and; 2) the
 // `EntityMapper::token_tree_ids`, which is a fragment-local entity id tracker.
 template <typename Entity, typename MakeId>
-bool PendingFragment::DoAdd(const Entity &entity, EntityIdMap &entity_ids,
-                            MakeId make_id) {
+bool PendingFragment::DoTryAdd(const Entity &entity, EntityIdMap &entity_ids,
+                               MakeId make_id) {
   auto locator = RawEntity(entity);
   if (entity_ids.contains(locator)) {
     return false;
@@ -260,8 +260,8 @@ bool PendingFragment::DoAdd(const Entity &entity, EntityIdMap &entity_ids,
   return true;
 }
 
-bool PendingFragment::Add(const pasta::Decl &entity) {
-  return DoAdd(
+bool PendingFragment::TryAdd(const pasta::Decl &entity) {
+  return DoTryAdd(
       entity,
       em.entity_ids,
       [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
@@ -274,8 +274,8 @@ bool PendingFragment::Add(const pasta::Decl &entity) {
       });
 }
 
-bool PendingFragment::Add(const pasta::Stmt &entity) {
-  return DoAdd(
+bool PendingFragment::TryAdd(const pasta::Stmt &entity) {
+  return DoTryAdd(
       entity,
       em.token_tree_ids,
       [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
@@ -287,8 +287,8 @@ bool PendingFragment::Add(const pasta::Stmt &entity) {
       });
 }
 
-bool PendingFragment::Add(const pasta::TemplateArgument &entity) {
-  return DoAdd(
+bool PendingFragment::TryAdd(const pasta::TemplateArgument &entity) {
+  return DoTryAdd(
       entity,
       em.token_tree_ids,
       [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
@@ -299,8 +299,8 @@ bool PendingFragment::Add(const pasta::TemplateArgument &entity) {
       });
 }
 
-bool PendingFragment::Add(const pasta::TemplateParameterList &entity) {
-  return DoAdd(
+bool PendingFragment::TryAdd(const pasta::TemplateParameterList &entity) {
+  return DoTryAdd(
       entity,
       em.token_tree_ids,
       [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
@@ -311,8 +311,8 @@ bool PendingFragment::Add(const pasta::TemplateParameterList &entity) {
       });
 }
 
-bool PendingFragment::Add(const pasta::CXXBaseSpecifier &entity) {
-  return DoAdd(
+bool PendingFragment::TryAdd(const pasta::CXXBaseSpecifier &entity) {
+  return DoTryAdd(
       entity,
       em.token_tree_ids,
       [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
@@ -323,8 +323,8 @@ bool PendingFragment::Add(const pasta::CXXBaseSpecifier &entity) {
       });
 }
 
-bool PendingFragment::Add(const pasta::Designator &entity) {
-  return DoAdd(
+bool PendingFragment::TryAdd(const pasta::Designator &entity) {
+  return DoTryAdd(
       entity,
       em.token_tree_ids,
       [&] (mx::RawEntityId fragment_index, mx::EntityOffset offset) {
@@ -335,7 +335,7 @@ bool PendingFragment::Add(const pasta::Designator &entity) {
       });
 }
 
-bool PendingFragment::Add(const pasta::Attr &entity) {
+bool PendingFragment::TryAdd(const pasta::Attr &entity) {
 
   // Attributes can be inherited, and can be pushed by pragmas, e.g.
   //
@@ -409,7 +409,7 @@ bool PendingFragment::Add(const pasta::Attr &entity) {
   return true;
 }
 
-bool PendingFragment::Add(pasta::Type entity) {
+bool PendingFragment::TryAdd(pasta::Type entity) {
   if (!em.tm.AddEntityId(em, &entity)) {
     return false;
   }
@@ -519,7 +519,7 @@ void BuildPendingFragment(PendingFragment &pf) {
     // want to see as many declarations first (thus giving them IDs) prior to
     // us processing types.
     for (const pasta::Type &entity : builder.pending_types) {
-      if (pf.Add(entity)) {
+      if (pf.TryAdd(entity)) {
         has_new_types = true;
       }
     }

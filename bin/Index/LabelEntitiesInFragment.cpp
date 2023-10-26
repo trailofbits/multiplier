@@ -59,7 +59,7 @@ class EntityLabeller final : public EntityVisitor {
       return false;
     }
     
-    if (!fragment.Add(entity)) {
+    if (!fragment.TryAdd(entity)) {
       return false;
     }
 
@@ -89,11 +89,6 @@ class EntityLabeller final : public EntityVisitor {
   // NOTE(pag): We can't rely on the order of types being deterministic for
   //            the "same" fragment in different translation units.
   bool Enter(const pasta::Type &) final {
-
-    // if (fragment.is_new) {
-    //   return fragment.Add(entity);
-    // }
-    
     return false;
   }
 
@@ -102,10 +97,14 @@ class EntityLabeller final : public EntityVisitor {
   }
 
   bool Enter(const pasta::Attr &attr) final {
-    fragment.Add(attr);
+    fragment.TryAdd(attr);
 
     // NOTE(pag): Want to return `true` because some attributes contain constant
     //            expressions.
+    //
+    // TODO(pag): Consider `return fragment.TryAdd`, given that it now has logic
+    //            to figure out if the attribute ought belong to this fragment
+    //            or not.
     return true;
   }
 
