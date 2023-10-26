@@ -14,6 +14,7 @@
 #include <unordered_set>
 
 #include "EntityMapper.h"
+#include "Util.h"
 #include "Visitor.h"
 
 namespace indexer {
@@ -27,10 +28,10 @@ struct SaveRestoreEntity {
   const void *oldval_ptr;
 
   SaveRestoreEntity(mx::RawEntityId &ref_, const void *&ptr_,
-                    mx::RawEntityId new_val, const void *newval_ptr)
+                    mx::EntityId new_val, const void *newval_ptr)
       : ref(ref_), ref_ptr(ptr_),
         old_val(ref), oldval_ptr(ref_ptr) {
-    ref = new_val;
+    ref = new_val.Pack();
     ref_ptr = newval_ptr;
   }
 
@@ -59,6 +60,26 @@ class ParentTrackerVisitor : public EntityVisitor {
       : em(fragment_.em),
         fragment(fragment_) {}
 
+  template <typename EntityListMap>
+  inline void AddUnseenEntities(const EntityListMap &entities) {
+    for (auto entity : Entities(entities)) {
+      not_yet_seen.emplace(RawEntity(entity));
+    }
+  }
+
+  inline bool HasUnseen(void) const {
+    return !not_yet_seen.empty();
+  }
+
+  inline bool HasBeenSeen(const void *raw_entity) const {
+    return !not_yet_seen.count(raw_entity);
+  }
+
+  template <typename T>
+  inline bool HasBeenSeen(const T &entity) const {
+    return !not_yet_seen.count(RawEntity(entity));
+  }
+
   void AddToMaps(const void *entity) {
     if (parent_decl_id != mx::kInvalidEntityId && parent_decl) {
       em.parent_decl_ids.emplace(entity, parent_decl_id);
@@ -72,59 +93,59 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::Decl &entity) final {
-    mx::RawEntityId rid = em.EntityId(entity);
-    mx::VariantId vid = mx::EntityId(rid).Unpack();
-    if (!std::holds_alternative<mx::DeclId>(vid)) {
+    auto eid = em.SpecificEntityId<mx::DeclId>(entity);
+    if (!eid) {
       return;
     }
-
-    mx::DeclId eid = std::get<mx::DeclId>(vid);
 
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
-    if (eid.fragment_id != fragment.fragment_index) {
+    //
+    // TODO(pag): Assert as a signal to find when it happens?
+    if (eid->fragment_id != fragment.fragment_index) {
       return;
     }
 
-    AddToMaps(entity.RawDecl());
+    auto raw_entity = RawEntity(entity);
+    AddToMaps(raw_entity);
 
     SaveRestoreEntity save_parent_decl(
-        parent_decl_id, parent_decl, rid, entity.RawDecl());
+        parent_decl_id, parent_decl, eid.value(), raw_entity);
     this->EntityVisitor::Accept(entity);
   }
 
   void Accept(const pasta::Stmt &entity) final {
-    mx::RawEntityId rid = em.EntityId(entity);
-    mx::VariantId vid = mx::EntityId(rid).Unpack();
-    if (!std::holds_alternative<mx::StmtId>(vid)) {
+    auto eid = em.SpecificEntityId<mx::StmtId>(entity);
+    if (!eid) {
       return;
     }
-
-    mx::StmtId eid = std::get<mx::StmtId>(vid);
 
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
-    if (eid.fragment_id != fragment.fragment_index) {
+    //
+    // TODO(pag): Assert as a signal to find when it happens?
+    if (eid->fragment_id != fragment.fragment_index) {
       return;
     }
 
-    AddToMaps(entity.RawStmt());
+    auto raw_entity = RawEntity(entity);
+    AddToMaps(raw_entity);
 
     SaveRestoreEntity save_parent_stmt(
-        parent_stmt_id, parent_stmt, rid, entity.RawStmt());
+        parent_stmt_id, parent_stmt, eid.value(), raw_entity);
     this->EntityVisitor::Accept(entity);
   }
 
   void Accept(const pasta::Attr &entity) final {
-    AddToMaps(entity.RawAttr());
+    AddToMaps(RawEntity(entity));
   }
 
   bool Enter(const pasta::Decl &entity) final {
-    return not_yet_seen.erase(entity.RawDecl());
+    return not_yet_seen.erase(RawEntity(entity));
   }
 
   bool Enter(const pasta::Stmt &entity) final {
-    return not_yet_seen.erase(entity.RawStmt());
+    return not_yet_seen.erase(RawEntity(entity));
   }
 
   bool Enter(const pasta::Type &) final {
@@ -132,26 +153,26 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   bool Enter(const pasta::Attr &entity) final {
-    AddToMaps(entity.RawAttr());
+    AddToMaps(RawEntity(entity));
     return false;
   }
 
   void Accept(const pasta::Type &) final {}
 
   void Accept(const pasta::TemplateParameterList &entity) final {
-    AddToMaps(entity.RawTemplateParameterList());
+    AddToMaps(RawEntity(entity));
   }
 
   void Accept(const pasta::TemplateArgument &entity) final {
-    AddToMaps(entity.RawTemplateArgument());
+    AddToMaps(RawEntity(entity));
   }
 
   void Accept(const pasta::Designator &entity) final {
-    AddToMaps(entity.RawDesignator());
+    AddToMaps(RawEntity(entity));
   }
 
   void Accept(const pasta::CXXBaseSpecifier &entity) final {
-    AddToMaps(entity.RawCXXBaseSpecifier());
+    AddToMaps(RawEntity(entity));
   }
 };
 
@@ -247,12 +268,12 @@ static void FindMissingParentageFromTokens(
 
     // If we're already seen `child_stmt`, then it isn't one of the missing
     // ones.
-    if (!vis.not_yet_seen.count(child_stmt)) {
+    if (vis.HasBeenSeen(child_stmt)) {
       continue;
     }
 
     if (ResolveParents(vis, parent_stmt, parent_decl)) {
-      auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+      auto ast = pasta::AST::From(pf.top_level_decls.front());
       vis.Accept(ast.Adopt(reinterpret_cast<const clang::Stmt *>(child_stmt)));
     }
   }
@@ -282,13 +303,13 @@ static void FindMissingParentageFromAttributeTokens(
     }
   }
 
-  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    if (!vis.not_yet_seen.count(stmt.RawStmt())) {
+  for (pasta::Stmt stmt : Entities(pf.stmts_to_serialize)) {
+    if (vis.HasBeenSeen(stmt)) {
       continue;
     }
 
     // Look at the tokens of the statement
-    for (pasta::Token tok : stmt.Tokens()) {
+    for (const pasta::Token &tok : stmt.Tokens()) {
       auto attr_it = tok_to_attr.find(tok.RawToken());
       if (attr_it == tok_to_attr.end()) {
         continue;
@@ -312,63 +333,62 @@ static void FindMissingParentageFromAttributeTokens(
 void LabelParentsInPendingFragment(PendingFragment &pf) {
 
   ParentTrackerVisitor vis(pf);
-  for (const pasta::Decl &decl : pf.decls_to_serialize) {
-    vis.not_yet_seen.emplace(decl.RawDecl());
-  }
-
-  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    vis.not_yet_seen.emplace(stmt.RawStmt());
-  }
+  vis.AddUnseenEntities(pf.decls_to_serialize);
+  vis.AddUnseenEntities(pf.stmts_to_serialize);
 
   // Visit the top-level decls first.
 
-  for (const pasta::Decl &decl : pf.top_level_decls) {
+  for (pasta::Decl decl : Entities(pf.top_level_decls)) {
     vis.Accept(decl);
   }
 
-  // Expand the set of decls.
-  for (size_t i = 0u, max_i = pf.decls_to_serialize.size(); i < max_i; ++i) {
-    pasta::Decl decl = pf.decls_to_serialize[i];
-    auto raw_entity = decl.RawDecl();
-    
-    if (vis.not_yet_seen.count(raw_entity)) {
-      vis.Accept(decl);
-      
-      // NOTE(pag): If this assertion is hit, then it suggests that the
-      //            manually-written traversals in `Visitor.cpp` are missing
-      //            something that the automatically generated visitors created
-      //            from `Visitor.inc.h` have found. Missing things is not the
-      //            end of the world, but it suggests a blindspot, hence we want
-      //            to loudly detect them here if possible. Missing things can
-      //            also be an indication that we're not fully linking something
-      //            to its parent decls/statements.
-      DCHECK(!vis.not_yet_seen.count(raw_entity));
+#ifndef NDEBUG
+  size_t num_entities = NumEntities(pf.decls_to_serialize);
+#endif
 
-      DCHECK_EQ(max_i, pf.decls_to_serialize.size());
-      max_i = pf.decls_to_serialize.size();
+  // Expand the set of decls.
+  for (pasta::Decl decl : Entities(pf.decls_to_serialize)) {  
+    if (vis.HasBeenSeen(decl)) {
+      continue;
     }
+
+    vis.Accept(decl);
+    
+    // NOTE(pag): If this assertion is hit, then it suggests that the
+    //            manually-written traversals in `Visitor.cpp` are missing
+    //            something that the automatically generated visitors created
+    //            from `Visitor.inc.h` have found. Missing things is not the
+    //            end of the world, but it suggests a blindspot, hence we want
+    //            to loudly detect them here if possible. Missing things can
+    //            also be an indication that we're not fully linking something
+    //            to its parent decls/statements.
+    DCHECK(vis.HasBeenSeen(decl));
   }
 
+#ifndef NDEBUG
+  CHECK_EQ(num_entities, NumEntities(pf.decls_to_serialize));
+#endif
+
   // We may have expressions inside of types, e.g. `int foo[stmt_here];`.
-  if (vis.not_yet_seen.empty()) {
+  if (!vis.HasUnseen()) {
     return;
   }
 
   FindMissingParentageFromTokens(vis, pf);
-  if (vis.not_yet_seen.empty()) {
+  if (!vis.HasUnseen()) {
     return;
   }
 
   FindMissingParentageFromAttributeTokens(vis, pf);
-  if (vis.not_yet_seen.empty()) {
+  if (!vis.HasUnseen()) {
     return;
   }
 
   // Log the error.
 
   std::optional<pasta::Stmt> first_missing_stmt;
-  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
-    if (vis.not_yet_seen.count(stmt.RawStmt())) {
+  for (pasta::Stmt stmt : Entities(pf.stmts_to_serialize)) {
+    if (!vis.HasBeenSeen(stmt)) {
       first_missing_stmt.emplace(stmt);
       break;
     }
@@ -376,10 +396,10 @@ void LabelParentsInPendingFragment(PendingFragment &pf) {
 
   CHECK(first_missing_stmt.has_value());
 
-  auto ast = pasta::AST::From(pf.stmts_to_serialize.front());
+  auto ast = pasta::AST::From(pf.top_level_decls.front());
   LOG(ERROR)
       << "Fragment"
-      << PrefixedLocation(pf.decls_to_serialize.front(), " at or near ")
+      << PrefixedLocation(pf.top_level_decls.front(), " at or near ")
       << " main job file " << ast.MainFile().Path().generic_string()
       << " has statements without parents: "
       << DiagnosePrintedTokens(

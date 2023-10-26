@@ -19,10 +19,10 @@ static thread_local RawEntityIdList tIgnoredRedecls;
 
 }  // namespace
 
-AttrImpl::AttrImpl(std::shared_ptr<EntityProvider> ep_,
-                   kj::Array<capnp::word> data_,
+AttrImpl::AttrImpl(FragmentImplPtr frag_,
+                   ast::Attr::Reader reader_,
                    RawEntityId id_)
-    : EntityImpl<ast::Attr>(std::move(ep_), kj::mv(data_)),
+    : FragmentEntityImpl<ast::Attr>(std::move(frag_), kj::mv(reader_)),
       fragment_id(FragmentIdFromEntityId(id_).value()),
       offset(FragmentOffsetFromEntityId(id_).value()) {}
 
@@ -36,7 +36,7 @@ SpecificEntityId<AttrId> Attr::id(void) const {
 
 // Return references to this attribute.
 gap::generator<Reference> Attr::references(void) const & {
-  const EntityProviderPtr &ep = impl->ep;
+  EntityProviderPtr ep = impl->ep;
   for (auto ref : ep->References(ep, id().Pack())) {
     if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
       auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));

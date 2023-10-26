@@ -12,18 +12,18 @@
 #include <multiplier/Entities/Stmt.h>
 #include <multiplier/Entities/Type.h>
 
-#include "Entity.h"
+#include "FragmentEntity.h"
 
 namespace mx {
 
 // Interface for accessing a statement.
-class StmtImpl final : public EntityImpl<ast::Stmt> {
+class StmtImpl final : public FragmentEntityImpl<ast::Stmt> {
  public:
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
 
-  explicit StmtImpl(std::shared_ptr<EntityProvider> ep_,
-                    kj::Array<capnp::word> data_,
+  explicit StmtImpl(FragmentImplPtr frag_,
+                    ast::Stmt::Reader reader_,
                     RawEntityId id_);
 };
 

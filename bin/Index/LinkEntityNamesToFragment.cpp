@@ -138,7 +138,7 @@ void LinkEntityNamesToFragment(
   const EntityMapper &em = pf.em;
   
   // Declaration names.
-  for (const pasta::Decl &decl : pf.decls_to_serialize) {
+  for (pasta::Decl decl : Entities(pf.decls_to_serialize)) {
     if (auto nd = pasta::NamedDecl::From(decl);
         nd && ShouldGetSymbolName(decl)) {
       database.AddAsync(mx::NamedEntityRecord{
@@ -148,8 +148,10 @@ void LinkEntityNamesToFragment(
 
   // Macro names.
   //
-  // NOTE(pag): Don't need to descent into the token trees to find the macro
-  //            definitions; they're guaranteed to be top-level.
+  // NOTE(pag): Don't need to descend into the token trees to find the macro
+  //            definitions; they're guaranteed to be top-level due to the
+  //            code in `IndexCompileJob.cpp` going and hoisting them all up
+  //            in `FindTLMs`.
   //
   // TODO(pag): Come up with a name mangling for macros. Clang has something
   //            like this, I think.
