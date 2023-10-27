@@ -51,7 +51,7 @@ jobs:
         run: |
           mkdir -p ${RELEASE_DIR}
           gh release download ${LLVM_PASTA_VER} --repo trail-of-forks/llvm-project --pattern 'llvm-*'
-          tar -xvzf llvm-pasta-*.tar.xz -C ${RELEASE_DIR}
+          tar -xvJf llvm-pasta-*.tar.xz -C ${RELEASE_DIR}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
