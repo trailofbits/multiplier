@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build
 
 on:
   push:
@@ -9,87 +9,81 @@ on:
     branches:
       - "*"
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-  EC2_RUNNER_ID: i-0829aea272db4290b
-  AWS_REGION: us-east-1
-
 # Cancel in progress runs for PRs but not main
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  LLVM_PASTA_VER: 6afc10b
 jobs:
-  start-ec2-runner:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
-
-      - name: Start EC2 runner
-        id: start_ec2_runner
-        run: |
-          aws ec2 start-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
-          aws ec2 wait instance-running --instance-ids ${{ env.EC2_RUNNER_ID }}
-
   build-docker:
-    runs-on: multiplier
-    needs: start-ec2-runner
+    runs-on: ubuntu-latest-32x64
+    container:
+      image: ghcr.io/lifting-bits/cxx-common/vcpkg-builder-ubuntu-v2:22.04
+      options: --user 1001
+
     permissions:
       contents: read
       packages: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "recursive"
+      - run: git config --global --add safe.directory '*'
 
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
-
-      - name: Build builder image
+      - name: Install prereqs
         run: |
-          docker buildx build \
-          --load \
-          -t ${REGISTRY}/${IMAGE_NAME}:builder \
-          --target builder \
-          .
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          apt-get update; apt-get install gh -y
 
-      - name: Build release image
+      - name: Set up variables
         run: |
-          docker buildx build \
-          --load \
-          -t ${REGISTRY}/${IMAGE_NAME} \
-          .
+          echo "RELEASE_DIR=${RUNNER_TEMP}/release" >> $GITHUB_ENV
+          echo "VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=multiplier-$(git rev-parse --short=7 HEAD).tar.xz" >> $GITHUB_ENV
 
-      - name: Prune Docker
+      - name: Install llvm-pasta
         run: |
-          docker system prune -f
+          mkdir -p ${RELEASE_DIR}
+          gh release download ${LLVM_PASTA_VER} --repo trail-of-forks/llvm-project --pattern 'llvm-*'
+          tar -xvzf llvm-pasta-*.tar.xz -C ${RELEASE_DIR}
 
-      - name: Push Docker images on merge to main
-        if: github.ref == 'refs/heads/main'
+      - name: Build
         run: |
-          docker push ${REGISTRY}/${IMAGE_NAME}:builder
-          docker push ${REGISTRY}/${IMAGE_NAME}:latest
 
-  stop-ec2-runner:
-    if: always()
-    runs-on: ubuntu-latest
-    needs:
-      - build-docker
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-access-key-id: ${{ secrets.EC2_GITHUB_RUNNER_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.EC2_GITHUB_RUNNER_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          CXXFLAGS="-g0" \
+          CCFLAGS="-g0" \
+          cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
+            -DCMAKE_C_COMPILER=/usr/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+            -DMX_ENABLE_BOOTSTRAP=OFF \
+            -DMX_BOOTSTRAP_VAST=OFF \
+            -DMX_BOOTSTRAP_PASTA=OFF \
+            -DMX_ENABLE_RE2=OFF \
+            -DMX_ENABLE_VAST=OFF \
+            -DMX_ENABLE_INSTALL=ON \
+            -DMX_USE_VENDORED_CLANG=OFF \
+            -DMX_USE_VENDORED_PASTA=OFF \
+            -GNinja \
+            ./multiplier
 
-      - name: Stop EC2 runner
-        run: aws ec2 stop-instances --instance-ids ${{ env.EC2_RUNNER_ID }}
+          ninja install
+
+      # Release on merge to main
+      - name: Package Release
+        # if: github.ref == 'refs/heads/main'
+        working-directory: ${{ env.RELEASE_DIR }}
+        run: tar --use-compress-program pixz -cf "${ARTIFACT_NAME}" *
+
+      - name: Create Release
+        # if: github.ref == 'refs/heads/main'
+        run: gh release create ${VERSION} --generate-notes ${{ env.RELEASE_DIR }}/${{ env.ARTIFACT_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
