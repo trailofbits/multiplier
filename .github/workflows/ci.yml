@@ -74,7 +74,7 @@ jobs:
             -DMX_USE_VENDORED_CLANG=OFF \
             -DMX_USE_VENDORED_PASTA=OFF \
             -GNinja \
-            ./multiplier
+            ./
 
           ninja install
 
