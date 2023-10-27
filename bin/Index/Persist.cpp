@@ -623,25 +623,44 @@ static void PersistTokenTree(
     }
   }
 
-  // Serialize the top-level list.
+  // Serialize the top-level list. This should be a mix of macro tokens, top-
+  // level macro uses, and sometimes macros that are technically part of hoisted
+  // fragments, but lexically inside this fragment, and so they show up here.
   auto tlms = fb.initTopLevelMacros(nodes.Size());
   i = 0u;
   for (TokenTreeNode node : nodes) {
-    mx::RawEntityId eid = em.EntityId(node);
-    auto id = mx::EntityId(eid).Extract<mx::MacroId>();
-    if (!id) {
+    mx::RawEntityId raw_id = em.EntityId(node);
+    if (raw_id == mx::kInvalidEntityId) {
+      assert(false);
       continue;
     }
 
+    mx::EntityId eid(raw_id);
+
     // A directive that's not hoisted into a different fragment.
-    if (id->fragment_id == pf.fragment_index) {
-      auto &macros = pf.macros_to_serialize[id->kind];
-      CHECK_LT(id->offset, macros.size());
-      CHECK(macros[id->offset].has_value());
-      CHECK_EQ(em.EntityId(macros[id->offset].value()), eid);
+    if (auto mid = eid.Extract<mx::MacroId>()) {
+      if (mid->fragment_id == pf.fragment_index) {
+        auto &macros = pf.macros_to_serialize[mid->kind];
+        CHECK_LT(mid->offset, macros.size());
+        CHECK(macros[mid->offset].has_value());
+        CHECK_EQ(em.EntityId(macros[mid->offset].value()), raw_id);
+      }
+
+    // Everything else should be a macro token.
+    } else {
+      assert(eid.Extract<mx::MacroTokenId>());
+
+      // This will seem confusing, but really, we shadow all the top-level
+      // parsed token ids with corresponding macro token ids, representing
+      // the fact that the pre-processor does a single pass over everything.
+      // However, if we're not looking at a macro use/directive, then we
+      // should never see a top-level macro token backing a top-level node, as
+      // those should only ever be nested inside of some other kind of macro
+      // entity.
+      assert(!node.MacroToken());
     }
 
-    tlms.set(i++, eid);
+    tlms.set(i++, raw_id);
   }
 }
 
