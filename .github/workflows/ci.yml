@@ -16,6 +16,7 @@ concurrency:
 
 env:
   LLVM_PASTA_VER: 6afc10b
+
 jobs:
   build:
     runs-on: ubuntu-latest-32x64
@@ -65,6 +66,8 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
             -DCMAKE_C_COMPILER=/usr/bin/clang \
             -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+            -DClang_DIR=${RELEASE_DIR}/lib/cmake/clang \
+            -DLLVM_DIR=${RELEASE_DIR}/lib/cmake/llvm \
             -DMX_ENABLE_BOOTSTRAP=OFF \
             -DMX_BOOTSTRAP_VAST=OFF \
             -DMX_BOOTSTRAP_PASTA=OFF \
