@@ -17,7 +17,7 @@ concurrency:
 env:
   LLVM_PASTA_VER: 6afc10b
 jobs:
-  build-docker:
+  build:
     runs-on: ubuntu-latest-32x64
     container:
       image: ghcr.io/lifting-bits/cxx-common/vcpkg-builder-ubuntu-v2:22.04
