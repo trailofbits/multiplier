@@ -212,6 +212,7 @@ class Index {
 template <typename T>
 std::optional<T> Reference::as(void) const noexcept {
   constexpr EntityCategory c = T::static_category();
+  auto category_ = category();
   if constexpr (EntityCategory::NOT_AN_ENTITY == c) {
     return std::nullopt;
 

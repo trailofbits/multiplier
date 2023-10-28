@@ -178,8 +178,8 @@ class EntityProvider {
   virtual gap::generator<RawEntityId> Redeclarations(
       const Ptr &, RawEntityId eid) & = 0;
 
-  // Fill out `redecl_ids_out` and `references_ids_out` with the set of things
-  // to analyze when looking for references.
+  // Generate references to `raw_id` as a tuple of `from_id`, `context_id`, and
+  // `kind_id`. Internally, this will handle redeclarations.
   virtual gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
   References(const Ptr &, RawEntityId eid) & = 0;
 

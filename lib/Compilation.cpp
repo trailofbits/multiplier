@@ -14,6 +14,7 @@
 #include "IR/SourceIR.h"
 #endif
 
+#include "Reference.h"
 #include "Token.h"
 
 namespace mx {
@@ -285,6 +286,11 @@ std::optional<ir::builtin::ModuleOp> Compilation::ir(void) const noexcept {
 #endif
 
   return std::nullopt;
+}
+
+// References to this compilation.
+gap::generator<Reference> Compilation::references(void) const & {
+  return References(impl->ep, id().Pack());
 }
 
 }  // namespace mx
