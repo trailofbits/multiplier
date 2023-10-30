@@ -626,11 +626,8 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
   return ret;
 }
 
-// Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
-// to analyze when looking for references.
-//
-// NOTE(pag): `fragment_ids_out` will always contain the fragment associated
-//            with `eid` if `eid` resides in a fragment.
+// Generate references to `raw_id` as a tuple of `from_id`, `context_id`, and
+// `kind_id`. Internally, this will handle redeclarations.
 gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
 
