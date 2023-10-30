@@ -1126,7 +1126,6 @@ bool CustomTokenReader::Equals(const TokenReader *that_) const {
   return token_ids == that->token_ids;
 }
 
-
 const FragmentImpl *CustomTokenReader::OwningFragment(void) const noexcept {
   return fragment.get();
 }
@@ -1158,14 +1157,9 @@ EntityId Token::id(void) const {
 // References to this token.
 gap::generator<Reference> Token::references(void) const & {
   if (EntityProviderPtr ep = TokenReader::EntityProviderFor(*this)) {
-    for (auto ref : ep->References(ep, id().Pack())) {
-      if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
-        auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));
-        co_yield Reference(std::move(eptr), std::move(context),
-                           std::get<0>(ref), category, std::get<2>(ref));
-      }
-    }
+    return References(std::move(ep), id().Pack());
   }
+  return EmptyReferences();
 }
 
 // Return the version of this token that was actually parsed. If this was a

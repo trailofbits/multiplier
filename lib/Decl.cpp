@@ -177,27 +177,38 @@ gap::generator<Decl> Decl::redeclarations(void) const & {
 
 // Return references to this declaration.
 gap::generator<Reference> Decl::references(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  for (auto ref : ep->References(ep, id().Pack())) {
-    if (auto [eptr, category] = ReferencedEntity(ep, std::get<0>(ref)); eptr) {
-      auto context = std::make_shared<ReferenceContextImpl>(ep, std::get<1>(ref));
-      co_yield Reference(std::move(eptr), std::move(context),
-                         std::get<0>(ref), category, std::get<2>(ref));
-    }
-  }
+  return References(impl->ep, id().Pack());
 }
 
 // Grab all call expressions of this FunctionDecl
 gap::generator<CallExpr> FunctionDecl::callers() const & {
-  for (Reference ref : references()) {
-    auto reference = ref.as_statement();
-    for (CallExpr call : CallExpr::containing(reference)) {
-      if (std::optional<FunctionDecl> decl = call.direct_callee()) {
-        if (*this == *decl) {
-          co_yield CallExpr(std::move(call));
-          break;
-        }
-      }
+  static constexpr auto kCallerKindId =
+      static_cast<RawEntityId>(BuiltinReferenceKind::CALLS);
+
+  auto ep = impl->ep;
+  for (auto [from_id, context_id, kind_id] : ep->References(ep, id().Pack())) {
+    if (kCallerKindId != kind_id) {
+      continue;
+    }
+
+    auto stmt_id = EntityId(from_id).Extract<StmtId>();
+    if (!stmt_id || stmt_id->kind != StmtKind::CALL_EXPR) {
+      continue;
+    }
+
+    auto eptr = ep->StmtFor(ep, from_id);
+    if (!eptr) {
+      continue;
+    }
+
+    // Don't double check the `CallExpr::direct_callee`. It may be missing, e.g.
+    // because it's an indirect call. It could also be a overridable method, and
+    // thus mislead us to thinking there's not a reference. We'll assume that
+    // users or the indexer has explicitly used the `BuiltinReferenceKind::CALLS`
+    // relation to communicate whatever knowledge they've learned.
+    Stmt stmt(std::move(eptr));
+    if (auto call = CallExpr::from(stmt)) {
+      co_yield call.value();
     }
   }
 }

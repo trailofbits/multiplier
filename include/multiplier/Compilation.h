@@ -150,6 +150,9 @@ class Compilation {
   // on macOS.
   gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
   framework_directories(void) const & noexcept;
+
+  // References to this compilation.
+  gap::generator<Reference> references(void) const &;
 };
 
 }  // namespace mx
