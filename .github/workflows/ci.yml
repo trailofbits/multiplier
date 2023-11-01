@@ -83,12 +83,12 @@ jobs:
 
       # Release on merge to main
       - name: Package Release
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         working-directory: ${{ env.RELEASE_DIR }}
         run: tar --use-compress-program pixz -cf "${ARTIFACT_NAME}" *
 
       - name: Create Release
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: gh release create ${VERSION} --generate-notes ${{ env.RELEASE_DIR }}/${{ env.ARTIFACT_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
