@@ -980,21 +980,34 @@ bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
   }
 }
 
-// Determines whether or not a TLM is likely to have to go into a child
-// fragment. This generally happens when a TLM is a directive.
-bool ShouldGoInNestedFragment(const pasta::Macro &macro) {
-  switch (macro.Kind()) {
-    case pasta::MacroKind::kDefineDirective:
-      return true;
-    default:
-      return false;
-  }
+// Determines whether or not a TLM is likely to have to go into a floating
+// fragment. This generally happens when a TLM is a directive. Some general
+// thoughts:
+//
+// Define directives can appear inside of macro expansion calls, e.g.
+//
+//      CALL_MACRO(
+//      #define FOO ...
+//          )
+//
+// This is annoying because the macro `CALL_MACRO` or its use site may be
+// polymorphic, and we don't want that introducing additional versions of
+// the definition.
+//
+// Conditional directives can straddle declaration bounds, as is demonstrated
+// by issue #457. We don't want to have to have so many redundant versions of
+// each directive.
+//
+// NOTE(pag): Must be kept in sync with `IsFloatingDirectiveFragment` in
+//            `lib/TokenTree.cpp`.
+bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
+  return pasta::MacroDirective::From(macro).has_value();
 }
 
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.
 bool AreVisibleAcrossFragments(const pasta::Macro &macro) {
-  return pasta::DefineMacroDirective::From(macro) ||
+  return ShouldGoInFloatingFragment(macro) ||
          pasta::MacroParameter::From(macro);
 }
 

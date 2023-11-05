@@ -26,6 +26,7 @@
 #include <iostream>
 #endif
 
+#include <iostream>
 namespace mx {
 namespace {
 
@@ -1854,6 +1855,33 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFragmentNode(
   return seq;
 }
 
+#ifndef NDEBUG
+namespace {
+
+// Returns `true` if this looks like a floating macro directive.
+//
+// NOTE(pag): Must be kept in sync with `ShouldGoInFloatingFragment` in
+//            `bin/Index/Util.*`
+static bool IsFloatingDirectiveFragment(const Fragment &frag) {
+  auto num_directives = 0u;
+  for (MacroOrToken &mt : frag.preprocessed_code()) {
+    if (!std::holds_alternative<Macro>(mt)) {
+      return false;
+    }
+
+    if (!MacroDirective::from(std::get<Macro>(mt))) {
+      return false;
+    }
+
+    ++num_directives;
+  }
+
+  return num_directives == 1u;
+}
+
+}  // namespace
+#endif  // NDEBUG
+
 // Create a node for a file. If there are overlapping fragments in this file,
 // then this will include them.
 TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
@@ -1891,19 +1919,9 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
     if (auto frag_it = file_frags.find(first_file_tok_id);
         frag_it != file_frags.end()) {
 
-      // TODO(pag): Eventually, this could manifest in the following way,
-      //            assuming the same code is built with and without `CONFIG`
-      //            defined.
-      //
-      //    struct X {
-      //      ...
-      //    #ifdef CONFIG
-      //      ...
-      //    };
-      //    #else
-      //      ...
-      //    };
-      //    #endif
+      // XREF(pag): Issue #457. Sometimes two fragments can start in the same
+      //            place, but end in different places. See test case
+      //            `tests/Macros/FragmentWithMultipleBounds.c`.
       assert(last_file_tok_id == frag_end[first_file_tok_id]);
 
       ChoiceNode *alt = frag_it->second;
@@ -1926,31 +1944,49 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
   // Combine the file tokens and alternations of the fragment tokens.
   for (Token file_tok : entity.tokens()) {
     RawEntityId file_tok_id = file_tok.id().Pack();
+    auto frag_it = file_frags.find(file_tok_id);
+    auto at_frag = frag_it != file_frags.end();
+    
+    // We're inside a fragment. If we get to the last token associated with the
+    // fragment then clear `stop_skip_after`, and resume appending file tokens,
+    // otherwise skip this file token, because it'll get covered by a fragment.
     if (stop_skip_after.has_value()) {
-      assert(!file_frags.count(file_tok_id));
       if (stop_skip_after.value() == file_tok_id) {
         stop_skip_after.reset();
+      }
+
+      if (at_frag) {
+        std::cerr << frag_it->second->fragments.front().file_tokens().data() << '\n';
+
+#ifndef NDEBUG
+        for (const Fragment &frag : frag_it->second->fragments) {
+          assert(IsFloatingDirectiveFragment(frag));
+        }
+#endif
+        file_frags.erase(file_tok_id);
       }
       continue;
     }
 
-    if (auto frag_it = file_frags.find(file_tok_id);
-        frag_it != file_frags.end()) {
-
-      ChoiceNode *frag_node = frag_it->second;
-      assert(frag_node != nullptr);
-
-      RawEntityId end_file_tok_id = frag_end[file_tok_id];
-      if (end_file_tok_id != file_tok_id) {
-        stop_skip_after.emplace(end_file_tok_id);
-      }
-      seq = AddToSequence(seq, frag_node, dummy_trailing_tokens);
-
-      file_frags.erase(file_tok_id);
-
-    } else {
+    // This file token doesn't correspond to the beginning of any fragment, so
+    // add it to a top-level sequence.
+    if (!at_frag) {
       seq = AddTokenToSequence(seq, file_tok, dummy_trailing_tokens);
+      continue;
     }
+
+    // This file token corresponds to a choice among one or more overlapping
+    // fragments. Add the fragment to the top-level sequence.
+    ChoiceNode *frag_node = frag_it->second;
+    assert(frag_node != nullptr);
+
+    RawEntityId end_file_tok_id = frag_end[file_tok_id];
+    if (end_file_tok_id != file_tok_id) {
+      stop_skip_after.emplace(end_file_tok_id);
+    }
+    seq = AddToSequence(seq, frag_node, dummy_trailing_tokens);
+
+    file_frags.erase(file_tok_id);
   }
 
   assert(file_frags.empty());
