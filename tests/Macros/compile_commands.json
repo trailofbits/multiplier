@@ -10,11 +10,6 @@
 "directory": ""
 },
 {
-"file": "EmptyFunctionMacroWithParams.c",
-"command": "/usr/bin/cc EmptyFunctionMacroWithParams.c",
-"directory": ""
-},
-{
 "file": "C99VarArgsTokenPaste.c",
 "command": "/usr/bin/cc C99VarArgsTokenPaste.c",
 "directory": ""
@@ -65,6 +60,11 @@
 "directory": ""
 },
 {
+"file": "EmptyFunctionMacroWithParams.c",
+"command": "/usr/bin/cc EmptyFunctionMacroWithParams.c",
+"directory": ""
+},
+{
 "file": "EmptyMacro.c",
 "command": "/usr/bin/cc EmptyMacro.c",
 "directory": ""
@@ -72,6 +72,31 @@
 {
 "file": "EmptyFunctionMacro.c",
 "command": "/usr/bin/cc EmptyFunctionMacro.c",
+"directory": ""
+},
+{
+"file": "FragmentWithMultipleBounds.c",
+"command": "/usr/bin/cc -DSHORT_BOUNDS FragmentWithMultipleBounds.c",
+"directory": ""
+},
+{
+"file": "FragmentWithMultipleBounds.c",
+"command": "/usr/bin/cc -DMEDIUM_BOUNDS FragmentWithMultipleBounds.c",
+"directory": ""
+},
+{
+"file": "FragmentWithMultipleBounds.c",
+"command": "/usr/bin/cc -DLONG_BOUNDS FragmentWithMultipleBounds.c",
+"directory": ""
+},
+{
+"file": "FragmentWithMultipleBounds2.c",
+"command": "/usr/bin/cc FragmentWithMultipleBounds2.c",
+"directory": ""
+},
+{
+"file": "FragmentWithMultipleBounds2.c",
+"command": "/usr/bin/cc -DLONG_BOUNDS FragmentWithMultipleBounds2.c",
 "directory": ""
 },
 {

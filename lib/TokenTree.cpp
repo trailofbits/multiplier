@@ -18,7 +18,7 @@
 #include "File.h"
 #include "Fragment.h"
 
-//#define D(...) __VA_ARGS__
+// #define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #endif
@@ -899,6 +899,10 @@ struct TokenTreeImpl::MacroExpansionProcessor {
             const Bounds &def_bounds);
   bool Run(bool is_non_tree);
 
+  inline bool HasAfterChildren(void) const {
+    return !after_children.empty();
+  }
+
   inline const std::vector<BodyTokenForChild> &ReplacementChildren(void) const {
     return merged_children;
   }
@@ -1529,7 +1533,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ExtendWithSimpleExpansion(
   MacroExpansionProcessor mep;
   mep.Init(me, me_def, def_bounds);
   if (!mep.Run(false)) {
-    assert(false);  // Probably a bug.
+    assert(!mep.HasAfterChildren());  // Probably a bug.
     return ExtendWithSubstitution(seq, me, user_bounds, trailing_tokens);
   }
 
@@ -1631,7 +1635,7 @@ TokenTreeImpl::SequenceNode *TokenTreeImpl::ProcessMacroChildren(
         TokenIndex rc_index = GetOrCreateIndex(rc_ft);
         if (new_bounds.reader_index == rc_index.first &&
             rc_index.second >= new_bounds.begin_index &&
-            rc_index.second) {
+            rc_index.second <= new_bounds.end_index) {
           assert(new_bounds.begin_index <= rc_index.second);
           assert(rc_index.second <= new_bounds.end_index);
           new_bounds.end_index = rc_index.second - 1u;
@@ -1854,18 +1858,55 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFragmentNode(
   return seq;
 }
 
+namespace {
+
+// Returns `true` if this looks like a floating macro directive.
+//
+// NOTE(pag): Must be kept in sync with `ShouldGoInFloatingFragment` in
+//            `bin/Index/Util.*`
+static bool IsFloatingDirectiveFragment(const Fragment &frag) {
+  auto num_directives = 0u;
+  for (MacroOrToken &mt : frag.preprocessed_code()) {
+    if (!std::holds_alternative<Macro>(mt)) {
+      return false;
+    }
+
+    auto dir = MacroDirective::from(std::get<Macro>(mt));
+    if (!dir) {
+      return false;
+    }
+
+    switch (dir->kind()) {
+      case MacroKind::INCLUDE_DIRECTIVE:
+      case MacroKind::INCLUDE_NEXT_DIRECTIVE:
+      case MacroKind::INCLUDE_MACROS_DIRECTIVE:
+      case MacroKind::IMPORT_DIRECTIVE:
+        return false;
+      default:
+        ++num_directives;
+        continue;
+    }
+  }
+
+  return num_directives == 1u;
+}
+
+}  // namespace
+
 // Create a node for a file. If there are overlapping fragments in this file,
 // then this will include them.
 TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
 
   // Collect all overlapping fragments into alternations.
   std::unordered_map<RawEntityId, ChoiceNode *> file_frags;
+  std::unordered_map<RawEntityId, RawEntityId> frag_begin;
   std::unordered_map<RawEntityId, RawEntityId> frag_end;
   std::unordered_map<RawEntityId, RawEntityId> last_frag;
-  for (Fragment frag : entity.fragments()) {
+
+  auto process_fragment = [&] (Fragment frag) {
     TokenRange file_toks = frag.file_tokens();
     if (file_toks.empty()) {
-      continue;
+      return;
     }
 
     RawEntityId first_file_tok_id = file_toks.front().id().Pack();
@@ -1888,23 +1929,8 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
     Node frag_node = CreateFragmentNode(frag, frag_bounds);
     assert(!depth);
 
-    if (auto frag_it = file_frags.find(first_file_tok_id);
+    if (auto frag_it = file_frags.find(last_file_tok_id);
         frag_it != file_frags.end()) {
-
-      // TODO(pag): Eventually, this could manifest in the following way,
-      //            assuming the same code is built with and without `CONFIG`
-      //            defined.
-      //
-      //    struct X {
-      //      ...
-      //    #ifdef CONFIG
-      //      ...
-      //    };
-      //    #else
-      //      ...
-      //    };
-      //    #endif
-      assert(last_file_tok_id == frag_end[first_file_tok_id]);
 
       ChoiceNode *alt = frag_it->second;
       alt->fragments.emplace_back(std::move(frag));
@@ -1915,9 +1941,46 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
       alt->fragments.emplace_back(std::move(frag));
       alt->children.emplace_back(std::move(frag_node));
 
+      file_frags.emplace(last_file_tok_id, alt);
+      frag_begin.emplace(last_file_tok_id, first_file_tok_id);
       frag_end.emplace(first_file_tok_id, last_file_tok_id);
-      file_frags.emplace(first_file_tok_id, alt);
     }
+
+    // Keep track of the minimum/maximum beginning file token id. In the case
+    // of something like:
+    //
+    //      #if ...
+    //      static
+    //      #endif
+    //      void func(...) { ... }
+    //
+    // We have two or more fragments sharing the same end location, but
+    // having different begin locations. We also have floating fragments for
+    // the directives, which may also share the same beginning/ending
+    // locations.
+#ifndef NDEBUG
+    auto &min_first_file_tok_id = frag_begin[last_file_tok_id];
+    min_first_file_tok_id = std::min(first_file_tok_id, min_first_file_tok_id);
+#endif
+
+    auto &max_last_file_tok_id = frag_end[first_file_tok_id];
+    max_last_file_tok_id = std::max(last_file_tok_id, max_last_file_tok_id);
+  };
+
+  std::vector<Fragment> floating_frags;
+  for (Fragment frag : entity.fragments()) {
+    if (IsFloatingDirectiveFragment(frag)) {
+      floating_frags.emplace_back(std::move(frag));
+    } else {
+      process_fragment(std::move(frag));
+    }
+  }
+
+  // Process floating fragments last. We want our "bigger", i.e. normal
+  // fragments to show up in the `ChoiceNode`s first, rather than floating
+  // fragments.
+  for (Fragment &frag : floating_frags) {
+    process_fragment(std::move(frag));
   }
 
   SequenceNode *seq = nullptr;
@@ -1926,34 +1989,60 @@ TokenTreeImpl::Node TokenTreeImpl::CreateFileNode(const File &entity) {
   // Combine the file tokens and alternations of the fragment tokens.
   for (Token file_tok : entity.tokens()) {
     RawEntityId file_tok_id = file_tok.id().Pack();
-    if (stop_skip_after.has_value()) {
-      assert(!file_frags.count(file_tok_id));
-      if (stop_skip_after.value() == file_tok_id) {
+
+    // We're inside a fragment, so skip file tokens.
+    if (stop_skip_after) {
+      auto skip_stop_file_tok_id = stop_skip_after.value();
+
+      // We might have floating fragments inside of some larger fragments. Go
+      // and double check that they are indeed floating.
+      if (skip_stop_file_tok_id > file_tok_id) {
+#ifndef NDEBUG
+        auto frag_it = file_frags.find(file_tok_id);
+        if (frag_it != file_frags.end()) {
+          for (const Fragment &frag : frag_it->second->fragments) {
+            assert(IsFloatingDirectiveFragment(frag));
+          }
+        }
+#endif
+
+      // We've hit the end of our outermost fragment.
+      } else if (skip_stop_file_tok_id == file_tok_id) {
+        stop_skip_after.reset();
+
+      } else {
+        assert(false);
         stop_skip_after.reset();
       }
       continue;
     }
 
-    if (auto frag_it = file_frags.find(file_tok_id);
-        frag_it != file_frags.end()) {
+    // We've just got to the beginning of a fragmnet. Compute the end location
+    // of the fragment, then look up the fragment by its end location.
+    if (auto end_it = frag_end.find(file_tok_id); end_it != frag_end.end()) {
+      auto max_last_file_tok_id = end_it->second;
+      assert(frag_begin[max_last_file_tok_id] == file_tok_id);
 
-      ChoiceNode *frag_node = frag_it->second;
-      assert(frag_node != nullptr);
+      auto frag_it = file_frags.find(max_last_file_tok_id);
+      if (frag_it != file_frags.end()) {
+        stop_skip_after.emplace(max_last_file_tok_id);
 
-      RawEntityId end_file_tok_id = frag_end[file_tok_id];
-      if (end_file_tok_id != file_tok_id) {
-        stop_skip_after.emplace(end_file_tok_id);
+        // This file token corresponds to a choice among one or more
+        // overlapping fragments. Add the fragment to the top-level sequence.
+        ChoiceNode *frag_node = frag_it->second;
+        assert(frag_node != nullptr);
+
+        seq = AddToSequence(seq, frag_node, dummy_trailing_tokens);
+        continue;
       }
-      seq = AddToSequence(seq, frag_node, dummy_trailing_tokens);
 
-      file_frags.erase(file_tok_id);
-
-    } else {
-      seq = AddTokenToSequence(seq, file_tok, dummy_trailing_tokens);
+      assert(false);
     }
-  }
 
-  assert(file_frags.empty());
+    // This file token doesn't correspond to the beginning of any fragment, so
+    // add it to a top-level sequence.
+    seq = AddTokenToSequence(seq, file_tok, dummy_trailing_tokens);
+  }
 
   if (!seq) {
     return {};
