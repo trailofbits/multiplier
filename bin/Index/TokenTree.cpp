@@ -1016,8 +1016,14 @@ Substitution *TokenTreeImpl::CreateSubstitution(mx::MacroKind kind_) {
 static pasta::Macro RootNodeFrom(const pasta::Macro &node) {
   
   // NOTE(pag): We extract macro directives into their own (nested) fragments,
-  //            even if they are logically nested within a macro use.
-  if (ShouldGoInNestedFragment(node)) {
+  //            even if they are logically nested within a macro use. It's
+  //            possible for a `#define` directive to be nested inside of a
+  //            macro use / expansion. In that case, the parent of the directive
+  //            is the expansion, but we want to put the directive into a
+  //            floating fragment all on its own, and so it wouldn't make sense
+  //            for that floating fragment to contain the expansion, which may
+  //            be polymorphic for other reasons.
+  if (ShouldGoInFloatingFragment(node)) {
     return node;
   
   } else if (auto parent = node.Parent()) {

@@ -980,21 +980,52 @@ bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
   }
 }
 
-// Determines whether or not a TLM is likely to have to go into a child
-// fragment. This generally happens when a TLM is a directive.
-bool ShouldGoInNestedFragment(const pasta::Macro &macro) {
-  switch (macro.Kind()) {
-    case pasta::MacroKind::kDefineDirective:
-      return true;
-    default:
+// Determines whether or not a TLM is likely to have to go into a floating
+// fragment. This generally happens when a TLM is a directive. Some general
+// thoughts:
+//
+// Define directives can appear inside of macro expansion calls, e.g.
+//
+//      CALL_MACRO(
+//      #define FOO ...
+//          )
+//
+// This is annoying because the macro `CALL_MACRO` or its use site may be
+// polymorphic, and we don't want that introducing additional versions of
+// the definition.
+//
+// Conditional directives can straddle declaration bounds, as is demonstrated
+// by issue #457. We don't want to have to have so many redundant versions of
+// each directive.
+//
+// Include directives that are themselves inside other fragments can cause those
+// other fragments to expand to contain a lot of other stuff. For example, this
+// is common with the x-macro pattern, which is how codebases like LLVM define
+// things like token kinds.
+//
+// NOTE(pag): Must be kept in sync with `IsFloatingDirectiveFragment` in
+//            `lib/TokenTree.cpp`.
+bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
+  auto dir = pasta::MacroDirective::From(macro);
+  if (!dir) {
+    return false;
+  }
+
+  switch (dir->Kind()) {
+    case pasta::MacroKind::kIncludeDirective:
+    case pasta::MacroKind::kIncludeNextDirective:
+    case pasta::MacroKind::kIncludeMacrosDirective:
+    case pasta::MacroKind::kImportDirective:
       return false;
+    default:
+      return true;
   }
 }
 
 // Returns `true` if a macro is visible across fragments, and should have an
 // entity id stored in the global mapper.
 bool AreVisibleAcrossFragments(const pasta::Macro &macro) {
-  return pasta::DefineMacroDirective::From(macro) ||
+  return ShouldGoInFloatingFragment(macro) ||
          pasta::MacroParameter::From(macro);
 }
 

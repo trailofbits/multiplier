@@ -216,9 +216,9 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<mx::EntityOffset>(entity_list.size());
 
-  // Macro definitions and their parameters can be referenced by other fragments
-  // that contain expansions of those definitions, and substitutions of those
-  // parameters for arguments.
+  // Macro directives and macro `#define` parameters can be referenced by other
+  // fragments that contain expansions of those definitions, and substitutions
+  // of those parameters for arguments.
   if (AreVisibleAcrossFragments(entity)) {
     CHECK(em.entity_ids.emplace(entity.RawMacro(), id).second);
   }
