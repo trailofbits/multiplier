@@ -998,10 +998,28 @@ bool ShouldGoInNestedFragment(const pasta::Decl &decl) {
 // by issue #457. We don't want to have to have so many redundant versions of
 // each directive.
 //
+// Include directives that are themselves inside other fragments can cause those
+// other fragments to expand to contain a lot of other stuff. For example, this
+// is common with the x-macro pattern, which is how codebases like LLVM define
+// things like token kinds.
+//
 // NOTE(pag): Must be kept in sync with `IsFloatingDirectiveFragment` in
 //            `lib/TokenTree.cpp`.
 bool ShouldGoInFloatingFragment(const pasta::Macro &macro) {
-  return pasta::MacroDirective::From(macro).has_value();
+  auto dir = pasta::MacroDirective::From(macro);
+  if (!dir) {
+    return false;
+  }
+
+  switch (dir->Kind()) {
+    case pasta::MacroKind::kIncludeDirective:
+    case pasta::MacroKind::kIncludeNextDirective:
+    case pasta::MacroKind::kIncludeMacrosDirective:
+    case pasta::MacroKind::kImportDirective:
+      return false;
+    default:
+      return true;
+  }
 }
 
 // Returns `true` if a macro is visible across fragments, and should have an
