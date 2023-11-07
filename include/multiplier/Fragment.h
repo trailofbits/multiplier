@@ -126,9 +126,6 @@ class Fragment {
   // Return child fragments.
   gap::generator<Fragment> nested_fragments(void) const &;
 
-  // Return references to this fragment.
-  gap::generator<Reference> references(void) const &;
-
   // Return the list of top-level declarations in this fragment.
   gap::generator<Decl> top_level_declarations(void) const &;
 

@@ -82,7 +82,6 @@ class CXXBaseSpecifier {
   }
 
   PackedCXXBaseSpecifierId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<CXXBaseSpecifier> from(const CXXBaseSpecifier &self) {
     return self;

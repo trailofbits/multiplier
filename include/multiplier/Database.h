@@ -251,6 +251,12 @@ struct ReferenceRecord {
                         kind_id)
           ) WITHOUT ROWID)",
 
+       R"(CREATE INDEX IF NOT EXISTS reference_to
+          ON reference(to_entity_id ASC, from_entity_id ASC))",
+
+       R"(CREATE INDEX IF NOT EXISTS reference_from
+          ON reference(from_entity_id ASC, to_entity_id ASC))",
+
        R"(CREATE TABLE IF NOT EXISTS reference_kind (
             kind BLOB NOT NULL PRIMARY KEY
           ))",

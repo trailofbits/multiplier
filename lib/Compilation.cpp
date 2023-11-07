@@ -288,9 +288,4 @@ std::optional<ir::builtin::ModuleOp> Compilation::ir(void) const noexcept {
   return std::nullopt;
 }
 
-// References to this compilation.
-gap::generator<Reference> Compilation::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
 }  // namespace mx

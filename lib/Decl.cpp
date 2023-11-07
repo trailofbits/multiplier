@@ -175,18 +175,15 @@ gap::generator<Decl> Decl::redeclarations(void) const & {
   }
 }
 
-// Return references to this declaration.
-gap::generator<Reference> Decl::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
 // Grab all call expressions of this FunctionDecl
 gap::generator<CallExpr> FunctionDecl::callers() const & {
   static constexpr auto kCallerKindId =
       static_cast<RawEntityId>(BuiltinReferenceKind::CALLS);
 
   auto ep = impl->ep;
-  for (auto [from_id, context_id, kind_id] : ep->References(ep, id().Pack())) {
+  for (auto [from_id, context_id, kind_id] :
+        ep->References(ep, id().Pack(), EntityProvider::kReferenceTo)) {
+
     if (kCallerKindId != kind_id) {
       continue;
     }

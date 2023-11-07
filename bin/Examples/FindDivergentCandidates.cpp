@@ -71,7 +71,7 @@ static void FindDivergentCandidates(mx::Index index) {
           std::vector<mx::ArraySubscriptExpr> mem_accesses;
           std::vector<mx::Stmt> outside_uses;
 
-          for (mx::Reference ref : decl.references()) {
+          for (mx::Reference ref : mx::Reference::to(decl)) {
             auto ref_stmt = ref.as_statement();
             if (!ref_stmt) {
               continue;

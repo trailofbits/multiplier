@@ -1154,14 +1154,6 @@ EntityId Token::id(void) const {
   return impl->NthTokenId(offset);
 }
 
-// References to this token.
-gap::generator<Reference> Token::references(void) const & {
-  if (EntityProviderPtr ep = TokenReader::EntityProviderFor(*this)) {
-    return References(std::move(ep), id().Pack());
-  }
-  return EmptyReferences();
-}
-
 // Return the version of this token that was actually parsed. If this was a
 // macro token that only relates to a single parsed token, then that is
 // returned. If this is a macro token that doesn't relate to any parsed

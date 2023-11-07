@@ -178,9 +178,6 @@ class File {
   // Return the contents of the file as a UTF-8 string.
   std::string_view data(void) const noexcept;
 
-  // References of this file.
-  gap::generator<Reference> references(void) const &;
-
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();
   }

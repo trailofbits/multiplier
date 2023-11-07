@@ -79,7 +79,6 @@ class Macro {
   }
 
   PackedMacroId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
  protected:
   static gap::generator<Macro> containing_internal(const Token &token);

@@ -229,11 +229,6 @@ gap::generator<Fragment> Fragment::nested_fragments(void) const & {
   }
 }
 
-// Return references to this fragment.
-gap::generator<Reference> Fragment::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
 // Return the list of top-level macros in this fragment.
 // This will return a mix of `Macro` or `Token` values.
 gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {

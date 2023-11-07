@@ -94,9 +94,6 @@ class Token final {
     return id().Pack() == that.id().Pack();
   }
 
-  // References to this token.
-  gap::generator<Reference> references(void) const &;
-
   // Return the context node that identifies how this token relates to the AST.
   //
   // NOTE(pag): This only works with parsed tokens, and not all parsed tokens

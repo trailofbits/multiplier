@@ -2311,8 +2311,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  constexpr inline static EntityCategory static_category(void) {\n"
         << "    return EntityCategory::" << category << ";\n"
         << "  }\n\n"
-        << "  Packed" << class_name << "Id id(void) const;\n"
-        << "  gap::generator<Reference> references(void) const &;\n\n";
+        << "  Packed" << class_name << "Id id(void) const;\n\n";
 
     seen_methods->emplace("id");  // Manual.
     seen_methods->emplace("references");  // Manual.
@@ -3009,7 +3008,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return self;\n" \
           << "  }\n\n" \
           << "  static std::optional<" << class_name \
-          << "> from(const Reference &r);\n\n" \
+          << "> from(const Reference &r);\n" \
+          << "  static std::optional<" << class_name \
+          << "> from(const VariantEntity &e);\n" \
           << "  static std::optional<" << class_name \
           << "> from(const TokenContext &t);\n\n"; \
       \
@@ -3017,6 +3018,20 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "std::optional<" << class_name \
           << "> " << class_name << "::from(const Reference &r) {\n" \
           << "  return r.as_" #lower_name "();\n" \
+          << "}\n\n" \
+          << "std::optional<" << class_name \
+          << "> " << class_name << "::from(const VariantEntity &e) {\n" \
+          << "  if (!std::holds_alternative<" << base_name << ">(e)) {\n" \
+          << "    return std::nullopt;\n" \
+          << "  }\n"; \
+      if (base_name == class_name) { \
+        lib_cpp_os \
+            << "  return std::get<" << base_name << ">(e);\n"; \
+      } else { \
+        lib_cpp_os \
+            << "  return from(std::get<" << base_name << ">(e));\n"; \
+      } \
+      lib_cpp_os \
           << "}\n\n" \
           << "std::optional<" << class_name \
           << "> " << class_name << "::from(const TokenContext &t) {\n" \
@@ -3591,7 +3606,8 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (class_name == "FunctionDecl") {
     forward_decls.insert("CallExpr");
     class_os
-        << "  gap::generator<CallExpr> callers(void) const &;\n";
+        << "  gap::generator<CallExpr> callers(void) const &;\n"
+        << "  gap::generator<CallExpr> callees(void) const &;\n";
   }
 
   // Allows CallExpr to conveniently get post-cast types if exists

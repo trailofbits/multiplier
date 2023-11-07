@@ -80,7 +80,6 @@ class Type {
   }
 
   PackedTypeId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   TokenRange tokens(void) const;
 

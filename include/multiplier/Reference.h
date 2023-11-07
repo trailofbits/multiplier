@@ -65,7 +65,12 @@ class ReferenceKind {
   /* implicit */ inline ReferenceKind(ReferenceKindImplPtr impl_)
       : impl(std::move(impl_)) {}
 
+  RawEntityId id(void) const noexcept;
+
  public:
+
+  // Get a reference kind for a builtin kind.
+  static ReferenceKind get(const Index &, BuiltinReferenceKind kind);
 
   // Get or create a reference kind.
   static ReferenceKind get(const Index &, std::string_view name);
@@ -74,19 +79,37 @@ class ReferenceKind {
   std::optional<BuiltinReferenceKind> builtin_reference_kind(void) const noexcept;
 
   // The name of this reference kind.
-  const std::string &kind(void) const & noexcept;
+  std::string_view kind(void) const & noexcept;
 
   // The name of this reference kind.
   std::string kind(void) const && noexcept;
 };
 
+// A reference is an arbitrarily named/kinded relation between two entities,
+// inducing a directed graph. Normally, the edges between entities are via
+// built-in method calls on entity objects. These methods are generally derived
+// from the PASTA API / Clang API, by way of the indexer serializing
+// ASTs. References, however, enable more semantic relationships between
+// entities to be expressed. By default, the indexer fills in several built-in
+// references, e.g. between callers and callees. Most of these correspond to
+// explicit references that appear in the code itself. Users, however, can
+// use the reference API to augment the built-in graph, e.g. expressing patterns
+// such as function pointer de-virtualization, by introducing their own
+// reference edges using built-in kinds, or by creating entirely custom
+// reference kinds for the sake of analysis result persistence.
+//
+// Although references are logically a `(from, kind, to)` triple, we store an
+// additional `context` field. By default, `context` matches `from`. However,
+// sometimes it differs. When it does, it's good to think about it as providing
+// *visual* context for `from`, and thus is should be an entity that is a
+// parent of `from`.
 class Reference {
  private:
   OpaqueImplPtr impl;
-  // The reference context will have entity id of referrer
-  // that references the entity of interest.
+  // The reference context will have entity id of referrer that references the
+  // entity of interest.
   RawEntityId context_id;
-  RawEntityId from_id;
+  RawEntityId entity_id;
   RawEntityId kind_id;
 
 #define MX_FRIEND(type_name, lower_name, enum_name, category) \
@@ -104,26 +127,34 @@ class Reference {
   Reference(void) = delete;
 
   // Add a reference between two entities.
-  static bool add(const ReferenceKind &kind, RawEntityId from_id,
-                  RawEntityId to_id, RawEntityId context_id, int);
+  static bool add_impl(RawEntityId kind_id, RawEntityId from_id,
+                       RawEntityId to_id, RawEntityId context_id);
+
+  inline static RawEntityId reference_kind_id(RawEntityId kind_id) noexcept {
+    return kind_id;
+  }
+
+  inline static RawEntityId reference_kind_id(
+      const ReferenceKind &kind) noexcept {
+    return kind.id();
+  }
 
  public:
 
   inline explicit Reference(OpaqueImplPtr impl_,
                             RawEntityId context_id_,
-                            RawEntityId from_id_,
+                            RawEntityId entity_id_,
                             RawEntityId kind_id_)
       : impl(std::move(impl_)),
         context_id(context_id_),
-        from_id(from_id_),
+        entity_id(entity_id_),
         kind_id(kind_id_) {}
 
-  // The context id will be same or ancestor of `from_id`. The default
-  // value will be same as `from_id`.
-  inline static bool add(const ReferenceKind &kind, EntityId from_id_,
-                         EntityId to_id_, EntityId context_id_) {
-    return add(kind, from_id_.Pack(), to_id_.Pack(), context_id_.Pack(), 0);
-  }
+  static bool add(const ReferenceKind &kind, const VariantEntity &from,
+                  const VariantEntity &to);
+
+  static bool add(const ReferenceKind &kind, const VariantEntity &from,
+                  const VariantEntity &to, const VariantEntity &context);
 
   EntityCategory category(void) const noexcept;
 
@@ -138,7 +169,7 @@ class Reference {
 
   // The ID of the referenced entity.
   inline EntityId referenced_entity_id(void) const noexcept {
-    return from_id;
+    return entity_id;
   }
 
   // Return the kind of this reference.
@@ -146,6 +177,9 @@ class Reference {
 
   // The contextual entity associated with this reference.
   VariantEntity context(void) const noexcept;
+
+  // Generate all references from some kind of entity.
+  static gap::generator<Reference> from(const VariantEntity &entity);
 
   // Generate all references to some kind of entity.
   static gap::generator<Reference> to(const VariantEntity &entity);

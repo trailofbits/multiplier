@@ -80,7 +80,6 @@ class TemplateParameterList {
   }
 
   PackedTemplateParameterListId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<TemplateParameterList> from(const TemplateParameterList &self) {
     return self;

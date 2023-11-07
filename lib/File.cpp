@@ -312,9 +312,4 @@ std::string_view File::data(void) const noexcept {
   return impl->Data();
 }
 
-// References of this file.
-gap::generator<Reference> File::references(void) const & {
-  return References(impl->ep, id().Pack());
-}
-
 }  // namespace mx

@@ -82,7 +82,6 @@ class TemplateArgument {
   }
 
   PackedTemplateArgumentId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<TemplateArgument> from(const TemplateArgument &self) {
     return self;

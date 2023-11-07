@@ -135,7 +135,7 @@ TaintTrackingResults TaintTracker::add_source(
 TaintTrackingResults TaintTracker::add_source(
     DefineMacroDirective def) & {
 
-  for (Reference ref : def.references()) {
+  for (Reference ref : mx::Reference::to(def)) {
     std::optional<MacroExpansion> exp = MacroExpansion::from(ref.as_macro());
     if (!exp) {
       continue;
@@ -439,7 +439,7 @@ static gap::generator<FunctionDecl> FindAssignedFunctionsTD(
       break;
     case StmtKind::MEMBER_EXPR:
       for (Reference ref :
-               MemberExpr::from(stmt)->member_declaration().references()) {
+               mx::Reference::to(MemberExpr::from(stmt)->member_declaration())) {
         for (FunctionDecl func : FindAssignedFunctionsBU(
                                      std::move(ref), seen)) {
           co_yield func;
@@ -505,7 +505,7 @@ static gap::generator<FunctionDecl> CalledFunctions(
     co_return;
   }
 
-  for (Reference ref : callee->references()) {
+  for (Reference ref : mx::Reference::to(callee.value())) {
     for (FunctionDecl func : FindAssignedFunctionsBU(std::move(ref), seen)) {
       co_yield func;
     }
@@ -704,7 +704,7 @@ TaintTrackingResults TaintTrackerImpl::AcceptStmt(Stmt stmt) {
 // taint those.
 TaintTrackingResults TaintTrackerImpl::TaintValue(ValueDecl val) {
   auto is_func = FunctionDecl::from(val).has_value();
-  for (Reference ref : val.references()) {
+  for (Reference ref : mx::Reference::to(val)) {
     if (std::optional<Stmt> stmt = ref.as_statement()) {
       TaintTrackingStepKind kind = TaintTrackingStepKind::NORMAL;
       if (is_func) {

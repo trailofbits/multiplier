@@ -113,17 +113,36 @@ gap::generator<Reference> EmptyReferences(void) {
   co_return;
 }
 
-gap::generator<Reference> References(EntityProviderPtr ep, RawEntityId raw_id) {
-  for (auto [from_id, context_id, kind_id] : ep->References(ep, raw_id)) {
-    if (auto eptr = ReferencedEntity(ep, from_id); eptr) {
-      co_yield Reference(std::move(eptr), context_id, from_id, kind_id);
+gap::generator<Reference> References(EntityProviderPtr ep, RawEntityId raw_id,
+                                     EntityProvider::ReferenceDirection dir) {
+  for (auto [entity_id, context_id, kind_id] : ep->References(ep, raw_id, dir)) {
+    if (auto eptr = ReferencedEntity(ep, entity_id); eptr) {
+      co_yield Reference(std::move(eptr), context_id, entity_id, kind_id);
     }
   }
 }
 
+RawEntityId ReferenceKind::id(void) const noexcept {
+  return impl->kind_id;
+}
+
+// Get a reference kind for a builtin kind.
+ReferenceKind ReferenceKind::get(const Index &index, BuiltinReferenceKind kind) {
+  const auto &ep = index.impl;
+  ReferenceKindImplPtr rptr =
+      ep->ReferenceKindFor(ep, static_cast<RawEntityId>(kind));
+  if (!rptr) {
+    assert(false);
+    rptr = std::make_shared<ReferenceKindImpl>(
+        kInvalidEP, ~0ull, "<invalid>");
+  }
+
+  return rptr;
+}
+
 // Get or create a reference kind.
 ReferenceKind ReferenceKind::get(const Index &index, std::string_view name) {
-  const EntityProviderPtr &ep = index.impl;
+  const auto &ep = index.impl;
   ReferenceKindImplPtr rptr = ep->ReferenceKindFor(ep, name);
   if (!rptr) {
     assert(false);
@@ -145,7 +164,7 @@ ReferenceKind::builtin_reference_kind(void) const noexcept {
 }
 
 // The name of this reference kind.
-const std::string &ReferenceKind::kind(void) const & noexcept {
+std::string_view ReferenceKind::kind(void) const & noexcept {
   return impl->kind_data;
 }
 
@@ -170,44 +189,47 @@ ReferenceKind Reference::kind(void) const noexcept {
   return rptr;
 }
 
+// Add a reference between two entities.
+bool Reference::add_impl(RawEntityId kind_id, RawEntityId from_id,
+                         RawEntityId to_id, RawEntityId context_id) {
+  const EntityProviderPtr &ep = kind.impl->ep;
+  if (from_id == kInvalidEntityId || to_id == kInvalidEntityId) {
+    return false;
+  }
+  if (context_id == kInvalidEntityId) {
+    context_id = from_id;
+  }
+  return ep->AddReference(ep, kind.impl->kind_id, from_id, to_id, context_id);
+}
+
+bool Reference::add(const ReferenceKind &kind, const VariantEntity &from,
+                    const VariantEntity &to) {
+  auto from_id = EntityId(from).Pack();
+  return add_impl(reference_kind_id(kind), from_id, EntityId(to).Pack(),
+                  from_id);
+}
+
+bool Reference::add(const ReferenceKind &kind, const VariantEntity &from,
+                    const VariantEntity &to, const VariantEntity &context) {
+  return add_impl(reference_kind_id(kind), EntityId(from).Pack(),
+                  EntityId(to).Pack(), EntityId(context).Pack());
+}
+
 EntityCategory Reference::category(void) const noexcept {
   return CategoryFromEntityId(from_id);
 }
 
 VariantEntity Reference::context(void) const noexcept {
+  if (context_id == entity_id) {
+    return as_variant();
+  }
+
   if (auto index = Index::containing(as_variant())) {
     return index->entity(context_id);
   }
+
+  assert(false);
   return NotAnEntity{};
-}
-
-// Add a reference between two entities.
-bool Reference::add(const ReferenceKind &kind, RawEntityId from_id,
-                    RawEntityId to_id, RawEntityId context_id, int) {
-  const EntityProviderPtr &ep = kind.impl->ep;
-  auto found = false;
-  for (RawEntityId redecl_id : ep->Redeclarations(ep, from_id)) {
-    from_id = redecl_id;
-    found = true;
-    break;
-  }
-
-  if (!found) {
-    return false;
-  }
-
-  found = false;
-  for (RawEntityId redecl_id : ep->Redeclarations(ep, to_id)) {
-    to_id = redecl_id;
-    found = true;
-    break;
-  }
-
-  if (!found) {
-    return false;
-  }
-
-  return ep->AddReference(ep, kind.impl->kind_id, from_id, to_id, context_id);
 }
 
 // Return this reference as a `VariantEntity`.
@@ -255,10 +277,20 @@ std::optional<Token> Reference::as_token(void) const noexcept {
       offset.value());
 }
 
-// Generate all references from some kind of entity.
+// Generate all references to some kind of entity.
 gap::generator<Reference> Reference::to(const VariantEntity &entity) {
   if (auto index = Index::containing(entity)) {
-    return References(index->impl, EntityId(entity).Pack());
+    return References(index->impl, EntityId(entity).Pack(),
+                      EntityProvider::kReferenceTo);
+  }
+  return EmptyReferences();
+}
+
+// Generate all references from some kind of entity.
+gap::generator<Reference> Reference::from(const VariantEntity &entity) {
+  if (auto index = Index::containing(entity)) {
+    return References(index->impl, EntityId(entity).Pack(),
+                      EntityProvider::kReferenceFrom);
   }
   return EmptyReferences();
 }

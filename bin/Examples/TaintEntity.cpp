@@ -647,7 +647,7 @@ void TaintTrackFunc(const mx::FunctionDecl &taint_source,
     return;
   }
 
-  for (mx::Reference ref : taint_source.references()) {
+  for (mx::Reference ref : mx::Reference::to(taint_source)) {
     auto stmt_taint_source = ref.as_statement();
     if (!stmt_taint_source) {
       continue;
@@ -669,7 +669,7 @@ void TaintTrackVarOrVarLike(const mx::Decl &taint_source,
 
   UsePath entry{&prev, PreferDefinition(taint_source).id().Pack()};
   if (!AlreadySeen(entry, seen)) {
-    for (mx::Reference ref : taint_source.references()) {
+    for (mx::Reference ref : mx::Reference::to(taint_source)) {
       if (auto ref_stmt = ref.as_statement()) {
         if (std::optional<mx::Expr> expr = mx::Expr::from(*ref_stmt)) {
           TaintTrackExpr(*expr, entry, seen);

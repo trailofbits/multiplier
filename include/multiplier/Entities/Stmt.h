@@ -81,7 +81,6 @@ class Stmt {
   }
 
   PackedStmtId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;

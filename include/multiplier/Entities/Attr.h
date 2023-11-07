@@ -78,7 +78,6 @@ class Attr {
   }
 
   PackedAttrId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
  public:
   static gap::generator<Attr> in(const Index &index, std::span<AttrKind> kinds);

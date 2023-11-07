@@ -91,7 +91,6 @@ class Decl {
   }
 
   PackedDeclId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   std::optional<Decl> definition(void) const;
   bool is_definition(void) const;

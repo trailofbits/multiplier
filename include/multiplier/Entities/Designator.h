@@ -81,7 +81,6 @@ class Designator {
   }
 
   PackedDesignatorId id(void) const;
-  gap::generator<Reference> references(void) const &;
 
   inline static std::optional<Designator> from(const Designator &self) {
     return self;

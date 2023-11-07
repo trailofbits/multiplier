@@ -85,7 +85,8 @@ class SQLiteEntityProviderImpl {
   sqlite::Statement get_entity_ids;
   sqlite::Statement expand_entity_id_list_with_redecls;
   sqlite::Statement get_entities_by_name;
-  sqlite::Statement get_references;
+  sqlite::Statement get_references_to;
+  sqlite::Statement get_references_from;
   sqlite::Statement get_fragments_covered_by_tokens;
 
 #define MX_DECLARE_GET_STATEMENTS(name) \
@@ -257,14 +258,30 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "LIMIT " MX_TO_STR(MX_ID_LIST_PAGE_SIZE))),
 #endif
 
-      get_references(db.Prepare(
-          "SELECT DISTINCT(r.from_entity_id), r.context_id, r.kind_id "
+      get_references_to(db.Prepare(
+          "SELECT DISTINCT(r.from_entity_id, r.context_id, r.kind_id) "
           "FROM reference AS r "
           "WHERE r.from_entity_id > ?1 "
           "  AND r.to_entity_id IN (SELECT l.entity_id "
           "                         FROM " + entity_id_list + " AS l "
           "                         ORDER BY l.entity_id ASC) "
-          "ORDER BY r.from_entity_id ASC "
+          "ORDER BY r.from_entity_id ASC, "
+          "         r.context_id ASC, "
+          "         r.kind_id ASC, "
+          "         r.to_entity_id ASC"
+          "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
+
+      get_references_from(db.Prepare(
+          "SELECT DISTINCT(r.to_entity_id, r.context_id, r.kind_id) "
+          "FROM reference AS r "
+          "WHERE r.to_entity_id > ?1 "
+          "  AND r.from_entity_id IN (SELECT l.entity_id "
+          "                         FROM " + entity_id_list + " AS l "
+          "                         ORDER BY l.entity_id ASC) "
+          "ORDER BY r.to_entity_id ASC, "
+          "         r.context_id ASC, "
+          "         r.kind_id ASC, "
+          "         r.from_entity_id ASC"
           "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
 
       get_fragments_covered_by_tokens(db.Prepare(
@@ -629,10 +646,13 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
 // Generate references to `raw_id` as a tuple of `from_id`, `context_id`, and
 // `kind_id`. Internally, this will handle redeclarations.
 gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
-SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id) & {
+SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
+                                 EntityProvider::ReferenceDirection dir) & {
 
   ImplPtr context = impl.Lock();
-  sqlite::Statement &get_references = context->get_references;
+  sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
+                                       context->get_references_to :
+                                       context->get_references_from);
   sqlite::Statement &add_entity_id = context->add_entity_id_to_list;
 
   EntityId eid(raw_id);
