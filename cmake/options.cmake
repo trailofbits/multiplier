@@ -27,8 +27,10 @@ option(MX_USE_VENDORED_ABSEIL "Set to OFF to disable default building of Abseil 
 option(MX_USE_VENDORED_RE2 "Set to OFF to disable default building of RE2 as a vendored library." ON)
 option(MX_USE_VENDORED_ROCKSDB "Set to OFF to disable default building of RocksDB as a vendored library." ON)
 option(MX_USE_VENDORED_XXHASH "Set to OFF to disable default building of xxHash as a vendored library." ON)
+option(MX_USE_VENDORED_NANOBIND "Set to OFF to disable default building of nanobind as a vendored library." ON)
 
 option(MX_ENABLE_BOOTSTRAP "Set to ON to enable re-bootstrapping of some auto-generated files." OFF)
 option(MX_ENABLE_INSTALL "Set to ON to enable the install target" ON)
 option(MX_ENABLE_RE2 "Set to OFF to disable RE2 integration" ON)
 option(MX_ENABLE_VAST "Set to OFF to disable VAST integration" ON)
+option(MX_ENABLE_PYTHON_BINDINGS "Set to ON to enable Python bindings" OFF)
