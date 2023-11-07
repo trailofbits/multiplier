@@ -126,10 +126,6 @@ class Reference {
 
   Reference(void) = delete;
 
-  // Add a reference between two entities.
-  static bool add_impl(RawEntityId kind_id, RawEntityId from_id,
-                       RawEntityId to_id, RawEntityId context_id);
-
   inline static RawEntityId reference_kind_id(RawEntityId kind_id) noexcept {
     return kind_id;
   }

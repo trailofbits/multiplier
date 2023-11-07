@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "StmtKind.h"
 
@@ -113,7 +113,7 @@ class Stmt {
   }
 
   static std::optional<Stmt> from(const Reference &r);
-
+  static std::optional<Stmt> from(const VariantEntity &e);
   static std::optional<Stmt> from(const TokenContext &t);
 
   Stmt ignore_containers(void) const;

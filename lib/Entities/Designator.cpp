@@ -60,6 +60,13 @@ std::optional<Designator> Designator::from(const Reference &r) {
   return r.as_designator();
 }
 
+std::optional<Designator> Designator::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Designator>(e)) {
+    return std::nullopt;
+  }
+  return std::get<Designator>(e);
+}
+
 std::optional<Designator> Designator::from(const TokenContext &t) {
   return t.as_designator();
 }

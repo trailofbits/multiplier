@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "AccessSpecifier.h"
 #include "PseudoKind.h"
@@ -92,7 +92,7 @@ class CXXBaseSpecifier {
   }
 
   static std::optional<CXXBaseSpecifier> from(const Reference &r);
-
+  static std::optional<CXXBaseSpecifier> from(const VariantEntity &e);
   static std::optional<CXXBaseSpecifier> from(const TokenContext &t);
 
   TokenRange tokens(void) const;

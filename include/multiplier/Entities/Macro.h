@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "MacroKind.h"
 
@@ -114,7 +114,7 @@ class Macro {
   }
 
   static std::optional<Macro> from(const Reference &r);
-
+  static std::optional<Macro> from(const VariantEntity &e);
   static std::optional<Macro> from(const TokenContext &t);
 
   MacroKind kind(void) const;

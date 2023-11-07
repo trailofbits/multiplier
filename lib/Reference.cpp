@@ -86,6 +86,19 @@ static OpaqueImplPtr ReferencedEntity(const EntityProviderPtr &ep,
   return {};
 }
 
+// Add a reference between two entities.
+static bool AddReference(const EntityProviderPtr &ep, RawEntityId kind_id,
+                         RawEntityId from_id, RawEntityId to_id,
+                         RawEntityId context_id) {
+  if (from_id == kInvalidEntityId || to_id == kInvalidEntityId) {
+    return false;
+  }
+  if (context_id == kInvalidEntityId) {
+    context_id = from_id;
+  }
+  return ep->AddReference(ep, kind_id, from_id, to_id, context_id);
+}
+
 }  // namespace
 
 const char *EnumeratorName(BuiltinReferenceKind kind) {
@@ -189,34 +202,22 @@ ReferenceKind Reference::kind(void) const noexcept {
   return rptr;
 }
 
-// Add a reference between two entities.
-bool Reference::add_impl(RawEntityId kind_id, RawEntityId from_id,
-                         RawEntityId to_id, RawEntityId context_id) {
-  const EntityProviderPtr &ep = kind.impl->ep;
-  if (from_id == kInvalidEntityId || to_id == kInvalidEntityId) {
-    return false;
-  }
-  if (context_id == kInvalidEntityId) {
-    context_id = from_id;
-  }
-  return ep->AddReference(ep, kind.impl->kind_id, from_id, to_id, context_id);
-}
-
 bool Reference::add(const ReferenceKind &kind, const VariantEntity &from,
                     const VariantEntity &to) {
   auto from_id = EntityId(from).Pack();
-  return add_impl(reference_kind_id(kind), from_id, EntityId(to).Pack(),
-                  from_id);
+  return AddReference(kind.impl->ep, reference_kind_id(kind), from_id,
+                      EntityId(to).Pack(), from_id);
 }
 
 bool Reference::add(const ReferenceKind &kind, const VariantEntity &from,
                     const VariantEntity &to, const VariantEntity &context) {
-  return add_impl(reference_kind_id(kind), EntityId(from).Pack(),
-                  EntityId(to).Pack(), EntityId(context).Pack());
+  return AddReference(kind.impl->ep, reference_kind_id(kind),
+                      EntityId(from).Pack(), EntityId(to).Pack(),
+                      EntityId(context).Pack());
 }
 
 EntityCategory Reference::category(void) const noexcept {
-  return CategoryFromEntityId(from_id);
+  return CategoryFromEntityId(entity_id);
 }
 
 VariantEntity Reference::context(void) const noexcept {
@@ -266,7 +267,7 @@ std::optional<Token> Reference::as_token(void) const noexcept {
     return std::nullopt;
   }
 
-  auto offset = FragmentOffsetFromEntityId(from_id);
+  auto offset = FragmentOffsetFromEntityId(entity_id);
   if (!offset) {
     assert(false);
     return std::nullopt;

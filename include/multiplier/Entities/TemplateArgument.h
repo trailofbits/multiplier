@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
@@ -92,7 +92,7 @@ class TemplateArgument {
   }
 
   static std::optional<TemplateArgument> from(const Reference &r);
-
+  static std::optional<TemplateArgument> from(const VariantEntity &e);
   static std::optional<TemplateArgument> from(const TokenContext &t);
 
   TemplateArgumentKind kind(void) const;

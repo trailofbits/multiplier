@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "AccessSpecifier.h"
 #include "AvailabilityResult.h"
@@ -125,7 +125,7 @@ class Decl {
   }
 
   static std::optional<Decl> from(const Reference &r);
-
+  static std::optional<Decl> from(const VariantEntity &e);
   static std::optional<Decl> from(const TokenContext &t);
 
   std::optional<Attr> nth_attribute(unsigned n) const;

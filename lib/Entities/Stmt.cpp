@@ -220,6 +220,13 @@ std::optional<Stmt> Stmt::from(const Reference &r) {
   return r.as_statement();
 }
 
+std::optional<Stmt> Stmt::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Stmt>(e)) {
+    return std::nullopt;
+  }
+  return std::get<Stmt>(e);
+}
+
 std::optional<Stmt> Stmt::from(const TokenContext &t) {
   return t.as_statement();
 }

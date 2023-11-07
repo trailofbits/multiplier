@@ -41,6 +41,13 @@ std::optional<TemplateParameterList> TemplateParameterList::from(const Reference
   return r.as_template_parameter_list();
 }
 
+std::optional<TemplateParameterList> TemplateParameterList::from(const VariantEntity &e) {
+  if (!std::holds_alternative<TemplateParameterList>(e)) {
+    return std::nullopt;
+  }
+  return std::get<TemplateParameterList>(e);
+}
+
 std::optional<TemplateParameterList> TemplateParameterList::from(const TokenContext &t) {
   return t.as_template_parameter_list();
 }

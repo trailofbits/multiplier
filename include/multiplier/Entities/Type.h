@@ -17,8 +17,8 @@
 #include <span>
 #include <vector>
 
+#include "../Entity.h"
 #include "../Iterator.h"
-#include "../Types.h"
 
 #include "Linkage.h"
 #include "TypeKind.h"
@@ -99,7 +99,7 @@ class Type {
   }
 
   static std::optional<Type> from(const Reference &r);
-
+  static std::optional<Type> from(const VariantEntity &e);
   static std::optional<Type> from(const TokenContext &t);
 
   Type desugared_type(void) const;

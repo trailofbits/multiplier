@@ -1914,8 +1914,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "#include <optional>\n"
         << "#include <span>\n"
         << "#include <vector>\n\n"
-        << "#include \"../Iterator.h\"\n"
-        << "#include \"../Types.h\"\n\n";
+        << "#include \"../Entity.h\"\n"
+        << "#include \"../Iterator.h\"\n\n";
   }
 
   include_h_os << "#include \"Entities/" << class_name << ".h\"\n";
@@ -3023,15 +3023,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "> " << class_name << "::from(const VariantEntity &e) {\n" \
           << "  if (!std::holds_alternative<" << base_name << ">(e)) {\n" \
           << "    return std::nullopt;\n" \
-          << "  }\n"; \
-      if (base_name == class_name) { \
-        lib_cpp_os \
-            << "  return std::get<" << base_name << ">(e);\n"; \
-      } else { \
-        lib_cpp_os \
-            << "  return from(std::get<" << base_name << ">(e));\n"; \
-      } \
-      lib_cpp_os \
+          << "  }\n"
+          << "  return std::get<" << base_name << ">(e);\n" \
           << "}\n\n" \
           << "std::optional<" << class_name \
           << "> " << class_name << "::from(const TokenContext &t) {\n" \
@@ -3043,12 +3036,21 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  static std::optional<" << class_name \
           << "> from(const Reference &r);\n" \
           << "  static std::optional<" << class_name \
+          << "> from(const VariantEntity &e);\n" \
+          << "  static std::optional<" << class_name \
           << "> from(const TokenContext &t);\n\n"; \
       \
       lib_cpp_os \
           << "std::optional<" << class_name \
           << "> " << class_name << "::from(const Reference &r) {\n" \
           << "  return " << class_name << "::from(r.as_" #lower_name "());\n" \
+          << "}\n\n" \
+          << "std::optional<" << class_name \
+          << "> " << class_name << "::from(const VariantEntity &e) {\n" \
+          << "  if (!std::holds_alternative<" << base_name << ">(e)) {\n" \
+          << "    return std::nullopt;\n" \
+          << "  }\n"
+          << "  return from(std::get<" << base_name << ">(e));\n" \
           << "}\n\n" \
           << "std::optional<" << class_name \
           << "> " << class_name << "::from(const TokenContext &t) {\n" \

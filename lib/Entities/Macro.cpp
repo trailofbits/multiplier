@@ -144,6 +144,13 @@ std::optional<Macro> Macro::from(const Reference &r) {
   return r.as_macro();
 }
 
+std::optional<Macro> Macro::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Macro>(e)) {
+    return std::nullopt;
+  }
+  return std::get<Macro>(e);
+}
+
 std::optional<Macro> Macro::from(const TokenContext &t) {
   return t.as_macro();
 }

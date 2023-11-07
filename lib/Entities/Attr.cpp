@@ -128,6 +128,13 @@ std::optional<Attr> Attr::from(const Reference &r) {
   return r.as_attribute();
 }
 
+std::optional<Attr> Attr::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Attr>(e)) {
+    return std::nullopt;
+  }
+  return std::get<Attr>(e);
+}
+
 std::optional<Attr> Attr::from(const TokenContext &t) {
   return t.as_attribute();
 }

@@ -61,6 +61,13 @@ std::optional<TemplateArgument> TemplateArgument::from(const Reference &r) {
   return r.as_template_argument();
 }
 
+std::optional<TemplateArgument> TemplateArgument::from(const VariantEntity &e) {
+  if (!std::holds_alternative<TemplateArgument>(e)) {
+    return std::nullopt;
+  }
+  return std::get<TemplateArgument>(e);
+}
+
 std::optional<TemplateArgument> TemplateArgument::from(const TokenContext &t) {
   return t.as_template_argument();
 }

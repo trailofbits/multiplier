@@ -205,6 +205,13 @@ std::optional<Decl> Decl::from(const Reference &r) {
   return r.as_declaration();
 }
 
+std::optional<Decl> Decl::from(const VariantEntity &e) {
+  if (!std::holds_alternative<Decl>(e)) {
+    return std::nullopt;
+  }
+  return std::get<Decl>(e);
+}
+
 std::optional<Decl> Decl::from(const TokenContext &t) {
   return t.as_declaration();
 }
